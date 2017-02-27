@@ -7,10 +7,10 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>web-server</artifactId>
+    <artifactId>dao</artifactId>
     <packaging>jar</packaging>
 
-    <name>web-server</name>
+    <name>dao</name>
     <url>http://maven.apache.org</url>
 
     <properties>
@@ -23,16 +23,6 @@
             <artifactId>junit</artifactId>
             <version>3.8.1</version>
             <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.baifendian.swordfish</groupId>
-            <artifactId>common</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.baifendian.swordfish</groupId>
-            <artifactId>dao</artifactId>
-            <version>${project.version}</version>
         </dependency>
     </dependencies>
 

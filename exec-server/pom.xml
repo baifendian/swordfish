@@ -7,10 +7,10 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>web-server</artifactId>
+    <artifactId>exec-server</artifactId>
     <packaging>jar</packaging>
 
-    <name>web-server</name>
+    <name>exec-server</name>
     <url>http://maven.apache.org</url>
 
     <properties>
