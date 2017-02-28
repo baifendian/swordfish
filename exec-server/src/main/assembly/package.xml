@@ -32,5 +32,34 @@
             </includes>
             <outputDirectory>/lib</outputDirectory>
         </fileSet>
+        <fileSet>
+            <directory>${project.parent.basedir}/common/src/main/resources</directory>
+            <includes>
+                <include>**/*.properties</include>
+                <include>**/*.xml</include>
+                <include>**/*.json</include>
+            </includes>
+            <outputDirectory>/conf</outputDirectory>
+        </fileSet>
+        <fileSet>
+            <directory>${project.parent.basedir}/dao/src/main/resources</directory>
+            <includes>
+                <include>**/*.properties</include>
+                <include>**/*.xml</include>
+                <include>**/*.json</include>
+            </includes>
+            <outputDirectory>/conf</outputDirectory>
+        </fileSet>
     </fileSets>
+    <dependencySets>
+        <dependencySet>
+            <outputDirectory>lib</outputDirectory>
+            <useProjectArtifact>true</useProjectArtifact>
+            <excludes>
+                <exclude>junit:junit</exclude>
+                <exclude>javax.servlet:servlet-api</exclude>
+                <exclude>org.eclipse.jetty.aggregate:jetty-all</exclude>
+            </excludes>
+        </dependencySet>
+    </dependencySets>
 </assembly>
