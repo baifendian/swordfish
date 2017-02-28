@@ -13,7 +13,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package com.baifendian.swordfish.com.baifendian.swordfish.common.mail;
+package com.baifendian.swordfish.common.mail;
 
 import com.baifendian.swordfish.common.mail.MailSendUtil;
 import org.junit.Test;
