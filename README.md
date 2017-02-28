@@ -1,6 +1,6 @@
 #swordfish 编译方法
 
-##1. 下载DataX源码
+##1. 下载 swordfish 源码
 ```
 $ git clone https://github.com/baifendian/swordfish.git
 ```
@@ -20,3 +20,5 @@ $ git clone https://github.com/baifendian/swordfish.git
   [INFO] Final Memory: 52M/314M
   [INFO] -----------------------------------------------------------------
 ```
+
+在 target 目录下看到 swordfish-all-{version}, 这个目录下面为打包好的项目信息
