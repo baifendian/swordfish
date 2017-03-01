@@ -24,7 +24,7 @@ $ git clone https://github.com/baifendian/swordfish.git
 在 target 目录下看到 swordfish-all-{version}, 这个目录下面为打包好的项目信息
 
 #如何部署
-[服务部署手册](https://github.com/baifendian/swordfish/wiki/plugin-dev)
+[服务部署手册](https://github.com/baifendian/swordfish/wiki/deploy)
 
 #插件开发
 [插件开发手册](https://github.com/baifendian/swordfish/wiki/plugin-dev)
