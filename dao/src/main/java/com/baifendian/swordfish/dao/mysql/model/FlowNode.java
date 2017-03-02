@@ -44,9 +44,6 @@ public class FlowNode {
     @JsonSerialize(using = StringNodeJsonSerializer.class)
     private String param;
 
-    @JsonIgnore
-    private BaseParam paramObject;
-
     @JsonDeserialize(using = StringNodeJsonDeserializer.class)
     @JsonSerialize(using = StringNodeJsonSerializer.class)
     private String inputTables;
@@ -163,19 +160,6 @@ public class FlowNode {
 
     public void setOutputTables(String ouputTables) {
         this.outputTables = ouputTables;
-    }
-
-    /**
-     * 获取 param 对象
-     * <p>
-     *
-     * @return param 对象
-     */
-    public BaseParam getParamObject() {
-        if (paramObject == null) {
-            paramObject = ParamUtil.parseParam(param, type);
-        }
-        return paramObject;
     }
 
     /**

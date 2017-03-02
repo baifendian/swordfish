@@ -85,7 +85,7 @@ public class MyBatisSqlSessionFactoryUtil {
 
                     Configuration configuration = new Configuration(environment);
                     configuration.setLazyLoadingEnabled(true);
-                    configuration.addMappers(MyBatisSqlSessionFactoryUtil.class.getPackage()+".mapper");
+                    configuration.addMappers("com.baifendian.swordfish.dao.mysql.mapper");
 
                     SqlSessionFactoryBuilder builder = new SqlSessionFactoryBuilder();
                     sqlSessionFactory = builder.build(configuration);

@@ -14,6 +14,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * MR 节点的参数
@@ -34,7 +35,7 @@ public class MrParam extends BaseParam {
     private List<String> args;
 
     /** 配置信息列表 */
-    private List<Property> properties;
+    private Map<String, String> properties;
 
     /** 额外的 jar 包，指的是本地的文件，这个可能很长 */
     private List<ResInfo> jarsResInfos;
@@ -137,7 +138,7 @@ public class MrParam extends BaseParam {
      * @see MrParam#properties
      * @return the properties
      */
-    public List<Property> getProperties() {
+    public Map<String, String> getProperties() {
         return properties;
     }
 
@@ -148,7 +149,7 @@ public class MrParam extends BaseParam {
      * @param properties
      *            the properties to set
      */
-    public void setProperties(List<Property> properties) {
+    public void setProperties(Map<String, String> properties) {
         this.properties = properties;
     }
 
