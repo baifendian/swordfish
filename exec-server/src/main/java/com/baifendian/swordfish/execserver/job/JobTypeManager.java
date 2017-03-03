@@ -4,7 +4,9 @@ import com.baifendian.swordfish.common.job.Job;
 import com.baifendian.swordfish.common.job.exception.ExecException;
 import com.baifendian.swordfish.execserver.exception.ConfigException;
 //import com.baifendian.swordfish.execserver.job.mr.MrJob;
+import com.baifendian.swordfish.execserver.job.process.DefaultProcessJob;
 import com.baifendian.swordfish.execserver.job.shell.ShellJob;
+import com.baifendian.swordfish.execserver.utils.CommandUtil;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.slf4j.Logger;
 
@@ -27,7 +29,7 @@ public class JobTypeManager {
 
     private static void initBaseJobType(){
         //jobTypeMap.put("MR", MrJob.class);
-        jobTypeMap.put("SHELL", ShellJob.class);
+        jobTypeMap.put("SHELL", DefaultProcessJob.class);
     }
 
     public static void addJobType(String jobType, Class<? extends Job> jobClass){
@@ -43,7 +45,7 @@ public class JobTypeManager {
         if (jobClass == null) {
             throw new ExecException("unsupport job type:" + jobType);
         } else {
-            Constructor<Job> constructor = jobClass.getConstructor(Job.class);
+            Constructor<Job> constructor = jobClass.getConstructor(String.class, PropertiesConfiguration.class, Logger.class);
             job = constructor.newInstance(jobId, props, logger);
         }
         return job;

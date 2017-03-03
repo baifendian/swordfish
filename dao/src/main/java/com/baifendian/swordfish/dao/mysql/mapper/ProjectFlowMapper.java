@@ -53,17 +53,19 @@ public interface ProjectFlowMapper {
     @Results(value = { @Result(property = "id", column = "id", id = true, javaType = int.class, jdbcType = JdbcType.INTEGER),
                        @Result(property = "type", column = "type", typeHandler = EnumOrdinalTypeHandler.class, javaType = FlowType.class, jdbcType = JdbcType.INTEGER),
                        @Result(property = "name", column = "name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-                       @Result(property = "createTime", column = "create_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE),
-                       @Result(property = "modifyTime", column = "modify_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE),
-                       @Result(property = "publishTime", column = "publish_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE),
+                       @Result(property = "createTime", column = "create_time", javaType = int.class, jdbcType = JdbcType.INTEGER),
+                       @Result(property = "modifyTime", column = "modify_time", javaType = int.class, jdbcType = JdbcType.INTEGER),
+                       @Result(property = "proxyUser", column = "proxy_user", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+                       @Result(property = "mailGroups", column = "mail_groups", javaType = String.class, jdbcType = JdbcType.VARCHAR),
                        @Result(property = "projectId", column = "project_id", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
                        @Result(property = "projectName", column = "project_name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
                        @Result(property = "lastModifyBy", column = "last_modify_by", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
-                       @Result(property = "lastPublishBy", column = "last_publish_by", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
                        @Result(property = "ownerId", column = "owner_id", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
                        @Result(property = "inputTables", column = "input_tables", javaType = String.class, jdbcType = JdbcType.VARCHAR),
                        @Result(property = "outputTables", column = "output_tables", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-                       @Result(property = "resourceIds", column = "resource_ids", javaType = String.class, jdbcType = JdbcType.VARCHAR), })
+                       @Result(property = "resources", column = "resources", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+                       @Result(property = "datasources", column = "datasources", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+                       @Result(property = "userDefinedParams", column = "user_defined_params", javaType = String.class, jdbcType = JdbcType.VARCHAR), })
     @SelectProvider(type = ProjectFlowMapperSqlProvider.class, method = "query")
     ProjectFlow findById(@Param("id") int flowId);
 

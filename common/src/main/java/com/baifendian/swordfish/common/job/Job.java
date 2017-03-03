@@ -19,7 +19,7 @@ import java.util.List;
  */
 public interface Job<T> {
     /**
-     * 获取 生成的作业ID: NODE_{nodeid}_yyyyMMddHHmmss
+     * 获取 生成的作业ID: 节点类型_yyyyMMddHHmmss_NodeId_execId
      * <p>
      *
      * @return 执行 id

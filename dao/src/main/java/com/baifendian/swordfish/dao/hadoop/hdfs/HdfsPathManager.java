@@ -35,11 +35,14 @@ public class HdfsPathManager {
     /** 资源已发布目录 */
     private static final String RESOURCE_PUBLISHED_PATH_FORMAT = "{0}/{1}/resource/" + PUBLISHED_PATH + "{2}/";
 
-    /** 任务的目录 */
-    private static final String TASK_PATH_FORMAT = "{0}/{1}/task/";
+    /** 节点的目录 */
+    private static final String NODE_PATH_FORMAT = "{0}/{1}/node/";
 
     /** 工作流的目录 */
     private static final String FLOW_PATH_FORMAT = "{0}/{1}/flow/";
+
+    /** 工作流本地存储目录 projectName/workflowName/execId */
+    private static final String FLOW_LOCAL_PATH_FORMAT = "{0}/{1}/{2}/res";
 
     /**
      * 初始化
@@ -69,16 +72,20 @@ public class HdfsPathManager {
     }
 
     /**
-     * 生成任务的目录
+     * 生成节点的目录
      * <p>
      *
-     * @param orgName
      * @param projectName
      * @return hdfs路径
      */
-    public static String genTaskHdfsPath(String orgName, String projectName) {
-        return MessageFormat.format(BASE_PATH + TASK_PATH_FORMAT, orgName, projectName);
+    public static String genNodeHdfsPath(String projectName) {
+        return MessageFormat.format(BASE_PATH + NODE_PATH_FORMAT, projectName);
     }
+
+    public static String genFlowLocalPath(String projectName, String flowName, long execId){
+        return MessageFormat.format(BASE_PATH + FLOW_LOCAL_PATH_FORMAT, projectName, flowName, execId);
+    }
+
 
     /**
      * 生成工作流的 archive 目录

@@ -17,19 +17,15 @@ import java.util.List;
 public class ScheduleMeta {
 
     // comment by qifeng.dai(用: BASE_DATE_FORMAT 更加合适?)
-    @JsonFormat(pattern = Constants.BASE_DATETIME_FORMAT)
-    private Date startDate;
+    private int startDate;
 
-    @JsonFormat(pattern = Constants.BASE_DATETIME_FORMAT)
-    private Date endDate;
+    private int endDate;
 
     private ScheduleType type;
 
-    @JsonFormat(pattern = Constants.BASE_TIME_FORMAT, timezone = Constants.DEFAULT_TIME_ZONE)
-    private Date startTime;
+    private int startTime;
 
-    @JsonFormat(pattern = Constants.BASE_TIME_FORMAT, timezone = Constants.DEFAULT_TIME_ZONE)
-    private Date endTime;
+    private int endTime;
 
     private int interval;
 
@@ -38,19 +34,19 @@ public class ScheduleMeta {
     private List<Integer> monthDays;
 
 
-    public Date getStartDate() {
+    public int getStartDate() {
         return startDate;
     }
 
-    public void setStartDate(Date startDate) {
+    public void setStartDate(int startDate) {
         this.startDate = startDate;
     }
 
-    public Date getEndDate() {
+    public int getEndDate() {
         return endDate;
     }
 
-    public void setEndDate(Date endDate) {
+    public void setEndDate(int endDate) {
         this.endDate = endDate;
     }
 
@@ -62,19 +58,19 @@ public class ScheduleMeta {
         this.type = type;
     }
 
-    public Date getStartTime() {
+    public int getStartTime() {
         return startTime;
     }
 
-    public void setStartTime(Date startTime) {
+    public void setStartTime(int startTime) {
         this.startTime = startTime;
     }
 
-    public Date getEndTime() {
+    public int getEndTime() {
         return endTime;
     }
 
-    public void setEndTime(Date endTime) {
+    public void setEndTime(int endTime) {
         this.endTime = endTime;
     }
 

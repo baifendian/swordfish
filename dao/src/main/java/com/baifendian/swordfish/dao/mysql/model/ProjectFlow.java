@@ -13,6 +13,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * workflow信息
@@ -38,8 +39,6 @@ public class ProjectFlow {
     private int lastModifyBy;
 
     private String lastModifyByName;
-
-    private int publishTime;
 
     private int lastPublishBy;
 
@@ -94,7 +93,7 @@ public class ProjectFlow {
     private String userDefinedParams;
 
     @JsonIgnore
-    private List<FlowParam> userDefinedParamList;
+    private Map<String, String> userDefinedParamMap;
 
     public int getId() {
         return id;
@@ -271,16 +270,8 @@ public class ProjectFlow {
         this.modifyTime = modifyTime;
     }
 
-    public int getPublishTime() {
-        return publishTime;
-    }
-
     public void setLastModifyBy(int lastModifyBy) {
         this.lastModifyBy = lastModifyBy;
-    }
-
-    public void setPublishTime(int publishTime) {
-        this.publishTime = publishTime;
     }
 
     public void setLastPublishBy(int lastPublishBy) {
@@ -333,14 +324,14 @@ public class ProjectFlow {
         this.userDefinedParams = userDefinedParams;
     }
 
-    public List<FlowParam> getUserDefinedParamList() {
-        if (userDefinedParamList == null && StringUtils.isNotEmpty(userDefinedParams)) {
-            userDefinedParamList = JsonUtil.parseObjectList(userDefinedParams, FlowParam.class);
+    public Map<String, String> getUserDefinedParamMap() {
+        if (userDefinedParamMap == null && StringUtils.isNotEmpty(userDefinedParams)) {
+            userDefinedParamMap = JsonUtil.parseObjectMap(userDefinedParams);
         }
-        return userDefinedParamList;
+        return userDefinedParamMap;
     }
 
-    public void setUserDefinedParamList(List<FlowParam> userDefinedParamList) {
-        this.userDefinedParamList = userDefinedParamList;
+    public void setUserDefinedParamMap(Map<String, String> userDefinedParamMap) {
+        this.userDefinedParamMap = userDefinedParamMap;
     }
 }

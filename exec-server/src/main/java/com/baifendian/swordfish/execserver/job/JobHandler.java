@@ -1,27 +1,40 @@
 package com.baifendian.swordfish.execserver.job;
 
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.LoggerContext;
+import ch.qos.logback.classic.encoder.PatternLayoutEncoder;
+import ch.qos.logback.core.Context;
+import ch.qos.logback.core.FileAppender;
+import ch.qos.logback.core.encoder.Encoder;
+import ch.qos.logback.core.filter.Filter;
 import com.baifendian.swordfish.common.consts.Constants;
+import com.baifendian.swordfish.common.hadoop.HdfsUtil;
 import com.baifendian.swordfish.common.job.AbstractProcessJob;
 import com.baifendian.swordfish.common.job.Job;
 import com.baifendian.swordfish.common.job.exception.ExecException;
 import com.baifendian.swordfish.common.utils.BFDDateUtils;
 import com.baifendian.swordfish.dao.FlowDao;
+import com.baifendian.swordfish.dao.hadoop.hdfs.HdfsPathManager;
 import com.baifendian.swordfish.dao.mysql.enums.FlowStatus;
 import com.baifendian.swordfish.dao.mysql.model.ExecutionFlow;
 import com.baifendian.swordfish.dao.mysql.model.ExecutionNode;
 import com.baifendian.swordfish.dao.mysql.model.FlowNode;
 import com.baifendian.swordfish.execserver.exception.ExecTimeoutException;
 import org.apache.commons.configuration.PropertiesConfiguration;
-import org.apache.log4j.EnhancedPatternLayout;
-import org.apache.log4j.FileAppender;
-import org.apache.log4j.Layout;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.text.MessageFormat;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.*;
 
@@ -33,19 +46,9 @@ public class JobHandler {
 
     private final Logger logger = LoggerFactory.getLogger(JobHandler.class);
 
-    private final Layout DEFAULT_LAYOUT = new EnhancedPatternLayout(
-            "%d{yyyy-MM-dd HH:mm:ss} %c{1} %p - %m\n");
-
-    /** 作业执行本地基础目录 */
-    private String BASE_PATH;
-
-    /** 作业执行日志存放目录 */
-    private String JOB_LOG_PATH_FORMAT = "{0}/job_log/{1}/{2}";
-
-    /** 作业执行文件存放目录 base_path/job_script/yyyy-MM-dd/jobId */
     private String JOB_SCRIPT_PATH_FORMAT = "{0}/job_script/{1}/{2}";
 
-    private String DATE_FORMAT="yyyyMMddHHmmss";
+    private String DATETIME_FORMAT="yyyyMMddHHmmss";
 
     private FlowNode node;
 
@@ -63,30 +66,59 @@ public class JobHandler {
 
     private final long startTime;
 
+    private Map<String, String> systemParamMap;
+
+    private Map<String, String> customParamMap;
+
+    private Map<String, String> allParamMap;
+
     public JobHandler(FlowDao flowDao, ExecutionFlow executionFlow, ExecutionNode executionNode, FlowNode node, ExecutorService executorService, int timeout,
                       Map<String, String> systemParamMap, Map<String, String> customParamMap){
         this.flowDao = flowDao;
-        this.node = node;
         this.executionFlow = executionFlow;
+        this.executionNode = executionNode;
+        this.node = node;
         this.executorService = executorService;
         this.timeout = timeout;
+        this.systemParamMap = systemParamMap;
+        this.customParamMap = customParamMap;
         this.startTime = System.currentTimeMillis();
-        this.jobId = MessageFormat.format("NODE_{0}_{1}", node.getId(), BFDDateUtils.now(DATE_FORMAT));
+        this.jobId = MessageFormat.format("{0}_{1}_{2}_{3}", node.getType().name(), BFDDateUtils.now(DATETIME_FORMAT),
+                    node.getId(), executionNode.getId());
+        // custom参数会覆盖system参数
+        allParamMap = new HashMap<>();
+        allParamMap.putAll(systemParamMap);
+        allParamMap.putAll(customParamMap);
 
     }
 
-    public FlowStatus handle() throws IOException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
-        String jobId = MessageFormat.format("NODE_{0}_{1}", node.getId(), BFDDateUtils.now(DATE_FORMAT));
-        String jobLogFile = MessageFormat.format(JOB_LOG_PATH_FORMAT, BASE_PATH, BFDDateUtils.now(Constants.BASE_DATE_FORMAT),
-                jobId + ".log");
-        String jobScriptPath = MessageFormat.format(JOB_SCRIPT_PATH_FORMAT, BASE_PATH, BFDDateUtils.now(Constants.BASE_DATE_FORMAT), jobId);
+    public FlowStatus handle() throws IOException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException, InterruptedException {
+        String jobScriptPath = MessageFormat.format(JOB_SCRIPT_PATH_FORMAT, BFDDateUtils.now(Constants.BASE_DATE_FORMAT), jobId);
+        logger.info("job:{} script path:{}", jobId, jobScriptPath);
 
+        // 下载节点级别的资源文件到脚本目录
+        String nodeResPath = HdfsPathManager.genNodeHdfsPath("aa");
+        HdfsUtil.GetFile(nodeResPath + "/*", jobScriptPath);
         // 建立资源文件软链接
-        Logger jobLogger = LoggerFactory.getLogger("xx");
+        String flowResLocalPath = HdfsPathManager.genFlowLocalPath(executionFlow.getProjectName(), executionFlow.getFlowName(), executionFlow.getId());
+        File dirFile = new File(flowResLocalPath);
+        for(File file:Arrays.asList(dirFile.listFiles())){
+            String targetFileName = jobScriptPath + "/" + file.getName();
+            File targetFile = new File(targetFileName);
+            if(!targetFile.exists()){
+                Files.createSymbolicLink(file.toPath(), targetFile.toPath());
+            }
+        }
+
+        // 作业参数配置
         PropertiesConfiguration props = new PropertiesConfiguration();
         props.addProperty(AbstractProcessJob.JOB_PARAMS, node.getParam());
+        props.addProperty(AbstractProcessJob.WORKING_DIR, jobScriptPath);
+        props.addProperty(AbstractProcessJob.PROXY_USER, executionFlow.getProxyUser());
+        props.addProperty(AbstractProcessJob.DEFINED_PARAMS, allParamMap);
 
-        Job job = JobTypeManager.newJob(jobId, node.getType().name(), props, jobLogger);
+        logger.info("props:{}", props);
+        Job job = JobTypeManager.newJob(jobId, node.getType().name(), props, logger);
         // 更新executionNode状态
         executionNode.setStatus(FlowStatus.RUNNING);
         flowDao.updateExecutionNode(executionNode);
@@ -104,14 +136,6 @@ public class JobHandler {
             status = FlowStatus.FAILED;
         }
         return status;
-    }
-
-    private FileAppender createFileAppender(String logName) throws IOException {
-        // Attempt to create FileAppender
-        FileAppender fileAppender = new FileAppender(DEFAULT_LAYOUT, logName);
-
-        logger.info("Created file appender for job " + this.jobId);
-        return fileAppender;
     }
 
     /**

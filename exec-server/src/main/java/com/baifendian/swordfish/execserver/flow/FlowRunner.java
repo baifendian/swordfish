@@ -4,23 +4,17 @@
  * File Name      : FlowRunner.java
  */
 
-package com.baifendian.swordfish.execserver;
+package com.baifendian.swordfish.execserver.flow;
 
-import com.baifendian.swordfish.common.utils.CommonUtil;
 import com.baifendian.swordfish.common.utils.BFDDateUtils;
 import com.baifendian.swordfish.common.utils.graph.DAGGraph;
 import com.baifendian.swordfish.common.utils.graph.Graph;
 import com.baifendian.swordfish.common.utils.json.JsonUtil;
 import com.baifendian.swordfish.dao.*;
 import com.baifendian.swordfish.dao.exception.SqlException;
-import com.baifendian.swordfish.dao.mysql.MyBatisSqlSessionFactoryUtil;
 import com.baifendian.swordfish.dao.mysql.enums.*;
 import com.baifendian.swordfish.dao.mysql.model.*;
 import com.baifendian.swordfish.dao.mysql.model.flow.FlowDag;
-import com.baifendian.swordfish.dao.mysql.model.flow.params.BaseParam;
-import com.baifendian.swordfish.dao.mysql.model.flow.params.adhoc.AdHocSqlParam;
-import com.baifendian.swordfish.dao.mysql.model.flow.params.shorts.SqlParam;
-import com.baifendian.swordfish.common.job.exception.ExecException;
 import com.baifendian.swordfish.execserver.exception.ExecTimeoutException;
 import com.baifendian.swordfish.execserver.node.NodeRunner;
 import com.baifendian.swordfish.execserver.node.ResourceHelper;
@@ -28,19 +22,13 @@ import com.baifendian.swordfish.execserver.utils.LoggerUtil;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.ObjectUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.math3.util.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.sql.Timestamp;
-import java.text.MessageFormat;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
-
-import static com.baifendian.swordfish.common.utils.StructuredArguments.jobValue;
 
 /**
  * flow 执行器

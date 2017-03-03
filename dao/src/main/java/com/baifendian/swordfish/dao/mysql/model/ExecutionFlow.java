@@ -35,6 +35,9 @@ public class ExecutionFlow {
     /** 提交用户 **/
     private String submitUserName;
 
+    /** 代理用户 **/
+    private String proxyUser;
+
     /** 提交时间 **/
     private int submitTime;
 
@@ -185,6 +188,14 @@ public class ExecutionFlow {
 
     public String getProjectName() {
         return projectName;
+    }
+
+    public String getProxyUser() {
+        return proxyUser;
+    }
+
+    public void setProxyUser(String proxyUser) {
+        this.proxyUser = proxyUser;
     }
 
     public void setProjectName(String projectName) {

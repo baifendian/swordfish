@@ -4,7 +4,7 @@
  * File Name      : EmailManager.java
  */
 
-package com.baifendian.swordfish.execserver;
+package com.baifendian.swordfish.execserver.flow;
 
 import com.baifendian.swordfish.common.utils.BFDDateUtils;
 import com.baifendian.swordfish.dao.DaoFactory;

@@ -26,6 +26,7 @@ import java.util.Set;
  */
 public class ResourceSqlProvider {
 
+    private final String TABLE_NAME="resources";
     /**
      * 插入
      * <p>
@@ -98,6 +99,16 @@ public class ResourceSqlProvider {
         }
 
         return sb.toString();
+    }
+
+    public String queryByProject(Integer projectId){
+        return new SQL(){
+            {
+                SELECT("*");
+                FROM(TABLE_NAME);
+                WHERE("project_id = ${projectId}");
+            }
+        }.toString();
     }
 
     /**

@@ -53,9 +53,9 @@ public class ShellJob extends AbstractProcessJob {
   public ShellJob(String jobId, PropertiesConfiguration props, Logger logger) throws IOException {
     super(jobId, props, logger);
 
-    this.script = (String)jobParams.get("script");
+    this.script = (String)jobParams.get("value");
     if (script == null || StringUtils.isEmpty(script)) {
-      throw new ExecException("ShellJob script can't be null");
+      throw new ExecException("ShellJob value param can't be null");
     }
     this.timeout = TIME_OUT;
     this.currentPath = (String)jobParams.get("currentPath");
@@ -117,7 +117,7 @@ public class ShellJob extends AbstractProcessJob {
     try {
       inputStream.connect(outputStream);
     } catch (IOException e) {
-      logger.error("Init input stream error", e);
+      logger.error(" Init input stream error", e);
       return;
     }
 
@@ -140,15 +140,15 @@ public class ShellJob extends AbstractProcessJob {
 
       readInputStream(inputStream);
     } catch (IOException e) {
-      logger.error("Execute task failed", e);
+      logger.error(" Execute task failed", e);
     } catch (InterruptedException e) {
-      logger.error("Execute task failed", e);
+      logger.error(" Execute task failed", e);
     }
 
     exitCode = resultHandler.getExitValue();
     complete = true;
 
-    logger.info("End of run, exitCode: {}", exitCode);
+    logger.info(" End of run, exitCode: {}", exitCode);
   }
 
   public static void main(String[] args) throws IOException {
@@ -157,7 +157,8 @@ public class ShellJob extends AbstractProcessJob {
     props.addProperty(AbstractProcessJob.WORKING_DIR, "/opt/hadoop");
     props.addProperty(AbstractProcessJob.JOB_PARAMS, "{\"script\":\"ls -l\"}");
     props.addProperty("timeout", 100);
-    ShellJob job = new ShellJob("NODE_1_2017", props, LoggerFactory.getLogger("shellJob"));
+    Logger logger = LoggerFactory.getLogger("shellJob");
+    ShellJob job = new ShellJob("NODE_1_2017", props, logger);
     job.exec();
     System.out.println("run finished!");
   }

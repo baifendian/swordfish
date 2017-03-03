@@ -12,4 +12,9 @@ public class RetInfo {
         this.code = code;
         this.msg = msg;
     }
+
+    @Override
+    public String toString(){
+        return code + ":" + msg;
+    }
 }

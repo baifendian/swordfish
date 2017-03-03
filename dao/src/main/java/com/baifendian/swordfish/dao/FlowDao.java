@@ -268,6 +268,7 @@ public class FlowDao extends BaseDao {
     public ExecutionFlow scheduleFlowToExecution(Integer projectId, Integer workflowId, int submitUser, int scheduleTime, FlowRunType runType) {
         List<FlowNodeRelation> flowNodeRelations = flowNodeRelationMapper.selectByFlowId(workflowId); // 边信息
         List<FlowNode> flowNodes = flowNodeMapper.selectByFlowId(workflowId); // 节点信息
+        ProjectFlow projectFlow = projectFlowMapper.findById(workflowId);
         FlowDag flowDag = new FlowDag();
         flowDag.setEdges(flowNodeRelations);
         flowDag.setNodes(flowNodes);
@@ -275,6 +276,7 @@ public class FlowDao extends BaseDao {
         ExecutionFlow executionFlow = new ExecutionFlow();
         executionFlow.setFlowId(workflowId);
         executionFlow.setSubmitUser(submitUser);
+        executionFlow.setProxyUser(projectFlow.getProxyUser());
         executionFlow.setScheduleTime(scheduleTime);
         executionFlow.setSubmitTime(BFDDateUtils.getSecs());
         executionFlow.setStartTime(BFDDateUtils.getSecs());
@@ -299,7 +301,6 @@ public class FlowDao extends BaseDao {
         int unixTimestamp = BFDDateUtils.getSecs();
         projectFlow.setCreateTime(unixTimestamp);
         projectFlow.setModifyTime(unixTimestamp);
-        projectFlow.setPublishTime(unixTimestamp);
         projectFlow.setOwnerId(userId);
         projectFlow.setLastModifyBy(userId);
         projectFlow.setProjectId(projectId);
@@ -395,19 +396,19 @@ public class FlowDao extends BaseDao {
             schedule.setMaxTryTimes(2);
             schedule.setFailurePolicy(FailurePolicyType.CONTINUE);
 
-            Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-            schedule.setCreateTime(timestamp);
-            schedule.setModifyTime(timestamp);
+            int unixTimestamp = BFDDateUtils.getSecs();
+            schedule.setCreateTime(unixTimestamp);
+            schedule.setModifyTime(unixTimestamp);
 
             // 调度时间
             ScheduleMeta meta = new ScheduleMeta();
             meta.setType(ScheduleType.DAY);
-            meta.setStartDate(timestamp);
-            schedule.setStartDate(timestamp);
-            Date endDate = BFDDateUtils.parse("2099-12-31 00:00:00");
+            meta.setStartDate(unixTimestamp);
+            schedule.setStartDate(unixTimestamp);
+            int endDate = BFDDateUtils.getSecs(BFDDateUtils.parse("2099-12-31 00:00:00"));
             meta.setEndDate(endDate);
             schedule.setEndDate(endDate);
-            Date startTime = BFDDateUtils.parse(time, Constants.BASE_TIME_FORMAT);
+            int startTime = BFDDateUtils.getSecs(BFDDateUtils.parse(time, Constants.BASE_TIME_FORMAT));
             meta.setStartTime(startTime);
             schedule.setCrontabStr(JsonUtil.toJsonString(meta));
 
@@ -419,13 +420,12 @@ public class FlowDao extends BaseDao {
         } else {
             // 更新调度信息
             ScheduleMeta meta = JsonUtil.parseObject(schedule.getCrontabStr(), ScheduleMeta.class);
-            Date startTime = BFDDateUtils.parse(time, Constants.BASE_TIME_FORMAT);
+            int startTime = BFDDateUtils.getSecs(BFDDateUtils.parse(time, Constants.BASE_TIME_FORMAT));
             meta.setStartTime(startTime);
             schedule.setCrontabStr(JsonUtil.toJsonString(meta));
 
             schedule.setLastModifyBy(userId);
-            Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-            schedule.setModifyTime(timestamp);
+            schedule.setModifyTime(BFDDateUtils.getSecs());
             int count = scheduleMapper.update(schedule);
             if (count <= 0) {
                 throw new Exception("更新失败");

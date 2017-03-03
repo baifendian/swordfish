@@ -61,15 +61,18 @@ public class CustomParamManager {
         }
 
         // 遍历 flow 的参数
-        for (FlowParam flowParam : projectFlow.getUserDefinedParamList()) {
-            String value = flowParam.getValue();
+        Map<String, String> userDefinedParamMap = projectFlow.getUserDefinedParamMap();
+        if(userDefinedParamMap != null) {
+            for (Map.Entry<String, String> entry : userDefinedParamMap.entrySet()) {
+                String value = entry.getValue();
 
-            // 基于系统参数 ${dw.system.cyctime} 的自定义变量
-            if (StringUtils.isNotEmpty(value) && value.startsWith(TimePlaceholderUtil.PLACEHOLDER_PREFIX) && value.endsWith(TimePlaceholderUtil.PLACEHOLDER_SUFFIX)) {
-                value = TimePlaceholderUtil.resolvePlaceholders(value, cycTime, true);
+                // 基于系统参数 ${dw.system.cyctime} 的自定义变量
+                if (StringUtils.isNotEmpty(value) && value.startsWith(TimePlaceholderUtil.PLACEHOLDER_PREFIX) && value.endsWith(TimePlaceholderUtil.PLACEHOLDER_SUFFIX)) {
+                    value = TimePlaceholderUtil.resolvePlaceholders(value, cycTime, true);
+                }
+
+                valueMap.put(entry.getKey(), value);
             }
-
-            valueMap.put(flowParam.getKey(), value);
         }
 
         return valueMap;

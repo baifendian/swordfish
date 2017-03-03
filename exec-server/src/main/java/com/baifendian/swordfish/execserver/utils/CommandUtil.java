@@ -29,4 +29,16 @@ public class CommandUtil {
         }
         return dArgs;
     }
+
+    /**
+     * 获取所有参数的类型
+     * @param args
+     * @return
+     */
+    public static Class<?>[] getTypes(Object... args) {
+        Class<?>[] argTypes = new Class<?>[args.length];
+        for (int i = 0; i < argTypes.length; i++)
+            argTypes[i] = args[i].getClass();
+        return argTypes;
+    }
 }

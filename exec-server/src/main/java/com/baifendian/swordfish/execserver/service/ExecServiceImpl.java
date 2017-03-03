@@ -11,7 +11,7 @@ import com.baifendian.swordfish.dao.FlowDao;
 import com.baifendian.swordfish.dao.mysql.enums.FlowStatus;
 import com.baifendian.swordfish.dao.mysql.model.ExecutionFlow;
 import com.baifendian.swordfish.dao.mysql.model.Schedule;
-import com.baifendian.swordfish.execserver.FlowRunnerManager;
+import com.baifendian.swordfish.execserver.flow.FlowRunnerManager;
 import com.baifendian.swordfish.execserver.result.ResultHelper;
 import com.baifendian.swordfish.execserver.rpc.IFace;
 import com.baifendian.swordfish.execserver.rpc.RetInfo;
@@ -110,11 +110,6 @@ public class ExecServiceImpl implements IFace {
      */
     public void destory() {
         flowRunnerManager.destroy();
-    }
-
-    public static void main(String[] args) throws TException {
-        ExecServiceImpl execService = new ExecServiceImpl();
-        execService.scheduleExecFlow(1,1,"tt", 1111111111);
     }
 
 }

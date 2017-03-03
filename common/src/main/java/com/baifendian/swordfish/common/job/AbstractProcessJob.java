@@ -7,6 +7,7 @@
 package com.baifendian.swordfish.common.job;
 
 import com.baifendian.swordfish.common.job.Job;
+import com.baifendian.swordfish.common.job.logger.JobLogger;
 import com.baifendian.swordfish.common.job.utils.ProcessUtil;
 import com.baifendian.swordfish.common.job.exception.ExecException;
 import org.apache.commons.configuration.PropertiesConfiguration;
@@ -34,11 +35,22 @@ import java.util.concurrent.ExecutionException;
  */
 public abstract class AbstractProcessJob implements Job {
 
+    /** 作业执行目录key 值为String **/
     public static final String WORKING_DIR = "working.dir";
+
+    /** 作业执行用户key 值为String **/
     public static final String PROXY_USER = "proxy.user";
+
+    /** 作业配置参数key 值为json字符串 **/
     public static final String JOB_PARAMS = "job.params";
+
+    /** 自定义参数key 值为Map<String, String> **/
+    public static final String DEFINED_PARAMS = "defined.params";
+
     /** LOGGER */
-    protected final Logger logger;
+    protected final JobLogger logger;
+
+    private final Logger _logger;
 
     /** jobId **/
     protected final String jobId;
@@ -68,7 +80,8 @@ public abstract class AbstractProcessJob implements Job {
     protected AbstractProcessJob(String jobId, PropertiesConfiguration props, Logger logger) throws IOException {
         this.jobId = jobId;
         this.props = props;
-        this.logger = logger;
+        this._logger = logger;
+        this.logger = new JobLogger(jobId, logger);
         initJobParams();
     }
 
@@ -100,15 +113,17 @@ public abstract class AbstractProcessJob implements Job {
             }
             ProcessBuilder curProcessBuilder;
             String proxyUser = getProxyUser();
+            String workDir = getWorkingDirectory();
+            logger.info("jobId:{} proxyUser:{} workDir:{}", jobId, proxyUser, workDir);
             if(proxyUser != null){
                 curProcessBuilder = new ProcessBuilder();
-                String commandFile = jobId + ".command";
+                String commandFile = workDir + File.separator + jobId + ".command";
+                logger.info("generate command file:{}", commandFile);
                 FileUtils.writeStringToFile(new File(commandFile), StringUtils.join(processBuilder.command(), " "));
-                curProcessBuilder.command().add(String.format("sh -c %s %s", proxyUser, commandFile));
+                curProcessBuilder.command().add(String.format("sudo -u %s sh %s", proxyUser, commandFile));
             } else {
                 curProcessBuilder = processBuilder;
             }
-            String workDir = getWorkingDirectory();
             curProcessBuilder.directory(new File(workDir));
             // 将 error 信息 merge 到标准输出流
             curProcessBuilder.redirectErrorStream(true);
@@ -121,7 +136,8 @@ public abstract class AbstractProcessJob implements Job {
             exitCode = process.waitFor();
         } catch (Exception e) {
             // jobContext.getExecLogger().appendLog(e);
-            logger.error("{}", jobId + e.getMessage(), e);
+            logger.error(e.getMessage(), e);
+            exitCode = -1;
         }
         if(exitCode != 0){
             throw new ExecException("Process error. Exit code is " + exitCode);
@@ -187,9 +203,9 @@ public abstract class AbstractProcessJob implements Job {
         String cmdStr;
         try {
             cmdStr = ProcessUtil.genCmdStr(processBuilder.command());
-            logger.info("{}任务进程的启动命令 ：{}", jobId, cmdStr);
+            logger.info("任务进程的启动命令 ：{}", cmdStr);
         } catch (IOException e) {
-            logger.error("{}", jobId + e.getMessage(), e);
+            logger.error(e.getMessage(), e);
         }
     }
 

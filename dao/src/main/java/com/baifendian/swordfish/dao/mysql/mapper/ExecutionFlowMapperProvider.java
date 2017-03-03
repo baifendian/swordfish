@@ -50,6 +50,7 @@ public class ExecutionFlowMapperProvider {
                 VALUES("work_id", "#{executionFlow.workId}");
                 VALUES("status", EnumFieldUtil.genFieldStr("executionFlow.status", FlowStatus.class));
                 VALUES("submit_user", "#{executionFlow.submitUser}");
+                VALUES("proxy_user", "#{executionFlow.proxyUser}");
                 VALUES("submit_time", "#{executionFlow.submitTime}");
                 VALUES("schedule_time", "#{executionFlow.scheduleTime}");
                 VALUES("start_time", "#{executionFlow.startTime}");
@@ -188,12 +189,9 @@ public class ExecutionFlowMapperProvider {
                 SELECT("b.name as flow_name");
                 SELECT("b.project_id as project_id");
                 SELECT("c.name as project_name");
-                SELECT("d.id as org_id");
-                SELECT("d.name as org_name");
                 FROM("execution_flows as a");
                 INNER_JOIN("project_flows as b on a.flow_id = b.id");
                 INNER_JOIN("project as c on b.project_id = c.id");
-                LEFT_OUTER_JOIN("org as d ON c.org_id = d.id");
                 WHERE("a.id = #{execId}");
             }
         }.toString();

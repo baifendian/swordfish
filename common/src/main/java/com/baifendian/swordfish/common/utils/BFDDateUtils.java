@@ -131,4 +131,8 @@ public class BFDDateUtils {
         return (int)(System.currentTimeMillis()/1000);
     }
 
+    public static int getSecs(Date date){
+        return (int)(date.getTime()/1000);
+    }
+
 }

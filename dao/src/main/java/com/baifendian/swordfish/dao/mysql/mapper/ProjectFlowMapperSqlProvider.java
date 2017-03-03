@@ -72,9 +72,6 @@ public class ProjectFlowMapperSqlProvider {
                 if (projectFlow.getLastModifyBy() != 0) {
                     SET("last_modify_by = #{flow.lastModifyBy}");
                 }
-                if (projectFlow.getPublishTime() != 0) {
-                    SET("publish_time = #{flow.publishTime}");
-                }
                 if (projectFlow.getLastPublishBy() != 0) {
                     SET("last_publish_by = #{flow.lastPublishBy}");
                 }

@@ -15,6 +15,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.util.StringUtils;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
@@ -89,6 +90,18 @@ public class JsonUtil {
         }
         try {
             return JSON_MAPPER.readValue(json, clazz);
+        } catch (IOException e) {
+            System.out.println(e);
+            throw new RuntimeException("Json反序列化异常", e);
+        }
+    }
+
+    public static Map<String, String> parseObjectMap(String json) {
+        if (StringUtils.isEmpty(json)) {
+            return null;
+        }
+        try {
+            return JSON_MAPPER.readValue(json, new TypeReference<HashMap<String,String>>(){});
         } catch (IOException e) {
             System.out.println(e);
             throw new RuntimeException("Json反序列化异常", e);

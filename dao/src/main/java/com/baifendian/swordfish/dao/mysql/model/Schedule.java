@@ -3,8 +3,6 @@ package com.baifendian.swordfish.dao.mysql.model;
 
 import com.baifendian.swordfish.dao.mysql.enums.*;
 
-import java.util.Date;
-
 /**
  *  调度的设置基础数据
  * <p>
@@ -20,9 +18,9 @@ public class Schedule {
 
     private FlowType flowType;
 
-    private Date createTime;
+    private int createTime;
 
-    private Date modifyTime;
+    private int modifyTime;
 
     private int lastModifyBy;
 
@@ -30,17 +28,17 @@ public class Schedule {
 
     private ScheduleStatus scheduleStatus;
 
-    private Date startDate;
+    private int startDate;
 
-    private Date endDate;
+    private int endDate;
 
-    private Date publishTime;
+    private int publishTime;
 
     private ScheduleType scheduleType;
 
     private String crontabStr;
 
-    private Date nextSubmitTime;
+    private int nextSubmitTime;
 
     private String depWorkflows;
 
@@ -84,19 +82,19 @@ public class Schedule {
         this.flowType = flowType;
     }
 
-    public Date getCreateTime() {
+    public int getCreateTime() {
         return createTime;
     }
 
-    public void setCreateTime(Date createTime) {
+    public void setCreateTime(int createTime) {
         this.createTime = createTime;
     }
 
-    public Date getModifyTime() {
+    public int getModifyTime() {
         return modifyTime;
     }
 
-    public void setModifyTime(Date modifyTime) {
+    public void setModifyTime(int modifyTime) {
         this.modifyTime = modifyTime;
     }
 
@@ -124,27 +122,27 @@ public class Schedule {
         this.scheduleStatus = scheduleStatus;
     }
 
-    public Date getStartDate() {
+    public int getStartDate() {
         return startDate;
     }
 
-    public void setStartDate(Date startDate) {
+    public void setStartDate(int startDate) {
         this.startDate = startDate;
     }
 
-    public Date getEndDate() {
+    public int getEndDate() {
         return endDate;
     }
 
-    public void setEndDate(Date endDate) {
+    public void setEndDate(int endDate) {
         this.endDate = endDate;
     }
 
-    public Date getPublishTime() {
+    public int getPublishTime() {
         return publishTime;
     }
 
-    public void setPublishTime(Date publishTime) {
+    public void setPublishTime(int publishTime) {
         this.publishTime = publishTime;
     }
 
@@ -164,11 +162,11 @@ public class Schedule {
         this.crontabStr = crontabStr;
     }
 
-    public Date getNextSubmitTime() {
+    public int getNextSubmitTime() {
         return nextSubmitTime;
     }
 
-    public void setNextSubmitTime(Date nextSubmitTime) {
+    public void setNextSubmitTime(int nextSubmitTime) {
         this.nextSubmitTime = nextSubmitTime;
     }
 

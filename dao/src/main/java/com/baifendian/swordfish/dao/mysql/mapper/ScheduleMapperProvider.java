@@ -56,7 +56,7 @@ public class ScheduleMapperProvider {
                 if (schedule.getScheduleStatus() != null) {
                     SET("schedule_status = " + EnumFieldUtil.genFieldStr("schedule.scheduleStatus", ScheduleStatus.class));
                 }
-                if (schedule.getStartDate() != null) {
+                if (schedule.getStartDate() != 0) {
                     SET("start_date = #{schedule.startDate}");
                     SET("end_date = #{schedule.endDate}");
                     SET("schedule_type = " + EnumFieldUtil.genFieldStr("schedule.scheduleType", ScheduleType.class));
