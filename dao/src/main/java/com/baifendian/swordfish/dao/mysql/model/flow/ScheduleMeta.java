@@ -16,23 +16,13 @@ import java.util.List;
  */
 public class ScheduleMeta {
 
-    // comment by qifeng.dai(用: BASE_DATE_FORMAT 更加合适?)
     private int startDate;
 
     private int endDate;
 
     private ScheduleType type;
 
-    private int startTime;
-
-    private int endTime;
-
-    private int interval;
-
-    private List<Integer> weekDays;
-
-    private List<Integer> monthDays;
-
+    private String crontab;
 
     public int getStartDate() {
         return startDate;
@@ -58,43 +48,11 @@ public class ScheduleMeta {
         this.type = type;
     }
 
-    public int getStartTime() {
-        return startTime;
+    public String getCrontab() {
+        return crontab;
     }
 
-    public void setStartTime(int startTime) {
-        this.startTime = startTime;
-    }
-
-    public int getEndTime() {
-        return endTime;
-    }
-
-    public void setEndTime(int endTime) {
-        this.endTime = endTime;
-    }
-
-    public int getInterval() {
-        return interval;
-    }
-
-    public void setInterval(int interval) {
-        this.interval = interval;
-    }
-
-    public List<Integer> getWeekDays() {
-        return weekDays;
-    }
-
-    public void setWeekDays(List<Integer> weekDays) {
-        this.weekDays = weekDays;
-    }
-
-    public List<Integer> getMonthDays() {
-        return monthDays;
-    }
-
-    public void setMonthDays(List<Integer> monthDays) {
-        this.monthDays = monthDays;
+    public void setCrontab(String crontab) {
+        this.crontab = crontab;
     }
 }

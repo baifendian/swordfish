@@ -1,7 +1,7 @@
 package com.baifendian.swordfish.dao.mysql.model.statistics;
 
 import com.baifendian.swordfish.common.consts.Constants;
-import com.baifendian.swordfish.dao.mysql.enums.FlowStatus;
+import com.baifendian.swordfish.common.job.FlowStatus;
 import com.baifendian.swordfish.dao.mysql.enums.FlowType;
 import com.baifendian.swordfish.dao.mysql.enums.NodeType;
 import com.fasterxml.jackson.annotation.JsonFormat;

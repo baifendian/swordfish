@@ -88,7 +88,7 @@ public class SystemParamManager {
         valueMap.put(BIZ_CUR_DATE, formatDate(bizCurDate));
         valueMap.put(CYC_TIME, formatTime(bizCurDate));
         valueMap.put(RUN_TIME, formatTime(runTime));
-        valueMap.put(FILES, HdfsPathManager.genTaskHdfsPath(executionFlow.getOrgName(), executionFlow.getProjectName()));
+        valueMap.put(FILES, HdfsPathManager.genNodeHdfsPath(executionFlow.getProjectName()));
         valueMap.put(FLOWNAME, executionFlow.getFlowName());
 
         return valueMap;

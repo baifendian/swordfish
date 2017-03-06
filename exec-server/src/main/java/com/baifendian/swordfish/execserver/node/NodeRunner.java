@@ -9,7 +9,7 @@ package com.baifendian.swordfish.execserver.node;
 import com.baifendian.swordfish.common.utils.BFDDateUtils;
 import com.baifendian.swordfish.dao.DaoFactory;
 import com.baifendian.swordfish.dao.FlowDao;
-import com.baifendian.swordfish.dao.mysql.enums.FlowStatus;
+import com.baifendian.swordfish.common.job.FlowStatus;
 import com.baifendian.swordfish.dao.mysql.model.ExecutionFlow;
 import com.baifendian.swordfish.dao.mysql.model.ExecutionNode;
 import com.baifendian.swordfish.dao.mysql.model.FlowNode;
@@ -17,7 +17,6 @@ import com.baifendian.swordfish.execserver.job.JobHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Date;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 

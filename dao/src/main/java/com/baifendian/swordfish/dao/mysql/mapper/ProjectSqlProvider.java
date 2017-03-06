@@ -89,14 +89,8 @@ public class ProjectSqlProvider {
             if (StringUtils.isNotEmpty(project.getDesc())) {
                 WHERE("p.`desc` = #{project.desc}");
             }
-            if (project.getTenantId() !=null) {
-                WHERE("p.tenant_id = #{project.tenant_id}");
-            }
             if (project.getOwnerId() !=null) {
                 WHERE("p.owner = #{project.ownerId}");
-            }
-            if (project.getQueueId() !=null) {
-                WHERE("p.queue_id = #{project.queueId}");
             }
         }}.toString();
     }
@@ -109,9 +103,6 @@ public class ProjectSqlProvider {
             }
             if (project.getOwnerId() !=null) {
                 SET("owner=#{project.ownerId}");
-            }
-            if (project.getQueueId() !=null) {
-                SET("queue_id=#{project.queueId}");
             }
             SET("modify_time=#{project.modifyTime}");
             WHERE("id = #{project.id}");
@@ -160,11 +151,10 @@ public class ProjectSqlProvider {
         return "select p.*,u.`name` as owner_name,SUM(dats.size) as project_size from project as p left join user as u on p.`owner` = u.id left join data_analysis_table_size as dats on p.id = dats.project_id where p.tenant_id = "+tenantId+" GROUP BY p.id ORDER BY project_size DESC LIMIT  0,"+top;
     }
 
-    public String queryByNameAndTenantId(Map<String, Object> parameter){
+    public String queryByName(Map<String, Object> parameter){
         return new SQL() {{
             SELECT("p.id as id,p.name as name,p.`desc` as `desc`,p.create_time as create_time,p.modify_time as modify_time,p.owner as owner,p.queue_id as queue_id,p.mail_groups as mail_groups");
             FROM("project p");
-            WHERE("p.tenant = #{tenantId}");
             WHERE("p.name = #{name}");
         }}.toString();
     }

@@ -1,7 +1,7 @@
 
 package com.baifendian.swordfish.dao.mysql.mapper;
 
-import com.baifendian.swordfish.dao.mysql.enums.FlowStatus;
+import com.baifendian.swordfish.common.job.FlowStatus;
 import com.baifendian.swordfish.dao.mysql.enums.FlowType;
 import com.baifendian.swordfish.dao.mysql.mapper.utils.EnumFieldUtil;
 import com.baifendian.swordfish.dao.mysql.model.ExecutionNode;

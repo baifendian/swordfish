@@ -115,7 +115,7 @@ public interface ProjectMapper {
             @Result(property = "mailGroups", column = "mail_groups",javaType = String.class,jdbcType = JdbcType.VARCHAR)
     })
     @SelectProvider(type = ProjectSqlProvider.class, method = "queryByNameAndTenantId")
-    Project queryByNameAndTenantId(@Param("name") String name, @Param("tenantId") int tenantId);
+    Project queryByName(@Param("name") String name);
 
     @UpdateProvider(type = ProjectSqlProvider.class, method = "updateDescAndMailById")
     int updateDescAndMailById(@Param("projectId") int projectId, @Param("desc") String desc, @Param("modifyTime") Date modifyTime, @Param("mailGroups") String mailGroups);

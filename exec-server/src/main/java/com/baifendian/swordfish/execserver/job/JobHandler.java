@@ -1,12 +1,5 @@
 package com.baifendian.swordfish.execserver.job;
 
-import ch.qos.logback.classic.Level;
-import ch.qos.logback.classic.LoggerContext;
-import ch.qos.logback.classic.encoder.PatternLayoutEncoder;
-import ch.qos.logback.core.Context;
-import ch.qos.logback.core.FileAppender;
-import ch.qos.logback.core.encoder.Encoder;
-import ch.qos.logback.core.filter.Filter;
 import com.baifendian.swordfish.common.consts.Constants;
 import com.baifendian.swordfish.common.hadoop.HdfsUtil;
 import com.baifendian.swordfish.common.job.AbstractProcessJob;
@@ -15,14 +8,12 @@ import com.baifendian.swordfish.common.job.exception.ExecException;
 import com.baifendian.swordfish.common.utils.BFDDateUtils;
 import com.baifendian.swordfish.dao.FlowDao;
 import com.baifendian.swordfish.dao.hadoop.hdfs.HdfsPathManager;
-import com.baifendian.swordfish.dao.mysql.enums.FlowStatus;
+import com.baifendian.swordfish.common.job.FlowStatus;
 import com.baifendian.swordfish.dao.mysql.model.ExecutionFlow;
 import com.baifendian.swordfish.dao.mysql.model.ExecutionNode;
 import com.baifendian.swordfish.dao.mysql.model.FlowNode;
 import com.baifendian.swordfish.execserver.exception.ExecTimeoutException;
 import org.apache.commons.configuration.PropertiesConfiguration;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,11 +21,9 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.*;
 
@@ -116,6 +105,7 @@ public class JobHandler {
         props.addProperty(AbstractProcessJob.WORKING_DIR, jobScriptPath);
         props.addProperty(AbstractProcessJob.PROXY_USER, executionFlow.getProxyUser());
         props.addProperty(AbstractProcessJob.DEFINED_PARAMS, allParamMap);
+        props.addProperty(AbstractProcessJob.PROJECT_ID, executionFlow.getProjectId());
 
         logger.info("props:{}", props);
         Job job = JobTypeManager.newJob(jobId, node.getType().name(), props, logger);
@@ -152,7 +142,7 @@ public class JobHandler {
             public Boolean call() throws Exception {
                 boolean isSuccess = true;
                 try {
-                    job.exec(); // run job
+                    job.run(); // run job
                     if (job.getExitCode() != 0) {
                         isSuccess = false;
                     }

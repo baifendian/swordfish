@@ -8,7 +8,7 @@ package com.baifendian.swordfish.execserver;
 
 import com.baifendian.swordfish.common.hadoop.HdfsClient;
 import com.baifendian.swordfish.dao.hadoop.ConfigurationUtil;
-import com.baifendian.swordfish.execserver.rpc.RetInfo;
+import com.baifendian.swordfish.rpc.RetInfo;
 import com.baifendian.swordfish.execserver.service.ExecServiceImpl;
 import com.baifendian.swordfish.execserver.utils.OsUtil;
 import com.bfd.harpc.common.configure.PropertiesConfiguration;
@@ -72,20 +72,18 @@ public class ExecServer {
             // impl.execFlow(projectId, executionFlow.getId(),
             // FlowType.SHORT.toString());
 
-            //final Server server = new Server(new String[] { SERVER_FILE_PATH }, impl);
-            //server.start();
-            RetInfo retInfo = impl.scheduleExecFlow(1,1,"aa",11111);
-            System.out.println(retInfo);
+            final Server server = new Server(new String[] { SERVER_FILE_PATH }, impl);
+            server.start();
 
             // 添加ShutdownHook
             Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    //server.close(); // 关闭服务
+                    server.close(); // 关闭服务
                     impl.destory(); // 销毁资源
                 }
             }));
-/*
+
             synchronized (ExecServer.class) {
                 while (running) {
                     try {
@@ -95,7 +93,6 @@ public class ExecServer {
                     }
                 }
             }
-            */
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
         }

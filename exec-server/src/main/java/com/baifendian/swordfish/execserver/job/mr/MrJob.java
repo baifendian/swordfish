@@ -44,8 +44,6 @@ public class MrJob extends AbstractProcessJob {
 
     private MrParam param;
 
-    private Map<String, String> definedParamMap;
-
     /** yarn 的 application id */
     private String appid;
 
@@ -60,7 +58,6 @@ public class MrJob extends AbstractProcessJob {
         super(jobId, props, logger);
 
         this.param = JsonUtil.parseObject(props.getString(JOB_PARAMS), MrParam.class);
-        this.definedParamMap = (Map<String, String>)props.getProperty(DEFINED_PARAMS);
     }
 
     public List<String> buildCommand(){

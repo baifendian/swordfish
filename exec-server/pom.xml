@@ -10,7 +10,6 @@
     <artifactId>swordfish-exec-server</artifactId>
     <packaging>jar</packaging>
 
-    <name>swordfish-exec-server</name>
     <url>http://maven.apache.org</url>
 
     <properties>
@@ -20,11 +19,6 @@
     </properties>
 
     <dependencies>
-        <dependency>
-            <groupId>com.baifendian</groupId>
-            <artifactId>harpc</artifactId>
-            <version>1.2</version>
-        </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-exec</artifactId>
@@ -45,17 +39,22 @@
             <artifactId>swordfish-dao</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.baifendian.swordfish</groupId>
+            <artifactId>swordfish-rpc</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
         <!-- 第三方依赖 -->
         <dependency>
             <groupId>org.quartz-scheduler</groupId>
             <artifactId>quartz</artifactId>
-            <version>2.2.3</version>
+            <version>${quartz.version}</version>
         </dependency>
         <dependency>
             <groupId>org.quartz-scheduler</groupId>
             <artifactId>quartz-jobs</artifactId>
-            <version>2.2.2</version>
+            <version>${quartz-jobs.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.hadoop</groupId>
@@ -76,6 +75,30 @@
             <groupId>commons-configuration</groupId>
             <artifactId>commons-configuration</artifactId>
             <version>${commons-configuration.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.spark</groupId>
+            <artifactId>spark-yarn_${scala.binary.version}</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-log4j12</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.spark</groupId>
+            <artifactId>spark-core_${scala.binary.version}</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.curator</groupId>
+                    <artifactId>curator-recipes</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-log4j12</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
     </dependencies>

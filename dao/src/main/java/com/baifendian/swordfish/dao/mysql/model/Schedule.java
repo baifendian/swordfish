@@ -32,8 +32,6 @@ public class Schedule {
 
     private int endDate;
 
-    private int publishTime;
-
     private ScheduleType scheduleType;
 
     private String crontabStr;
@@ -136,14 +134,6 @@ public class Schedule {
 
     public void setEndDate(int endDate) {
         this.endDate = endDate;
-    }
-
-    public int getPublishTime() {
-        return publishTime;
-    }
-
-    public void setPublishTime(int publishTime) {
-        this.publishTime = publishTime;
     }
 
     public ScheduleType getScheduleType() {

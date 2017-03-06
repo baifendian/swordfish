@@ -1,5 +1,7 @@
 package com.baifendian.swordfish.dao.mysql.enums;
 
+import com.baifendian.swordfish.common.job.FlowStatus;
+
 /**
  *  workflow 等运行的类型
  * <p>

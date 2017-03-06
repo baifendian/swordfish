@@ -8,13 +8,13 @@ package com.baifendian.swordfish.execserver.service;
 
 import com.baifendian.swordfish.dao.DaoFactory;
 import com.baifendian.swordfish.dao.FlowDao;
-import com.baifendian.swordfish.dao.mysql.enums.FlowStatus;
+import com.baifendian.swordfish.common.job.FlowStatus;
 import com.baifendian.swordfish.dao.mysql.model.ExecutionFlow;
 import com.baifendian.swordfish.dao.mysql.model.Schedule;
 import com.baifendian.swordfish.execserver.flow.FlowRunnerManager;
 import com.baifendian.swordfish.execserver.result.ResultHelper;
-import com.baifendian.swordfish.execserver.rpc.IFace;
-import com.baifendian.swordfish.execserver.rpc.RetInfo;
+import com.baifendian.swordfish.rpc.WorkerService.Iface;
+import com.baifendian.swordfish.rpc.RetInfo;
 import org.apache.commons.lang.StringUtils;
 import org.apache.thrift.TException;
 import org.slf4j.Logger;
@@ -29,7 +29,7 @@ import java.util.Date;
  * @author : dsfan
  * @date : 2016年10月25日
  */
-public class ExecServiceImpl implements IFace {
+public class ExecServiceImpl implements Iface {
 
     /** LOGGER */
     private final Logger LOGGER = LoggerFactory.getLogger(getClass());

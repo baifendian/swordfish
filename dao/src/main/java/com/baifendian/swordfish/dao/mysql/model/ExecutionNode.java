@@ -1,7 +1,7 @@
 
 package com.baifendian.swordfish.dao.mysql.model;
 
-import com.baifendian.swordfish.dao.mysql.enums.FlowStatus;
+import com.baifendian.swordfish.common.job.FlowStatus;
 
 import java.util.List;
 

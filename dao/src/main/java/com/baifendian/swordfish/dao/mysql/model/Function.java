@@ -9,6 +9,7 @@ package com.baifendian.swordfish.dao.mysql.model;
 import com.baifendian.swordfish.dao.mysql.enums.FunctionType;
 
 import java.sql.Timestamp;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -55,14 +56,16 @@ public class Function {
     /** 函数用途 */
     private String feature;
 
-    /** 资源 id 列表 */
-    private List<Integer> resourceIds;
+    /** 资源列表 */
+    private String resources;
+
+    private List<String> resourceList;
 
     @Override
     public String toString() {
         return "Function [id=" + id + ", name=" + name + ", type=" + type + ", projectId=" + projectId + ", ownerId=" + ownerId + ", ownerName=" + ownerName + ", desc=" + desc
-               + ", createTime=" + createTime + ", modifyTime=" + modifyTime + ", className=" + className + ", command=" + command + ", feature=" + feature + ", resourceIds="
-               + resourceIds + "]";
+               + ", createTime=" + createTime + ", modifyTime=" + modifyTime + ", className=" + className + ", command=" + command + ", feature=" + feature + ", resources="
+               + resources + "]";
     }
 
     /**
@@ -317,25 +320,19 @@ public class Function {
         this.feature = feature;
     }
 
-    /**
-     * getter method
-     * 
-     * @see Function#resourceIds
-     * @return the resourceIds
-     */
-    public List<Integer> getResourceIds() {
-        return resourceIds;
+    public String getResources() {
+        return resources;
     }
 
-    /**
-     * setter method
-     * 
-     * @see Function#resourceIds
-     * @param resourceIds
-     *            the resourceIds to set
-     */
-    public void setResourceIds(List<Integer> resourceIds) {
-        this.resourceIds = resourceIds;
+    public void setResources(String resources) {
+        this.resources = resources;
+    }
+
+    public List<String> getResourceList() {
+        if(resourceList == null){
+            resourceList = Arrays.asList(resources.split(","));
+        }
+        return resourceList;
     }
 
 }

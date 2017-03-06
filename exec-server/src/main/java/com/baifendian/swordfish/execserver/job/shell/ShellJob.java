@@ -88,7 +88,7 @@ public class ShellJob extends AbstractProcessJob {
   }
 
   @Override
-  public void exec() {
+  public void process() {
     Path path = Paths.get(currentPath, "run_" + UUID.randomUUID().toString().substring(0, 8) + ".sh");
 
     try {
@@ -159,7 +159,7 @@ public class ShellJob extends AbstractProcessJob {
     props.addProperty("timeout", 100);
     Logger logger = LoggerFactory.getLogger("shellJob");
     ShellJob job = new ShellJob("NODE_1_2017", props, logger);
-    job.exec();
+    job.process();
     System.out.println("run finished!");
   }
 }

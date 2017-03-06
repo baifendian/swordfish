@@ -17,7 +17,7 @@ import java.util.List;
  * @author : liujin
  * @date : 2017年3月2日
  */
-public interface Job<T> {
+public interface Job {
     /**
      * 获取 生成的作业ID: 节点类型_yyyyMMddHHmmss_NodeId_execId
      * <p>
@@ -33,18 +33,23 @@ public interface Job<T> {
     void before() throws Exception;
 
     /**
-     * 执行(一个job对象仅执行一次)
-     * <p>
-     *
-     * @throws Exception
+     * 作业处理
      */
-    void exec() throws Exception;
+    void process() throws Exception;
 
     /**
      * 作业后处理
      * @throws Exception
      */
     void after() throws Exception;
+
+    /**
+     * 执行(一个job对象仅执行一次)
+     * <p>
+     *
+     * @throws Exception
+     */
+    void run() throws Exception;
 
     /**
      * 取消执行(执行 cancel 之前，必须要保证已经调用 run)
@@ -84,8 +89,8 @@ public interface Job<T> {
      * job执行是否有返回结果
      * @return
      */
-    boolean hasResult();
+    boolean hasResults();
 
-    T getResult();
+    List<ExecResult> getResults();
 
 }

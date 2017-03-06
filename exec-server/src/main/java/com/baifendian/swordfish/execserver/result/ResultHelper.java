@@ -6,9 +6,7 @@
 
 package com.baifendian.swordfish.execserver.result;
 
-//import com.bfd.dw.rpc.scheduler.RetInfo;
-
-import com.baifendian.swordfish.execserver.rpc.RetInfo;
+import com.baifendian.swordfish.rpc.RetInfo;
 
 /**
  * 返回结果帮助类

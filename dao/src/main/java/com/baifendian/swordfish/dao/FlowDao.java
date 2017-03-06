@@ -16,8 +16,8 @@
 package com.baifendian.swordfish.dao;
 
 import com.baifendian.swordfish.common.consts.Constants;
+import com.baifendian.swordfish.common.job.FlowStatus;
 import com.baifendian.swordfish.common.utils.BFDDateUtils;
-import com.baifendian.swordfish.common.utils.PlaceholderUtil;
 import com.baifendian.swordfish.common.utils.json.JsonUtil;
 //import com.baifendian.swordfish.dao.etl.EtlAutoGen;
 import com.baifendian.swordfish.dao.hadoop.hdfs.HdfsPathManager;
@@ -27,18 +27,12 @@ import com.baifendian.swordfish.dao.mysql.mapper.*;
 import com.baifendian.swordfish.dao.mysql.model.*;
 import com.baifendian.swordfish.dao.mysql.model.flow.FlowDag;
 import com.baifendian.swordfish.dao.mysql.model.flow.ScheduleMeta;
-import com.baifendian.swordfish.dao.mysql.model.flow.params.ParamUtil;
 import com.baifendian.swordfish.dao.mysql.model.flow.params.dq.DqSqlParam;
-import com.baifendian.swordfish.dao.mysql.model.flow.params.shorts.SqlParam;
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.math3.util.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -409,7 +403,6 @@ public class FlowDao extends BaseDao {
             meta.setEndDate(endDate);
             schedule.setEndDate(endDate);
             int startTime = BFDDateUtils.getSecs(BFDDateUtils.parse(time, Constants.BASE_TIME_FORMAT));
-            meta.setStartTime(startTime);
             schedule.setCrontabStr(JsonUtil.toJsonString(meta));
 
             int count = scheduleMapper.insert(schedule);
@@ -421,7 +414,6 @@ public class FlowDao extends BaseDao {
             // 更新调度信息
             ScheduleMeta meta = JsonUtil.parseObject(schedule.getCrontabStr(), ScheduleMeta.class);
             int startTime = BFDDateUtils.getSecs(BFDDateUtils.parse(time, Constants.BASE_TIME_FORMAT));
-            meta.setStartTime(startTime);
             schedule.setCrontabStr(JsonUtil.toJsonString(meta));
 
             schedule.setLastModifyBy(userId);

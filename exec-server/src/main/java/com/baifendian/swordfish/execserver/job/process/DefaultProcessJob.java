@@ -8,6 +8,7 @@ package com.baifendian.swordfish.execserver.job.process;
 
 import com.baifendian.swordfish.common.job.AbstractProcessJob;
 import com.baifendian.swordfish.common.job.exception.ExecException;
+import com.baifendian.swordfish.common.utils.PlaceholderUtil;
 import com.baifendian.swordfish.execserver.job.shell.ShellJob;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.lang.StringUtils;
@@ -66,18 +67,6 @@ public class DefaultProcessJob extends AbstractProcessJob {
         }
 
         return processBuilder;
-    }
-
-    public static void main(String[] args) throws Exception {
-        PropertiesConfiguration props = new PropertiesConfiguration();
-        props.addProperty(AbstractProcessJob.PROXY_USER, "hadoop");
-        props.addProperty(AbstractProcessJob.WORKING_DIR, "/home/swordfish");
-        props.addProperty(AbstractProcessJob.JOB_PARAMS, "{\"command\":\"ls -l\"}");
-        props.addProperty("timeout", 100);
-        Logger logger = LoggerFactory.getLogger("shellJob");
-        DefaultProcessJob job = new DefaultProcessJob("NODE_1_2017", props, logger);
-        job.exec();
-        System.out.println("run finished!");
     }
 
 }
