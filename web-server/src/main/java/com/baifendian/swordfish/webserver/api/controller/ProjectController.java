@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 /**
  *
@@ -46,6 +47,11 @@ public class ProjectController {
     public @ResponseBody Error projectConflict(ProjectConflictException e){
         String name = e.getProjectName();
         return new Error("project [" + name + "] conflict");
+    }
+
+    @RequestMapping(method =RequestMethod.GET)
+    public ResponseEntity<List<Project>> queryList() {
+        return new ResponseEntity<List<Project>>(projectService.queryList(), HttpStatus.OK);
     }
 
 }

@@ -25,27 +25,8 @@ import java.util.List;
 @Service
 public class ProjectService {
     private static org.slf4j.Logger logger = LoggerFactory.getLogger(ProjectService.class);
-
-    @Autowired
-    ResourceMapper resourceMapper;
-
-    @Autowired
-    FunctionMapper functionMapper;
-
-    @Autowired
-    private UserMapper userMapper;
-
-    @Autowired
+    @Autowired(required = true)
     private ProjectMapper projectMapper;
-
-    @Autowired
-    private ProjectUserMapper projectUserMapper;
-
-    @Autowired
-    private MailSendService mailSendService;
-
-    @Autowired
-    private ProjectFlowMapper projectFlowMapper;
 
     /**
      * 创建项目
@@ -86,10 +67,10 @@ public class ProjectService {
 
     /**
      * 删除某个项目
-     * @param user
      * @param projectId
      * @return
      */
+    /*
     @Transactional(rollbackFor = {Exception.class})
     public BaseResponse delete(User user, Integer projectId) {
         if (projectId == null){
@@ -128,8 +109,13 @@ public class ProjectService {
 
         return BaseResponse.createSuccessResponse(null, null);
     }
+    */
 
     public Project getProject(int projectId){
         return projectMapper.queryById(projectId);
+    }
+
+    public List<Project> queryList(){
+        return projectMapper.queryAllProject();
     }
 }

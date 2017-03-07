@@ -6,8 +6,8 @@
 
 package com.baifendian.swordfish.webserver.api;
 
+import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration;
 import org.springframework.context.annotation.ComponentScan;
@@ -20,7 +20,7 @@ import org.springframework.context.annotation.ComponentScan;
  * @date : 2016-7-20
  */
 @SpringBootApplication(exclude = { MongoAutoConfiguration.class })
-@ComponentScan("com.baifendian.swordfish")
+@MapperScan("com.baifendian.swordfish")
 public class RestfulApiApplication {
     /**
      * main

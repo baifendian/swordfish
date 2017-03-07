@@ -90,9 +90,6 @@ public interface ResourceMapper {
     @SelectProvider(type = ResourceSqlProvider.class, method = "queryDetails")
     List<Resource> queryDetails(@Param("resourceIds") Set<Integer> resourceIds);
 
-    @SelectProvider(type = ResourceSqlProvider.class, method = "")
-    List<Resource> queryByProject(@Param("projectId") Integer projectId);
-
     /**
      * 删除资源
      * <p>

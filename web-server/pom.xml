@@ -44,14 +44,6 @@
         </dependency>
 
         <dependency>
-            <groupId>avalon-logkit</groupId>
-            <artifactId>avalon-logkit</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>logkit</groupId>
-            <artifactId>logkit</artifactId>
-        </dependency>
-        <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-parent</artifactId>
         </dependency>
@@ -75,11 +67,6 @@
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-validator</artifactId>
-        </dependency>
-
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>

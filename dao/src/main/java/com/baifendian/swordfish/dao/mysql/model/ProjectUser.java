@@ -1,7 +1,7 @@
 package com.baifendian.swordfish.dao.mysql.model;
 
+import com.baifendian.swordfish.common.utils.BFDDateUtils;
 import com.baifendian.swordfish.common.utils.json.DateSerializer;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import java.util.Date;
 
@@ -11,12 +11,12 @@ import java.util.Date;
 public class ProjectUser {
     private int projectId;
     private int userId;
-    private Date createTime;
+    private int createTime;
 
     public ProjectUser() {
     }
 
-    public ProjectUser(int projectId, int userId, Date createTime) {
+    public ProjectUser(int projectId, int userId, int createTime) {
         this.projectId = projectId;
         this.userId = userId;
         this.createTime = createTime;
@@ -24,7 +24,7 @@ public class ProjectUser {
     public ProjectUser(int projectId, int userId) {
         this.projectId = projectId;
         this.userId = userId;
-        this.createTime = new Date();
+        this.createTime = BFDDateUtils.getSecs();
     }
 
     public int getProjectId() {
@@ -43,12 +43,11 @@ public class ProjectUser {
         this.userId = userId;
     }
 
-    @JsonSerialize(using = DateSerializer.class)
-    public Date getCreateTime() {
+    public int getCreateTime() {
         return createTime;
     }
 
-    public void setCreateTime(Date createTime) {
+    public void setCreateTime(int createTime) {
         this.createTime = createTime;
     }
 }

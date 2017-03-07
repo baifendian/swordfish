@@ -38,12 +38,10 @@ public interface ProjectMapper {
             @Result(property = "desc", column = "desc", javaType = String.class, jdbcType = JdbcType.VARCHAR),
             @Result(property = "tenantId", column = "tenant_id", id = true, javaType = int.class, jdbcType = JdbcType.INTEGER),
             @Result(property = "tenantName", column = "tenant_name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-            @Result(property = "createTime", column = "create_time", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP),
-            @Result(property = "modifyTime", column = "modify_time", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP),
+            @Result(property = "createTime", column = "create_time", javaType = int.class, jdbcType = JdbcType.INTEGER),
+            @Result(property = "modifyTime", column = "modify_time", javaType = int.class, jdbcType = JdbcType.INTEGER),
             @Result(property = "ownerId", column = "owner", javaType = int.class, jdbcType = JdbcType.INTEGER),
             @Result(property = "ownerName", column = "owner_name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-            @Result(property = "queueId", column = "queue_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
-            @Result(property = "queue_name", column = "queue_name", javaType = int.class, jdbcType = JdbcType.INTEGER),
     })
     @SelectProvider(type = ProjectSqlProvider.class, method = "queryAllProject")
     List<Project> queryAllProject();
@@ -114,7 +112,7 @@ public interface ProjectMapper {
             @Result(property = "queueId", column = "queue_id",javaType = Integer.class,jdbcType = JdbcType.INTEGER),
             @Result(property = "mailGroups", column = "mail_groups",javaType = String.class,jdbcType = JdbcType.VARCHAR)
     })
-    @SelectProvider(type = ProjectSqlProvider.class, method = "queryByNameAndTenantId")
+    @SelectProvider(type = ProjectSqlProvider.class, method = "queryByName")
     Project queryByName(@Param("name") String name);
 
     @UpdateProvider(type = ProjectSqlProvider.class, method = "updateDescAndMailById")

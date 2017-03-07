@@ -30,7 +30,7 @@ public class ProjectSqlProvider {
     public String queryUserProject(Map<String, Object> parameter){
         return new SQL() {
             {
-                SELECT("p.id as id,p.name as name,p.`desc` as `desc`,p.tenant_id as tenant_id, t.name as tenant_name");
+                SELECT("p.id as id,p.name as name,p.descs");
                 SELECT("p.create_time as create_time, p.modify_time as modify_time,p.owner as owner");
                 SELECT("u.name as owner_name, p.queue_id as queue_id, q.name as queue_name");
                 FROM("project p");
@@ -44,12 +44,11 @@ public class ProjectSqlProvider {
     public String queryAllProject(Map<String, Object> parameter){
         return new SQL() {
             {
-                SELECT("p.id as id,p.name as name,p.`desc` as `desc`,p.tenant_id as tenant_id, t.name as tenant_name");
+                SELECT("p.id as id,p.name as name,p.`desc` as `desc`");
                 SELECT("p.create_time as create_time, p.modify_time as modify_time,p.owner as owner");
-                SELECT("u.name as owner_name, p.queue_id as queue_id, q.name as queue_name");
+                SELECT("u.name as owner_name ");
                 FROM("project p");
                 LEFT_OUTER_JOIN("user u on p.owner = u.id");
-                LEFT_OUTER_JOIN("queue q on p.queue_id = q.id");
             }}.toString();
     }
 
