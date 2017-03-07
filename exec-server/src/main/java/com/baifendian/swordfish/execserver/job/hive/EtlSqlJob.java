@@ -1,6 +1,7 @@
 package com.baifendian.swordfish.execserver.job.hive;
 
 import com.baifendian.swordfish.common.job.AbstractJob;
+import com.baifendian.swordfish.common.job.JobProps;
 import com.baifendian.swordfish.common.utils.CommonUtil;
 import com.baifendian.swordfish.common.utils.json.JsonUtil;
 import com.baifendian.swordfish.dao.hive.FunctionUtil;
@@ -21,16 +22,17 @@ public class EtlSqlJob extends AbstractJob {
 
     private SqlParam param;
 
-    private Map<String, String> definedParamMap;
-
     private List<ExecResult> results;
 
 
-    public EtlSqlJob(String jobId, PropertiesConfiguration props, Logger logger) throws IOException {
+    public EtlSqlJob(String jobId, JobProps props, Logger logger) throws IOException {
         super(jobId, props, logger);
 
-        this.param = JsonUtil.parseObject(props.getString(JOB_PARAMS), SqlParam.class);
-        this.definedParamMap = (Map<String, String>)props.getProperty(DEFINED_PARAMS);
+    }
+
+    @Override
+    public void initJobParams() {
+        this.param = JsonUtil.parseObject(props.getJobParams(), SqlParam.class);
     }
 
     @Override

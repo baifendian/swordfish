@@ -5,8 +5,6 @@ import com.baifendian.swordfish.common.utils.json.JsonUtil;
 import com.baifendian.swordfish.common.utils.json.StringNodeJsonDeserializer;
 import com.baifendian.swordfish.common.utils.json.StringNodeJsonSerializer;
 import com.baifendian.swordfish.dao.mysql.enums.NodeType;
-import com.baifendian.swordfish.dao.mysql.model.flow.params.BaseParam;
-import com.baifendian.swordfish.dao.mysql.model.flow.params.ParamUtil;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;

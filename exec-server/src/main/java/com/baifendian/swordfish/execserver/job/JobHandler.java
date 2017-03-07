@@ -4,9 +4,11 @@ import com.baifendian.swordfish.common.consts.Constants;
 import com.baifendian.swordfish.common.hadoop.HdfsUtil;
 import com.baifendian.swordfish.common.job.AbstractProcessJob;
 import com.baifendian.swordfish.common.job.Job;
+import com.baifendian.swordfish.common.job.JobProps;
 import com.baifendian.swordfish.common.job.exception.ExecException;
 import com.baifendian.swordfish.common.utils.BFDDateUtils;
 import com.baifendian.swordfish.dao.FlowDao;
+import com.baifendian.swordfish.dao.config.BaseConfig;
 import com.baifendian.swordfish.dao.hadoop.hdfs.HdfsPathManager;
 import com.baifendian.swordfish.common.job.FlowStatus;
 import com.baifendian.swordfish.dao.mysql.model.ExecutionFlow;
@@ -14,6 +16,7 @@ import com.baifendian.swordfish.dao.mysql.model.ExecutionNode;
 import com.baifendian.swordfish.dao.mysql.model.FlowNode;
 import com.baifendian.swordfish.execserver.exception.ExecTimeoutException;
 import org.apache.commons.configuration.PropertiesConfiguration;
+import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,7 +38,7 @@ public class JobHandler {
 
     private final Logger logger = LoggerFactory.getLogger(JobHandler.class);
 
-    private String JOB_SCRIPT_PATH_FORMAT = "{0}/job_script/{1}/{2}";
+    private String JOB_SCRIPT_PATH_FORMAT = "{0}/job_script/{1}";
 
     private String DATETIME_FORMAT="yyyyMMddHHmmss";
 
@@ -82,30 +85,34 @@ public class JobHandler {
     }
 
     public FlowStatus handle() throws IOException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException, InterruptedException {
-        String jobScriptPath = MessageFormat.format(JOB_SCRIPT_PATH_FORMAT, BFDDateUtils.now(Constants.BASE_DATE_FORMAT), jobId);
+        String flowLocalPath = BaseConfig.getFlowExecPath(executionFlow.getProjectName(), executionFlow.getFlowName(), executionFlow.getId());
+        String jobScriptPath = flowLocalPath + "/" + node.getName();
+        FileUtils.forceMkdir(new File(jobScriptPath));
         logger.info("job:{} script path:{}", jobId, jobScriptPath);
 
         // 下载节点级别的资源文件到脚本目录
+        /*
         String nodeResPath = HdfsPathManager.genNodeHdfsPath("aa");
-        HdfsUtil.GetFile(nodeResPath + "/*", jobScriptPath);
+        HdfsUtil.GetFile(nodeResPath, jobScriptPath);
+        */
         // 建立资源文件软链接
-        String flowResLocalPath = HdfsPathManager.genFlowLocalPath(executionFlow.getProjectName(), executionFlow.getFlowName(), executionFlow.getId());
+        String flowResLocalPath = BaseConfig.getFlowExecResPath(executionFlow.getProjectName(), executionFlow.getFlowName(), executionFlow.getId());
         File dirFile = new File(flowResLocalPath);
         for(File file:Arrays.asList(dirFile.listFiles())){
             String targetFileName = jobScriptPath + "/" + file.getName();
             File targetFile = new File(targetFileName);
             if(!targetFile.exists()){
-                Files.createSymbolicLink(file.toPath(), targetFile.toPath());
+                Files.createSymbolicLink(targetFile.toPath(), file.toPath());
             }
         }
 
         // 作业参数配置
-        PropertiesConfiguration props = new PropertiesConfiguration();
-        props.addProperty(AbstractProcessJob.JOB_PARAMS, node.getParam());
-        props.addProperty(AbstractProcessJob.WORKING_DIR, jobScriptPath);
-        props.addProperty(AbstractProcessJob.PROXY_USER, executionFlow.getProxyUser());
-        props.addProperty(AbstractProcessJob.DEFINED_PARAMS, allParamMap);
-        props.addProperty(AbstractProcessJob.PROJECT_ID, executionFlow.getProjectId());
+        JobProps props = new JobProps();
+        props.setJobParams(node.getParam());
+        props.setWorkDir(jobScriptPath);
+        props.setProxyUser(executionFlow.getProxyUser());
+        props.setDefinedParams(allParamMap);
+        props.setProjectId(executionFlow.getProjectId());
 
         logger.info("props:{}", props);
         Job job = JobTypeManager.newJob(jobId, node.getType().name(), props, logger);

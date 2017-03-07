@@ -24,7 +24,7 @@
         </rollingPolicy>
 
         <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
-            <level>DEBUG</level>
+            <level>TRACE</level>
         </filter>
         <!-- Safely log to the same file from multiple JVMs. Degrades performance! -->
         <prudent>true</prudent>
@@ -66,7 +66,7 @@
 
     <!-- Enable FILE and STDOUT appenders for all log messages.
          By default, only log at level INFO and above. -->
-    <root level="DEBUG">
+    <root level="TRACE">
         <appender-ref ref="FILE" />
         <appender-ref ref="STDOUT" />
     </root>

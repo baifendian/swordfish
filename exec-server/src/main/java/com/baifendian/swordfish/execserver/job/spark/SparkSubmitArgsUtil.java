@@ -65,12 +65,12 @@ public class SparkSubmitArgsUtil {
             args.add(param.getExecutorMemory());
         }
 
-        if (!param.getJars().isEmpty()) {
+        if (param.getJars() != null && !param.getJars().isEmpty()) {
             args.add(SparkSubmitArgsConst.JARS);
             args.add(StringUtils.join(param.getJars(), ","));
         }
 
-        if (!param.getFiles().isEmpty()) {
+        if (param.getFiles() != null && !param.getFiles().isEmpty()) {
             args.add(SparkSubmitArgsConst.FILES);
             args.add(StringUtils.join(param.getFiles(), ","));
         }

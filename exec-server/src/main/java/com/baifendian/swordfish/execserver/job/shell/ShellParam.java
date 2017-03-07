@@ -1,6 +1,6 @@
 package com.baifendian.swordfish.execserver.job.shell;
 
-import com.baifendian.swordfish.dao.mysql.model.flow.params.BaseParam;
+import com.baifendian.swordfish.common.job.BaseParam;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -20,6 +20,12 @@ public class Property {
     /** 配置值 */
     private String value;
 
+    public Property(){}
+
+    public Property(String prop, String value){
+        this.prop = prop;
+        this.value = value;
+    }
     /**
      * getter method
      * 

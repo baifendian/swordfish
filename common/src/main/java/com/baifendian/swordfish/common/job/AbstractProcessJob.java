@@ -6,25 +6,17 @@
 
 package com.baifendian.swordfish.common.job;
 
-import com.baifendian.swordfish.common.job.Job;
-import com.baifendian.swordfish.common.job.logger.JobLogger;
 import com.baifendian.swordfish.common.job.utils.ProcessUtil;
 import com.baifendian.swordfish.common.job.exception.ExecException;
-import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
-import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.concurrent.ExecutionException;
 
 /**
  * 进程 Job
@@ -40,7 +32,7 @@ public abstract class AbstractProcessJob extends AbstractJob {
      * @param props 作业配置信息,各类作业根据此配置信息生成具体的作业
      * @param logger 日志
      */
-    protected AbstractProcessJob(String jobId, PropertiesConfiguration props, Logger logger) throws IOException {
+    protected AbstractProcessJob(String jobId, JobProps props, Logger logger) throws IOException {
         super(jobId, props, logger);
     }
 
@@ -50,7 +42,7 @@ public abstract class AbstractProcessJob extends AbstractJob {
      *
      * @return {@link ProcessBuilder}
      */
-    public abstract ProcessBuilder createProcessBuilder();
+    public abstract ProcessBuilder createProcessBuilder() throws IOException;
 
     @Override
     public void before() throws Exception{}
@@ -64,26 +56,27 @@ public abstract class AbstractProcessJob extends AbstractJob {
                 complete = true;
                 return;
             }
-            ProcessBuilder curProcessBuilder;
+
             String proxyUser = getProxyUser();
             String workDir = getWorkingDirectory();
             logger.info("jobId:{} proxyUser:{} workDir:{}", jobId, proxyUser, workDir);
             if(proxyUser != null){
-                curProcessBuilder = new ProcessBuilder();
                 String commandFile = workDir + File.separator + jobId + ".command";
                 logger.info("generate command file:{}", commandFile);
                 FileUtils.writeStringToFile(new File(commandFile), StringUtils.join(processBuilder.command(), " "));
-                curProcessBuilder.command().add(String.format("sudo -u %s sh %s", proxyUser, commandFile));
+                processBuilder.command("sudo -u ", proxyUser, "sh -c", commandFile);
             } else {
-                curProcessBuilder = processBuilder;
+                List<String> commands = processBuilder.command();
+                processBuilder.command("sh -c");
+                processBuilder.command(commands);
             }
-            curProcessBuilder.directory(new File(workDir));
+            processBuilder.directory(new File(workDir));
             // 将 error 信息 merge 到标准输出流
-            curProcessBuilder.redirectErrorStream(true);
-            process = curProcessBuilder.start();
+            processBuilder.redirectErrorStream(true);
+            process = processBuilder.start();
 
             // 打印 进程的启动命令行
-            printCommand(curProcessBuilder);
+            printCommand(processBuilder);
 
             readProcessOutput();
             exitCode = process.waitFor();

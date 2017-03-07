@@ -7,6 +7,7 @@
 package com.baifendian.swordfish.execserver.job.spark;
 
 import com.baifendian.swordfish.common.job.AbstractProcessJob;
+import com.baifendian.swordfish.common.job.JobProps;
 import com.baifendian.swordfish.common.utils.PlaceholderUtil;
 import com.baifendian.swordfish.common.utils.json.JsonUtil;
 import org.apache.commons.configuration.PropertiesConfiguration;
@@ -34,16 +35,18 @@ public class SparkJob extends AbstractProcessJob {
     private final Logger LOGGER = LoggerFactory.getLogger(getClass());
 
     /** 提交的参数 */
-    private final SparkParam param;
+    private SparkParam param;
 
     /** app id **/
     private String appid;
 
-    public SparkJob(String jobId, PropertiesConfiguration props, Logger logger) throws IllegalAccessException, IOException {
+    public SparkJob(String jobId, JobProps props, Logger logger) throws IllegalAccessException, IOException {
         super(jobId, props, logger);
+    }
 
-        this.param = JsonUtil.parseObject(props.getString(JOB_PARAMS), SparkParam.class);
-
+    @Override
+    public void initJobParams(){
+        this.param = JsonUtil.parseObject(props.getJobParams(), SparkParam.class);
     }
 
     public List<String> buildCommand(){

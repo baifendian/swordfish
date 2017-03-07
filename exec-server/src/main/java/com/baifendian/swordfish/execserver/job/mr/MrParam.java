@@ -6,14 +6,12 @@
 
 package com.baifendian.swordfish.execserver.job.mr;
 
-import com.baifendian.swordfish.dao.mysql.model.flow.params.BaseParam;
+import com.baifendian.swordfish.common.job.BaseParam;
 import com.baifendian.swordfish.dao.mysql.model.flow.params.Property;
-import com.baifendian.swordfish.dao.mysql.model.flow.params.ResInfo;
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * MR 节点的参数
@@ -24,197 +22,121 @@ import java.util.List;
  */
 public class MrParam extends BaseParam {
 
-    /** 主jar包资源信息 */
-    private String mainJarResInfo;
+    /**
+     * 主jar包资源信息
+     */
+    private String mainJar;
 
-    /** 主程序 */
+    /**
+     * 主程序
+     */
     private String mainClass;
 
-    /** 参数信息 */
+    /**
+     * 参数信息
+     */
     private List<String> args;
 
-    /** 配置信息列表 */
+    /**
+     * 配置信息列表
+     */
     private List<Property> properties;
 
-    /** 额外的 jar 包，指的是本地的文件，这个可能很长 */
-    private List<String> jarsResInfos;
+    /**
+     * 额外的 jar 包，指的是本地的文件，这个可能很长
+     */
+    private List<String> jars;
 
-    /** 额外的文件，指的是本地的文件，可能是多条配置 */
-    private List<String> filesResInfos;
+    /**
+     * 额外的文件，指的是本地的文件，可能是多条配置
+     */
+    private List<String> files;
 
-    /** 额外的压缩文件，指的是本地的文件，可能是多条配置 */
-    private List<String> archivesResInfos;
+    /**
+     * 额外的压缩文件，指的是本地的文件，可能是多条配置
+     */
+    private List<String> archives;
+
+    /** 执行队列 */
+    private String queue;
 
     @Override
     public boolean checkValid() {
-        return mainJarResInfo != null && StringUtils.isNotEmpty(mainClass);
+        return mainJar != null && StringUtils.isNotEmpty(mainClass);
     }
 
-    @Override
-    public List<Integer> findAllResourceIds() {
-        List<Integer> resourceIds = new ArrayList<>();
-        /*
-        if (mainJarResInfo != null) {
-            resourceIds.add(mainJarResInfo.getId());
-        }
-        if (CollectionUtils.isNotEmpty(jarsResInfos)) {
-            addToResourceIds(jarsResInfos, resourceIds);
-        }
-        if (CollectionUtils.isNotEmpty(filesResInfos)) {
-            addToResourceIds(filesResInfos, resourceIds);
-        }
-        if (CollectionUtils.isNotEmpty(archivesResInfos)) {
-            addToResourceIds(archivesResInfos, resourceIds);
-        }
-        */
-        return resourceIds;
+    public String getMainJar() {
+        return mainJar;
     }
 
-    /**
-     * getter method
-     * 
-     * @see MrParam#mainJarResInfo
-     * @return the mainJarResInfo
-     */
-    public String getMainJarResInfo() {
-        return mainJarResInfo;
+    public void setMainJar(String mainJar) {
+        this.mainJar = mainJar;
     }
 
-    /**
-     * setter method
-     * 
-     * @see MrParam#mainJarResInfo
-     * @param mainJarResInfo
-     *            the mainJarResInfo to set
-     */
-    public void setMainJarResInfo(String mainJarResInfo) {
-        this.mainJarResInfo = mainJarResInfo;
-    }
-
-    /**
-     * getter method
-     * 
-     * @see MrParam#mainClass
-     * @return the mainClass
-     */
     public String getMainClass() {
         return mainClass;
     }
 
-    /**
-     * setter method
-     * 
-     * @see MrParam#mainClass
-     * @param mainClass
-     *            the mainClass to set
-     */
     public void setMainClass(String mainClass) {
         this.mainClass = mainClass;
     }
 
-    /**
-     * getter method
-     * 
-     * @see MrParam#args
-     * @return the args
-     */
     public List<String> getArgs() {
         return args;
     }
 
-    /**
-     * setter method
-     * 
-     * @see MrParam#args
-     * @param args
-     *            the args to set
-     */
     public void setArgs(List<String> args) {
         this.args = args;
     }
 
-    /**
-     * getter method
-     * 
-     * @see MrParam#properties
-     * @return the properties
-     */
     public List<Property> getProperties() {
         return properties;
     }
 
-    /**
-     * setter method
-     * 
-     * @see MrParam#properties
-     * @param properties
-     *            the properties to set
-     */
     public void setProperties(List<Property> properties) {
         this.properties = properties;
     }
 
-    /**
-     * getter method
-     * 
-     * @see MrParam#jarsResInfos
-     * @return the jarsResInfos
-     */
-    public List<String> getJarsResInfos() {
-        return jarsResInfos;
+    public List<String> getJars() {
+        return jars;
     }
 
-    /**
-     * setter method
-     * 
-     * @see MrParam#jarsResInfos
-     * @param jarsResInfos
-     *            the jarsResInfos to set
-     */
-    public void setJarsResInfos(List<String> jarsResInfos) {
-        this.jarsResInfos = jarsResInfos;
+    public void setJars(List<String> jars) {
+        this.jars = jars;
     }
 
-    /**
-     * getter method
-     * 
-     * @see MrParam#filesResInfos
-     * @return the filesResInfos
-     */
-    public List<String> getFilesResInfos() {
-        return filesResInfos;
+    public List<String> getFiles() {
+        return files;
     }
 
-    /**
-     * setter method
-     * 
-     * @see MrParam#filesResInfos
-     * @param filesResInfos
-     *            the filesResInfos to set
-     */
-    public void setFilesResInfos(List<String> filesResInfos) {
-        this.filesResInfos = filesResInfos;
+    public void setFiles(List<String> files) {
+        this.files = files;
     }
 
-    /**
-     * getter method
-     * 
-     * @see MrParam#archivesResInfos
-     * @return the archivesResInfos
-     */
-    public List<String> getArchivesResInfos() {
-        return archivesResInfos;
+    public List<String> getArchives() {
+        return archives;
     }
 
-    /**
-     * setter method
-     * 
-     * @see MrParam#archivesResInfos
-     * @param archivesResInfos
-     *            the archivesResInfos to set
-     */
-    public void setArchivesResInfos(List<String> archivesResInfos) {
-        this.archivesResInfos = archivesResInfos;
+    public void setArchives(List<String> archives) {
+        this.archives = archives;
     }
 
+    public List<String> getDArgs(){
+        return this.properties.stream().map(prop ->  prop.getProp() + "=" + prop.getValue())
+                .collect(Collectors.toList());
+    }
+
+    public void setDArgs(){
+
+    }
+
+    public String getQueue() {
+        return queue;
+    }
+
+    public void setQueue(String queue) {
+        this.queue = queue;
+    }
 }
+
+

@@ -6,7 +6,7 @@
 
 package com.baifendian.swordfish.execserver.job.hive;
 
-import com.baifendian.swordfish.dao.mysql.model.flow.params.BaseParam;
+import com.baifendian.swordfish.common.job.BaseParam;
 import com.baifendian.swordfish.dao.mysql.model.flow.params.adhoc.AdHocSqlParam;
 import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.hive.ql.parse.ParseDriver;

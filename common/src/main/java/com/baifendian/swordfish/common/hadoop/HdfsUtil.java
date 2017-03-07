@@ -2,6 +2,7 @@ package com.baifendian.swordfish.common.hadoop;
 
 import com.baifendian.swordfish.common.job.exception.ExecException;
 import org.apache.commons.io.IOUtils;
+import org.apache.hadoop.fs.FileStatus;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -18,14 +19,18 @@ public class HdfsUtil {
      * @param dst 本地目录
      */
     public static void GetFile(String src, String dst) throws IOException, InterruptedException, ExecException {
-        ProcessBuilder processBuilder = new ProcessBuilder();
-        String cmd = String.format("hdfs dfs -get %s %s", src, dst);
-        processBuilder.command(cmd);
-        processBuilder.redirectErrorStream(true);
-        Process process = processBuilder.start();
-        int ret = process.waitFor();
-        if(ret != 0){
-            throw new ExecException(String.format("call cmd %s error, %s", cmd, IOUtils.toString(process.getInputStream(), "UTF-8")));
+        HdfsClient hdfsClient = HdfsClient.getInstance();
+        FileStatus[] fileStatuses = hdfsClient.listFileStatus(src);
+        if(fileStatuses.length>0) {
+            ProcessBuilder processBuilder = new ProcessBuilder();
+            String cmd = String.format("hdfs dfs -get %s/* %s", src, dst);
+            processBuilder.command("sh", "-c", cmd);
+            processBuilder.redirectErrorStream(true);
+            Process process = processBuilder.start();
+            int ret = process.waitFor();
+            if (ret != 0) {
+                throw new ExecException(String.format("call cmd %s error, %s", cmd, IOUtils.toString(process.getInputStream(), "UTF-8")));
+            }
         }
     }
 }

@@ -7,10 +7,9 @@
 package com.baifendian.swordfish.execserver.job.mr;
 
 import com.baifendian.swordfish.common.job.AbstractProcessJob;
+import com.baifendian.swordfish.common.job.JobProps;
 import com.baifendian.swordfish.common.utils.PlaceholderUtil;
 import com.baifendian.swordfish.common.utils.json.JsonUtil;
-import com.baifendian.swordfish.execserver.node.ResourceHelper;
-import com.baifendian.swordfish.execserver.utils.CommandUtil;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
@@ -22,7 +21,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * mr 作业
@@ -54,16 +52,16 @@ public class MrJob extends AbstractProcessJob {
      * @param logger
      * @throws IOException
      */
-    public MrJob(String jobId, PropertiesConfiguration props, Logger logger) throws IOException {
+    public MrJob(String jobId, JobProps props, Logger logger) throws IOException {
         super(jobId, props, logger);
+    }
 
-        this.param = JsonUtil.parseObject(props.getString(JOB_PARAMS), MrParam.class);
+    @Override
+    public void initJobParams(){
+        param = JsonUtil.parseObject(props.getJobParams(), MrParam.class);
     }
 
     public List<String> buildCommand(){
-        HadoopJarArgsBuilder builder = new HadoopJarArgsBuilder();
-        builder.setMainClass(param.getMainClass());
-        builder.setMainJar(param.getMainJarResInfo());
         if (param.getArgs() != null) {
             List<String> appArgs = new ArrayList<>();
             for (String arg : param.getArgs()) {
@@ -71,13 +69,9 @@ public class MrJob extends AbstractProcessJob {
                 arg = PlaceholderUtil.resolvePlaceholders(arg, definedParamMap, true);
                 appArgs.add(arg);
             }
-            builder.setAppArgs(appArgs);
+            param.setArgs(appArgs);
         }
-        //builder.setDArgs(CommandUtil.genDArgs(param.getProperties()));
-        builder.setJars(param.getJarsResInfos());
-        builder.setArchives(param.getArchivesResInfos());
-        builder.setFiles(param.getFilesResInfos());
-        return builder.buildArgs();
+        return HadoopJarArgsUtil.buildArgs(param);
     }
 
     @Override

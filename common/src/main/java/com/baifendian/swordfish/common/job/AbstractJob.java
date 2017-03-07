@@ -21,22 +21,7 @@ import java.util.Map;
  * @author : liujin
  * @date : 2017-03-06 10:56
  */
-public class AbstractJob implements Job {
-    /** 作业执行目录key 值为String **/
-    public static final String WORKING_DIR = "working.dir";
-
-    /** 作业执行用户key 值为String **/
-    public static final String PROXY_USER = "proxy.user";
-
-    /** 作业配置参数key 值为json字符串 **/
-    public static final String JOB_PARAMS = "job.params";
-
-    /** 自定义参数key 值为Map<String, String> **/
-    public static final String DEFINED_PARAMS = "defined.params";
-
-    /** 项目id  **/
-    public static final String PROJECT_ID = "project.id";
-
+public abstract class AbstractJob implements Job {
     /** LOGGER */
     protected final JobLogger logger;
 
@@ -49,7 +34,7 @@ public class AbstractJob implements Job {
     protected Process process;
 
     /** 配置参数 **/
-    PropertiesConfiguration props;
+    protected JobProps props;
 
     protected String jobPath;
 
@@ -71,14 +56,14 @@ public class AbstractJob implements Job {
      * @param props 作业配置信息,各类作业根据此配置信息生成具体的作业
      * @param logger 日志
      */
-    protected AbstractJob(String jobId, PropertiesConfiguration props, Logger logger) throws IOException {
+    protected AbstractJob(String jobId, JobProps props, Logger logger) throws IOException {
         this.jobId = jobId;
         this.props = props;
         this._logger = logger;
         this.logger = new JobLogger(jobId, logger);
         initJobParams();
-        this.definedParamMap = (Map<String, String>)props.getProperty(DEFINED_PARAMS);
-        this.projectId = props.getInt(PROJECT_ID);
+        this.definedParamMap = props.getDefinedParams();
+        this.projectId = props.getProjectId();
     }
 
     @Override
@@ -125,23 +110,14 @@ public class AbstractJob implements Job {
     }
 
     @Override
-    public PropertiesConfiguration getProperties(){
+    public JobProps getJobProps(){
         return props;
     }
 
-    public void initJobParams() throws IOException {
-        // json字符串
-        String jobParamsStr = props.getString(JOB_PARAMS);
-        if(jobParamsStr != null && StringUtils.isNotEmpty(jobParamsStr)) {
-            ObjectMapper mapper = new ObjectMapper();
-            jobParams = mapper.readValue(jobParamsStr, Map.class);
-        }else{
-            jobParams = new HashMap<>();
-        }
-    }
+    public abstract void initJobParams() throws IOException;
 
     public String getWorkingDirectory() {
-        String workingDir = getProperties().getString(WORKING_DIR, jobPath);
+        String workingDir = props.getWorkDir();
         if (workingDir == null) {
             return "";
         }
@@ -150,7 +126,7 @@ public class AbstractJob implements Job {
     }
 
     public String getProxyUser() {
-        return getProperties().getString(PROXY_USER);
+        return props.getProxyUser();
     }
 
     @Override

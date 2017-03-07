@@ -77,7 +77,7 @@ public interface Job {
      * 获取作业的配置参数信息
      * @return
      */
-    PropertiesConfiguration getProperties();
+    JobProps getJobProps();
 
     /**
      * 获取返回码

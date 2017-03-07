@@ -350,6 +350,23 @@ public class HdfsClient implements Closeable {
     }
 
     /**
+     * 获取目录下的文件列表
+     * <p>
+     *
+     * @param filePath
+     * @return {@link FileStatus}
+     */
+    public FileStatus[] listFileStatus(String filePath) {
+        Path path = new Path(filePath);
+        try {
+            return fileSystem.listStatus(new Path(filePath));
+        } catch (IOException e) {
+            LOGGER.error("获取文件列表异常", e);
+            throw new HdfsException("获取文件列表异常", e);
+        }
+    }
+
+    /**
      * 获取文件或目录的内容概要（包括逻辑空间大小、物理空间大小等）
      * <p>
      *

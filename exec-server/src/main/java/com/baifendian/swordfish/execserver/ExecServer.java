@@ -8,6 +8,7 @@ package com.baifendian.swordfish.execserver;
 
 import com.baifendian.swordfish.common.hadoop.HdfsClient;
 import com.baifendian.swordfish.dao.hadoop.ConfigurationUtil;
+import com.baifendian.swordfish.dao.mysql.enums.FlowType;
 import com.baifendian.swordfish.rpc.RetInfo;
 import com.baifendian.swordfish.execserver.service.ExecServiceImpl;
 import com.baifendian.swordfish.execserver.utils.OsUtil;
@@ -49,6 +50,7 @@ public class ExecServer {
      * @param args
      */
     public static void main(String[] args) {
+        System.out.println("start exec server");
         try {
             // 下面语句用于 windows 调试
             if (OsUtil.isWindows()) {
@@ -64,14 +66,17 @@ public class ExecServer {
             ExecServiceImpl impl = new ExecServiceImpl();
 
             // 下面是测试
-            // Integer projectId = 5794;
-            // Integer flowId = 999;
-            // FlowDao flowDao = DaoFactory.getDaoInstance(FlowDao.class);
-            // ExecutionFlow executionFlow =
-            // flowDao.runFlowToExecution(projectId, flowId);
-            // impl.execFlow(projectId, executionFlow.getId(),
-            // FlowType.SHORT.toString());
-
+            /*
+             Integer projectId = 5794;
+             Integer flowId = 999;
+             FlowDao flowDao = DaoFactory.getDaoInstance(FlowDao.class);
+             ExecutionFlow executionFlow =
+             flowDao.runFlowToExecution(projectId, flowId);
+             impl.execFlow(projectId, executionFlow.getId(),
+             FlowType.SHORT.toString());
+             */
+            impl.scheduleExecFlow(1, 4, "etl", System.currentTimeMillis());
+/*
             final Server server = new Server(new String[] { SERVER_FILE_PATH }, impl);
             server.start();
 
@@ -84,6 +89,7 @@ public class ExecServer {
                 }
             }));
 
+
             synchronized (ExecServer.class) {
                 while (running) {
                     try {
@@ -93,6 +99,7 @@ public class ExecServer {
                     }
                 }
             }
+*/
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
         }

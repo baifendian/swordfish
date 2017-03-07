@@ -7,6 +7,8 @@
 package com.baifendian.swordfish.execserver.job.process;
 
 import com.baifendian.swordfish.common.job.AbstractProcessJob;
+import com.baifendian.swordfish.common.job.JobProps;
+import com.baifendian.swordfish.common.utils.json.JsonUtil;
 import com.bfd.harpc.common.configure.PropertiesConfiguration;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -33,10 +35,7 @@ public class JavaProcessJob extends AbstractProcessJob {
     private static List<String> javaOptList = new ArrayList<>();
 
     /** 参数 */
-    private final List<String> args;
-
-    /** 环境变量 */
-    private final Map<String, String> envMap;
+    private ProcessParam param;
 
     static {
         // java 可选参数
@@ -46,17 +45,14 @@ public class JavaProcessJob extends AbstractProcessJob {
         }
     }
 
-    /**
-     * @param args
-     * @param envMap
-     * @param jobIdLog
-     */
-    public JavaProcessJob(String jobId, org.apache.commons.configuration.PropertiesConfiguration props, Logger logger) throws IOException {
+    public JavaProcessJob(String jobId, JobProps props, Logger logger) throws IOException {
         super(jobId, props, logger);
 
-        args = (List<String>)jobParams.get("args");
+    }
 
-        envMap = (Map<String, String>)jobParams.get("envMap");
+    @Override
+    public void initJobParams(){
+        param = JsonUtil.parseObject(props.getJobParams(), ProcessParam.class);
     }
 
     @Override
@@ -65,11 +61,11 @@ public class JavaProcessJob extends AbstractProcessJob {
         if (!javaOptList.isEmpty()) {
             processBuilder.command().addAll(javaOptList);
         }
-        if (args != null) {
-            processBuilder.command().addAll(args);
+        if (param.getArgs() != null) {
+            processBuilder.command().addAll(param.getArgs());
         }
-        if (envMap != null) {
-            processBuilder.environment().putAll(envMap);
+        if (param.getEnvMap() != null) {
+            processBuilder.environment().putAll(param.getEnvMap());
         }
 
         // List<String> commands=new ArrayList<String>();

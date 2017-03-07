@@ -6,7 +6,9 @@
 
 package com.baifendian.swordfish.execserver.flow;
 
+import com.baifendian.swordfish.common.hadoop.HdfsUtil;
 import com.baifendian.swordfish.common.job.FlowStatus;
+import com.baifendian.swordfish.dao.config.BaseConfig;
 import com.baifendian.swordfish.dao.mail.EmailManager;
 import com.baifendian.swordfish.common.utils.BFDDateUtils;
 import com.baifendian.swordfish.common.utils.graph.DAGGraph;
@@ -22,11 +24,15 @@ import com.baifendian.swordfish.execserver.node.NodeRunner;
 import com.baifendian.swordfish.execserver.node.ResourceHelper;
 import com.baifendian.swordfish.execserver.utils.LoggerUtil;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.ObjectUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
@@ -133,8 +139,25 @@ public class FlowRunner implements Runnable {
         FlowStatus status = null;
 
         try {
-            String execLocalPath = ResourceHelper.getExecLocalPath(executionFlow.getId());
+            String execLocalPath = BaseConfig.getFlowExecPath(executionFlow.getProjectName(), executionFlow.getFlowName(),
+                                                            executionFlow.getId());
+            String execLocalResPath = BaseConfig.getFlowExecResPath(executionFlow.getProjectName(), executionFlow.getFlowName(),
+                    executionFlow.getId());
             LOGGER.info("当前执行的目录是：{}", execLocalPath);
+            LOGGER.info("当前执行的资源目录是：{}", execLocalResPath);
+            File execLocalPathFile = new File(execLocalPath);
+            if(execLocalPathFile.exists()){
+                FileUtils.forceDelete(execLocalPathFile);
+                //throw new ExecTimeoutException(String.format("path %s exists", execLocalPath));
+            }
+            FileUtils.forceMkdir(execLocalPathFile);
+            FileUtils.forceMkdir(new File(execLocalResPath));
+
+            /** 下载项目和workflow的资源文件到本地, workflow的资源文件会覆盖项目级别的 */
+            String projectHdfsPath = BaseConfig.getHdfsProjectResourcesPath(executionFlow.getProjectId());
+            HdfsUtil.GetFile(projectHdfsPath, execLocalResPath);
+            String workflowHdfsPath = BaseConfig.getHdfsFlowResourcesPath(executionFlow.getProjectId(), executionFlow.getFlowId());
+            HdfsUtil.GetFile(workflowHdfsPath, execLocalResPath);
 
             FlowType flowType = executionFlow.getFlowType();
             FlowDag flowDag = JsonUtil.parseObject(executionFlow.getWorkflowData(), FlowDag.class);

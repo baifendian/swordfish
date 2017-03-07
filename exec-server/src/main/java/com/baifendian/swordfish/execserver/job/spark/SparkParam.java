@@ -6,8 +6,7 @@
 
 package com.baifendian.swordfish.execserver.job.spark;
 
-import com.baifendian.swordfish.dao.mysql.model.flow.params.BaseParam;
-import com.baifendian.swordfish.dao.mysql.model.flow.params.Property;
+import com.baifendian.swordfish.common.job.BaseParam;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
