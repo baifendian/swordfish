@@ -113,6 +113,7 @@ public class JobHandler {
         props.setProxyUser(executionFlow.getProxyUser());
         props.setDefinedParams(allParamMap);
         props.setProjectId(executionFlow.getProjectId());
+        props.setEnvFile(BaseConfig.getSystemEnvPath());
 
         logger.info("props:{}", props);
         Job job = JobTypeManager.newJob(jobId, node.getType().name(), props, logger);
@@ -124,7 +125,7 @@ public class JobHandler {
             result = submitJob(job);
         }catch (Exception e){
             result = false;
-            logger.error("run job error", e);
+            logger.error("run job error, jobId:"+jobId, e);
         }
         FlowStatus status;
         if(result){

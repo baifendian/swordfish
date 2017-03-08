@@ -31,9 +31,6 @@ import java.util.List;
  */
 public class MrJob extends AbstractProcessJob {
 
-    /** LOGGER */
-    private final Logger LOGGER = LoggerFactory.getLogger(getClass());
-
     /** hadoop */
     private static final String HADOOP_COMMAND = "hadoop";
 
@@ -101,10 +98,10 @@ public class MrJob extends AbstractProcessJob {
                     appid = findAppid(line);
                 }
                 // jobContext.appendLog(line);
-                LOGGER.info("MR execute log : {}", line);
+                logger.info("MR execute log : {}", line);
             }
         } catch (IOException e) {
-            LOGGER.error(e.getMessage(), e);
+            logger.error(e.getMessage(), e);
         } finally {
             IOUtils.closeQuietly(inputStream);
         }

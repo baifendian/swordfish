@@ -20,14 +20,12 @@ import java.util.Map;
  */
 public class EtlSqlJob extends AbstractJob {
 
-    private SqlParam param;
+    protected SqlParam param;
 
-    private List<ExecResult> results;
-
+    protected List<ExecResult> results;
 
     public EtlSqlJob(String jobId, JobProps props, Logger logger) throws IOException {
         super(jobId, props, logger);
-
     }
 
     @Override

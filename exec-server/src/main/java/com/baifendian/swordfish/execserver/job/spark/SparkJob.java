@@ -31,9 +31,6 @@ import java.util.List;
  */
 public class SparkJob extends AbstractProcessJob {
 
-    /** LOGGER */
-    private final Logger LOGGER = LoggerFactory.getLogger(getClass());
-
     /** 提交的参数 */
     private SparkParam param;
 
@@ -79,10 +76,10 @@ public class SparkJob extends AbstractProcessJob {
                     appid = findAppid(line);
                 }
                 // jobContext.appendLog(line);
-                LOGGER.info("MR execute log : {}", line);
+                logger.info(line);
             }
         } catch (IOException e) {
-            LOGGER.error(e.getMessage(), e);
+            logger.error(e.getMessage(), e);
         } finally {
             IOUtils.closeQuietly(inputStream);
         }
@@ -96,7 +93,7 @@ public class SparkJob extends AbstractProcessJob {
      * @return appid
      */
     private String findAppid(String line) {
-        if (line.contains("impl.YarnClientImpl: Submitted application")) {
+        if (line.contains("YarnClientImpl: Submitted application")) {
             return line.substring(line.indexOf("application") + "application".length() + 1);
         }
         return null;

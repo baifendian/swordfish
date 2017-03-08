@@ -1,4 +1,12 @@
 /*
+ * Copyright (c) 2017. Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+ * Morbi non lorem porttitor neque feugiat blandit. Ut vitae ipsum eget quam lacinia accumsan.
+ * Etiam sed turpis ac ipsum condimentum fringilla. Maecenas magna.
+ * Proin dapibus sapien vel ante. Aliquam erat volutpat. Pellentesque sagittis ligula eget metus.
+ * Vestibulum commodo. Ut rhoncus gravida arcu.
+ */
+
+/*
  * Create Author  : dsfan
  * Create Date    : 2016年11月22日
  * File Name      : HadoopJarArgsBuilder.java
@@ -37,12 +45,6 @@ public class HadoopJarArgsUtil {
             args.add(param.getMainClass());
         }
 
-        if (param.getArgs() != null && !param.getArgs().isEmpty()) {
-            for (String appArg : param.getArgs()) {
-                args.add(appArg);
-            }
-        }
-
         if (param.getDArgs() != null && !param.getDArgs().isEmpty()) {
             for (String darg : param.getDArgs()) {
                 args.add(HadoopJarArgsConst.D);
@@ -68,6 +70,12 @@ public class HadoopJarArgsUtil {
         if (StringUtils.isNotEmpty(param.getQueue())) {
             args.add(HadoopJarArgsConst.D);
             args.add(HadoopJarArgsConst.QUEUE + "=" + param.getQueue());
+        }
+
+        if (param.getArgs() != null && !param.getArgs().isEmpty()) {
+            for (String appArg : param.getArgs()) {
+                args.add(appArg);
+            }
         }
         return args;
     }

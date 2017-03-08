@@ -63,13 +63,23 @@ public abstract class AbstractProcessJob extends AbstractJob {
             if(proxyUser != null){
                 String commandFile = workDir + File.separator + jobId + ".command";
                 logger.info("generate command file:{}", commandFile);
-                FileUtils.writeStringToFile(new File(commandFile), StringUtils.join(processBuilder.command(), " "));
-                processBuilder.command("sudo -u ", proxyUser, "sh -c", commandFile);
+                StringBuilder stringBuilder = new StringBuilder();
+                stringBuilder.append("#!/bin/sh\n");
+                stringBuilder.append("BASEDIR=$(cd `dirname $0`; pwd)\n");
+                stringBuilder.append("cd $BASEDIR\n");
+                if(props.getEnvFile() != null) {
+                    stringBuilder.append("source " + props.getEnvFile() + "\n");
+                }
+                stringBuilder.append("\n\n");
+                stringBuilder.append(StringUtils.join(processBuilder.command(), " "));
+                FileUtils.writeStringToFile(new File(commandFile), stringBuilder.toString());
+                processBuilder.command("sudo","-u", proxyUser, "sh", commandFile);
             } else {
                 List<String> commands = processBuilder.command();
-                processBuilder.command("sh -c");
-                processBuilder.command(commands);
+                processBuilder.command("sh", "-c");
+                processBuilder.command().addAll(commands);
             }
+            logger.info("run command:{}", processBuilder.command());
             processBuilder.directory(new File(workDir));
             // 将 error 信息 merge 到标准输出流
             processBuilder.redirectErrorStream(true);

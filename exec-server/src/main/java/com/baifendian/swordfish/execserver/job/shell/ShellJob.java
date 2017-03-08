@@ -67,7 +67,7 @@ public class ShellJob extends AbstractProcessJob {
     String fileName = currentPath + "/run_" + UUID.randomUUID().toString().substring(0, 8) + ".sh";
     Path path = new File(fileName).toPath();
 
-    Set<PosixFilePermission> perms = PosixFilePermissions.fromString("rwxr-xr--");
+    Set<PosixFilePermission> perms = PosixFilePermissions.fromString("rwxr-xr-x");
     FileAttribute<Set<PosixFilePermission>> attr = PosixFilePermissions.asFileAttribute(perms);
 
     Files.createFile(path, attr);

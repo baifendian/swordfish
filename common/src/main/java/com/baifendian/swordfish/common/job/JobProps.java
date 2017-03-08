@@ -11,6 +11,15 @@ public class JobProps {
     /** 项目id  **/
     private int projectId;
 
+    /** flow id **/
+    private int workflowId;
+
+    /** node id **/
+    private int nodeId;
+
+    /** 执行id **/
+    private long execId;
+
     /** 作业执行用户 **/
     private String proxyUser;
 
@@ -19,6 +28,9 @@ public class JobProps {
 
     /** 作业执行目录 **/
     private String workDir;
+
+    /** 环境变量文件 **/
+    private String envFile;
 
     /** 自定义参数 **/
     private Map<String, String> definedParams;
@@ -61,5 +73,37 @@ public class JobProps {
 
     public void setDefinedParams(Map<String, String> definedParams) {
         this.definedParams = definedParams;
+    }
+
+    public String getEnvFile() {
+        return envFile;
+    }
+
+    public void setEnvFile(String envFile) {
+        this.envFile = envFile;
+    }
+
+    public int getWorkflowId() {
+        return workflowId;
+    }
+
+    public void setWorkflowId(int workflowId) {
+        this.workflowId = workflowId;
+    }
+
+    public int getNodeId() {
+        return nodeId;
+    }
+
+    public void setNodeId(int nodeId) {
+        this.nodeId = nodeId;
+    }
+
+    public long getExecId() {
+        return execId;
+    }
+
+    public void setExecId(long execId) {
+        this.execId = execId;
     }
 }

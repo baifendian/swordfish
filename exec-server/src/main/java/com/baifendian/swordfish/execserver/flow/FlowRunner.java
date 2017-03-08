@@ -34,6 +34,7 @@ import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
@@ -82,6 +83,9 @@ public class FlowRunner implements Runnable {
 
     /** 执行的节点的 Future */
     private final Map<ExecutionNode, Future<?>> nodeFutureMap = new HashMap<>();
+
+    /** 正在运行的nodeRunner */
+    private Set<NodeRunner> activeNodeRunners = Collections.newSetFromMap(new ConcurrentHashMap<NodeRunner, Boolean>());
 
     /** 一个节点失败后的策略类型 */
     private final FailurePolicyType failurePolicyType;
@@ -158,7 +162,6 @@ public class FlowRunner implements Runnable {
             HdfsUtil.GetFile(projectHdfsPath, execLocalResPath);
             String workflowHdfsPath = BaseConfig.getHdfsFlowResourcesPath(executionFlow.getProjectId(), executionFlow.getFlowId());
             HdfsUtil.GetFile(workflowHdfsPath, execLocalResPath);
-
             FlowType flowType = executionFlow.getFlowType();
             FlowDag flowDag = JsonUtil.parseObject(executionFlow.getWorkflowData(), FlowDag.class);
             switch (flowType) {
@@ -469,6 +472,7 @@ public class FlowRunner implements Runnable {
         int nowTimeout = calcNodeTimeout(); // 重新计算超时时间
         NodeRunner nodeRunner = new NodeRunner(executionFlow, executionNode, flowNode, jobExecutorService, synObject, nowTimeout, systemParamMap, customParamMap);
         Future<?> future = executorService.submit(nodeRunner);
+        activeNodeRunners.add(nodeRunner);
         nodeFutureMap.put(executionNode, future);
     }
 
@@ -756,6 +760,10 @@ public class FlowRunner implements Runnable {
         if (schedule != null && (BooleanUtils.isTrue(schedule.getSuccessEmails()) || BooleanUtils.isTrue(schedule.getFailureEmails()))) {
             EmailManager.sendEmail(executionFlow);
         }
+    }
+
+    public void kill(String user){
+        LOGGER.info("Flow killed by" + user);
     }
 
     /**

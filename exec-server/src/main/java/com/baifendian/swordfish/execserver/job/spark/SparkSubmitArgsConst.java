@@ -41,7 +41,7 @@ public class SparkSubmitArgsConst {
     public static final String EXECUTOR_MEMORY = "--executor-memory";
 
     /** --addJars jars */
-    public static final String JARS = "--addJars";
+    public static final String JARS = "--jars";
 
     /** --files files */
     public static final String FILES = "--files";
