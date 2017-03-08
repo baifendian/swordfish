@@ -10,6 +10,7 @@ import com.baifendian.swordfish.common.job.AbstractProcessJob;
 import com.baifendian.swordfish.common.job.JobProps;
 import com.baifendian.swordfish.common.utils.PlaceholderUtil;
 import com.baifendian.swordfish.common.utils.json.JsonUtil;
+import com.baifendian.swordfish.execserver.parameter.ParamHelper;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
@@ -44,6 +45,14 @@ public class SparkJob extends AbstractProcessJob {
     @Override
     public void initJobParams(){
         this.param = JsonUtil.parseObject(props.getJobParams(), SparkParam.class);
+        if (param.getAppArgs() != null) {
+            List<String> appArgs = new ArrayList<>();
+            for (String arg : param.getAppArgs()) {
+                arg = ParamHelper.resolvePlaceholders(arg, definedParamMap);
+                appArgs.add(arg);
+            }
+            param.setAppArgs(appArgs);
+        }
     }
 
     public List<String> buildCommand(){

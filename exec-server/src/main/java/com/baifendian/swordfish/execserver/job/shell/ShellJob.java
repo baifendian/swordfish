@@ -6,6 +6,7 @@ import com.baifendian.swordfish.common.job.AbstractProcessJob;
 import com.baifendian.swordfish.common.job.JobProps;
 import com.baifendian.swordfish.common.job.exception.ExecException;
 import com.baifendian.swordfish.common.utils.json.JsonUtil;
+import com.baifendian.swordfish.execserver.parameter.ParamHelper;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.exec.*;
 import org.apache.commons.lang.StringUtils;
@@ -60,6 +61,9 @@ public class ShellJob extends AbstractProcessJob {
   @Override
   public void initJobParams(){
     param = JsonUtil.parseObject(props.getJobParams(), ShellParam.class);
+    String value = param.getValue();
+    value = ParamHelper.resolvePlaceholders(value, props.getDefinedParams());
+    param.setValue(value);
   }
 
   @Override

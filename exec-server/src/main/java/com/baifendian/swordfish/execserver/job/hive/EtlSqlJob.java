@@ -31,12 +31,16 @@ public class EtlSqlJob extends AbstractJob {
     @Override
     public void initJobParams() {
         this.param = JsonUtil.parseObject(props.getJobParams(), SqlParam.class);
+        String value = param.getValue();
+        value = ParamHelper.resolvePlaceholders(value, props.getDefinedParams());
+        param.setValue(value);
     }
 
     @Override
     public void process() throws Exception {
         String sqls = param.getValue();
         sqls = ParamHelper.resolvePlaceholders(sqls, definedParamMap);
+        logger.info("exec sql:{}", sqls);
         List<String> funcs = FunctionUtil.createFuncs(sqls, projectId);
         List<String> execSqls = CommonUtil.sqlSplit(sqls);
         HiveSqlExec hiveSqlExec = new HiveSqlExec(funcs, execSqls, getProxyUser(), param.getDbName(), false, null, null, logger);

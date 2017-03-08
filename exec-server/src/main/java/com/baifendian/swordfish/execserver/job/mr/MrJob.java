@@ -10,6 +10,7 @@ import com.baifendian.swordfish.common.job.AbstractProcessJob;
 import com.baifendian.swordfish.common.job.JobProps;
 import com.baifendian.swordfish.common.utils.PlaceholderUtil;
 import com.baifendian.swordfish.common.utils.json.JsonUtil;
+import com.baifendian.swordfish.execserver.parameter.ParamHelper;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
@@ -62,8 +63,7 @@ public class MrJob extends AbstractProcessJob {
         if (param.getArgs() != null) {
             List<String> appArgs = new ArrayList<>();
             for (String arg : param.getArgs()) {
-                //arg = PlaceholderUtil.resolvePlaceholders(arg, systemParamMap, true);
-                arg = PlaceholderUtil.resolvePlaceholders(arg, definedParamMap, true);
+                arg = ParamHelper.resolvePlaceholders(arg, definedParamMap);
                 appArgs.add(arg);
             }
             param.setArgs(appArgs);

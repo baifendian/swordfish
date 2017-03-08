@@ -30,4 +30,5 @@ public class HiveSqlExecTest {
         hiveSqlExec.run();
         System.out.println(hiveSqlExec.getResults());
     }
+
 }

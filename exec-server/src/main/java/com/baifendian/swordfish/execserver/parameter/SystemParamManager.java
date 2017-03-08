@@ -32,22 +32,22 @@ public class SystemParamManager {
     public static final String TIME_FORMAT = "yyyyMMddHHmmss";
 
     /** 日常调度实例定时的定时时间日期的前一天，格式为 yyyyMMdd */
-    private static final String BIZ_DATE = "dw.system.bizdate";
+    private static final String BIZ_DATE = "sf.system.bizdate";
 
-    /** 日常调度实例定时的定时时间日期，格式为 yyyymmdd，取值为 ${dw.system.bizdate} + 1 */
+    /** 日常调度实例定时的定时时间日期，格式为 yyyymmdd，取值为 ${sf.system.bizdate} + 1 */
     private static final String BIZ_CUR_DATE = "dw.system.bizcurdate";
 
     /** ${dw.system.cyctime}，格式 yyyyMMddHHmmss，表示的是日常调度实例定时时间（年月日时分秒） */
-    public static final String CYC_TIME = "dw.system.cyctime";
+    public static final String CYC_TIME = "sf.system.cyctime";
 
     /** 调度时刻的时间，格式为 yyyyMMddHHmmss */
-    private static final String RUN_TIME = "dw.system.runtime";
+    private static final String RUN_TIME = "sf.system.runtime";
 
     /** 当前项目的 HDFS 路径 */
-    private static final String FILES = "dw.system.files";
+    private static final String FILES = "sf.system.files";
 
     /** 当前 workflow 的名称 */
-    private static final String FLOWNAME = "dw.system.flowname";
+    private static final String FLOWNAME = "sf.system.flowname";
 
     /**
      * 构建系统参数值
