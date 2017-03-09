@@ -16,7 +16,10 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.lang.reflect.Field;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 进程 Job
@@ -26,6 +29,12 @@ import java.util.List;
  * @date : 2016年10月26日
  */
 public abstract class AbstractProcessJob extends AbstractJob {
+
+    protected boolean started = false;
+
+    protected final CountDownLatch completeLatch;
+
+    protected final long KILL_TIME_MS = 5000;
     /**
      *
      * @param jobId 生成的作业id
@@ -34,6 +43,7 @@ public abstract class AbstractProcessJob extends AbstractJob {
      */
     protected AbstractProcessJob(String jobId, JobProps props, Logger logger) throws IOException {
         super(jobId, props, logger);
+        completeLatch = new CountDownLatch(1);
     }
 
     /**
@@ -85,11 +95,15 @@ public abstract class AbstractProcessJob extends AbstractJob {
             processBuilder.redirectErrorStream(true);
             process = processBuilder.start();
 
+            started = true;
+
             // 打印 进程的启动命令行
             printCommand(processBuilder);
 
             readProcessOutput();
             exitCode = process.waitFor();
+
+            completeLatch.countDown();
         } catch (Exception e) {
             // jobContext.getExecLogger().appendLog(e);
             logger.error(e.getMessage(), e);
@@ -104,7 +118,72 @@ public abstract class AbstractProcessJob extends AbstractJob {
 
     @Override
     public void cancel() throws Exception {
-        // 暂不支持
+        if(process == null){
+            throw new IllegalStateException("not started.");
+        }
+        int processId = getProcessId(process);
+        logger.info("job:{} cancel job. kill process:{}", jobId, processId);
+
+        boolean killed = softKill(processId, KILL_TIME_MS, TimeUnit.MILLISECONDS);
+        if(!killed){
+            logger.warn("Kill with signal TERM failed. Killing with KILL signal.");
+            hardKill(processId);
+        }
+
+    }
+
+    private boolean isStarted(){
+        return started;
+    }
+
+    private boolean isRunning(){
+        return isStarted() && !isCompleted();
+    }
+
+    private void checkStarted(){
+        if(!isStarted()){
+            throw new IllegalStateException("process has not yet started.");
+        }
+    }
+
+    private boolean softKill(int processId, final long time, final TimeUnit unit) throws InterruptedException {
+        checkStarted();
+        if(processId != 0 && isStarted()){
+            try{
+                String cmd;
+                if(props.getProxyUser() != null){
+                    cmd = String.format("sudo -u %s kill %d", props.getProxyUser(), processId);
+                } else {
+                    cmd = String.format("kill %d", processId);
+                }
+                Runtime.getRuntime().exec(cmd);
+                return completeLatch.await(time, unit);
+            } catch (IOException e) {
+                logger.info("kill attempt failed.", e);
+            }
+            return false;
+        }
+        return false;
+    }
+
+    public void hardKill(int processId) {
+        checkStarted();
+        if (isRunning()) {
+            if (processId != 0) {
+                try {
+                    String cmd;
+                    if(props.getProxyUser() != null){
+                        cmd = String.format("sudo -u %s kill -9 %d", props.getProxyUser(), processId);
+                    } else {
+                        cmd = String.format("kill -9 %d", processId);
+                    }
+                    Runtime.getRuntime().exec(cmd);
+                } catch (IOException e) {
+                    logger.error("Kill attempt failed.", e);
+                }
+            }
+            process.destroy();
+        }
     }
 
     private void printCommand(ProcessBuilder processBuilder) {
@@ -115,6 +194,20 @@ public abstract class AbstractProcessJob extends AbstractJob {
         } catch (IOException e) {
             logger.error(e.getMessage(), e);
         }
+    }
+
+    private int getProcessId(Process process){
+        int processId = 0;
+        try{
+            Field f = process.getClass().getDeclaredField("pid");
+            f.setAccessible(true);
+
+            processId = f.getInt(process);
+        } catch (Throwable e) {
+            e.printStackTrace();
+        }
+
+        return processId;
     }
 
     /**

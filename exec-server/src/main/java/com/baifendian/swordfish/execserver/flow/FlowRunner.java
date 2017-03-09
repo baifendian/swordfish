@@ -25,6 +25,7 @@ import com.baifendian.swordfish.execserver.node.ResourceHelper;
 import com.baifendian.swordfish.execserver.utils.LoggerUtil;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.ObjectUtils;
 import org.slf4j.Logger;
@@ -117,6 +118,8 @@ public class FlowRunner implements Runnable {
     /** 节点列表 */
     private List<FlowNode> flowNodes;
 
+    private boolean flowKilled = false;
+
     /**
      * @param context
      */
@@ -162,6 +165,17 @@ public class FlowRunner implements Runnable {
             HdfsUtil.GetFile(projectHdfsPath, execLocalResPath);
             String workflowHdfsPath = BaseConfig.getHdfsFlowResourcesPath(executionFlow.getProjectId(), executionFlow.getFlowId());
             HdfsUtil.GetFile(workflowHdfsPath, execLocalResPath);
+            /** 资源文件解压缩处理 workflow下的文件为 workflowId.zip */
+            File zipFile = new File(execLocalPath, executionFlow.getFlowId()+".zip");
+            if(zipFile.exists()){
+                String cmd = String.format("unzip -o %s -d %s", zipFile.getPath(), zipFile.getAbsolutePath());
+                Process process = Runtime.getRuntime().exec(cmd);
+                int ret = process.waitFor();
+                if (ret != 0) {
+                    LOGGER.error("run cmd:" + cmd + " error");
+                    LOGGER.error(IOUtils.toString(process.getErrorStream()));
+                }
+            }
             FlowType flowType = executionFlow.getFlowType();
             FlowDag flowDag = JsonUtil.parseObject(executionFlow.getWorkflowData(), FlowDag.class);
             switch (flowType) {
@@ -455,10 +469,7 @@ public class FlowRunner implements Runnable {
      */
     private void submitNodeRunner(Graph<FlowNode, FlowNodeRelation> dagGraph, ExecutionNode executionNode) {
         FlowNode node = dagGraph.getVertex(executionNode.getNodeId());
-        int nowTimeout = calcNodeTimeout(); // 重新计算超时时间
-        NodeRunner nodeRunner = new NodeRunner(executionFlow, executionNode, node, jobExecutorService, synObject, nowTimeout, systemParamMap, customParamMap);
-        Future<?> future = executorService.submit(nodeRunner);
-        nodeFutureMap.put(executionNode, future);
+        submitNodeRunner(node, executionNode);
     }
 
     /**
@@ -763,7 +774,25 @@ public class FlowRunner implements Runnable {
     }
 
     public void kill(String user){
-        LOGGER.info("Flow killed by" + user);
+        synchronized (synObject) {
+            LOGGER.info("Flow killed by " + user);
+            kill();
+            updateExecutionFlow(FlowStatus.KILL);
+        }
+    }
+
+    private void kill(){
+        synchronized (synObject){
+            LOGGER.info("Kill has been called on exec:" + executionFlow.getId());
+
+            flowKilled = true;
+
+            LOGGER.info("Killing running nodes, num:" + activeNodeRunners.size());
+            for(NodeRunner nodeRunner: activeNodeRunners){
+                nodeRunner.kill();
+            }
+        }
+
     }
 
     /**

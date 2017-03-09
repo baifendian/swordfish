@@ -11,6 +11,7 @@ import com.baifendian.swordfish.common.job.JobProps;
 import com.baifendian.swordfish.common.utils.PlaceholderUtil;
 import com.baifendian.swordfish.common.utils.json.JsonUtil;
 import com.baifendian.swordfish.execserver.parameter.ParamHelper;
+import com.baifendian.swordfish.execserver.utils.OsUtil;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
@@ -22,6 +23,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * mr 作业
@@ -38,7 +40,7 @@ public class MrJob extends AbstractProcessJob {
     /** jar */
     private static final String HADOOP_JAR = "jar";
 
-    private MrParam param;
+    private MrParam mrParam;
 
     /** yarn 的 application id */
     private String appid;
@@ -57,18 +59,16 @@ public class MrJob extends AbstractProcessJob {
     @Override
     public void initJobParams(){
         param = JsonUtil.parseObject(props.getJobParams(), MrParam.class);
+        mrParam = (MrParam) param;
+        mrParam.setQueue(props.getQueue());
     }
 
     public List<String> buildCommand(){
-        if (param.getArgs() != null) {
-            List<String> appArgs = new ArrayList<>();
-            for (String arg : param.getArgs()) {
-                arg = ParamHelper.resolvePlaceholders(arg, definedParamMap);
-                appArgs.add(arg);
-            }
-            param.setArgs(appArgs);
+        if (mrParam.getArgs() != null) {
+            String args = ParamHelper.resolvePlaceholders(mrParam.getArgs(), definedParamMap);
+            mrParam.setArgs(args);
         }
-        return HadoopJarArgsUtil.buildArgs(param);
+        return HadoopJarArgsUtil.buildArgs(mrParam);
     }
 
     @Override
@@ -119,6 +119,22 @@ public class MrJob extends AbstractProcessJob {
             return line.substring(line.indexOf("application") + "application".length() + 1);
         }
         return null;
+    }
+
+    public void cancel() throws Exception {
+        super.cancel();
+
+        if(appid != null) {
+            String cmd = "yarn application -kill " + appid;
+
+            if (props.getProxyUser() != null) {
+                cmd = "sudo -u " + props.getProxyUser() + " " + cmd;
+            }
+            Runtime.getRuntime().exec(cmd);
+
+            completeLatch.await(KILL_TIME_MS, TimeUnit.MILLISECONDS);
+        }
+
     }
 
 }

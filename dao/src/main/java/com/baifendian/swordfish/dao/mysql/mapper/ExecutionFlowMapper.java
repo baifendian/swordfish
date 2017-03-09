@@ -90,6 +90,7 @@ public interface ExecutionFlowMapper {
                        @Result(property = "type", column = "type", typeHandler = EnumOrdinalTypeHandler.class, jdbcType = JdbcType.TINYINT),
                        @Result(property = "flowName", column = "flow_name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
                        @Result(property = "errorCode", column = "error_code", typeHandler = EnumOrdinalTypeHandler.class, jdbcType = JdbcType.TINYINT),
+                       @Result(property = "queue", column = "queue", javaType = String.class, jdbcType = JdbcType.VARCHAR),
                        @Result(property = "flowType", column = "flow_type", typeHandler = EnumOrdinalTypeHandler.class, jdbcType = JdbcType.TINYINT), })
     @SelectProvider(type = ExecutionFlowMapperProvider.class, method = "selectByExecId")
     ExecutionFlow selectByExecId(@Param("execId") Long execId);

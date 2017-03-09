@@ -188,6 +188,7 @@ public class ExecutionFlowMapperProvider {
                 SELECT("b.type as flow_type");
                 SELECT("b.name as flow_name");
                 SELECT("b.project_id as project_id");
+                SELECT("b.queue as queue");
                 SELECT("c.name as project_name");
                 FROM("execution_flows as a");
                 INNER_JOIN("project_flows as b on a.flow_id = b.id");

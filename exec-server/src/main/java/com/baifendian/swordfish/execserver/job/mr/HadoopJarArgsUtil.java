@@ -52,19 +52,19 @@ public class HadoopJarArgsUtil {
             }
         }
 
-        if (param.getJars() != null && !param.getJars().isEmpty()) {
+        if (param.getLibJars() != null && !param.getLibJars().isEmpty()) {
             args.add(HadoopJarArgsConst.JARS);
-            args.add(StringUtils.join(param.getJars(), ","));
+            args.add(StringUtils.join(param.getLibJars().stream().map(p -> p.getRes()).toArray(),","));
         }
 
         if (param.getFiles() != null && !param.getFiles().isEmpty()) {
             args.add(HadoopJarArgsConst.FILES);
-            args.add(StringUtils.join(param.getFiles(), ","));
+            args.add(StringUtils.join(param.getFiles().stream().map(p -> p.getSymbolicRes()).toArray(), ","));
         }
 
         if (param.getArchives() != null && !param.getArchives().isEmpty()) {
             args.add(HadoopJarArgsConst.ARCHIVES);
-            args.add(StringUtils.join(param.getArchives(), ","));
+            args.add(StringUtils.join(param.getArchives().stream().map(p -> p.getSymbolicRes()).toArray(), ","));
         }
 
         if (StringUtils.isNotEmpty(param.getQueue())) {
@@ -72,10 +72,8 @@ public class HadoopJarArgsUtil {
             args.add(HadoopJarArgsConst.QUEUE + "=" + param.getQueue());
         }
 
-        if (param.getArgs() != null && !param.getArgs().isEmpty()) {
-            for (String appArg : param.getArgs()) {
-                args.add(appArg);
-            }
+        if (StringUtils.isNotEmpty(param.getArgs())){
+            args.add(param.getArgs());
         }
         return args;
     }

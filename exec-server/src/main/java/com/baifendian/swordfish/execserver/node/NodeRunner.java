@@ -6,6 +6,7 @@
 
 package com.baifendian.swordfish.execserver.node;
 
+import com.baifendian.swordfish.common.job.Job;
 import com.baifendian.swordfish.common.utils.BFDDateUtils;
 import com.baifendian.swordfish.dao.DaoFactory;
 import com.baifendian.swordfish.dao.FlowDao;
@@ -61,8 +62,9 @@ public class NodeRunner implements Runnable {
     /** 自定义参数 */
     private final Map<String, String> customParamMap;
 
-    /** jobId 字符串 */
-    private final String jobIdLog;
+    private boolean killed = false;
+
+    private JobHandler jobHandler;
 
     /**
      * @param executionFlow
@@ -85,16 +87,14 @@ public class NodeRunner implements Runnable {
         this.timeout = timeout;
         this.systemParamMap = systemParamMap;
         this.customParamMap = customParamMap;
-        this.jobIdLog = jobValue(executionNode.getJobId());
+        // 生成具体 handler
+        this.jobHandler = new JobHandler(flowDao, executionFlow, executionNode, node, executorService, timeout, systemParamMap, customParamMap);
     }
 
     @Override
     public void run() {
         FlowStatus status = null;
         try {
-            // 生成具体 handler
-            JobHandler jobHandler = new JobHandler(flowDao, executionFlow, executionNode, node, executorService, timeout, systemParamMap, customParamMap);
-
             // 具体执行
             status = jobHandler.handle();
 
@@ -102,7 +102,7 @@ public class NodeRunner implements Runnable {
             updateExecutionNode(status);
 
         } catch (Exception e) {
-            LOGGER.error("{}", jobIdLog + e.getMessage(), e);
+            LOGGER.error("{}", jobHandler.getJobId() + e.getMessage(), e);
         } finally {
             if (status == null) {
                 updateExecutionNode(FlowStatus.FAILED);
@@ -132,6 +132,28 @@ public class NodeRunner implements Runnable {
         synchronized (synObject) {
             synObject.notifyAll();
         }
+    }
+
+    public void kill(){
+        // 存在线程竞争问题
+        if(executionNode.getStatus().typeIsFinished()){
+            return;
+        }
+        LOGGER.info("kill has been called on node:{} node exec:{}", executionNode.getNodeId(), executionNode.getId());
+        killed = true;
+
+        Job job = jobHandler.getJob();
+        if(job == null){
+            LOGGER.info("Job hasn't started");
+            return;
+        }
+
+        try{
+            job.cancel();
+        } catch (Exception e) {
+            LOGGER.error("cancel job error", e);
+        }
+        updateExecutionNode(FlowStatus.KILL);
     }
 
 }

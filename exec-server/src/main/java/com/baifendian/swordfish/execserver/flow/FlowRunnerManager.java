@@ -15,6 +15,7 @@
  */
 package com.baifendian.swordfish.execserver.flow;
 
+import com.baifendian.swordfish.common.job.exception.ExecException;
 import com.baifendian.swordfish.dao.DaoFactory;
 import com.baifendian.swordfish.dao.FlowDao;
 import com.baifendian.swordfish.dao.mysql.MyBatisSqlSessionFactoryUtil;
@@ -38,6 +39,7 @@ import java.io.File;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -76,6 +78,8 @@ public class FlowRunnerManager {
 
     /** 默认的节点失败后的执行策略 */
     private final FailurePolicyType defaultFailurePolicyType = FailurePolicyType.END;
+
+    private final Map<Long, FlowRunner> runningFlows = new ConcurrentHashMap<>();
 
     /**
      * constructor
@@ -158,7 +162,9 @@ public class FlowRunnerManager {
      */
     public void submitFlow(ExecutionFlow executionFlow) {
         // 系统参数
-        Map<String, String> systemParamMap = SystemParamManager.buildSystemParam(executionFlow, null, null);
+        Date scheduleDate = new Date();
+        Date addDate = new Date();
+        Map<String, String> systemParamMap = SystemParamManager.buildSystemParam(executionFlow, scheduleDate, addDate);
 
         // 自定义参数
         String cycTimeStr = systemParamMap.get(SystemParamManager.CYC_TIME);
@@ -181,9 +187,15 @@ public class FlowRunnerManager {
         context.setSystemParamMap(systemParamMap);
         context.setCustomParamMap(customParamMap);
 
-        Runnable flowRunner = new FlowRunner(context);
+        FlowRunner flowRunner = new FlowRunner(context);
 
+        runningFlows.put(executionFlow.getId(), flowRunner);
         flowExecutorService.submit(flowRunner);
+    }
+
+    public void submitFlow(long execId) {
+        ExecutionFlow executionFlow = flowDao.queryExecutionFlow(execId);
+        submitFlow(executionFlow);
     }
 
     /**
@@ -215,8 +227,9 @@ public class FlowRunnerManager {
         context.setFailurePolicyType(failurePolicy);
         context.setSystemParamMap(systemParamMap);
         context.setCustomParamMap(customParamMap);
-        Runnable flowRunner = new FlowRunner(context);
+        FlowRunner flowRunner = new FlowRunner(context);
 
+        runningFlows.put(executionFlow.getId(), flowRunner);
         flowExecutorService.submit(flowRunner);
     }
 
@@ -248,6 +261,17 @@ public class FlowRunnerManager {
                 LOGGER.error(e.getMessage(), e);
             }
         }
+    }
+
+    public void cancelFlow(long execId, String user)   {
+        FlowRunner flowRunner = runningFlows.get(execId);
+
+        if(flowRunner == null){
+            throw new ExecException("Execution " + execId + "is not running");
+        }
+
+        flowRunner.kill(user);
+        runningFlows.remove(execId);
     }
 
 }

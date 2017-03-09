@@ -6,14 +6,17 @@ import com.baifendian.swordfish.common.utils.json.StringNodeJsonDeserializer;
 import com.baifendian.swordfish.common.utils.json.StringNodeJsonSerializer;
 import com.baifendian.swordfish.dao.mysql.enums.FlowType;
 import com.baifendian.swordfish.dao.mysql.enums.ScheduleStatus;
+import com.baifendian.swordfish.dao.mysql.model.flow.params.Property;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import javafx.util.Pair;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * workflow信息
@@ -51,6 +54,8 @@ public class ProjectFlow {
     private FlowType type;
 
     private String proxyUser;
+
+    private String queue;
 
     private String mailGroups;
 
@@ -325,8 +330,10 @@ public class ProjectFlow {
     }
 
     public Map<String, String> getUserDefinedParamMap() {
+        List<Property> propList;
         if (userDefinedParamMap == null && StringUtils.isNotEmpty(userDefinedParams)) {
-            userDefinedParamMap = JsonUtil.parseObjectMap(userDefinedParams);
+            propList = JsonUtil.parseObjectList(userDefinedParams, Property.class);
+            userDefinedParamMap = propList.stream().collect(Collectors.toMap(Property::getProp, Property::getValue));
         }
         return userDefinedParamMap;
     }

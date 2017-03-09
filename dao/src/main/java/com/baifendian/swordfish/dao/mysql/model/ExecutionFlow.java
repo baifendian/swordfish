@@ -74,6 +74,9 @@ public class ExecutionFlow {
     /** 执行的错误码 */
     private FlowErrorCode errorCode;
 
+    /** 作业提交队列 **/
+    private String queue;
+
     public Long getId() {
         return id;
     }
@@ -247,4 +250,11 @@ public class ExecutionFlow {
         this.errorCode = errorCode;
     }
 
+    public String getQueue() {
+        return queue;
+    }
+
+    public void setQueue(String queue) {
+        this.queue = queue;
+    }
 }

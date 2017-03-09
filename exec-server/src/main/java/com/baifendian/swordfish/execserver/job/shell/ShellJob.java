@@ -39,7 +39,7 @@ public class ShellJob extends AbstractProcessJob {
    */
   private static int TIME_OUT = 500;
 
-  private ShellParam param;
+  private ShellParam shellParam;
 
   /**
    * 当前执行的路径
@@ -49,21 +49,22 @@ public class ShellJob extends AbstractProcessJob {
   public ShellJob(String jobId, JobProps props, Logger logger) throws IOException {
     super(jobId, props, logger);
 
-    if (param.getValue() == null || StringUtils.isEmpty(param.getValue())) {
+    if (shellParam.checkValid()){
       throw new ExecException("ShellJob value param can't be null");
     }
     this.currentPath = getWorkingDirectory();
 
-    logger.info("script:\n{}", param.getValue());
+    logger.info("script:\n{}", shellParam.getValue());
     logger.info("currentPath: {}", currentPath);
   }
 
   @Override
   public void initJobParams(){
     param = JsonUtil.parseObject(props.getJobParams(), ShellParam.class);
-    String value = param.getValue();
+    shellParam = (ShellParam)param;
+    String value = shellParam.getValue();
     value = ParamHelper.resolvePlaceholders(value, props.getDefinedParams());
-    param.setValue(value);
+    shellParam.setValue(value);
   }
 
   @Override
@@ -76,7 +77,7 @@ public class ShellJob extends AbstractProcessJob {
 
     Files.createFile(path, attr);
 
-    Files.write(path, param.getValue().getBytes(), StandardOpenOption.APPEND);
+    Files.write(path, shellParam.getValue().getBytes(), StandardOpenOption.APPEND);
     ProcessBuilder processBuilder = new ProcessBuilder(fileName);
 
     return processBuilder;

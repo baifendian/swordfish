@@ -8,6 +8,7 @@ package com.baifendian.swordfish.execserver.job.mr;
 
 import com.baifendian.swordfish.common.job.BaseParam;
 import com.baifendian.swordfish.dao.mysql.model.flow.params.Property;
+import com.baifendian.swordfish.execserver.job.ResourceInfo;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
@@ -35,7 +36,7 @@ public class MrParam extends BaseParam {
     /**
      * 参数信息
      */
-    private List<String> args;
+    private String args;
 
     /**
      * 配置信息列表
@@ -45,17 +46,17 @@ public class MrParam extends BaseParam {
     /**
      * 额外的 jar 包，指的是本地的文件，这个可能很长
      */
-    private List<String> jars;
+    private List<ResourceInfo> libJars;
 
     /**
      * 额外的文件，指的是本地的文件，可能是多条配置
      */
-    private List<String> files;
+    private List<ResourceInfo> files;
 
     /**
      * 额外的压缩文件，指的是本地的文件，可能是多条配置
      */
-    private List<String> archives;
+    private List<ResourceInfo> archives;
 
     /** 执行队列 */
     private String queue;
@@ -81,11 +82,11 @@ public class MrParam extends BaseParam {
         this.mainClass = mainClass;
     }
 
-    public List<String> getArgs() {
+    public String getArgs() {
         return args;
     }
 
-    public void setArgs(List<String> args) {
+    public void setArgs(String args) {
         this.args = args;
     }
 
@@ -97,27 +98,27 @@ public class MrParam extends BaseParam {
         this.properties = properties;
     }
 
-    public List<String> getJars() {
-        return jars;
+    public List<ResourceInfo> getLibJars() {
+        return libJars;
     }
 
-    public void setJars(List<String> jars) {
-        this.jars = jars;
+    public void setLibJars(List<ResourceInfo> libJars) {
+        this.libJars = libJars;
     }
 
-    public List<String> getFiles() {
+    public List<ResourceInfo> getFiles() {
         return files;
     }
 
-    public void setFiles(List<String> files) {
+    public void setFiles(List<ResourceInfo> files) {
         this.files = files;
     }
 
-    public List<String> getArchives() {
+    public List<ResourceInfo> getArchives() {
         return archives;
     }
 
-    public void setArchives(List<String> archives) {
+    public void setArchives(List<ResourceInfo> archives) {
         this.archives = archives;
     }
 

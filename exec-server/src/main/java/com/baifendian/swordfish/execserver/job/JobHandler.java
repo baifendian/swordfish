@@ -52,6 +52,8 @@ public class JobHandler {
 
     private String jobId;
 
+    private Job job;
+
     private ExecutorService executorService;
 
     private int timeout;
@@ -114,12 +116,10 @@ public class JobHandler {
         props.setDefinedParams(allParamMap);
         props.setProjectId(executionFlow.getProjectId());
         props.setEnvFile(BaseConfig.getSystemEnvPath());
+        props.setQueue(executionFlow.getQueue());
 
-        logger.info("props:{}", props);
-        Job job = JobTypeManager.newJob(jobId, node.getType().name(), props, logger);
-        // 更新executionNode状态
-        executionNode.setStatus(FlowStatus.RUNNING);
-        flowDao.updateExecutionNode(executionNode);
+        //logger.info("props:{}", props);
+        job = JobTypeManager.newJob(jobId, node.getType().name(), props, logger);
         Boolean result;
         try {
             result = submitJob(job);
@@ -192,5 +192,13 @@ public class JobHandler {
             throw new ExecTimeoutException("当前 workflow 已经执行超时");
         }
         return timeout - usedTime;
+    }
+
+    public Job getJob(){
+        return job;
+    }
+
+    public String getJobId(){
+        return jobId;
     }
 }

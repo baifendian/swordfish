@@ -37,7 +37,7 @@ public class BaseConfig {
             properties.load(is);
             hdfsBasePath = properties.getProperty("hdfs.base.path");
             localBasePath = properties.getProperty("local.base.path");
-            systemEnvPath = properties.getProperty("swordfish.env.file");
+            systemEnvPath = properties.getProperty("sf.env.file");
         } catch (IOException e) {
             LOGGER.error(e.getMessage(), e);
         } finally {
@@ -68,7 +68,7 @@ public class BaseConfig {
     }
 
     public static String getHdfsFlowResourcesPath(int projectId, int flowId){
-        return MessageFormat.format("{0}/{1}/{2}/resources", hdfsBasePath, projectId, flowId);
+        return MessageFormat.format("{0}/{1}/workflows/{2}", hdfsBasePath, projectId, flowId);
     }
 
     public static String getSystemEnvPath(){

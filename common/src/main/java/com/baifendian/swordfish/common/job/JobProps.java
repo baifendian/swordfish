@@ -29,6 +29,9 @@ public class JobProps {
     /** 作业执行目录 **/
     private String workDir;
 
+    /** 作业执行队列 **/
+    private String queue;
+
     /** 环境变量文件 **/
     private String envFile;
 
@@ -105,5 +108,13 @@ public class JobProps {
 
     public void setExecId(long execId) {
         this.execId = execId;
+    }
+
+    public String getQueue() {
+        return queue;
+    }
+
+    public void setQueue(String queue) {
+        this.queue = queue;
     }
 }

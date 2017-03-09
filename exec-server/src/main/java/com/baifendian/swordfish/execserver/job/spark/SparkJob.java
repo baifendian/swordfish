@@ -11,6 +11,7 @@ import com.baifendian.swordfish.common.job.JobProps;
 import com.baifendian.swordfish.common.utils.PlaceholderUtil;
 import com.baifendian.swordfish.common.utils.json.JsonUtil;
 import com.baifendian.swordfish.execserver.parameter.ParamHelper;
+import com.baifendian.swordfish.execserver.utils.OsUtil;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
@@ -22,6 +23,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Spark 作业
@@ -33,7 +35,7 @@ import java.util.List;
 public class SparkJob extends AbstractProcessJob {
 
     /** 提交的参数 */
-    private SparkParam param;
+    private SparkParam sparkParam;
 
     /** app id **/
     private String appid;
@@ -45,18 +47,20 @@ public class SparkJob extends AbstractProcessJob {
     @Override
     public void initJobParams(){
         this.param = JsonUtil.parseObject(props.getJobParams(), SparkParam.class);
-        if (param.getAppArgs() != null) {
+        sparkParam = (SparkParam)param;
+        sparkParam.setQueue(props.getQueue());
+        if (sparkParam.getAppArgs() != null) {
             List<String> appArgs = new ArrayList<>();
-            for (String arg : param.getAppArgs()) {
-                arg = ParamHelper.resolvePlaceholders(arg, definedParamMap);
+            for (String arg : sparkParam.getAppArgs()) {
+                arg = ParamHelper.resolvePlaceholders(arg, props.getDefinedParams());
                 appArgs.add(arg);
             }
-            param.setAppArgs(appArgs);
+            sparkParam.setAppArgs(appArgs);
         }
     }
 
     public List<String> buildCommand(){
-        return SparkSubmitArgsUtil.buildArgs(param);
+        return SparkSubmitArgsUtil.buildArgs(sparkParam);
     }
 
     @Override
@@ -108,5 +112,20 @@ public class SparkJob extends AbstractProcessJob {
         return null;
     }
 
+    public void cancel() throws Exception {
+        super.cancel();
+
+        if(appid != null) {
+            String cmd = "yarn application -kill " + appid;
+
+            if (props.getProxyUser() != null) {
+                cmd = "sudo -u " + props.getProxyUser() + " " + cmd;
+            }
+            Runtime.getRuntime().exec(cmd);
+
+            completeLatch.await(KILL_TIME_MS, TimeUnit.MILLISECONDS);
+        }
+
+    }
 
 }

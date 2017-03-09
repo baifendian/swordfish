@@ -15,7 +15,7 @@ import java.util.List;
  * @author : dsfan
  * @date : 2016年8月30日
  */
-public class BaseParam {
+public abstract class BaseParam {
 
     /**
      * 校验参数是否合法（需要校验的子类 @Override 该方法）
@@ -26,5 +26,11 @@ public class BaseParam {
     public boolean checkValid() {
         return true;
     }
+
+    /**
+     * 获取node需要的资源文件清单，用于后续做软链接处理
+     * @return
+     */
+    public abstract List<String> getResourceFiles();
 
 }
