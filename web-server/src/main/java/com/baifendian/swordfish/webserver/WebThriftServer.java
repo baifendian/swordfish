@@ -46,11 +46,14 @@ public class WebThriftServer {
 
     private TServer server;
 
-    private final String hostName;
+    private final String host;
 
     private final int port;
 
     private final String MASTER_PORT = "master.port";
+
+    private final String MASTER_MIN_THREADS = "master.min.threads";
+    private final String MASTER_MAX_THREADS = "master.max.threads";
 
     private MasterDao masterDao;
 
@@ -63,7 +66,7 @@ public class WebThriftServer {
     }
 
     public WebThriftServer() throws UnknownHostException, TTransportException {
-        hostName = InetAddress.getLocalHost().getHostName();
+        host = InetAddress.getLocalHost().getHostName();
         port = conf.getInt(MASTER_PORT);
         masterDao = DaoFactory.getDaoInstance(MasterDao.class);
         init();
@@ -75,16 +78,18 @@ public class WebThriftServer {
     private void init() throws UnknownHostException, TTransportException {
         TProtocolFactory protocolFactory = new TBinaryProtocol.Factory();
         TTransportFactory tTransportFactory = new TTransportFactory();
-        TProcessor tProcessor = new WorkerService.Processor(new MasterServiceImpl());
-        InetSocketAddress inetSocketAddress = new InetSocketAddress(hostName, port);
-        server = getTThreadPoolServer(protocolFactory, tProcessor, tTransportFactory, inetSocketAddress, 50, 200);
+        TProcessor tProcessor = new MasterService.Processor(new MasterServiceImpl());
+        InetSocketAddress inetSocketAddress = new InetSocketAddress(host, port);
+        int minThreads = conf.getInt(MASTER_MIN_THREADS, 50);
+        int maxThreads = conf.getInt(MASTER_MAX_THREADS, 200);
+        server = getTThreadPoolServer(protocolFactory, tProcessor, tTransportFactory, inetSocketAddress, minThreads, maxThreads);
         logger.info("start thrift server on port:{}", port);
 
         registerMaster();
     }
 
     public void registerMaster(){
-        masterDao.
+        masterDao.registerMasterServer(host, port);
     }
 
     public static void main(String[] args) {

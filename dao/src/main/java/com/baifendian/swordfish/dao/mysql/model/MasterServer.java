@@ -14,18 +14,18 @@ package com.baifendian.swordfish.dao.mysql.model;
  */
 public class MasterServer {
 
-    private String ip;
+    private String host;
 
     private int port;
 
     private int updateTime;
 
-    public String getIp() {
-        return ip;
+    public String getHost() {
+        return host;
     }
 
-    public void setIp(String ip) {
-        this.ip = ip;
+    public void setHost(String host) {
+        this.host = host;
     }
 
     public int getPort() {

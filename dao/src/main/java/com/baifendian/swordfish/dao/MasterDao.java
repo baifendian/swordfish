@@ -8,6 +8,7 @@
 
 package com.baifendian.swordfish.dao;
 
+import com.baifendian.swordfish.common.utils.BFDDateUtils;
 import com.baifendian.swordfish.dao.mysql.MyBatisSqlSessionFactoryUtil;
 import com.baifendian.swordfish.dao.mysql.mapper.MasterServerMapper;
 import com.baifendian.swordfish.dao.mysql.model.MasterServer;
@@ -32,7 +33,11 @@ public class MasterDao extends BaseDao{
         return masterServerMapper.query();
     }
 
-    public registerMasterServer(String host, int port){
-        return masterServerMapper.insert()
+    public int registerMasterServer(String host, int port){
+        MasterServer masterServer = new MasterServer();
+        masterServer.setHost(host);
+        masterServer.setPort(port);
+        masterServer.setUpdateTime(BFDDateUtils.getSecs());
+        return masterServerMapper.insert(masterServer);
     }
 }

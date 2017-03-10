@@ -23,7 +23,7 @@ import java.util.Date;
 @MapperScan
 public interface MasterServerMapper {
     @Results(value = {
-            @Result(property = "ip", column = "ip",javaType = String.class,jdbcType = JdbcType.VARCHAR),
+            @Result(property = "host", column = "host",javaType = String.class,jdbcType = JdbcType.VARCHAR),
             @Result(property = "port", column = "port",javaType = int.class,jdbcType = JdbcType.INTEGER),
             @Result(property = "updateTime", column = "update_time",javaType = int.class,jdbcType = JdbcType.INTEGER),
     })
@@ -32,7 +32,7 @@ public interface MasterServerMapper {
 
 
     @InsertProvider(type = MasterServerMapperSQL.class, method = "insert")
-    int insert(@Param("session") Session session);
+    int insert(@Param("masterServer") MasterServer masterServer);
 
     @SelectProvider(type = MasterServerMapperSQL.class, method = "delete")
     void delete();
