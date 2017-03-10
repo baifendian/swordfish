@@ -26,7 +26,7 @@ public class HadoopJarArgsUtilTest {
 
     @Before
     public void testBefore(){
-        String jsonStr = "{\"mainJar\":\"hadoop-mapreduce-examples-2.7.3.jar\",\"mainClass\":\"org.apache.hadoop.examples.ExampleDriver\",\"args\":[\"3\",\"5\"],\"properties\":[{\"prop\":\"aa\",\"value\":\"11\"},{\"prop\":\"bb\",\"value\":\"55\"}],\"jars\":[\"hadoop.jar\",\"test.jar\"],\"files\":[\"x.conf\"],\"archives\":null,\"queue\":null,\"dargs\":[\"aa=11\",\"bb=55\"]}";
+        String jsonStr = "{   \"mainClass\": \"com.baifendian.mr.WordCount\",   \"mainJar\": {       \"scope\": \"project\",  \"res\": \"wordcount-examples.jar\"   },   \"args\": \"/user/joe/wordcount/input /user/joe/wordcount/output\",   \"properties\": [{       \"prop\": \"wordcount.case.sensitive\",       \"value\": \"true\"     }, {       \"prop\": \"stopwords\",        \"value\": \"the,who,a,then\"     }   ],   \"files\": [{       \"res\": \"ABC.conf\",       \"alias\": \"aa\"     }, {       \"scope\": \"workflow\",   \"res\": \"conf/HEL.conf\",       \"alias\": \"hh\"     }   ],   \"archives\": [{       \"res\": \"JOB.zip\",       \"alias\": \"jj\"     }   ],   \"libJars\": [{       \"scope\": \"workflow\",        \"res\": \"lib/tokenizer-0.1.jar\"     }   ] } \n";
         param = JsonUtil.parseObject(jsonStr, MrParam.class);
 
     }
@@ -34,7 +34,7 @@ public class HadoopJarArgsUtilTest {
     @Test
     public void testBuildArgs(){
         List<String> args = HadoopJarArgsUtil.buildArgs(param);
-        String[] result = {"hadoop-mapreduce-examples-2.7.3.jar", "org.apache.hadoop.examples.ExampleDriver", "3", "5", "-D", "aa=11", "-D", "bb=55", "-libjars", "hadoop.jar,test.jar", "--files", "x.conf"};
-        assertEquals(args, Arrays.asList(result));
+        String result = "wordcount-examples.jar com.baifendian.mr.WordCount -Dwordcount.case.sensitive=true -Dstopwords=the,who,a,then -files ABC.conf#aa,conf/HEL.conf#hh -libjars lib/tokenizer-0.1.jar -archives JOB.zip#jj /user/joe/wordcount/input /user/joe/wordcount/output";
+        assertEquals(result, String.join(" ", args));
     }
 }

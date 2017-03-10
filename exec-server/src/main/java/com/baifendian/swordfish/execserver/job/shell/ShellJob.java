@@ -3,6 +3,7 @@ package com.baifendian.swordfish.execserver.job.shell;
 
 import com.baifendian.swordfish.common.job.AbstractJob;
 import com.baifendian.swordfish.common.job.AbstractProcessJob;
+import com.baifendian.swordfish.common.job.BaseParam;
 import com.baifendian.swordfish.common.job.JobProps;
 import com.baifendian.swordfish.common.job.exception.ExecException;
 import com.baifendian.swordfish.common.utils.json.JsonUtil;
@@ -49,27 +50,26 @@ public class ShellJob extends AbstractProcessJob {
   public ShellJob(String jobId, JobProps props, Logger logger) throws IOException {
     super(jobId, props, logger);
 
-    if (shellParam.checkValid()){
-      throw new ExecException("ShellJob value param can't be null");
+    if (!shellParam.checkValid()){
+      throw new ExecException("ShellJob script param can't be null");
     }
     this.currentPath = getWorkingDirectory();
 
-    logger.info("script:\n{}", shellParam.getValue());
-    logger.info("currentPath: {}", currentPath);
   }
 
   @Override
   public void initJobParams(){
-    param = JsonUtil.parseObject(props.getJobParams(), ShellParam.class);
-    shellParam = (ShellParam)param;
-    String value = shellParam.getValue();
-    value = ParamHelper.resolvePlaceholders(value, props.getDefinedParams());
-    shellParam.setValue(value);
+    shellParam = JsonUtil.parseObject(props.getJobParams(), ShellParam.class);
+    String script = shellParam.getScript();
+    script = ParamHelper.resolvePlaceholders(script, props.getDefinedParams());
+    shellParam.setScript(script);
   }
 
   @Override
   public ProcessBuilder createProcessBuilder() throws IOException {
-    String fileName = currentPath + "/run_" + UUID.randomUUID().toString().substring(0, 8) + ".sh";
+    logger.info("script:\n{}", shellParam.getScript());
+    logger.info("currentPath: {}", currentPath);
+    String fileName = currentPath + "/" + jobId + "_" + UUID.randomUUID().toString().substring(0, 8) + ".sh";
     Path path = new File(fileName).toPath();
 
     Set<PosixFilePermission> perms = PosixFilePermissions.fromString("rwxr-xr-x");
@@ -77,10 +77,15 @@ public class ShellJob extends AbstractProcessJob {
 
     Files.createFile(path, attr);
 
-    Files.write(path, shellParam.getValue().getBytes(), StandardOpenOption.APPEND);
+    Files.write(path, shellParam.getScript().getBytes(), StandardOpenOption.APPEND);
     ProcessBuilder processBuilder = new ProcessBuilder(fileName);
 
     return processBuilder;
+  }
+
+  @Override
+  public BaseParam getParam(){
+    return shellParam;
   }
 
 }

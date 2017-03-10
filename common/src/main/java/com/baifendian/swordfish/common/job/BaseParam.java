@@ -28,7 +28,7 @@ public abstract class BaseParam {
     }
 
     /**
-     * 获取node需要的资源文件清单，用于后续做软链接处理
+     * 获取node需要的项目级资源文件清单
      * @return
      */
     public abstract List<String> getResourceFiles();

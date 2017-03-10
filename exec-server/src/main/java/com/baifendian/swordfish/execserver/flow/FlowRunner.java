@@ -8,7 +8,9 @@ package com.baifendian.swordfish.execserver.flow;
 
 import com.baifendian.swordfish.common.hadoop.HdfsUtil;
 import com.baifendian.swordfish.common.job.FlowStatus;
-import com.baifendian.swordfish.dao.config.BaseConfig;
+import com.baifendian.swordfish.common.job.Job;
+import com.baifendian.swordfish.common.job.JobProps;
+import com.baifendian.swordfish.common.job.config.BaseConfig;
 import com.baifendian.swordfish.dao.mail.EmailManager;
 import com.baifendian.swordfish.common.utils.BFDDateUtils;
 import com.baifendian.swordfish.common.utils.graph.DAGGraph;
@@ -20,6 +22,7 @@ import com.baifendian.swordfish.dao.mysql.enums.*;
 import com.baifendian.swordfish.dao.mysql.model.*;
 import com.baifendian.swordfish.dao.mysql.model.flow.FlowDag;
 import com.baifendian.swordfish.execserver.exception.ExecTimeoutException;
+import com.baifendian.swordfish.execserver.job.JobTypeManager;
 import com.baifendian.swordfish.execserver.node.NodeRunner;
 import com.baifendian.swordfish.execserver.node.ResourceHelper;
 import com.baifendian.swordfish.execserver.utils.LoggerUtil;
@@ -32,8 +35,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.nio.file.Files;
-import java.nio.file.Path;
+import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -146,38 +148,50 @@ public class FlowRunner implements Runnable {
         FlowStatus status = null;
 
         try {
-            String execLocalPath = BaseConfig.getFlowExecPath(executionFlow.getProjectName(), executionFlow.getFlowName(),
+            String execLocalPath = BaseConfig.getFlowExecPath(executionFlow.getProjectId(), executionFlow.getFlowId(),
                                                             executionFlow.getId());
-            String execLocalResPath = BaseConfig.getFlowExecResPath(executionFlow.getProjectName(), executionFlow.getFlowName(),
-                    executionFlow.getId());
             LOGGER.info("当前执行的目录是：{}", execLocalPath);
-            LOGGER.info("当前执行的资源目录是：{}", execLocalResPath);
             File execLocalPathFile = new File(execLocalPath);
             if(execLocalPathFile.exists()){
                 FileUtils.forceDelete(execLocalPathFile);
                 //throw new ExecTimeoutException(String.format("path %s exists", execLocalPath));
             }
             FileUtils.forceMkdir(execLocalPathFile);
-            FileUtils.forceMkdir(new File(execLocalResPath));
 
-            /** 下载项目和workflow的资源文件到本地, workflow的资源文件会覆盖项目级别的 */
-            String projectHdfsPath = BaseConfig.getHdfsProjectResourcesPath(executionFlow.getProjectId());
-            HdfsUtil.GetFile(projectHdfsPath, execLocalResPath);
+            FlowType flowType = executionFlow.getFlowType();
+            FlowDag flowDag = JsonUtil.parseObject(executionFlow.getWorkflowData(), FlowDag.class);
+
+            /** 下载workflow的资源文件到本地exec目录 */
             String workflowHdfsPath = BaseConfig.getHdfsFlowResourcesPath(executionFlow.getProjectId(), executionFlow.getFlowId());
-            HdfsUtil.GetFile(workflowHdfsPath, execLocalResPath);
+            HdfsUtil.GetFile(workflowHdfsPath, execLocalPath);
             /** 资源文件解压缩处理 workflow下的文件为 workflowId.zip */
             File zipFile = new File(execLocalPath, executionFlow.getFlowId()+".zip");
             if(zipFile.exists()){
-                String cmd = String.format("unzip -o %s -d %s", zipFile.getPath(), zipFile.getAbsolutePath());
+                String cmd = String.format("unzip -o %s -d %s", zipFile.getPath(), execLocalPath);
+                LOGGER.info("call cmd:" + cmd);
                 Process process = Runtime.getRuntime().exec(cmd);
                 int ret = process.waitFor();
                 if (ret != 0) {
                     LOGGER.error("run cmd:" + cmd + " error");
                     LOGGER.error(IOUtils.toString(process.getErrorStream()));
                 }
+            } else {
+                LOGGER.error("can't found workflow zip file:" + zipFile.getPath());
             }
-            FlowType flowType = executionFlow.getFlowType();
-            FlowDag flowDag = JsonUtil.parseObject(executionFlow.getWorkflowData(), FlowDag.class);
+            /** 解析作业参数获取需要的项目级资源文件清单 **/
+            String projectHdfsPath = BaseConfig.getHdfsProjectResourcesPath(executionFlow.getProjectId());
+            List<String> projectRes = genProjectResFiles(flowDag);
+            for(String res: projectRes){
+                File resFile = new File(execLocalPath, res);
+                if(!resFile.exists()){
+                    String resHdfsPath = projectHdfsPath + File.separator + res;
+                    LOGGER.info("get project file:{}", resHdfsPath);
+                    HdfsUtil.GetFile(resHdfsPath, execLocalPath);
+                } else {
+                    LOGGER.info("file:{} exists, ignore", resFile.getName());
+                }
+            }
+
             switch (flowType) {
                 case ETL:
                     // 生成 etl sql 节点
@@ -236,6 +250,26 @@ public class FlowRunner implements Runnable {
         }
 
         return dagGraph;
+    }
+
+    private List<String> genProjectResFiles(FlowDag flowDag) throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
+        List<FlowNode> nodes = flowDag.getNodes();
+        Set<String> projectFiles = new HashSet<>();
+        Map<String, String> allParamMap = new HashMap<>();
+        allParamMap.putAll(systemParamMap);
+        allParamMap.putAll(customParamMap);
+        for(FlowNode node: nodes) {
+            JobProps props = new JobProps();
+            props.setJobParams(node.getParam());
+            props.setDefinedParams(allParamMap);
+            String jobId = node.getType().name()+"_"+node.getId();
+
+            Job job = JobTypeManager.newJob(jobId, node.getType().name(), props, LOGGER);
+            if(job.getParam() != null && job.getParam().getResourceFiles() != null){
+                projectFiles.addAll(job.getParam().getResourceFiles());
+            }
+        }
+        return new ArrayList<>(projectFiles);
     }
 
     /**

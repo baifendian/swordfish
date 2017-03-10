@@ -1,12 +1,17 @@
 package com.baifendian.swordfish.common.job;
 
+import com.baifendian.swordfish.common.job.config.BaseConfig;
 import com.baifendian.swordfish.common.job.logger.JobLogger;
+import com.fasterxml.jackson.databind.deser.Deserializers;
 import org.slf4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * @author : liujin
@@ -28,8 +33,6 @@ public abstract class AbstractJob implements Job {
     protected JobProps props;
 
     protected String jobPath;
-
-    protected BaseParam param;
 
     protected int exitCode;
 
@@ -57,21 +60,6 @@ public abstract class AbstractJob implements Job {
         this.definedParamMap = props.getDefinedParams();
         this.projectId = props.getProjectId();
         initJobParams();
-    }
-
-
-    private void linkFiles() {
-        // flow资源文件存放目录为工作目录的上层目录下的resources目录中
-        String flowResLocalPath = new File(props.getWorkDir()).getAbsolutePath() + "/resources";
-        File dirFile = new File(flowResLocalPath);
-        for (String res : param.getResourceFiles()) {
-            // 如果
-            String targetFileName = props.getWorkDir() + "/" + file.getName();
-            File targetFile = new File(targetFileName);
-            if (!targetFile.exists()) {
-                Files.createSymbolicLink(targetFile.toPath(), file.toPath());
-            }
-        }
     }
 
     @Override
@@ -144,6 +132,11 @@ public abstract class AbstractJob implements Job {
 
     @Override
     public List<ExecResult> getResults(){
+        return null;
+    }
+
+    @Override
+    public BaseParam getParam(){
         return null;
     }
 

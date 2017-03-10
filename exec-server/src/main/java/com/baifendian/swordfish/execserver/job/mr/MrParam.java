@@ -11,6 +11,7 @@ import com.baifendian.swordfish.dao.mysql.model.flow.params.Property;
 import com.baifendian.swordfish.execserver.job.ResourceInfo;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -26,7 +27,7 @@ public class MrParam extends BaseParam {
     /**
      * 主jar包资源信息
      */
-    private String mainJar;
+    private ResourceInfo mainJar;
 
     /**
      * 主程序
@@ -41,7 +42,7 @@ public class MrParam extends BaseParam {
     /**
      * 配置信息列表
      */
-    private List<Property> properties;
+    private List<Property> properties = new ArrayList<>();
 
     /**
      * 额外的 jar 包，指的是本地的文件，这个可能很长
@@ -66,11 +67,11 @@ public class MrParam extends BaseParam {
         return mainJar != null && StringUtils.isNotEmpty(mainClass);
     }
 
-    public String getMainJar() {
+    public ResourceInfo getMainJar() {
         return mainJar;
     }
 
-    public void setMainJar(String mainJar) {
+    public void setMainJar(ResourceInfo mainJar) {
         this.mainJar = mainJar;
     }
 
@@ -123,12 +124,12 @@ public class MrParam extends BaseParam {
     }
 
     public List<String> getDArgs(){
-        return this.properties.stream().map(prop ->  prop.getProp() + "=" + prop.getValue())
-                .collect(Collectors.toList());
-    }
-
-    public void setDArgs(){
-
+        if(properties.isEmpty()){
+            return new ArrayList<>();
+        } else {
+            return this.properties.stream().map(prop -> prop.getProp() + "=" + prop.getValue())
+                    .collect(Collectors.toList());
+        }
     }
 
     public String getQueue() {
@@ -137,6 +138,24 @@ public class MrParam extends BaseParam {
 
     public void setQueue(String queue) {
         this.queue = queue;
+    }
+
+    @Override
+    public List<String> getResourceFiles(){
+        List<String> resFiles = new ArrayList<>();
+        if(mainJar.isProjectScope()) {
+            resFiles.add(mainJar.getRes());
+        }
+        if(libJars != null && !libJars.isEmpty())
+            resFiles.addAll(libJars.stream().filter(p->p.isProjectScope())
+                    .map(p->p.getRes()).collect(Collectors.toList()));
+        if(files != null && !files.isEmpty())
+            resFiles.addAll(files.stream().filter(p->p.isProjectScope())
+                    .map(p->p.getRes()).collect(Collectors.toList()));
+        if(archives != null && !archives.isEmpty())
+            resFiles.addAll(archives.stream().filter(p->p.isProjectScope())
+                    .map(p->p.getRes()).collect(Collectors.toList()));
+        return resFiles;
     }
 }
 

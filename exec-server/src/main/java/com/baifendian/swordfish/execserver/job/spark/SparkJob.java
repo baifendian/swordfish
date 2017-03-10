@@ -7,6 +7,7 @@
 package com.baifendian.swordfish.execserver.job.spark;
 
 import com.baifendian.swordfish.common.job.AbstractProcessJob;
+import com.baifendian.swordfish.common.job.BaseParam;
 import com.baifendian.swordfish.common.job.JobProps;
 import com.baifendian.swordfish.common.utils.PlaceholderUtil;
 import com.baifendian.swordfish.common.utils.json.JsonUtil;
@@ -46,16 +47,11 @@ public class SparkJob extends AbstractProcessJob {
 
     @Override
     public void initJobParams(){
-        this.param = JsonUtil.parseObject(props.getJobParams(), SparkParam.class);
-        sparkParam = (SparkParam)param;
+        sparkParam = JsonUtil.parseObject(props.getJobParams(), SparkParam.class);
         sparkParam.setQueue(props.getQueue());
-        if (sparkParam.getAppArgs() != null) {
-            List<String> appArgs = new ArrayList<>();
-            for (String arg : sparkParam.getAppArgs()) {
-                arg = ParamHelper.resolvePlaceholders(arg, props.getDefinedParams());
-                appArgs.add(arg);
-            }
-            sparkParam.setAppArgs(appArgs);
+        if (sparkParam.getArgs() != null) {
+            String args = ParamHelper.resolvePlaceholders(sparkParam.getArgs(), props.getDefinedParams());
+            sparkParam.setArgs(args);
         }
     }
 
@@ -126,6 +122,11 @@ public class SparkJob extends AbstractProcessJob {
             completeLatch.await(KILL_TIME_MS, TimeUnit.MILLISECONDS);
         }
 
+    }
+
+    @Override
+    public BaseParam getParam(){
+        return sparkParam;
     }
 
 }

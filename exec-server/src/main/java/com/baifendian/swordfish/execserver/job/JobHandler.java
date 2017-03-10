@@ -1,21 +1,16 @@
 package com.baifendian.swordfish.execserver.job;
 
-import com.baifendian.swordfish.common.consts.Constants;
-import com.baifendian.swordfish.common.hadoop.HdfsUtil;
-import com.baifendian.swordfish.common.job.AbstractProcessJob;
 import com.baifendian.swordfish.common.job.Job;
 import com.baifendian.swordfish.common.job.JobProps;
 import com.baifendian.swordfish.common.job.exception.ExecException;
 import com.baifendian.swordfish.common.utils.BFDDateUtils;
 import com.baifendian.swordfish.dao.FlowDao;
-import com.baifendian.swordfish.dao.config.BaseConfig;
-import com.baifendian.swordfish.dao.hadoop.hdfs.HdfsPathManager;
+import com.baifendian.swordfish.common.job.config.BaseConfig;
 import com.baifendian.swordfish.common.job.FlowStatus;
 import com.baifendian.swordfish.dao.mysql.model.ExecutionFlow;
 import com.baifendian.swordfish.dao.mysql.model.ExecutionNode;
 import com.baifendian.swordfish.dao.mysql.model.FlowNode;
 import com.baifendian.swordfish.execserver.exception.ExecTimeoutException;
-import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -87,26 +82,10 @@ public class JobHandler {
     }
 
     public FlowStatus handle() throws IOException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException, InterruptedException {
-        String flowLocalPath = BaseConfig.getFlowExecPath(executionFlow.getProjectName(), executionFlow.getFlowName(), executionFlow.getId());
-        String jobScriptPath = flowLocalPath + "/" + node.getName();
-        FileUtils.forceMkdir(new File(jobScriptPath));
+        String flowLocalPath = BaseConfig.getFlowExecPath(executionFlow.getProjectId(), executionFlow.getFlowId(), executionFlow.getId());
+        String jobScriptPath = flowLocalPath;
+        //FileUtils.forceMkdir(new File(jobScriptPath));
         logger.info("job:{} script path:{}", jobId, jobScriptPath);
-
-        // 下载节点级别的资源文件到脚本目录
-        /*
-        String nodeResPath = HdfsPathManager.genNodeHdfsPath("aa");
-        HdfsUtil.GetFile(nodeResPath, jobScriptPath);
-        */
-        // 建立资源文件软链接
-        String flowResLocalPath = BaseConfig.getFlowExecResPath(executionFlow.getProjectName(), executionFlow.getFlowName(), executionFlow.getId());
-        File dirFile = new File(flowResLocalPath);
-        for(File file:Arrays.asList(dirFile.listFiles())){
-            String targetFileName = jobScriptPath + "/" + file.getName();
-            File targetFile = new File(targetFileName);
-            if(!targetFile.exists()){
-                Files.createSymbolicLink(targetFile.toPath(), file.toPath());
-            }
-        }
 
         // 作业参数配置
         JobProps props = new JobProps();
@@ -115,6 +94,8 @@ public class JobHandler {
         props.setProxyUser(executionFlow.getProxyUser());
         props.setDefinedParams(allParamMap);
         props.setProjectId(executionFlow.getProjectId());
+        props.setWorkflowId(executionFlow.getFlowId());
+        props.setExecId(executionFlow.getId());
         props.setEnvFile(BaseConfig.getSystemEnvPath());
         props.setQueue(executionFlow.getQueue());
 

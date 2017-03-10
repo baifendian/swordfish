@@ -37,8 +37,8 @@ public class HadoopJarArgsUtil {
     public static List<String> buildArgs(MrParam param) {
         List<String> args = new ArrayList<>();
 
-        if (StringUtils.isNotEmpty(param.getMainJar())) {
-            args.add(param.getMainJar());
+        if (StringUtils.isNotEmpty(param.getMainJar().getRes())) {
+            args.add(param.getMainJar().getRes());
         }
 
         if (StringUtils.isNotEmpty(param.getMainClass())) {

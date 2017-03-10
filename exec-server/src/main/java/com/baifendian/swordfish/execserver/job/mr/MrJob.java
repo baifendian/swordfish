@@ -7,6 +7,7 @@
 package com.baifendian.swordfish.execserver.job.mr;
 
 import com.baifendian.swordfish.common.job.AbstractProcessJob;
+import com.baifendian.swordfish.common.job.BaseParam;
 import com.baifendian.swordfish.common.job.JobProps;
 import com.baifendian.swordfish.common.utils.PlaceholderUtil;
 import com.baifendian.swordfish.common.utils.json.JsonUtil;
@@ -58,8 +59,7 @@ public class MrJob extends AbstractProcessJob {
 
     @Override
     public void initJobParams(){
-        param = JsonUtil.parseObject(props.getJobParams(), MrParam.class);
-        mrParam = (MrParam) param;
+        mrParam = JsonUtil.parseObject(props.getJobParams(), MrParam.class);
         mrParam.setQueue(props.getQueue());
     }
 
@@ -135,6 +135,11 @@ public class MrJob extends AbstractProcessJob {
             completeLatch.await(KILL_TIME_MS, TimeUnit.MILLISECONDS);
         }
 
+    }
+
+    @Override
+    public BaseParam getParam(){
+        return mrParam;
     }
 
 }

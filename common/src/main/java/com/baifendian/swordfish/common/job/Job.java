@@ -74,7 +74,7 @@ public interface Job {
     boolean isCanceled();
 
     /**
-     * 获取作业的配置参数信息
+     * 获取作业的全局参数信息
      * @return
      */
     JobProps getJobProps();
@@ -92,5 +92,11 @@ public interface Job {
     boolean hasResults();
 
     List<ExecResult> getResults();
+
+    /**
+     * 获取作业的配置参数信息
+     * @return
+     */
+    BaseParam getParam();
 
 }

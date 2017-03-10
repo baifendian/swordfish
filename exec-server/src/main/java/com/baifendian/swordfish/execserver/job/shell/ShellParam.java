@@ -1,6 +1,7 @@
 package com.baifendian.swordfish.execserver.job.shell;
 
 import com.baifendian.swordfish.common.job.BaseParam;
+import com.baifendian.swordfish.execserver.job.ResourceInfo;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
+import java.util.stream.Collectors;
 
 import static com.baifendian.swordfish.common.utils.http.HttpUtil.PATTERN_RESOURCE_RULE_MATCHES;
 
@@ -27,51 +29,33 @@ public class ShellParam extends BaseParam {
   /**
    * 原始 shell 语句
    */
-  private String value;
+  private String script;
 
-  /**
-   * @return
-   */
-  public String getValue() {
-    return value;
+  private List<ResourceInfo> resources;
+
+  @Override
+  public boolean checkValid(){
+    return script != null && !script.isEmpty();
   }
 
-  /**
-   * @param value
-   */
-  public void setValue(String value) {
-    this.value = value;
+  public String getScript() {
+    return script;
   }
 
-  public List<String> getResourceNames() {
-    if (StringUtils.isEmpty(value)) {
-      return Collections.emptyList();
-    }
-
-    Matcher matcher = PATTERN_RESOURCE_RULE_MATCHES.matcher(value);
-
-    List<String> resourceNames = new ArrayList<>();
-
-    while (matcher.find()) {
-      resourceNames.add(matcher.group(1));
-    }
-
-    return resourceNames;
+  public void setScript(String script) {
+    this.script = script;
   }
 
-  public static void main(String[] args) {
-    ShellParam shellParam = new ShellParam();
+  public List<ResourceInfo> getResources() {
+    return resources;
+  }
 
-    shellParam.setValue("This order was placed for # --@resource_reference{sss.jbb} QT3000! OK? --@resource_reference{bbb.jbb}");
+  public void setResources(List<ResourceInfo> resources) {
+    this.resources = resources;
+  }
 
-    for (String resource : shellParam.getResourceNames()) {
-      System.out.println("resource is: " + resource);
-    }
-
-    shellParam.setValue("ls -l\npwd");
-
-    for (String resource : shellParam.getResourceNames()) {
-      System.out.println("resource is: " + resource);
-    }
+  @Override
+  public List<String> getResourceFiles(){
+    return resources.stream().map(p->p.getRes()).collect(Collectors.toList());
   }
 }

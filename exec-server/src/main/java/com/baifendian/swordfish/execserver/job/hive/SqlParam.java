@@ -7,11 +7,15 @@
 package com.baifendian.swordfish.execserver.job.hive;
 
 import com.baifendian.swordfish.common.job.BaseParam;
-import com.baifendian.swordfish.dao.mysql.model.flow.params.adhoc.AdHocSqlParam;
+import com.baifendian.swordfish.execserver.job.ResourceInfo;
 import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.hive.ql.parse.ParseDriver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * sql 节点参数
@@ -25,10 +29,10 @@ public class SqlParam extends BaseParam {
     /** LOGGER */
     private final Logger LOGGER = LoggerFactory.getLogger(getClass());
 
-    private String dbName;
-
     /** 原始 sql 语句（多条，内部可能包含换行等符号，执行时需要处理） */
-    private String value;
+    private String sql;
+
+    private List<UdfsInfo> udfs;
 
     @Override
     public boolean checkValid() {
@@ -55,7 +59,7 @@ public class SqlParam extends BaseParam {
     /**
      * getter method
      * 
-     * @see AdHocSqlParam#value
+     * @see
      * @return the value
      */
     public String getValue() {
@@ -65,7 +69,7 @@ public class SqlParam extends BaseParam {
     /**
      * setter method
      * 
-     * @see AdHocSqlParam#value
+     * @see
      * @param value
      *            the value to set
      */
@@ -73,11 +77,20 @@ public class SqlParam extends BaseParam {
         this.value = value;
     }
 
-    public String getDbName() {
-        return dbName;
+    public List<UdfsInfo> getUdfs() {
+        return udfs;
     }
 
-    public void setDbName(String dbName) {
-        this.dbName = dbName;
+    public void setUdfs(List<UdfsInfo> udfs) {
+        this.udfs = udfs;
+    }
+
+    @Override
+    public List<String> getResourceFiles(){
+        if(udfs != null && !udfs.isEmpty()){
+            return udfs.stream().flatMap(p->p.getLibJar().stream().map(q->q.getRes())).collect(Collectors.toList());
+        } else {
+            return null;
+        }
     }
 }

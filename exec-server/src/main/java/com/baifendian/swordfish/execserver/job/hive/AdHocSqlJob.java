@@ -62,7 +62,7 @@ public class AdHocSqlJob extends EtlSqlJob {
                 adHocResultMapper.update(adHocResult); // 更新结果到数据库中
             }
         };
-        HiveSqlExec hiveSqlExec = new HiveSqlExec(funcs, execSqls, getProxyUser(), param.getDbName(), false, resultCallback, null, logger);
+        HiveSqlExec hiveSqlExec = new HiveSqlExec(funcs, execSqls, getProxyUser(), null, false, resultCallback, null, logger);
         hiveSqlExec.run();
         results = hiveSqlExec.getResults();
     }

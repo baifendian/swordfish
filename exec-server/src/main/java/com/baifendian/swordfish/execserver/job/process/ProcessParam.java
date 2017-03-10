@@ -40,4 +40,9 @@ public class ProcessParam extends BaseParam {
     public void setEnvMap(Map<String, String> envMap) {
         this.envMap = envMap;
     }
+
+    @Override
+    public List<String> getResourceFiles(){
+        return null;
+    }
 }

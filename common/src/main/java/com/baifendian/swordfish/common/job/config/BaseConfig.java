@@ -1,4 +1,12 @@
-package com.baifendian.swordfish.dao.config;
+/*
+ * Copyright (c) 2017. Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+ * Morbi non lorem porttitor neque feugiat blandit. Ut vitae ipsum eget quam lacinia accumsan.
+ * Etiam sed turpis ac ipsum condimentum fringilla. Maecenas magna.
+ * Proin dapibus sapien vel ante. Aliquam erat volutpat. Pellentesque sagittis ligula eget metus.
+ * Vestibulum commodo. Ut rhoncus gravida arcu.
+ */
+
+package com.baifendian.swordfish.common.job.config;
 
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
@@ -45,22 +53,11 @@ public class BaseConfig {
         }
     }
 
-    /** workflow 执行本地目录 projectName/workflowName/execId*/
+    /** workflow 执行本地目录 projectId/workflowId/execId*/
     private static final String FLOW_EXEC_PATH_FORMAT="{0}/{1}/{2}";
 
-    public static String getFlowExecPath(String projectName, String workflowName, long execId){
-        return MessageFormat.format("{0}/{1}/{2}/{3}", localBasePath, projectName, workflowName, execId);
-    }
-
-    /**
-     * 获取workflow本地资源存放的路径
-     * @param projectName
-     * @param workflowName
-     * @param execId
-     * @return
-     */
-    public static String getFlowExecResPath(String projectName, String workflowName, long execId){
-        return MessageFormat.format("{0}/{1}/{2}/{3}/resources", localBasePath, projectName, workflowName, execId);
+    public static String getFlowExecPath(int projectId, int workflowId, long execId){
+        return MessageFormat.format("{0}/{1}/{2}/{3}", localBasePath, projectId, workflowId, execId);
     }
 
     public static String getHdfsProjectResourcesPath(int projectId){

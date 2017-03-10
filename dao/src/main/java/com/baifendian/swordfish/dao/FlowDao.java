@@ -27,7 +27,6 @@ import com.baifendian.swordfish.dao.mysql.mapper.*;
 import com.baifendian.swordfish.dao.mysql.model.*;
 import com.baifendian.swordfish.dao.mysql.model.flow.FlowDag;
 import com.baifendian.swordfish.dao.mysql.model.flow.ScheduleMeta;
-import com.baifendian.swordfish.dao.mysql.model.flow.params.dq.DqSqlParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -349,27 +348,6 @@ public class FlowDao extends BaseDao {
         int count = flowNodeMapper.insert(flowNode);
         if (count <= 0) {
             throw new Exception("插入节点失败");
-        }
-    }
-
-    /**
-     * 创建发布节点，如存在则先删除
-     */
-    @Transactional(value = "TransactionManager")
-    public void createPubNode(int workflowId, int nodeId, String value) throws Exception {
-        FlowNode flowNode = flowNodeMapper.selectByNodeId(nodeId);
-
-        List<FlowNode> pubNodes = flowNodeMapper.selectByFlowId(workflowId);
-        if (!pubNodes.isEmpty()) {
-            flowNodeMapper.deleteByFlowId(workflowId);
-        }
-
-        DqSqlParam param = new DqSqlParam();
-        param.setValue(value);
-        flowNode.setParam(JsonUtil.toJsonString(param));
-        int count = flowNodeMapper.insert(flowNode);
-        if (count <= 0) {
-            throw new Exception("插入发布节点失败");
         }
     }
 

@@ -6,6 +6,9 @@
 
 package com.baifendian.swordfish.execserver.job.spark;
 
+import com.baifendian.swordfish.common.utils.CommonUtil;
+import com.baifendian.swordfish.dao.mysql.model.flow.params.Property;
+import com.baifendian.swordfish.execserver.job.ResourceInfo;
 import org.apache.commons.lang.StringUtils;
 
 import java.util.ArrayList;
@@ -40,9 +43,9 @@ public class SparkSubmitArgsUtil {
             args.add(param.getMainClass());
         }
 
-        if (StringUtils.isNotEmpty(param.getDriverCores())) {
+        if (param.getDriverCores() != 0) {
             args.add(SparkSubmitArgsConst.DRIVER_CORES);
-            args.add(param.getDriverCores());
+            args.add(String.format("%d",param.getDriverCores()));
         }
 
         if (StringUtils.isNotEmpty(param.getDriverMemory())) {
@@ -50,14 +53,14 @@ public class SparkSubmitArgsUtil {
             args.add(param.getDriverMemory());
         }
 
-        if (StringUtils.isNotEmpty(param.getNumExecutors())) {
+        if (param.getNumExecutors() != 0) {
             args.add(SparkSubmitArgsConst.NUM_EXECUTORS);
-            args.add(param.getNumExecutors());
+            args.add(String.format("%d", param.getNumExecutors()));
         }
 
-        if (StringUtils.isNotEmpty(param.getExecutorCores())) {
+        if (param.getExecutorCores() != 0) {
             args.add(SparkSubmitArgsConst.EXECUTOR_CORES);
-            args.add(param.getExecutorCores());
+            args.add(String.format("%d", param.getExecutorCores()));
         }
 
         if (StringUtils.isNotEmpty(param.getExecutorMemory())) {
@@ -65,19 +68,19 @@ public class SparkSubmitArgsUtil {
             args.add(param.getExecutorMemory());
         }
 
-        if (param.getJars() != null && !param.getJars().isEmpty()) {
+        if (param.getLibJars() != null && !param.getLibJars().isEmpty()) {
             args.add(SparkSubmitArgsConst.JARS);
-            args.add(StringUtils.join(param.getJars(), ","));
+            args.add(getFilesStr(param.getLibJars(), false));
         }
 
         if (param.getFiles() != null && !param.getFiles().isEmpty()) {
             args.add(SparkSubmitArgsConst.FILES);
-            args.add(StringUtils.join(param.getFiles(), ","));
+            args.add(getFilesStr(param.getFiles(), true));
         }
 
         if (!param.getArchives().isEmpty()) {
             args.add(SparkSubmitArgsConst.ARCHIVES);
-            args.add(StringUtils.join(param.getArchives(), ","));
+            args.add(getFilesStr(param.getArchives(), true));
         }
 
         if (StringUtils.isNotEmpty(param.getQueue())) {
@@ -85,16 +88,31 @@ public class SparkSubmitArgsUtil {
             args.add(param.getQueue());
         }
 
-        if (StringUtils.isNotEmpty(param.getMainJar())) {
-            args.add(param.getMainJar());
-        }
-
-        if (!param.getAppArgs().isEmpty()) {
-            for (String appArg : param.getAppArgs()) {
-                args.add(appArg);
+        if(!param.getProperties().isEmpty()){
+            for(Property property: param.getProperties()){
+                args.add(SparkSubmitArgsConst.CONF);
+                args.add(property.getProp() + "=" + property.getValue());
             }
         }
+
+        if (param.getMainJar() != null) {
+            args.add(param.getMainJar().getRes());
+        }
+
+        if (StringUtils.isNotEmpty(param.getArgs())) {
+            args.add(param.getArgs());
+        }
         return args;
+    }
+
+    private static String getFilesStr(List<ResourceInfo> files, boolean isSymbolic){
+        if(files == null)
+            return "";
+
+        if(isSymbolic)
+            return StringUtils.join(files.stream().map(p->p.getSymbolicRes()).toArray(), ",");
+        else
+            return StringUtils.join(files.stream().map(p->p.getRes()).toArray(), ",");
     }
 
 }

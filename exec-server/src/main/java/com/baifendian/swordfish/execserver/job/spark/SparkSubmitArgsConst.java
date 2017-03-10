@@ -22,8 +22,8 @@ public class SparkSubmitArgsConst {
     /** --class CLASS_NAME */
     public static final String CLASS = "--class";
 
-    /** --arg ARG */
-    public static final String ARGS = "--arg";
+    /** --conf  */
+    public static final String CONF = "--conf";
 
     /** --driver-cores NUM */
     public static final String DRIVER_CORES = "--driver-cores";

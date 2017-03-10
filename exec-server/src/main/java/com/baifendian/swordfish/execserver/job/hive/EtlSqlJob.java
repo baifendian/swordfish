@@ -43,7 +43,7 @@ public class EtlSqlJob extends AbstractJob {
         logger.info("exec sql:{}", sqls);
         List<String> funcs = FunctionUtil.createFuncs(sqls, projectId);
         List<String> execSqls = CommonUtil.sqlSplit(sqls);
-        HiveSqlExec hiveSqlExec = new HiveSqlExec(funcs, execSqls, getProxyUser(), param.getDbName(), false, null, null, logger);
+        HiveSqlExec hiveSqlExec = new HiveSqlExec(funcs, execSqls, getProxyUser(), null, false, null, null, logger);
         hiveSqlExec.run();
         results = hiveSqlExec.getResults();
     }
