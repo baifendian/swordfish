@@ -88,9 +88,6 @@ public class FlowRunnerManager {
         this.flowDao = DaoFactory.getDaoInstance(FlowDao.class);
         this.executionNodeMapper = MyBatisSqlSessionFactoryUtil.getSqlSession().getMapper(ExecutionNodeMapper.class);
 
-        // 启动清除线程
-        startCleanThread();
-
         NamedThreadFactory flowThreadFactory = new NamedThreadFactory("Exec-Worker-FlowRunner");
         flowExecutorService = Executors.newCachedThreadPool(flowThreadFactory);
 

@@ -38,7 +38,7 @@ public class AdHocSqlJob extends EtlSqlJob {
 
     @Override
     public void process() throws Exception {
-        String sqls = param.getValue();
+        String sqls = param.getSql();
         sqls = ParamHelper.resolvePlaceholders(sqls, definedParamMap);
         List<String> funcs = FunctionUtil.createFuncs(sqls, projectId);
         List<String> execSqls = CommonUtil.sqlSplit(sqls);

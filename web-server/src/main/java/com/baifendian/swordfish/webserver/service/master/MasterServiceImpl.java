@@ -15,10 +15,13 @@ import com.baifendian.swordfish.dao.mysql.model.ExecutionFlow;
 import com.baifendian.swordfish.dao.mysql.model.ProjectFlow;
 import com.baifendian.swordfish.dao.mysql.model.Schedule;
 import com.baifendian.swordfish.dao.mysql.model.flow.ScheduleMeta;
+import com.baifendian.swordfish.rpc.HeartBeatData;
 import com.baifendian.swordfish.rpc.MasterService.Iface;
 import com.baifendian.swordfish.rpc.RetInfo;
 import com.baifendian.swordfish.rpc.ScheduleInfo;
 import com.baifendian.swordfish.rpc.WorkerService;
+import com.baifendian.swordfish.webserver.ExecutorServerInfo;
+import com.baifendian.swordfish.webserver.ExecutorServerManager;
 import com.baifendian.swordfish.webserver.config.MasterConfig;
 import com.baifendian.swordfish.webserver.quartz.FlowScheduleJob;
 import com.baifendian.swordfish.webserver.quartz.QuartzManager;
@@ -33,6 +36,7 @@ import org.slf4j.LoggerFactory;
 import java.util.Date;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
 
 /**
@@ -48,7 +52,7 @@ public class MasterServiceImpl implements Iface {
     private final Logger LOGGER = LoggerFactory.getLogger(getClass());
 
     /** worker rpc client */
-    private final WorkerService.Iface worker;
+    private final ExecutorServerManager executorServerManager;
 
     /** {@link FlowDao} */
     private final FlowDao flowDao;
@@ -63,13 +67,12 @@ public class MasterServiceImpl implements Iface {
     private final FlowExecManager flowExecManager;
 
     /**
-     * @param worker
      */
-    public MasterServiceImpl(WorkerService.Iface worker) {
-        this.worker = worker;
+    public MasterServiceImpl() {
+        executorServerManager = new ExecutorServerManager();
         this.flowDao = DaoFactory.getDaoInstance(FlowDao.class);
 
-        flowExecManager = new FlowExecManager(worker, flowDao);
+        flowExecManager = new FlowExecManager(executorServerManager, flowDao);
 
         // 启动请求 worker 失败的处理线程
         executionFlowQueue = new LinkedBlockingQueue<>(MasterConfig.failRetryQueueSize);
@@ -267,6 +270,41 @@ public class MasterServiceImpl implements Iface {
      */
     public void destory() {
         flowExecManager.destroy();
+    }
+
+    public RetInfo registerExecutor(String host, int port) throws TException{
+        String key = String.format("%s:%d", host, port);
+        if(executorServerManager.serverExists(key)){
+            return ResultHelper.createErrorResult("executor is register before");
+        }
+
+        ExecutorServerInfo executorServerInfo = new ExecutorServerInfo();
+        executorServerInfo.setHost(host);
+        executorServerInfo.setPort(port);
+        executorServerInfo.setHeartBeatData(null);
+
+        executorServerManager.addServer(key, executorServerInfo);
+        return ResultHelper.SUCCESS;
+    }
+
+    /**
+     * execServer汇报心跳
+     * host : host地址
+     * port : 端口号
+     *
+     * @param host
+     * @param port
+     * @param heartBeatData
+     */
+    public RetInfo executorReport(String host, int port, HeartBeatData heartBeatData) throws org.apache.thrift.TException {
+        String key = String.format("%s:%d", host, port);
+        ExecutorServerInfo executorServerInfo = new ExecutorServerInfo();
+        executorServerInfo.setHost(host);
+        executorServerInfo.setPort(port);
+        executorServerInfo.setHeartBeatData(heartBeatData);
+
+        executorServerManager.addServer(key, executorServerInfo);
+        return ResultHelper.SUCCESS;
     }
 
 }

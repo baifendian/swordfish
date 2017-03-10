@@ -36,16 +36,16 @@ public class SqlParam extends BaseParam {
 
     @Override
     public boolean checkValid() {
-        if (StringUtils.isEmpty(value)) {
+        if (StringUtils.isEmpty(sql)) {
             return false;
         }
         try {
-            for (String sql : value.split(";")) {
-                sql = sql.replaceAll("\n", " ");
-                sql = sql.replaceAll("\r", "");
-                if (StringUtils.isNotBlank(sql)) {
+            for (String sqlOne : sql.split(";")) {
+                sqlOne = sqlOne.replaceAll("\n", " ");
+                sqlOne = sqlOne.replaceAll("\r", "");
+                if (StringUtils.isNotBlank(sqlOne)) {
                     ParseDriver pd = new ParseDriver();
-                    pd.parse(sql);
+                    pd.parse(sqlOne);
                 }
             }
         } catch (Exception e) {
@@ -56,25 +56,12 @@ public class SqlParam extends BaseParam {
         return true;
     }
 
-    /**
-     * getter method
-     * 
-     * @see
-     * @return the value
-     */
-    public String getValue() {
-        return value;
+    public String getSql() {
+        return sql;
     }
 
-    /**
-     * setter method
-     * 
-     * @see
-     * @param value
-     *            the value to set
-     */
-    public void setValue(String value) {
-        this.value = value;
+    public void setSql(String sql) {
+        this.sql = sql;
     }
 
     public List<UdfsInfo> getUdfs() {

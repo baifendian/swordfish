@@ -112,4 +112,24 @@ public class ExecServiceImpl implements Iface {
         flowRunnerManager.destroy();
     }
 
+    public RetInfo cancelExecFlow(int projectId, long execId, String flowType) throws TException{
+        try {
+            // 查询 ExecutionFlow
+            ExecutionFlow executionFlow = flowDao.queryExecutionFlow(execId);
+            if (executionFlow == null) {
+                return ResultHelper.createErrorResult("execId 对应的记录不存在");
+            }
+
+            if (executionFlow.getStatus().typeIsFinished()) {
+                return ResultHelper.createErrorResult("execId run finished");
+            }
+
+            flowRunnerManager.cancelFlow(execId,"user");
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage(), e);
+            return ResultHelper.createErrorResult(e.getMessage());
+        }
+        return ResultHelper.SUCCESS;
+
+    }
 }

@@ -31,14 +31,14 @@ public class EtlSqlJob extends AbstractJob {
     @Override
     public void initJobParams() {
         this.param = JsonUtil.parseObject(props.getJobParams(), SqlParam.class);
-        String value = param.getValue();
+        String value = param.getSql();
         value = ParamHelper.resolvePlaceholders(value, props.getDefinedParams());
-        param.setValue(value);
+        param.setSql(value);
     }
 
     @Override
     public void process() throws Exception {
-        String sqls = param.getValue();
+        String sqls = param.getSql();
         sqls = ParamHelper.resolvePlaceholders(sqls, definedParamMap);
         logger.info("exec sql:{}", sqls);
         List<String> funcs = FunctionUtil.createFuncs(sqls, projectId);
