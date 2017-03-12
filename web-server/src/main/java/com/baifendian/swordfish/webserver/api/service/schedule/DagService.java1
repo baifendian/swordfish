@@ -1,0 +1,119 @@
+package com.baifendian.swordfish.webserver.api.service.schedule;
+
+import com.baifendian.swordfish.webserver.api.dto.BaseResponse;
+import com.baifendian.swordfish.common.utils.graph.DAGGraph;
+import com.baifendian.swordfish.common.utils.json.JsonUtil;
+import com.baifendian.swordfish.dao.mysql.mapper.ScheduleMapper;
+import com.baifendian.swordfish.dao.mysql.model.Schedule;
+import com.baifendian.swordfish.dao.mysql.model.flow.DepWorkflow;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+
+/**
+ * 所有workflow dag信息
+ * <p>
+ *
+ * @author : wenting.wang
+ * @date : 2016年9月20日
+ */
+@Service
+public class DagService {
+    @Autowired
+    private ScheduleMapper scheduleMapper;
+
+    private DAGGraph dagGraph;
+
+    public void init() {
+        dagGraph = new DAGGraph();
+        List<Schedule> schedules = scheduleMapper.queryAll();
+        Integer workflowId;
+
+        // add vertex
+        for(Schedule schedule: schedules) {
+            workflowId = schedule.getFlowId();
+            dagGraph.addVertex(workflowId, null);
+        }
+
+        //add edge
+        for(Schedule schedule: schedules) {
+            List<DepWorkflow> depWorkflows = JsonUtil.parseObjectList(schedule.getDepWorkflows(), DepWorkflow.class);
+
+            if (depWorkflows != null) {
+                workflowId = schedule.getFlowId();
+                List<Integer> starts = new ArrayList<>();
+                for (DepWorkflow depWorkflow : depWorkflows) {
+                    starts.add(depWorkflow.getWorkflowId());
+                }
+                dagGraph.addRemoveMultiEdges(new ArrayList<>(), starts, workflowId);
+            }
+        }
+    }
+
+    /**
+     * 添加或更新节点的依赖关系
+     * <p>
+     *
+     * @param depWorkflows
+     * @param endId
+     * @return {@link BaseResponse}
+     */
+    public boolean AddOrUpdateEdge(List<DepWorkflow> depWorkflows, Integer endId) {
+        List<Integer> starts = new ArrayList<>();
+
+        if (depWorkflows != null) {
+            for (DepWorkflow depWorkflow : depWorkflows) {
+                starts.add(depWorkflow.getWorkflowId());
+            }
+        }
+        return dagGraph.forceRefreshPreEdges(starts, endId);
+    }
+
+    /**
+     * 添加一个节点
+     * <p>
+     *
+     * @param workflowId
+     * @return void
+     */
+    public void addVertex(int workflowId) {
+        dagGraph.addVertexIfAbsent(workflowId, null);
+    }
+
+    /**
+     * 删除一个节点，删除时，依赖此节点的边删除
+     * <p>
+     *
+     * @param workflowId
+     * @return void
+     */
+    public void deleteVertext(int workflowId) {
+        dagGraph.removeVertex(workflowId);
+    }
+
+
+    /**
+     * 查询一个workflow 的后续节点
+     * <p>
+     *
+     * @param workflowId
+     * @return Set<Integer>
+     */
+    public Set<Integer> getBeDepend(int workflowId) {
+        return  dagGraph.getPostNode(workflowId);
+    }
+
+    /**
+     * 查询一个workflow 的前续节点
+     * <p>
+     *
+     * @param workflowId
+     * @return Set<Integer>
+     */
+    public Set<Integer> getDepend(int workflowId) {
+        return  dagGraph.getPreNode(workflowId);
+    }
+}
