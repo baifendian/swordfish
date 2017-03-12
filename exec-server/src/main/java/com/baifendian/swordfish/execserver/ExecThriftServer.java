@@ -80,10 +80,10 @@ public class ExecThriftServer {
         }
 
         port = conf.getInt("executor.port", 9999);
-        masterClient = new MasterClient(masterServer.getIp(), masterServer.getPort(), 3);
+        masterClient = new MasterClient(masterServer.getHost(), masterServer.getPort(), 3);
         hostName = InetAddress.getLocalHost().getHostName();
 
-        logger.info("register to master {}:{}", masterServer.getIp(), masterServer.getPort());
+        logger.info("register to master {}:{}", masterServer.getHost(), masterServer.getPort());
         /** 注册到master */
         boolean ret = masterClient.registerExecutor(hostName, port);
         if(!ret){
