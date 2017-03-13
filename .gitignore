@@ -8,3 +8,4 @@ log
 RemoteSystemsTempFiles
 *.iml
 *.log
+logs
