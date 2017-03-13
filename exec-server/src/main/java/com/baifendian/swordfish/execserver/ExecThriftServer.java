@@ -8,9 +8,11 @@
 
 package com.baifendian.swordfish.execserver;
 
+import com.baifendian.swordfish.common.hadoop.HdfsClient;
 import com.baifendian.swordfish.common.job.exception.ExecException;
 import com.baifendian.swordfish.dao.DaoFactory;
 import com.baifendian.swordfish.dao.MasterDao;
+import com.baifendian.swordfish.dao.hadoop.ConfigurationUtil;
 import com.baifendian.swordfish.dao.mysql.model.MasterServer;
 import com.baifendian.swordfish.execserver.service.ExecServiceImpl;
 import com.baifendian.swordfish.rpc.HeartBeatData;
@@ -52,7 +54,7 @@ public class ExecThriftServer {
 
     private final MasterServer masterServer;
 
-    private final String hostName;
+    private String hostName;
 
     private final int port;
 
@@ -63,6 +65,11 @@ public class ExecThriftServer {
     private MasterClient masterClient;
 
     private AtomicBoolean heartBeatTimeout = new AtomicBoolean(false);
+
+    private final int THRIFT_RPC_RETRIES = 3;
+
+    /** 心跳时间间隔，单位秒 */
+    private int heartBeatInterval;
 
     static{
         try {
@@ -79,8 +86,13 @@ public class ExecThriftServer {
             throw new ExecException("can't found master server");
         }
 
-        port = conf.getInt("executor.port", 9999);
-        masterClient = new MasterClient(masterServer.getHost(), masterServer.getPort(), 3);
+        port = conf.getInt("executor.port", 10000);
+    }
+
+    public void run() throws UnknownHostException, TTransportException {
+        HdfsClient.init(ConfigurationUtil.getConfiguration());
+
+        masterClient = new MasterClient(masterServer.getHost(), masterServer.getPort(), THRIFT_RPC_RETRIES);
         hostName = InetAddress.getLocalHost().getHostName();
 
         logger.info("register to master {}:{}", masterServer.getHost(), masterServer.getPort());
@@ -89,6 +101,8 @@ public class ExecThriftServer {
         if(!ret){
             throw new ExecException("register executor error");
         }
+
+        heartBeatInterval = conf.getInt("executor.heartbeat.interval", 60);
 
         executorService = Executors.newScheduledThreadPool(5);
         Runnable heartBeatThread = getHeartBeatThread();
@@ -101,9 +115,6 @@ public class ExecThriftServer {
         server = getTThreadPoolServer(protocolFactory, tProcessor, tTransportFactory, inetSocketAddress, 50, 200);
         logger.info("start thrift server on port:{}", port);
         server.serve();
-    }
-
-    public void run(){
 
     }
 
@@ -113,7 +124,9 @@ public class ExecThriftServer {
             public void run() {
                 HeartBeatData heartBeatData = new HeartBeatData();
                 heartBeatData.setReportDate(System.currentTimeMillis());
-                boolean result = masterClient.executorReport(hostName, port,heartBeatData);
+                MasterClient client = new MasterClient(masterServer.getHost(), masterServer.getPort(), THRIFT_RPC_RETRIES);
+                logger.debug("executor report heartbeat:{}", heartBeatData);
+                boolean result = client.executorReport(hostName, port,heartBeatData);
                 if(!result){
                     heartBeatTimeout.compareAndSet(false, true);
                 }
@@ -125,5 +138,6 @@ public class ExecThriftServer {
 
     public static void main(String[] args) throws TTransportException, UnknownHostException {
         ExecThriftServer execThriftServer = new ExecThriftServer();
+        execThriftServer.run();
     }
 }

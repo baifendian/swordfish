@@ -43,6 +43,7 @@ public class WebServer {
      * @param args
      */
     public static void main(String[] args) {
+        /*
         try {
             // 加载配置文件
             PropertiesConfiguration.load(new String[] { DEFAULT_CONFIG });
@@ -55,7 +56,7 @@ public class WebServer {
             Iface worker = client.createProxy();
 
             // 启动 master 服务
-            MasterServiceImpl impl = new MasterServiceImpl(worker);
+            MasterServiceImpl impl = new MasterServiceImpl();
             final Server server = new Server(new String[] { SERVER_FILE_PATH }, impl, client.getRegistryConfig());
             server.start();
 
@@ -88,6 +89,6 @@ public class WebServer {
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
         }
-
+*/
     }
 }

@@ -5,7 +5,6 @@ import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.fs.FileStatus;
 
 import java.io.IOException;
-import java.util.Arrays;
 
 /**
  * @author : liujin

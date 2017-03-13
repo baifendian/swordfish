@@ -7,12 +7,10 @@ import com.baifendian.swordfish.common.utils.json.JsonUtil;
 import com.baifendian.swordfish.dao.hive.FunctionUtil;
 import com.baifendian.swordfish.common.job.ExecResult;
 import com.baifendian.swordfish.execserver.parameter.ParamHelper;
-import org.apache.commons.configuration.PropertiesConfiguration;
 import org.slf4j.Logger;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author : liujin

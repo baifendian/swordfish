@@ -6,12 +6,12 @@
  * Vestibulum commodo. Ut rhoncus gravida arcu.
  */
 
-package com.baifendian.swordfish.execserver;
+package com.baifendian.swordfish.webserver;
 
 import com.baifendian.swordfish.rpc.HeartBeatData;
 import com.baifendian.swordfish.rpc.MasterService;
 import com.baifendian.swordfish.rpc.RetInfo;
-import com.baifendian.swordfish.rpc.ScheduleInfo;
+import com.baifendian.swordfish.rpc.WorkerService;
 import org.apache.thrift.TException;
 import org.apache.thrift.protocol.TBinaryProtocol;
 import org.apache.thrift.protocol.TProtocol;
@@ -23,11 +23,11 @@ import org.slf4j.LoggerFactory;
 
 /**
  * @author : liujin
- * @date : 2017-03-10 16:49
+ * @date : 2017-03-13 8:43
  */
-public class MasterClient {
+public class ExecutorClient {
 
-    private static Logger logger = LoggerFactory.getLogger(MasterClient.class);
+    private static Logger logger = LoggerFactory.getLogger(ExecutorClient.class);
 
     private String host;
 
@@ -35,23 +35,31 @@ public class MasterClient {
 
     private int timeout = 3000;
 
+    private final int RPC_RETRIES = 3;
+
     private TTransport tTransport;
 
-    private MasterService.Client client;
+    private WorkerService.Client client;
 
     private int retries;
 
-    public MasterClient(String host, int port, int retries){
+    public ExecutorClient(String host, int port, int retries){
         this.host = host;
         this.port = port;
         this.retries = retries;
+    }
+
+    public ExecutorClient(ExecutorServerInfo executorServerInfo){
+        this.host = executorServerInfo.getHost();
+        this.port = executorServerInfo.getPort();
+        this.retries = RPC_RETRIES;
     }
 
     private void connect(){
         tTransport = new TSocket(host, port, timeout);
         try {
             TProtocol protocol = new TBinaryProtocol(tTransport);
-            client = new MasterService.Client(protocol);
+            client = new WorkerService.Client(protocol);
             tTransport.open();
         } catch (TTransportException e) {
             e.printStackTrace();
@@ -64,10 +72,10 @@ public class MasterClient {
         }
     }
 
-    public boolean executorReport(String clientHost, int clientPort, HeartBeatData heartBeatData) {
+    public boolean scheduleExecFlow(int projectId, long execId, String flowType, long scheduleDate) {
         connect();
         try{
-            client.executorReport(clientHost, clientPort, heartBeatData);
+            client.scheduleExecFlow(projectId, execId, flowType, scheduleDate);
         }catch (TException e) {
             logger.error("report info error", e);
             return false;
@@ -77,45 +85,13 @@ public class MasterClient {
         return true;
     }
 
-    public boolean registerExecutor(String clientHost, int clientPort) {
+    public boolean execFlow(int projectId, long execId, String flowType) throws TException {
         connect();
         try{
-            RetInfo ret = client.registerExecutor(clientHost, clientPort);
-            if(ret.getStatus() != 0) {
-                logger.error("register executor error:{}", ret.getMsg());
-                return false;
-            }
+            client.execFlow(projectId, execId, flowType);
         }catch (TException e) {
-            logger.error("register executor error", e);
-            return false;
-        }finally {
-            close();
-        }
-        return true;
-    }
-
-    public boolean registerExecutorWithRetry(String clientHost, int clientPort) {
-        boolean flag = false;
-        for(int i=0; i<retries; i++){
-            if(registerExecutor(clientHost, clientPort)){
-                flag = true;
-                break;
-            }
-        }
-        return flag;
-    }
-
-    public boolean setSchedule(int projectId, int flowId, String flowType, ScheduleInfo scheduleInfo){
-        connect();
-        try{
-            RetInfo ret = client.setSchedule(projectId, flowId, flowType, scheduleInfo);
-            if(ret.getStatus() != 0) {
-                logger.error("set schedule error:{}", ret.getMsg());
-                return false;
-            }
-        }catch (TException e) {
-            logger.error("set schedule error", e);
-            return false;
+            logger.error("exec flow error", e);
+            throw e;
         }finally {
             close();
         }

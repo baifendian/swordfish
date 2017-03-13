@@ -332,6 +332,10 @@ public class HdfsClient implements Closeable {
         return getContentSummary(filePath).getLength();
     }
 
+    public boolean exists(String filePath) throws IOException {
+        return fileSystem.exists(new Path(filePath));
+    }
+
     /**
      * 获取文件或目录的状态信息
      * <p>

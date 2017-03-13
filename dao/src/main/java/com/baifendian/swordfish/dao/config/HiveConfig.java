@@ -1,7 +1,6 @@
 package com.baifendian.swordfish.dao.config;
 
 import com.baifendian.swordfish.common.hive.HiveConnectionClient;
-import com.baifendian.swordfish.common.hive.HiveMetaPoolClient;
 import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.springframework.beans.factory.annotation.Value;
@@ -44,13 +43,6 @@ public class HiveConfig {
   private String hiveUserName;
 
   org.apache.hadoop.conf.Configuration conf = new org.apache.hadoop.conf.Configuration();
-
-  @Bean
-  public HiveMetaPoolClient hiveMetaPoolClient() {
-    HiveMetaPoolClient.init(metastoreUris, jdoUrl,
-        jdoUser, jdoPassword, jdoDriverName);
-    return HiveMetaPoolClient.getInstance();
-  }
 
   @Bean
   public HiveConnectionClient hiveConnectionClient() {

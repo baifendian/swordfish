@@ -60,8 +60,8 @@
         <module>common</module>
         <module>dao</module>
         <module>rpc</module>
-        <module>web-server</module>
         <module>exec-server</module>
+        <module>web-server</module>
     </modules>
 
     <dependencyManagement>

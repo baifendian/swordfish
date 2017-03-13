@@ -6,6 +6,7 @@
 
 package com.baifendian.swordfish.execserver.flow;
 
+import com.baifendian.swordfish.common.hadoop.HdfsClient;
 import com.baifendian.swordfish.common.hadoop.HdfsUtil;
 import com.baifendian.swordfish.common.job.FlowStatus;
 import com.baifendian.swordfish.common.job.Job;
@@ -163,20 +164,23 @@ public class FlowRunner implements Runnable {
 
             /** 下载workflow的资源文件到本地exec目录 */
             String workflowHdfsPath = BaseConfig.getHdfsFlowResourcesPath(executionFlow.getProjectId(), executionFlow.getFlowId());
-            HdfsUtil.GetFile(workflowHdfsPath, execLocalPath);
-            /** 资源文件解压缩处理 workflow下的文件为 workflowId.zip */
-            File zipFile = new File(execLocalPath, executionFlow.getFlowId()+".zip");
-            if(zipFile.exists()){
-                String cmd = String.format("unzip -o %s -d %s", zipFile.getPath(), execLocalPath);
-                LOGGER.info("call cmd:" + cmd);
-                Process process = Runtime.getRuntime().exec(cmd);
-                int ret = process.waitFor();
-                if (ret != 0) {
-                    LOGGER.error("run cmd:" + cmd + " error");
-                    LOGGER.error(IOUtils.toString(process.getErrorStream()));
+            HdfsClient hdfsClient = HdfsClient.getInstance();
+            if(hdfsClient.exists(workflowHdfsPath)) {
+                HdfsUtil.GetFile(workflowHdfsPath, execLocalPath);
+                /** 资源文件解压缩处理 workflow下的文件为 workflowId.zip */
+                File zipFile = new File(execLocalPath, executionFlow.getFlowId() + ".zip");
+                if (zipFile.exists()) {
+                    String cmd = String.format("unzip -o %s -d %s", zipFile.getPath(), execLocalPath);
+                    LOGGER.info("call cmd:" + cmd);
+                    Process process = Runtime.getRuntime().exec(cmd);
+                    int ret = process.waitFor();
+                    if (ret != 0) {
+                        LOGGER.error("run cmd:" + cmd + " error");
+                        LOGGER.error(IOUtils.toString(process.getErrorStream()));
+                    }
+                } else {
+                    LOGGER.error("can't found workflow zip file:" + zipFile.getPath());
                 }
-            } else {
-                LOGGER.error("can't found workflow zip file:" + zipFile.getPath());
             }
             /** 解析作业参数获取需要的项目级资源文件清单 **/
             String projectHdfsPath = BaseConfig.getHdfsProjectResourcesPath(executionFlow.getProjectId());

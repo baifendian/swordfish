@@ -29,6 +29,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
+import java.util.concurrent.BlockingQueue;
 
 /**
  * Workflow 调度 Job
@@ -64,7 +65,7 @@ public class FlowScheduleJob implements Job {
     private static final String PARAM_SCHEDULE = "schedule";
 
     /** worker rpc client */
-    private static WorkerService.Iface worker;
+    private static BlockingQueue<ExecutionFlow> executionFlowQueue;
 
     /** {@link FlowDao} */
     private static FlowDao flowDao;
@@ -76,11 +77,11 @@ public class FlowScheduleJob implements Job {
      * 初始化 Job （使用该调度 Job 前，必须先调用该函数初始化）
      * <p>
      *
-     * @param worker
+     * @param executionFlowQueue
      * @param flowDao
      */
-    public static void init(WorkerService.Iface worker, FlowDao flowDao) {
-        FlowScheduleJob.worker = worker;
+    public static void init(BlockingQueue<ExecutionFlow> executionFlowQueue, FlowDao flowDao) {
+        FlowScheduleJob.executionFlowQueue = executionFlowQueue;
         FlowScheduleJob.flowDao = flowDao;
     }
 
@@ -172,7 +173,7 @@ public class FlowScheduleJob implements Job {
         }
 
         // 发送执行任务到 worker
-        sendExecutionToWoker(executionFlow, scheduledFireTime);
+        sendToExecution(executionFlow, scheduledFireTime);
     }
 
     /**
@@ -442,29 +443,8 @@ public class FlowScheduleJob implements Job {
      * @param executionFlow
      * @param scheduleDate
      */
-    private void sendExecutionToWoker(ExecutionFlow executionFlow, Date scheduleDate) {
-        long execId = executionFlow.getId();
-        boolean isSucess = false; // 是否请求成功
-        for (int i = 0; i < MasterConfig.failRetryCount + 1; i++) {
-            try {
-                worker.scheduleExecFlow(executionFlow.getProjectId(), execId, executionFlow.getFlowType().name(), scheduleDate.getTime());
-                isSucess = true;
-                break; // 请求成功，结束重试请求
-            } catch (RpcException e) {
-                ExecutionFlow temp = flowDao.queryExecutionFlow(execId);
-                // 如果执行被取消或者状态已经更新，结束重试请求
-                if (temp == null || temp.getStatus() != FlowStatus.INIT) {
-                    break;
-                }
-            } catch (Exception e) { // 内部错误
-                LOGGER.error(e.getMessage(), e);
-            }
-        }
-
-        // 多次重试后仍然失败
-        if (!isSucess) {
-            flowDao.updateExecutionFlowStatus(execId, FlowStatus.FAILED);
-        }
+    private void sendToExecution(ExecutionFlow executionFlow, Date scheduleDate) {
+        executionFlowQueue.add(executionFlow);
     }
 
     /**

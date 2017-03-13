@@ -19,7 +19,6 @@ import com.baifendian.swordfish.rpc.HeartBeatData;
 import com.baifendian.swordfish.rpc.MasterService.Iface;
 import com.baifendian.swordfish.rpc.RetInfo;
 import com.baifendian.swordfish.rpc.ScheduleInfo;
-import com.baifendian.swordfish.rpc.WorkerService;
 import com.baifendian.swordfish.webserver.ExecutorServerInfo;
 import com.baifendian.swordfish.webserver.ExecutorServerManager;
 import com.baifendian.swordfish.webserver.config.MasterConfig;
@@ -27,6 +26,7 @@ import com.baifendian.swordfish.webserver.quartz.FlowScheduleJob;
 import com.baifendian.swordfish.webserver.quartz.QuartzManager;
 import com.baifendian.swordfish.execserver.result.ResultHelper;
 import com.bfd.harpc.RpcException;
+import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
 import org.apache.thrift.TException;
 import org.quartz.CronExpression;
@@ -35,9 +35,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Date;
 import java.util.Map;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.*;
 
 /**
  * MasterService 实现
@@ -60,28 +58,56 @@ public class MasterServiceImpl implements Iface {
     /** workflow 执行队列 */
     private final BlockingQueue<ExecutionFlow> executionFlowQueue;
 
-    /** {@link RetryToWorkerThread} */
-    private final RetryToWorkerThread retryToWorkerThread;
+    /** {@link Submit2ExecutorServerThread} */
+    private final Submit2ExecutorServerThread retryToWorkerThread;
 
     /** {@link FlowExecManager} */
     private final FlowExecManager flowExecManager;
 
+    /** executor server服务检查线程 **/
+    private ExecutorCheckThread executorCheckThread;
+
+    private ScheduledExecutorService executorService;
+
+    private Configuration conf;
+
     /**
      */
-    public MasterServiceImpl() {
-        executorServerManager = new ExecutorServerManager();
+    public MasterServiceImpl(ExecutorServerManager executorServerManager, Configuration conf) {
+        this.executorServerManager = executorServerManager;
+        this.conf = conf;
         this.flowDao = DaoFactory.getDaoInstance(FlowDao.class);
+        this.executorService = Executors.newScheduledThreadPool(5);
 
-        flowExecManager = new FlowExecManager(executorServerManager, flowDao);
-
-        // 启动请求 worker 失败的处理线程
+        // 启动请求 executor server的处理线程
         executionFlowQueue = new LinkedBlockingQueue<>(MasterConfig.failRetryQueueSize);
-        retryToWorkerThread = new RetryToWorkerThread(worker, flowDao, executionFlowQueue);
+        retryToWorkerThread = new Submit2ExecutorServerThread(executorServerManager, flowDao, executionFlowQueue);
         retryToWorkerThread.setDaemon(true);
         retryToWorkerThread.start();
 
+        int timeoutInterval = conf.getInt("master.heartbeat.timeout.interval", 60);
+        int checkInterval = conf.getInt("master.heartbeat.check.interval", 30);
+        executorCheckThread = new ExecutorCheckThread(executorServerManager, timeoutInterval, executionFlowQueue, flowDao);
+        executorService.scheduleAtFixedRate(executorCheckThread,0, checkInterval, TimeUnit.SECONDS);
+
+        flowExecManager = new FlowExecManager(executionFlowQueue, flowDao);
+
         // 初始化调度作业
-        FlowScheduleJob.init(worker, flowDao);
+        FlowScheduleJob.init(executionFlowQueue, flowDao);
+    }
+
+    @Override
+    public RetInfo execFlow(int projectId, long execId, String flowType) throws TException {
+        ExecutionFlow executionFlow = flowDao.queryExecutionFlow(execId);
+        if(executionFlow == null){
+            LOGGER.error("execId 对应的任务不存在");
+            return ResultHelper.createErrorResult("execId 对应的任务不存在");
+        }
+        flowDao.updateExecutionFlowStatus(execId, FlowStatus.INIT);
+
+        executionFlowQueue.add(executionFlow);
+
+        return ResultHelper.SUCCESS;
     }
 
     /**
@@ -98,6 +124,7 @@ public class MasterServiceImpl implements Iface {
     * @return
     * @throws TException
     */
+    /*
     @Override
     public RetInfo execFlow(int projectId, long execId, String flowType) throws TException {
         // 更新状态
@@ -131,6 +158,7 @@ public class MasterServiceImpl implements Iface {
 
         return ResultHelper.SUCCESS;
     }
+    */
 
     /**
     * 设置调度信息, 最终设置的是 Crontab 表达式(其实是按照 Quartz 的语法)
@@ -144,6 +172,7 @@ public class MasterServiceImpl implements Iface {
     */
     @Override
     public RetInfo setSchedule(int projectId, int flowId, String flowType, ScheduleInfo scheduleInfo) throws TException {
+        LOGGER.info("set schedule {} {}", projectId, flowId);
         if (StringUtils.isEmpty(flowType)) {
             return ResultHelper.createErrorResult("flowType 参数不能为空");
         }
@@ -273,6 +302,7 @@ public class MasterServiceImpl implements Iface {
     }
 
     public RetInfo registerExecutor(String host, int port) throws TException{
+        LOGGER.info("register executor server[{}:{}]", host, port);
         String key = String.format("%s:%d", host, port);
         if(executorServerManager.serverExists(key)){
             return ResultHelper.createErrorResult("executor is register before");
@@ -297,7 +327,18 @@ public class MasterServiceImpl implements Iface {
      * @param heartBeatData
      */
     public RetInfo executorReport(String host, int port, HeartBeatData heartBeatData) throws org.apache.thrift.TException {
+        LOGGER.debug("executor server[{}:{}] report info {}", host, port, heartBeatData);
+        long nowTime = System.currentTimeMillis();
+        /** 时钟差异检查 **/
+        if(heartBeatData.getReportDate() > nowTime+10000){
+            return ResultHelper.createErrorResult("executor master clock time diff then 10 seconds");
+        }
         String key = String.format("%s:%d", host, port);
+
+        /** executorserver不存在，由于汇报超时导致server被删除，这里 */
+        if(!executorServerManager.serverExists(key)){
+            return ResultHelper.createErrorResult("executor is not register before");
+        }
         ExecutorServerInfo executorServerInfo = new ExecutorServerInfo();
         executorServerInfo.setHost(host);
         executorServerInfo.setPort(port);

@@ -32,6 +32,9 @@ struct HeartBeatData {
     /** 内存使用率 **/
     3: double memUsed,
 
+    /** workflow execId list **/
+    4: list<i64> execIds,
+
 }
 	
 /* Master 服务接口 */	

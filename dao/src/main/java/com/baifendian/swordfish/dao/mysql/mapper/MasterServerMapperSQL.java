@@ -28,7 +28,7 @@ public class MasterServerMapperSQL {
     public String insert(Map<String,Object> parameter){
         return new SQL(){{
             INSERT_INTO("master_server");
-            VALUES("ip","#{masterServer.ip}");
+            VALUES("host","#{masterServer.host}");
             VALUES("port","#{masterServer.port}");
             VALUES("update_time","#{masterServer.updateTime}");
         }}.toString();

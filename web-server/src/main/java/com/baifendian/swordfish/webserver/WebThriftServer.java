@@ -13,6 +13,7 @@ import com.baifendian.swordfish.dao.MasterDao;
 import com.baifendian.swordfish.execserver.service.ExecServiceImpl;
 import com.baifendian.swordfish.rpc.MasterService;
 import com.baifendian.swordfish.rpc.WorkerService;
+import com.baifendian.swordfish.webserver.quartz.QuartzManager;
 import com.baifendian.swordfish.webserver.service.master.MasterServiceImpl;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
@@ -23,6 +24,8 @@ import org.apache.thrift.protocol.TProtocolFactory;
 import org.apache.thrift.server.TServer;
 import org.apache.thrift.transport.TTransportException;
 import org.apache.thrift.transport.TTransportFactory;
+import org.apache.tools.ant.taskdefs.Exec;
+import org.quartz.SchedulerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,6 +60,8 @@ public class WebThriftServer {
 
     private MasterDao masterDao;
 
+    private ExecutorServerManager executorServerManager;
+
     static{
         try {
             conf = new PropertiesConfiguration("master.properties");
@@ -65,20 +70,24 @@ public class WebThriftServer {
         }
     }
 
-    public WebThriftServer() throws UnknownHostException, TTransportException {
+    public WebThriftServer() throws UnknownHostException {
         host = InetAddress.getLocalHost().getHostName();
-        port = conf.getInt(MASTER_PORT);
+        port = conf.getInt(MASTER_PORT, 9999);
         masterDao = DaoFactory.getDaoInstance(MasterDao.class);
+        executorServerManager = new ExecutorServerManager();
+    }
+
+    public void run() throws TTransportException, UnknownHostException, SchedulerException {
+        // 启动调度
+        QuartzManager.start();
         init();
         server.serve();
-        System.out.println("haha");
-
     }
 
     private void init() throws UnknownHostException, TTransportException {
         TProtocolFactory protocolFactory = new TBinaryProtocol.Factory();
         TTransportFactory tTransportFactory = new TTransportFactory();
-        TProcessor tProcessor = new MasterService.Processor(new MasterServiceImpl());
+        TProcessor tProcessor = new MasterService.Processor(new MasterServiceImpl(executorServerManager, conf));
         InetSocketAddress inetSocketAddress = new InetSocketAddress(host, port);
         int minThreads = conf.getInt(MASTER_MIN_THREADS, 50);
         int maxThreads = conf.getInt(MASTER_MAX_THREADS, 200);
@@ -92,7 +101,8 @@ public class WebThriftServer {
         masterDao.registerMasterServer(host, port);
     }
 
-    public static void main(String[] args) {
-
+    public static void main(String[] args) throws TTransportException, UnknownHostException, SchedulerException {
+        WebThriftServer webThriftServer = new WebThriftServer();
+        webThriftServer.run();
     }
 }

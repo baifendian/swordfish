@@ -8,7 +8,8 @@
 
 package com.baifendian.swordfish.webserver;
 
-import java.util.Map;
+
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -18,12 +19,43 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ExecutorServerManager {
     private Map<String, ExecutorServerInfo> executorServers = new ConcurrentHashMap<>();
 
-
     public boolean serverExists(String key){
         return executorServers.containsKey(key);
     }
 
     public ExecutorServerInfo addServer(String key, ExecutorServerInfo executorServerInfo){
         return executorServers.put(key, executorServerInfo);
+    }
+
+    /**
+     * 获取一个可用的executor server, 选取执行的workflow最少的那个excutorserver
+     * @return
+     */
+    public synchronized ExecutorServerInfo getExecutorServer(){
+        Optional<ExecutorServerInfo> server = executorServers.values().stream().filter(p->p.getHeartBeatData()!=null)
+                .min(Comparator.comparing(executorServerInfo -> executorServerInfo.getHeartBeatData().getExecIdsSize()));
+        if(server.isPresent()){
+            return server.get();
+        }else{
+            return null;
+        }
+    }
+
+    public synchronized List<ExecutorServerInfo> checkTimeoutServer(long timeoutInterval){
+        List<ExecutorServerInfo> faultServers = new ArrayList<>();
+        for(Map.Entry<String, ExecutorServerInfo> entry: executorServers.entrySet()){
+            long nowTime = System.currentTimeMillis();
+            long diff = nowTime - entry.getValue().getHeartBeatData().getReportDate();
+            if(diff > timeoutInterval){
+                executorServers.remove(entry.getKey());
+                faultServers.add(entry.getValue());
+            }
+        }
+        return faultServers;
+    }
+
+    public synchronized ExecutorServerInfo removeServer(ExecutorServerInfo executorServerInfo){
+        String key = executorServerInfo.getHost() + ":" + executorServerInfo.getPort();
+        return executorServers.remove(key);
     }
 }
