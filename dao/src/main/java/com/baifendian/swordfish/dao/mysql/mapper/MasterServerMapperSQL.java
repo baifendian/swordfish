@@ -34,6 +34,15 @@ public class MasterServerMapperSQL {
         }}.toString();
     }
 
+    public String update(Map<String,Object> parameter){
+        return new SQL(){{
+            UPDATE("master_server");
+            SET("update_time=#{masterServer.updateTime}");
+            WHERE("host=#{masterServer.host}");
+            WHERE("port=#{masterServer.port}");
+        }}.toString();
+    }
+
     public String delete(){
         return new SQL(){{
             DELETE_FROM("master_server");

@@ -34,6 +34,9 @@ public interface MasterServerMapper {
     @InsertProvider(type = MasterServerMapperSQL.class, method = "insert")
     int insert(@Param("masterServer") MasterServer masterServer);
 
+    @UpdateProvider(type = MasterServerMapperSQL.class, method = "update")
+    int update(@Param("masterServer") MasterServer masterServer);
+
     @SelectProvider(type = MasterServerMapperSQL.class, method = "delete")
     void delete();
 

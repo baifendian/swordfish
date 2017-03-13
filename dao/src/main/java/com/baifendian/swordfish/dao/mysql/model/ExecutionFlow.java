@@ -23,8 +23,8 @@ public class ExecutionFlow {
     /** workflow名称 **/
     private String flowName;
 
-    /** worker的id **/
-    private int workId;
+    /** worker的host **/
+    private String worker;
 
     /** workflow执行的状态 **/
     private FlowStatus status;
@@ -101,12 +101,12 @@ public class ExecutionFlow {
         this.flowName = flowName;
     }
 
-    public int getWorkId() {
-        return workId;
+    public String getWorker() {
+        return worker;
     }
 
-    public void setWorkId(int workId) {
-        this.workId = workId;
+    public void setWorker(String worker) {
+        this.worker = worker;
     }
 
     public FlowStatus getStatus() {

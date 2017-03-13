@@ -40,4 +40,12 @@ public class MasterDao extends BaseDao{
         masterServer.setUpdateTime(BFDDateUtils.getSecs());
         return masterServerMapper.insert(masterServer);
     }
+
+    public int updateMasterServer(String host, int port){
+        MasterServer masterServer = new MasterServer();
+        masterServer.setHost(host);
+        masterServer.setPort(port);
+        masterServer.setUpdateTime(BFDDateUtils.getSecs());
+        return masterServerMapper.update(masterServer);
+    }
 }

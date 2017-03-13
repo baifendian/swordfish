@@ -26,6 +26,7 @@ import org.apache.thrift.protocol.TProtocolFactory;
 import org.apache.thrift.server.TServer;
 import org.apache.thrift.server.TThreadPoolServer;
 import org.apache.thrift.transport.*;
+import org.omg.CORBA.OBJ_ADAPTER;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -65,6 +66,10 @@ public class ExecThriftServer {
     private MasterClient masterClient;
 
     private AtomicBoolean heartBeatTimeout = new AtomicBoolean(false);
+
+    private Object syncObject = new Object();
+
+    private ExecServiceImpl workerService;
 
     private final int THRIFT_RPC_RETRIES = 3;
 
@@ -110,7 +115,8 @@ public class ExecThriftServer {
 
         TProtocolFactory protocolFactory = new TBinaryProtocol.Factory();
         TTransportFactory tTransportFactory = new TTransportFactory();
-        TProcessor tProcessor = new WorkerService.Processor(new ExecServiceImpl());
+        workerService = new ExecServiceImpl();
+        TProcessor tProcessor = new WorkerService.Processor(workerService);
         inetSocketAddress = new InetSocketAddress(hostName, port);
         server = getTThreadPoolServer(protocolFactory, tProcessor, tTransportFactory, inetSocketAddress, 50, 200);
         logger.info("start thrift server on port:{}", port);
@@ -122,17 +128,40 @@ public class ExecThriftServer {
         Runnable heartBeatThread = new Runnable() {
             @Override
             public void run() {
-                HeartBeatData heartBeatData = new HeartBeatData();
-                heartBeatData.setReportDate(System.currentTimeMillis());
-                MasterClient client = new MasterClient(masterServer.getHost(), masterServer.getPort(), THRIFT_RPC_RETRIES);
-                logger.debug("executor report heartbeat:{}", heartBeatData);
-                boolean result = client.executorReport(hostName, port,heartBeatData);
-                if(!result){
-                    heartBeatTimeout.compareAndSet(false, true);
+                if(!heartBeatTimeout.get()) {
+                    MasterServer masterServer = masterDao.getMasterServer();
+                    HeartBeatData heartBeatData = new HeartBeatData();
+                    heartBeatData.setReportDate(System.currentTimeMillis());
+                    MasterClient client = new MasterClient(masterServer.getHost(), masterServer.getPort(), THRIFT_RPC_RETRIES);
+                    logger.debug("executor report heartbeat:{}", heartBeatData);
+                    boolean result = client.executorReport(hostName, port, heartBeatData);
+                    if (!result) {
+                        heartBeatTimeout.compareAndSet(false, true);
+                        syncObject.notify();
+                    }
                 }
             }
         };
         return heartBeatThread;
+    }
+
+    public Runnable getHealthyCheckThread(){
+        Runnable healthyCheckThread = new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    syncObject.wait();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                if (heartBeatTimeout.get()) {
+                    logger.info("heart beat time out, close exec server!");
+                    server.stop();
+                    workerService.destory();
+                }
+            }
+        };
+        return healthyCheckThread;
     }
 
 

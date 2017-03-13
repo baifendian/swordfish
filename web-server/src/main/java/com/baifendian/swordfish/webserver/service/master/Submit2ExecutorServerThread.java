@@ -86,6 +86,8 @@ public class Submit2ExecutorServerThread extends Thread {
             for (int i = 0; i < MasterConfig.failRetryCount; i++) {
                 isExecutorServerError = false;
                 try {
+                    executionFlow.setWorker(String.format("%s:%d", executorServerInfo.getHost(), executorServerInfo.getPort()));
+                    flowDao.updateExecutionFlow(executionFlow);
                     executorClient.execFlow(executionFlow.getProjectId(), execId, executionFlow.getFlowType().name());
                     isSucess = true;
                     break; // 请求成功，结束重试请求

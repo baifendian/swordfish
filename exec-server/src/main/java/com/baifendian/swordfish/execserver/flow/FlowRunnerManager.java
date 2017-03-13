@@ -235,6 +235,9 @@ public class FlowRunnerManager {
      * <p>
      */
     public void destroy() {
+        for(FlowRunner flowRunner: runningFlows.values()){
+            flowRunner.kill("execServer");
+        }
         if (!flowExecutorService.isShutdown()) {
             try {
                 flowExecutorService.shutdownNow();

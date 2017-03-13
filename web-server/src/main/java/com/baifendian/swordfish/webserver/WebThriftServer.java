@@ -10,6 +10,7 @@ package com.baifendian.swordfish.webserver;
 
 import com.baifendian.swordfish.dao.DaoFactory;
 import com.baifendian.swordfish.dao.MasterDao;
+import com.baifendian.swordfish.dao.mysql.model.MasterServer;
 import com.baifendian.swordfish.execserver.service.ExecServiceImpl;
 import com.baifendian.swordfish.rpc.MasterService;
 import com.baifendian.swordfish.rpc.WorkerService;
@@ -77,14 +78,14 @@ public class WebThriftServer {
         executorServerManager = new ExecutorServerManager();
     }
 
-    public void run() throws TTransportException, UnknownHostException, SchedulerException {
+    public void run() throws Exception {
         // 启动调度
         QuartzManager.start();
         init();
         server.serve();
     }
 
-    private void init() throws UnknownHostException, TTransportException {
+    private void init() throws Exception {
         TProtocolFactory protocolFactory = new TBinaryProtocol.Factory();
         TTransportFactory tTransportFactory = new TTransportFactory();
         TProcessor tProcessor = new MasterService.Processor(new MasterServiceImpl(executorServerManager, conf));
@@ -97,11 +98,20 @@ public class WebThriftServer {
         registerMaster();
     }
 
-    public void registerMaster(){
-        masterDao.registerMasterServer(host, port);
+    public void registerMaster() throws Exception {
+        MasterServer masterServer = masterDao.getMasterServer();
+        if(masterServer != null && !(masterServer.getHost().equals(host) && masterServer.getPort() == port)){
+            throw new Exception(String.format("can't register more then one master, exist master:%s:%d",
+                    masterServer.getHost(), masterServer.getPort()));
+        } else {
+            if(masterServer == null)
+                masterDao.registerMasterServer(host, port);
+            else
+                masterDao.updateMasterServer(host, port);
+        }
     }
 
-    public static void main(String[] args) throws TTransportException, UnknownHostException, SchedulerException {
+    public static void main(String[] args) throws Exception {
         WebThriftServer webThriftServer = new WebThriftServer();
         webThriftServer.run();
     }
