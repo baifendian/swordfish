@@ -9,6 +9,8 @@
 package com.baifendian.swordfish.webserver;
 
 
+import com.baifendian.swordfish.common.job.exception.ExecException;
+
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -23,7 +25,10 @@ public class ExecutorServerManager {
         return executorServers.containsKey(key);
     }
 
-    public ExecutorServerInfo addServer(String key, ExecutorServerInfo executorServerInfo){
+    public synchronized ExecutorServerInfo addServer(String key, ExecutorServerInfo executorServerInfo){
+        if(executorServers.containsKey(key)) {
+            throw new ExecException("executor is register before");
+        }
         return executorServers.put(key, executorServerInfo);
     }
 
