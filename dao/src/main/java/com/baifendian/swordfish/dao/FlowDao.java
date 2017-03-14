@@ -163,6 +163,20 @@ public class FlowDao extends BaseDao {
         return executionFlowMapper.update(executionFlow) > 0;
     }
 
+    public boolean updateExecutionFlowStatus(long execId, FlowStatus status, String worker) {
+        ExecutionFlow executionFlow = new ExecutionFlow();
+        executionFlow.setId(execId);
+        executionFlow.setStatus(status);
+        executionFlow.setWorker(worker);
+
+        // add by qifeng.dai, 如果结束了, 则应该设置结束时间
+        if(status.typeIsFinished()) {
+            executionFlow.setEndTime(BFDDateUtils.getSecs());
+        }
+
+        return executionFlowMapper.update(executionFlow) > 0;
+    }
+
     /**
      * 更新 flow 执行详情
      * <p>

@@ -20,6 +20,7 @@ import org.apache.thrift.TException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.net.InetAddress;
 import java.util.Date;
 
 /**
@@ -40,12 +41,18 @@ public class ExecServiceImpl implements Iface {
     /** {@link FlowRunnerManager} */
     private final FlowRunnerManager flowRunnerManager;
 
+    private String host;
+
+    private int port;
+
     /**
      * constructor
      */
-    public ExecServiceImpl() {
+    public ExecServiceImpl(String host, int port) {
         this.flowDao = DaoFactory.getDaoInstance(FlowDao.class);
         this.flowRunnerManager = new FlowRunnerManager();
+        this.host = host;
+        this.port = port;
     }
 
     @Override
@@ -62,7 +69,8 @@ public class ExecServiceImpl implements Iface {
             }
 
             // 更新状态为 RUNNING
-            flowDao.updateExecutionFlowStatus(execId, FlowStatus.RUNNING);
+            String worker = String.format("%s:%d", host, port);
+            flowDao.updateExecutionFlowStatus(execId, FlowStatus.RUNNING, worker);
 
             // 提交任务运行
             flowRunnerManager.submitFlow(executionFlow);
@@ -93,7 +101,8 @@ public class ExecServiceImpl implements Iface {
             }
 
             // 更新状态为 RUNNING
-            flowDao.updateExecutionFlowStatus(execId, FlowStatus.RUNNING);
+            String worker = String.format("%s:%d", host, port);
+            flowDao.updateExecutionFlowStatus(execId, FlowStatus.RUNNING, worker);
 
             // 提交任务运行
             flowRunnerManager.submitFlow(executionFlow, schedule, new Date(scheduleDate));

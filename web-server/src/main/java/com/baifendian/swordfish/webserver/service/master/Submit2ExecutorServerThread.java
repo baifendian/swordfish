@@ -89,12 +89,12 @@ public class Submit2ExecutorServerThread extends Thread {
                 try {
                     ExecutorClient executorClient = new ExecutorClient(executorServerInfo);
                     executionFlow.setWorker(String.format("%s:%d", executorServerInfo.getHost(), executorServerInfo.getPort()));
-                    flowDao.updateExecutionFlow(executionFlow);
                     logger.debug("execId:{}", execId);
                     logger.debug("projectId:{}", executionFlow.getProjectId());
                     logger.debug("flowType:{}", executionFlow.getFlowType());
                     logger.debug("client:{}", executorClient);
                     executorClient.execFlow(executionFlow.getProjectId(), execId, executionFlow.getFlowType().name());
+                    flowDao.updateExecutionFlow(executionFlow);
                     isSucess = true;
                     break; // 请求成功，结束重试请求
                 } catch (TException e) {

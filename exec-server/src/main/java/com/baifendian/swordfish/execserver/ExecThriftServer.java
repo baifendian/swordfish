@@ -55,7 +55,7 @@ public class ExecThriftServer {
 
     private final MasterServer masterServer;
 
-    private String hostName;
+    private String host;
 
     private final int port;
 
@@ -98,11 +98,11 @@ public class ExecThriftServer {
         HdfsClient.init(ConfigurationUtil.getConfiguration());
 
         masterClient = new MasterClient(masterServer.getHost(), masterServer.getPort(), THRIFT_RPC_RETRIES);
-        hostName = InetAddress.getLocalHost().getHostName();
+        host = InetAddress.getLocalHost().getHostName();
 
         logger.info("register to master {}:{}", masterServer.getHost(), masterServer.getPort());
         /** 注册到master */
-        boolean ret = masterClient.registerExecutor(hostName, port, System.currentTimeMillis());
+        boolean ret = masterClient.registerExecutor(host, port, System.currentTimeMillis());
         if(!ret){
             throw new ExecException("register executor error");
         }
@@ -114,9 +114,9 @@ public class ExecThriftServer {
 
         TProtocolFactory protocolFactory = new TBinaryProtocol.Factory();
         TTransportFactory tTransportFactory = new TTransportFactory();
-        workerService = new ExecServiceImpl();
+        workerService = new ExecServiceImpl(host, port);
         TProcessor tProcessor = new WorkerService.Processor(workerService);
-        inetSocketAddress = new InetSocketAddress(hostName, port);
+        inetSocketAddress = new InetSocketAddress(host, port);
         server = getTThreadPoolServer(protocolFactory, tProcessor, tTransportFactory, inetSocketAddress, 50, 200);
         logger.info("start thrift server on port:{}", port);
         Thread serverThread = new TServerThread(server);
@@ -149,7 +149,7 @@ public class ExecThriftServer {
                     heartBeatData.setReportDate(System.currentTimeMillis());
                     MasterClient client = new MasterClient(masterServer.getHost(), masterServer.getPort(), THRIFT_RPC_RETRIES);
                     logger.debug("executor report heartbeat:{}", heartBeatData);
-                    boolean result = client.executorReport(hostName, port, heartBeatData);
+                    boolean result = client.executorReport(host, port, heartBeatData);
                     if (!result) {
                         logger.warn("heart beat time out");
                         running.compareAndSet(true, false);
