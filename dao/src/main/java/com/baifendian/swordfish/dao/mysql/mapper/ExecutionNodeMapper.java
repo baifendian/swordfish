@@ -65,6 +65,23 @@ public interface ExecutionNodeMapper {
     ExecutionNode selectOneExecNode(@Param("execId") Long execId, @Param("nodeId") Integer nodeId, @Param("attempt") Integer attempt);
 
     /**
+     *
+     * @param execId
+     * @param nodeId
+     * @return
+     */
+            @Results(value = {@Result(property = "id", column = "id", javaType = Long.class, jdbcType = JdbcType.BIGINT),
+                    @Result(property = "execId", column = "exec_id", javaType = Long.class, jdbcType = JdbcType.BIGINT),
+                    @Result(property = "flowId", column = "flow_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
+                    @Result(property = "nodeId", column = "node_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
+                    @Result(property = "appsId", column = "apps_id", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+                    @Result(property = "status", column = "status", typeHandler = EnumOrdinalTypeHandler.class, jdbcType = JdbcType.TINYINT),
+                    @Result(property = "attempt", column = "attempt", javaType = int.class, jdbcType = JdbcType.TINYINT)
+            })
+    @SelectProvider(type = ExecutionNodeMapperProvider.class, method = "selectExecNodeLastAttempt")
+    ExecutionNode selectExecNodeLastAttempt(@Param("execId") Long execId, @Param("nodeId") Integer nodeId);
+
+    /**
      * 查询单个Node记录(由于重试会获取多条记录)
      * <p>
      *

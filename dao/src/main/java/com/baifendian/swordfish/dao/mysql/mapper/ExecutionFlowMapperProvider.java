@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * workflow 执行的信息操作
@@ -47,7 +48,7 @@ public class ExecutionFlowMapperProvider {
             {
                 INSERT_INTO(TABLE_NAME);
                 VALUES("flow_id", "#{executionFlow.flowId}");
-                VALUES("work_id", "#{executionFlow.workId}");
+                VALUES("worker", "#{executionFlow.worker}");
                 VALUES("status", EnumFieldUtil.genFieldStr("executionFlow.status", FlowStatus.class));
                 VALUES("submit_user", "#{executionFlow.submitUser}");
                 VALUES("proxy_user", "#{executionFlow.proxyUser}");
@@ -77,6 +78,9 @@ public class ExecutionFlowMapperProvider {
                 }
                 if (executionFlow.getErrorCode() != null) {
                     SET("error_code = " + EnumFieldUtil.genFieldStr("executionFlow.errorCode", FlowErrorCode.class));
+                }
+                if (executionFlow.getWorker() != null) {
+                    SET("worker = #{executionFlow.worker}");
                 }
                 WHERE("id = #{executionFlow.id}");
             }
@@ -132,6 +136,16 @@ public class ExecutionFlowMapperProvider {
         String limit = String.format("ORDER BY a.start_time desc LIMIT %s , %s", start, maintainQuery.getLength());
         sb.append(limit);
         return sb.toString();
+    }
+
+    public String selectNoFinishFlow(){
+        return new SQL(){
+            {
+                SELECT("id, flow_id, worker, status ");
+                FROM(TABLE_NAME);
+                WHERE("status <=" + FlowStatus.RUNNING.getType());
+            }
+        }.toString();
     }
 
     public String selectCount(MaintainQuery maintainQuery) {

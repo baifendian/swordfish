@@ -57,7 +57,7 @@ public class BaseConfig {
     private static final String FLOW_EXEC_PATH_FORMAT="{0}/{1}/{2}";
 
     public static String getFlowExecPath(int projectId, int workflowId, long execId){
-        return MessageFormat.format("{0}/{1}/{2}/{3}", localBasePath, projectId, workflowId, execId);
+        return String.format("%s/%d/%d/%d", localBasePath, projectId, workflowId, execId);
     }
 
     public static String getHdfsProjectResourcesPath(int projectId){

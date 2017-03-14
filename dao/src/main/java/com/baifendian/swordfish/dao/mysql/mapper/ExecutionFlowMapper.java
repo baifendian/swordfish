@@ -1,6 +1,7 @@
 
 package com.baifendian.swordfish.dao.mysql.mapper;
 
+import com.baifendian.swordfish.common.job.FlowStatus;
 import com.baifendian.swordfish.dao.mysql.model.ExecutionFlow;
 import com.baifendian.swordfish.dao.mysql.model.MaintainQuery;
 import com.baifendian.swordfish.dao.mysql.model.statistics.FlowAvgTime;
@@ -94,6 +95,14 @@ public interface ExecutionFlowMapper {
                        @Result(property = "flowType", column = "flow_type", typeHandler = EnumOrdinalTypeHandler.class, jdbcType = JdbcType.TINYINT), })
     @SelectProvider(type = ExecutionFlowMapperProvider.class, method = "selectByExecId")
     ExecutionFlow selectByExecId(@Param("execId") Long execId);
+
+    @Results(value = {@Result(property = "id", column = "id", id = true, javaType = Long.class, jdbcType = JdbcType.BIGINT),
+            @Result(property = "flowId", column = "flow_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
+            @Result(property = "worker", column = "worker", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+            @Result(property = "status", column = "status", typeHandler = EnumOrdinalTypeHandler.class, jdbcType = JdbcType.TINYINT),
+    })
+    @SelectProvider(type = ExecutionFlowMapperProvider.class, method = "selectNoFinishFlow")
+    List<ExecutionFlow> selectNoFinishFlow();
 
     @Results(value = { @Result(property = "id", column = "id", id = true, javaType = Long.class, jdbcType = JdbcType.BIGINT),
                        @Result(property = "flowId", column = "flow_id", javaType = int.class, jdbcType = JdbcType.INTEGER),

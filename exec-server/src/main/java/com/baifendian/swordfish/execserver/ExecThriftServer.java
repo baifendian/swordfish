@@ -65,7 +65,7 @@ public class ExecThriftServer {
 
     private MasterClient masterClient;
 
-    private AtomicBoolean heartBeatTimeout = new AtomicBoolean(false);
+    private AtomicBoolean running = new AtomicBoolean(true);
 
     private Object syncObject = new Object();
 
@@ -102,16 +102,15 @@ public class ExecThriftServer {
 
         logger.info("register to master {}:{}", masterServer.getHost(), masterServer.getPort());
         /** 注册到master */
-        boolean ret = masterClient.registerExecutor(hostName, port);
+        boolean ret = masterClient.registerExecutor(hostName, port, System.currentTimeMillis());
         if(!ret){
             throw new ExecException("register executor error");
         }
-
         heartBeatInterval = conf.getInt("executor.heartbeat.interval", 60);
 
         executorService = Executors.newScheduledThreadPool(5);
         Runnable heartBeatThread = getHeartBeatThread();
-        executorService.scheduleAtFixedRate(heartBeatThread, 10, 120, TimeUnit.SECONDS);
+        executorService.scheduleAtFixedRate(heartBeatThread, 10, heartBeatInterval, TimeUnit.SECONDS);
 
         TProtocolFactory protocolFactory = new TBinaryProtocol.Factory();
         TTransportFactory tTransportFactory = new TTransportFactory();
@@ -120,7 +119,23 @@ public class ExecThriftServer {
         inetSocketAddress = new InetSocketAddress(hostName, port);
         server = getTThreadPoolServer(protocolFactory, tProcessor, tTransportFactory, inetSocketAddress, 50, 200);
         logger.info("start thrift server on port:{}", port);
-        server.serve();
+        Thread serverThread = new TServerThread(server);
+        serverThread.setDaemon(true);
+        serverThread.start();
+
+        synchronized (syncObject){
+            while(running.get()){
+                try {
+                    logger.info("wait....................");
+                    syncObject.wait();
+                } catch (InterruptedException e) {
+                    logger.error("error", e);
+                }
+            }
+            executorService.shutdown();
+            server.stop();
+            logger.info("exec server stop");
+        }
 
     }
 
@@ -128,7 +143,7 @@ public class ExecThriftServer {
         Runnable heartBeatThread = new Runnable() {
             @Override
             public void run() {
-                if(!heartBeatTimeout.get()) {
+                if(running.get()) {
                     MasterServer masterServer = masterDao.getMasterServer();
                     HeartBeatData heartBeatData = new HeartBeatData();
                     heartBeatData.setReportDate(System.currentTimeMillis());
@@ -136,8 +151,11 @@ public class ExecThriftServer {
                     logger.debug("executor report heartbeat:{}", heartBeatData);
                     boolean result = client.executorReport(hostName, port, heartBeatData);
                     if (!result) {
-                        heartBeatTimeout.compareAndSet(false, true);
-                        syncObject.notify();
+                        logger.warn("heart beat time out");
+                        running.compareAndSet(true, false);
+                        synchronized (syncObject) {
+                            syncObject.notify();
+                        }
                     }
                 }
             }
@@ -145,25 +163,17 @@ public class ExecThriftServer {
         return heartBeatThread;
     }
 
-    public Runnable getHealthyCheckThread(){
-        Runnable healthyCheckThread = new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    syncObject.wait();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                if (heartBeatTimeout.get()) {
-                    logger.info("heart beat time out, close exec server!");
-                    server.stop();
-                    workerService.destory();
-                }
-            }
-        };
-        return healthyCheckThread;
-    }
+    public class TServerThread extends Thread{
+        private TServer server;
+        public TServerThread(TServer server){
+            this.server = server;
+        }
 
+        @Override
+        public void run(){
+            server.serve();
+        }
+    }
 
     public static void main(String[] args) throws TTransportException, UnknownHostException {
         ExecThriftServer execThriftServer = new ExecThriftServer();

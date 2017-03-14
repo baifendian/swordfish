@@ -22,6 +22,7 @@ import com.baifendian.swordfish.rpc.ScheduleInfo;
 import com.baifendian.swordfish.webserver.ExecutorServerInfo;
 import com.baifendian.swordfish.webserver.ExecutorServerManager;
 import com.baifendian.swordfish.webserver.config.MasterConfig;
+import com.baifendian.swordfish.webserver.exception.MasterException;
 import com.baifendian.swordfish.webserver.quartz.FlowScheduleJob;
 import com.baifendian.swordfish.webserver.quartz.QuartzManager;
 import com.baifendian.swordfish.execserver.result.ResultHelper;
@@ -33,8 +34,7 @@ import org.quartz.CronExpression;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Date;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.*;
 
 /**
@@ -85,15 +85,53 @@ public class MasterServiceImpl implements Iface {
         retryToWorkerThread.setDaemon(true);
         retryToWorkerThread.start();
 
-        int timeoutInterval = conf.getInt("master.heartbeat.timeout.interval", 60);
+        // 恢复运行中的workflow
+        recoveryExecFlow();
+
+        int timeoutInterval = conf.getInt("master.heartbeat.timeout.interval", 60) * 1000;
         int checkInterval = conf.getInt("master.heartbeat.check.interval", 30);
         executorCheckThread = new ExecutorCheckThread(executorServerManager, timeoutInterval, executionFlowQueue, flowDao);
-        executorService.scheduleAtFixedRate(executorCheckThread,0, checkInterval, TimeUnit.SECONDS);
+        executorService.scheduleAtFixedRate(executorCheckThread,10, checkInterval, TimeUnit.SECONDS);
 
         flowExecManager = new FlowExecManager(executionFlowQueue, flowDao);
 
         // 初始化调度作业
         FlowScheduleJob.init(executionFlowQueue, flowDao);
+    }
+
+    /**
+     * 从调度信息表中恢复在运行的workflow信息
+     */
+    private void recoveryExecFlow(){
+        List<ExecutionFlow> executionFlowList = flowDao.queryAllNoFinishFlow();
+        Map<String, ExecutorServerInfo> executorServerInfoMap = new HashMap<>();
+        if(executionFlowList != null){
+            for(ExecutionFlow executionFlow: executionFlowList){
+                String worker = executionFlow.getWorker();
+                if(worker != null && worker.contains(":")){
+                    LOGGER.info("recovery execId:{} executor server:{}", executionFlow.getId(), executionFlow.getWorker());
+                    String[] workerInfo = worker.split(":");
+                    if(executorServerInfoMap.containsKey(worker)){
+                        executorServerInfoMap.get(worker).getHeartBeatData().getExecIds().add(executionFlow.getId());
+                    } else {
+                        ExecutorServerInfo executorServerInfo = new ExecutorServerInfo();
+                        executorServerInfo.setHost(workerInfo[0]);
+                        executorServerInfo.setPort(Integer.parseInt(workerInfo[1]));
+                        HeartBeatData heartBeatData = new HeartBeatData();
+                        heartBeatData.setExecIds(new ArrayList<>());
+                        heartBeatData.getExecIds().add(executionFlow.getId());
+                        executorServerInfo.setHeartBeatData(heartBeatData);
+                    }
+                } else {
+                    // 没有worker信息，提交到executionFlowQueue队列
+                    LOGGER.info("no worker info, add execution flow[execId:{}] to queue", executionFlow.getId());
+                    ExecutionFlow execFlow = flowDao.queryExecutionFlow(executionFlow.getId());
+                    executionFlowQueue.add(execFlow);
+                }
+            }
+            executorServerManager.initServers(executorServerInfoMap);
+        }
+
     }
 
     @Override
@@ -109,6 +147,7 @@ public class MasterServiceImpl implements Iface {
 
         return ResultHelper.SUCCESS;
     }
+
 
     /**
     * 保证 flow 事务执行:
@@ -301,19 +340,28 @@ public class MasterServiceImpl implements Iface {
         flowExecManager.destroy();
     }
 
-    public RetInfo registerExecutor(String host, int port) throws TException{
+    public RetInfo registerExecutor(String host, int port, long registerTime) throws TException {
         LOGGER.info("register executor server[{}:{}]", host, port);
         String key = String.format("%s:%d", host, port);
-        if(executorServerManager.serverExists(key)){
-            return ResultHelper.createErrorResult("executor is register before");
+        /** 时钟差异检查 **/
+        long nowTime = System.currentTimeMillis();
+        if(registerTime > nowTime+10000){
+            return ResultHelper.createErrorResult("executor master clock time diff then 10 seconds");
         }
 
         ExecutorServerInfo executorServerInfo = new ExecutorServerInfo();
         executorServerInfo.setHost(host);
         executorServerInfo.setPort(port);
-        executorServerInfo.setHeartBeatData(null);
+        HeartBeatData heartBeatData = new HeartBeatData();
+        heartBeatData.setReportDate(registerTime);
+        executorServerInfo.setHeartBeatData(heartBeatData);
 
-        executorServerManager.addServer(key, executorServerInfo);
+        try {
+            executorServerManager.addServer(key, executorServerInfo);
+        } catch(MasterException e) {
+            LOGGER.warn("executor register error", e);
+            return ResultHelper.createErrorResult(e.getMessage());
+        }
         return ResultHelper.SUCCESS;
     }
 
@@ -328,23 +376,19 @@ public class MasterServiceImpl implements Iface {
      */
     public RetInfo executorReport(String host, int port, HeartBeatData heartBeatData) throws org.apache.thrift.TException {
         LOGGER.debug("executor server[{}:{}] report info {}", host, port, heartBeatData);
-        long nowTime = System.currentTimeMillis();
-        /** 时钟差异检查 **/
-        if(heartBeatData.getReportDate() > nowTime+10000){
-            return ResultHelper.createErrorResult("executor master clock time diff then 10 seconds");
-        }
         String key = String.format("%s:%d", host, port);
 
-        /** executorserver不存在，由于汇报超时导致server被删除，这里 */
-        if(!executorServerManager.serverExists(key)){
-            return ResultHelper.createErrorResult("executor is not register before");
-        }
         ExecutorServerInfo executorServerInfo = new ExecutorServerInfo();
         executorServerInfo.setHost(host);
         executorServerInfo.setPort(port);
         executorServerInfo.setHeartBeatData(heartBeatData);
 
-        executorServerManager.addServer(key, executorServerInfo);
+        try {
+            executorServerManager.updateServer(key, executorServerInfo);
+        } catch(MasterException e) {
+            LOGGER.warn("executor report error", e);
+            return ResultHelper.createErrorResult(e.getMessage());
+        }
         return ResultHelper.SUCCESS;
     }
 

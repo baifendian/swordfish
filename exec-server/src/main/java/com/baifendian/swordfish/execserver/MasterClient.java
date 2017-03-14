@@ -67,7 +67,11 @@ public class MasterClient {
     public boolean executorReport(String clientHost, int clientPort, HeartBeatData heartBeatData) {
         connect();
         try{
-            client.executorReport(clientHost, clientPort, heartBeatData);
+            RetInfo retInfo = client.executorReport(clientHost, clientPort, heartBeatData);
+            if(retInfo.getStatus() != 0){
+                logger.error("executor report return {}", retInfo.getMsg());
+                return false;
+            }
         }catch (TException e) {
             logger.error("report info error", e);
             return false;
@@ -77,10 +81,10 @@ public class MasterClient {
         return true;
     }
 
-    public boolean registerExecutor(String clientHost, int clientPort) {
+    public boolean registerExecutor(String clientHost, int clientPort, long registerTime) {
         connect();
         try{
-            RetInfo ret = client.registerExecutor(clientHost, clientPort);
+            RetInfo ret = client.registerExecutor(clientHost, clientPort, registerTime);
             if(ret.getStatus() != 0) {
                 logger.error("register executor error:{}", ret.getMsg());
                 return false;
@@ -92,17 +96,6 @@ public class MasterClient {
             close();
         }
         return true;
-    }
-
-    public boolean registerExecutorWithRetry(String clientHost, int clientPort) {
-        boolean flag = false;
-        for(int i=0; i<retries; i++){
-            if(registerExecutor(clientHost, clientPort)){
-                flag = true;
-                break;
-            }
-        }
-        return flag;
     }
 
     public boolean setSchedule(int projectId, int flowId, String flowType, ScheduleInfo scheduleInfo){

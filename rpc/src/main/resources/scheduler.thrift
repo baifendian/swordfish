@@ -85,7 +85,7 @@ service MasterService {
      * ip :  ip地址
      * port : 端口号
      */
-	RetInfo registerExecutor(1:string ip, 2:i32 port),
+	RetInfo registerExecutor(1:string ip, 2:i32 port, 3:i64 registerTime),
 
     /**
      * execServer汇报心跳

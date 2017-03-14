@@ -423,6 +423,13 @@ public class FlowRunner implements Runnable {
                 Iterator<Integer> iterator = topologicalSort.iterator();
                 while (iterator.hasNext()) {
                     Integer nodeId = iterator.next();
+                    // 支持恢复处理，
+                    // 当在恢复处理时该节点有可能已经运行成功了,此时跳过该节点处理
+                    // 其他情况，重新调度
+                    ExecutionNode executionNodeLast = flowDao.queryExecutionNodeLastAttempt(executionFlow.getId(), nodeId);
+                    if(executionNodeLast != null && executionNodeLast.getStatus().typeIsSuccess()){
+                        iterator.remove();
+                    }
 
                     // 找到当前节点的所有前驱节点
                     Set<Integer> preNodes = dagGraph.getPreNode(nodeId);

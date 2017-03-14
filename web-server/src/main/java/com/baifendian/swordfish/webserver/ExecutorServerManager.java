@@ -9,7 +9,9 @@
 package com.baifendian.swordfish.webserver;
 
 
-import com.baifendian.swordfish.common.job.exception.ExecException;
+import com.baifendian.swordfish.webserver.exception.MasterException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -19,15 +21,20 @@ import java.util.concurrent.ConcurrentHashMap;
  * @date : 2017-03-10 18:01
  */
 public class ExecutorServerManager {
+    private final Logger logger = LoggerFactory.getLogger(getClass());
+
     private Map<String, ExecutorServerInfo> executorServers = new ConcurrentHashMap<>();
 
-    public boolean serverExists(String key){
-        return executorServers.containsKey(key);
+    public synchronized ExecutorServerInfo addServer(String key, ExecutorServerInfo executorServerInfo) throws MasterException {
+        if(executorServers.containsKey(key)) {
+            throw new MasterException("executor is register");
+        }
+        return executorServers.put(key, executorServerInfo);
     }
 
-    public synchronized ExecutorServerInfo addServer(String key, ExecutorServerInfo executorServerInfo){
-        if(executorServers.containsKey(key)) {
-            throw new ExecException("executor is register before");
+    public synchronized ExecutorServerInfo updateServer(String key, ExecutorServerInfo executorServerInfo) throws MasterException {
+        if(!executorServers.containsKey(key)) {
+            throw new MasterException("executor is not register");
         }
         return executorServers.put(key, executorServerInfo);
     }
@@ -37,13 +44,21 @@ public class ExecutorServerManager {
      * @return
      */
     public synchronized ExecutorServerInfo getExecutorServer(){
-        Optional<ExecutorServerInfo> server = executorServers.values().stream().filter(p->p.getHeartBeatData()!=null)
-                .min(Comparator.comparing(executorServerInfo -> executorServerInfo.getHeartBeatData().getExecIdsSize()));
-        if(server.isPresent()){
-            return server.get();
-        }else{
-            return null;
+        logger.debug("executor servers:{}", executorServers.toString());
+        ExecutorServerInfo result = null;
+        for(ExecutorServerInfo executorServerInfo: executorServers.values()){
+            if(executorServerInfo.getHeartBeatData() == null){
+                continue;
+            }
+            if(result == null){
+                result = executorServerInfo;
+            } else {
+                if(result.getHeartBeatData().getExecIdsSize() > executorServerInfo.getHeartBeatData().getExecIdsSize()){
+                    result = executorServerInfo;
+                }
+            }
         }
+        return result;
     }
 
     public synchronized List<ExecutorServerInfo> checkTimeoutServer(long timeoutInterval){
@@ -52,6 +67,7 @@ public class ExecutorServerManager {
             long nowTime = System.currentTimeMillis();
             long diff = nowTime - entry.getValue().getHeartBeatData().getReportDate();
             if(diff > timeoutInterval){
+                logger.warn("executor server time out {}", entry.getKey());
                 executorServers.remove(entry.getKey());
                 faultServers.add(entry.getValue());
             }
@@ -63,4 +79,11 @@ public class ExecutorServerManager {
         String key = executorServerInfo.getHost() + ":" + executorServerInfo.getPort();
         return executorServers.remove(key);
     }
+
+    public void initServers(Map<String, ExecutorServerInfo> executorServerInfoMap){
+        for(Map.Entry<String, ExecutorServerInfo> entry:executorServerInfoMap.entrySet()){
+            executorServers.put(entry.getKey(), entry.getValue());
+        }
+    }
+
 }

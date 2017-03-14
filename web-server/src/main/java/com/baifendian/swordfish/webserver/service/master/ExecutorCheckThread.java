@@ -12,8 +12,8 @@ import com.baifendian.swordfish.dao.FlowDao;
 import com.baifendian.swordfish.dao.mysql.model.ExecutionFlow;
 import com.baifendian.swordfish.webserver.ExecutorServerInfo;
 import com.baifendian.swordfish.webserver.ExecutorServerManager;
-import parquet.org.slf4j.Logger;
-import parquet.org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
@@ -48,6 +48,7 @@ public class ExecutorCheckThread implements Runnable{
         logger.debug("blocking queue size:{}, {}", executionFlowBlockingQueue.size(),executionFlowBlockingQueue);
         List<ExecutorServerInfo> faultServers = executorServerManager.checkTimeoutServer(timeoutInterval);
         if(faultServers != null){
+            logger.debug("get fault servers:{}", faultServers);
             for(ExecutorServerInfo executorServerInfo: faultServers){
                 if (executorServerInfo.getHeartBeatData() != null && executorServerInfo.getHeartBeatData().getExecIdsSize() > 0) {
                     for(Long execId: executorServerInfo.getHeartBeatData().getExecIds()){

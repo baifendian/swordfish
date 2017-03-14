@@ -108,6 +108,16 @@ public class FlowDao extends BaseDao {
     }
 
     /**
+     * 获取所有未完成的 flow 列表
+     * <p>
+     *
+     * @return
+     */
+    public List<ExecutionFlow> queryAllNoFinishFlow() {
+        return executionFlowMapper.selectNoFinishFlow();
+    }
+
+    /**
      * 按时间段查询 flow 的调度的最新运行状态(调度或者补数据)
      * <p>
      *
@@ -449,6 +459,10 @@ public class FlowDao extends BaseDao {
      */
     public ExecutionNode queryExecutionNode(long execId, Integer nodeId, Integer attempt) {
         return executionNodeMapper.selectOneExecNode(execId, nodeId, attempt);
+    }
+
+    public ExecutionNode queryExecutionNodeLastAttempt(long execId, Integer nodeId) {
+        return executionNodeMapper.selectExecNodeLastAttempt(execId, nodeId);
     }
 
     /**

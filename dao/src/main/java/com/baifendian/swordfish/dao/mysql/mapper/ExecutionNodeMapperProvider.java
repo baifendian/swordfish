@@ -66,6 +66,17 @@ public class ExecutionNodeMapperProvider {
         }.toString();
     }
 
+    public String selectExecNodeLastAttempt(Map<String, Object> parameter){
+        return new SQL(){
+            {
+                SELECT("a.*");
+                FROM(TABLE_NAME + " as a");
+                //INNER_JOIN("(SELECT exec_id, node_id, MAX(attempt) attempt FROM "+TABLE_NAME+" WHERE exec_id = #{execId} AND node_id=#{nodeId} group by exec_id, node_id) as b on a.exec_id = b.exec_id and a.node_id = b.node_id and a.attempt = b.attempt");
+                INNER_JOIN("(SELECT exec_id, node_id, MAX(id) id FROM "+TABLE_NAME+" WHERE exec_id = #{execId} AND node_id=#{nodeId} group by exec_id, node_id) as b on a.exec_id = b.exec_id and a.node_id = b.node_id and a.id = b.id");
+            }
+        }.toString();
+    }
+
     public String selectByNodeId(Map<String, Object> parameter) {
         return new SQL() {
             {

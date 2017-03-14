@@ -32,7 +32,7 @@ import java.util.concurrent.BlockingQueue;
 public class Submit2ExecutorServerThread extends Thread {
 
     /** LOGGER */
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private final Logger logger = LoggerFactory.getLogger(Submit2ExecutorServerThread.class);
 
     /** executor server manager */
     private final ExecutorServerManager executorServerManager;
@@ -53,7 +53,7 @@ public class Submit2ExecutorServerThread extends Thread {
         this.flowDao = flowDao;
         this.executionFlowQueue = executionFlowQueue;
 
-        this.setName("Master-RetryToWorker");
+        this.setName("Master-submitExecFlowToWorker");
     }
 
     @Override
@@ -82,12 +82,18 @@ public class Submit2ExecutorServerThread extends Thread {
                 executionFlowQueue.add(executionFlow);
                 continue;
             }
-            ExecutorClient executorClient = new ExecutorClient(executorServerInfo);
+            logger.info("get execution flow from queue, flowId:{} execId:{} submit to exec {}:{}",
+                    executionFlow.getFlowId(), executionFlow.getId(), executorServerInfo.getHost(), executorServerInfo.getPort());
             for (int i = 0; i < MasterConfig.failRetryCount; i++) {
                 isExecutorServerError = false;
                 try {
+                    ExecutorClient executorClient = new ExecutorClient(executorServerInfo);
                     executionFlow.setWorker(String.format("%s:%d", executorServerInfo.getHost(), executorServerInfo.getPort()));
                     flowDao.updateExecutionFlow(executionFlow);
+                    logger.debug("execId:{}", execId);
+                    logger.debug("projectId:{}", executionFlow.getProjectId());
+                    logger.debug("flowType:{}", executionFlow.getFlowType());
+                    logger.debug("client:{}", executorClient);
                     executorClient.execFlow(executionFlow.getProjectId(), execId, executionFlow.getFlowType().name());
                     isSucess = true;
                     break; // 请求成功，结束重试请求
@@ -97,9 +103,10 @@ public class Submit2ExecutorServerThread extends Thread {
                     if (temp == null || temp.getStatus() != FlowStatus.INIT) {
                         break;
                     }
+                    logger.error("run executor get error", e);
                     isExecutorServerError = true;
                 } catch (Exception e) { // 内部错误
-                    logger.error(e.getMessage(), e);
+                    logger.error("inner error", e);
                 }
             }
 
@@ -108,6 +115,7 @@ public class Submit2ExecutorServerThread extends Thread {
                 if(isExecutorServerError){
                     /** executor server error，将执行数据放回队列，将该executor server从executor server列表删除 */
                     executionFlowQueue.add(executionFlow);
+                    logger.info("connect to executor server error, remove {}:{}", executorServerInfo.getHost(), executorServerInfo.getPort());
                     ExecutorServerInfo removedExecutionServerInfo = executorServerManager.removeServer(executorServerInfo);
                     resubmitExecFlow(removedExecutionServerInfo);
                 } else {
