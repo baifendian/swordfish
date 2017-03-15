@@ -50,6 +50,12 @@
             </dependency>
 
             <dependency>
+                <groupId>com.baifendian</groupId>
+                <artifactId>harpc</artifactId>
+                <version>${harpc.version}</version>
+            </dependency>
+
+            <dependency>
                 <groupId>jdk.tools</groupId>
                 <artifactId>jdk.tools</artifactId>
                 <version>${java.version}</version>
@@ -278,6 +284,13 @@
                 <groupId>org.apache.hive</groupId>
                 <artifactId>hive-exec</artifactId>
                 <version>${hive.version}</version>
+            </dependency>
+
+            <!-- hbase -->
+            <dependency>
+                <groupId>org.apache.hbase</groupId>
+                <artifactId>hbase-common</artifactId>
+                <version>${hbase.version}</version>
             </dependency>
 
             <dependency>
