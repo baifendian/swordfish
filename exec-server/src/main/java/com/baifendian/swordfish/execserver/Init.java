@@ -41,9 +41,9 @@ public class Init {
 
     }
     public static void main(String[] args) throws NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException, IOException, TException {
-        //Init.initFlow();
+        Init.initFlow();
         //Init.testJob();
-        Init.runFlow();
+        //Init.runFlow();
         System.out.println(BaseConfig.getSystemEnvPath());
         System.out.println(new Date(1488607000));
     }

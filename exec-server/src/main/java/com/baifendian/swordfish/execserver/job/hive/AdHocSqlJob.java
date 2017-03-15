@@ -39,12 +39,10 @@ public class AdHocSqlJob extends EtlSqlJob {
     public void process() throws Exception {
         String sqls = param.getSql();
         sqls = ParamHelper.resolvePlaceholders(sqls, definedParamMap);
-        List<String> funcs = FunctionUtil.createFuncs(param.getUdfs(), jobId);
+        List<String> funcs = FunctionUtil.createFuncs(param.getUdfs(), jobId, getWorkingDirectory());
         List<String> execSqls = CommonUtil.sqlSplit(sqls);
         /** 查询结果写入数据库 */
         ResultCallback resultCallback = new ResultCallback() {
-
-
             @Override
             public void handleResult(ExecResult execResult) {
                 AdHocResult adHocResult = new AdHocResult();
