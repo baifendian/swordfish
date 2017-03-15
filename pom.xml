@@ -14,46 +14,22 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.version>1.0-SNAPSHOT</project.version>
+
+        <!-- common component -->
         <junit.version>4.12</junit.version>
         <java.version>1.8</java.version>
-        <scala.version>2.1.0</scala.version>
-        <scala.binary.version>2.1.0</scala.binary.version>
+        <scala.version>2.10</scala.version>
         <servlet.version>3.1.0</servlet.version>
         <spring.version>4.3.5.RELEASE</spring.version>
         <spring.boot.version>1.4.3.RELEASE</spring.boot.version>
-        <logback.version>1.1.7</logback.version>
-        <mysql.version>5.1.32</mysql.version>
-        <tomcat.version>7.0.25</tomcat.version>
-        <avalog.version>2.1</avalog.version>
-        <commons-email.version>1.2</commons-email.version>
-        <mail.version>1.4.1</mail.version>
-        <commons-lang3.version>3.5</commons-lang3.version>
-        <commons-configuration.version>1.10</commons-configuration.version>
-        <commons-collections4.version>4.1</commons-collections4.version>
-        <commons-exec.version>1.3</commons-exec.version>
-        <hadoop.version>2.6.0</hadoop.version>
+
+        <!-- big data related version -->
+        <hadoop.version>2.7.3</hadoop.version>
         <hbase.version>1.1.3</hbase.version>
         <hive.version>1.2.1</hive.version>
         <spark.version>2.1.0</spark.version>
-        <druid.version>1.0.23</druid.version>
-        <quartz.version>2.2.3</quartz.version>
-        <quartz-jobs.version>2.2.2</quartz-jobs.version>
         <harpc.version>1.2</harpc.version>
-        <mybatis.version>3.4.0</mybatis.version>
-        <volicity.version>1.7</volicity.version>
-        <avalog.version>2.1</avalog.version>
-        <logkit.version>2.0</logkit.version>
-        <velocity.version>1.7</velocity.version>
-        <logstash-logback.version>4.8</logstash-logback.version>
-        <logback.version>1.1.7</logback.version>
-        <es.client.version>5.0.1</es.client.version>
-        <httpcore-nio.version>4.4.5</httpcore-nio.version>
-        <httpclient.version>4.5.2</httpclient.version>
-        <httpasyncclient.version>4.1.2</httpasyncclient.version>
-        <httpcore.version>4.4.5</httpcore.version>
-        <hibernate.version>5.2.4.Final</hibernate.version>
-        <mybatis.spring.version>1.1.1</mybatis.spring.version>
-        <jackson.databind.version>2.8.5</jackson.databind.version>
+        <es.version>5.2.1</es.version>
     </properties>
 
     <modules>
@@ -89,42 +65,42 @@
             <dependency>
                 <groupId>ch.qos.logback</groupId>
                 <artifactId>logback-classic</artifactId>
-                <version>${logback.version}</version>
+                <version>1.1.7</version>
             </dependency>
             <dependency>
                 <groupId>ch.qos.logback</groupId>
                 <artifactId>logback-core</artifactId>
-                <version>${logback.version}</version>
+                <version>1.1.7</version>
             </dependency>
             <dependency>
                 <groupId>ch.qos.logback</groupId>
                 <artifactId>logback-access</artifactId>
-                <version>${logback.version}</version>
+                <version>1.1.7</version>
             </dependency>
             <dependency>
                 <groupId>avalon-logkit</groupId>
                 <artifactId>avalon-logkit</artifactId>
-                <version>${avalog.version}</version>
+                <version>2.1</version>
             </dependency>
             <dependency>
                 <groupId>logkit</groupId>
                 <artifactId>logkit</artifactId>
-                <version>${logkit.version}</version>
+                <version>2.0</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.httpcomponents</groupId>
                 <artifactId>httpcore</artifactId>
-                <version>${httpcore.version}</version>
+                <version>4.4.5</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.httpcomponents</groupId>
                 <artifactId>httpclient</artifactId>
-                <version>${httpclient.version}</version>
+                <version>4.5.2</version>
             </dependency>
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-databind</artifactId>
-                <version>${jackson.databind.version}</version>
+                <version>2.8.5</version>
             </dependency>
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
@@ -135,7 +111,7 @@
             <dependency>
                 <groupId>org.mybatis.spring.boot</groupId>
                 <artifactId>mybatis-spring-boot-starter</artifactId>
-                <version>${mybatis.spring.version}</version>
+                <version>1.2.0</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework</groupId>
@@ -177,84 +153,159 @@
                 <artifactId>spring-boot-starter-aop</artifactId>
                 <version>${spring.boot.version}</version>
             </dependency>
+
+            <dependency>
+                <groupId>org.springframework.session</groupId>
+                <artifactId>spring-session</artifactId>
+                <version>1.3.0.RELEASE</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-redis</artifactId>
+                <version>1.4.3.RELEASE</version>
+            </dependency>
+
             <dependency>
                 <groupId>org.apache.velocity</groupId>
                 <artifactId>velocity</artifactId>
-                <version>${velocity.version}</version>
+                <version>1.7</version>
             </dependency>
 
             <dependency>
                 <groupId>mysql</groupId>
                 <artifactId>mysql-connector-java</artifactId>
-                <version>${mysql.version}</version>
+                <version>5.1.41</version>
             </dependency>
 
             <dependency>
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-email</artifactId>
-                <version>${commons-email.version}</version>
+                <version>1.2</version>
             </dependency>
             <dependency>
                 <groupId>javax.mail</groupId>
                 <artifactId>mail</artifactId>
-                <version>${mail.version}</version>
+                <version>1.4.1</version>
             </dependency>
 
             <dependency>
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-lang3</artifactId>
-                <version>${commons-lang3.version}</version>
+                <version>3.5</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-collections4</artifactId>
-                <version>${commons-collections4.version}</version>
+                <version>4.1</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-exec</artifactId>
-                <version>${commons-exec.version}</version>
+                <version>1.3</version>
             </dependency>
             <dependency>
                 <groupId>org.quartz-scheduler</groupId>
                 <artifactId>quartz-jobs</artifactId>
-                <version>${quartz-jobs.version}</version>
+                <version>2.2.3</version>
             </dependency>
             <dependency>
                 <groupId>javax.validation</groupId>
                 <artifactId>validation-api</artifactId>
                 <version>1.1.0.Final</version>
             </dependency>
+
+            <!-- spark -->
             <dependency>
                 <groupId>org.apache.spark</groupId>
-                <artifactId>spark-yarn_${scala.binary.version}</artifactId>
+                <artifactId>spark-yarn_${scala.version}</artifactId>
                 <version>${spark.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>org.slf4j</groupId>
-                        <artifactId>slf4j-log4j12</artifactId>
-                    </exclusion>
-                </exclusions>
             </dependency>
             <dependency>
                 <groupId>org.apache.spark</groupId>
-                <artifactId>spark-core_${scala.binary.version}</artifactId>
+                <artifactId>spark-yarn_${scala.version}</artifactId>
                 <version>${spark.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>org.apache.curator</groupId>
-                        <artifactId>curator-recipes</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.slf4j</groupId>
-                        <artifactId>slf4j-log4j12</artifactId>
-                    </exclusion>
-                </exclusions>
             </dependency>
             <dependency>
                 <groupId>org.apache.spark</groupId>
-                <artifactId>spark-streaming_${scala.binary.version}</artifactId>
+                <artifactId>spark-core_${scala.version}</artifactId>
                 <version>${spark.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.spark</groupId>
+                <artifactId>spark-streaming_${scala.version}</artifactId>
+                <version>${spark.version}</version>
+            </dependency>
+
+            <!-- hadoop -->
+            <dependency>
+                <groupId>org.apache.hadoop</groupId>
+                <artifactId>hadoop-common</artifactId>
+                <version>${hadoop.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.hadoop</groupId>
+                <artifactId>hadoop-client</artifactId>
+                <version>${hadoop.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.hadoop</groupId>
+                <artifactId>hadoop-hdfs</artifactId>
+                <version>${hadoop.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.hadoop</groupId>
+                <artifactId>hadoop-yarn-common</artifactId>
+                <version>${hadoop.version}</version>
+            </dependency>
+
+            <!-- hive -->
+            <dependency>
+                <groupId>org.apache.hive</groupId>
+                <artifactId>hive-common</artifactId>
+                <version>${hive.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.hive</groupId>
+                <artifactId>hive-jdbc</artifactId>
+                <version>${hive.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.hive</groupId>
+                <artifactId>hive-metastore</artifactId>
+                <version>${hive.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.hive</groupId>
+                <artifactId>hive-exec</artifactId>
+                <version>${hive.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-collections4</artifactId>
+                <version>4.1</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>druid</artifactId>
+                <version>1.0.28</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.quartz-scheduler</groupId>
+                <artifactId>quartz</artifactId>
+                <version>2.2.3</version>
+            </dependency>
+            <dependency>
+                <groupId>org.quartz-scheduler</groupId>
+                <artifactId>quartz-jobs</artifactId>
+                <version>2.2.3</version>
+            </dependency>
+            <dependency>
+                <groupId>commons-configuration</groupId>
+                <artifactId>commons-configuration</artifactId>
+                <version>1.10</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
