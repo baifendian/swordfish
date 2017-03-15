@@ -8,6 +8,8 @@ import com.baifendian.swordfish.common.job.config.BaseConfig;
 import com.baifendian.swordfish.dao.mysql.enums.FlowRunType;
 import com.baifendian.swordfish.dao.mysql.model.ExecutionFlow;
 import com.baifendian.swordfish.execserver.job.JobTypeManager;
+import com.baifendian.swordfish.execserver.service.ExecServiceImpl;
+import org.apache.thrift.TException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,10 +34,16 @@ public class Init {
         Logger logger = LoggerFactory.getLogger(Init.class);
         Job job = JobTypeManager.newJob("NODE_1", "VIRTUAL", props, logger);
     }
-    public static void main(String[] args) throws NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException, IOException {
-        Init.initFlow();
+
+    public static void runFlow() throws TException {
+        ExecServiceImpl impl = new ExecServiceImpl("127.0.0.1", 7777);
+        impl.scheduleExecFlow(1, 3275, "etl", System.currentTimeMillis());
+
+    }
+    public static void main(String[] args) throws NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException, IOException, TException {
+        //Init.initFlow();
         //Init.testJob();
-        //FileUtils.writeStringToFile(new File("/home/swordfish/log/job_log/2017-03-03/NODE_1_20170303133421.log"), "haha");
+        Init.runFlow();
         System.out.println(BaseConfig.getSystemEnvPath());
         System.out.println(new Date(1488607000));
     }

@@ -72,7 +72,7 @@ public class JobHandler {
         this.systemParamMap = systemParamMap;
         this.customParamMap = customParamMap;
         this.startTime = System.currentTimeMillis();
-        this.jobId = MessageFormat.format("{0}_{1}_{2}_{3}", node.getType().name(), BFDDateUtils.now(DATETIME_FORMAT),
+        this.jobId = String.format("%s_%s_%d_%d", node.getType().name(), BFDDateUtils.now(DATETIME_FORMAT),
                     node.getId(), executionNode.getId());
         // custom参数会覆盖system参数
         allParamMap = new HashMap<>();
@@ -131,7 +131,9 @@ public class JobHandler {
             public Boolean call() throws Exception {
                 boolean isSuccess = true;
                 try {
-                    job.run(); // run job
+                    job.before();
+                    job.process();
+                    job.after();
                     if (job.getExitCode() != 0) {
                         isSuccess = false;
                     }

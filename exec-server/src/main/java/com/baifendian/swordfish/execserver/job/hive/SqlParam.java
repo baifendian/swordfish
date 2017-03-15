@@ -75,7 +75,8 @@ public class SqlParam extends BaseParam {
     @Override
     public List<String> getResourceFiles(){
         if(udfs != null && !udfs.isEmpty()){
-            return udfs.stream().flatMap(p->p.getLibJar().stream().map(q->q.getRes())).collect(Collectors.toList());
+            return udfs.stream().filter(p->p.getLibJar() != null && p.getLibJar().isProjectScope())
+                .map(p->p.getLibJar().getRes()).collect(Collectors.toList());
         } else {
             return null;
         }

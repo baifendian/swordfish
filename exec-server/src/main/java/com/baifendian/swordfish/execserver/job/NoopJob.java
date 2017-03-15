@@ -7,6 +7,7 @@
 package com.baifendian.swordfish.execserver.job;
 
 import com.baifendian.swordfish.common.job.AbstractProcessJob;
+import com.baifendian.swordfish.common.job.BaseParam;
 import com.baifendian.swordfish.common.job.JobProps;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.slf4j.Logger;
@@ -38,6 +39,11 @@ public class NoopJob extends AbstractProcessJob {
 
     @Override
     public void initJobParams(){
+    }
+
+    @Override
+    public BaseParam getParam(){
+        return null;
     }
 
 

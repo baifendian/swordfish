@@ -12,7 +12,6 @@ import com.baifendian.swordfish.common.job.ExecResult;
 import com.baifendian.swordfish.common.job.JobProps;
 import com.baifendian.swordfish.common.utils.CommonUtil;
 import com.baifendian.swordfish.common.utils.json.JsonUtil;
-import com.baifendian.swordfish.dao.hive.FunctionUtil;
 import com.baifendian.swordfish.dao.mysql.MyBatisSqlSessionFactoryUtil;
 import com.baifendian.swordfish.dao.mysql.mapper.AdHocResultMapper;
 import com.baifendian.swordfish.dao.mysql.model.AdHocJsonObject;
@@ -40,7 +39,7 @@ public class AdHocSqlJob extends EtlSqlJob {
     public void process() throws Exception {
         String sqls = param.getSql();
         sqls = ParamHelper.resolvePlaceholders(sqls, definedParamMap);
-        List<String> funcs = FunctionUtil.createFuncs(sqls, projectId);
+        List<String> funcs = FunctionUtil.createFuncs(param.getUdfs(), jobId);
         List<String> execSqls = CommonUtil.sqlSplit(sqls);
         /** 查询结果写入数据库 */
         ResultCallback resultCallback = new ResultCallback() {

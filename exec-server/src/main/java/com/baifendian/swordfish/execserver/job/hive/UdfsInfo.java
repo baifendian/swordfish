@@ -21,7 +21,7 @@ public class UdfsInfo {
 
     private String className;
 
-    private List<ResourceInfo> libJar;
+    private ResourceInfo libJar;
 
     public String getFunc() {
         return func;
@@ -39,11 +39,11 @@ public class UdfsInfo {
         this.className = className;
     }
 
-    public List<ResourceInfo> getLibJar() {
+    public ResourceInfo getLibJar() {
         return libJar;
     }
 
-    public void setLibJar(List<ResourceInfo> libJar) {
+    public void setLibJar(ResourceInfo libJar) {
         this.libJar = libJar;
     }
 }

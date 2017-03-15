@@ -36,7 +36,8 @@ public class HdfsUtil {
         Process process = processBuilder.start();
         int ret = process.waitFor();
         if (ret != 0) {
-            throw new ExecException(String.format("call cmd %s error, %s", cmd, IOUtils.toString(process.getInputStream(), "UTF-8")));
+            String msg = String.format("call cmd %s error, %s", cmd, IOUtils.toString(process.getInputStream(), "UTF-8"));
+            throw new ExecException(msg);
         }
     }
 }

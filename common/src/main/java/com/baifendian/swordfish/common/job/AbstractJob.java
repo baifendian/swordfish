@@ -76,13 +76,6 @@ public abstract class AbstractJob implements Job {
     }
 
     @Override
-    public void run() throws Exception {
-        before();
-        process();
-        after();
-    }
-
-    @Override
     public void after() throws Exception{}
 
     @Override
@@ -132,11 +125,6 @@ public abstract class AbstractJob implements Job {
 
     @Override
     public List<ExecResult> getResults(){
-        return null;
-    }
-
-    @Override
-    public BaseParam getParam(){
         return null;
     }
 

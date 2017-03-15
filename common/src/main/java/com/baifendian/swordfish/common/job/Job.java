@@ -44,14 +44,6 @@ public interface Job {
     void after() throws Exception;
 
     /**
-     * 执行(一个job对象仅执行一次)
-     * <p>
-     *
-     * @throws Exception
-     */
-    void run() throws Exception;
-
-    /**
      * 取消执行(执行 cancel 之前，必须要保证已经调用 run)
      * <p>
      *

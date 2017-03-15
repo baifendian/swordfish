@@ -1,10 +1,10 @@
 package com.baifendian.swordfish.execserver.job.hive;
 
 import com.baifendian.swordfish.common.job.AbstractJob;
+import com.baifendian.swordfish.common.job.BaseParam;
 import com.baifendian.swordfish.common.job.JobProps;
 import com.baifendian.swordfish.common.utils.CommonUtil;
 import com.baifendian.swordfish.common.utils.json.JsonUtil;
-import com.baifendian.swordfish.dao.hive.FunctionUtil;
 import com.baifendian.swordfish.common.job.ExecResult;
 import com.baifendian.swordfish.execserver.parameter.ParamHelper;
 import org.slf4j.Logger;
@@ -38,8 +38,8 @@ public class EtlSqlJob extends AbstractJob {
     public void process() throws Exception {
         String sqls = param.getSql();
         sqls = ParamHelper.resolvePlaceholders(sqls, definedParamMap);
-        logger.info("exec sql:{}", sqls);
-        List<String> funcs = FunctionUtil.createFuncs(sqls, projectId);
+        List<String> funcs = FunctionUtil.createFuncs(param.getUdfs(), jobId, getWorkingDirectory());
+        logger.info("exec sql:{}, funcs:{}", sqls, funcs);
         List<String> execSqls = CommonUtil.sqlSplit(sqls);
         HiveSqlExec hiveSqlExec = new HiveSqlExec(funcs, execSqls, getProxyUser(), null, false, null, null, logger);
         hiveSqlExec.run();
@@ -49,6 +49,11 @@ public class EtlSqlJob extends AbstractJob {
     @Override
     public List<ExecResult> getResults(){
         return results;
+    }
+
+    @Override
+    public BaseParam getParam(){
+        return param;
     }
 
 }

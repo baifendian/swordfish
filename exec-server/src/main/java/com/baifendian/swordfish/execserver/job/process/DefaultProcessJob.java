@@ -7,6 +7,7 @@
 package com.baifendian.swordfish.execserver.job.process;
 
 import com.baifendian.swordfish.common.job.AbstractProcessJob;
+import com.baifendian.swordfish.common.job.BaseParam;
 import com.baifendian.swordfish.common.job.JobProps;
 import com.baifendian.swordfish.common.job.exception.ExecException;
 import com.baifendian.swordfish.common.utils.PlaceholderUtil;
@@ -64,6 +65,11 @@ public class DefaultProcessJob extends AbstractProcessJob {
         }
 
         return processBuilder;
+    }
+
+    @Override
+    public BaseParam getParam(){
+        return param;
     }
 
 }

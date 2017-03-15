@@ -7,6 +7,7 @@
 package com.baifendian.swordfish.execserver.job.process;
 
 import com.baifendian.swordfish.common.job.AbstractProcessJob;
+import com.baifendian.swordfish.common.job.BaseParam;
 import com.baifendian.swordfish.common.job.JobProps;
 import com.baifendian.swordfish.common.utils.json.JsonUtil;
 import com.bfd.harpc.common.configure.PropertiesConfiguration;
@@ -82,6 +83,11 @@ public class JavaProcessJob extends AbstractProcessJob {
         // commands.add(command);
 
         return processBuilder;
+    }
+
+    @Override
+    public BaseParam getParam(){
+        return param;
     }
 
 }
