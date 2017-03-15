@@ -15,19 +15,25 @@
  */
 package com.baifendian.swordfish.webserver.api;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.stereotype.Component;
 
 /**
  * author: smile8
- * date:   2017/3/13
- * desc:
+ * date:   2017/3/15
+ * desc:   程序启动后的初始化工作
  */
-@SpringBootApplication
-public class RestfulApiApplication {
+@Component
+public class StartupRunner implements CommandLineRunner {
+  private static Logger logger = LoggerFactory.getLogger(StartupRunner.class.getName());
 
-    public static void main(String[] args) {
-        SpringApplication.run(RestfulApiApplication.class, args);
-    }
+  public void run(String... args) {
+    logger.info("begin startup...");
 
+    // TODO::
+
+    logger.info("end startup");
+  }
 }
