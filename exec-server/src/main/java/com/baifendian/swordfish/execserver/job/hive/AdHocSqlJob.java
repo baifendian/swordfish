@@ -1,9 +1,17 @@
 /*
- * Copyright (c) 2017. Lorem ipsum dolor sit amet, consectetur adipiscing elit.
- * Morbi non lorem porttitor neque feugiat blandit. Ut vitae ipsum eget quam lacinia accumsan.
- * Etiam sed turpis ac ipsum condimentum fringilla. Maecenas magna.
- * Proin dapibus sapien vel ante. Aliquam erat volutpat. Pellentesque sagittis ligula eget metus.
- * Vestibulum commodo. Ut rhoncus gravida arcu.
+ * Copyright (C) 2017 Baifendian Corporation
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *          http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package com.baifendian.swordfish.execserver.job.hive;
@@ -12,7 +20,6 @@ import com.baifendian.swordfish.common.job.ExecResult;
 import com.baifendian.swordfish.common.job.JobProps;
 import com.baifendian.swordfish.common.utils.CommonUtil;
 import com.baifendian.swordfish.common.utils.json.JsonUtil;
-import com.baifendian.swordfish.dao.hive.FunctionUtil;
 import com.baifendian.swordfish.dao.mysql.MyBatisSqlSessionFactoryUtil;
 import com.baifendian.swordfish.dao.mysql.mapper.AdHocResultMapper;
 import com.baifendian.swordfish.dao.mysql.model.AdHocJsonObject;
@@ -40,12 +47,10 @@ public class AdHocSqlJob extends EtlSqlJob {
     public void process() throws Exception {
         String sqls = param.getSql();
         sqls = ParamHelper.resolvePlaceholders(sqls, definedParamMap);
-        List<String> funcs = FunctionUtil.createFuncs(sqls, projectId);
+        List<String> funcs = FunctionUtil.createFuncs(param.getUdfs(), jobId, getWorkingDirectory());
         List<String> execSqls = CommonUtil.sqlSplit(sqls);
         /** 查询结果写入数据库 */
         ResultCallback resultCallback = new ResultCallback() {
-
-
             @Override
             public void handleResult(ExecResult execResult) {
                 AdHocResult adHocResult = new AdHocResult();

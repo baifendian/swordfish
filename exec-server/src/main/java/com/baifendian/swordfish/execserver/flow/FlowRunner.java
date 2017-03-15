@@ -1,7 +1,17 @@
 /*
- * Create Author  : dsfan
- * Create Date    : 2016年10月27日
- * File Name      : FlowRunner.java
+ * Copyright (C) 2017 Baifendian Corporation
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *          http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package com.baifendian.swordfish.execserver.flow;
@@ -162,12 +172,12 @@ public class FlowRunner implements Runnable {
             FlowType flowType = executionFlow.getFlowType();
             FlowDag flowDag = JsonUtil.parseObject(executionFlow.getWorkflowData(), FlowDag.class);
 
-            /** 下载workflow的资源文件到本地exec目录 */
+            // 下载workflow的资源文件到本地exec目录
             String workflowHdfsPath = BaseConfig.getHdfsFlowResourcesPath(executionFlow.getProjectId(), executionFlow.getFlowId());
             HdfsClient hdfsClient = HdfsClient.getInstance();
             if(hdfsClient.exists(workflowHdfsPath)) {
                 HdfsUtil.GetFile(workflowHdfsPath, execLocalPath);
-                /** 资源文件解压缩处理 workflow下的文件为 workflowId.zip */
+                // 资源文件解压缩处理 workflow下的文件为 workflowId.zip
                 File zipFile = new File(execLocalPath, executionFlow.getFlowId() + ".zip");
                 if (zipFile.exists()) {
                     String cmd = String.format("unzip -o %s -d %s", zipFile.getPath(), execLocalPath);
@@ -182,7 +192,8 @@ public class FlowRunner implements Runnable {
                     LOGGER.error("can't found workflow zip file:" + zipFile.getPath());
                 }
             }
-            /** 解析作业参数获取需要的项目级资源文件清单 **/
+
+            // 解析作业参数获取需要的项目级资源文件清单
             String projectHdfsPath = BaseConfig.getHdfsProjectResourcesPath(executionFlow.getProjectId());
             List<String> projectRes = genProjectResFiles(flowDag);
             for(String res: projectRes){
@@ -429,6 +440,7 @@ public class FlowRunner implements Runnable {
                     ExecutionNode executionNodeLast = flowDao.queryExecutionNodeLastAttempt(executionFlow.getId(), nodeId);
                     if(executionNodeLast != null && executionNodeLast.getStatus().typeIsSuccess()){
                         iterator.remove();
+                        continue;
                     }
 
                     // 找到当前节点的所有前驱节点
@@ -665,7 +677,7 @@ public class FlowRunner implements Runnable {
      * 判断前驱节点是否已经存在执行失败的情况
      * <p>
      *
-     * @param preExecutionNodes
+     * @param preNodes
      * @return 是否存在失败
      */
     private boolean isPreNodesHasFailed(Set<Integer> preNodes) {

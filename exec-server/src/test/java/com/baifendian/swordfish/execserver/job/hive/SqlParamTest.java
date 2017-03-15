@@ -14,38 +14,34 @@
  * limitations under the License.
  */
 
-package com.baifendian.swordfish.dao;
+package com.baifendian.swordfish.execserver.job.hive;
 
-import com.baifendian.swordfish.common.job.FlowStatus;
-import com.baifendian.swordfish.dao.mysql.model.ExecutionFlow;
-import com.baifendian.swordfish.dao.mysql.model.ExecutionNode;
+import com.baifendian.swordfish.common.utils.json.JsonUtil;
+import org.apache.commons.lang.StringUtils;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.junit.Assert.assertEquals;
+
 /**
  * @author : liujin
- * @date : 2017-03-14 9:06
+ * @date : 2017-03-15 15:23
  */
-public class FlowDaoTest {
-    FlowDao flowDao;
-
+public class SqlParamTest {
+    private SqlParam param;
     @Before
     public void before(){
-        flowDao = DaoFactory.getDaoInstance(FlowDao.class);
+        String paramStr = "{\"sql\":\"select count(*) from bfd_test.test;\", \"udfs\":[{ \"func\": \"md4\", \"className\": \"com.baifendian.hive.udf.Md5\", \"libJar\": { \"scope\": \"project\", \"res\": \"udf.jar\" } }]}\n";
+        param = JsonUtil.parseObject(paramStr, SqlParam.class);
     }
 
     @Test
-    public void testQueryExecutionNodeLastAttempt(){
-        ExecutionNode executionNode = flowDao.queryExecutionNodeLastAttempt(411, 6);
-        System.out.println(executionNode.getStatus());
-    }
-
-    @Test
-    public void testQueryAllExecutionFlow(){
-        List<ExecutionFlow> executionNodeList = flowDao.queryAllNoFinishFlow();
-        System.out.println(executionNodeList.size());
+    public void testGetResourceFiles(){
+        List<String> resources = param.getResourceFiles();
+        String result = "udf.jar";
+        assertEquals(result, StringUtils.join(resources, ""));
     }
 }

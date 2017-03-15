@@ -1,12 +1,23 @@
 /*
- * Create Author  : dsfan
- * Create Date    : 2016年11月14日
- * File Name      : DefaultProcessJob.java
+ * Copyright (C) 2017 Baifendian Corporation
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *          http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package com.baifendian.swordfish.execserver.job.process;
 
 import com.baifendian.swordfish.common.job.AbstractProcessJob;
+import com.baifendian.swordfish.common.job.BaseParam;
 import com.baifendian.swordfish.common.job.JobProps;
 import com.baifendian.swordfish.common.job.exception.ExecException;
 import com.baifendian.swordfish.common.utils.PlaceholderUtil;
@@ -64,6 +75,11 @@ public class DefaultProcessJob extends AbstractProcessJob {
         }
 
         return processBuilder;
+    }
+
+    @Override
+    public BaseParam getParam(){
+        return param;
     }
 
 }
