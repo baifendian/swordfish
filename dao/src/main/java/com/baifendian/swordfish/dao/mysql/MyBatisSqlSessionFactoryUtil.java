@@ -57,7 +57,7 @@ public class MyBatisSqlSessionFactoryUtil {
 
     static {
         try {
-            File dataSourceFile = ResourceUtils.getFile("classpath:common/mysql/data_source.properties");
+            File dataSourceFile = ResourceUtils.getFile("classpath:dao/data_source.properties");
             InputStream is = new FileInputStream(dataSourceFile);
             PROPERTIES.load(is);
 
