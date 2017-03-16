@@ -20,7 +20,7 @@ import com.baifendian.swordfish.common.hadoop.HdfsClient;
 import com.baifendian.swordfish.common.job.exception.ExecException;
 import com.baifendian.swordfish.dao.DaoFactory;
 import com.baifendian.swordfish.dao.MasterDao;
-import com.baifendian.swordfish.dao.hadoop.ConfigurationUtil;
+import com.baifendian.swordfish.execserver.utils.hadoop.ConfigurationUtil;
 import com.baifendian.swordfish.dao.mysql.model.MasterServer;
 import com.baifendian.swordfish.execserver.service.ExecServiceImpl;
 import com.baifendian.swordfish.rpc.HeartBeatData;
@@ -32,9 +32,7 @@ import org.apache.thrift.TProcessor;
 import org.apache.thrift.protocol.TBinaryProtocol;
 import org.apache.thrift.protocol.TProtocolFactory;
 import org.apache.thrift.server.TServer;
-import org.apache.thrift.server.TThreadPoolServer;
 import org.apache.thrift.transport.*;
-import org.omg.CORBA.OBJ_ADAPTER;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -18,17 +18,12 @@ package com.baifendian.swordfish.execserver.job.shell;
 
 import com.baifendian.swordfish.common.job.BaseParam;
 import com.baifendian.swordfish.execserver.job.ResourceInfo;
-import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.regex.Matcher;
 import java.util.stream.Collectors;
 
-import static com.baifendian.swordfish.common.utils.http.HttpUtil.PATTERN_RESOURCE_RULE_MATCHES;
 
 /**
  * author: smile8

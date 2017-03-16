@@ -19,17 +19,12 @@ package com.baifendian.swordfish.execserver;
 import com.baifendian.swordfish.common.hadoop.HdfsClient;
 import com.baifendian.swordfish.dao.DaoFactory;
 import com.baifendian.swordfish.dao.FlowDao;
-import com.baifendian.swordfish.dao.hadoop.ConfigurationUtil;
-import com.baifendian.swordfish.dao.mysql.enums.FlowType;
+import com.baifendian.swordfish.execserver.utils.hadoop.ConfigurationUtil;
 import com.baifendian.swordfish.execserver.flow.FlowRunnerManager;
 import com.baifendian.swordfish.execserver.servlet.ExecutorServlet;
-import com.baifendian.swordfish.rpc.RetInfo;
-import com.baifendian.swordfish.execserver.service.ExecServiceImpl;
 import com.baifendian.swordfish.execserver.utils.OsUtil;
 import org.apache.commons.configuration.Configuration;
-import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
-import org.apache.commons.daemon.support.DaemonLoader;
 import org.mortbay.jetty.Connector;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.servlet.Context;
@@ -37,8 +32,6 @@ import org.mortbay.jetty.servlet.ServletHolder;
 import org.mortbay.thread.QueuedThreadPool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.Properties;
 
 /**
  * Worker 服务
@@ -95,7 +88,7 @@ public class ExecServer {
     }
 
     /**
-     * @param args
+     * @param props
      */
     private Server createJettyServer(Configuration props) {
         int maxThreads = props.getInt("executor.maxThreads", DEFAULT_THREAD_NUMBER);

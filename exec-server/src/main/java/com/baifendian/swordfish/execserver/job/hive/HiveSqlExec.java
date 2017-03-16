@@ -21,7 +21,7 @@ import com.baifendian.swordfish.common.hive.HiveConnectionClient;
 import com.baifendian.swordfish.dao.DaoFactory;
 import com.baifendian.swordfish.dao.exception.DaoSemanticException;
 import com.baifendian.swordfish.dao.exception.SqlException;
-import com.baifendian.swordfish.dao.hive.HiveJdbcExec;
+import com.baifendian.swordfish.execserver.utils.hive.HiveJdbcExec;
 import com.baifendian.swordfish.common.job.ExecResult;
 import com.baifendian.swordfish.common.job.FlowStatus;
 import com.bfd.harpc.common.configure.PropertiesConfiguration;

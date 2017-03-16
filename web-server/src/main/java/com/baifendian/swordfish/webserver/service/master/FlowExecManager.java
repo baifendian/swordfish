@@ -97,8 +97,7 @@ public class FlowExecManager {
                         Boolean execStatus = null;
                         if (!isFailed) {
                             // 插入 ExecutionFlow
-                            int scheduleUnixTimestamp = BFDDateUtils.getSecs(scheduleDate);
-                            ExecutionFlow executionFlow = flowDao.scheduleFlowToExecution(flow.getProjectId(), flow.getId(), flow.getOwnerId(), scheduleUnixTimestamp, FlowRunType.ADD_DATA);
+                            ExecutionFlow executionFlow = flowDao.scheduleFlowToExecution(flow.getProjectId(), flow.getId(), flow.getOwnerId(), scheduleDate, FlowRunType.ADD_DATA);
                             executionFlow.setProjectId(flow.getProjectId());
                             executionFlow.setFlowType(flow.getType());
 

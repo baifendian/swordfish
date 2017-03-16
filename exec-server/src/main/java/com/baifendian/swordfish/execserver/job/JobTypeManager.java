@@ -21,11 +21,13 @@ import com.baifendian.swordfish.common.job.JobProps;
 import com.baifendian.swordfish.common.job.exception.ExecException;
 import com.baifendian.swordfish.execserver.exception.ConfigException;
 //import com.baifendian.swordfish.execserver.job.mr.MrJob;
+import com.baifendian.swordfish.execserver.job.hive.AdHocSqlJob;
 import com.baifendian.swordfish.execserver.job.hive.EtlSqlJob;
 import com.baifendian.swordfish.execserver.job.mr.MrJob;
 import com.baifendian.swordfish.execserver.job.process.DefaultProcessJob;
 import com.baifendian.swordfish.execserver.job.shell.ShellJob;
 import com.baifendian.swordfish.execserver.job.spark.SparkJob;
+import com.baifendian.swordfish.execserver.job.upload.UploadJob;
 import com.baifendian.swordfish.execserver.utils.CommandUtil;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.slf4j.Logger;
@@ -41,6 +43,7 @@ import java.util.Map;
  * @date : 2017-03-02 10:30
  */
 public class JobTypeManager {
+
     private static Map<String, Class<? extends Job>> jobTypeMap = new HashMap<>();
 
     static{
@@ -53,6 +56,9 @@ public class JobTypeManager {
         jobTypeMap.put("SPARK_BATCH", SparkJob.class);
         jobTypeMap.put("VIRTUAL", NoopJob.class);
         jobTypeMap.put("SQL", EtlSqlJob.class);
+        jobTypeMap.put("ADHOC_SQL", AdHocSqlJob.class);
+        jobTypeMap.put("ADHOC_SQL", AdHocSqlJob.class);
+        jobTypeMap.put("FILE_IMPORT_SQL", UploadJob.class);
     }
 
     public static void addJobType(String jobType, Class<? extends Job> jobClass){

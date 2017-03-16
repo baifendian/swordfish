@@ -15,6 +15,8 @@
  */
 package com.baifendian.swordfish.webserver.api.interceptor;
 
+import com.baifendian.swordfish.common.consts.Constants;
+import com.baifendian.swordfish.common.utils.http.HttpUtil;
 import com.baifendian.swordfish.webserver.api.service.SessionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.servlet.HandlerInterceptor;

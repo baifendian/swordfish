@@ -325,8 +325,8 @@ public class MasterServiceImpl implements Iface {
             String crontabStr = meta.getCrontab();
             CronExpression cron = new CronExpression(crontabStr);
 
-            Date startDateTime = new Date(meta.getStartDate()*1000);
-            Date endDateTime = new Date(meta.getEndDate()*1000);
+            Date startDateTime = meta.getStartDate();
+            Date endDateTime = meta.getEndDate();
 
             // 提交补数据任务
             flowExecManager.submitAddData(flow, cron, startDateTime, endDateTime);

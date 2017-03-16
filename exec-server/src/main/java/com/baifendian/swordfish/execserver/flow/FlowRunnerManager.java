@@ -27,7 +27,6 @@ import com.baifendian.swordfish.dao.mysql.mapper.ExecutionNodeMapper;
 import com.baifendian.swordfish.dao.mysql.model.ExecutionFlow;
 import com.baifendian.swordfish.dao.mysql.model.ExecutionNode;
 import com.baifendian.swordfish.dao.mysql.model.Schedule;
-import com.baifendian.swordfish.execserver.node.ResourceHelper;
 import com.baifendian.swordfish.execserver.parameter.CustomParamManager;
 import com.baifendian.swordfish.execserver.parameter.SystemParamManager;
 import com.bfd.harpc.monitor.NamedThreadFactory;
@@ -97,59 +96,6 @@ public class FlowRunnerManager {
 
         NamedThreadFactory jobThreadFactory = new NamedThreadFactory("Exec-Worker-Job");
         jobExecutorService = Executors.newCachedThreadPool(jobThreadFactory);
-    }
-
-    /**
-     * 启动清除线程
-     * <p>
-     */
-    private void startCleanThread() {
-        Thread cleanThread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                // 清除老的任务
-                cleanOldExecutions();
-            }
-        }, "Exec-Worker-CleanOldExec");
-        cleanThread.setDaemon(true);
-        cleanThread.start();
-    }
-
-    /**
-     * 清除老的执行任务
-     * <p>
-     */
-    private void cleanOldExecutions() {
-        File execPath = new File(ResourceHelper.getExecBasePath());
-        if (execPath.exists()) {
-            File[] files = execPath.listFiles();
-            if (files != null) {
-                for (File file : files) {
-                    try {
-                        Long execId = Long.valueOf(file.getName());
-                        ExecutionFlow executionFlow = flowDao.queryExecutionFlow(execId);
-                        // 如果状态不是完成状态，则更新状态为失败
-                        if (!executionFlow.getStatus().typeIsFinished()) {
-                            flowDao.updateExecutionFlowStatus(execId, FlowStatus.FAILED);
-                            List<ExecutionNode> executionNodes = executionNodeMapper.selectExecNodesStatus(execId, executionFlow.getFlowId());
-                            if (CollectionUtils.isNotEmpty(executionNodes)) {
-                                for (ExecutionNode executionNode : executionNodes) {
-                                    if (!executionNode.getStatus().typeIsFinished()) {
-                                        executionNode.setStatus(FlowStatus.FAILED);
-                                        flowDao.updateExecutionNode(executionNode);
-                                    }
-                                }
-                            }
-                        }
-
-                        // 删除文件夹
-                        FileUtils.deleteQuietly(file);
-                    } catch (Exception e) {
-                        LOGGER.error(e.getMessage(), e);
-                    }
-                }
-            }
-        }
     }
 
     /**

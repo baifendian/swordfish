@@ -62,7 +62,7 @@ public abstract class AbstractProcessJob extends AbstractJob {
      *
      * @return {@link ProcessBuilder}
      */
-    public abstract ProcessBuilder createProcessBuilder() throws IOException;
+    public abstract ProcessBuilder createProcessBuilder() throws Exception;
 
     @Override
     public void before() throws Exception{}

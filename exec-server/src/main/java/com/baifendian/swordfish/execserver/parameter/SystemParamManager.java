@@ -17,7 +17,7 @@
 package com.baifendian.swordfish.execserver.parameter;
 
 import com.baifendian.swordfish.common.utils.BFDDateUtils;
-import com.baifendian.swordfish.dao.hadoop.hdfs.HdfsPathManager;
+import com.baifendian.swordfish.execserver.utils.hadoop.hdfs.HdfsPathManager;
 import com.baifendian.swordfish.dao.mysql.enums.FlowRunType;
 import com.baifendian.swordfish.dao.mysql.model.ExecutionFlow;
 import org.apache.commons.lang.time.DateUtils;
@@ -71,7 +71,7 @@ public class SystemParamManager {
     public static Map<String, String> buildSystemParam(ExecutionFlow executionFlow, Date scheduleDate, Date addDate) {
         FlowRunType runType = executionFlow.getType();
         Date bizDate;
-        Date execStartTime = new Date(executionFlow.getStartTime()*1000);
+        Date execStartTime = executionFlow.getStartTime();
         switch (runType) {
             case DIRECT_RUN:
                 bizDate = DateUtils.addDays(execStartTime, -1); // 运行日期的前一天

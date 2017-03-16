@@ -60,7 +60,7 @@ public class CustomParamManager {
         // 获取工作流的参数
         ProjectFlow projectFlow = projectFlowMapper.findById(executionFlow.getFlowId());
         Map<String, String> valueMap = new HashMap<>();
-        Date cycTime = new Date(executionFlow.getStartTime()*1000);
+        Date cycTime = executionFlow.getStartTime();
 
         if (StringUtils.isNotEmpty(cycTimeStr)) {
             try {
@@ -100,7 +100,7 @@ public class CustomParamManager {
     public static Map<String, String> buildCustomParam(ExecutionFlow executionFlow, String cycTimeStr, Map<String, String> envMap) {
         Map<String, String> valueMap = new HashMap<>();
 
-        Date cycTime = new Date(executionFlow.getStartTime()*1000);
+        Date cycTime = executionFlow.getStartTime();
         if (StringUtils.isNotEmpty(cycTimeStr)) {
             try {
                 cycTime = DateUtils.parseDate(cycTimeStr, new String[] { SystemParamManager.TIME_FORMAT });

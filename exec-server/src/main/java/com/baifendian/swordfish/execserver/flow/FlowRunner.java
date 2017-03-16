@@ -35,7 +35,6 @@ import com.baifendian.swordfish.dao.mysql.model.flow.FlowDag;
 import com.baifendian.swordfish.execserver.exception.ExecTimeoutException;
 import com.baifendian.swordfish.execserver.job.JobTypeManager;
 import com.baifendian.swordfish.execserver.node.NodeRunner;
-import com.baifendian.swordfish.execserver.node.ResourceHelper;
 import com.baifendian.swordfish.execserver.utils.LoggerUtil;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.FileUtils;
@@ -234,8 +233,6 @@ public class FlowRunner implements Runnable {
             if (status == null) { // 执行失败
                 updateExecutionFlow(FlowStatus.FAILED);
             }
-            // 清除执行目录
-            ResourceHelper.cleanExecutionDir(executionFlow.getId());
         }
 
         // 后置处理
@@ -358,7 +355,7 @@ public class FlowRunner implements Runnable {
             executionNode.setFlowId(executionFlow.getFlowId());
             executionNode.setNodeId(flowNode.getId());
             executionNode.setAttempt(0);
-            executionNode.setStartTime((int)(new Date().getTime()/1000));
+            executionNode.setStartTime(new Date());
             executionNode.setStatus(FlowStatus.INIT);
             executionNode.setJobId(LoggerUtil.genJobId(executionFlow.getFlowType(), executionFlow.getId(), flowNode.getId()));
 
@@ -453,7 +450,7 @@ public class FlowRunner implements Runnable {
                         executionNode.setFlowId(executionFlow.getFlowId());
                         executionNode.setNodeId(nodeId);
                         executionNode.setAttempt(0);
-                        executionNode.setStartTime(BFDDateUtils.getSecs());
+                        executionNode.setStartTime(new Date());
                         executionNode.setStatus(FlowStatus.INIT);
                         executionNode.setJobId(LoggerUtil.genJobId(executionFlow.getFlowType(), executionFlow.getId(), nodeId));
                         flowDao.insertExecutionNode(executionNode);
@@ -590,7 +587,7 @@ public class FlowRunner implements Runnable {
                     retryExecutionNode.setFlowId(executionNode.getFlowId());
                     retryExecutionNode.setNodeId(executionNode.getNodeId());
                     retryExecutionNode.setAttempt(executionNode.getAttempt() + 1);
-                    retryExecutionNode.setStartTime(BFDDateUtils.getSecs());
+                    retryExecutionNode.setStartTime(new Date());
                     retryExecutionNode.setStatus(FlowStatus.INIT);
                     retryExecutionNode.setJobId(LoggerUtil.genJobId(executionFlow.getFlowType(), executionFlow.getId(), executionNode.getNodeId()));
                     flowDao.insertExecutionNode(retryExecutionNode);
@@ -645,7 +642,7 @@ public class FlowRunner implements Runnable {
                     retryExecutionNode.setFlowId(executionNode.getFlowId());
                     retryExecutionNode.setNodeId(executionNode.getNodeId());
                     retryExecutionNode.setAttempt(executionNode.getAttempt() + 1);
-                    retryExecutionNode.setStartTime(BFDDateUtils.getSecs());
+                    retryExecutionNode.setStartTime(new Date());
                     retryExecutionNode.setStatus(FlowStatus.INIT);
                     retryExecutionNode.setJobId(LoggerUtil.genJobId(executionFlow.getFlowType(), executionFlow.getId(), executionNode.getNodeId()));
                     flowDao.insertExecutionNode(retryExecutionNode);
@@ -742,7 +739,7 @@ public class FlowRunner implements Runnable {
      * @param status
      */
     private void updateExecutionFlow(FlowStatus status) {
-        executionFlow.setEndTime(BFDDateUtils.getSecs());
+        executionFlow.setEndTime(new Date());
         executionFlow.setStatus(status);
         FlowErrorCode errorCode;
         switch (status) {
@@ -777,7 +774,7 @@ public class FlowRunner implements Runnable {
                  */
                 // 修改执行节点的状态
                 executionNode.setStatus(FlowStatus.KILL);
-                executionNode.setEndTime(BFDDateUtils.getSecs());
+                executionNode.setEndTime(new Date());
                 flowDao.updateExecutionNode(executionNode);
             }
         }
