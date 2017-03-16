@@ -54,8 +54,8 @@ public class ErrorData extends BaseData {
   @Override
   public String toString() {
     return "ErrorData{" +
-        "code=" + code +
-        ", message='" + message + '\'' +
-        '}';
+            "code=" + code +
+            ", message='" + message + '\'' +
+            '}';
   }
 }

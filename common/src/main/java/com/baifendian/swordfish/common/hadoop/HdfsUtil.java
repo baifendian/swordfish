@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.baifendian.swordfish.common.hadoop;
 
 import com.baifendian.swordfish.common.job.exception.ExecException;

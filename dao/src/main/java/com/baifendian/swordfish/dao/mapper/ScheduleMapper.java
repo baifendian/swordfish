@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.baifendian.swordfish.dao.mapper;
 
 /**
@@ -40,8 +39,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- *  已发布workflow节点信息
- * <p>
+ * 已发布workflow节点信息 <p>
  *
  * @author : wenting.wang
  * @date : 2016年8月24日
@@ -49,31 +47,23 @@ import java.util.Set;
 @MapperScan
 public interface ScheduleMapper {
   /**
-   * 插入记录
-   * <p>
+   * 插入记录 <p>
    *
-   * @param
    * @return 插入记录数
    */
   @InsertProvider(type = ScheduleMapperProvider.class, method = "insert")
   int insert(@Param("schedule") Schedule schedule);
 
   /**
-   * 任务的调度设置
-   * <p>
+   * 任务的调度设置 <p>
    *
-   * @param schedule
    * @return 更新记录数
    */
   @UpdateProvider(type = ScheduleMapperProvider.class, method = "update")
   int update(@Param("schedule") Schedule schedule);
 
   /**
-   * workflow 发布任务的调度查询(单个任务)
-   * <p>
-   *
-   * @param
-   * @return
+   * workflow 发布任务的调度查询(单个任务) <p>
    */
   @Results(value = {
           @Result(property = "flowId", column = "flow_id", id = true, javaType = int.class, jdbcType = JdbcType.INTEGER),
@@ -99,11 +89,7 @@ public interface ScheduleMapper {
   Schedule selectByFlowId(@Param("flowId") int flowId);
 
   /**
-   * 查询已发布 workflow 任务的调度情况列表
-   * <p>
-   *
-   * @param projectId
-   * @return
+   * 查询已发布 workflow 任务的调度情况列表 <p>
    */
   @Results(value = {
           @Result(property = "flowId", column = "flow_id", id = true, javaType = int.class, jdbcType = JdbcType.INTEGER),
@@ -135,11 +121,7 @@ public interface ScheduleMapper {
                                    @Param("scheduleStatus") ScheduleStatus scheduleStatus);
 
   /**
-   * 查询多个workflow的调度信息
-   * <p>
-   *
-   * @param flowIds
-   * @return
+   * 查询多个workflow的调度信息 <p>
    */
   @Results(value = {
           @Result(property = "flowId", column = "flow_id", id = true, javaType = int.class, jdbcType = JdbcType.INTEGER),
@@ -180,11 +162,7 @@ public interface ScheduleMapper {
   int deleteByFlowId(@Param("flowId") int flowId);
 
   /**
-   *  任务类型分布
-   * <p>
-   *
-   * @param projectId
-   * @return
+   * 任务类型分布 <p>
    */
   @Results(value = {@Result(property = "nodeType", column = "node_type", typeHandler = NodeTypeHandler.class, jdbcType = JdbcType.TINYINT),
           @Result(property = "value", column = "num", javaType = int.class, jdbcType = JdbcType.INTEGER),
@@ -193,11 +171,7 @@ public interface ScheduleMapper {
   List<DisField> queryTaskTypeDis(@Param("projectId") int projectId);
 
   /**
-   *  工作流类型分布
-   * <p>
-   *
-   * @param projectId
-   * @return
+   * 工作流类型分布 <p>
    */
   @Results(value = {@Result(property = "flowType", column = "flow_type", typeHandler = EnumOrdinalTypeHandler.class, jdbcType = JdbcType.TINYINT),
           @Result(property = "value", column = "num", javaType = int.class, jdbcType = JdbcType.INTEGER),
@@ -206,10 +180,8 @@ public interface ScheduleMapper {
   List<DisField> queryFlowTypeDis(@Param("projectId") int projectId);
 
   /**
-   * 查询一个项目中图形化ETL上线的的数目
-   * <p>
+   * 查询一个项目中图形化ETL上线的的数目 <p>
    *
-   * @param projectId
    * @return 查询记录数
    */
   @SelectProvider(type = ScheduleMapperProvider.class, method = "queryFlowEtlNum")
@@ -217,11 +189,7 @@ public interface ScheduleMapper {
 
 
   /**
-   *  工作流调度类型分布
-   * <p>
-   *
-   * @param projectId
-   * @return
+   * 工作流调度类型分布 <p>
    */
   @Results(value = {@Result(property = "scheduleType", column = "schedule_type", typeHandler = EnumOrdinalTypeHandler.class, jdbcType = JdbcType.TINYINT),
           @Result(property = "value", column = "num", javaType = int.class, jdbcType = JdbcType.INTEGER),
@@ -234,10 +202,8 @@ public interface ScheduleMapper {
 
 
   /**
-   * 查询一个组织里面的workflow数量
-   * <p>
+   * 查询一个组织里面的workflow数量 <p>
    *
-   * @param tenantId
    * @return 查询记录数
    */
   @SelectProvider(type = ScheduleMapperProvider.class, method = "queryFlowNum")

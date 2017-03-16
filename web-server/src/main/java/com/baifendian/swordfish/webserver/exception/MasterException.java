@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.baifendian.swordfish.webserver.exception;
 
 /**
@@ -22,7 +21,7 @@ package com.baifendian.swordfish.webserver.exception;
  */
 public class MasterException extends RuntimeException {
 
-    public MasterException(String msg){
-        super(msg);
-    }
+  public MasterException(String msg) {
+    super(msg);
+  }
 }
