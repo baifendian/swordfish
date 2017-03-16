@@ -15,32 +15,8 @@
  */
 package com.baifendian.swordfish.webserver.api.dto;
 
-import com.baifendian.swordfish.dao.model.User;
-
-public class UserSessionData extends BaseData {
-  /**
-   * 用户 session id
-   */
-  private String sessionId;
-
-  /**
-   * 用户信息
-   */
-  private User user;
-
-  public String getSessionId() {
-    return sessionId;
-  }
-
-  public void setSessionId(String sessionId) {
-    this.sessionId = sessionId;
-  }
-
-  public User getUser() {
-    return user;
-  }
-
-  public void setUser(User user) {
-    this.user = user;
-  }
+/**
+ * 返回的基础 data, 所有前端返回的都继承它
+ */
+public abstract class BaseData {
 }

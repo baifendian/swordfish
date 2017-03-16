@@ -15,32 +15,47 @@
  */
 package com.baifendian.swordfish.webserver.api.dto;
 
-import com.baifendian.swordfish.dao.model.User;
-
-public class UserSessionData extends BaseData {
+public class ErrorData extends BaseData {
   /**
-   * 用户 session id
+   * 编码信息
    */
-  private String sessionId;
+  private int code;
 
   /**
-   * 用户信息
+   * 错误消息
    */
-  private User user;
+  private String message;
 
-  public String getSessionId() {
-    return sessionId;
+  public ErrorData() {
+
   }
 
-  public void setSessionId(String sessionId) {
-    this.sessionId = sessionId;
+  public ErrorData(int code, String message) {
+    this.code = code;
+    this.message = message;
   }
 
-  public User getUser() {
-    return user;
+  public int getCode() {
+    return code;
   }
 
-  public void setUser(User user) {
-    this.user = user;
+  public void setCode(int code) {
+    this.code = code;
+  }
+
+  public String getMessage() {
+    return message;
+  }
+
+  public void setMessage(String message) {
+    this.message = message;
+  }
+
+  @Override
+  public String toString() {
+    return "ErrorData{" +
+        "code=" + code +
+        ", message='" + message + '\'' +
+        '}';
   }
 }

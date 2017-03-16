@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.baifendian.swordfish.dao;
 
 import org.slf4j.Logger;
@@ -24,10 +23,9 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Dao 工厂 <p>
- *
- * @author : dsfan
- * @date : 2016年10月17日
+ * author: dsfan
+ * date:   2017/3/16
+ * desc:   Dao 工厂
  */
 public class DaoFactory {
 
@@ -42,8 +40,10 @@ public class DaoFactory {
   private static Map<String, BaseDao> daoMap = new ConcurrentHashMap<>();
 
   /**
-   * 获取 Dao 实例 （单例） <p>
+   * 获取 Dao 实例 （单例）
+   * <p>
    *
+   * @param clazz
    * @return Dao实例
    */
   @SuppressWarnings("unchecked")

@@ -20,7 +20,6 @@ import com.baifendian.swordfish.dao.mapper.SessionMapper;
 import com.baifendian.swordfish.dao.mapper.UserMapper;
 import com.baifendian.swordfish.dao.model.User;
 import com.baifendian.swordfish.webserver.api.dto.BaseData;
-import com.baifendian.swordfish.webserver.api.dto.ErrorInfo;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -34,11 +33,6 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-/**
- * author: smile8
- * date:   2017/3/16
- * desc:
- */
 @RestController
 @RequestMapping("/login")
 public class LoginController {
@@ -65,20 +59,20 @@ public class LoginController {
     // 必须存在一个
     if (StringUtils.isEmpty(name) && StringUtils.isEmpty(password)) {
       response.setStatus(HttpStatus.SC_BAD_REQUEST);
-      return new ErrorInfo(1, "用户名和邮箱必须存在一个");
+      return new ErrorData(1, "用户名和邮箱必须存在一个");
     }
 
     // 且必须存在一个
     if (StringUtils.isNotEmpty(name) && StringUtils.isNotEmpty(password)) {
       response.setStatus(HttpStatus.SC_BAD_REQUEST);
-      return new ErrorInfo(1, "用户名和邮箱不能同时存在");
+      return new ErrorData(1, "用户名和邮箱不能同时存在");
     }
 
     // 得到用户 ip 信息
     String ip = HttpUtil.getClientIpAddress(request);
     if (StringUtils.isEmpty(ip)) {
       response.setStatus(HttpStatus.SC_BAD_REQUEST);
-      return new ErrorInfo(1, "无法获取用户 ip 信息");
+      return new ErrorData(1, "无法获取用户 ip 信息");
     }
 
     logger.info("Login information: User({}, {}), IP: {}", name, email, ip);
