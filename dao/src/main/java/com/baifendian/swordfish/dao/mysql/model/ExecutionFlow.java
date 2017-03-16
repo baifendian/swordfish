@@ -21,6 +21,8 @@ import com.baifendian.swordfish.dao.mysql.enums.FlowRunType;
 import com.baifendian.swordfish.common.job.FlowStatus;
 import com.baifendian.swordfish.dao.mysql.enums.FlowType;
 
+import java.util.Date;
+
 /**
  * workflow 执行的信息
  * <p>
@@ -54,13 +56,13 @@ public class ExecutionFlow {
     private String proxyUser;
 
     /** 提交时间 **/
-    private int submitTime;
+    private Date submitTime;
 
     /** 起始时间 **/
-    private int startTime;
+    private Date startTime;
 
     /** 结束时间 **/
-    private int endTime;
+    private Date endTime;
 
     /** workflow的数据 **/
     private String workflowData;
@@ -84,7 +86,7 @@ public class ExecutionFlow {
     private String orgName;
 
     /** 调度时间 **/
-    private int scheduleTime;
+    private Date scheduleTime;
 
     /** 执行的错误码 */
     private FlowErrorCode errorCode;
@@ -148,28 +150,32 @@ public class ExecutionFlow {
         this.submitUserName = submitUserName;
     }
 
-    public int getSubmitTime() {
+    public Date getSubmitTime() {
         return submitTime;
     }
 
-    public void setSubmitTime(int submitTime) {
+    public void setSubmitTime(Date submitTime) {
         this.submitTime = submitTime;
     }
 
-    public int getStartTime() {
+    public Date getStartTime() {
         return startTime;
     }
 
-    public void setStartTime(int startTime) {
+    public void setStartTime(Date startTime) {
         this.startTime = startTime;
     }
 
-    public int getEndTime() {
+    public Date getEndTime() {
         return endTime;
     }
 
-    public void setEndTime(int endTime) {
+    public void setEndTime(Date endTime) {
         this.endTime = endTime;
+    }
+
+    public void setScheduleTime(Date scheduleTime) {
+        this.scheduleTime = scheduleTime;
     }
 
     public String getWorkflowData() {
@@ -249,14 +255,6 @@ public class ExecutionFlow {
         this.orgName = orgName;
     }
 
-    public int getScheduleTime() {
-        return scheduleTime;
-    }
-
-    public void setScheduleTime(int scheduleTime) {
-        this.scheduleTime = scheduleTime;
-    }
-
     public FlowErrorCode getErrorCode() {
         return errorCode;
     }
@@ -271,5 +269,9 @@ public class ExecutionFlow {
 
     public void setQueue(String queue) {
         this.queue = queue;
+    }
+
+    public Date getScheduleTime() {
+        return scheduleTime;
     }
 }

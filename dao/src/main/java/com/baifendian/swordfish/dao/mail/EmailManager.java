@@ -136,7 +136,7 @@ public class EmailManager {
      * @param flowStatus
      * @return 内容
      */
-    public static String genContent(FlowRunType runType, String projectName, String flowName, FlowType flowType, int scheduleDate, FlowStatus flowStatus) {
+    public static String genContent(FlowRunType runType, String projectName, String flowName, FlowType flowType, Date scheduleDate, FlowStatus flowStatus) {
         return MessageFormat.format(CONTENT_FORMAT, getRunTypeCnName(runType), projectName, flowName,
                                 getFlowTypeCnName(flowType), BFDDateUtils.defaultFormat(scheduleDate),
                                     getFlowStatusCnNameH5(flowStatus));

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.baifendian.swordfish.dao.hadoop.hdfs;
+package com.baifendian.swordfish.execserver.utils.hadoop.hdfs;
 
 import java.text.MessageFormat;
 

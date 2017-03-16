@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.baifendian.swordfish.dao.hadoop;
+package com.baifendian.swordfish.execserver.utils.hadoop;
 
 import com.baifendian.swordfish.dao.mysql.MyBatisSqlSessionFactoryUtil;
 import org.apache.commons.io.IOUtils;

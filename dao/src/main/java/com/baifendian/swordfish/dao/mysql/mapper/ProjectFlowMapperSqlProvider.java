@@ -85,7 +85,7 @@ public class ProjectFlowMapperSqlProvider {
                 if (projectFlow.getLastPublishBy() != 0) {
                     SET("last_publish_by = #{flow.lastPublishBy}");
                 }
-                if (projectFlow.getModifyTime() != 0) {
+                if (projectFlow.getModifyTime() != null) {
                     SET("modify_time = #{flow.modifyTime}");
                 }
                 if (projectFlow.getInputTables() != null) {

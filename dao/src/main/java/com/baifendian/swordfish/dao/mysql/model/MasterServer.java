@@ -16,6 +16,8 @@
 
 package com.baifendian.swordfish.dao.mysql.model;
 
+import java.util.Date;
+
 /**
  * @author : liujin
  * @date : 2017-03-10 16:01
@@ -26,7 +28,7 @@ public class MasterServer {
 
     private int port;
 
-    private int updateTime;
+    private Date updateTime;
 
     public String getHost() {
         return host;
@@ -44,11 +46,11 @@ public class MasterServer {
         this.port = port;
     }
 
-    public int getUpdateTime() {
+    public Date getUpdateTime() {
         return updateTime;
     }
 
-    public void setUpdateTime(int updateTime) {
+    public void setUpdateTime(Date updateTime) {
         this.updateTime = updateTime;
     }
 }

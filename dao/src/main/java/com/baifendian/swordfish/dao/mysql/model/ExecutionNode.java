@@ -18,6 +18,7 @@ package com.baifendian.swordfish.dao.mysql.model;
 
 import com.baifendian.swordfish.common.job.FlowStatus;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -51,10 +52,10 @@ public class ExecutionNode {
     private FlowStatus status;
 
     /** 起始时间 **/
-    private int startTime;
+    private Date startTime;
 
     /** 结束时间 **/
-    private int endTime;
+    private Date endTime;
 
     /** 尝试次数 **/
     private int attempt;
@@ -120,19 +121,19 @@ public class ExecutionNode {
         this.status = status;
     }
 
-    public int getStartTime() {
+    public Date getStartTime() {
         return startTime;
     }
 
-    public void setStartTime(int startTime) {
+    public void setStartTime(Date startTime) {
         this.startTime = startTime;
     }
 
-    public int getEndTime() {
+    public Date getEndTime() {
         return endTime;
     }
 
-    public void setEndTime(int endTime) {
+    public void setEndTime(Date endTime) {
         this.endTime = endTime;
     }
 

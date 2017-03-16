@@ -14,12 +14,11 @@
  * limitations under the License.
  */
 
-package com.baifendian.swordfish.dao.hive;
+package com.baifendian.swordfish.execserver.utils.hive;
 
 import com.baifendian.swordfish.common.hive.ConnectionInfo;
 import com.baifendian.swordfish.common.hive.HiveConnectionClient;
 import com.baifendian.swordfish.dao.BaseDao;
-import com.baifendian.swordfish.dao.config.HiveConfig;
 import com.baifendian.swordfish.dao.exception.DaoSemanticException;
 import com.baifendian.swordfish.dao.exception.SqlException;
 import com.baifendian.swordfish.common.job.ExecResult;

@@ -19,6 +19,8 @@ package com.baifendian.swordfish.dao.mysql.model;
 
 import com.baifendian.swordfish.dao.mysql.enums.*;
 
+import java.util.Date;
+
 /**
  *  调度的设置基础数据
  * <p>
@@ -34,9 +36,9 @@ public class Schedule {
 
     private FlowType flowType;
 
-    private int createTime;
+    private Date createTime;
 
-    private int modifyTime;
+    private Date modifyTime;
 
     private int lastModifyBy;
 
@@ -44,15 +46,15 @@ public class Schedule {
 
     private ScheduleStatus scheduleStatus;
 
-    private int startDate;
+    private Date startDate;
 
-    private int endDate;
+    private Date endDate;
 
     private ScheduleType scheduleType;
 
     private String crontabStr;
 
-    private int nextSubmitTime;
+    private Date nextSubmitTime;
 
     private String depWorkflows;
 
@@ -96,19 +98,19 @@ public class Schedule {
         this.flowType = flowType;
     }
 
-    public int getCreateTime() {
+    public Date getCreateTime() {
         return createTime;
     }
 
-    public void setCreateTime(int createTime) {
+    public void setCreateTime(Date createTime) {
         this.createTime = createTime;
     }
 
-    public int getModifyTime() {
+    public Date getModifyTime() {
         return modifyTime;
     }
 
-    public void setModifyTime(int modifyTime) {
+    public void setModifyTime(Date modifyTime) {
         this.modifyTime = modifyTime;
     }
 
@@ -136,19 +138,19 @@ public class Schedule {
         this.scheduleStatus = scheduleStatus;
     }
 
-    public int getStartDate() {
+    public Date getStartDate() {
         return startDate;
     }
 
-    public void setStartDate(int startDate) {
+    public void setStartDate(Date startDate) {
         this.startDate = startDate;
     }
 
-    public int getEndDate() {
+    public Date getEndDate() {
         return endDate;
     }
 
-    public void setEndDate(int endDate) {
+    public void setEndDate(Date endDate) {
         this.endDate = endDate;
     }
 
@@ -168,20 +170,12 @@ public class Schedule {
         this.crontabStr = crontabStr;
     }
 
-    public int getNextSubmitTime() {
+    public Date getNextSubmitTime() {
         return nextSubmitTime;
     }
 
-    public void setNextSubmitTime(int nextSubmitTime) {
+    public void setNextSubmitTime(Date nextSubmitTime) {
         this.nextSubmitTime = nextSubmitTime;
-    }
-
-    public DepPolicyType getDepPolicy() {
-        return depPolicy;
-    }
-
-    public void setDepPolicy(DepPolicyType depPolicy) {
-        this.depPolicy = depPolicy;
     }
 
     public String getDepWorkflows() {
@@ -190,6 +184,14 @@ public class Schedule {
 
     public void setDepWorkflows(String depWorkflows) {
         this.depWorkflows = depWorkflows;
+    }
+
+    public DepPolicyType getDepPolicy() {
+        return depPolicy;
+    }
+
+    public void setDepPolicy(DepPolicyType depPolicy) {
+        this.depPolicy = depPolicy;
     }
 
     public FailurePolicyType getFailurePolicy() {

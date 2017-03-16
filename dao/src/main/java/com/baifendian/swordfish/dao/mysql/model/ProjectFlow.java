@@ -50,9 +50,9 @@ public class ProjectFlow {
 
     private String name;
 
-    private int createTime;
+    private Date createTime;
 
-    private int modifyTime;
+    private Date modifyTime;
 
     private int lastModifyBy;
 
@@ -274,19 +274,19 @@ public class ProjectFlow {
         this.outputTableList = outputTableList;
     }
 
-    public int getCreateTime() {
+    public Date getCreateTime() {
         return createTime;
     }
 
-    public void setCreateTime(int createTime) {
+    public void setCreateTime(Date createTime) {
         this.createTime = createTime;
     }
 
-    public int getModifyTime() {
+    public Date getModifyTime() {
         return modifyTime;
     }
 
-    public void setModifyTime(int modifyTime) {
+    public void setModifyTime(Date modifyTime) {
         this.modifyTime = modifyTime;
     }
 

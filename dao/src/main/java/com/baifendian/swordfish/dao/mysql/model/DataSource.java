@@ -21,6 +21,7 @@ import com.baifendian.swordfish.dao.mysql.enums.DbType;
 import org.apache.commons.lang.StringUtils;
 
 import java.sql.Timestamp;
+import java.util.Date;
 
 /**
  * @auth: ronghua.yu
@@ -38,8 +39,8 @@ public class DataSource {
   private DbType type; // db 类型
   private String params; // 参数信息
   private DataSourceDbBase paramObj; // 参数信息, object 形式
-  private int createTime;
-  private int modifyTime;
+  private Date createTime;
+  private Date modifyTime;
 
   public DataSource() {
   }
@@ -108,19 +109,19 @@ public class DataSource {
     this.params = params;
   }
 
-  public int getCreateTime() {
+  public Date getCreateTime() {
     return createTime;
   }
 
-  public void setCreateTime(int createTime) {
+  public void setCreateTime(Date createTime) {
     this.createTime = createTime;
   }
 
-  public int getModifyTime() {
+  public Date getModifyTime() {
     return modifyTime;
   }
 
-  public void setModifyTime(int modifyTime) {
+  public void setModifyTime(Date modifyTime) {
     this.modifyTime = modifyTime;
   }
 

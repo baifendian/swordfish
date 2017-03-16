@@ -23,6 +23,7 @@ import org.apache.ibatis.type.EnumOrdinalTypeHandler;
 import org.apache.ibatis.type.JdbcType;
 
 import java.sql.Timestamp;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
@@ -63,8 +64,8 @@ public interface ProjectFlowMapper {
     @Results(value = { @Result(property = "id", column = "id", id = true, javaType = int.class, jdbcType = JdbcType.INTEGER),
                        @Result(property = "type", column = "type", typeHandler = EnumOrdinalTypeHandler.class, javaType = FlowType.class, jdbcType = JdbcType.INTEGER),
                        @Result(property = "name", column = "name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-                       @Result(property = "createTime", column = "create_time", javaType = int.class, jdbcType = JdbcType.INTEGER),
-                       @Result(property = "modifyTime", column = "modify_time", javaType = int.class, jdbcType = JdbcType.INTEGER),
+                       @Result(property = "createTime", column = "create_time", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP),
+                       @Result(property = "modifyTime", column = "modify_time", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP),
                        @Result(property = "proxyUser", column = "proxy_user", javaType = String.class, jdbcType = JdbcType.VARCHAR),
                        @Result(property = "mailGroups", column = "mail_groups", javaType = String.class, jdbcType = JdbcType.VARCHAR),
                        @Result(property = "projectId", column = "project_id", javaType = Integer.class, jdbcType = JdbcType.INTEGER),

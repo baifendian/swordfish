@@ -22,6 +22,8 @@ import com.baifendian.swordfish.dao.mysql.mapper.MasterServerMapper;
 import com.baifendian.swordfish.dao.mysql.model.MasterServer;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.Date;
+
 /**
  * @author : liujin
  * @date : 2017-03-10 15:57
@@ -45,7 +47,7 @@ public class MasterDao extends BaseDao{
         MasterServer masterServer = new MasterServer();
         masterServer.setHost(host);
         masterServer.setPort(port);
-        masterServer.setUpdateTime(BFDDateUtils.getSecs());
+        masterServer.setUpdateTime(new Date());
         return masterServerMapper.insert(masterServer);
     }
 
@@ -53,7 +55,7 @@ public class MasterDao extends BaseDao{
         MasterServer masterServer = new MasterServer();
         masterServer.setHost(host);
         masterServer.setPort(port);
-        masterServer.setUpdateTime(BFDDateUtils.getSecs());
+        masterServer.setUpdateTime(new Date());
         return masterServerMapper.update(masterServer);
     }
 }

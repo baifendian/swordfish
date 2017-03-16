@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.baifendian.swordfish.dao.hive;
+package com.baifendian.swordfish.execserver.utils.hive;
 
 import org.apache.hive.jdbc.HiveStatement;
 import org.slf4j.Logger;

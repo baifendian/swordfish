@@ -85,10 +85,10 @@ public class ExecutionFlowMapperProvider {
                 if (executionFlow.getStatus() != null) {
                     SET("status = " + EnumFieldUtil.genFieldStr("executionFlow.status", FlowStatus.class));
                 }
-                if (executionFlow.getStartTime() != 0) {
+                if (executionFlow.getStartTime() != null) {
                     SET("start_time = #{executionFlow.startTime}");
                 }
-                if (executionFlow.getEndTime() != 0) {
+                if (executionFlow.getEndTime() != null) {
                     SET("end_time = #{executionFlow.endTime}");
                 }
                 if (executionFlow.getErrorCode() != null) {

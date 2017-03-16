@@ -21,15 +21,13 @@ import com.baifendian.swordfish.common.job.FlowStatus;
 import com.baifendian.swordfish.common.utils.BFDDateUtils;
 import com.baifendian.swordfish.common.utils.json.JsonUtil;
 //import com.baifendian.swordfish.dao.etl.EtlAutoGen;
-import com.baifendian.swordfish.dao.hadoop.hdfs.HdfsPathManager;
+import com.baifendian.swordfish.execserver.utils.hadoop.hdfs.HdfsPathManager;
 import com.baifendian.swordfish.dao.mysql.MyBatisSqlSessionFactoryUtil;
 import com.baifendian.swordfish.dao.mysql.enums.*;
 import com.baifendian.swordfish.dao.mysql.mapper.*;
 import com.baifendian.swordfish.dao.mysql.model.*;
 import com.baifendian.swordfish.dao.mysql.model.flow.FlowDag;
 import com.baifendian.swordfish.dao.mysql.model.flow.ScheduleMeta;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -158,7 +156,7 @@ public class FlowDao extends BaseDao {
 
         // add by qifeng.dai, 如果结束了, 则应该设置结束时间
         if(status.typeIsFinished()) {
-            executionFlow.setEndTime(BFDDateUtils.getSecs());
+            executionFlow.setEndTime(new Date());
         }
 
         return executionFlowMapper.update(executionFlow) > 0;
@@ -170,9 +168,8 @@ public class FlowDao extends BaseDao {
         executionFlow.setStatus(status);
         executionFlow.setWorker(worker);
 
-        // add by qifeng.dai, 如果结束了, 则应该设置结束时间
         if(status.typeIsFinished()) {
-            executionFlow.setEndTime(BFDDateUtils.getSecs());
+            executionFlow.setEndTime(new Date());
         }
 
         return executionFlowMapper.update(executionFlow) > 0;
@@ -263,8 +260,8 @@ public class FlowDao extends BaseDao {
         executionFlow.setProjectId(projectId);
         executionFlow.setFlowId(workflowId);
         executionFlow.setSubmitUser(projectFlow.getOwnerId());
-        executionFlow.setSubmitTime(BFDDateUtils.getSecs());
-        executionFlow.setStartTime(BFDDateUtils.getSecs());
+        executionFlow.setSubmitTime(new Date());
+        executionFlow.setStartTime(new Date());
         executionFlow.setType(FlowRunType.DIRECT_RUN);
         executionFlow.setStatus(FlowStatus.INIT);
         executionFlow.setWorkflowData(JsonUtil.toJsonString(flowDag));
@@ -285,7 +282,7 @@ public class FlowDao extends BaseDao {
      * @param runType
      * @return {@link ExecutionFlow}
      */
-    public ExecutionFlow scheduleFlowToExecution(Integer projectId, Integer workflowId, int submitUser, int scheduleTime, FlowRunType runType) {
+    public ExecutionFlow scheduleFlowToExecution(Integer projectId, Integer workflowId, int submitUser, Date scheduleTime, FlowRunType runType) {
         List<FlowNodeRelation> flowNodeRelations = flowNodeRelationMapper.selectByFlowId(workflowId); // 边信息
         List<FlowNode> flowNodes = flowNodeMapper.selectByFlowId(workflowId); // 节点信息
         ProjectFlow projectFlow = projectFlowMapper.findById(workflowId);
@@ -298,8 +295,8 @@ public class FlowDao extends BaseDao {
         executionFlow.setSubmitUser(submitUser);
         executionFlow.setProxyUser(projectFlow.getProxyUser());
         executionFlow.setScheduleTime(scheduleTime);
-        executionFlow.setSubmitTime(BFDDateUtils.getSecs());
-        executionFlow.setStartTime(BFDDateUtils.getSecs());
+        executionFlow.setSubmitTime(new Date());
+        executionFlow.setStartTime(new Date());
         executionFlow.setType(runType);
         executionFlow.setStatus(FlowStatus.INIT);
         executionFlow.setWorkflowData(JsonUtil.toJsonString(flowDag));
@@ -318,9 +315,8 @@ public class FlowDao extends BaseDao {
         ProjectFlow projectFlow = new ProjectFlow();
 
         projectFlow.setName(name);
-        int unixTimestamp = BFDDateUtils.getSecs();
-        projectFlow.setCreateTime(unixTimestamp);
-        projectFlow.setModifyTime(unixTimestamp);
+        projectFlow.setCreateTime(new Date());
+        projectFlow.setModifyTime(new Date());
         projectFlow.setOwnerId(userId);
         projectFlow.setLastModifyBy(userId);
         projectFlow.setProjectId(projectId);
@@ -395,16 +391,16 @@ public class FlowDao extends BaseDao {
             schedule.setMaxTryTimes(2);
             schedule.setFailurePolicy(FailurePolicyType.CONTINUE);
 
-            int unixTimestamp = BFDDateUtils.getSecs();
-            schedule.setCreateTime(unixTimestamp);
-            schedule.setModifyTime(unixTimestamp);
+            Date now = new Date();
+            schedule.setCreateTime(now);
+            schedule.setModifyTime(now);
 
             // 调度时间
             ScheduleMeta meta = new ScheduleMeta();
             meta.setType(ScheduleType.DAY);
-            meta.setStartDate(unixTimestamp);
-            schedule.setStartDate(unixTimestamp);
-            int endDate = BFDDateUtils.getSecs(BFDDateUtils.parse("2099-12-31 00:00:00"));
+            meta.setStartDate(now);
+            schedule.setStartDate(now);
+            Date endDate = BFDDateUtils.parse("2099-12-31 00:00:00");
             meta.setEndDate(endDate);
             schedule.setEndDate(endDate);
             int startTime = BFDDateUtils.getSecs(BFDDateUtils.parse(time, Constants.BASE_TIME_FORMAT));
@@ -422,7 +418,7 @@ public class FlowDao extends BaseDao {
             schedule.setCrontabStr(JsonUtil.toJsonString(meta));
 
             schedule.setLastModifyBy(userId);
-            schedule.setModifyTime(BFDDateUtils.getSecs());
+            schedule.setModifyTime(new Date());
             int count = scheduleMapper.update(schedule);
             if (count <= 0) {
                 throw new Exception("更新失败");

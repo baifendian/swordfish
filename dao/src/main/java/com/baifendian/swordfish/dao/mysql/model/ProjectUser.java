@@ -27,12 +27,12 @@ import java.util.Date;
 public class ProjectUser {
     private int projectId;
     private int userId;
-    private int createTime;
+    private Date createTime;
 
     public ProjectUser() {
     }
 
-    public ProjectUser(int projectId, int userId, int createTime) {
+    public ProjectUser(int projectId, int userId, Date createTime) {
         this.projectId = projectId;
         this.userId = userId;
         this.createTime = createTime;
@@ -40,7 +40,7 @@ public class ProjectUser {
     public ProjectUser(int projectId, int userId) {
         this.projectId = projectId;
         this.userId = userId;
-        this.createTime = BFDDateUtils.getSecs();
+        this.createTime = new Date();
     }
 
     public int getProjectId() {
@@ -59,11 +59,11 @@ public class ProjectUser {
         this.userId = userId;
     }
 
-    public int getCreateTime() {
+    public Date getCreateTime() {
         return createTime;
     }
 
-    public void setCreateTime(int createTime) {
+    public void setCreateTime(Date createTime) {
         this.createTime = createTime;
     }
 }

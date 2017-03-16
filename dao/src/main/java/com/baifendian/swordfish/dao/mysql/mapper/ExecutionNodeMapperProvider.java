@@ -67,7 +67,7 @@ public class ExecutionNodeMapperProvider {
         return new SQL() {
             {
                 UPDATE(TABLE_NAME);
-                if (executionNode.getEndTime() != 0) {
+                if (executionNode.getEndTime() != null) {
                     SET("end_time = #{executionNode.endTime}");
                 }
                 if (executionNode.getAppsId() != null) {
