@@ -7,10 +7,12 @@ CREATE TABLE `user` (
   `phone` varchar(20) DEFAULT NULL COMMENT 'user phone number',
   `password` varchar(32) NOT NULL COMMENT 'user password for login, md5-value',
   `role` tinyint(4) NOT NULL COMMENT '0 means administrator, others means normal user',
+  `proxy_users` text DEFAULT NULL COMMENT 'allow proxy user list',
   `create_time` datetime NOT NULL COMMENT 'create time of user',
   `modify_time` datetime NOT NULL COMMENT 'last modify time of user information',
   PRIMARY KEY (`id`),
-  UNIQUE KEY `name` (`name`)
+  UNIQUE KEY `name` (`name`),
+  UNIQUE KEY `email` (`email`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- Create a admin user, password is '123456'

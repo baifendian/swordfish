@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.baifendian.swordfish.dao.mysql.mapper;
 
 import com.baifendian.swordfish.dao.mysql.model.Session;
@@ -21,32 +20,63 @@ import org.apache.ibatis.annotations.*;
 import org.apache.ibatis.type.JdbcType;
 import org.mybatis.spring.annotation.MapperScan;
 
+import java.sql.Timestamp;
 import java.util.Date;
 
 /**
- * Created by caojingwei on 16/8/19.
+ * author: smile8
+ * date:   2017/3/16
+ * desc:   session 操作接口
  */
 @MapperScan
 public interface SessionMapper {
-    @Results(value = {
-            @Result(property = "id", column = "id", id = true,javaType = String.class,jdbcType = JdbcType.VARCHAR),
-            @Result(property = "userId", column = "user_id",javaType = int.class,jdbcType = JdbcType.INTEGER),
-            @Result(property = "ip", column = "ip",javaType = String.class,jdbcType = JdbcType.VARCHAR),
-            @Result(property = "startTime", column = "start_time",javaType = int.class,jdbcType = JdbcType.INTEGER),
-            @Result(property = "endTime", column = "end_time",javaType = int.class,jdbcType = JdbcType.INTEGER),
-            @Result(property = "isRemember", column = "is_remember",javaType = Boolean.class,jdbcType = JdbcType.BOOLEAN),
-    })
-    @SelectProvider(type = SessionMapperSQL.class, method = "findById")
-    Session findById(@Param("sessionId") String sessionId);
 
+  /**
+   * 根据 session id 进行查询
+   *
+   * @param sessionId
+   * @return
+   */
+  @Results(value = {
+      @Result(property = "id", column = "id", id = true, javaType = String.class, jdbcType = JdbcType.VARCHAR),
+      @Result(property = "userId", column = "user_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
+      @Result(property = "ip", column = "ip", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+      @Result(property = "lastLoginTime", column = "last_login_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE)
+  })
+  @SelectProvider(type = SessionMapperProvider.class, method = "queryById")
+  Session queryById(@Param("sessionId") String sessionId);
 
-    @InsertProvider(type = SessionMapperSQL.class, method = "insert")
-    int insert(@Param("session") Session session);
+  /**
+   * 插入一个 session 数据
+   *
+   * @param session
+   * @return
+   */
+  @InsertProvider(type = SessionMapperProvider.class, method = "insert")
+  int insert(@Param("session") Session session);
 
-    @SelectProvider(type = SessionMapperSQL.class, method = "delete")
-    void delete(@Param("sessionId") String sessionId, @Param("endTime") int endTime);
+  /**
+   * 删除指定的 session 数据
+   *
+   * @param sessionId
+   */
+  @SelectProvider(type = SessionMapperProvider.class, method = "deleteById")
+  void deleteById(@Param("sessionId") String sessionId);
 
-    @UpdateProvider(type = SessionMapperSQL.class, method = "update")
-    int update(@Param("sessionId") String sessionId, @Param("endTime") Date endTime, @Param("startTime") Date startTime);
+  /**
+   * 删除过期的 session
+   *
+   * @param expireTime
+   */
+  @SelectProvider(type = SessionMapperProvider.class, method = "deleteByExpireTime")
+  void deleteByExpireTime(@Param("expireTime") Date expireTime);
 
+  /**
+   * 更新 session 的最后登陆时间
+   *
+   * @param sessionId
+   * @return
+   */
+  @UpdateProvider(type = SessionMapperProvider.class, method = "update")
+  int update(@Param("sessionId") String sessionId, @Param("loginTime") Date loginTime);
 }

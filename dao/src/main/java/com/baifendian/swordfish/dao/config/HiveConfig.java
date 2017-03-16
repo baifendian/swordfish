@@ -25,7 +25,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 
 @Configuration
-@PropertySource({"classpath:common/hive/hive.properties"})
+@PropertySource({"classpath:dao/hive/hive.properties"})
 public class HiveConfig {
 
   @Value("${hive.metastore.uris}")

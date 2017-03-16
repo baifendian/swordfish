@@ -13,104 +13,66 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.baifendian.swordfish.dao.mysql.model;
-
-import com.baifendian.swordfish.common.utils.json.DateSerializer;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import java.util.Date;
 
 /**
- * Created by caojingwei on 16/8/19.
+ * author: smile8
+ * date:   2017/3/16
+ * desc:   用户 session 信息
  */
-public class Session/* implements Serializable */ {
-    private String id;
+public class Session {
+  private String id;
 
-    private String ip;
+  private int userId;
 
-    private Date startTime;
+  private String ip;
 
-    private Date endTime;
+  private Date lastLoginTime;
 
-    private boolean isRemember;
+  public Session() {
+  }
 
-    private User user;
+  public String getId() {
+    return id;
+  }
 
-    public Session() {
-    }
+  public void setId(String id) {
+    this.id = id;
+  }
 
-    public Session(String id, String ip, Date startTime, Date endTime, boolean isRemember, User user) {
-        this.id = id;
-        this.ip = ip;
-        this.startTime = startTime;
-        this.endTime = endTime;
-        this.isRemember = isRemember;
-        this.user = user;
-    }
+  public int getUserId() {
+    return userId;
+  }
 
-    public String getId() {
-        return id;
-    }
+  public void setUserId(int userId) {
+    this.userId = userId;
+  }
 
-    public void setId(String id) {
-        this.id = id;
-    }
+  public String getIp() {
+    return ip;
+  }
 
-    public int getUserId() {
-        return user.getId();
-    }
+  public void setIp(String ip) {
+    this.ip = ip;
+  }
 
-    public String getIp() {
-        return ip;
-    }
+  public Date getLastLoginTime() {
+    return lastLoginTime;
+  }
 
-    public void setIp(String ip) {
-        this.ip = ip;
-    }
+  public void setLastLoginTime(Date lastLoginTime) {
+    this.lastLoginTime = lastLoginTime;
+  }
 
-    @JsonSerialize(using = DateSerializer.class)
-    public Date getStartTime() {
-        return startTime;
-    }
-
-    public void setStartTime(Date startTime) {
-        this.startTime = startTime;
-    }
-
-    @JsonSerialize(using = DateSerializer.class)
-    public Date getEndTime() {
-        return endTime;
-    }
-
-    public void setEndTime(Date endTime) {
-        this.endTime = endTime;
-    }
-
-    public boolean isRemember() {
-        return isRemember;
-    }
-
-    public void setRemember(boolean remember) {
-        isRemember = remember;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public Integer getTenantId(){
-        return user.getTenantId();
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
-
-    @Override
-    public String toString() {
-        return "Session [id=" + id + ", ip=" + ip + ", startTime=" + startTime + ", endTime=" + endTime + ", isRemember=" + isRemember + ", user=" + user
-               + "]";
-    }
-
+  @Override
+  public String toString() {
+    return "Session{" +
+        "id='" + id + '\'' +
+        ", userId=" + userId +
+        ", ip='" + ip + '\'' +
+        ", lastLoginTime=" + lastLoginTime +
+        '}';
+  }
 }
