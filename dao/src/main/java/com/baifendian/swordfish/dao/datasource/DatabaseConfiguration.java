@@ -98,4 +98,6 @@ public class DatabaseConfiguration {
   public PlatformTransactionManager transactionManager() throws SQLException {
     return new DataSourceTransactionManager(dataSource());
   }
+
+
 }
