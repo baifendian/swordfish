@@ -14,18 +14,18 @@
  * limitations under the License.
  */
 
-package com.baifendian.swordfish.dao.mail;
+package com.baifendian.swordfish.execserver.utils.mail;
 
 import com.baifendian.swordfish.common.mail.MailSendUtil;
 import com.baifendian.swordfish.dao.BaseDao;
+import com.baifendian.swordfish.dao.datasource.ConnectionFactory;
 import com.baifendian.swordfish.dao.mysql.MyBatisSqlSessionFactoryUtil;
-import com.baifendian.swordfish.dao.mysql.mapper.ProjectFlowMapper;
-import com.baifendian.swordfish.dao.mysql.mapper.ProjectMapper;
-import com.baifendian.swordfish.dao.mysql.mapper.ProjectUserMapper;
-import com.baifendian.swordfish.dao.mysql.mapper.UserMapper;
-import com.baifendian.swordfish.dao.mysql.model.Project;
-import com.baifendian.swordfish.dao.mysql.model.ProjectFlow;
-import com.baifendian.swordfish.dao.mysql.model.User;
+import com.baifendian.swordfish.dao.mapper.ProjectFlowMapper;
+import com.baifendian.swordfish.dao.mapper.ProjectMapper;
+import com.baifendian.swordfish.dao.mapper.ProjectUserMapper;
+import com.baifendian.swordfish.dao.mapper.UserMapper;
+import com.baifendian.swordfish.dao.model.ProjectFlow;
+import com.baifendian.swordfish.dao.model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,11 +54,10 @@ public class MailSendService extends BaseDao{
   
   @Override
   protected void init() {
-	 userMapper = MyBatisSqlSessionFactoryUtil.getSqlSession().getMapper(UserMapper.class);
-	 projectUserMapper = MyBatisSqlSessionFactoryUtil.getSqlSession().getMapper(ProjectUserMapper.class);
-     projectFlowMapper = MyBatisSqlSessionFactoryUtil.getSqlSession().getMapper(ProjectFlowMapper.class);
-	 projectMapper = MyBatisSqlSessionFactoryUtil.getSqlSession().getMapper(ProjectMapper.class);
-
+	 userMapper = ConnectionFactory.getSqlSessionFactory().openSession().getMapper(UserMapper.class);
+	 projectUserMapper = ConnectionFactory.getSqlSessionFactory().openSession().getMapper(ProjectUserMapper.class);
+     projectFlowMapper = ConnectionFactory.getSqlSessionFactory().openSession().getMapper(ProjectFlowMapper.class);
+	 projectMapper = ConnectionFactory.getSqlSessionFactory().openSession().getMapper(ProjectMapper.class);
   }
 
   /**

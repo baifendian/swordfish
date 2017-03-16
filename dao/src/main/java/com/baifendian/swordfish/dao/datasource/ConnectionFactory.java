@@ -99,7 +99,7 @@ public class ConnectionFactory {
 
           Configuration configuration = new Configuration(environment);
           configuration.setLazyLoadingEnabled(true);
-          configuration.addMappers("com.baifendian.mapper");
+          configuration.addMappers("com.baifendian.swordfish.dao.mapper");
 
           SqlSessionFactoryBuilder builder = new SqlSessionFactoryBuilder();
           sqlSessionFactory = builder.build(configuration);

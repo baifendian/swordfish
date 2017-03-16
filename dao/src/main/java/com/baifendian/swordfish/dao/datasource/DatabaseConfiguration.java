@@ -19,6 +19,8 @@ import com.alibaba.druid.pool.DruidDataSource;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.SqlSessionFactoryBean;
 import org.mybatis.spring.annotation.MapperScan;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.ApplicationContextException;
@@ -44,19 +46,25 @@ import java.util.Arrays;
 @ConfigurationProperties(prefix = "spring.datasource")
 @PropertySource({"classpath:dao/data_source.properties"})
 @EnableTransactionManagement
-@MapperScan(basePackages = "com.baifendian.mapper", sqlSessionFactoryRef = "SqlSessionFactory")
+@MapperScan(basePackages = "com.baifendian.swordfish.dao.mapper", sqlSessionFactoryRef = "SqlSessionFactory")
 public class DatabaseConfiguration {
+  private static Logger logger = LoggerFactory.getLogger(DatabaseConfiguration.class.getName());
+
   @Autowired
   private Environment env;
 
-  // 注册 dataSource
+  /**
+   * 注册数据源
+   *
+   * @return
+   * @throws SQLException
+   */
   @Primary
   @Bean(name = "DataSource", initMethod = "init", destroyMethod = "close")
   public DruidDataSource dataSource() throws SQLException {
     if (StringUtils.isEmpty(env.getProperty("url"))) {
-      System.out.println("Your database connection pool configuration is incorrect!"
-          + " Please check your Spring profile, current profiles are:"
-          + Arrays.toString(env.getActiveProfiles()));
+      logger.error("Your database connection pool configuration is incorrect! Please check your Spring profile, " +
+          "current profiles are: {}", Arrays.toString(env.getActiveProfiles()));
       throw new ApplicationContextException(
           "Database connection pool is not configured correctly");
     }
@@ -98,6 +106,4 @@ public class DatabaseConfiguration {
   public PlatformTransactionManager transactionManager() throws SQLException {
     return new DataSourceTransactionManager(dataSource());
   }
-
-
 }

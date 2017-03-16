@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-package com.baifendian.swordfish.dao.mail;
+package com.baifendian.swordfish.execserver.utils.mail;
 
 import com.baifendian.swordfish.common.utils.BFDDateUtils;
 import com.baifendian.swordfish.dao.DaoFactory;
-import com.baifendian.swordfish.dao.mysql.enums.FlowRunType;
+import com.baifendian.swordfish.dao.enums.FlowRunType;
 import com.baifendian.swordfish.common.job.FlowStatus;
-import com.baifendian.swordfish.dao.mysql.enums.FlowType;
-import com.baifendian.swordfish.dao.mysql.model.ExecutionFlow;
-import com.baifendian.swordfish.dao.mysql.model.ProjectFlow;
+import com.baifendian.swordfish.dao.enums.FlowType;
+import com.baifendian.swordfish.dao.model.ExecutionFlow;
+import com.baifendian.swordfish.dao.model.ProjectFlow;
 
 import java.text.MessageFormat;
 import java.util.Date;
