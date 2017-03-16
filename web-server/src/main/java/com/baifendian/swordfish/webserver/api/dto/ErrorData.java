@@ -16,10 +16,14 @@
 package com.baifendian.swordfish.webserver.api.dto;
 
 public class ErrorData extends BaseData {
+  public enum Code {
+    PARAM_NOT_VALID
+  }
+
   /**
    * 编码信息
    */
-  private int code;
+  private Code code;
 
   /**
    * 错误消息
@@ -30,16 +34,16 @@ public class ErrorData extends BaseData {
 
   }
 
-  public ErrorData(int code, String message) {
+  public ErrorData(Code code, String message) {
     this.code = code;
     this.message = message;
   }
 
-  public int getCode() {
+  public Code getCode() {
     return code;
   }
 
-  public void setCode(int code) {
+  public void setCode(Code code) {
     this.code = code;
   }
 
