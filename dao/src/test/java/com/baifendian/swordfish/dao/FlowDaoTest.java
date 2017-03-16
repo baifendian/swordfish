@@ -17,8 +17,8 @@
 package com.baifendian.swordfish.dao;
 
 import com.baifendian.swordfish.common.job.FlowStatus;
-import com.baifendian.swordfish.dao.mysql.model.ExecutionFlow;
-import com.baifendian.swordfish.dao.mysql.model.ExecutionNode;
+import com.baifendian.swordfish.dao.model.ExecutionFlow;
+import com.baifendian.swordfish.dao.model.ExecutionNode;
 import org.junit.Before;
 import org.junit.Test;
 

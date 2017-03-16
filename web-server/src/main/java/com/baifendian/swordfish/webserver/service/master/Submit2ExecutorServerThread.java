@@ -18,7 +18,7 @@ package com.baifendian.swordfish.webserver.service.master;
 
 import com.baifendian.swordfish.dao.FlowDao;
 import com.baifendian.swordfish.common.job.FlowStatus;
-import com.baifendian.swordfish.dao.mysql.model.ExecutionFlow;
+import com.baifendian.swordfish.dao.model.ExecutionFlow;
 import com.baifendian.swordfish.rpc.WorkerService;
 import com.baifendian.swordfish.webserver.ExecutorClient;
 import com.baifendian.swordfish.webserver.ExecutorServerInfo;

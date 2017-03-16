@@ -16,10 +16,9 @@
 
 package com.baifendian.swordfish.dao;
 
-import com.baifendian.swordfish.common.utils.BFDDateUtils;
-import com.baifendian.swordfish.dao.mysql.MyBatisSqlSessionFactoryUtil;
-import com.baifendian.swordfish.dao.mysql.mapper.MasterServerMapper;
-import com.baifendian.swordfish.dao.mysql.model.MasterServer;
+import com.baifendian.swordfish.dao.datasource.ConnectionFactory;
+import com.baifendian.swordfish.dao.mapper.MasterServerMapper;
+import com.baifendian.swordfish.dao.model.MasterServer;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Date;
@@ -33,10 +32,9 @@ public class MasterDao extends BaseDao{
     @Autowired
     MasterServerMapper masterServerMapper;
 
-
     @Override
     protected void init() {
-        masterServerMapper = MyBatisSqlSessionFactoryUtil.getSqlSession().getMapper(MasterServerMapper.class);
+        masterServerMapper = ConnectionFactory.getSqlSessionFactory().openSession().getMapper(MasterServerMapper.class);
     }
 
     public MasterServer getMasterServer(){

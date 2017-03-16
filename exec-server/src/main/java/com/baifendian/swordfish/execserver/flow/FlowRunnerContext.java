@@ -16,9 +16,9 @@
 
 package com.baifendian.swordfish.execserver.flow;
 
-import com.baifendian.swordfish.dao.mysql.enums.FailurePolicyType;
-import com.baifendian.swordfish.dao.mysql.model.ExecutionFlow;
-import com.baifendian.swordfish.dao.mysql.model.Schedule;
+import com.baifendian.swordfish.dao.enums.FailurePolicyType;
+import com.baifendian.swordfish.dao.model.ExecutionFlow;
+import com.baifendian.swordfish.dao.model.Schedule;
 
 import java.util.Map;
 import java.util.concurrent.ExecutorService;

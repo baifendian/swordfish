@@ -18,7 +18,6 @@ package com.baifendian.swordfish.dao.model;
 
 
 import com.baifendian.swordfish.dao.enums.*;
-import com.baifendian.swordfish.dao.mysql.enums.*;
 
 import java.util.Date;
 

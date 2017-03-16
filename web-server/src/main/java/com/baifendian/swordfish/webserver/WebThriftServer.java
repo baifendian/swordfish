@@ -18,7 +18,7 @@ package com.baifendian.swordfish.webserver;
 
 import com.baifendian.swordfish.dao.DaoFactory;
 import com.baifendian.swordfish.dao.MasterDao;
-import com.baifendian.swordfish.dao.mysql.model.MasterServer;
+import com.baifendian.swordfish.dao.model.MasterServer;
 import com.baifendian.swordfish.execserver.service.ExecServiceImpl;
 import com.baifendian.swordfish.rpc.MasterService;
 import com.baifendian.swordfish.rpc.WorkerService;

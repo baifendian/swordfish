@@ -17,7 +17,7 @@
 package com.baifendian.swordfish.execserver.job.spark;
 
 import com.baifendian.swordfish.common.utils.CommonUtil;
-import com.baifendian.swordfish.dao.mysql.model.flow.params.Property;
+import com.baifendian.swordfish.dao.model.flow.params.Property;
 import com.baifendian.swordfish.execserver.job.ResourceInfo;
 import org.apache.commons.lang.StringUtils;
 

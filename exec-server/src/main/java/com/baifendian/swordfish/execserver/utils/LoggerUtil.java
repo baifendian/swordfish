@@ -16,7 +16,7 @@
 
 package com.baifendian.swordfish.execserver.utils;
 
-import com.baifendian.swordfish.dao.mysql.enums.FlowType;
+import com.baifendian.swordfish.dao.enums.FlowType;
 
 /**
  * 日志记录工具类

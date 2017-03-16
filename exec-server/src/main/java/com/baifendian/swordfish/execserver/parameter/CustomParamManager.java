@@ -17,13 +17,13 @@
 package com.baifendian.swordfish.execserver.parameter;
 
 import com.baifendian.swordfish.common.utils.TimePlaceholderUtil;
-import com.baifendian.swordfish.dao.mysql.MyBatisSqlSessionFactoryUtil;
-import com.baifendian.swordfish.dao.mysql.mapper.FlowParamMapper;
-import com.baifendian.swordfish.dao.mysql.mapper.ProjectFlowMapper;
-import com.baifendian.swordfish.dao.mysql.model.ExecutionFlow;
-import com.baifendian.swordfish.dao.mysql.model.FlowParam;
-import com.baifendian.swordfish.dao.mysql.model.Project;
-import com.baifendian.swordfish.dao.mysql.model.ProjectFlow;
+import com.baifendian.swordfish.dao.datasource.ConnectionFactory;
+import com.baifendian.swordfish.dao.mapper.FlowParamMapper;
+import com.baifendian.swordfish.dao.mapper.ProjectFlowMapper;
+import com.baifendian.swordfish.dao.model.ExecutionFlow;
+import com.baifendian.swordfish.dao.model.FlowParam;
+import com.baifendian.swordfish.dao.model.Project;
+import com.baifendian.swordfish.dao.model.ProjectFlow;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateUtils;
 import org.slf4j.Logger;
@@ -45,7 +45,7 @@ public class CustomParamManager {
     private static final Logger LOGGER = LoggerFactory.getLogger(CustomParamManager.class);
 
     /** {@link ProjectFlowMapper} */
-    private static final ProjectFlowMapper projectFlowMapper= MyBatisSqlSessionFactoryUtil.getSqlSession().getMapper(ProjectFlowMapper.class);
+    private static final ProjectFlowMapper projectFlowMapper= ConnectionFactory.getSqlSessionFactory().openSession().getMapper(ProjectFlowMapper.class);
 
     /**
      * 构建自定义参数值

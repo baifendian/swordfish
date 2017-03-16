@@ -16,7 +16,7 @@
 
 package com.baifendian.swordfish.execserver.utils;
 
-import com.baifendian.swordfish.dao.mysql.model.flow.params.Property;
+import com.baifendian.swordfish.dao.model.flow.params.Property;
 
 import java.util.ArrayList;
 import java.util.List;

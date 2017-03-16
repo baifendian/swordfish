@@ -17,7 +17,7 @@
 package com.baifendian.swordfish.webserver.service.master;
 
 import com.baifendian.swordfish.dao.FlowDao;
-import com.baifendian.swordfish.dao.mysql.model.ExecutionFlow;
+import com.baifendian.swordfish.dao.model.ExecutionFlow;
 import com.baifendian.swordfish.webserver.ExecutorServerInfo;
 import com.baifendian.swordfish.webserver.ExecutorServerManager;
 import org.slf4j.Logger;

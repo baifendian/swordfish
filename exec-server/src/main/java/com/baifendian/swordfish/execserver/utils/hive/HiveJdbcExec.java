@@ -19,11 +19,11 @@ package com.baifendian.swordfish.execserver.utils.hive;
 import com.baifendian.swordfish.common.hive.ConnectionInfo;
 import com.baifendian.swordfish.common.hive.HiveConnectionClient;
 import com.baifendian.swordfish.dao.BaseDao;
+import com.baifendian.swordfish.dao.datasource.ConnectionFactory;
 import com.baifendian.swordfish.dao.exception.DaoSemanticException;
 import com.baifendian.swordfish.dao.exception.SqlException;
 import com.baifendian.swordfish.common.job.ExecResult;
-import com.baifendian.swordfish.dao.mysql.MyBatisSqlSessionFactoryUtil;
-import com.baifendian.swordfish.dao.mysql.mapper.*;
+import com.baifendian.swordfish.dao.mapper.*;
 import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.hive.ql.parse.ASTNode;
 import org.apache.hadoop.hive.ql.parse.ParseDriver;
@@ -86,7 +86,7 @@ public class HiveJdbcExec extends BaseDao {
     public void init() {
         hiveConfig = MyHiveFactoryUtil.getInstance();
         hiveConnectionClient = hiveConfig.hiveConnectionClient();
-        userMapper = MyBatisSqlSessionFactoryUtil.getSqlSession().getMapper(UserMapper.class);
+        userMapper = ConnectionFactory.getSqlSessionFactory().openSession().getMapper(UserMapper.class);
     }
 
     public HiveConnectionClient getHiveConnectionClient() {

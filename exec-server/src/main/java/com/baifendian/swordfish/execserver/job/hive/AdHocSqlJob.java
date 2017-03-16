@@ -20,10 +20,10 @@ import com.baifendian.swordfish.common.job.ExecResult;
 import com.baifendian.swordfish.common.job.JobProps;
 import com.baifendian.swordfish.common.utils.CommonUtil;
 import com.baifendian.swordfish.common.utils.json.JsonUtil;
-import com.baifendian.swordfish.dao.mysql.MyBatisSqlSessionFactoryUtil;
-import com.baifendian.swordfish.dao.mysql.mapper.AdHocResultMapper;
-import com.baifendian.swordfish.dao.mysql.model.AdHocJsonObject;
-import com.baifendian.swordfish.dao.mysql.model.AdHocResult;
+import com.baifendian.swordfish.dao.datasource.ConnectionFactory;
+import com.baifendian.swordfish.dao.mapper.AdHocResultMapper;
+import com.baifendian.swordfish.dao.model.AdHocJsonObject;
+import com.baifendian.swordfish.dao.model.AdHocResult;
 import com.baifendian.swordfish.execserver.parameter.ParamHelper;
 import org.slf4j.Logger;
 
@@ -40,7 +40,7 @@ public class AdHocSqlJob extends EtlSqlJob {
 
     public AdHocSqlJob(String jobId, JobProps props, Logger logger) throws IOException {
         super(jobId, props, logger);
-        adHocResultMapper = MyBatisSqlSessionFactoryUtil.getSqlSession().getMapper(AdHocResultMapper.class);
+        adHocResultMapper = ConnectionFactory.getSqlSessionFactory().openSession().getMapper(AdHocResultMapper.class);
     }
 
     @Override

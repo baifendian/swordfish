@@ -16,7 +16,7 @@
 
 package com.baifendian.swordfish.webserver;
 
-import com.baifendian.swordfish.dao.mysql.enums.FlowType;
+import com.baifendian.swordfish.dao.enums.FlowType;
 import com.baifendian.swordfish.execserver.MasterClient;
 import com.baifendian.swordfish.rpc.ScheduleInfo;
 

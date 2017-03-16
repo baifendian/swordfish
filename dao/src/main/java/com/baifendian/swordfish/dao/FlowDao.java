@@ -20,12 +20,13 @@ import com.baifendian.swordfish.common.consts.Constants;
 import com.baifendian.swordfish.common.job.FlowStatus;
 import com.baifendian.swordfish.common.utils.BFDDateUtils;
 import com.baifendian.swordfish.common.utils.json.JsonUtil;
-import com.baifendian.swordfish.dao.mysql.MyBatisSqlSessionFactoryUtil;
-import com.baifendian.swordfish.dao.mysql.enums.*;
-import com.baifendian.swordfish.dao.mysql.mapper.*;
-import com.baifendian.swordfish.dao.mysql.model.*;
-import com.baifendian.swordfish.dao.mysql.model.flow.FlowDag;
-import com.baifendian.swordfish.dao.mysql.model.flow.ScheduleMeta;
+import com.baifendian.swordfish.dao.datasource.ConnectionFactory;
+import com.baifendian.swordfish.dao.enums.*;
+import com.baifendian.swordfish.dao.mapper.*;
+import com.baifendian.swordfish.dao.model.*;
+import com.baifendian.swordfish.dao.model.flow.FlowDag;
+import com.baifendian.swordfish.dao.model.flow.ScheduleMeta;
+import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -43,6 +44,8 @@ import java.util.List;
  */
 @Component
 public class FlowDao extends BaseDao {
+
+    private SqlSession sqlSession;
 
     @Autowired
     private ExecutionFlowMapper executionFlowMapper;
@@ -73,14 +76,15 @@ public class FlowDao extends BaseDao {
 
     @Override
     protected void init() {
-        executionFlowMapper = MyBatisSqlSessionFactoryUtil.getSqlSession().getMapper(ExecutionFlowMapper.class);
-        projectFlowMapper = MyBatisSqlSessionFactoryUtil.getSqlSession().getMapper(ProjectFlowMapper.class);
-        flowNodeMapper = MyBatisSqlSessionFactoryUtil.getSqlSession().getMapper(FlowNodeMapper.class);
-        flowNodeRelationMapper = MyBatisSqlSessionFactoryUtil.getSqlSession().getMapper(FlowNodeRelationMapper.class);
-        scheduleMapper = MyBatisSqlSessionFactoryUtil.getSqlSession().getMapper(ScheduleMapper.class);
-        executionNodeMapper = MyBatisSqlSessionFactoryUtil.getSqlSession().getMapper(ExecutionNodeMapper.class);
-        execNodeLogMapper = MyBatisSqlSessionFactoryUtil.getSqlSession().getMapper(ExecNodeLogMapper.class);
-        resourceMapper = MyBatisSqlSessionFactoryUtil.getSqlSession().getMapper(ResourceMapper.class);
+        sqlSession = ConnectionFactory.getSqlSessionFactory().openSession();
+        executionFlowMapper = sqlSession.getMapper(ExecutionFlowMapper.class);
+        projectFlowMapper = sqlSession.getMapper(ProjectFlowMapper.class);
+        flowNodeMapper = sqlSession.getMapper(FlowNodeMapper.class);
+        flowNodeRelationMapper = sqlSession.getMapper(FlowNodeRelationMapper.class);
+        scheduleMapper = sqlSession.getMapper(ScheduleMapper.class);
+        executionNodeMapper = sqlSession.getMapper(ExecutionNodeMapper.class);
+        execNodeLogMapper = sqlSession.getMapper(ExecNodeLogMapper.class);
+        resourceMapper = sqlSession.getMapper(ResourceMapper.class);
         //etlAutoGen = new EtlAutoGen();
     }
 

@@ -19,14 +19,14 @@ package com.baifendian.swordfish.execserver.flow;
 import com.baifendian.swordfish.common.job.exception.ExecException;
 import com.baifendian.swordfish.dao.DaoFactory;
 import com.baifendian.swordfish.dao.FlowDao;
-import com.baifendian.swordfish.dao.mysql.MyBatisSqlSessionFactoryUtil;
-import com.baifendian.swordfish.dao.mysql.enums.FailurePolicyType;
+import com.baifendian.swordfish.dao.datasource.ConnectionFactory;
+import com.baifendian.swordfish.dao.enums.FailurePolicyType;
 import com.baifendian.swordfish.common.job.FlowStatus;
-import com.baifendian.swordfish.dao.mysql.enums.FlowType;
-import com.baifendian.swordfish.dao.mysql.mapper.ExecutionNodeMapper;
-import com.baifendian.swordfish.dao.mysql.model.ExecutionFlow;
-import com.baifendian.swordfish.dao.mysql.model.ExecutionNode;
-import com.baifendian.swordfish.dao.mysql.model.Schedule;
+import com.baifendian.swordfish.dao.enums.FlowType;
+import com.baifendian.swordfish.dao.mapper.ExecutionNodeMapper;
+import com.baifendian.swordfish.dao.model.ExecutionFlow;
+import com.baifendian.swordfish.dao.model.ExecutionNode;
+import com.baifendian.swordfish.dao.model.Schedule;
 import com.baifendian.swordfish.execserver.parameter.CustomParamManager;
 import com.baifendian.swordfish.execserver.parameter.SystemParamManager;
 import com.bfd.harpc.monitor.NamedThreadFactory;
@@ -86,7 +86,7 @@ public class FlowRunnerManager {
      */
     public FlowRunnerManager() {
         this.flowDao = DaoFactory.getDaoInstance(FlowDao.class);
-        this.executionNodeMapper = MyBatisSqlSessionFactoryUtil.getSqlSession().getMapper(ExecutionNodeMapper.class);
+        this.executionNodeMapper = ConnectionFactory.getSqlSessionFactory().openSession().getMapper(ExecutionNodeMapper.class);
 
         NamedThreadFactory flowThreadFactory = new NamedThreadFactory("Exec-Worker-FlowRunner");
         flowExecutorService = Executors.newCachedThreadPool(flowThreadFactory);

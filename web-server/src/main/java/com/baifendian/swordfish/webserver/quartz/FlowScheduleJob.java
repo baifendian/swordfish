@@ -17,18 +17,14 @@
 package com.baifendian.swordfish.webserver.quartz;
 
 import com.baifendian.swordfish.common.job.FlowStatus;
-import com.baifendian.swordfish.common.utils.BFDDateUtils;
 import com.baifendian.swordfish.common.utils.json.JsonUtil;
 import com.baifendian.swordfish.dao.FlowDao;
-import com.baifendian.swordfish.dao.mysql.enums.*;
-import com.baifendian.swordfish.dao.mysql.model.ExecutionFlow;
-import com.baifendian.swordfish.dao.mysql.model.ProjectFlow;
-import com.baifendian.swordfish.dao.mysql.model.Schedule;
-import com.baifendian.swordfish.dao.mysql.model.flow.DepWorkflow;
-import com.baifendian.swordfish.rpc.WorkerService;
-import com.baifendian.swordfish.webserver.config.MasterConfig;
-import com.baifendian.swordfish.dao.mail.EmailManager;
-import com.bfd.harpc.RpcException;
+import com.baifendian.swordfish.dao.enums.*;
+import com.baifendian.swordfish.dao.model.ExecutionFlow;
+import com.baifendian.swordfish.dao.model.ProjectFlow;
+import com.baifendian.swordfish.dao.model.Schedule;
+import com.baifendian.swordfish.dao.model.flow.DepWorkflow;
+import com.baifendian.swordfish.execserver.utils.mail.EmailManager;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.BooleanUtils;
 import org.quartz.Job;

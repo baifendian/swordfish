@@ -16,7 +16,6 @@
 
 package com.baifendian.swordfish.execserver.utils.hadoop;
 
-import com.baifendian.swordfish.dao.mysql.MyBatisSqlSessionFactoryUtil;
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.slf4j.Logger;
@@ -38,7 +37,7 @@ import java.util.Properties;
  */
 public class ConfigurationUtil {
     /** LOGGER */
-    private static final Logger LOGGER = LoggerFactory.getLogger(MyBatisSqlSessionFactoryUtil.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ConfigurationUtil.class);
 
     /** {@link Configuration} */
     private static volatile Configuration configuration;
