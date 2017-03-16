@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.baifendian.swordfish.common.utils.graph;
 
 import org.apache.commons.collections4.CollectionUtils;
@@ -23,9 +22,8 @@ import org.slf4j.LoggerFactory;
 import java.util.*;
 
 /**
- * author: smile8
- * date:   09/09/2016
- * desc:   这里描述了一个图的结构, 图具有顶点和边, 顶点属性是 VD, 边的属性是 ED, 默认实现是考虑的普通的 "有向图结构"
+ * author: smile8 date:   09/09/2016 desc:   这里描述了一个图的结构, 图具有顶点和边, 顶点属性是 VD, 边的属性是 ED, 默认实现是考虑的普通的
+ * "有向图结构"
  */
 public class Graph<VD, ED> {
   private static final Logger LOG = LoggerFactory.getLogger(Graph.class);
@@ -53,9 +51,6 @@ public class Graph<VD, ED> {
 
   /**
    * 增加顶点信息
-   *
-   * @param id
-   * @param vertex
    */
   public synchronized void addVertex(int id, VD vertex) {
     vertices.put(id, vertex);
@@ -63,9 +58,6 @@ public class Graph<VD, ED> {
 
   /**
    * 增加顶点, 不存在则插入
-   *
-   * @param id
-   * @param vertex
    */
   public synchronized void addVertexIfAbsent(int id, VD vertex) {
     if (!containsVertex(id)) {
@@ -75,8 +67,6 @@ public class Graph<VD, ED> {
 
   /**
    * 删除顶点, 需要将关联的边也进行删除
-   *
-   * @param id
    */
   public synchronized void removeVertex(int id) {
     List<Map.Entry<Integer, Integer>> pairs = new ArrayList<>();
@@ -101,10 +91,6 @@ public class Graph<VD, ED> {
 
   /**
    * 属性没有值
-   *
-   * @param startId
-   * @param endId
-   * @return
    */
   public boolean addEdge(int startId, int endId) {
     return addEdge(startId, endId, false);
@@ -112,11 +98,6 @@ public class Graph<VD, ED> {
 
   /**
    * 属性没有值
-   *
-   * @param startId
-   * @param endId
-   * @param createVertex
-   * @return
    */
   public boolean addEdge(int startId, int endId, boolean createVertex) {
     return addEdge(startId, endId, null, createVertex);
@@ -124,11 +105,6 @@ public class Graph<VD, ED> {
 
   /**
    * 增加边, 注意, 边的起点和终点必须存在, 否则返回失败
-   *
-   * @param startId
-   * @param endId
-   * @param edge
-   * @return
    */
   public boolean addEdge(int startId, int endId, ED edge) {
     return addEdge(startId, endId, edge, false);
@@ -137,11 +113,7 @@ public class Graph<VD, ED> {
   /**
    * 增加边, 如果边的起始或终止结点不存在, 可以设置是否创建
    *
-   * @param startId
-   * @param endId
-   * @param edge
    * @param createVertex, true 表示创建, 否则表示不创建
-   * @return
    */
   public synchronized boolean addEdge(int startId, int endId, ED edge, boolean createVertex) {
     // 需要是否可以加入 startId, endId (普通的 Graph 不需要判断, DAG 需要判断)
@@ -157,11 +129,6 @@ public class Graph<VD, ED> {
 
   /**
    * 增加边, 不做顶点是否存在的检测, 以及不检测边是否是存在的
-   *
-   * @param startId
-   * @param endId
-   * @param edge
-   * @return
    */
   private synchronized void addEdgeNoCheck(int startId, int endId, ED edge) {
     addVertexIfAbsent(startId, null);
@@ -173,11 +140,6 @@ public class Graph<VD, ED> {
 
   /**
    * 增加边到具体的数据结构中
-   *
-   * @param startId
-   * @param endId
-   * @param edge
-   * @param edges
    */
   private synchronized void addEdge(int startId, int endId, ED edge, Map<Integer, Map<Integer, ED>> edges) {
     edges.putIfAbsent(startId, new HashMap<>());
@@ -187,9 +149,6 @@ public class Graph<VD, ED> {
 
   /**
    * 删除边
-   *
-   * @param startId
-   * @param endId
    */
   public synchronized void removeEdge(int startId, int endId) {
     removeEdge(startId, endId, edges);
@@ -198,10 +157,6 @@ public class Graph<VD, ED> {
 
   /**
    * 删除边
-   *
-   * @param startId
-   * @param endId
-   * @param edges
    */
   private synchronized void removeEdge(int startId, int endId, Map<Integer, Map<Integer, ED>> edges) {
     Map<Integer, ED> endEdges = edges.get(startId);
@@ -217,12 +172,7 @@ public class Graph<VD, ED> {
   }
 
   /**
-   * 强制刷新 endId 的前续结点, 该操作会删除所有以 endId 为终结点的边, 并增加 addStartIds.
-   * 我们不支持刷新后继结点信息, 是由于这个算法并不高效.
-   *
-   * @param addStartIds
-   * @param endId
-   * @return
+   * 强制刷新 endId 的前续结点, 该操作会删除所有以 endId 为终结点的边, 并增加 addStartIds. 我们不支持刷新后继结点信息, 是由于这个算法并不高效.
    */
   public boolean forceRefreshPreEdges(Collection<Integer> addStartIds,
                                       int endId) {
@@ -246,11 +196,6 @@ public class Graph<VD, ED> {
 
   /**
    * 一次性增加, 删除多条边, 顶点不存在则失败
-   *
-   * @param removeStartIds
-   * @param addStartIds
-   * @param endId
-   * @return
    */
   public boolean addRemoveMultiEdges(Collection<Integer> removeStartIds,
                                      Collection<Integer> addStartIds,
@@ -260,12 +205,6 @@ public class Graph<VD, ED> {
 
   /**
    * 一次性增加, 删除多条边, 顶点不存在可以选择创建
-   *
-   * @param removeStartIds
-   * @param addStartIds
-   * @param endId
-   * @param createVertex
-   * @return
    */
   public synchronized boolean addRemoveMultiEdges(Collection<Integer> removeStartIds,
                                                   Collection<Integer> addStartIds,
@@ -310,9 +249,6 @@ public class Graph<VD, ED> {
 
   /**
    * 是否包含顶点
-   *
-   * @param id
-   * @return
    */
   public synchronized boolean containsVertex(int id) {
     return vertices.containsKey(id);
@@ -320,9 +256,6 @@ public class Graph<VD, ED> {
 
   /**
    * 获取顶点属性
-   *
-   * @param id
-   * @return
    */
   public synchronized VD getVertex(int id) {
     return vertices.get(id);
@@ -330,8 +263,6 @@ public class Graph<VD, ED> {
 
   /**
    * 返回所有顶点
-   *
-   * @return
    */
   public Map<Integer, VD> getVertices() {
     return vertices;
@@ -339,10 +270,6 @@ public class Graph<VD, ED> {
 
   /**
    * 是否包含边
-   *
-   * @param startId
-   * @param endId
-   * @return
    */
   public synchronized boolean containsEdge(int startId, int endId) {
     Map<Integer, ED> endEdges = edges.get(startId);
@@ -355,8 +282,6 @@ public class Graph<VD, ED> {
 
   /**
    * 返回所有边
-   *
-   * @return
    */
   public Map<Integer, Map<Integer, ED>> getEdges() {
     return edges;
@@ -364,10 +289,6 @@ public class Graph<VD, ED> {
 
   /**
    * 获取边的属性
-   *
-   * @param startId
-   * @param endId
-   * @return
    */
   public synchronized ED getEdge(int startId, int endId) {
     Map<Integer, ED> endEdges = edges.get(startId);
@@ -381,8 +302,6 @@ public class Graph<VD, ED> {
 
   /**
    * 获取边的个数
-   *
-   * @return
    */
   public synchronized int getEdgeNumber() {
     int c = 0;
@@ -396,8 +315,6 @@ public class Graph<VD, ED> {
 
   /**
    * 获取顶点个数
-   *
-   * @return
    */
   public int getVertexNumber() {
     return vertices.size();
@@ -405,8 +322,6 @@ public class Graph<VD, ED> {
 
   /**
    * 获取起始结点
-   *
-   * @return
    */
   public synchronized Collection<Integer> getStartVertex() {
     return CollectionUtils.subtract(vertices.keySet(), reverseEdges.keySet());
@@ -414,8 +329,6 @@ public class Graph<VD, ED> {
 
   /**
    * 获取终止结点
-   *
-   * @return
    */
   public synchronized Collection<Integer> getEndVertex() {
     return CollectionUtils.subtract(vertices.keySet(), edges.keySet());
@@ -423,9 +336,6 @@ public class Graph<VD, ED> {
 
   /**
    * 获取前置结点
-   *
-   * @param id
-   * @return
    */
   public Set<Integer> getPreNode(int id) {
     return getNeighborNode(id, reverseEdges);
@@ -433,9 +343,6 @@ public class Graph<VD, ED> {
 
   /**
    * 获取前续结点及其属性
-   *
-   * @param id
-   * @return
    */
   public Map<Integer, ED> getPreNodeAttr(int id) {
     return getNeighborNodeAttr(id, reverseEdges);
@@ -443,9 +350,6 @@ public class Graph<VD, ED> {
 
   /**
    * 获取后续结点
-   *
-   * @param id
-   * @return
    */
   public Set<Integer> getPostNode(int id) {
     return getNeighborNode(id, edges);
@@ -453,9 +357,6 @@ public class Graph<VD, ED> {
 
   /**
    * 获取后续结点及其属性
-   *
-   * @param id
-   * @return
    */
   public Map<Integer, ED> getPostNodeAttr(int id) {
     return getNeighborNodeAttr(id, edges);
@@ -463,10 +364,6 @@ public class Graph<VD, ED> {
 
   /**
    * 获取邻居结点
-   *
-   * @param id
-   * @param edges
-   * @return
    */
   private Set<Integer> getNeighborNode(int id, final Map<Integer, Map<Integer, ED>> edges) {
     return getNeighborNodeAttr(id, edges).keySet();
@@ -474,10 +371,6 @@ public class Graph<VD, ED> {
 
   /**
    * 获取邻居结点及其属性
-   *
-   * @param id
-   * @param edges
-   * @return
    */
   private synchronized Map<Integer, ED> getNeighborNodeAttr(int id, final Map<Integer, Map<Integer, ED>> edges) {
     final Map<Integer, ED> neighborEdges = edges.get(id);
@@ -491,9 +384,6 @@ public class Graph<VD, ED> {
 
   /**
    * 获取 id 的入度
-   *
-   * @param id
-   * @return
    */
   public synchronized int getIndegree(int id) {
     Collection<Integer> getNeighborNode = getPreNode(id);
@@ -506,9 +396,6 @@ public class Graph<VD, ED> {
 
   /**
    * 返回 id 的出度
-   *
-   * @param id
-   * @return
    */
   public synchronized int getOutdegree(int id) {
     Collection<Integer> getNeighborNode = getPostNode(id);
@@ -521,10 +408,6 @@ public class Graph<VD, ED> {
 
   /**
    * 判断增加 startId -> endId 是否合法
-   *
-   * @param startId
-   * @param endId
-   * @return
    */
   protected synchronized boolean validIfAdd(int startId, int endId, boolean createVertex) {
     // 不允许自己加到自己
@@ -551,8 +434,6 @@ public class Graph<VD, ED> {
 
   /**
    * 广度优先遍历, 在无法遍历完成的时候, 是会抛出异常的
-   *
-   * @return
    */
   public List<Integer> broadFirstSearch() throws Exception {
     List<Integer> visit = new ArrayList<>();
@@ -591,8 +472,6 @@ public class Graph<VD, ED> {
 
   /**
    * 深度优先遍历, 在无法遍历完成的时候, 是会抛出异常的
-   *
-   * @return
    */
   public List<Integer> depthFirstSearch() throws Exception {
     List<Integer> visit = new ArrayList<>();
@@ -614,9 +493,6 @@ public class Graph<VD, ED> {
 
   /**
    * 深度优先遍历递归
-   *
-   * @param visit
-   * @param hasVisited
    */
   private void depthFirstSearch(int id, Collection<Integer> visit, Set<Integer> hasVisited) {
     visit.add(id);
@@ -631,8 +507,6 @@ public class Graph<VD, ED> {
 
   /**
    * 返回 topological 排序, 如果有环, 会抛出异常
-   *
-   * @return
    */
   public List<Integer> topologicalSort() throws Exception {
     Map.Entry<Boolean, List<Integer>> entry = topologicalSortImpl();
@@ -645,10 +519,7 @@ public class Graph<VD, ED> {
   }
 
   /**
-   * 返回 topological 排序
-   * key 返回的是状态, 如果成功为 true, 失败(如有环)为 false, value 为 topology sort
-   *
-   * @return
+   * 返回 topological 排序 key 返回的是状态, 如果成功为 true, 失败(如有环)为 false, value 为 topology sort
    */
   private Map.Entry<Boolean, List<Integer>> topologicalSortImpl() {
     List<Integer> sort = new ArrayList<>();
@@ -693,11 +564,7 @@ public class Graph<VD, ED> {
   }
 
   /**
-   * 判断图是否是联通的, 判断连通是当做无向图来看待的, 算法描述如下:
-   * 1) 以一个点为起点, 采用广度优先遍历的方式对图进行遍历;
-   * 2) 如果遍历结束后, 能覆盖所有顶点, 则认为是联通的
-   *
-   * @return
+   * 判断图是否是联通的, 判断连通是当做无向图来看待的, 算法描述如下: 1) 以一个点为起点, 采用广度优先遍历的方式对图进行遍历; 2) 如果遍历结束后, 能覆盖所有顶点, 则认为是联通的
    */
   public synchronized boolean isConnected() {
     Queue<Integer> q = new LinkedList<>();

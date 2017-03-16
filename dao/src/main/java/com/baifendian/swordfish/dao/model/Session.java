@@ -18,9 +18,7 @@ package com.baifendian.swordfish.dao.model;
 import java.util.Date;
 
 /**
- * author: smile8
- * date:   2017/3/16
- * desc:   用户 session 信息
+ * author: smile8 date:   2017/3/16 desc:   用户 session 信息
  */
 public class Session {
   private String id;
@@ -69,10 +67,10 @@ public class Session {
   @Override
   public String toString() {
     return "Session{" +
-        "id='" + id + '\'' +
-        ", userId=" + userId +
-        ", ip='" + ip + '\'' +
-        ", lastLoginTime=" + lastLoginTime +
-        '}';
+            "id='" + id + '\'' +
+            ", userId=" + userId +
+            ", ip='" + ip + '\'' +
+            ", lastLoginTime=" + lastLoginTime +
+            '}';
   }
 }

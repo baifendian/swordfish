@@ -13,46 +13,44 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.baifendian.swordfish.dao.enums;
 
 /**
- *  workflow 中一个节点失败后的策略类型
- * <p>
+ * workflow 中一个节点失败后的策略类型 <p>
  *
  * @author : wenting.wang
  * @date : 2016年8月27日
  */
 public enum FailurePolicyType {
 
-    /**0.结束  1.继续**/
-    END, CONTINUE;
-    /**
-     * getter method
-     *
-     * @see FailurePolicyType
-     * @return the type
-     */
-    public Integer getType() {
-        return ordinal();
-    }
+  /**
+   * 0.结束  1.继续
+   **/
+  END, CONTINUE;
 
-    /**
-     * 通过 type 获取枚举对象
-     * <p>
-     *
-     * @param type
-     * @return {@link FailurePolicyType}
-     * @throws IllegalArgumentException
-     */
-    public static FailurePolicyType valueOfType(Integer type) throws IllegalArgumentException {
-        if (type == null) {
-            return null;
-        }
-        try {
-            return FailurePolicyType.values()[type];
-        } catch (Exception ex) {
-            throw new IllegalArgumentException("Cannot convert " + type + " to " + FailurePolicyType.class.getSimpleName() + " .", ex);
-        }
+  /**
+   * getter method
+   *
+   * @return the type
+   * @see FailurePolicyType
+   */
+  public Integer getType() {
+    return ordinal();
+  }
+
+  /**
+   * 通过 type 获取枚举对象 <p>
+   *
+   * @return {@link FailurePolicyType}
+   */
+  public static FailurePolicyType valueOfType(Integer type) throws IllegalArgumentException {
+    if (type == null) {
+      return null;
     }
+    try {
+      return FailurePolicyType.values()[type];
+    } catch (Exception ex) {
+      throw new IllegalArgumentException("Cannot convert " + type + " to " + FailurePolicyType.class.getSimpleName() + " .", ex);
+    }
+  }
 }

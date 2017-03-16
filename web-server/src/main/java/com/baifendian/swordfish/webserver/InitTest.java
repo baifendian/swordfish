@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.baifendian.swordfish.webserver;
 
 import com.baifendian.swordfish.dao.enums.FlowType;
@@ -25,12 +24,12 @@ import com.baifendian.swordfish.rpc.ScheduleInfo;
  * @date : 2017-03-13 13:54
  */
 public class InitTest {
-    public static void main(String[] args) {
-        MasterClient masterClient = new MasterClient("172.18.1.22", 9999, 3);
-        ScheduleInfo scheduleInfo = new ScheduleInfo();
-        scheduleInfo.setStartDate(System.currentTimeMillis()-3600*24*1000);
-        scheduleInfo.setEndDate(4101494400000l);
-        scheduleInfo.setCronExpression("1 10 * * * ?");
-        masterClient.setSchedule(1, 1, FlowType.SHORT.name(), scheduleInfo);
-    }
+  public static void main(String[] args) {
+    MasterClient masterClient = new MasterClient("172.18.1.22", 9999, 3);
+    ScheduleInfo scheduleInfo = new ScheduleInfo();
+    scheduleInfo.setStartDate(System.currentTimeMillis() - 3600 * 24 * 1000);
+    scheduleInfo.setEndDate(4101494400000l);
+    scheduleInfo.setCronExpression("1 10 * * * ?");
+    masterClient.setSchedule(1, 1, FlowType.SHORT.name(), scheduleInfo);
+  }
 }

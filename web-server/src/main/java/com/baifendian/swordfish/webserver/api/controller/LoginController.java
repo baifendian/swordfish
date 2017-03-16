@@ -20,6 +20,7 @@ import com.baifendian.swordfish.dao.mapper.SessionMapper;
 import com.baifendian.swordfish.dao.mapper.UserMapper;
 import com.baifendian.swordfish.dao.model.User;
 import com.baifendian.swordfish.webserver.api.dto.BaseData;
+
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -47,8 +48,6 @@ public class LoginController {
   /**
    * @param name:     用户名
    * @param password: 登陆密码
-   * @param response
-   * @return
    */
   @RequestMapping(value = "/}", method = {RequestMethod.POST})
   public BaseData login(@RequestParam(value = "name", required = false) String name,

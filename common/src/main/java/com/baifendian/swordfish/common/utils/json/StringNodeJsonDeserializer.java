@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.baifendian.swordfish.common.utils.json;
 
 import com.fasterxml.jackson.core.JsonParser;
@@ -25,18 +24,17 @@ import com.fasterxml.jackson.databind.JsonNode;
 import java.io.IOException;
 
 /**
- * 字符串节点的自定义反序列化
- * <p>
- * 
+ * 字符串节点的自定义反序列化 <p>
+ *
  * @author : dsfan
  * @date : 2016年9月8日
  */
 public class StringNodeJsonDeserializer extends JsonDeserializer<String> {
 
-    @Override
-    public String deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException, JsonProcessingException {
-        JsonNode node = jp.getCodec().readTree(jp);
-        return node.toString();
-    }
+  @Override
+  public String deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException, JsonProcessingException {
+    JsonNode node = jp.getCodec().readTree(jp);
+    return node.toString();
+  }
 
 }

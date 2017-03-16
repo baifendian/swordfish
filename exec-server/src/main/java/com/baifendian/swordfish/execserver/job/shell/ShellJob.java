@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.baifendian.swordfish.execserver.job.shell;
 
 import com.baifendian.swordfish.common.job.AbstractJob;
@@ -23,6 +22,7 @@ import com.baifendian.swordfish.common.job.JobProps;
 import com.baifendian.swordfish.common.job.exception.ExecException;
 import com.baifendian.swordfish.common.utils.json.JsonUtil;
 import com.baifendian.swordfish.execserver.parameter.ParamHelper;
+
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.exec.*;
 import org.apache.commons.lang.StringUtils;
@@ -65,7 +65,7 @@ public class ShellJob extends AbstractProcessJob {
   public ShellJob(String jobId, JobProps props, Logger logger) throws IOException {
     super(jobId, props, logger);
 
-    if (!shellParam.checkValid()){
+    if (!shellParam.checkValid()) {
       throw new ExecException("ShellJob script param can't be null");
     }
     this.currentPath = getWorkingDirectory();
@@ -73,7 +73,7 @@ public class ShellJob extends AbstractProcessJob {
   }
 
   @Override
-  public void initJobParams(){
+  public void initJobParams() {
     shellParam = JsonUtil.parseObject(props.getJobParams(), ShellParam.class);
     String script = shellParam.getScript();
     script = ParamHelper.resolvePlaceholders(script, props.getDefinedParams());
@@ -99,7 +99,7 @@ public class ShellJob extends AbstractProcessJob {
   }
 
   @Override
-  public BaseParam getParam(){
+  public BaseParam getParam() {
     return shellParam;
   }
 

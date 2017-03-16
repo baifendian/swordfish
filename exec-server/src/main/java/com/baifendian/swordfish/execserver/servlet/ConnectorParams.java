@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.baifendian.swordfish.execserver.servlet;
 
 public interface ConnectorParams {
@@ -101,8 +100,8 @@ public interface ConnectorParams {
   public static final String STATS_MAP_METRICNAMEPARAM = "metricName";
 
   /**
-   * useStats param is used to filter datapoints on /stats graph by using standard deviation and means
-   * By default, we consider only top/bottom 5% datapoints
+   * useStats param is used to filter datapoints on /stats graph by using standard deviation and
+   * means By default, we consider only top/bottom 5% datapoints
    */
 
   public static final String STATS_MAP_METRICRETRIEVALMODE = "useStats";

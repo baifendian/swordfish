@@ -16,6 +16,7 @@
 package com.baifendian.swordfish.dao.datasource;
 
 import com.alibaba.druid.pool.DruidDataSource;
+
 import org.apache.ibatis.mapping.Environment;
 import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.session.SqlSession;
@@ -29,6 +30,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.util.ResourceUtils;
 
 import javax.sql.DataSource;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -36,9 +38,7 @@ import java.io.InputStream;
 import java.util.Properties;
 
 /**
- * author: smile8
- * date:   2017/3/16
- * desc:
+ * author: smile8 date:   2017/3/16 desc:
  */
 public class ConnectionFactory {
   private static Logger logger = LoggerFactory.getLogger(ConnectionFactory.class.getName());
@@ -59,8 +59,6 @@ public class ConnectionFactory {
 
   /**
    * 得到数据源
-   *
-   * @return
    */
   public static DataSource getDataSource() {
     DruidDataSource druidDataSource = new DruidDataSource();
@@ -87,8 +85,6 @@ public class ConnectionFactory {
 
   /**
    * 构建 sql session factory
-   *
-   * @return
    */
   public static SqlSessionFactory getSqlSessionFactory() {
     if (sqlSessionFactory == null) {
@@ -114,8 +110,6 @@ public class ConnectionFactory {
 
   /**
    * 获取 sql session
-   *
-   * @return
    */
   public static SqlSession getSqlSession() {
     return new SqlSessionTemplate(getSqlSessionFactory());

@@ -21,9 +21,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.Date;
 
 /**
- * author: smile8
- * date:   2017/3/16
- * desc:   用户信息
+ * author: smile8 date:   2017/3/16 desc:   用户信息
  */
 public class User {
   /**
@@ -162,16 +160,16 @@ public class User {
   @Override
   public String toString() {
     return "User{" +
-        "id=" + id +
-        ", name='" + name + '\'' +
-        ", email='" + email + '\'' +
-        ", desc='" + desc + '\'' +
-        ", password='" + password + '\'' +
-        ", phone='" + phone + '\'' +
-        ", role=" + role +
-        ", proxyUsers='" + proxyUsers + '\'' +
-        ", createTime=" + createTime +
-        ", modifyTime=" + modifyTime +
-        '}';
+            "id=" + id +
+            ", name='" + name + '\'' +
+            ", email='" + email + '\'' +
+            ", desc='" + desc + '\'' +
+            ", password='" + password + '\'' +
+            ", phone='" + phone + '\'' +
+            ", role=" + role +
+            ", proxyUsers='" + proxyUsers + '\'' +
+            ", createTime=" + createTime +
+            ", modifyTime=" + modifyTime +
+            '}';
   }
 }

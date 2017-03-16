@@ -13,26 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.baifendian.swordfish.dao.exception;
 
-/**sql语句的语法错误等
- * <p>
- * 
- * @author : dsfan
+/**
+ * sql语句的语法错误等 <p>
  *
+ * @author : dsfan
  * @date : 2016-7-21
  */
 public class SqlException extends RuntimeException {
 
-    /** Serial version UID */
-    private static final long serialVersionUID = 1L;
+  /**
+   * Serial version UID
+   */
+  private static final long serialVersionUID = 1L;
 
-    /**
-     * @param msg
-     */
-    public SqlException(String msg) {
-        super(msg);
-    }
+  /**
+   * @param msg
+   */
+  public SqlException(String msg) {
+    super(msg);
+  }
 
 }

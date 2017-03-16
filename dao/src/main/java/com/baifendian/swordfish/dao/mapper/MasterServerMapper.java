@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.baifendian.swordfish.dao.mapper;
 
 import com.baifendian.swordfish.dao.model.MasterServer;
+
 import org.apache.ibatis.annotations.*;
 import org.apache.ibatis.type.JdbcType;
 import org.mybatis.spring.annotation.MapperScan;
@@ -29,22 +29,22 @@ import java.util.Date;
  */
 @MapperScan
 public interface MasterServerMapper {
-    @Results(value = {
-            @Result(property = "host", column = "host",javaType = String.class,jdbcType = JdbcType.VARCHAR),
-            @Result(property = "port", column = "port",javaType = int.class,jdbcType = JdbcType.INTEGER),
-            @Result(property = "updateTime", column = "update_time",javaType = Date.class,jdbcType = JdbcType.TIMESTAMP),
-    })
-    @SelectProvider(type = MasterServerMapperSQL.class, method = "query")
-    MasterServer query();
+  @Results(value = {
+          @Result(property = "host", column = "host", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+          @Result(property = "port", column = "port", javaType = int.class, jdbcType = JdbcType.INTEGER),
+          @Result(property = "updateTime", column = "update_time", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP),
+  })
+  @SelectProvider(type = MasterServerMapperSQL.class, method = "query")
+  MasterServer query();
 
 
-    @InsertProvider(type = MasterServerMapperSQL.class, method = "insert")
-    int insert(@Param("masterServer") MasterServer masterServer);
+  @InsertProvider(type = MasterServerMapperSQL.class, method = "insert")
+  int insert(@Param("masterServer") MasterServer masterServer);
 
-    @UpdateProvider(type = MasterServerMapperSQL.class, method = "update")
-    int update(@Param("masterServer") MasterServer masterServer);
+  @UpdateProvider(type = MasterServerMapperSQL.class, method = "update")
+  int update(@Param("masterServer") MasterServer masterServer);
 
-    @SelectProvider(type = MasterServerMapperSQL.class, method = "delete")
-    void delete();
+  @SelectProvider(type = MasterServerMapperSQL.class, method = "delete")
+  void delete();
 
 }

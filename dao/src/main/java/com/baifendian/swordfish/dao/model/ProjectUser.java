@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.baifendian.swordfish.dao.model;
 
 import com.baifendian.swordfish.common.utils.BFDDateUtils;
@@ -25,45 +24,46 @@ import java.util.Date;
  * Created by caojingwei on 16/8/25.
  */
 public class ProjectUser {
-    private int projectId;
-    private int userId;
-    private Date createTime;
+  private int projectId;
+  private int userId;
+  private Date createTime;
 
-    public ProjectUser() {
-    }
+  public ProjectUser() {
+  }
 
-    public ProjectUser(int projectId, int userId, Date createTime) {
-        this.projectId = projectId;
-        this.userId = userId;
-        this.createTime = createTime;
-    }
-    public ProjectUser(int projectId, int userId) {
-        this.projectId = projectId;
-        this.userId = userId;
-        this.createTime = new Date();
-    }
+  public ProjectUser(int projectId, int userId, Date createTime) {
+    this.projectId = projectId;
+    this.userId = userId;
+    this.createTime = createTime;
+  }
 
-    public int getProjectId() {
-        return projectId;
-    }
+  public ProjectUser(int projectId, int userId) {
+    this.projectId = projectId;
+    this.userId = userId;
+    this.createTime = new Date();
+  }
 
-    public void setProjectId(int projectId) {
-        this.projectId = projectId;
-    }
+  public int getProjectId() {
+    return projectId;
+  }
 
-    public int getUserId() {
-        return userId;
-    }
+  public void setProjectId(int projectId) {
+    this.projectId = projectId;
+  }
 
-    public void setUserId(int userId) {
-        this.userId = userId;
-    }
+  public int getUserId() {
+    return userId;
+  }
 
-    public Date getCreateTime() {
-        return createTime;
-    }
+  public void setUserId(int userId) {
+    this.userId = userId;
+  }
 
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
-    }
+  public Date getCreateTime() {
+    return createTime;
+  }
+
+  public void setCreateTime(Date createTime) {
+    this.createTime = createTime;
+  }
 }

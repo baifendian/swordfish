@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.baifendian.swordfish.dao.model;
 
 /**
@@ -44,8 +43,8 @@ public class DataSourceMongo extends DataSourceDbBase {
   @Override
   public String toString() {
     return "DataSourceMongo{" +
-        "address='" + address + '\'' +
-        ", database='" + database + '\'' +
-        '}';
+            "address='" + address + '\'' +
+            ", database='" + database + '\'' +
+            '}';
   }
 }

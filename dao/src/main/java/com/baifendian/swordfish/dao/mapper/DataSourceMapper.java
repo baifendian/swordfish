@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.baifendian.swordfish.dao.mapper;
 
 import com.baifendian.swordfish.dao.enums.DbType;
 import com.baifendian.swordfish.dao.model.DataSource;
+
 import org.apache.ibatis.annotations.*;
 import org.apache.ibatis.type.EnumOrdinalTypeHandler;
 import org.apache.ibatis.type.JdbcType;
@@ -59,16 +59,16 @@ public interface DataSourceMapper {
    */
   @SelectProvider(type = DataSourceMapperProvider.class, method = "getById")
   @Results(value = {
-      @Result(property = "id", column = "id", id = true, javaType = Integer.class, jdbcType = JdbcType.INTEGER),
-      @Result(property = "ownerId", column = "owner_id", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
-      @Result(property = "projectId", column = "project_id", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
-      @Result(property = "name", column = "name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-      @Result(property = "desc", column = "desc", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-      @Result(property = "type", column = "type", typeHandler = EnumOrdinalTypeHandler.class, javaType = DbType.class, jdbcType = JdbcType.INTEGER),
-      // @Result(property = "dbId", column = "db_id", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
-      @Result(property = "params", column = "params", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-      @Result(property = "createTime", column = "create_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE),
-      @Result(property = "modifyTime", column = "modify_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE),
+          @Result(property = "id", column = "id", id = true, javaType = Integer.class, jdbcType = JdbcType.INTEGER),
+          @Result(property = "ownerId", column = "owner_id", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
+          @Result(property = "projectId", column = "project_id", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
+          @Result(property = "name", column = "name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+          @Result(property = "desc", column = "desc", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+          @Result(property = "type", column = "type", typeHandler = EnumOrdinalTypeHandler.class, javaType = DbType.class, jdbcType = JdbcType.INTEGER),
+          // @Result(property = "dbId", column = "db_id", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
+          @Result(property = "params", column = "params", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+          @Result(property = "createTime", column = "create_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE),
+          @Result(property = "modifyTime", column = "modify_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE),
   })
   DataSource getById(@Param("id") Integer id);
 
@@ -79,16 +79,16 @@ public interface DataSourceMapper {
    */
   @SelectProvider(type = DataSourceMapperProvider.class, method = "getByName")
   @Results(value = {
-      @Result(property = "id", column = "id", id = true, javaType = Integer.class, jdbcType = JdbcType.INTEGER),
-      @Result(property = "ownerId", column = "owner_id", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
-      @Result(property = "projectId", column = "project_id", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
-      @Result(property = "name", column = "name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-      @Result(property = "desc", column = "desc", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-      @Result(property = "type", column = "type", typeHandler = EnumOrdinalTypeHandler.class, javaType = DbType.class, jdbcType = JdbcType.INTEGER),
-      //@Result(property = "dbId", column = "db_id", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
-      @Result(property = "params", column = "params", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-      @Result(property = "createTime", column = "create_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE),
-      @Result(property = "modifyTime", column = "modify_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE),
+          @Result(property = "id", column = "id", id = true, javaType = Integer.class, jdbcType = JdbcType.INTEGER),
+          @Result(property = "ownerId", column = "owner_id", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
+          @Result(property = "projectId", column = "project_id", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
+          @Result(property = "name", column = "name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+          @Result(property = "desc", column = "desc", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+          @Result(property = "type", column = "type", typeHandler = EnumOrdinalTypeHandler.class, javaType = DbType.class, jdbcType = JdbcType.INTEGER),
+          //@Result(property = "dbId", column = "db_id", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
+          @Result(property = "params", column = "params", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+          @Result(property = "createTime", column = "create_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE),
+          @Result(property = "modifyTime", column = "modify_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE),
   })
   DataSource getByName(@Param("projectId") Integer projectId, @Param("name") String name);
 
@@ -98,17 +98,17 @@ public interface DataSourceMapper {
    */
   @SelectProvider(type = DataSourceMapperProvider.class, method = "getByProjectId")
   @Results(value = {
-      @Result(property = "id", column = "id", id = true, javaType = Integer.class, jdbcType = JdbcType.INTEGER),
-      @Result(property = "ownerId", column = "owner_id", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
-      @Result(property = "ownerName", column = "owner_name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-      @Result(property = "projectId", column = "project_id", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
-      @Result(property = "name", column = "name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-      @Result(property = "desc", column = "desc", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-      @Result(property = "type", column = "type", typeHandler = EnumOrdinalTypeHandler.class, javaType = DbType.class, jdbcType = JdbcType.INTEGER),
-      // @Result(property = "dbId", column = "db_id", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
-      @Result(property = "params", column = "params", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-      @Result(property = "createTime", column = "create_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE),
-      @Result(property = "modifyTime", column = "modify_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE),
+          @Result(property = "id", column = "id", id = true, javaType = Integer.class, jdbcType = JdbcType.INTEGER),
+          @Result(property = "ownerId", column = "owner_id", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
+          @Result(property = "ownerName", column = "owner_name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+          @Result(property = "projectId", column = "project_id", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
+          @Result(property = "name", column = "name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+          @Result(property = "desc", column = "desc", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+          @Result(property = "type", column = "type", typeHandler = EnumOrdinalTypeHandler.class, javaType = DbType.class, jdbcType = JdbcType.INTEGER),
+          // @Result(property = "dbId", column = "db_id", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
+          @Result(property = "params", column = "params", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+          @Result(property = "createTime", column = "create_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE),
+          @Result(property = "modifyTime", column = "modify_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE),
   })
   List<DataSource> getByProjectId(@Param("projectId") Integer projectId);
 
@@ -119,25 +119,22 @@ public interface DataSourceMapper {
    */
   @SelectProvider(type = DataSourceMapperProvider.class, method = "getByProjectIdAndType")
   @Results(value = {
-      @Result(property = "id", column = "id", id = true, javaType = Integer.class, jdbcType = JdbcType.INTEGER),
-      @Result(property = "ownerId", column = "owner_id", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
-      @Result(property = "ownerName", column = "owner_name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-      @Result(property = "projectId", column = "project_id", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
-      @Result(property = "name", column = "name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-      @Result(property = "desc", column = "desc", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-      @Result(property = "type", column = "type", typeHandler = EnumOrdinalTypeHandler.class, javaType = DbType.class, jdbcType = JdbcType.INTEGER),
-      // @Result(property = "dbId", column = "db_id", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
-      @Result(property = "params", column = "params", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-      @Result(property = "createTime", column = "create_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE),
-      @Result(property = "modifyTime", column = "modify_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE),
+          @Result(property = "id", column = "id", id = true, javaType = Integer.class, jdbcType = JdbcType.INTEGER),
+          @Result(property = "ownerId", column = "owner_id", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
+          @Result(property = "ownerName", column = "owner_name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+          @Result(property = "projectId", column = "project_id", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
+          @Result(property = "name", column = "name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+          @Result(property = "desc", column = "desc", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+          @Result(property = "type", column = "type", typeHandler = EnumOrdinalTypeHandler.class, javaType = DbType.class, jdbcType = JdbcType.INTEGER),
+          // @Result(property = "dbId", column = "db_id", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
+          @Result(property = "params", column = "params", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+          @Result(property = "createTime", column = "create_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE),
+          @Result(property = "modifyTime", column = "modify_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE),
   })
   List<DataSource> getByProjectIdAndType(@Param("projectId") Integer projectId, @Param("type") Integer type);
 
   /**
    * 根据项目删除数据源
-   *
-   * @param projectId
-   * @return
    */
   @DeleteProvider(type = DataSourceMapperProvider.class, method = "deleteByProjectId")
   int deleteByProjectId(@Param("projectId") int projectId);

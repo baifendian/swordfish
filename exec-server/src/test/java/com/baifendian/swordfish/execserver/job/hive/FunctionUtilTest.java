@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.baifendian.swordfish.execserver.job.hive;
 
 import com.baifendian.swordfish.common.utils.json.JsonUtil;
+
 import org.apache.commons.lang.StringUtils;
 import org.junit.Before;
 import org.junit.Test;
@@ -32,15 +32,15 @@ import static org.junit.Assert.assertEquals;
  * @date : 2017-03-15 11:23
  */
 public class FunctionUtilTest {
-    private List<UdfsInfo> udfsInfos;
+  private List<UdfsInfo> udfsInfos;
 
-    @Before
-    public void before(){
-        udfsInfos = new ArrayList<>();
-        String udfDefine = "{ \"func\": \"upper\", \"className\": \"com.baifendian.example.UpperUtils\", \"libJar\": { \"scope\": \"project\", \"res\": \"upper-0.1.jar\" } } ";
-        UdfsInfo udfsInfo = JsonUtil.parseObject(udfDefine, UdfsInfo.class);
-        udfsInfos.add(udfsInfo);
-    }
+  @Before
+  public void before() {
+    udfsInfos = new ArrayList<>();
+    String udfDefine = "{ \"func\": \"upper\", \"className\": \"com.baifendian.example.UpperUtils\", \"libJar\": { \"scope\": \"project\", \"res\": \"upper-0.1.jar\" } } ";
+    UdfsInfo udfsInfo = JsonUtil.parseObject(udfDefine, UdfsInfo.class);
+    udfsInfos.add(udfsInfo);
+  }
 
     /*
     @Test

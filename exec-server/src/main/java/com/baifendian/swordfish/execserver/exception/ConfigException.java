@@ -13,32 +13,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.baifendian.swordfish.execserver.exception;
 
 /**
- * 配置信息错误
- * <p>
- * 
+ * 配置信息错误 <p>
+ *
  * @author : liujin
  * @date : 2017年3月2日
  */
 public class ConfigException extends RuntimeException {
-    /** Serial version UID */
-    private static final long serialVersionUID = 1L;
+  /**
+   * Serial version UID
+   */
+  private static final long serialVersionUID = 1L;
 
-    /**
-     * @param msg
-     */
-    public ConfigException(String msg) {
-        super(msg);
-    }
+  /**
+   * @param msg
+   */
+  public ConfigException(String msg) {
+    super(msg);
+  }
 
-    /**
-     * @param msg
-     * @param cause
-     */
-    public ConfigException(String msg, Throwable cause) {
-        super(msg, cause);
-    }
+  /**
+   * @param msg
+   * @param cause
+   */
+  public ConfigException(String msg, Throwable cause) {
+    super(msg, cause);
+  }
 }

@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.baifendian.swordfish.execserver.utils;
 
 import org.slf4j.Logger;
@@ -22,30 +21,27 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 
 /**
- * 操作系统工具类
- * <p>
- * 
+ * 操作系统工具类 <p>
+ *
  * @author : dsfan
  * @date : 2016年11月2日
  */
 public class OsUtil {
 
-    private static final Logger logger = LoggerFactory.getLogger(OsUtil.class);
-    /**
-     * private constructor
-     */
-    private OsUtil() {
-    }
+  private static final Logger logger = LoggerFactory.getLogger(OsUtil.class);
 
-    /**
-     * 是否 windows
-     * <p>
-     *
-     * @return
-     */
-    public static boolean isWindows() {
-        String os = System.getProperty("os.name");
-        return os.startsWith("Windows");
-    }
+  /**
+   * private constructor
+   */
+  private OsUtil() {
+  }
+
+  /**
+   * 是否 windows <p>
+   */
+  public static boolean isWindows() {
+    String os = System.getProperty("os.name");
+    return os.startsWith("Windows");
+  }
 
 }

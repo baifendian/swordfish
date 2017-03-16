@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.baifendian.swordfish.dao.model;
 
 /**
@@ -107,15 +106,15 @@ public class DataSourceMysql extends DataSourceDbBase {
   @Override
   public String toString() {
     return "DataSourceMysql{" +
-        "address='" + address + '\'' +
-        ", database='" + database + '\'' +
-        ", user='" + user + '\'' +
-        ", password='" + password + '\'' +
-        ", autoRec=" + autoRec +
-        ", maxRec=" + maxRec +
-        ", initialTimeout=" + initialTimeout +
-        ", useUnicode=" + useUnicode +
-        ", characterEncoding='" + characterEncoding + '\'' +
-        '}';
+            "address='" + address + '\'' +
+            ", database='" + database + '\'' +
+            ", user='" + user + '\'' +
+            ", password='" + password + '\'' +
+            ", autoRec=" + autoRec +
+            ", maxRec=" + maxRec +
+            ", initialTimeout=" + initialTimeout +
+            ", useUnicode=" + useUnicode +
+            ", characterEncoding='" + characterEncoding + '\'' +
+            '}';
   }
 }

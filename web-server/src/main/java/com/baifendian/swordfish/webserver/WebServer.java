@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.baifendian.swordfish.webserver;
 
 import com.baifendian.swordfish.rpc.WorkerService.Iface;
@@ -22,37 +21,47 @@ import com.baifendian.swordfish.webserver.service.master.MasterServiceImpl;
 import com.bfd.harpc.common.configure.PropertiesConfiguration;
 import com.bfd.harpc.main.Client;
 import com.bfd.harpc.main.Server;
+
 import org.quartz.SchedulerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Master 服务
- * <p>
- * 
+ * Master 服务 <p>
+ *
  * @author : dsfan
  * @date : 2016年10月25日
  */
 public class WebServer {
-    /** LOGGER */
-    private static final Logger LOGGER = LoggerFactory.getLogger(WebServer.class);
+  /**
+   * LOGGER
+   */
+  private static final Logger LOGGER = LoggerFactory.getLogger(WebServer.class);
 
-    /** 默认配置文件 */
-    private static final String DEFAULT_CONFIG = "classpath:master.properties";
+  /**
+   * 默认配置文件
+   */
+  private static final String DEFAULT_CONFIG = "classpath:master.properties";
 
-    /** worker client 配置文件 */
-    private static final String CLIENT_FILE_PATH = "classpath:worker-client.properties";
+  /**
+   * worker client 配置文件
+   */
+  private static final String CLIENT_FILE_PATH = "classpath:worker-client.properties";
 
-    /** master server 配置文件 */
-    private static final String SERVER_FILE_PATH = "classpath:master-server.properties";
+  /**
+   * master server 配置文件
+   */
+  private static final String SERVER_FILE_PATH = "classpath:master-server.properties";
 
-    /** 是否保持启动 */
-    private static boolean running = true;
+  /**
+   * 是否保持启动
+   */
+  private static boolean running = true;
 
-    /**
-     * @param args
-     */
-    public static void main(String[] args) {
+  /**
+   * @param args
+   */
+  public static void main(String[] args) {
         /*
         try {
             // 加载配置文件
@@ -100,5 +109,5 @@ public class WebServer {
             LOGGER.error(e.getMessage(), e);
         }
 */
-    }
+  }
 }

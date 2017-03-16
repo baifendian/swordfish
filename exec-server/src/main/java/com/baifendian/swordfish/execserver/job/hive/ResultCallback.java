@@ -13,25 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.baifendian.swordfish.execserver.job.hive;
 
 import com.baifendian.swordfish.common.job.ExecResult;
 
 /**
- * 执行结果回调处理
- * <p>
- * 
+ * 执行结果回调处理 <p>
+ *
  * @author : dsfan
  * @date : 2016年12月21日
  */
 public interface ResultCallback {
 
-    /**
-     * 处理执行结果
-     * <p>
-     *
-     * @param execResult
-     */
-    void handleResult(ExecResult execResult);
+  /**
+   * 处理执行结果 <p>
+   */
+  void handleResult(ExecResult execResult);
 }

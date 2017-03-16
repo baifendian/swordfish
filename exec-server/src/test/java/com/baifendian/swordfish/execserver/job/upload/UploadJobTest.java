@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.baifendian.swordfish.execserver.job.upload;
 
 import org.apache.hadoop.hive.conf.HiveConf;
@@ -30,22 +29,22 @@ import java.util.List;
  * @date : 2017-03-16 13:21
  */
 public class UploadJobTest {
-    private HiveMetaStoreClient hiveMetaStoreClient;
+  private HiveMetaStoreClient hiveMetaStoreClient;
 
-    @Before
-    public void before() throws Exception {
-        HiveConf hiveConf = new HiveConf();
-        hiveConf.set(HiveConf.ConfVars.METASTOREURIS.name(), "thrift://172.18.1.22:9083");
-        hiveMetaStoreClient = new HiveMetaStoreClient(hiveConf);
-    }
+  @Before
+  public void before() throws Exception {
+    HiveConf hiveConf = new HiveConf();
+    hiveConf.set(HiveConf.ConfVars.METASTOREURIS.name(), "thrift://172.18.1.22:9083");
+    hiveMetaStoreClient = new HiveMetaStoreClient(hiveConf);
+  }
 
-    @Test
-    public void testHiveMeta() throws TException {
-        List<String> dbs = hiveMetaStoreClient.getAllDatabases();
-        System.out.println(dbs);
-        List<String> tbs = hiveMetaStoreClient.getAllTables("default");
-        System.out.println(tbs);
-        Table table = hiveMetaStoreClient.getTable("bfd_test", "test");
-        System.out.println(table);
-    }
+  @Test
+  public void testHiveMeta() throws TException {
+    List<String> dbs = hiveMetaStoreClient.getAllDatabases();
+    System.out.println(dbs);
+    List<String> tbs = hiveMetaStoreClient.getAllTables("default");
+    System.out.println(tbs);
+    Table table = hiveMetaStoreClient.getTable("bfd_test", "test");
+    System.out.println(table);
+  }
 }

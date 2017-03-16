@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.baifendian.swordfish.execserver.job.shell;
 
 import com.baifendian.swordfish.common.job.BaseParam;
 import com.baifendian.swordfish.execserver.job.ResourceInfo;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,9 +26,7 @@ import java.util.stream.Collectors;
 
 
 /**
- * author: smile8
- * date:   15/12/2016
- * desc:
+ * author: smile8 date:   15/12/2016 desc:
  */
 public class ShellParam extends BaseParam {
 
@@ -45,7 +43,7 @@ public class ShellParam extends BaseParam {
   private List<ResourceInfo> resources;
 
   @Override
-  public boolean checkValid(){
+  public boolean checkValid() {
     return script != null && !script.isEmpty();
   }
 
@@ -66,8 +64,8 @@ public class ShellParam extends BaseParam {
   }
 
   @Override
-  public List<String> getResourceFiles(){
-    if(resources != null) {
+  public List<String> getResourceFiles() {
+    if (resources != null) {
       return resources.stream().map(p -> p.getRes()).collect(Collectors.toList());
     } else {
       return null;

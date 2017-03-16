@@ -22,18 +22,13 @@ import org.slf4j.LoggerFactory;
 import javax.servlet.http.HttpServletRequest;
 
 /**
- * author: caojingwei
- * date:   2017/3/16
- * desc:   公用类
+ * author: caojingwei date:   2017/3/16 desc:   公用类
  */
 public class HttpUtil {
   private static final Logger logger = LoggerFactory.getLogger(HttpUtil.class);
 
   /**
    * 得到 http 请求中的 ip 地址
-   *
-   * @param request
-   * @return
    */
   public static String getClientIpAddress(HttpServletRequest request) {
     String ip = request.getHeader("X-Forwarded-For");

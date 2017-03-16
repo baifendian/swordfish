@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.baifendian.swordfish.common.job.config;
 
 import org.apache.commons.io.IOUtils;
@@ -34,53 +33,57 @@ import java.util.Properties;
  */
 public class BaseConfig {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(BaseConfig.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(BaseConfig.class);
 
-    private static String hdfsBasePath;
+  private static String hdfsBasePath;
 
-    private static String localBasePath;
+  private static String localBasePath;
 
-    /** 环境变量信息 */
-    private static String systemEnvPath;
+  /**
+   * 环境变量信息
+   */
+  private static String systemEnvPath;
 
-    private static Properties properties = new Properties();
+  private static Properties properties = new Properties();
 
-    static {
-        InputStream is = null;
-        try {
-            File dataSourceFile = ResourceUtils.getFile("classpath:base_config.properties");
-            is = new FileInputStream(dataSourceFile);
-            properties.load(is);
-            hdfsBasePath = properties.getProperty("hdfs.base.path");
-            localBasePath = properties.getProperty("local.base.path");
-            systemEnvPath = properties.getProperty("sf.env.file");
-        } catch (IOException e) {
-            LOGGER.error(e.getMessage(), e);
-        } finally {
-            IOUtils.closeQuietly(is);
-        }
+  static {
+    InputStream is = null;
+    try {
+      File dataSourceFile = ResourceUtils.getFile("classpath:base_config.properties");
+      is = new FileInputStream(dataSourceFile);
+      properties.load(is);
+      hdfsBasePath = properties.getProperty("hdfs.base.path");
+      localBasePath = properties.getProperty("local.base.path");
+      systemEnvPath = properties.getProperty("sf.env.file");
+    } catch (IOException e) {
+      LOGGER.error(e.getMessage(), e);
+    } finally {
+      IOUtils.closeQuietly(is);
     }
+  }
 
-    /** workflow 执行本地目录 projectId/workflowId/execId*/
-    private static final String FLOW_EXEC_PATH_FORMAT="{0}/{1}/{2}";
+  /**
+   * workflow 执行本地目录 projectId/workflowId/execId
+   */
+  private static final String FLOW_EXEC_PATH_FORMAT = "{0}/{1}/{2}";
 
-    public static String getFlowExecPath(int projectId, int workflowId, long execId){
-        return String.format("%s/%d/%d/%d", localBasePath, projectId, workflowId, execId);
-    }
+  public static String getFlowExecPath(int projectId, int workflowId, long execId) {
+    return String.format("%s/%d/%d/%d", localBasePath, projectId, workflowId, execId);
+  }
 
-    public static String getHdfsProjectResourcesPath(int projectId){
-        return MessageFormat.format("{0}/{1}/resources", hdfsBasePath, projectId);
-    }
+  public static String getHdfsProjectResourcesPath(int projectId) {
+    return MessageFormat.format("{0}/{1}/resources", hdfsBasePath, projectId);
+  }
 
-    public static String getHdfsFlowResourcesPath(int projectId, int flowId){
-        return MessageFormat.format("{0}/{1}/workflows/{2}", hdfsBasePath, projectId, flowId);
-    }
+  public static String getHdfsFlowResourcesPath(int projectId, int flowId) {
+    return MessageFormat.format("{0}/{1}/workflows/{2}", hdfsBasePath, projectId, flowId);
+  }
 
-    public static String getSystemEnvPath(){
-        return systemEnvPath;
-    }
+  public static String getSystemEnvPath() {
+    return systemEnvPath;
+  }
 
-    public static void main(String[] args) {
-        System.out.println(BaseConfig.localBasePath);
-    }
+  public static void main(String[] args) {
+    System.out.println(BaseConfig.localBasePath);
+  }
 }

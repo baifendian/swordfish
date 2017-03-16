@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.baifendian.swordfish.execserver.utils.hive;
 
 import org.slf4j.Logger;
@@ -27,8 +26,7 @@ import java.io.InputStream;
 import java.util.Properties;
 
 /**
- * 初始化hiveConf
- * <p>
+ * 初始化hiveConf <p>
  *
  * @author : wenting.wang
  * @date : 2016年10月26日
@@ -36,42 +34,42 @@ import java.util.Properties;
 
 public class MyHiveFactoryUtil {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(MyHiveFactoryUtil.class);
-    private static final Properties PROPERTIES = new Properties();
-    private static HiveConfig hiveConfig;
+  private static final Logger LOGGER = LoggerFactory.getLogger(MyHiveFactoryUtil.class);
+  private static final Properties PROPERTIES = new Properties();
+  private static HiveConfig hiveConfig;
 
-    static {
-        try {
-            File dataSourceFile = ResourceUtils.getFile("classpath:common/hive/hive.properties");
-            InputStream is = new FileInputStream(dataSourceFile);
-            PROPERTIES.load(is);
-        } catch (IOException e) {
-            LOGGER.error(e.getMessage(), e);
-        }
+  static {
+    try {
+      File dataSourceFile = ResourceUtils.getFile("classpath:common/hive/hive.properties");
+      InputStream is = new FileInputStream(dataSourceFile);
+      PROPERTIES.load(is);
+    } catch (IOException e) {
+      LOGGER.error(e.getMessage(), e);
     }
+  }
 
-    public static void buildHiveConfig(HiveConfig hiveConfig) {
-        hiveConfig.setMetastoreUris(PROPERTIES.getProperty("hive.metastore.uris"));
-        hiveConfig.setThriftUris(PROPERTIES.getProperty("hive.thrift.uris"));
-        hiveConfig.setRootUser(PROPERTIES.getProperty("hive.root.user"));
-        hiveConfig.setPassword(PROPERTIES.getProperty("hive.root.password"));
-        hiveConfig.setJdoUrl(PROPERTIES.getProperty("javax.jdo.option.ConnectionURL"));
-        hiveConfig.setJdoDriverName(PROPERTIES.getProperty("javax.jdo.option.ConnectionDriverName"));
-        hiveConfig.setJdoUser(PROPERTIES.getProperty("javax.jdo.option.ConnectionUserName"));
-        hiveConfig.setJdoPassword(PROPERTIES.getProperty("javax.jdo.option.ConnectionPassword"));
-    }
+  public static void buildHiveConfig(HiveConfig hiveConfig) {
+    hiveConfig.setMetastoreUris(PROPERTIES.getProperty("hive.metastore.uris"));
+    hiveConfig.setThriftUris(PROPERTIES.getProperty("hive.thrift.uris"));
+    hiveConfig.setRootUser(PROPERTIES.getProperty("hive.root.user"));
+    hiveConfig.setPassword(PROPERTIES.getProperty("hive.root.password"));
+    hiveConfig.setJdoUrl(PROPERTIES.getProperty("javax.jdo.option.ConnectionURL"));
+    hiveConfig.setJdoDriverName(PROPERTIES.getProperty("javax.jdo.option.ConnectionDriverName"));
+    hiveConfig.setJdoUser(PROPERTIES.getProperty("javax.jdo.option.ConnectionUserName"));
+    hiveConfig.setJdoPassword(PROPERTIES.getProperty("javax.jdo.option.ConnectionPassword"));
+  }
 
-    public static HiveConfig getInstance() {
+  public static HiveConfig getInstance() {
+    if (hiveConfig == null) {
+      synchronized (MyHiveFactoryUtil.class) {
         if (hiveConfig == null) {
-            synchronized (MyHiveFactoryUtil.class) {
-                if (hiveConfig == null) {
-                    HiveConfig hiveConfigTemp = new HiveConfig();
-                    buildHiveConfig(hiveConfigTemp);
-                    hiveConfig = hiveConfigTemp;
-                }
-            }
+          HiveConfig hiveConfigTemp = new HiveConfig();
+          buildHiveConfig(hiveConfigTemp);
+          hiveConfig = hiveConfigTemp;
         }
-        return hiveConfig;
+      }
     }
+    return hiveConfig;
+  }
 
 }

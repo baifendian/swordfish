@@ -13,93 +13,94 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.baifendian.swordfish.dao.model;
 
 /**
- * workflow 的自定义参数
- * <p>
- * 
+ * workflow 的自定义参数 <p>
+ *
  * @author : dsfan
  * @date : 2016年10月12日
  */
 public class FlowParam {
 
-    /** workflow id */
-    private int flowId;
+  /**
+   * workflow id
+   */
+  private int flowId;
 
-    /** 参数名 */
-    private String key;
+  /**
+   * 参数名
+   */
+  private String key;
 
-    /** 参数值 */
-    private String value;
+  /**
+   * 参数值
+   */
+  private String value;
 
-    @Override
-    public String toString() {
-        return "FlowParam [flowId=" + flowId + ", key=" + key + ", value=" + value + "]";
-    }
+  @Override
+  public String toString() {
+    return "FlowParam [flowId=" + flowId + ", key=" + key + ", value=" + value + "]";
+  }
 
-    /**
-     * getter method
-     * 
-     * @see FlowParam#flowId
-     * @return the flowId
-     */
-    public int getFlowId() {
-        return flowId;
-    }
+  /**
+   * getter method
+   *
+   * @return the flowId
+   * @see FlowParam#flowId
+   */
+  public int getFlowId() {
+    return flowId;
+  }
 
-    /**
-     * setter method
-     * 
-     * @see FlowParam#flowId
-     * @param flowId
-     *            the flowId to set
-     */
-    public void setFlowId(int flowId) {
-        this.flowId = flowId;
-    }
+  /**
+   * setter method
+   *
+   * @param flowId the flowId to set
+   * @see FlowParam#flowId
+   */
+  public void setFlowId(int flowId) {
+    this.flowId = flowId;
+  }
 
-    /**
-     * getter method
-     * 
-     * @see FlowParam#key
-     * @return the key
-     */
-    public String getKey() {
-        return key;
-    }
+  /**
+   * getter method
+   *
+   * @return the key
+   * @see FlowParam#key
+   */
+  public String getKey() {
+    return key;
+  }
 
-    /**
-     * setter method
-     * 
-     * @see FlowParam#key
-     * @param key
-     *            the key to set
-     */
-    public void setKey(String key) {
-        this.key = key;
-    }
+  /**
+   * setter method
+   *
+   * @param key the key to set
+   * @see FlowParam#key
+   */
+  public void setKey(String key) {
+    this.key = key;
+  }
 
-    /**
-     * getter method
-     * 
-     * @see FlowParam#value
-     * @return the value
-     */
-    public String getValue() {
-        return value;
-    }
+  /**
+   * getter method
+   *
+   * @return the value
+   * @see FlowParam#value
+   */
+  public String getValue() {
+    return value;
+  }
 
-    /**
-     * setter method
-     * 
-     * @see FlowParam#value
-     * @param value
-     *            the value to set
-     */
-    public void setValue(String value) {
-        this.value = value;
-    }
+  /**
+   * setter method
+   *
+   * @param value the value to set
+   * @see FlowParam#value
+   */
+  public void setValue(String value) {
+    this.value = value;
+  }
 
 }

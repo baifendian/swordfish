@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.baifendian.swordfish.execserver.job.process;
 
 import com.baifendian.swordfish.common.job.BaseParam;
@@ -27,38 +26,38 @@ import java.util.Map;
  */
 public class ProcessParam extends BaseParam {
 
-    private String script;
+  private String script;
 
-    private List<String> args;
+  private List<String> args;
 
-    private Map<String, String> envMap;
+  private Map<String, String> envMap;
 
-    public String getScript() {
-        return script;
-    }
+  public String getScript() {
+    return script;
+  }
 
-    public void setScript(String script) {
-        this.script = script;
-    }
+  public void setScript(String script) {
+    this.script = script;
+  }
 
-    public List<String> getArgs() {
-        return args;
-    }
+  public List<String> getArgs() {
+    return args;
+  }
 
-    public void setArgs(List<String> args) {
-        this.args = args;
-    }
+  public void setArgs(List<String> args) {
+    this.args = args;
+  }
 
-    public Map<String, String> getEnvMap() {
-        return envMap;
-    }
+  public Map<String, String> getEnvMap() {
+    return envMap;
+  }
 
-    public void setEnvMap(Map<String, String> envMap) {
-        this.envMap = envMap;
-    }
+  public void setEnvMap(Map<String, String> envMap) {
+    this.envMap = envMap;
+  }
 
-    @Override
-    public List<String> getResourceFiles(){
-        return null;
-    }
+  @Override
+  public List<String> getResourceFiles() {
+    return null;
+  }
 }

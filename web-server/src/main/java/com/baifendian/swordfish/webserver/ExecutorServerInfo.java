@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.baifendian.swordfish.webserver;
 
 import com.baifendian.swordfish.rpc.HeartBeatData;
@@ -24,33 +23,33 @@ import com.baifendian.swordfish.rpc.HeartBeatData;
  */
 public class ExecutorServerInfo {
 
-    private String host;
+  private String host;
 
-    private int port;
+  private int port;
 
-    private HeartBeatData heartBeatData;
+  private HeartBeatData heartBeatData;
 
-    public String getHost() {
-        return host;
-    }
+  public String getHost() {
+    return host;
+  }
 
-    public void setHost(String host) {
-        this.host = host;
-    }
+  public void setHost(String host) {
+    this.host = host;
+  }
 
-    public int getPort() {
-        return port;
-    }
+  public int getPort() {
+    return port;
+  }
 
-    public void setPort(int port) {
-        this.port = port;
-    }
+  public void setPort(int port) {
+    this.port = port;
+  }
 
-    public HeartBeatData getHeartBeatData() {
-        return heartBeatData;
-    }
+  public HeartBeatData getHeartBeatData() {
+    return heartBeatData;
+  }
 
-    public void setHeartBeatData(HeartBeatData heartBeatData) {
-        this.heartBeatData = heartBeatData;
-    }
+  public void setHeartBeatData(HeartBeatData heartBeatData) {
+    this.heartBeatData = heartBeatData;
+  }
 }

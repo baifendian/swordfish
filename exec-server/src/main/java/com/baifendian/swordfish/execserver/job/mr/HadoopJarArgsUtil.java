@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.baifendian.swordfish.execserver.job.mr;
 
 import org.apache.commons.lang.StringUtils;
@@ -22,63 +21,61 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Hadoop jar 参数构建器
- * <p>
- * 
+ * Hadoop jar 参数构建器 <p>
+ *
  * @author : dsfan
  * @date : 2016年11月22日
  */
 public class HadoopJarArgsUtil {
 
-    /**
-     * 构建参数数组
-     * <p>
-     *
-     * @return 参数数组
-     */
-    public static List<String> buildArgs(MrParam param) {
-        List<String> args = new ArrayList<>();
+  /**
+   * 构建参数数组 <p>
+   *
+   * @return 参数数组
+   */
+  public static List<String> buildArgs(MrParam param) {
+    List<String> args = new ArrayList<>();
 
-        if (StringUtils.isNotEmpty(param.getMainJar().getRes())) {
-            args.add(param.getMainJar().getRes());
-        }
-
-        if (StringUtils.isNotEmpty(param.getMainClass())) {
-            args.add(param.getMainClass());
-        }
-
-        if (param.getDArgs() != null && !param.getDArgs().isEmpty()) {
-            for (String darg : param.getDArgs()) {
-                args.add(HadoopJarArgsConst.D);
-                args.add(darg);
-            }
-        }
-
-        if (param.getLibJars() != null && !param.getLibJars().isEmpty()) {
-            args.add(HadoopJarArgsConst.JARS);
-            args.add(StringUtils.join(param.getLibJars().stream().map(p -> p.getRes()).toArray(),","));
-        }
-
-        if (param.getFiles() != null && !param.getFiles().isEmpty()) {
-            args.add(HadoopJarArgsConst.FILES);
-            args.add(StringUtils.join(param.getFiles().stream().map(p -> p.getSymbolicRes()).toArray(), ","));
-        }
-
-        if (param.getArchives() != null && !param.getArchives().isEmpty()) {
-            args.add(HadoopJarArgsConst.ARCHIVES);
-            args.add(StringUtils.join(param.getArchives().stream().map(p -> p.getSymbolicRes()).toArray(), ","));
-        }
-
-        if (StringUtils.isNotEmpty(param.getQueue())) {
-            args.add(HadoopJarArgsConst.D);
-            args.add(HadoopJarArgsConst.QUEUE + "=" + param.getQueue());
-        }
-
-        if (StringUtils.isNotEmpty(param.getArgs())){
-            args.add(param.getArgs());
-        }
-        return args;
+    if (StringUtils.isNotEmpty(param.getMainJar().getRes())) {
+      args.add(param.getMainJar().getRes());
     }
+
+    if (StringUtils.isNotEmpty(param.getMainClass())) {
+      args.add(param.getMainClass());
+    }
+
+    if (param.getDArgs() != null && !param.getDArgs().isEmpty()) {
+      for (String darg : param.getDArgs()) {
+        args.add(HadoopJarArgsConst.D);
+        args.add(darg);
+      }
+    }
+
+    if (param.getLibJars() != null && !param.getLibJars().isEmpty()) {
+      args.add(HadoopJarArgsConst.JARS);
+      args.add(StringUtils.join(param.getLibJars().stream().map(p -> p.getRes()).toArray(), ","));
+    }
+
+    if (param.getFiles() != null && !param.getFiles().isEmpty()) {
+      args.add(HadoopJarArgsConst.FILES);
+      args.add(StringUtils.join(param.getFiles().stream().map(p -> p.getSymbolicRes()).toArray(), ","));
+    }
+
+    if (param.getArchives() != null && !param.getArchives().isEmpty()) {
+      args.add(HadoopJarArgsConst.ARCHIVES);
+      args.add(StringUtils.join(param.getArchives().stream().map(p -> p.getSymbolicRes()).toArray(), ","));
+    }
+
+    if (StringUtils.isNotEmpty(param.getQueue())) {
+      args.add(HadoopJarArgsConst.D);
+      args.add(HadoopJarArgsConst.QUEUE + "=" + param.getQueue());
+    }
+
+    if (StringUtils.isNotEmpty(param.getArgs())) {
+      args.add(param.getArgs());
+    }
+    return args;
+  }
 
 }
 

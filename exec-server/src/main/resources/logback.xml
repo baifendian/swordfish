@@ -1,7 +1,24 @@
+<!--
+  ~ Copyright (C) 2017 Baifendian Corporation
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~          http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
 <!-- Logback configuration. See http://logback.qos.ch/manual/index.html -->
 <configuration scan="true" scanPeriod="10 seconds">
 
-    <conversionRule conversionWord="nanos" converterClass="com.baifendian.swordfish.common.utils.NanoSampleConverter" />
+    <conversionRule conversionWord="nanos"
+                    converterClass="com.baifendian.swordfish.common.utils.NanoSampleConverter"/>
 
     <!-- Simple file output -->
     <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
@@ -67,13 +84,13 @@
     <!-- Enable FILE and STDOUT appenders for all log messages.
          By default, only log at level INFO and above. -->
     <root level="TRACE">
-        <appender-ref ref="FILE" />
-        <appender-ref ref="STDOUT" />
+        <appender-ref ref="FILE"/>
+        <appender-ref ref="STDOUT"/>
     </root>
 
     <!-- For loggers in the these namespaces, log at all levels. -->
-    <logger name="pedestal" level="ALL" />
-    <logger name="hammock-cafe" level="ALL" />
-    <logger name="user" level="ALL" />
+    <logger name="pedestal" level="ALL"/>
+    <logger name="hammock-cafe" level="ALL"/>
+    <logger name="user" level="ALL"/>
 
 </configuration>

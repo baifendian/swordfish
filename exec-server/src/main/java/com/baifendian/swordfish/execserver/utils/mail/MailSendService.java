@@ -13,19 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.baifendian.swordfish.execserver.utils.mail;
 
 import com.baifendian.swordfish.common.mail.MailSendUtil;
 import com.baifendian.swordfish.dao.BaseDao;
 import com.baifendian.swordfish.dao.datasource.ConnectionFactory;
-import com.baifendian.swordfish.dao.mysql.MyBatisSqlSessionFactoryUtil;
 import com.baifendian.swordfish.dao.mapper.ProjectFlowMapper;
 import com.baifendian.swordfish.dao.mapper.ProjectMapper;
 import com.baifendian.swordfish.dao.mapper.ProjectUserMapper;
 import com.baifendian.swordfish.dao.mapper.UserMapper;
 import com.baifendian.swordfish.dao.model.ProjectFlow;
 import com.baifendian.swordfish.dao.model.User;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,7 +36,7 @@ import java.util.Collection;
 import java.util.List;
 
 @Component
-public class MailSendService extends BaseDao{
+public class MailSendService extends BaseDao {
   private final Logger LOGGER = LoggerFactory.getLogger(getClass());
 
   @Autowired
@@ -51,13 +50,13 @@ public class MailSendService extends BaseDao{
 
   @Autowired
   private ProjectMapper projectMapper;
-  
+
   @Override
   protected void init() {
-	 userMapper = ConnectionFactory.getSqlSessionFactory().openSession().getMapper(UserMapper.class);
-	 projectUserMapper = ConnectionFactory.getSqlSessionFactory().openSession().getMapper(ProjectUserMapper.class);
-     projectFlowMapper = ConnectionFactory.getSqlSessionFactory().openSession().getMapper(ProjectFlowMapper.class);
-	 projectMapper = ConnectionFactory.getSqlSessionFactory().openSession().getMapper(ProjectMapper.class);
+    userMapper = ConnectionFactory.getSqlSessionFactory().openSession().getMapper(UserMapper.class);
+    projectUserMapper = ConnectionFactory.getSqlSessionFactory().openSession().getMapper(ProjectUserMapper.class);
+    projectFlowMapper = ConnectionFactory.getSqlSessionFactory().openSession().getMapper(ProjectFlowMapper.class);
+    projectMapper = ConnectionFactory.getSqlSessionFactory().openSession().getMapper(ProjectMapper.class);
   }
 
   /**
@@ -90,7 +89,6 @@ public class MailSendService extends BaseDao{
    * @param projectId 项目的id
    * @param title     邮件主题
    * @param content   邮件内容(支持HTML)
-   * @return
    */
   public boolean sendToProjectUsers(int projectId, String title, String content) {
     List<User> users = projectUserMapper.queryForUser(projectId);
@@ -112,11 +110,10 @@ public class MailSendService extends BaseDao{
   /**
    * 若workflow无邮件组，且指定sendToUserIfMailsEmpty为true时，则发送邮件给项目组成员
    *
-   * @param flowId              flowid
+   * @param flowId                 flowid
    * @param title                  邮件主题
    * @param content                邮件内容
    * @param sendToUserIfMailsEmpty 标志位，若项目无邮件组发送邮件给项目成员
-   * @return
    */
   public boolean sendToFlowMails(int flowId, String title, String content, boolean sendToUserIfMailsEmpty) {
     ProjectFlow flow = projectFlowMapper.findById(flowId);

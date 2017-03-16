@@ -20,17 +20,12 @@ import org.apache.ibatis.jdbc.SQL;
 import java.util.Map;
 
 /**
- * author: smile8
- * date:   2017/3/16
- * desc:   session 相关的 sql 生成器
+ * author: smile8 date:   2017/3/16 desc:   session 相关的 sql 生成器
  */
 public class SessionMapperProvider {
 
   /**
    * 生成查询 sql
-   *
-   * @param parameter
-   * @return
    */
   public String queryById(Map<String, Object> parameter) {
     return new SQL() {{
@@ -42,9 +37,6 @@ public class SessionMapperProvider {
 
   /**
    * 生成插入 sql
-   *
-   * @param parameter
-   * @return
    */
   public String insert(Map<String, Object> parameter) {
     return new SQL() {{
@@ -58,9 +50,6 @@ public class SessionMapperProvider {
 
   /**
    * 生成删除 sql
-   *
-   * @param parameter
-   * @return
    */
   public String deleteById(Map<String, Object> parameter) {
     return new SQL() {{
@@ -71,9 +60,6 @@ public class SessionMapperProvider {
 
   /**
    * 生成删除 sql
-   *
-   * @param parameter
-   * @return
    */
   public String deleteByExpireTime(Map<String, Object> parameter) {
     return new SQL() {{
@@ -84,9 +70,6 @@ public class SessionMapperProvider {
 
   /**
    * 生成更新 sql
-   *
-   * @param parameter
-   * @return
    */
   public String update(Map<String, Object> parameter) {
     return new SQL() {

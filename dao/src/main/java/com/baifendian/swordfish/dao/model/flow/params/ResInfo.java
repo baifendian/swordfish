@@ -13,87 +13,88 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.baifendian.swordfish.dao.model.flow.params;
 
 /**
- * 资源信息
- * <p>
- * 
+ * 资源信息 <p>
+ *
  * @author : dsfan
  * @date : 2016年10月10日
  */
 public class ResInfo {
-    /** 资源 id */
-    private int id;
+  /**
+   * 资源 id
+   */
+  private int id;
 
-    /** 资源别名 */
-    private String alias;
+  /**
+   * 资源别名
+   */
+  private String alias;
 
-    /** 资源的相对路径(用于第三方接口) */
-    private String path;
+  /**
+   * 资源的相对路径(用于第三方接口)
+   */
+  private String path;
 
-    /**
-     * getter method
-     * 
-     * @see ResInfo#id
-     * @return the id
-     */
-    public int getId() {
-        return id;
-    }
+  /**
+   * getter method
+   *
+   * @return the id
+   * @see ResInfo#id
+   */
+  public int getId() {
+    return id;
+  }
 
-    /**
-     * setter method
-     * 
-     * @see ResInfo#id
-     * @param id
-     *            the id to set
-     */
-    public void setId(int id) {
-        this.id = id;
-    }
+  /**
+   * setter method
+   *
+   * @param id the id to set
+   * @see ResInfo#id
+   */
+  public void setId(int id) {
+    this.id = id;
+  }
 
-    /**
-     * getter method
-     * 
-     * @see ResInfo#alias
-     * @return the alias
-     */
-    public String getAlias() {
-        return alias;
-    }
+  /**
+   * getter method
+   *
+   * @return the alias
+   * @see ResInfo#alias
+   */
+  public String getAlias() {
+    return alias;
+  }
 
-    /**
-     * setter method
-     * 
-     * @see ResInfo#alias
-     * @param alias
-     *            the alias to set
-     */
-    public void setAlias(String alias) {
-        this.alias = alias;
-    }
+  /**
+   * setter method
+   *
+   * @param alias the alias to set
+   * @see ResInfo#alias
+   */
+  public void setAlias(String alias) {
+    this.alias = alias;
+  }
 
-    /**
-     * getter method
-     * 
-     * @see ResInfo#path
-     * @return the path
-     */
-    public String getPath() {
-        return path;
-    }
+  /**
+   * getter method
+   *
+   * @return the path
+   * @see ResInfo#path
+   */
+  public String getPath() {
+    return path;
+  }
 
-    /**
-     * setter method
-     * 
-     * @see ResInfo#path
-     * @param path
-     *            the path to set
-     */
-    public void setPath(String path) {
-        this.path = path;
-    }
+  /**
+   * setter method
+   *
+   * @param path the path to set
+   * @see ResInfo#path
+   */
+  public void setPath(String path) {
+    this.path = path;
+  }
 
 }

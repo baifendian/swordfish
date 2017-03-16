@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.baifendian.swordfish.execserver.utils;
 
 import org.apache.thrift.TProcessor;
@@ -33,15 +32,15 @@ import java.net.InetSocketAddress;
  */
 public class ThriftUtil {
 
-    public static TServer getTThreadPoolServer(TProtocolFactory protocolFactory, TProcessor processor,
-                                                TTransportFactory transportFactory, InetSocketAddress inetSocketAddress, int minWorkerThreads, int maxWorkerThreads) throws TTransportException {
-        TServerTransport serverTransport = new TServerSocket(inetSocketAddress);
-        TThreadPoolServer.Args serverArgs = new TThreadPoolServer.Args(serverTransport);
-        serverArgs.minWorkerThreads(minWorkerThreads);
-        serverArgs.maxWorkerThreads(maxWorkerThreads);
-        serverArgs.processor(processor);
-        serverArgs.transportFactory(transportFactory);
-        serverArgs.protocolFactory(protocolFactory);
-        return new TThreadPoolServer(serverArgs);
-    }
+  public static TServer getTThreadPoolServer(TProtocolFactory protocolFactory, TProcessor processor,
+                                             TTransportFactory transportFactory, InetSocketAddress inetSocketAddress, int minWorkerThreads, int maxWorkerThreads) throws TTransportException {
+    TServerTransport serverTransport = new TServerSocket(inetSocketAddress);
+    TThreadPoolServer.Args serverArgs = new TThreadPoolServer.Args(serverTransport);
+    serverArgs.minWorkerThreads(minWorkerThreads);
+    serverArgs.maxWorkerThreads(maxWorkerThreads);
+    serverArgs.processor(processor);
+    serverArgs.transportFactory(transportFactory);
+    serverArgs.protocolFactory(protocolFactory);
+    return new TThreadPoolServer(serverArgs);
+  }
 }

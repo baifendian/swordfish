@@ -25,6 +25,7 @@ import com.baifendian.swordfish.dao.mapper.*;
 import com.baifendian.swordfish.dao.model.*;
 import com.baifendian.swordfish.dao.model.flow.FlowDag;
 import com.baifendian.swordfish.dao.model.flow.ScheduleMeta;
+
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -35,9 +36,7 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * author: dsfan
- * date:   2017/3/16
- * desc:
+ * author: dsfan date:   2017/3/16 desc:
  */
 @Component
 public class FlowDao extends BaseDao {
@@ -87,10 +86,8 @@ public class FlowDao extends BaseDao {
   }
 
   /**
-   * 获取 flow 执行详情
-   * <p>
+   * 获取 flow 执行详情 <p>
    *
-   * @param execId
    * @return {@link ExecutionFlow}
    */
   public ExecutionFlow queryExecutionFlow(long execId) {
@@ -98,22 +95,15 @@ public class FlowDao extends BaseDao {
   }
 
   /**
-   * 获取所有未完成的 flow 列表
-   * <p>
-   *
-   * @return
+   * 获取所有未完成的 flow 列表 <p>
    */
   public List<ExecutionFlow> queryAllNoFinishFlow() {
     return executionFlowMapper.selectNoFinishFlow();
   }
 
   /**
-   * 按时间段查询 flow 的调度的最新运行状态(调度或者补数据)
-   * <p>
+   * 按时间段查询 flow 的调度的最新运行状态(调度或者补数据) <p>
    *
-   * @param flowId
-   * @param startDate
-   * @param endDate
    * @return List<{@link ExecutionFlow}>
    */
   public List<ExecutionFlow> queryFlowLastStatus(Integer flowId, Date startDate, Date endDate) {
@@ -121,11 +111,8 @@ public class FlowDao extends BaseDao {
   }
 
   /**
-   * 按时间查询 flow 的调度的最新运行状态(调度或者补数据)
-   * <p>
+   * 按时间查询 flow 的调度的最新运行状态(调度或者补数据) <p>
    *
-   * @param flowId
-   * @param scheduleTime
    * @return List<{@link ExecutionFlow}>
    */
   public List<ExecutionFlow> queryFlowLastStatus(int flowId, Date scheduleTime) {
@@ -133,11 +120,8 @@ public class FlowDao extends BaseDao {
   }
 
   /**
-   * 更新 flow 执行状态
-   * <p>
+   * 更新 flow 执行状态 <p>
    *
-   * @param execId
-   * @param status
    * @return 是否成功
    */
   public boolean updateExecutionFlowStatus(long execId, FlowStatus status) {
@@ -167,10 +151,8 @@ public class FlowDao extends BaseDao {
   }
 
   /**
-   * 更新 flow 执行详情
-   * <p>
+   * 更新 flow 执行详情 <p>
    *
-   * @param executionFlow
    * @return 是否成功
    */
   public boolean updateExecutionFlow(ExecutionFlow executionFlow) {
@@ -178,10 +160,8 @@ public class FlowDao extends BaseDao {
   }
 
   /**
-   * 获取 workflow 详情
-   * <p>
+   * 获取 workflow 详情 <p>
    *
-   * @param workflowId
    * @return {@link ProjectFlow}
    */
   public ProjectFlow queryFlow(Integer workflowId) {
@@ -189,11 +169,8 @@ public class FlowDao extends BaseDao {
   }
 
   /**
-   * 执行 workflow 时，插入执行信息
-   * <p>
+   * 执行 workflow 时，插入执行信息 <p>
    *
-   * @param projectId
-   * @param workflowId
    * @return {@link ExecutionFlow}
    */
   public ExecutionFlow runFlowToExecution(Integer projectId, Integer workflowId) {
@@ -220,14 +197,8 @@ public class FlowDao extends BaseDao {
   }
 
   /**
-   * 调度 workflow 时，插入执行信息（调度或者补数据）
-   * <p>
+   * 调度 workflow 时，插入执行信息（调度或者补数据） <p>
    *
-   * @param projectId
-   * @param workflowId
-   * @param submitUser
-   * @param scheduleTime
-   * @param runType
    * @return {@link ExecutionFlow}
    */
   public ExecutionFlow scheduleFlowToExecution(Integer projectId, Integer workflowId, int submitUser, Date scheduleTime, FlowRunType runType) {
@@ -298,8 +269,6 @@ public class FlowDao extends BaseDao {
 
   /**
    * 创建节点
-   *
-   * @throws Exception
    */
   @Transactional(value = "TransactionManager")
   public void createNode(int projectId, int workflowId, NodeType nodeType, int userId, String name) throws Exception {
@@ -375,10 +344,7 @@ public class FlowDao extends BaseDao {
   }
 
   /**
-   * 插入 ExecutionNode
-   * <p>
-   *
-   * @param executionNode
+   * 插入 ExecutionNode <p>
    */
   public void insertExecutionNode(ExecutionNode executionNode) {
     // 插入执行节点信息
@@ -386,10 +352,7 @@ public class FlowDao extends BaseDao {
   }
 
   /**
-   * 更新 ExecutionNode
-   * <p>
-   *
-   * @param executionNode
+   * 更新 ExecutionNode <p>
    */
   public void updateExecutionNode(ExecutionNode executionNode) {
     // 更新执行节点信息
@@ -397,10 +360,7 @@ public class FlowDao extends BaseDao {
   }
 
   /**
-   * 插入 ExecNodeLog
-   * <p>
-   *
-   * @param execNodeLog
+   * 插入 ExecNodeLog <p>
    */
   public void insertExecNodeLog(ExecNodeLog execNodeLog) {
     // 插入执行节点执行日志
@@ -408,12 +368,8 @@ public class FlowDao extends BaseDao {
   }
 
   /**
-   * 获取 node 执行详情
-   * <p>
+   * 获取 node 执行详情 <p>
    *
-   * @param execId
-   * @param nodeId
-   * @param attempt
    * @return {@link ExecutionNode}
    */
   public ExecutionNode queryExecutionNode(long execId, Integer nodeId, Integer attempt) {
@@ -425,10 +381,8 @@ public class FlowDao extends BaseDao {
   }
 
   /**
-   * 查询 Schedule
-   * <p>
+   * 查询 Schedule <p>
    *
-   * @param flowId
    * @return {@link Schedule}
    */
   public Schedule querySchedule(int flowId) {

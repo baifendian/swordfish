@@ -13,13 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.baifendian.swordfish.dao.enums;
 
 /**
- * author: smile8
- * date:   24/09/2016
- * desc:
+ * author: smile8 date:   24/09/2016 desc:
  */
 public enum WriterModeType {
   OVERWRITE,

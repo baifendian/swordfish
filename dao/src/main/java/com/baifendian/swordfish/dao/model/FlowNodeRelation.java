@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.baifendian.swordfish.dao.model;
 
 import com.baifendian.swordfish.common.utils.json.JsonUtil;
@@ -25,8 +24,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 /**
- * 已发布workflow节点关系信息
- * <p>
+ * 已发布workflow节点关系信息 <p>
  *
  * @author : wenting.wang
  * @author : dsfan
@@ -34,62 +32,61 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
  */
 public class FlowNodeRelation {
 
-    private int flowId;
+  private int flowId;
 
-    private int startId;
+  private int startId;
 
-    private int endId;
+  private int endId;
 
-    @JsonDeserialize(using = StringNodeJsonDeserializer.class)
-    @JsonSerialize(using = StringNodeJsonSerializer.class)
-    private String attribute;
+  @JsonDeserialize(using = StringNodeJsonDeserializer.class)
+  @JsonSerialize(using = StringNodeJsonSerializer.class)
+  private String attribute;
 
-    @JsonIgnore
-    private EdgeAttribute attributeObject;
+  @JsonIgnore
+  private EdgeAttribute attributeObject;
 
-    public int getFlowId() {
-        return flowId;
+  public int getFlowId() {
+    return flowId;
+  }
+
+  public void setFlowId(int flowId) {
+    this.flowId = flowId;
+  }
+
+  public int getStartId() {
+    return startId;
+  }
+
+  public void setStartId(int startId) {
+    this.startId = startId;
+  }
+
+  public int getEndId() {
+    return endId;
+  }
+
+  public void setEndId(int endId) {
+    this.endId = endId;
+  }
+
+  public String getAttribute() {
+    return attribute;
+  }
+
+  public void setAttribute(String attribute) {
+    this.attribute = attribute;
+  }
+
+  /**
+   * 获取 EdgeAttribute 对象 <p>
+   *
+   * @return EdgeAttribute 对象
+   */
+  public EdgeAttribute getAttributeObject() {
+    if (attributeObject == null) {
+      attributeObject = JsonUtil.parseObject(attribute, EdgeAttribute.class);
     }
-
-    public void setFlowId(int flowId) {
-        this.flowId = flowId;
-    }
-
-    public int getStartId() {
-        return startId;
-    }
-
-    public void setStartId(int startId) {
-        this.startId = startId;
-    }
-
-    public int getEndId() {
-        return endId;
-    }
-
-    public void setEndId(int endId) {
-        this.endId = endId;
-    }
-
-    public String getAttribute() {
-        return attribute;
-    }
-
-    public void setAttribute(String attribute) {
-        this.attribute = attribute;
-    }
-
-    /**
-     * 获取 EdgeAttribute 对象
-     * <p>
-     *
-     * @return EdgeAttribute 对象
-     */
-    public EdgeAttribute getAttributeObject() {
-        if (attributeObject == null) {
-            attributeObject = JsonUtil.parseObject(attribute, EdgeAttribute.class);
-        }
-        return attributeObject;
-    }
+    return attributeObject;
+  }
 
 }

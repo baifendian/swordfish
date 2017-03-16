@@ -13,66 +13,66 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.baifendian.swordfish.dao.model;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 即席查询结果的 JsonObject
- * <p>
- * 
+ * 即席查询结果的 JsonObject <p>
+ *
  * @author : dsfan
  * @date : 2016年9月6日
  */
 public class AdHocJsonObject {
-    /** 返回的表头 */
-    private List<String> titles;
+  /**
+   * 返回的表头
+   */
+  private List<String> titles;
 
-    /** 返回的数据 */
-    private List<List<String>> values = new ArrayList<List<String>>();
+  /**
+   * 返回的数据
+   */
+  private List<List<String>> values = new ArrayList<List<String>>();
 
-    /**
-     * getter method
-     * 
-     * @see AdHocJsonObject#titles
-     * @return the titles
-     */
-    public List<String> getTitles() {
-        return titles;
-    }
+  /**
+   * getter method
+   *
+   * @return the titles
+   * @see AdHocJsonObject#titles
+   */
+  public List<String> getTitles() {
+    return titles;
+  }
 
-    /**
-     * setter method
-     * 
-     * @see AdHocJsonObject#titles
-     * @param titles
-     *            the titles to set
-     */
-    public void setTitles(List<String> titles) {
-        this.titles = titles;
-    }
+  /**
+   * setter method
+   *
+   * @param titles the titles to set
+   * @see AdHocJsonObject#titles
+   */
+  public void setTitles(List<String> titles) {
+    this.titles = titles;
+  }
 
-    /**
-     * getter method
-     * 
-     * @see AdHocJsonObject#values
-     * @return the values
-     */
-    public List<List<String>> getValues() {
-        return values;
-    }
+  /**
+   * getter method
+   *
+   * @return the values
+   * @see AdHocJsonObject#values
+   */
+  public List<List<String>> getValues() {
+    return values;
+  }
 
-    /**
-     * setter method
-     * 
-     * @see AdHocJsonObject#values
-     * @param values
-     *            the values to set
-     */
-    public void setValues(List<List<String>> values) {
-        this.values = values;
-    }
+  /**
+   * setter method
+   *
+   * @param values the values to set
+   * @see AdHocJsonObject#values
+   */
+  public void setValues(List<List<String>> values) {
+    this.values = values;
+  }
 
 }

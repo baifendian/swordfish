@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.baifendian.swordfish.dao.mapper;
 
 import org.apache.commons.lang.StringUtils;
@@ -26,35 +25,35 @@ import java.util.Map;
  * @date : 2017-03-10 16:01
  */
 public class MasterServerMapperSQL {
-    public String query(){
-        return new SQL(){{
-            SELECT("*");
-            FROM("master_server");
-        }}.toString();
-    }
+  public String query() {
+    return new SQL() {{
+      SELECT("*");
+      FROM("master_server");
+    }}.toString();
+  }
 
-    public String insert(Map<String,Object> parameter){
-        return new SQL(){{
-            INSERT_INTO("master_server");
-            VALUES("host","#{masterServer.host}");
-            VALUES("port","#{masterServer.port}");
-            VALUES("update_time","#{masterServer.updateTime}");
-        }}.toString();
-    }
+  public String insert(Map<String, Object> parameter) {
+    return new SQL() {{
+      INSERT_INTO("master_server");
+      VALUES("host", "#{masterServer.host}");
+      VALUES("port", "#{masterServer.port}");
+      VALUES("update_time", "#{masterServer.updateTime}");
+    }}.toString();
+  }
 
-    public String update(Map<String,Object> parameter){
-        return new SQL(){{
-            UPDATE("master_server");
-            SET("update_time=#{masterServer.updateTime}");
-            WHERE("host=#{masterServer.host}");
-            WHERE("port=#{masterServer.port}");
-        }}.toString();
-    }
+  public String update(Map<String, Object> parameter) {
+    return new SQL() {{
+      UPDATE("master_server");
+      SET("update_time=#{masterServer.updateTime}");
+      WHERE("host=#{masterServer.host}");
+      WHERE("port=#{masterServer.port}");
+    }}.toString();
+  }
 
-    public String delete(){
-        return new SQL(){{
-            DELETE_FROM("master_server");
-        }}.toString();
-    }
+  public String delete() {
+    return new SQL() {{
+      DELETE_FROM("master_server");
+    }}.toString();
+  }
 
 }

@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.baifendian.swordfish.dao.model.flow;
 
 import com.baifendian.swordfish.dao.enums.ScheduleType;
@@ -21,51 +20,50 @@ import com.baifendian.swordfish.dao.enums.ScheduleType;
 import java.util.Date;
 
 /**
- * schedule的基本
- * <p>
+ * schedule的基本 <p>
  *
  * @author : wenting.wang
  * @date : 2016年8月26日
  */
 public class ScheduleMeta {
 
-    private Date startDate;
+  private Date startDate;
 
-    private Date endDate;
+  private Date endDate;
 
-    private ScheduleType type;
+  private ScheduleType type;
 
-    private String crontab;
+  private String crontab;
 
-    public Date getStartDate() {
-        return startDate;
-    }
+  public Date getStartDate() {
+    return startDate;
+  }
 
-    public void setStartDate(Date startDate) {
-        this.startDate = startDate;
-    }
+  public void setStartDate(Date startDate) {
+    this.startDate = startDate;
+  }
 
-    public Date getEndDate() {
-        return endDate;
-    }
+  public Date getEndDate() {
+    return endDate;
+  }
 
-    public void setEndDate(Date endDate) {
-        this.endDate = endDate;
-    }
+  public void setEndDate(Date endDate) {
+    this.endDate = endDate;
+  }
 
-    public ScheduleType getType() {
-        return type;
-    }
+  public ScheduleType getType() {
+    return type;
+  }
 
-    public void setType(ScheduleType type) {
-        this.type = type;
-    }
+  public void setType(ScheduleType type) {
+    this.type = type;
+  }
 
-    public String getCrontab() {
-        return crontab;
-    }
+  public String getCrontab() {
+    return crontab;
+  }
 
-    public void setCrontab(String crontab) {
-        this.crontab = crontab;
-    }
+  public void setCrontab(String crontab) {
+    this.crontab = crontab;
+  }
 }

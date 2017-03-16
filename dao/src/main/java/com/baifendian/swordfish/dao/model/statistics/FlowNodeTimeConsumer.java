@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.baifendian.swordfish.dao.model.statistics;
 
 import com.baifendian.swordfish.common.consts.Constants;
@@ -25,143 +24,142 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import java.util.Date;
 
 /**
- *  工作流和任务耗时排行
- * <p>
+ * 工作流和任务耗时排行 <p>
  *
  * @author : wenting.wang
  * @date : 2016年9月29日
  */
 public class FlowNodeTimeConsumer {
 
-    private Long execId;
+  private Long execId;
 
-    private int flowId;
+  private int flowId;
 
-    private String flowName;
+  private String flowName;
 
-    private FlowType flowType;
+  private FlowType flowType;
 
-    private int nodeId;
+  private int nodeId;
 
-    private String nodeName;
+  private String nodeName;
 
-    private NodeType nodeType;
+  private NodeType nodeType;
 
-    private int submitUser;
+  private int submitUser;
 
-    private String submitUserName;
+  private String submitUserName;
 
-    @JsonFormat(pattern = Constants.BASE_DATETIME_FORMAT)
-    private Date startTime;
+  @JsonFormat(pattern = Constants.BASE_DATETIME_FORMAT)
+  private Date startTime;
 
-    @JsonFormat(pattern = Constants.BASE_DATETIME_FORMAT)
-    private Date endTime;
+  @JsonFormat(pattern = Constants.BASE_DATETIME_FORMAT)
+  private Date endTime;
 
-    private int duration;
+  private int duration;
 
-    private FlowStatus status;
+  private FlowStatus status;
 
-    public Long getExecId() {
-        return execId;
-    }
+  public Long getExecId() {
+    return execId;
+  }
 
-    public void setExecId(Long execId) {
-        this.execId = execId;
-    }
+  public void setExecId(Long execId) {
+    this.execId = execId;
+  }
 
-    public int getFlowId() {
-        return flowId;
-    }
+  public int getFlowId() {
+    return flowId;
+  }
 
-    public void setFlowId(int flowId) {
-        this.flowId = flowId;
-    }
+  public void setFlowId(int flowId) {
+    this.flowId = flowId;
+  }
 
-    public String getFlowName() {
-        return flowName;
-    }
+  public String getFlowName() {
+    return flowName;
+  }
 
-    public void setFlowName(String flowName) {
-        this.flowName = flowName;
-    }
+  public void setFlowName(String flowName) {
+    this.flowName = flowName;
+  }
 
-    public FlowType getFlowType() {
-        return flowType;
-    }
+  public FlowType getFlowType() {
+    return flowType;
+  }
 
-    public void setFlowType(FlowType flowType) {
-        this.flowType = flowType;
-    }
+  public void setFlowType(FlowType flowType) {
+    this.flowType = flowType;
+  }
 
-    public int getNodeId() {
-        return nodeId;
-    }
+  public int getNodeId() {
+    return nodeId;
+  }
 
-    public void setNodeId(int nodeId) {
-        this.nodeId = nodeId;
-    }
+  public void setNodeId(int nodeId) {
+    this.nodeId = nodeId;
+  }
 
-    public String getNodeName() {
-        return nodeName;
-    }
+  public String getNodeName() {
+    return nodeName;
+  }
 
-    public void setNodeName(String nodeName) {
-        this.nodeName = nodeName;
-    }
+  public void setNodeName(String nodeName) {
+    this.nodeName = nodeName;
+  }
 
-    public NodeType getNodeType() {
-        return nodeType;
-    }
+  public NodeType getNodeType() {
+    return nodeType;
+  }
 
-    public void setNodeType(NodeType nodeType) {
-        this.nodeType = nodeType;
-    }
+  public void setNodeType(NodeType nodeType) {
+    this.nodeType = nodeType;
+  }
 
-    public int getSubmitUser() {
-        return submitUser;
-    }
+  public int getSubmitUser() {
+    return submitUser;
+  }
 
-    public void setSubmitUser(int submitUser) {
-        this.submitUser = submitUser;
-    }
+  public void setSubmitUser(int submitUser) {
+    this.submitUser = submitUser;
+  }
 
-    public String getSubmitUserName() {
-        return submitUserName;
-    }
+  public String getSubmitUserName() {
+    return submitUserName;
+  }
 
-    public void setSubmitUserName(String submitUserName) {
-        this.submitUserName = submitUserName;
-    }
+  public void setSubmitUserName(String submitUserName) {
+    this.submitUserName = submitUserName;
+  }
 
-    public Date getStartTime() {
-        return startTime;
-    }
+  public Date getStartTime() {
+    return startTime;
+  }
 
-    public void setStartTime(Date startTime) {
-        this.startTime = startTime;
-    }
+  public void setStartTime(Date startTime) {
+    this.startTime = startTime;
+  }
 
-    public Date getEndTime() {
-        return endTime;
-    }
+  public Date getEndTime() {
+    return endTime;
+  }
 
-    public void setEndTime(Date endTime) {
-        this.endTime = endTime;
-    }
+  public void setEndTime(Date endTime) {
+    this.endTime = endTime;
+  }
 
-    public int getDuration() {
-        return duration;
-    }
+  public int getDuration() {
+    return duration;
+  }
 
-    public void setDuration(int duration) {
-        this.duration = duration;
-    }
+  public void setDuration(int duration) {
+    this.duration = duration;
+  }
 
-    public FlowStatus getStatus() {
-        return status;
-    }
+  public FlowStatus getStatus() {
+    return status;
+  }
 
-    public void setStatus(FlowStatus status) {
-        this.status = status;
-    }
+  public void setStatus(FlowStatus status) {
+    this.status = status;
+  }
 }

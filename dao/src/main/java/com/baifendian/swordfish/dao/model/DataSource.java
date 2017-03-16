@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.baifendian.swordfish.dao.model;
 
 import com.baifendian.swordfish.common.utils.json.JsonUtil;
 import com.baifendian.swordfish.dao.enums.DbType;
+
 import org.apache.commons.lang.StringUtils;
 
 import java.util.Date;
@@ -149,16 +149,16 @@ public class DataSource {
   @Override
   public String toString() {
     return "DataSource{" +
-        "id=" + id +
-        ", ownerId=" + ownerId +
-        ", ownerName='" + ownerName + '\'' +
-        ", projectId=" + projectId +
-        ", name='" + name + '\'' +
-        ", desc='" + desc + '\'' +
-        ", type=" + type +
-        ", params='" + params + '\'' +
-        ", createTime=" + createTime +
-        ", modifyTime=" + modifyTime +
-        '}';
+            "id=" + id +
+            ", ownerId=" + ownerId +
+            ", ownerName='" + ownerName + '\'' +
+            ", projectId=" + projectId +
+            ", name='" + name + '\'' +
+            ", desc='" + desc + '\'' +
+            ", type=" + type +
+            ", params='" + params + '\'' +
+            ", createTime=" + createTime +
+            ", modifyTime=" + modifyTime +
+            '}';
   }
 }

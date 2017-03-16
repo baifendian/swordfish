@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.baifendian.swordfish.dao.model.flow;
 
 import com.baifendian.swordfish.dao.model.FlowNode;
@@ -22,60 +21,61 @@ import com.baifendian.swordfish.dao.model.FlowNodeRelation;
 import java.util.List;
 
 /**
- * workflow dag 信息
- * <p>
- * 
+ * workflow dag 信息 <p>
+ *
  * @author : dsfan
  * @date : 2016年8月29日
  */
 public class FlowDag {
 
-    /** DAG 边信息 **/
-    private List<FlowNodeRelation> edges;
+  /**
+   * DAG 边信息
+   **/
+  private List<FlowNodeRelation> edges;
 
-    /** 表示 node 的内容详情 */
-    private List<FlowNode> nodes;
+  /**
+   * 表示 node 的内容详情
+   */
+  private List<FlowNode> nodes;
 
-    /**
-     * getter method
-     * 
-     * @see FlowDag#edges
-     * @return the edges
-     */
-    public List<FlowNodeRelation> getEdges() {
-        return edges;
-    }
+  /**
+   * getter method
+   *
+   * @return the edges
+   * @see FlowDag#edges
+   */
+  public List<FlowNodeRelation> getEdges() {
+    return edges;
+  }
 
-    /**
-     * setter method
-     * 
-     * @see FlowDag#edges
-     * @param edges
-     *            the edges to set
-     */
-    public void setEdges(List<FlowNodeRelation> edges) {
-        this.edges = edges;
-    }
+  /**
+   * setter method
+   *
+   * @param edges the edges to set
+   * @see FlowDag#edges
+   */
+  public void setEdges(List<FlowNodeRelation> edges) {
+    this.edges = edges;
+  }
 
-    /**
-     * getter method
-     * 
-     * @see FlowDag#nodes
-     * @return the nodes
-     */
-    public List<FlowNode> getNodes() {
-        return nodes;
-    }
+  /**
+   * getter method
+   *
+   * @return the nodes
+   * @see FlowDag#nodes
+   */
+  public List<FlowNode> getNodes() {
+    return nodes;
+  }
 
-    /**
-     * setter method
-     * 
-     * @see FlowDag#nodes
-     * @param nodes
-     *            the nodes to set
-     */
-    public void setNodes(List<FlowNode> nodes) {
-        this.nodes = nodes;
-    }
+  /**
+   * setter method
+   *
+   * @param nodes the nodes to set
+   * @see FlowDag#nodes
+   */
+  public void setNodes(List<FlowNode> nodes) {
+    this.nodes = nodes;
+  }
 
 }
