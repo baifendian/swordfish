@@ -50,6 +50,7 @@ CREATE TABLE `session` (
   `ip` varchar(32) NOT NULL COMMENT 'ip address of login on',
   `last_login_time` datetime NOT NULL COMMENT 'last login time',
   PRIMARY KEY (`id`),
+  INDEX `user_id` (`user_id`),
   FOREIGN KEY (`user_id`) REFERENCES `user`(`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 

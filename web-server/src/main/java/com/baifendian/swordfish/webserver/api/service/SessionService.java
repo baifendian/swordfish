@@ -16,8 +16,8 @@
 
 package com.baifendian.swordfish.webserver.api.service;
 
-import com.baifendian.swordfish.dao.mysql.mapper.SessionMapper;
-import com.baifendian.swordfish.dao.mysql.model.Session;
+import com.baifendian.swordfish.dao.mapper.SessionMapper;
+import com.baifendian.swordfish.dao.model.Session;
 import org.jvnet.hk2.annotations.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

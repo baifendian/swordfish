@@ -15,7 +15,7 @@
  */
 package com.baifendian.swordfish.webserver.api.dto;
 
-import com.baifendian.swordfish.dao.mysql.model.User;
+import com.baifendian.swordfish.dao.model.User;
 
 /**
  * author: smile8

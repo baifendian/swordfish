@@ -18,7 +18,6 @@ package com.baifendian.swordfish.dao.mapper;
 
 import com.baifendian.swordfish.dao.enums.*;
 import com.baifendian.swordfish.dao.mapper.utils.EnumFieldUtil;
-import com.baifendian.swordfish.dao.mysql.enums.*;
 import com.baifendian.swordfish.dao.model.Schedule;
 import org.apache.ibatis.jdbc.SQL;
 
