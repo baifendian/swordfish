@@ -15,36 +15,35 @@
  */
 package com.baifendian.swordfish.webserver.api.dto;
 
-/**
- * author: smile8
- * date:   2017/3/16
- * desc:
- */
-public class ErrorInfo extends BaseData {
-  /**
-   * 错误码
-   */
-  private int code;
+public class ErrorData extends BaseData {
+  public enum Code {
+    PARAM_NOT_VALID
+  }
 
   /**
-   * 错误信息
+   * 编码信息
+   */
+  private Code code;
+
+  /**
+   * 错误消息
    */
   private String message;
 
-  public ErrorInfo() {
+  public ErrorData() {
 
   }
 
-  public ErrorInfo(int code, String message) {
+  public ErrorData(Code code, String message) {
     this.code = code;
     this.message = message;
   }
 
-  public int getCode() {
+  public Code getCode() {
     return code;
   }
 
-  public void setCode(int code) {
+  public void setCode(Code code) {
     this.code = code;
   }
 
@@ -58,9 +57,9 @@ public class ErrorInfo extends BaseData {
 
   @Override
   public String toString() {
-    return "ErrorInfo{" +
-        "code=" + code +
-        ", message='" + message + '\'' +
-        '}';
+    return "ErrorData{" +
+            "code=" + code +
+            ", message='" + message + '\'' +
+            '}';
   }
 }
