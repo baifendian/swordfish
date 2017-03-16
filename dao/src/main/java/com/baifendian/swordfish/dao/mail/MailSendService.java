@@ -69,6 +69,7 @@ public class MailSendService extends BaseDao{
    * @param content        邮件内容(支持HTML)
    * @return
    */
+  /*
   public boolean sendToUser(int receiverUserId, String title, String content) {
     User user = userMapper.queryById(receiverUserId);
     if (user == null) {
@@ -82,6 +83,7 @@ public class MailSendService extends BaseDao{
 
     return MailSendUtil.sendMails(receivers, title, content);
   }
+  */
 
   /**
    * 发送邮件给项目所有成员

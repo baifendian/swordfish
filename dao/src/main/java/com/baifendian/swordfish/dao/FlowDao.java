@@ -20,8 +20,6 @@ import com.baifendian.swordfish.common.consts.Constants;
 import com.baifendian.swordfish.common.job.FlowStatus;
 import com.baifendian.swordfish.common.utils.BFDDateUtils;
 import com.baifendian.swordfish.common.utils.json.JsonUtil;
-//import com.baifendian.swordfish.dao.etl.EtlAutoGen;
-import com.baifendian.swordfish.execserver.utils.hadoop.hdfs.HdfsPathManager;
 import com.baifendian.swordfish.dao.mysql.MyBatisSqlSessionFactoryUtil;
 import com.baifendian.swordfish.dao.mysql.enums.*;
 import com.baifendian.swordfish.dao.mysql.mapper.*;
@@ -486,22 +484,6 @@ public class FlowDao extends BaseDao {
     public Schedule querySchedule(int flowId) {
         // 插入执行节点信息
         return scheduleMapper.selectByFlowId(flowId);
-    }
-
-    /**
-     * 获取 hdfs 中的资源路径
-     * <p>
-     *
-     * @param resourceId
-     * @param isPub
-     * @return 资源的 hdfs 路径
-     */
-    public String queryResourceHdfsPath(int resourceId, boolean isPub) {
-        Resource resource = resourceMapper.queryDetail(resourceId);
-        if (resource != null) {
-            return HdfsPathManager.genResourceHdfsPath(resource.getOrgName(), resource.getProjectName(), resourceId, isPub) + resource.getName();
-        }
-        return null;
     }
 
 }

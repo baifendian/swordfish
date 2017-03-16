@@ -42,11 +42,6 @@ public class UserMapperProvider {
                 VALUES("modify_time", "#{user.modifyTime}");
                 VALUES("status", "#{user.status}");
 
-                if (user.getTenantId() != null){
-                    VALUES("tenant_id", "#{user.tenantId}");
-                    VALUES("join_time", "#{user.joinTime}");
-                }
-
                 VALUES("role", "#{user.roleType}");
             }
         }.toString();
@@ -72,9 +67,11 @@ public class UserMapperProvider {
                 if (StringUtils.isNotEmpty(user.getPhone())) {
                     WHERE("u.phone = #{user.phone}");
                 }
+               /*
                 if (user.getStatus() !=null) {
                     WHERE("u.status = #{user.status}");
                 }
+                */
                 //WHERE("u.is_system_user = #{user.isSystemUser}");
             }
         }.toString();
