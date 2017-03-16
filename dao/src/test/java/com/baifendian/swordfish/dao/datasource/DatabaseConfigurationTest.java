@@ -18,7 +18,6 @@ package com.baifendian.swordfish.dao.datasource;
 import com.baifendian.swordfish.dao.mapper.SessionMapper;
 import com.baifendian.swordfish.dao.model.Session;
 import org.apache.ibatis.session.SqlSession;
-import org.apache.ibatis.session.SqlSessionFactory;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -33,38 +32,32 @@ import static org.junit.Assert.assertEquals;
  * desc:
  */
 public class DatabaseConfigurationTest {
-  private static SqlSessionFactory sqlSessionFactory;
+  private static SqlSession sqlSession;
 
   @BeforeClass
   public static void runOnceBeforeClass() {
-    sqlSessionFactory = ConnectionFactory.getSqlSessionFactory();
+    sqlSession = ConnectionFactory.getSqlSession();
   }
 
   @Test
   public void testSession() {
-    SqlSession session = sqlSessionFactory.openSession();
+    SessionMapper mapper = sqlSession.getMapper(SessionMapper.class);
 
-    try {
-      SessionMapper mapper = session.getMapper(SessionMapper.class);
+    Session userSession = new Session();
 
-      Session userSession = new Session();
+    String uuid = UUID.randomUUID().toString();
 
-      String uuid = UUID.randomUUID().toString();
+    userSession.setId(uuid);
+    userSession.setIp("localhost");
+    userSession.setUserId(0);
+    userSession.setLastLoginTime(new Date());
 
-      userSession.setId(uuid);
-      userSession.setIp("localhost");
-      userSession.setUserId(0);
-      userSession.setLastLoginTime(new Date());
+    mapper.insert(userSession);
 
-      mapper.insert(userSession);
+    Session userSession2 = mapper.queryById(uuid);
 
-      Session userSession2 = mapper.queryById(uuid);
+    assertEquals(userSession2.getId(), userSession.getId());
 
-      assertEquals(userSession2.getId(), userSession.getId());
-
-      System.out.println(userSession2.toString());
-    } finally {
-      session.close();
-    }
+    System.out.println(userSession2.toString());
   }
 }

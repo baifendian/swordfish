@@ -13,21 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.baifendian.swordfish.dao;
 
 /**
- * Dao 基类
- * <p>
- * 
- * @author : dsfan
- * @date : 2016年10月17日
+ * author: dsfan
+ * date:   2017/3/16
+ * desc:
  */
 public abstract class BaseDao {
 
-    /**
-     * 初始化一个 Dao 实例
-     * <p>
-     */
-    protected abstract void init();
+  /**
+   * 初始化一个 Dao 实例
+   * <p>
+   */
+  protected abstract void init();
 }
