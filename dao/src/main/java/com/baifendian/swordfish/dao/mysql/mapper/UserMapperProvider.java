@@ -25,7 +25,7 @@ import java.util.Map;
 /**
  * Created by caojingwei on 16/7/25.
  */
-public class UserMapperSQL {
+public class UserMapperProvider {
 
     public String insert(final User user) {
         return new SQL() {

@@ -13,38 +13,39 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.baifendian.swordfish.dao.mysql.enums;
+package com.baifendian.swordfish.webserver.api.dto;
+
+import com.baifendian.swordfish.dao.mysql.model.User;
 
 /**
  * author: smile8
  * date:   2017/3/16
- * desc:   用户角色信息
+ * desc:
  */
-public enum UserRoleType {
-  ADMIN_USER(0),
-  GENERAL_USER(1);
+public class UserSessionData extends BaseData {
+  /**
+   * 用户 session id
+   */
+  private String sessionId;
 
-  private int role;
+  /**
+   * 用户信息
+   */
+  private User user;
 
-  UserRoleType(int val) {
-    this.role = val;
+  public String getSessionId() {
+    return sessionId;
   }
 
-  public Integer getType() {
-    return role;
+  public void setSessionId(String sessionId) {
+    this.sessionId = sessionId;
   }
 
-  public static UserRoleType valueOfType(Integer type) throws IllegalArgumentException {
-    if (type == null) {
-      return null;
-    }
+  public User getUser() {
+    return user;
+  }
 
-    for (UserRoleType roleType : UserRoleType.values()) {
-      if (roleType.getType().equals(type)) {
-        return roleType;
-      }
-    }
-
-    throw new IllegalArgumentException("Cannot convert " + type + " to " + UserRoleType.class.getSimpleName() + " .");
+  public void setUser(User user) {
+    this.user = user;
   }
 }

@@ -15,8 +15,12 @@
  */
 package com.baifendian.swordfish.webserver.api.controller;
 
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import com.baifendian.swordfish.webserver.api.service.ProjectService;
+import org.apache.tools.ant.Project;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * author: smile8
@@ -26,5 +30,54 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/projects")
 public class ProjectController {
+  @Autowired
+  private ProjectService projectService;
 
+  /**
+   * 创建一个项目, 如果存在, 会返回错误
+   *
+   * @param name
+   * @param desc
+   * @param response
+   * @return
+   */
+  @RequestMapping(value = "/{name}", method = {RequestMethod.POST})
+  public Project createProject(@PathVariable("name") String name,
+                               @RequestParam(value = "desc", required = false) String desc,
+                               HttpServletResponse response) {
+    return null;
+  }
+
+  /**
+   * 修改一个项目, 如果不存在, 会返回错误
+   *
+   * @param name
+   * @param desc
+   * @param response
+   * @return
+   */
+  @RequestMapping(value = "/{name}", method = {RequestMethod.PUT})
+  public Project modifyProject(@PathVariable("name") String name,
+                               @RequestParam(value = "desc", required = false) String desc,
+                               HttpServletResponse response) {
+    return null;
+  }
+
+  /**
+   * 删除项目
+   *
+   * @param name
+   * @param response
+   * @return
+   */
+  @RequestMapping(value = "/{name}", method = {RequestMethod.DELETE})
+  public Project deleteProject(@PathVariable("name") String name,
+                               HttpServletResponse response) {
+    return null;
+  }
+
+  @RequestMapping(value = "/", method = {RequestMethod.GET})
+  public Project queryProjects(HttpServletResponse response) {
+    return null;
+  }
 }

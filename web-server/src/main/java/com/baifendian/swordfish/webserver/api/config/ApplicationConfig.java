@@ -15,26 +15,26 @@
  */
 package com.baifendian.swordfish.webserver.api.config;
 
-import org.springframework.beans.factory.annotation.Value;
+import com.baifendian.swordfish.webserver.api.interceptor.LoginInterceptor;
 import org.springframework.context.annotation.Bean;
-import org.springframework.data.redis.connection.RedisConnectionFactory;
-import org.springframework.session.data.redis.RedisOperationsSessionRepository;
-import org.springframework.session.data.redis.config.annotation.web.http.EnableRedisHttpSession;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
 /**
  * author: smile8
  * date:   2017/3/15
- * desc:
+ * desc:   应用配置信息
  */
-@EnableRedisHttpSession
-public class HttpSessionConfig {
-  @Value("${server.session.timeout}")
-  private Integer maxInactiveIntervalInSeconds;
+@Configuration
+public class ApplicationConfig extends WebMvcConfigurerAdapter {
+  @Override
+  public void addInterceptors(InterceptorRegistry registry) {
+    registry.addInterceptor(loginInterceptor()).addPathPatterns("/**/*").excludePathPatterns("/login/*");
+  }
 
   @Bean
-  public RedisOperationsSessionRepository sessionRepository(RedisConnectionFactory factory) {
-    RedisOperationsSessionRepository sessionRepository = new RedisOperationsSessionRepository(factory);
-    sessionRepository.setDefaultMaxInactiveInterval(maxInactiveIntervalInSeconds);
-    return sessionRepository;
+  public LoginInterceptor loginInterceptor() {
+    return new LoginInterceptor();
   }
 }

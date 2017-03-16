@@ -13,20 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.baifendian.swordfish.webserver.api.controller;
+package com.baifendian.swordfish.webserver.api.service;
 
-import org.apache.tools.ant.Project;
-import org.springframework.web.bind.annotation.*;
-
-import javax.servlet.http.HttpServletResponse;
+import org.jvnet.hk2.annotations.Service;
 
 /**
  * author: smile8
  * date:   2017/3/15
  * desc:
  */
-@RestController
-@RequestMapping("/users")
-public class UserController {
-
+@Service
+public class ProjectService {
 }
