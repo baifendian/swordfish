@@ -158,4 +158,20 @@ public class User {
   public void setModifyTime(Date modifyTime) {
     this.modifyTime = modifyTime;
   }
+
+  @Override
+  public String toString() {
+    return "User{" +
+        "id=" + id +
+        ", name='" + name + '\'' +
+        ", email='" + email + '\'' +
+        ", desc='" + desc + '\'' +
+        ", password='" + password + '\'' +
+        ", phone='" + phone + '\'' +
+        ", role=" + role +
+        ", proxyUsers='" + proxyUsers + '\'' +
+        ", createTime=" + createTime +
+        ", modifyTime=" + modifyTime +
+        '}';
+  }
 }
