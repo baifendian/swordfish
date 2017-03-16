@@ -38,9 +38,6 @@ import org.springframework.util.StringUtils;
 import java.sql.SQLException;
 import java.util.Arrays;
 
-/**
- * author: smile8 date:   2017/3/16 desc:
- */
 @Configuration
 @ConfigurationProperties(prefix = "spring.datasource")
 @PropertySource({"classpath:dao/data_source.properties"})

@@ -16,56 +16,53 @@
 package com.baifendian.swordfish.dao.mapper;
 
 import com.baifendian.swordfish.dao.model.User;
-
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.type.EnumOrdinalTypeHandler;
 import org.apache.ibatis.type.JdbcType;
-import org.mybatis.spring.annotation.MapperScan;
 
 import java.util.Date;
 
-/**
- * author: smile8 date:   2017/3/16 desc:   用户信息操作接口
- */
-@MapperScan
 public interface UserMapper {
 
   /**
    * 根据用户名称查询用户信息
+   *
+   * @param name
+   * @return
    */
   @Results(value = {@Result(property = "id", column = "id", id = true, javaType = Integer.class, jdbcType = JdbcType.INTEGER),
-          @Result(property = "name", column = "name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-          @Result(property = "password", column = "password", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-          @Result(property = "email", column = "email", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-          @Result(property = "phone", column = "phone", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-          @Result(property = "createTime", column = "create_time", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP),
-          @Result(property = "modifyTime", column = "modify_time", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP),
-          @Result(property = "tenantId", column = "tenant_id", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
-          @Result(property = "joinTime", column = "join_time", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP),
-          @Result(property = "roleType", column = "role", typeHandler = EnumOrdinalTypeHandler.class, jdbcType = JdbcType.TINYINT),
-          @Result(property = "status", column = "status", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
+      @Result(property = "name", column = "name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+      @Result(property = "email", column = "email", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+      @Result(property = "desc", column = "desc", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+      @Result(property = "phone", column = "phone", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+      @Result(property = "password", column = "password", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+      @Result(property = "role", column = "role", typeHandler = EnumOrdinalTypeHandler.class, jdbcType = JdbcType.TINYINT),
+      @Result(property = "proxyUsers", column = "proxy_users", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+      @Result(property = "createTime", column = "create_time", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP),
+      @Result(property = "modifyTime", column = "modify_time", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP)
   })
-  @SelectProvider(type = UserMapperProvider.class, method = "findByName")
+  @SelectProvider(type = UserMapperProvider.class, method = "queryByName")
   User queryByName(@Param("name") String name);
 
   /**
-   * 根据 email 查询用户信息
+   * 根据 email 名称查询用户信息
+   *
+   * @param email
+   * @return
    */
   @Results(value = {@Result(property = "id", column = "id", id = true, javaType = Integer.class, jdbcType = JdbcType.INTEGER),
-          @Result(property = "name", column = "name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-          @Result(property = "password", column = "password", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-          @Result(property = "email", column = "email", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-          @Result(property = "phone", column = "phone", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-          @Result(property = "createTime", column = "create_time", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP),
-          @Result(property = "modifyTime", column = "modify_time", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP),
-          @Result(property = "tenantId", column = "tenant_id", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
-          @Result(property = "tenantName", column = "tenant_name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-          @Result(property = "joinTime", column = "join_time", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP),
-          @Result(property = "roleType", column = "role", typeHandler = EnumOrdinalTypeHandler.class, jdbcType = JdbcType.TINYINT),
-          @Result(property = "status", column = "status", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
+      @Result(property = "name", column = "name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+      @Result(property = "email", column = "email", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+      @Result(property = "desc", column = "desc", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+      @Result(property = "phone", column = "phone", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+      @Result(property = "password", column = "password", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+      @Result(property = "role", column = "role", typeHandler = EnumOrdinalTypeHandler.class, jdbcType = JdbcType.TINYINT),
+      @Result(property = "proxyUsers", column = "proxy_users", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+      @Result(property = "createTime", column = "create_time", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP),
+      @Result(property = "modifyTime", column = "modify_time", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP)
   })
   @SelectProvider(type = UserMapperProvider.class, method = "queryByEmail")
   User queryByEmail(@Param("email") String email);

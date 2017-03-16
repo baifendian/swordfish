@@ -18,14 +18,10 @@ package com.baifendian.swordfish.webserver.api.config;
 import com.baifendian.swordfish.webserver.api.interceptor.LoginInterceptor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
-/**
- * author: smile8
- * date:   2017/3/15
- * desc:   应用配置信息
- */
 @Configuration
 public class ApplicationConfig extends WebMvcConfigurerAdapter {
   @Override
@@ -36,5 +32,10 @@ public class ApplicationConfig extends WebMvcConfigurerAdapter {
   @Bean
   public LoginInterceptor loginInterceptor() {
     return new LoginInterceptor();
+  }
+
+  @Override
+  public void addCorsMappings(CorsRegistry registry) {
+    registry.addMapping("/**").allowedOrigins("*");
   }
 }

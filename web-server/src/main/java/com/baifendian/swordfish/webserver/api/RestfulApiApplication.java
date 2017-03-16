@@ -13,22 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.baifendian.swordfish.webserver.api;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-/**
- * author: smile8
- * date:   2017/3/13
- * desc:
- */
 @SpringBootApplication
 public class RestfulApiApplication {
-
-    public static void main(String[] args) {
-        SpringApplication.run(RestfulApiApplication.class, args);
-    }
-
+  public static void main(String[] args) {
+    SpringApplication.run(RestfulApiApplication.class, args);
+  }
 }

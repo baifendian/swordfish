@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.baifendian.swordfish.webserver.api;
 
 import org.slf4j.Logger;
@@ -21,11 +20,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
-/**
- * author: smile8
- * date:   2017/3/15
- * desc:   程序启动后的初始化工作
- */
 @Component
 public class StartupRunner implements CommandLineRunner {
   private static Logger logger = LoggerFactory.getLogger(StartupRunner.class.getName());

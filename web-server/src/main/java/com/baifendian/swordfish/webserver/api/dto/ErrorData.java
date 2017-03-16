@@ -17,7 +17,8 @@ package com.baifendian.swordfish.webserver.api.dto;
 
 public class ErrorData extends BaseData {
   public enum Code {
-    PARAM_NOT_VALID
+    PARAM_NOT_VALID,
+    USER_NOT_EXIST
   }
 
   /**

@@ -15,7 +15,7 @@
  */
 package com.baifendian.swordfish.webserver.api.dto;
 
-import com.baifendian.swordfish.dao.mysql.model.User;
+import com.baifendian.swordfish.dao.model.User;
 
 /**
  * author: smile8
@@ -33,6 +33,14 @@ public class UserSessionData extends BaseData {
    */
   private User user;
 
+  public UserSessionData() {
+  }
+
+  public UserSessionData(String sessionId, User user) {
+    this.sessionId = sessionId;
+    this.user = user;
+  }
+
   public String getSessionId() {
     return sessionId;
   }
@@ -47,5 +55,13 @@ public class UserSessionData extends BaseData {
 
   public void setUser(User user) {
     this.user = user;
+  }
+
+  @Override
+  public String toString() {
+    return "UserSessionData{" +
+        "sessionId='" + sessionId + '\'' +
+        ", user=" + user +
+        '}';
   }
 }
