@@ -15,22 +15,27 @@
  */
 package com.baifendian.swordfish.webserver.api.dto;
 
-public class ErrorData extends BaseData {
+/**
+ * author: smile8
+ * date:   2017/3/16
+ * desc:
+ */
+public class ErrorInfo extends BaseData {
   /**
-   * 编码信息
+   * 错误码
    */
   private int code;
 
   /**
-   * 错误消息
+   * 错误信息
    */
   private String message;
 
-  public ErrorData() {
+  public ErrorInfo() {
 
   }
 
-  public ErrorData(int code, String message) {
+  public ErrorInfo(int code, String message) {
     this.code = code;
     this.message = message;
   }
@@ -53,9 +58,9 @@ public class ErrorData extends BaseData {
 
   @Override
   public String toString() {
-    return "ErrorData{" +
-            "code=" + code +
-            ", message='" + message + '\'' +
-            '}';
+    return "ErrorInfo{" +
+        "code=" + code +
+        ", message='" + message + '\'' +
+        '}';
   }
 }

@@ -16,7 +16,9 @@
 package com.baifendian.swordfish.webserver.api.dto;
 
 /**
- * 返回的基础 data, 所有前端返回的都继承它
+ * author: smile8
+ * date:   2017/3/16
+ * desc:
  */
 public abstract class BaseData {
 }

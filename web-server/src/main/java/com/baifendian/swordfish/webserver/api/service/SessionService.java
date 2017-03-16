@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.baifendian.swordfish.webserver.api.service;
 
-import com.baifendian.swordfish.dao.mapper.SessionMapper;
-import com.baifendian.swordfish.dao.model.Session;
-
+import com.baifendian.swordfish.dao.mysql.mapper.SessionMapper;
+import com.baifendian.swordfish.dao.mysql.model.Session;
 import org.jvnet.hk2.annotations.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,7 +25,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
 /**
- * author: smile8 date:   2017/3/15 desc:
+ * author: smile8
+ * date:   2017/3/15
+ * desc:
  */
 @Service
 public class SessionService {
@@ -39,6 +41,10 @@ public class SessionService {
 
   /**
    * 查询 session 信息
+   *
+   * @param sessionId
+   * @param remoteIp
+   * @return
    */
   private Session querySession(String sessionId, String remoteIp) {
     if (sessionId == null) {
@@ -60,6 +66,10 @@ public class SessionService {
 
   /**
    * 从请求中获取用户的 session
+   *
+   * @param req
+   * @return
+   * @throws ServletException
    */
   public Session getSessionFromRequest(HttpServletRequest req) throws ServletException {
     String remoteIp = HttpUtil.getClientIpAddress(req);
@@ -80,6 +90,10 @@ public class SessionService {
 
   /**
    * 创建一个 session
+   *
+   * @param user
+   * @param remoteIp
+   * @return
    */
   public Session createSession(User user, String remoteIp) {
     String sessionId = UUID.randomUUID().toString();

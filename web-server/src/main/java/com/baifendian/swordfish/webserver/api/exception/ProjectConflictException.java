@@ -13,39 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.baifendian.swordfish.webserver.api.dto;
 
-import com.baifendian.swordfish.dao.mysql.model.User;
+package com.baifendian.swordfish.webserver.api.exception;
 
 /**
- * author: smile8
- * date:   2017/3/16
- * desc:
+ * @author : liujin
+ * @date : 2017-03-04 16:14
  */
-public class UserSessionData extends BaseData {
-  /**
-   * 用户 session id
-   */
-  private String sessionId;
+public class ProjectConflictException extends RuntimeException {
+    private String projectName;
 
-  /**
-   * 用户信息
-   */
-  private User user;
+    public ProjectConflictException(String projectName){
+        this.projectName = projectName;
+    }
 
-  public String getSessionId() {
-    return sessionId;
-  }
-
-  public void setSessionId(String sessionId) {
-    this.sessionId = sessionId;
-  }
-
-  public User getUser() {
-    return user;
-  }
-
-  public void setUser(User user) {
-    this.user = user;
-  }
+    public String getProjectName(){
+        return projectName;
+    }
 }

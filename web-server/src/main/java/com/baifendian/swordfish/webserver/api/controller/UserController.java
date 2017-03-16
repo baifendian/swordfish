@@ -13,39 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.baifendian.swordfish.webserver.api.dto;
+package com.baifendian.swordfish.webserver.api.controller;
 
-import com.baifendian.swordfish.dao.mysql.model.User;
+import org.apache.tools.ant.Project;
+import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * author: smile8
- * date:   2017/3/16
+ * date:   2017/3/15
  * desc:
  */
-public class UserSessionData extends BaseData {
-  /**
-   * 用户 session id
-   */
-  private String sessionId;
+@RestController
+@RequestMapping("/users")
+public class UserController {
 
-  /**
-   * 用户信息
-   */
-  private User user;
-
-  public String getSessionId() {
-    return sessionId;
-  }
-
-  public void setSessionId(String sessionId) {
-    this.sessionId = sessionId;
-  }
-
-  public User getUser() {
-    return user;
-  }
-
-  public void setUser(User user) {
-    this.user = user;
-  }
 }

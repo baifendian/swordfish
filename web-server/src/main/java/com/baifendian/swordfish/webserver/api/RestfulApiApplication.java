@@ -13,39 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.baifendian.swordfish.webserver.api.dto;
 
-import com.baifendian.swordfish.dao.mysql.model.User;
+package com.baifendian.swordfish.webserver.api;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 /**
  * author: smile8
- * date:   2017/3/16
+ * date:   2017/3/13
  * desc:
  */
-public class UserSessionData extends BaseData {
-  /**
-   * 用户 session id
-   */
-  private String sessionId;
+@SpringBootApplication
+public class RestfulApiApplication {
 
-  /**
-   * 用户信息
-   */
-  private User user;
+    public static void main(String[] args) {
+        SpringApplication.run(RestfulApiApplication.class, args);
+    }
 
-  public String getSessionId() {
-    return sessionId;
-  }
-
-  public void setSessionId(String sessionId) {
-    this.sessionId = sessionId;
-  }
-
-  public User getUser() {
-    return user;
-  }
-
-  public void setUser(User user) {
-    this.user = user;
-  }
 }

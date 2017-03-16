@@ -13,39 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.baifendian.swordfish.webserver.api.dto;
 
-import com.baifendian.swordfish.dao.mysql.model.User;
+package com.baifendian.swordfish.webserver.api;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.stereotype.Component;
 
 /**
  * author: smile8
- * date:   2017/3/16
- * desc:
+ * date:   2017/3/15
+ * desc:   程序启动后的初始化工作
  */
-public class UserSessionData extends BaseData {
-  /**
-   * 用户 session id
-   */
-  private String sessionId;
+@Component
+public class StartupRunner implements CommandLineRunner {
+  private static Logger logger = LoggerFactory.getLogger(StartupRunner.class.getName());
 
-  /**
-   * 用户信息
-   */
-  private User user;
+  public void run(String... args) {
+    logger.info("begin startup...");
 
-  public String getSessionId() {
-    return sessionId;
-  }
+    // TODO::
 
-  public void setSessionId(String sessionId) {
-    this.sessionId = sessionId;
-  }
-
-  public User getUser() {
-    return user;
-  }
-
-  public void setUser(User user) {
-    this.user = user;
+    logger.info("end startup");
   }
 }
