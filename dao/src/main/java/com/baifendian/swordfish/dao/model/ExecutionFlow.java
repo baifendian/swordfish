@@ -24,254 +24,294 @@ import com.baifendian.swordfish.dao.enums.FlowType;
 import java.util.Date;
 
 /**
- * workflow 执行的信息
- * <p>
+ * workflow 执行的信息 <p>
  *
  * @author : wenting.wang
  * @date : 2016年8月29日
  */
 public class ExecutionFlow {
-    /** 具体执行的id **/
-    private Long id;
+  /**
+   * 具体执行的id
+   **/
+  private Long id;
 
-    /** workflow的id **/
-    private int flowId;
+  /**
+   * workflow的id
+   **/
+  private int flowId;
 
-    /** workflow名称 **/
-    private String flowName;
+  /**
+   * workflow名称
+   **/
+  private String flowName;
 
-    /** worker的host **/
-    private String worker;
+  /**
+   * worker的host
+   **/
+  private String worker;
 
-    /** workflow执行的状态 **/
-    private FlowStatus status;
+  /**
+   * workflow执行的状态
+   **/
+  private FlowStatus status;
 
-    /** 提交用户id **/
-    private int submitUser;
+  /**
+   * 提交用户id
+   **/
+  private int submitUser;
 
-    /** 提交用户 **/
-    private String submitUserName;
+  /**
+   * 提交用户
+   **/
+  private String submitUserName;
 
-    /** 代理用户 **/
-    private String proxyUser;
+  /**
+   * 代理用户
+   **/
+  private String proxyUser;
 
-    /** 提交时间 **/
-    private Date submitTime;
+  /**
+   * 提交时间
+   **/
+  private Date submitTime;
 
-    /** 起始时间 **/
-    private Date startTime;
+  /**
+   * 起始时间
+   **/
+  private Date startTime;
 
-    /** 结束时间 **/
-    private Date endTime;
+  /**
+   * 结束时间
+   **/
+  private Date endTime;
 
-    /** workflow的数据 **/
-    private String workflowData;
+  /**
+   * workflow的数据
+   **/
+  private String workflowData;
 
-    /** workflow 等运行的类型 **/
-    private FlowRunType type;
+  /**
+   * workflow 等运行的类型
+   **/
+  private FlowRunType type;
 
-    /** worklow 的类型 */
-    private FlowType flowType;
+  /**
+   * worklow 的类型
+   */
+  private FlowType flowType;
 
-    /** workflow 所在项目的id */
-    private Integer projectId;
+  /**
+   * workflow 所在项目的id
+   */
+  private Integer projectId;
 
-    /** workflow 所在项目的名称 */
-    private String projectName;
+  /**
+   * workflow 所在项目的名称
+   */
+  private String projectName;
 
-    /** workflow 所在组织的id */
-    private Integer orgId;
+  /**
+   * workflow 所在组织的id
+   */
+  private Integer orgId;
 
-    /** workflow 所在组织的名称 */
-    private String orgName;
+  /**
+   * workflow 所在组织的名称
+   */
+  private String orgName;
 
-    /** 调度时间 **/
-    private Date scheduleTime;
+  /**
+   * 调度时间
+   **/
+  private Date scheduleTime;
 
-    /** 执行的错误码 */
-    private FlowErrorCode errorCode;
+  /**
+   * 执行的错误码
+   */
+  private FlowErrorCode errorCode;
 
-    /** 作业提交队列 **/
-    private String queue;
+  /**
+   * 作业提交队列
+   **/
+  private String queue;
 
-    public Long getId() {
-        return id;
-    }
+  public Long getId() {
+    return id;
+  }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+  public void setId(Long id) {
+    this.id = id;
+  }
 
-    public int getFlowId() {
-        return flowId;
-    }
+  public int getFlowId() {
+    return flowId;
+  }
 
-    public void setFlowId(int flowId) {
-        this.flowId = flowId;
-    }
+  public void setFlowId(int flowId) {
+    this.flowId = flowId;
+  }
 
-    public String getFlowName() {
-        return flowName;
-    }
+  public String getFlowName() {
+    return flowName;
+  }
 
-    public void setFlowName(String flowName) {
-        this.flowName = flowName;
-    }
+  public void setFlowName(String flowName) {
+    this.flowName = flowName;
+  }
 
-    public String getWorker() {
-        return worker;
-    }
+  public String getWorker() {
+    return worker;
+  }
 
-    public void setWorker(String worker) {
-        this.worker = worker;
-    }
+  public void setWorker(String worker) {
+    this.worker = worker;
+  }
 
-    public FlowStatus getStatus() {
-        return status;
-    }
+  public FlowStatus getStatus() {
+    return status;
+  }
 
-    public void setStatus(FlowStatus status) {
-        this.status = status;
-    }
+  public void setStatus(FlowStatus status) {
+    this.status = status;
+  }
 
-    public int getSubmitUser() {
-        return submitUser;
-    }
+  public int getSubmitUser() {
+    return submitUser;
+  }
 
-    public void setSubmitUser(int submitUser) {
-        this.submitUser = submitUser;
-    }
+  public void setSubmitUser(int submitUser) {
+    this.submitUser = submitUser;
+  }
 
-    public String getSubmitUserName() {
-        return submitUserName;
-    }
+  public String getSubmitUserName() {
+    return submitUserName;
+  }
 
-    public void setSubmitUserName(String submitUserName) {
-        this.submitUserName = submitUserName;
-    }
+  public void setSubmitUserName(String submitUserName) {
+    this.submitUserName = submitUserName;
+  }
 
-    public Date getSubmitTime() {
-        return submitTime;
-    }
+  public Date getSubmitTime() {
+    return submitTime;
+  }
 
-    public void setSubmitTime(Date submitTime) {
-        this.submitTime = submitTime;
-    }
+  public void setSubmitTime(Date submitTime) {
+    this.submitTime = submitTime;
+  }
 
-    public Date getStartTime() {
-        return startTime;
-    }
+  public Date getStartTime() {
+    return startTime;
+  }
 
-    public void setStartTime(Date startTime) {
-        this.startTime = startTime;
-    }
+  public void setStartTime(Date startTime) {
+    this.startTime = startTime;
+  }
 
-    public Date getEndTime() {
-        return endTime;
-    }
+  public Date getEndTime() {
+    return endTime;
+  }
 
-    public void setEndTime(Date endTime) {
-        this.endTime = endTime;
-    }
+  public void setEndTime(Date endTime) {
+    this.endTime = endTime;
+  }
 
-    public void setScheduleTime(Date scheduleTime) {
-        this.scheduleTime = scheduleTime;
-    }
+  public void setScheduleTime(Date scheduleTime) {
+    this.scheduleTime = scheduleTime;
+  }
 
-    public String getWorkflowData() {
-        return workflowData;
-    }
+  public String getWorkflowData() {
+    return workflowData;
+  }
 
-    public void setWorkflowData(String workflowData) {
-        this.workflowData = workflowData;
-    }
+  public void setWorkflowData(String workflowData) {
+    this.workflowData = workflowData;
+  }
 
-    public FlowRunType getType() {
-        return type;
-    }
+  public FlowRunType getType() {
+    return type;
+  }
 
-    public void setType(FlowRunType type) {
-        this.type = type;
-    }
+  public void setType(FlowRunType type) {
+    this.type = type;
+  }
 
-    public FlowType getFlowType() {
-        return flowType;
-    }
+  public FlowType getFlowType() {
+    return flowType;
+  }
 
-    public void setFlowType(FlowType flowType) {
-        this.flowType = flowType;
-    }
+  public void setFlowType(FlowType flowType) {
+    this.flowType = flowType;
+  }
 
-    public Integer getProjectId() {
-        return projectId;
-    }
+  public Integer getProjectId() {
+    return projectId;
+  }
 
-    public void setProjectId(Integer projectId) {
-        this.projectId = projectId;
-    }
+  public void setProjectId(Integer projectId) {
+    this.projectId = projectId;
+  }
 
-    public String getProjectName() {
-        return projectName;
-    }
+  public String getProjectName() {
+    return projectName;
+  }
 
-    public String getProxyUser() {
-        return proxyUser;
-    }
+  public String getProxyUser() {
+    return proxyUser;
+  }
 
-    public void setProxyUser(String proxyUser) {
-        this.proxyUser = proxyUser;
-    }
+  public void setProxyUser(String proxyUser) {
+    this.proxyUser = proxyUser;
+  }
 
-    public void setProjectName(String projectName) {
-        this.projectName = projectName;
-    }
+  public void setProjectName(String projectName) {
+    this.projectName = projectName;
+  }
 
-    public Integer getOrgId() {
-        return orgId;
-    }
+  public Integer getOrgId() {
+    return orgId;
+  }
 
-    public void setOrgId(Integer orgId) {
-        this.orgId = orgId;
-    }
+  public void setOrgId(Integer orgId) {
+    this.orgId = orgId;
+  }
 
-    /**
-     * getter method
-     * 
-     * @see ExecutionFlow#orgName
-     * @return the orgName
-     */
-    public String getOrgName() {
-        return orgName;
-    }
+  /**
+   * getter method
+   *
+   * @return the orgName
+   * @see ExecutionFlow#orgName
+   */
+  public String getOrgName() {
+    return orgName;
+  }
 
-    /**
-     * setter method
-     * 
-     * @see ExecutionFlow#orgName
-     * @param orgName
-     *            the orgName to set
-     */
-    public void setOrgName(String orgName) {
-        this.orgName = orgName;
-    }
+  /**
+   * setter method
+   *
+   * @param orgName the orgName to set
+   * @see ExecutionFlow#orgName
+   */
+  public void setOrgName(String orgName) {
+    this.orgName = orgName;
+  }
 
-    public FlowErrorCode getErrorCode() {
-        return errorCode;
-    }
+  public FlowErrorCode getErrorCode() {
+    return errorCode;
+  }
 
-    public void setErrorCode(FlowErrorCode errorCode) {
-        this.errorCode = errorCode;
-    }
+  public void setErrorCode(FlowErrorCode errorCode) {
+    this.errorCode = errorCode;
+  }
 
-    public String getQueue() {
-        return queue;
-    }
+  public String getQueue() {
+    return queue;
+  }
 
-    public void setQueue(String queue) {
-        this.queue = queue;
-    }
+  public void setQueue(String queue) {
+    this.queue = queue;
+  }
 
-    public Date getScheduleTime() {
-        return scheduleTime;
-    }
+  public Date getScheduleTime() {
+    return scheduleTime;
+  }
 }

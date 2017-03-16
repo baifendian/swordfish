@@ -44,8 +44,8 @@ public class DataSourceMongo extends DataSourceDbBase {
   @Override
   public String toString() {
     return "DataSourceMongo{" +
-        "address='" + address + '\'' +
-        ", database='" + database + '\'' +
-        '}';
+            "address='" + address + '\'' +
+            ", database='" + database + '\'' +
+            '}';
   }
 }

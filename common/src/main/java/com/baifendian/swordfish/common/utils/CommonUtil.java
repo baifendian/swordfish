@@ -17,6 +17,7 @@
 package com.baifendian.swordfish.common.utils;
 
 import com.google.common.collect.Sets;
+
 import org.apache.commons.lang.StringUtils;
 
 import java.math.BigInteger;
@@ -47,7 +48,7 @@ public class CommonUtil {
    * 关键词, 不需要列举全
    */
   private final static Set<String> keywords = Sets.newHashSet("SELECT", "ALL", "DISTINCT", "FROM", "WHERE", "BY",
-      "WITH", "LIMIT", "JOIN", "UNION", "OVER", "IN", "IF", "AND", "OR", "PARTITION");
+          "WITH", "LIMIT", "JOIN", "UNION", "OVER", "IN", "IF", "AND", "OR", "PARTITION");
 
   private static MessageDigest md = null;
 
@@ -114,10 +115,8 @@ public class CommonUtil {
   }
 
   /**
-   * 解析整型
-   * <p>
+   * 解析整型 <p>
    *
-   * @param integerStr
    * @return 整型
    */
   public static Integer parseInteger(String integerStr) {
@@ -128,11 +127,7 @@ public class CommonUtil {
   }
 
   /**
-   * sql 字符串解析, 将一个语句进行正常切割, 为多个.
-   * 能处理 ', ", 回车换行问题.
-   *
-   * @param sql
-   * @return
+   * sql 字符串解析, 将一个语句进行正常切割, 为多个. 能处理 ', ", 回车换行问题.
    */
   public static List<String> sqlSplit(String sql) {
     if (StringUtils.isEmpty(sql)) {
@@ -268,9 +263,6 @@ public class CommonUtil {
 
   /**
    * 返回 token 以及类型, 对于单词, 采用 value, 其它的则没有
-   *
-   * @param sql
-   * @return
    */
   public static List<Map.Entry<TokenType, String>> getToken(String sql) {
     if (StringUtils.isEmpty(sql)) {
@@ -402,16 +394,9 @@ public class CommonUtil {
   }
 
   /**
-   * 识别一个 sql 中的自定义 function, 这个算法是采用栈的方式来实现:
-   * 1) 首先将 sql 处理, 去除掉 "";
-   * 2) 然后获取一个个的 Token, 对于 Token 有2种情况, 单词, 非单词(都是一个个字符);
-   * 3) 单词就符合单词的规则, 以 _ 或者字母开头, 后面都是数字;
-   * 4) 如果是 单词, 后面接上了 (, 考虑将 单词 作为 function name, 否则抛弃;
-   * <p>
-   * 注意: 有可能多找关键词, 比如某些 hive 关键词后面跟上了 (), 会误认为是关键词, 不过这个不影响我们的正常处理.
-   *
-   * @param sql
-   * @return
+   * 识别一个 sql 中的自定义 function, 这个算法是采用栈的方式来实现: 1) 首先将 sql 处理, 去除掉 ""; 2) 然后获取一个个的 Token, 对于 Token
+   * 有2种情况, 单词, 非单词(都是一个个字符); 3) 单词就符合单词的规则, 以 _ 或者字母开头, 后面都是数字; 4) 如果是 单词, 后面接上了 (, 考虑将 单词 作为
+   * function name, 否则抛弃; <p> 注意: 有可能多找关键词, 比如某些 hive 关键词后面跟上了 (), 会误认为是关键词, 不过这个不影响我们的正常处理.
    */
   public static Set<String> sqlFunction(String sql) {
     Collection<Map.Entry<TokenType, String>> tokens = getToken(sql);

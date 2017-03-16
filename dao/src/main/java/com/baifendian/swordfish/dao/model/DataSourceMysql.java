@@ -107,15 +107,15 @@ public class DataSourceMysql extends DataSourceDbBase {
   @Override
   public String toString() {
     return "DataSourceMysql{" +
-        "address='" + address + '\'' +
-        ", database='" + database + '\'' +
-        ", user='" + user + '\'' +
-        ", password='" + password + '\'' +
-        ", autoRec=" + autoRec +
-        ", maxRec=" + maxRec +
-        ", initialTimeout=" + initialTimeout +
-        ", useUnicode=" + useUnicode +
-        ", characterEncoding='" + characterEncoding + '\'' +
-        '}';
+            "address='" + address + '\'' +
+            ", database='" + database + '\'' +
+            ", user='" + user + '\'' +
+            ", password='" + password + '\'' +
+            ", autoRec=" + autoRec +
+            ", maxRec=" + maxRec +
+            ", initialTimeout=" + initialTimeout +
+            ", useUnicode=" + useUnicode +
+            ", characterEncoding='" + characterEncoding + '\'' +
+            '}';
   }
 }

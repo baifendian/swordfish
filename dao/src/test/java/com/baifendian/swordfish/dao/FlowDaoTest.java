@@ -19,6 +19,7 @@ package com.baifendian.swordfish.dao;
 import com.baifendian.swordfish.common.job.FlowStatus;
 import com.baifendian.swordfish.dao.model.ExecutionFlow;
 import com.baifendian.swordfish.dao.model.ExecutionNode;
+
 import org.junit.Before;
 import org.junit.Test;
 
@@ -30,22 +31,22 @@ import java.util.List;
  * @date : 2017-03-14 9:06
  */
 public class FlowDaoTest {
-    FlowDao flowDao;
+  FlowDao flowDao;
 
-    @Before
-    public void before(){
-        flowDao = DaoFactory.getDaoInstance(FlowDao.class);
-    }
+  @Before
+  public void before() {
+    flowDao = DaoFactory.getDaoInstance(FlowDao.class);
+  }
 
-    @Test
-    public void testQueryExecutionNodeLastAttempt(){
-        ExecutionNode executionNode = flowDao.queryExecutionNodeLastAttempt(411, 6);
-        System.out.println(executionNode.getStatus());
-    }
+  @Test
+  public void testQueryExecutionNodeLastAttempt() {
+    ExecutionNode executionNode = flowDao.queryExecutionNodeLastAttempt(411, 6);
+    System.out.println(executionNode.getStatus());
+  }
 
-    @Test
-    public void testQueryAllExecutionFlow(){
-        List<ExecutionFlow> executionNodeList = flowDao.queryAllNoFinishFlow();
-        System.out.println(executionNodeList.size());
-    }
+  @Test
+  public void testQueryAllExecutionFlow() {
+    List<ExecutionFlow> executionNodeList = flowDao.queryAllNoFinishFlow();
+    System.out.println(executionNodeList.size());
+  }
 }

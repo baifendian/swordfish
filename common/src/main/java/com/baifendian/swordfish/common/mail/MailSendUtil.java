@@ -30,9 +30,7 @@ import java.util.Collection;
 import java.util.Properties;
 
 /**
- * author: smile8
- * date:   2017/2/28
- * desc:
+ * author: smile8 date:   2017/2/28 desc:
  */
 public class MailSendUtil {
   private static Logger LOGGER = LoggerFactory.getLogger(MailSendUtil.class.getName());
@@ -67,11 +65,6 @@ public class MailSendUtil {
 
   /**
    * 发送邮件给具体的邮件接收人
-   *
-   * @param receivers
-   * @param title
-   * @param content
-   * @return
    */
   public static boolean sendMails(Collection<String> receivers, String title, String content) {
     if (receivers == null) {

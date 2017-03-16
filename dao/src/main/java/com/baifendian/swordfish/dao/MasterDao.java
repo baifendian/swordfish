@@ -19,6 +19,7 @@ package com.baifendian.swordfish.dao;
 import com.baifendian.swordfish.dao.datasource.ConnectionFactory;
 import com.baifendian.swordfish.dao.mapper.MasterServerMapper;
 import com.baifendian.swordfish.dao.model.MasterServer;
+
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Date;
@@ -27,33 +28,33 @@ import java.util.Date;
  * @author : liujin
  * @date : 2017-03-10 15:57
  */
-public class MasterDao extends BaseDao{
+public class MasterDao extends BaseDao {
 
-    @Autowired
-    MasterServerMapper masterServerMapper;
+  @Autowired
+  MasterServerMapper masterServerMapper;
 
-    @Override
-    protected void init() {
-        masterServerMapper = ConnectionFactory.getSqlSessionFactory().openSession().getMapper(MasterServerMapper.class);
-    }
+  @Override
+  protected void init() {
+    masterServerMapper = ConnectionFactory.getSqlSessionFactory().openSession().getMapper(MasterServerMapper.class);
+  }
 
-    public MasterServer getMasterServer(){
-        return masterServerMapper.query();
-    }
+  public MasterServer getMasterServer() {
+    return masterServerMapper.query();
+  }
 
-    public int registerMasterServer(String host, int port){
-        MasterServer masterServer = new MasterServer();
-        masterServer.setHost(host);
-        masterServer.setPort(port);
-        masterServer.setUpdateTime(new Date());
-        return masterServerMapper.insert(masterServer);
-    }
+  public int registerMasterServer(String host, int port) {
+    MasterServer masterServer = new MasterServer();
+    masterServer.setHost(host);
+    masterServer.setPort(port);
+    masterServer.setUpdateTime(new Date());
+    return masterServerMapper.insert(masterServer);
+  }
 
-    public int updateMasterServer(String host, int port){
-        MasterServer masterServer = new MasterServer();
-        masterServer.setHost(host);
-        masterServer.setPort(port);
-        masterServer.setUpdateTime(new Date());
-        return masterServerMapper.update(masterServer);
-    }
+  public int updateMasterServer(String host, int port) {
+    MasterServer masterServer = new MasterServer();
+    masterServer.setHost(host);
+    masterServer.setPort(port);
+    masterServer.setUpdateTime(new Date());
+    return masterServerMapper.update(masterServer);
+  }
 }

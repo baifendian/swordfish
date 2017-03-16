@@ -17,6 +17,7 @@ package com.baifendian.swordfish.dao.datasource;
 
 import com.baifendian.swordfish.dao.mapper.SessionMapper;
 import com.baifendian.swordfish.dao.model.Session;
+
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.junit.BeforeClass;
@@ -28,9 +29,7 @@ import java.util.UUID;
 import static org.junit.Assert.assertEquals;
 
 /**
- * author: smile8
- * date:   2017/3/16
- * desc:
+ * author: smile8 date:   2017/3/16 desc:
  */
 public class DatabaseConfigurationTest {
   private static SqlSessionFactory sqlSessionFactory;

@@ -26,6 +26,7 @@ import com.baifendian.swordfish.dao.mapper.*;
 import com.baifendian.swordfish.dao.model.*;
 import com.baifendian.swordfish.dao.model.flow.FlowDag;
 import com.baifendian.swordfish.dao.model.flow.ScheduleMeta;
+
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -36,176 +37,156 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * Workflow 相关操作
- * <p>
- * 
+ * Workflow 相关操作 <p>
+ *
  * @author : dsfan
  * @date : 2016年10月27日
  */
 @Component
 public class FlowDao extends BaseDao {
 
-    private SqlSession sqlSession;
+  private SqlSession sqlSession;
 
-    @Autowired
-    private ExecutionFlowMapper executionFlowMapper;
+  @Autowired
+  private ExecutionFlowMapper executionFlowMapper;
 
-    @Autowired
-    private ProjectFlowMapper projectFlowMapper;
+  @Autowired
+  private ProjectFlowMapper projectFlowMapper;
 
-    @Autowired
-    private FlowNodeMapper flowNodeMapper;
+  @Autowired
+  private FlowNodeMapper flowNodeMapper;
 
-    @Autowired
-    private FlowNodeRelationMapper flowNodeRelationMapper;
+  @Autowired
+  private FlowNodeRelationMapper flowNodeRelationMapper;
 
-    @Autowired
-    private ScheduleMapper scheduleMapper;
+  @Autowired
+  private ScheduleMapper scheduleMapper;
 
-    @Autowired
-    private ExecutionNodeMapper executionNodeMapper;
+  @Autowired
+  private ExecutionNodeMapper executionNodeMapper;
 
-    @Autowired
-    private ExecNodeLogMapper execNodeLogMapper;
+  @Autowired
+  private ExecNodeLogMapper execNodeLogMapper;
 
-    @Autowired
-    private ResourceMapper resourceMapper;
+  @Autowired
+  private ResourceMapper resourceMapper;
 
-    @Autowired
-    //private EtlAutoGen etlAutoGen;
+  @Autowired
+  //private EtlAutoGen etlAutoGen;
 
-    @Override
-    protected void init() {
-        sqlSession = ConnectionFactory.getSqlSessionFactory().openSession();
-        executionFlowMapper = sqlSession.getMapper(ExecutionFlowMapper.class);
-        projectFlowMapper = sqlSession.getMapper(ProjectFlowMapper.class);
-        flowNodeMapper = sqlSession.getMapper(FlowNodeMapper.class);
-        flowNodeRelationMapper = sqlSession.getMapper(FlowNodeRelationMapper.class);
-        scheduleMapper = sqlSession.getMapper(ScheduleMapper.class);
-        executionNodeMapper = sqlSession.getMapper(ExecutionNodeMapper.class);
-        execNodeLogMapper = sqlSession.getMapper(ExecNodeLogMapper.class);
-        resourceMapper = sqlSession.getMapper(ResourceMapper.class);
-        //etlAutoGen = new EtlAutoGen();
+  @Override
+  protected void init() {
+    sqlSession = ConnectionFactory.getSqlSessionFactory().openSession();
+    executionFlowMapper = sqlSession.getMapper(ExecutionFlowMapper.class);
+    projectFlowMapper = sqlSession.getMapper(ProjectFlowMapper.class);
+    flowNodeMapper = sqlSession.getMapper(FlowNodeMapper.class);
+    flowNodeRelationMapper = sqlSession.getMapper(FlowNodeRelationMapper.class);
+    scheduleMapper = sqlSession.getMapper(ScheduleMapper.class);
+    executionNodeMapper = sqlSession.getMapper(ExecutionNodeMapper.class);
+    execNodeLogMapper = sqlSession.getMapper(ExecNodeLogMapper.class);
+    resourceMapper = sqlSession.getMapper(ResourceMapper.class);
+    //etlAutoGen = new EtlAutoGen();
+  }
+
+  /**
+   * @param nodeId
+   * @return
+   */
+  public FlowNode queryNodeInfo(Integer nodeId) {
+    FlowNode flowNode = flowNodeMapper.selectByNodeId(nodeId);
+    return flowNode;
+  }
+
+  /**
+   * 获取 flow 执行详情 <p>
+   *
+   * @return {@link ExecutionFlow}
+   */
+  public ExecutionFlow queryExecutionFlow(long execId) {
+    return executionFlowMapper.selectByExecId(execId);
+  }
+
+  /**
+   * 获取所有未完成的 flow 列表 <p>
+   */
+  public List<ExecutionFlow> queryAllNoFinishFlow() {
+    return executionFlowMapper.selectNoFinishFlow();
+  }
+
+  /**
+   * 按时间段查询 flow 的调度的最新运行状态(调度或者补数据) <p>
+   *
+   * @return List<{@link ExecutionFlow}>
+   */
+  public List<ExecutionFlow> queryFlowLastStatus(Integer flowId, Date startDate, Date endDate) {
+    return executionFlowMapper.selectByFlowIdAndTimes(flowId, startDate, endDate);
+  }
+
+  /**
+   * 按时间查询 flow 的调度的最新运行状态(调度或者补数据) <p>
+   *
+   * @return List<{@link ExecutionFlow}>
+   */
+  public List<ExecutionFlow> queryFlowLastStatus(int flowId, Date scheduleTime) {
+    return executionFlowMapper.selectByFlowIdAndTime(flowId, scheduleTime);
+  }
+
+  /**
+   * 更新 flow 执行状态 <p>
+   *
+   * @return 是否成功
+   */
+  public boolean updateExecutionFlowStatus(long execId, FlowStatus status) {
+    ExecutionFlow executionFlow = new ExecutionFlow();
+    executionFlow.setId(execId);
+    executionFlow.setStatus(status);
+
+    // add by qifeng.dai, 如果结束了, 则应该设置结束时间
+    if (status.typeIsFinished()) {
+      executionFlow.setEndTime(new Date());
     }
 
-    /**
-     * @param nodeId
-     * @return
-     */
-    public FlowNode queryNodeInfo(Integer nodeId) {
-        FlowNode flowNode = flowNodeMapper.selectByNodeId(nodeId);
-        return flowNode;
+    return executionFlowMapper.update(executionFlow) > 0;
+  }
+
+  public boolean updateExecutionFlowStatus(long execId, FlowStatus status, String worker) {
+    ExecutionFlow executionFlow = new ExecutionFlow();
+    executionFlow.setId(execId);
+    executionFlow.setStatus(status);
+    executionFlow.setWorker(worker);
+
+    if (status.typeIsFinished()) {
+      executionFlow.setEndTime(new Date());
     }
 
-    /**
-     * 获取 flow 执行详情
-     * <p>
-     *
-     * @param execId
-     * @return {@link ExecutionFlow}
-     */
-    public ExecutionFlow queryExecutionFlow(long execId) {
-        return executionFlowMapper.selectByExecId(execId);
-    }
+    return executionFlowMapper.update(executionFlow) > 0;
+  }
 
-    /**
-     * 获取所有未完成的 flow 列表
-     * <p>
-     *
-     * @return
-     */
-    public List<ExecutionFlow> queryAllNoFinishFlow() {
-        return executionFlowMapper.selectNoFinishFlow();
-    }
+  /**
+   * 更新 flow 执行详情 <p>
+   *
+   * @return 是否成功
+   */
+  public boolean updateExecutionFlow(ExecutionFlow executionFlow) {
+    return executionFlowMapper.update(executionFlow) > 0;
+  }
 
-    /**
-     * 按时间段查询 flow 的调度的最新运行状态(调度或者补数据)
-     * <p>
-     *
-     * @param flowId
-     * @param startDate
-     * @param endDate
-     * @return List<{@link ExecutionFlow}>
-     */
-    public List<ExecutionFlow> queryFlowLastStatus(Integer flowId, Date startDate, Date endDate) {
-        return executionFlowMapper.selectByFlowIdAndTimes(flowId, startDate, endDate);
-    }
+  /**
+   * 获取 workflow 详情 <p>
+   *
+   * @return {@link ProjectFlow}
+   */
+  public ProjectFlow queryFlow(Integer workflowId) {
+    return projectFlowMapper.findById(workflowId);
+  }
 
-    /**
-     * 按时间查询 flow 的调度的最新运行状态(调度或者补数据)
-     * <p>
-     *
-     * @param flowId
-     * @param scheduleTime
-     * @return List<{@link ExecutionFlow}>
-     */
-    public List<ExecutionFlow> queryFlowLastStatus(int flowId, Date scheduleTime) {
-        return executionFlowMapper.selectByFlowIdAndTime(flowId, scheduleTime);
-    }
-
-    /**
-     * 更新 flow 执行状态
-     * <p>
-     *
-     * @param execId
-     * @param status
-     * @return 是否成功
-     */
-    public boolean updateExecutionFlowStatus(long execId, FlowStatus status) {
-        ExecutionFlow executionFlow = new ExecutionFlow();
-        executionFlow.setId(execId);
-        executionFlow.setStatus(status);
-
-        // add by qifeng.dai, 如果结束了, 则应该设置结束时间
-        if(status.typeIsFinished()) {
-            executionFlow.setEndTime(new Date());
-        }
-
-        return executionFlowMapper.update(executionFlow) > 0;
-    }
-
-    public boolean updateExecutionFlowStatus(long execId, FlowStatus status, String worker) {
-        ExecutionFlow executionFlow = new ExecutionFlow();
-        executionFlow.setId(execId);
-        executionFlow.setStatus(status);
-        executionFlow.setWorker(worker);
-
-        if(status.typeIsFinished()) {
-            executionFlow.setEndTime(new Date());
-        }
-
-        return executionFlowMapper.update(executionFlow) > 0;
-    }
-
-    /**
-     * 更新 flow 执行详情
-     * <p>
-     *
-     * @param executionFlow
-     * @return 是否成功
-     */
-    public boolean updateExecutionFlow(ExecutionFlow executionFlow) {
-        return executionFlowMapper.update(executionFlow) > 0;
-    }
-
-    /**
-     * 获取 workflow 详情
-     * <p>
-     *
-     * @param workflowId
-     * @return {@link ProjectFlow}
-     */
-    public ProjectFlow queryFlow(Integer workflowId) {
-        return projectFlowMapper.findById(workflowId);
-    }
-
-    /**
-     * 查询项目中的所有的 sql
-     * <p>
-     *
-     * @param projectId
-     * @return sql列表
-     */
+  /**
+   * 查询项目中的所有的 sql
+   * <p>
+   *
+   * @param projectId
+   * @return sql列表
+   */
     /*
     public List<String> queryAllSqlFromProject(int projectId) {
         List<String> sqlList = new ArrayList<>();
@@ -242,252 +223,226 @@ public class FlowDao extends BaseDao {
     }
     */
 
-    /**
-     * 执行 workflow 时，插入执行信息
-     * <p>
-     *
-     * @param projectId
-     * @param workflowId
-     * @return {@link ExecutionFlow}
-     */
-    public ExecutionFlow runFlowToExecution(Integer projectId, Integer workflowId) {
-        ProjectFlow projectFlow = projectFlowMapper.findById(workflowId);
-        List<FlowNodeRelation> flowNodeRelations = flowNodeRelationMapper.selectByFlowId(workflowId); // 边信息
-        List<FlowNode> flowNodes = flowNodeMapper.selectByFlowId(workflowId); // 节点信息
-        FlowDag flowDag = new FlowDag();
-        flowDag.setEdges(flowNodeRelations);
-        flowDag.setNodes(flowNodes);
+  /**
+   * 执行 workflow 时，插入执行信息 <p>
+   *
+   * @return {@link ExecutionFlow}
+   */
+  public ExecutionFlow runFlowToExecution(Integer projectId, Integer workflowId) {
+    ProjectFlow projectFlow = projectFlowMapper.findById(workflowId);
+    List<FlowNodeRelation> flowNodeRelations = flowNodeRelationMapper.selectByFlowId(workflowId); // 边信息
+    List<FlowNode> flowNodes = flowNodeMapper.selectByFlowId(workflowId); // 节点信息
+    FlowDag flowDag = new FlowDag();
+    flowDag.setEdges(flowNodeRelations);
+    flowDag.setNodes(flowNodes);
 
-        ExecutionFlow executionFlow = new ExecutionFlow();
-        executionFlow.setProjectId(projectId);
-        executionFlow.setFlowId(workflowId);
-        executionFlow.setSubmitUser(projectFlow.getOwnerId());
-        executionFlow.setSubmitTime(new Date());
-        executionFlow.setStartTime(new Date());
-        executionFlow.setType(FlowRunType.DIRECT_RUN);
-        executionFlow.setStatus(FlowStatus.INIT);
-        executionFlow.setWorkflowData(JsonUtil.toJsonString(flowDag));
+    ExecutionFlow executionFlow = new ExecutionFlow();
+    executionFlow.setProjectId(projectId);
+    executionFlow.setFlowId(workflowId);
+    executionFlow.setSubmitUser(projectFlow.getOwnerId());
+    executionFlow.setSubmitTime(new Date());
+    executionFlow.setStartTime(new Date());
+    executionFlow.setType(FlowRunType.DIRECT_RUN);
+    executionFlow.setStatus(FlowStatus.INIT);
+    executionFlow.setWorkflowData(JsonUtil.toJsonString(flowDag));
 
-        executionFlowMapper.insertAndGetId(executionFlow); // 插入执行信息
+    executionFlowMapper.insertAndGetId(executionFlow); // 插入执行信息
 
-        return executionFlow;
+    return executionFlow;
+  }
+
+  /**
+   * 调度 workflow 时，插入执行信息（调度或者补数据） <p>
+   *
+   * @return {@link ExecutionFlow}
+   */
+  public ExecutionFlow scheduleFlowToExecution(Integer projectId, Integer workflowId, int submitUser, Date scheduleTime, FlowRunType runType) {
+    List<FlowNodeRelation> flowNodeRelations = flowNodeRelationMapper.selectByFlowId(workflowId); // 边信息
+    List<FlowNode> flowNodes = flowNodeMapper.selectByFlowId(workflowId); // 节点信息
+    ProjectFlow projectFlow = projectFlowMapper.findById(workflowId);
+    FlowDag flowDag = new FlowDag();
+    flowDag.setEdges(flowNodeRelations);
+    flowDag.setNodes(flowNodes);
+
+    ExecutionFlow executionFlow = new ExecutionFlow();
+    executionFlow.setFlowId(workflowId);
+    executionFlow.setSubmitUser(submitUser);
+    executionFlow.setProxyUser(projectFlow.getProxyUser());
+    executionFlow.setScheduleTime(scheduleTime);
+    executionFlow.setSubmitTime(new Date());
+    executionFlow.setStartTime(new Date());
+    executionFlow.setType(runType);
+    executionFlow.setStatus(FlowStatus.INIT);
+    executionFlow.setWorkflowData(JsonUtil.toJsonString(flowDag));
+
+    executionFlowMapper.insertAndGetId(executionFlow); // 插入执行信息
+
+    return executionFlow;
+  }
+
+  /**
+   * 创建工作流 创建的工作流已有发布时间
+   *
+   * @return workflowId
+   */
+  public int createWorkflow(int projectId, String name, FlowType type, int userId) throws Exception {
+    ProjectFlow projectFlow = new ProjectFlow();
+
+    projectFlow.setName(name);
+    projectFlow.setCreateTime(new Date());
+    projectFlow.setModifyTime(new Date());
+    projectFlow.setOwnerId(userId);
+    projectFlow.setLastModifyBy(userId);
+    projectFlow.setProjectId(projectId);
+    projectFlow.setType(type);
+
+    int count = projectFlowMapper.insertAndGetId(projectFlow); // 插入函数记录
+    if (count <= 0) {
+      throw new Exception("工作流插入失败");
     }
+    return projectFlow.getId();
+  }
 
-    /**
-     * 调度 workflow 时，插入执行信息（调度或者补数据）
-     * <p>
-     *
-     * @param projectId
-     * @param workflowId
-     * @param submitUser
-     * @param scheduleTime
-     * @param runType
-     * @return {@link ExecutionFlow}
-     */
-    public ExecutionFlow scheduleFlowToExecution(Integer projectId, Integer workflowId, int submitUser, Date scheduleTime, FlowRunType runType) {
-        List<FlowNodeRelation> flowNodeRelations = flowNodeRelationMapper.selectByFlowId(workflowId); // 边信息
-        List<FlowNode> flowNodes = flowNodeMapper.selectByFlowId(workflowId); // 节点信息
-        ProjectFlow projectFlow = projectFlowMapper.findById(workflowId);
-        FlowDag flowDag = new FlowDag();
-        flowDag.setEdges(flowNodeRelations);
-        flowDag.setNodes(flowNodes);
+  /**
+   * 删除工作流、及其节点、和调度配置
+   */
+  @Transactional(value = "TransactionManager")
+  public void deleteWorkflow(int workflowId) {
+    projectFlowMapper.deleteById(workflowId);
+    flowNodeMapper.deleteByFlowId(workflowId);
+    // flowNodePubMapper.deleteByFlowId(workflowId);
+    // scheduleMapper.deleteByFlowId(workflowId);
+  }
 
-        ExecutionFlow executionFlow = new ExecutionFlow();
-        executionFlow.setFlowId(workflowId);
-        executionFlow.setSubmitUser(submitUser);
-        executionFlow.setProxyUser(projectFlow.getProxyUser());
-        executionFlow.setScheduleTime(scheduleTime);
-        executionFlow.setSubmitTime(new Date());
-        executionFlow.setStartTime(new Date());
-        executionFlow.setType(runType);
-        executionFlow.setStatus(FlowStatus.INIT);
-        executionFlow.setWorkflowData(JsonUtil.toJsonString(flowDag));
+  /**
+   * 查询工作流已发布的节点
+   */
+  public List<FlowNode> queryWorkflowNodes(int workflowId) {
+    List<FlowNode> flowNodes = flowNodeMapper.selectByFlowId(workflowId);
+    return flowNodes;
+  }
 
-        executionFlowMapper.insertAndGetId(executionFlow); // 插入执行信息
+  /**
+   * 创建节点
+   */
+  @Transactional(value = "TransactionManager")
+  public void createNode(int projectId, int workflowId, NodeType nodeType, int userId, String name) throws Exception {
+    FlowNode flowNode = new FlowNode();
 
-        return executionFlow;
+    flowNode.setName(name);
+    flowNode.setFlowId(workflowId);
+    flowNode.setType(nodeType);
+    flowNode.setPosX(0.0);
+    flowNode.setPosY(0.0);
+    Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+    flowNode.setCreateTime(timestamp);
+    flowNode.setModifyTime(timestamp);
+    flowNode.setLastModifyBy(userId);
+    int count = flowNodeMapper.insert(flowNode);
+    if (count <= 0) {
+      throw new Exception("插入节点失败");
     }
+  }
 
-    /**
-     * 创建工作流 创建的工作流已有发布时间
-     * 
-     * @return workflowId
-     */
-    public int createWorkflow(int projectId, String name, FlowType type, int userId) throws Exception {
-        ProjectFlow projectFlow = new ProjectFlow();
+  /**
+   * 配置调度信息
+   */
+  public void configSchedule(int workflowId, int userId, String time) throws Exception {
+    Schedule schedule = scheduleMapper.selectByFlowId(workflowId);
+    if (schedule == null) {
+      // 插入调度信息
+      schedule = new Schedule();
 
-        projectFlow.setName(name);
-        projectFlow.setCreateTime(new Date());
-        projectFlow.setModifyTime(new Date());
-        projectFlow.setOwnerId(userId);
-        projectFlow.setLastModifyBy(userId);
-        projectFlow.setProjectId(projectId);
-        projectFlow.setType(type);
+      schedule.setFlowId(workflowId);
+      schedule.setTimeout(10);
+      schedule.setPubStatus(PubStatus.END);
+      schedule.setScheduleStatus(ScheduleStatus.ONLINE);
+      schedule.setLastModifyBy(userId);
+      schedule.setFailureEmails(Boolean.TRUE);
+      schedule.setSuccessEmails(Boolean.FALSE);
+      schedule.setMaxTryTimes(2);
+      schedule.setFailurePolicy(FailurePolicyType.CONTINUE);
 
-        int count = projectFlowMapper.insertAndGetId(projectFlow); // 插入函数记录
-        if (count <= 0) {
-            throw new Exception("工作流插入失败");
-        }
-        return projectFlow.getId();
+      Date now = new Date();
+      schedule.setCreateTime(now);
+      schedule.setModifyTime(now);
+
+      // 调度时间
+      ScheduleMeta meta = new ScheduleMeta();
+      meta.setType(ScheduleType.DAY);
+      meta.setStartDate(now);
+      schedule.setStartDate(now);
+      Date endDate = BFDDateUtils.parse("2099-12-31 00:00:00");
+      meta.setEndDate(endDate);
+      schedule.setEndDate(endDate);
+      int startTime = BFDDateUtils.getSecs(BFDDateUtils.parse(time, Constants.BASE_TIME_FORMAT));
+      schedule.setCrontabStr(JsonUtil.toJsonString(meta));
+
+      int count = scheduleMapper.insert(schedule);
+      if (count <= 0) {
+        throw new Exception("插入失败");
+      }
+
+    } else {
+      // 更新调度信息
+      ScheduleMeta meta = JsonUtil.parseObject(schedule.getCrontabStr(), ScheduleMeta.class);
+      int startTime = BFDDateUtils.getSecs(BFDDateUtils.parse(time, Constants.BASE_TIME_FORMAT));
+      schedule.setCrontabStr(JsonUtil.toJsonString(meta));
+
+      schedule.setLastModifyBy(userId);
+      schedule.setModifyTime(new Date());
+      int count = scheduleMapper.update(schedule);
+      if (count <= 0) {
+        throw new Exception("更新失败");
+      }
     }
+  }
 
-    /**
-     * 删除工作流、及其节点、和调度配置
-     */
-    @Transactional(value = "TransactionManager")
-    public void deleteWorkflow(int workflowId) {
-        projectFlowMapper.deleteById(workflowId);
-        flowNodeMapper.deleteByFlowId(workflowId);
-        // flowNodePubMapper.deleteByFlowId(workflowId);
-        // scheduleMapper.deleteByFlowId(workflowId);
-    }
+  /**
+   * 插入 ExecutionNode <p>
+   */
+  public void insertExecutionNode(ExecutionNode executionNode) {
+    // 插入执行节点信息
+    executionNodeMapper.insert(executionNode);
+  }
 
-    /**
-     * 查询工作流已发布的节点
-     */
-    public List<FlowNode> queryWorkflowNodes(int workflowId) {
-        List<FlowNode> flowNodes = flowNodeMapper.selectByFlowId(workflowId);
-        return flowNodes;
-    }
+  /**
+   * 更新 ExecutionNode <p>
+   */
+  public void updateExecutionNode(ExecutionNode executionNode) {
+    // 更新执行节点信息
+    executionNodeMapper.update(executionNode);
+  }
 
-    /**
-     * 创建节点
-     * 
-     * @throws Exception
-     */
-    @Transactional(value = "TransactionManager")
-    public void createNode(int projectId, int workflowId, NodeType nodeType, int userId, String name) throws Exception {
-        FlowNode flowNode = new FlowNode();
+  /**
+   * 插入 ExecNodeLog <p>
+   */
+  public void insertExecNodeLog(ExecNodeLog execNodeLog) {
+    // 插入执行节点执行日志
+    execNodeLogMapper.insert(execNodeLog);
+  }
 
-        flowNode.setName(name);
-        flowNode.setFlowId(workflowId);
-        flowNode.setType(nodeType);
-        flowNode.setPosX(0.0);
-        flowNode.setPosY(0.0);
-        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-        flowNode.setCreateTime(timestamp);
-        flowNode.setModifyTime(timestamp);
-        flowNode.setLastModifyBy(userId);
-        int count = flowNodeMapper.insert(flowNode);
-        if (count <= 0) {
-            throw new Exception("插入节点失败");
-        }
-    }
+  /**
+   * 获取 node 执行详情 <p>
+   *
+   * @return {@link ExecutionNode}
+   */
+  public ExecutionNode queryExecutionNode(long execId, Integer nodeId, Integer attempt) {
+    return executionNodeMapper.selectOneExecNode(execId, nodeId, attempt);
+  }
 
-    /**
-     * 配置调度信息
-     */
-    public void configSchedule(int workflowId, int userId, String time) throws Exception {
-        Schedule schedule = scheduleMapper.selectByFlowId(workflowId);
-        if (schedule == null) {
-            // 插入调度信息
-            schedule = new Schedule();
+  public ExecutionNode queryExecutionNodeLastAttempt(long execId, Integer nodeId) {
+    return executionNodeMapper.selectExecNodeLastAttempt(execId, nodeId);
+  }
 
-            schedule.setFlowId(workflowId);
-            schedule.setTimeout(10);
-            schedule.setPubStatus(PubStatus.END);
-            schedule.setScheduleStatus(ScheduleStatus.ONLINE);
-            schedule.setLastModifyBy(userId);
-            schedule.setFailureEmails(Boolean.TRUE);
-            schedule.setSuccessEmails(Boolean.FALSE);
-            schedule.setMaxTryTimes(2);
-            schedule.setFailurePolicy(FailurePolicyType.CONTINUE);
-
-            Date now = new Date();
-            schedule.setCreateTime(now);
-            schedule.setModifyTime(now);
-
-            // 调度时间
-            ScheduleMeta meta = new ScheduleMeta();
-            meta.setType(ScheduleType.DAY);
-            meta.setStartDate(now);
-            schedule.setStartDate(now);
-            Date endDate = BFDDateUtils.parse("2099-12-31 00:00:00");
-            meta.setEndDate(endDate);
-            schedule.setEndDate(endDate);
-            int startTime = BFDDateUtils.getSecs(BFDDateUtils.parse(time, Constants.BASE_TIME_FORMAT));
-            schedule.setCrontabStr(JsonUtil.toJsonString(meta));
-
-            int count = scheduleMapper.insert(schedule);
-            if (count <= 0) {
-                throw new Exception("插入失败");
-            }
-
-        } else {
-            // 更新调度信息
-            ScheduleMeta meta = JsonUtil.parseObject(schedule.getCrontabStr(), ScheduleMeta.class);
-            int startTime = BFDDateUtils.getSecs(BFDDateUtils.parse(time, Constants.BASE_TIME_FORMAT));
-            schedule.setCrontabStr(JsonUtil.toJsonString(meta));
-
-            schedule.setLastModifyBy(userId);
-            schedule.setModifyTime(new Date());
-            int count = scheduleMapper.update(schedule);
-            if (count <= 0) {
-                throw new Exception("更新失败");
-            }
-        }
-    }
-
-    /**
-     * 插入 ExecutionNode
-     * <p>
-     *
-     * @param executionNode
-     */
-    public void insertExecutionNode(ExecutionNode executionNode) {
-        // 插入执行节点信息
-        executionNodeMapper.insert(executionNode);
-    }
-
-    /**
-     * 更新 ExecutionNode
-     * <p>
-     *
-     * @param executionNode
-     */
-    public void updateExecutionNode(ExecutionNode executionNode) {
-        // 更新执行节点信息
-        executionNodeMapper.update(executionNode);
-    }
-
-    /**
-     * 插入 ExecNodeLog
-     * <p>
-     *
-     * @param execNodeLog
-     */
-    public void insertExecNodeLog(ExecNodeLog execNodeLog) {
-        // 插入执行节点执行日志
-        execNodeLogMapper.insert(execNodeLog);
-    }
-
-    /**
-     * 获取 node 执行详情
-     * <p>
-     *
-     * @param execId
-     * @param nodeId
-     * @param attempt
-     * @return {@link ExecutionNode}
-     */
-    public ExecutionNode queryExecutionNode(long execId, Integer nodeId, Integer attempt) {
-        return executionNodeMapper.selectOneExecNode(execId, nodeId, attempt);
-    }
-
-    public ExecutionNode queryExecutionNodeLastAttempt(long execId, Integer nodeId) {
-        return executionNodeMapper.selectExecNodeLastAttempt(execId, nodeId);
-    }
-
-    /**
-     * 查询 Schedule
-     * <p>
-     *
-     * @param flowId
-     * @return {@link Schedule}
-     */
-    public Schedule querySchedule(int flowId) {
-        // 插入执行节点信息
-        return scheduleMapper.selectByFlowId(flowId);
-    }
+  /**
+   * 查询 Schedule <p>
+   *
+   * @return {@link Schedule}
+   */
+  public Schedule querySchedule(int flowId) {
+    // 插入执行节点信息
+    return scheduleMapper.selectByFlowId(flowId);
+  }
 
 }

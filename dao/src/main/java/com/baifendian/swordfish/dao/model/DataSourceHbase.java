@@ -22,40 +22,40 @@ package com.baifendian.swordfish.dao.model;
  * @desc:
  */
 public class DataSourceHbase extends DataSourceDbBase {
-    private String address;
-    private String zkQuorum;
-    private Boolean distributed;
+  private String address;
+  private String zkQuorum;
+  private Boolean distributed;
 
-    public String getAddress() {
-        return address;
-    }
+  public String getAddress() {
+    return address;
+  }
 
-    public void setAddress(String address) {
-        this.address = address;
-    }
+  public void setAddress(String address) {
+    this.address = address;
+  }
 
-    public String getZkQuorum() {
-        return zkQuorum;
-    }
+  public String getZkQuorum() {
+    return zkQuorum;
+  }
 
-    public void setZkQuorum(String zkQuorum) {
-        this.zkQuorum = zkQuorum;
-    }
+  public void setZkQuorum(String zkQuorum) {
+    this.zkQuorum = zkQuorum;
+  }
 
-    public Boolean getDistributed() {
-        return distributed;
-    }
+  public Boolean getDistributed() {
+    return distributed;
+  }
 
-    public void setDistributed(Boolean distributed) {
-        this.distributed = distributed;
-    }
+  public void setDistributed(Boolean distributed) {
+    this.distributed = distributed;
+  }
 
-    @Override
-    public String toString() {
-        return "DataSourceHbase{" +
-                "address='" + address + '\'' +
-                ", zkQuorum='" + zkQuorum + '\'' +
-                ", distributed=" + distributed +
-                '}';
-    }
+  @Override
+  public String toString() {
+    return "DataSourceHbase{" +
+            "address='" + address + '\'' +
+            ", zkQuorum='" + zkQuorum + '\'' +
+            ", distributed=" + distributed +
+            '}';
+  }
 }

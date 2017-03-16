@@ -17,17 +17,15 @@
 package com.baifendian.swordfish.dao;
 
 /**
- * Dao 基类
- * <p>
- * 
+ * Dao 基类 <p>
+ *
  * @author : dsfan
  * @date : 2016年10月17日
  */
 public abstract class BaseDao {
 
-    /**
-     * 初始化一个 Dao 实例
-     * <p>
-     */
-    protected abstract void init();
+  /**
+   * 初始化一个 Dao 实例 <p>
+   */
+  protected abstract void init();
 }

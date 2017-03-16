@@ -17,65 +17,68 @@
 package com.baifendian.swordfish.dao.model.flow.params;
 
 /**
- * 配置信息
- * <p>
- * 
+ * 配置信息 <p>
+ *
  * @author : dsfan
  * @date : 2016年10月10日
  */
 public class Property {
-    /** 配置名 */
-    private String prop;
+  /**
+   * 配置名
+   */
+  private String prop;
 
-    /** 配置值 */
-    private String value;
+  /**
+   * 配置值
+   */
+  private String value;
 
-    public Property(){}
+  public Property() {
+  }
 
-    public Property(String prop, String value){
-        this.prop = prop;
-        this.value = value;
-    }
-    /**
-     * getter method
-     * 
-     * @see Property#prop
-     * @return the prop
-     */
-    public String getProp() {
-        return prop;
-    }
+  public Property(String prop, String value) {
+    this.prop = prop;
+    this.value = value;
+  }
 
-    /**
-     * setter method
-     * 
-     * @see Property#prop
-     * @param prop
-     *            the prop to set
-     */
-    public void setProp(String prop) {
-        this.prop = prop;
-    }
+  /**
+   * getter method
+   *
+   * @return the prop
+   * @see Property#prop
+   */
+  public String getProp() {
+    return prop;
+  }
 
-    /**
-     * getter method
-     * 
-     * @see Property#value
-     * @return the value
-     */
-    public String getValue() {
-        return value;
-    }
+  /**
+   * setter method
+   *
+   * @param prop the prop to set
+   * @see Property#prop
+   */
+  public void setProp(String prop) {
+    this.prop = prop;
+  }
 
-    /**
-     * setter method
-     * 
-     * @see Property#value
-     * @param value
-     *            the value to set
-     */
-    public void setValue(String value) {
-        this.value = value;
-    }
+  /**
+   * getter method
+   *
+   * @return the value
+   * @see Property#value
+   */
+  public String getValue() {
+    return value;
+  }
+
+  /**
+   * setter method
+   *
+   * @param value the value to set
+   * @see Property#value
+   */
+  public void setValue(String value) {
+    this.value = value;
+  }
 
 }

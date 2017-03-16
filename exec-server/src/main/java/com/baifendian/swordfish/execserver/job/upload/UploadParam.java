@@ -14,6 +14,22 @@
  * limitations under the License.
  */
 
+/*
+ * Copyright (C) 2017 Baifendian Corporation
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *          http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.baifendian.swordfish.execserver.job.upload;
 
 import com.baifendian.swordfish.common.job.BaseParam;
@@ -26,110 +42,110 @@ import java.util.List;
  * @date : 2017-03-16 10:23
  */
 public class UploadParam extends BaseParam {
-    private String file;
+  private String file;
 
-    private String separator;
+  private String separator;
 
-    private String coding;
+  private String coding;
 
-    private boolean hasTitle;
+  private boolean hasTitle;
 
-    private String targetDB;
+  private String targetDB;
 
-    private String targetTable;
+  private String targetTable;
 
-    private List<MappingRelation> mappingRelation = new ArrayList<>();
+  private List<MappingRelation> mappingRelation = new ArrayList<>();
 
-    private String writeMode;
+  private String writeMode;
 
-    public class MappingRelation{
-        private int originFieldIndex;
+  public class MappingRelation {
+    private int originFieldIndex;
 
-        private String targetField;
+    private String targetField;
 
-        public int getOriginFieldIndex() {
-            return originFieldIndex;
-        }
-
-        public void setOriginFieldIndex(int originFieldIndex) {
-            this.originFieldIndex = originFieldIndex;
-        }
-
-        public String getTargetField() {
-            return targetField;
-        }
-
-        public void setTargetField(String targetField) {
-            this.targetField = targetField;
-        }
+    public int getOriginFieldIndex() {
+      return originFieldIndex;
     }
 
-    public String getFile() {
-        return file;
+    public void setOriginFieldIndex(int originFieldIndex) {
+      this.originFieldIndex = originFieldIndex;
     }
 
-    public void setFile(String file) {
-        this.file = file;
+    public String getTargetField() {
+      return targetField;
     }
 
-    public String getSeparator() {
-        return separator;
+    public void setTargetField(String targetField) {
+      this.targetField = targetField;
     }
+  }
 
-    public void setSeparator(String separator) {
-        this.separator = separator;
-    }
+  public String getFile() {
+    return file;
+  }
 
-    public String getCoding() {
-        return coding;
-    }
+  public void setFile(String file) {
+    this.file = file;
+  }
 
-    public void setCoding(String coding) {
-        this.coding = coding;
-    }
+  public String getSeparator() {
+    return separator;
+  }
 
-    public boolean isHasTitle() {
-        return hasTitle;
-    }
+  public void setSeparator(String separator) {
+    this.separator = separator;
+  }
 
-    public void setHasTitle(boolean hasTitle) {
-        this.hasTitle = hasTitle;
-    }
+  public String getCoding() {
+    return coding;
+  }
 
-    public String getTargetDB() {
-        return targetDB;
-    }
+  public void setCoding(String coding) {
+    this.coding = coding;
+  }
 
-    public void setTargetDB(String targetDB) {
-        this.targetDB = targetDB;
-    }
+  public boolean isHasTitle() {
+    return hasTitle;
+  }
 
-    public String getTargetTable() {
-        return targetTable;
-    }
+  public void setHasTitle(boolean hasTitle) {
+    this.hasTitle = hasTitle;
+  }
 
-    public void setTargetTable(String targetTable) {
-        this.targetTable = targetTable;
-    }
+  public String getTargetDB() {
+    return targetDB;
+  }
 
-    public List<MappingRelation> getMappingRelation() {
-        return mappingRelation;
-    }
+  public void setTargetDB(String targetDB) {
+    this.targetDB = targetDB;
+  }
 
-    public void setMappingRelation(List<MappingRelation> mappingRelation) {
-        this.mappingRelation = mappingRelation;
-    }
+  public String getTargetTable() {
+    return targetTable;
+  }
 
-    public String getWriteMode() {
-        return writeMode;
-    }
+  public void setTargetTable(String targetTable) {
+    this.targetTable = targetTable;
+  }
 
-    public void setWriteMode(String writeMode) {
-        this.writeMode = writeMode;
-    }
+  public List<MappingRelation> getMappingRelation() {
+    return mappingRelation;
+  }
 
-    @Override
-    public List<String> getResourceFiles(){
-        return null;
-    }
+  public void setMappingRelation(List<MappingRelation> mappingRelation) {
+    this.mappingRelation = mappingRelation;
+  }
+
+  public String getWriteMode() {
+    return writeMode;
+  }
+
+  public void setWriteMode(String writeMode) {
+    this.writeMode = writeMode;
+  }
+
+  @Override
+  public List<String> getResourceFiles() {
+    return null;
+  }
 }

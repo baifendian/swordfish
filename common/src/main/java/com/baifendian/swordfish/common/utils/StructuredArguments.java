@@ -19,9 +19,7 @@ package com.baifendian.swordfish.common.utils;
 import java.io.IOException;
 
 /**
- * author: smile8
- * date:   01/12/2016
- * desc:
+ * author: smile8 date:   01/12/2016 desc:
  */
 public class StructuredArguments {
 
@@ -38,9 +36,6 @@ public class StructuredArguments {
 
   /**
    * 支持 jobId
-   *
-   * @param value
-   * @return
    */
   public static String jobValue(String value) {
     return String.format("[jobId=%s]", value/*, COUNTER.getAndIncrement()*/);
