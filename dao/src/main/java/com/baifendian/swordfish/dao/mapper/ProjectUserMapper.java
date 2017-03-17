@@ -15,6 +15,7 @@
  */
 package com.baifendian.swordfish.dao.mapper;
 
+import com.baifendian.swordfish.dao.enums.UserRoleType;
 import com.baifendian.swordfish.dao.model.Project;
 import com.baifendian.swordfish.dao.model.ProjectUser;
 import com.baifendian.swordfish.dao.model.User;
@@ -44,7 +45,7 @@ public interface ProjectUserMapper {
           @Result(property = "tenantId", column = "tenant_id", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
           @Result(property = "tenantName", column = "tenant_name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
           @Result(property = "joinTime", column = "join_time", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP),
-          @Result(property = "roleType", column = "role", typeHandler = EnumOrdinalTypeHandler.class, jdbcType = JdbcType.TINYINT),
+          @Result(property = "roleType", column = "role", typeHandler = EnumOrdinalTypeHandler.class, javaType=UserRoleType.class, jdbcType = JdbcType.TINYINT),
           @Result(property = "status", column = "status", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
   })
   @SelectProvider(type = ProjectUserSqlProvider.class, method = "queryForUser")

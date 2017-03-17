@@ -66,7 +66,7 @@ public class FlowDao extends BaseDao {
 
   @Override
   protected void init() {
-    sqlSession = ConnectionFactory.getSqlSessionFactory().openSession();
+    sqlSession = ConnectionFactory.getSqlSession();
     executionFlowMapper = sqlSession.getMapper(ExecutionFlowMapper.class);
     projectFlowMapper = sqlSession.getMapper(ProjectFlowMapper.class);
     flowNodeMapper = sqlSession.getMapper(FlowNodeMapper.class);

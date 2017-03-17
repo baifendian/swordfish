@@ -34,7 +34,7 @@ public class MasterDao extends BaseDao {
 
   @Override
   protected void init() {
-    masterServerMapper = ConnectionFactory.getSqlSessionFactory().openSession().getMapper(MasterServerMapper.class);
+    masterServerMapper = ConnectionFactory.getSqlSession().getMapper(MasterServerMapper.class);
   }
 
   public MasterServer getMasterServer() {
