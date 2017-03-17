@@ -20,9 +20,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.util.Date;
 
-/**
- * author: smile8 date:   2017/3/16 desc:   用户信息
- */
 public class User {
   /**
    * 用户 ID

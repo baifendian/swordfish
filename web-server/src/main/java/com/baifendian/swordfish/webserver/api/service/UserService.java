@@ -15,14 +15,29 @@
  */
 package com.baifendian.swordfish.webserver.api.service;
 
+import com.baifendian.swordfish.dao.mapper.UserMapper;
+import com.baifendian.swordfish.dao.model.User;
+import org.apache.commons.codec.digest.DigestUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-/**
- * author: smile8
- * date:   2017/3/15
- * desc:
- */
 @Service
-public class ProjectService {
+public class UserService {
 
+  @Autowired
+  private UserMapper userMapper;
+
+  /**
+   * 查询用户信息
+   *
+   * @param name
+   * @param email
+   * @param password
+   * @return
+   */
+  public User queryUser(String name, String email, String password) {
+    String md5 = DigestUtils.md5Hex(password);
+
+    return userMapper.queryForCheck(name, email, md5);
+  }
 }

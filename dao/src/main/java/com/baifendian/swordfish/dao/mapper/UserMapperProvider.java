@@ -15,9 +15,6 @@
  */
 package com.baifendian.swordfish.dao.mapper;
 
-import com.baifendian.swordfish.dao.model.User;
-
-import org.apache.commons.lang.StringUtils;
 import org.apache.ibatis.jdbc.SQL;
 
 import java.util.Map;
@@ -25,7 +22,6 @@ import java.util.Map;
 public class UserMapperProvider {
 
   /**
-   *
    * @param parameter
    * @return
    */
@@ -40,7 +36,6 @@ public class UserMapperProvider {
   }
 
   /**
-   *
    * @param parameter
    * @return
    */
@@ -53,6 +48,29 @@ public class UserMapperProvider {
       }
     }.toString();
   }
+
+  /**
+   * 校验用户信息
+   *
+   * @param parameter
+   * @return
+   */
+  public String queryForCheck(Map<String, Object> parameter) {
+    return new SQL() {
+      {
+        SELECT("*");
+        FROM("user");
+        if (parameter.get("name") != null) {
+          WHERE("name = #{name}");
+        }
+        if (parameter.get("email") != null) {
+          WHERE("email = #{email}");
+        }
+        WHERE("password = #{password}");
+      }
+    }.toString();
+  }
+
 //
 //  public String insert(final User user) {
 //    return new SQL() {

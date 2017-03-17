@@ -24,7 +24,8 @@ import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.type.EnumOrdinalTypeHandler;
 import org.apache.ibatis.type.JdbcType;
 
-import java.util.Date;
+import java.sql.Date;
+import java.sql.Timestamp;
 
 public interface UserMapper {
 
@@ -42,8 +43,8 @@ public interface UserMapper {
       @Result(property = "password", column = "password", javaType = String.class, jdbcType = JdbcType.VARCHAR),
       @Result(property = "role", column = "role", typeHandler = EnumOrdinalTypeHandler.class, javaType = UserRoleType.class, jdbcType = JdbcType.TINYINT),
       @Result(property = "proxyUsers", column = "proxy_users", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-      @Result(property = "createTime", column = "create_time", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP),
-      @Result(property = "modifyTime", column = "modify_time", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP)
+      @Result(property = "createTime", column = "create_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE),
+      @Result(property = "modifyTime", column = "modify_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE)
   })
   @SelectProvider(type = UserMapperProvider.class, method = "queryByName")
   User queryByName(@Param("name") String name);
@@ -60,13 +61,35 @@ public interface UserMapper {
       @Result(property = "desc", column = "desc", javaType = String.class, jdbcType = JdbcType.VARCHAR),
       @Result(property = "phone", column = "phone", javaType = String.class, jdbcType = JdbcType.VARCHAR),
       @Result(property = "password", column = "password", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-      @Result(property = "role", column = "role", typeHandler = EnumOrdinalTypeHandler.class, jdbcType = JdbcType.TINYINT),
+      @Result(property = "role", column = "role", typeHandler = EnumOrdinalTypeHandler.class, javaType = UserRoleType.class, jdbcType = JdbcType.TINYINT),
       @Result(property = "proxyUsers", column = "proxy_users", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-      @Result(property = "createTime", column = "create_time", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP),
-      @Result(property = "modifyTime", column = "modify_time", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP)
+      @Result(property = "createTime", column = "create_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE),
+      @Result(property = "modifyTime", column = "modify_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE)
   })
   @SelectProvider(type = UserMapperProvider.class, method = "queryByEmail")
   User queryByEmail(@Param("email") String email);
+
+  /**
+   * 校验用户信息是否正确
+   *
+   * @param name
+   * @param email
+   * @param password
+   * @return
+   */
+  @Results(value = {@Result(property = "id", column = "id", id = true, javaType = Integer.class, jdbcType = JdbcType.INTEGER),
+      @Result(property = "name", column = "name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+      @Result(property = "email", column = "email", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+      @Result(property = "desc", column = "desc", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+      @Result(property = "phone", column = "phone", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+      @Result(property = "password", column = "password", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+      @Result(property = "role", column = "role", typeHandler = EnumOrdinalTypeHandler.class, javaType = UserRoleType.class, jdbcType = JdbcType.TINYINT),
+      @Result(property = "proxyUsers", column = "proxy_users", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+      @Result(property = "createTime", column = "create_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE),
+      @Result(property = "modifyTime", column = "modify_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE)
+  })
+  @SelectProvider(type = UserMapperProvider.class, method = "queryForCheck")
+  User queryForCheck(@Param("name") String name, @Param("email") String email, @Param("password") String password);
 
 //
 //  @InsertProvider(type = UserMapperProvider.class, method = "insert")

@@ -20,7 +20,6 @@ import com.baifendian.swordfish.dao.mapper.UserMapper;
 import com.baifendian.swordfish.dao.model.Session;
 import com.baifendian.swordfish.dao.model.User;
 import com.baifendian.swordfish.webserver.api.dto.UserSessionData;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -97,53 +96,36 @@ public class SessionService {
    * 1) 如果已经登陆了, 直接返回已经登陆的 session
    * 2) 如果没有登陆或者过期了, 那么会删除过期的信息, 并分配新的 sessionId
    *
-   * @param name
-   * @param email
+   * @param user
    * @param ip
    * @return
    */
-  public UserSessionData createSession(String name, String email, String ip) {
-    UserSessionData userSessionData = new UserSessionData();
-    User user;
-
-    // 用户名存在
-    if (StringUtils.isNotEmpty(name)) {
-      user = userMapper.queryByName(name);
-    } else { // 邮箱存在
-      user = userMapper.queryByEmail(email);
-    }
-
-    // 查看是否已经存在
-    if (user == null) {
-      return null;
-    }
-
+  public UserSessionData createSession(User user, String ip) {
+    // 查询是否登录过
     Session session = sessionMapper.queryByUserIdAndIp(user.getId(), ip);
-    boolean needCreate = true;
+    Date now = new Date();
 
+    // 如果登录过, 且还是有效期内, 直接返回
     if (session != null) {
-      Date lastLoginTime = session.getLastLoginTime();
-      Date now = new Date();
+      if (now.getTime() - session.getLastLoginTime().getTime() <= sessionEffectiveTime * 1000) {
+        // 更新最新登录时间
+        sessionMapper.update(session.getId(), now);
 
-      // session 未过期
-      if (now.getTime() - lastLoginTime.getTime() < sessionEffectiveTime * 1000) {
-        needCreate = false;
-      } else { // 过期删除
+        return new UserSessionData(session.getId(), user);
+      } else { // 有效期外, 则删除
         sessionMapper.deleteById(session.getId());
       }
     }
 
     // 需要新建
-    if (needCreate) {
-      session = new Session();
+    session = new Session();
 
-      session.setId(UUID.randomUUID().toString());
-      session.setIp(ip);
-      session.setUserId(user.getId());
-      session.setLastLoginTime(new Date());
+    session.setId(UUID.randomUUID().toString());
+    session.setIp(ip);
+    session.setUserId(user.getId());
+    session.setLastLoginTime(now);
 
-      sessionMapper.insert(session);
-    }
+    sessionMapper.insert(session);
 
     return new UserSessionData(session.getId(), user);
   }
