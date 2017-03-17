@@ -80,7 +80,7 @@ public class UploadJob extends AbstractProcessJob {
     StringBuilder sb = new StringBuilder();
     String tempCreateTableSql = genTempCreateTableSql(tempTableName, param.getSeparator(), maxColNum);
     sb.append(tempCreateTableSql);
-    sb.append(";");
+    sb.append(";\n");
     sb.append(String.format("LOAD DATA LOCAL INPATH '%s' OVERWRITE INTO TABLE %s;\n", targetFile, tempTableName));
     sb.append("INSERT ");
     if (param.getWriterMode().equalsIgnoreCase("OVERWRITE")) {
