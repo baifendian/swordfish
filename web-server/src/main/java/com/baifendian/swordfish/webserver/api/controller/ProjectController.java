@@ -28,6 +28,7 @@ import javax.servlet.http.HttpServletResponse;
 @RestController
 @RequestMapping("/projects")
 public class ProjectController {
+
   @Autowired
   private ProjectService projectService;
 
@@ -74,7 +75,7 @@ public class ProjectController {
     return null;
   }
 
-  @RequestMapping(value = "/", method = {RequestMethod.GET})
+  @RequestMapping(value = "", method = {RequestMethod.GET})
   public Project queryProjects(HttpServletResponse response) {
     return null;
   }
