@@ -103,7 +103,7 @@ public class FlowRunnerManager {
    */
   public FlowRunnerManager() {
     this.flowDao = DaoFactory.getDaoInstance(FlowDao.class);
-    this.executionNodeMapper = ConnectionFactory.getSqlSessionFactory().openSession().getMapper(ExecutionNodeMapper.class);
+    this.executionNodeMapper = ConnectionFactory.getSqlSession().getMapper(ExecutionNodeMapper.class);
 
     NamedThreadFactory flowThreadFactory = new NamedThreadFactory("Exec-Worker-FlowRunner");
     flowExecutorService = Executors.newCachedThreadPool(flowThreadFactory);

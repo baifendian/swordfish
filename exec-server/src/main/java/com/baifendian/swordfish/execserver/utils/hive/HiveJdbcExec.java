@@ -55,9 +55,6 @@ public class HiveJdbcExec extends BaseDao {
   @Autowired
   HiveConnectionClient hiveConnectionClient;
 
-  @Autowired
-  UserMapper userMapper;
-
   ParseDriver pd = new ParseDriver();
 
   public boolean isTokQuery(String command) throws ParseException {
@@ -86,7 +83,6 @@ public class HiveJdbcExec extends BaseDao {
   public void init() {
     hiveConfig = MyHiveFactoryUtil.getInstance();
     hiveConnectionClient = hiveConfig.hiveConnectionClient();
-    userMapper = ConnectionFactory.getSqlSessionFactory().openSession().getMapper(UserMapper.class);
   }
 
   public HiveConnectionClient getHiveConnectionClient() {

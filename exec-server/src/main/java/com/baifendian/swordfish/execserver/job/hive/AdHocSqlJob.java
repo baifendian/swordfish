@@ -40,7 +40,7 @@ public class AdHocSqlJob extends EtlSqlJob {
 
   public AdHocSqlJob(String jobId, JobProps props, Logger logger) throws IOException {
     super(jobId, props, logger);
-    adHocResultMapper = ConnectionFactory.getSqlSessionFactory().openSession().getMapper(AdHocResultMapper.class);
+    adHocResultMapper = ConnectionFactory.getSqlSession().getMapper(AdHocResultMapper.class);
   }
 
   @Override

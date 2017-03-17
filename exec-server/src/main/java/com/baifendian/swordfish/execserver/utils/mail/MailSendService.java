@@ -53,10 +53,10 @@ public class MailSendService extends BaseDao {
 
   @Override
   protected void init() {
-    userMapper = ConnectionFactory.getSqlSessionFactory().openSession().getMapper(UserMapper.class);
-    projectUserMapper = ConnectionFactory.getSqlSessionFactory().openSession().getMapper(ProjectUserMapper.class);
-    projectFlowMapper = ConnectionFactory.getSqlSessionFactory().openSession().getMapper(ProjectFlowMapper.class);
-    projectMapper = ConnectionFactory.getSqlSessionFactory().openSession().getMapper(ProjectMapper.class);
+    userMapper = ConnectionFactory.getSqlSession().getMapper(UserMapper.class);
+    projectUserMapper = ConnectionFactory.getSqlSession().getMapper(ProjectUserMapper.class);
+    projectFlowMapper = ConnectionFactory.getSqlSession().getMapper(ProjectFlowMapper.class);
+    projectMapper = ConnectionFactory.getSqlSession().getMapper(ProjectMapper.class);
   }
 
   /**

@@ -48,7 +48,7 @@ public class CustomParamManager {
   /**
    * {@link ProjectFlowMapper}
    */
-  private static final ProjectFlowMapper projectFlowMapper = ConnectionFactory.getSqlSessionFactory().openSession().getMapper(ProjectFlowMapper.class);
+  private static final ProjectFlowMapper projectFlowMapper = ConnectionFactory.getSqlSession().getMapper(ProjectFlowMapper.class);
 
   /**
    * 构建自定义参数值
