@@ -62,7 +62,7 @@ public class FunctionUtil {
     }
   }
 
-  public static List<String> createFuncs(List<UdfsInfo> udfsInfos, String jobId, String workingDir) throws IOException, InterruptedException {
+  public static List<String> createFuncs(List<UdfsInfo> udfsInfos, String jobIdLog, String workingDir) throws IOException, InterruptedException {
     List<String> funcList = new ArrayList<>();
     if (CollectionUtils.isNotEmpty(udfsInfos)) {
       Set<String> resources = getFuncResouces(udfsInfos);
@@ -71,7 +71,7 @@ public class FunctionUtil {
         if (StringUtils.isEmpty(hiveUdfJarBasePath)) {
           throw new ExecException(JOB_HIVE_UDFJAR_BASEPATH + " not defined ");
         }
-        String uploadPath = hiveUdfJarBasePath + "/" + jobId;
+        String uploadPath = hiveUdfJarBasePath + "/" + jobIdLog;
         uploadUdfJars(resources, uploadPath, workingDir);
         addJarSql(funcList, resources, uploadPath);
       }

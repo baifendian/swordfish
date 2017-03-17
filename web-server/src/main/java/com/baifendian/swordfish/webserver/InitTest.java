@@ -29,7 +29,7 @@ public class InitTest {
     ScheduleInfo scheduleInfo = new ScheduleInfo();
     scheduleInfo.setStartDate(System.currentTimeMillis() - 3600 * 24 * 1000);
     scheduleInfo.setEndDate(4101494400000l);
-    scheduleInfo.setCronExpression("1 10 * * * ?");
-    masterClient.setSchedule(1, 1, FlowType.SHORT.name(), scheduleInfo);
+    scheduleInfo.setCronExpression("30 * * * * ?");
+    masterClient.setSchedule(1, 2, FlowType.SHORT.name(), scheduleInfo);
   }
 }

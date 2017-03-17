@@ -63,13 +63,13 @@ public class MrJob extends AbstractProcessJob {
 
   /**
    *
-   * @param jobId
+   * @param jobIdLog
    * @param props
    * @param logger
    * @throws IOException
    */
-  public MrJob(String jobId, JobProps props, Logger logger) throws IOException {
-    super(jobId, props, logger);
+  public MrJob(String jobIdLog, JobProps props, Logger logger) throws IOException {
+    super(jobIdLog, props, logger);
   }
 
   @Override

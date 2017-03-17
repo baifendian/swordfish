@@ -20,13 +20,11 @@ import com.baifendian.swordfish.common.job.BaseParam;
 import com.baifendian.swordfish.common.job.JobProps;
 import com.baifendian.swordfish.common.job.exception.ExecException;
 import com.baifendian.swordfish.common.utils.json.JsonUtil;
+import com.baifendian.swordfish.execserver.utils.hive.HiveConfig;
+import com.baifendian.swordfish.execserver.utils.hive.MyHiveFactoryUtil;
 
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.configuration.ConfigurationException;
-import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
 import org.apache.hadoop.hive.metastore.api.Table;
 import org.slf4j.Logger;
@@ -43,14 +41,10 @@ import java.util.stream.IntStream;
 public class UploadJob extends AbstractProcessJob {
   private UploadParam param;
 
-  private Configuration conf;
-
   private static final String DEFAULT_CHARSET = "UTF-8";
 
-  public UploadJob(String jobId, JobProps props, Logger logger) throws IOException, ConfigurationException {
-    super(jobId, props, logger);
-
-    conf = new PropertiesConfiguration("job/hive.properties");
+  public UploadJob(String jobIdLog, JobProps props, Logger logger) throws IOException{
+    super(jobIdLog, props, logger);
   }
 
   @Override
@@ -61,7 +55,7 @@ public class UploadJob extends AbstractProcessJob {
   @Override
   public ProcessBuilder createProcessBuilder() throws Exception {
     String sourceFile = getWorkingDirectory() + "/" + param.getFile();
-    String outFile = getWorkingDirectory() + "/" + jobId + ".data";
+    String outFile = getWorkingDirectory() + "/" + jobIdLog + ".data";
     String targetFile = sourceFile;
 
     // 文件标题行和字符集处理
@@ -82,14 +76,14 @@ public class UploadJob extends AbstractProcessJob {
 
     int maxColNum = param.getMappingRelation().stream().mapToInt(p -> p.getOriginFieldIndex()).max().getAsInt();
 
-    String tempTableName = jobId;
+    String tempTableName = jobIdLog;
     StringBuilder sb = new StringBuilder();
     String tempCreateTableSql = genTempCreateTableSql(tempTableName, param.getSeparator(), maxColNum);
     sb.append(tempCreateTableSql);
-    sb.append(";");
+    sb.append(";\n");
     sb.append(String.format("LOAD DATA LOCAL INPATH '%s' OVERWRITE INTO TABLE %s;\n", targetFile, tempTableName));
     sb.append("INSERT ");
-    if (param.getWriteMode().equalsIgnoreCase("OVERWRITE")) {
+    if (param.getWriterMode().equalsIgnoreCase("OVERWRITE")) {
       sb.append("OVERWRITE ");
     } else {
       sb.append("INTO ");
@@ -101,16 +95,15 @@ public class UploadJob extends AbstractProcessJob {
     }
 
     // 根据hive表meta数据生成查询语句
-    HiveConf hiveConf = new HiveConf();
-    hiveConf.set(HiveConf.ConfVars.METASTOREURIS.name(), conf.getString(HiveConf.ConfVars.METASTOREURIS.name()));
-    HiveMetaStoreClient hiveMetaStoreClient = new HiveMetaStoreClient(hiveConf);
+    HiveConfig hiveConfig = MyHiveFactoryUtil.getInstance();
+    HiveMetaStoreClient hiveMetaStoreClient = hiveConfig.hiveMetaStoreClient();
     Table table = hiveMetaStoreClient.getTable(param.getTargetDB(), param.getTargetTable());
     List<String> cols = table.getSd().getCols().stream().map(p -> p.getName()).collect(Collectors.toList());
     List<String> selectStatement = new ArrayList<>();
     Map<String, String> colMappings = new HashMap<>();
     Set<String> colSet = new HashSet<>(cols);
     List<String> notFoundCols = new ArrayList<>();
-    for (UploadParam.MappingRelation rel : param.getMappingRelation()) {
+    for (MappingRelation rel : param.getMappingRelation()) {
       if (!colSet.contains(rel.getTargetField())) {
         notFoundCols.add(rel.getTargetField());
       }
@@ -131,7 +124,7 @@ public class UploadJob extends AbstractProcessJob {
     sb.append("SELECT " + StringUtils.join(selectStatement, ",") + " FROM ");
     sb.append(tempTableName + ";\n");
 
-    String tempSqlFile = getWorkingDirectory() + "/" + jobId + ".hql";
+    String tempSqlFile = getWorkingDirectory() + "/" + jobIdLog + ".hql";
     FileUtils.writeStringToFile(new File(tempSqlFile), sb.toString());
 
     // 创建 ProcessBuilder
@@ -144,7 +137,7 @@ public class UploadJob extends AbstractProcessJob {
     StringBuilder sb = new StringBuilder();
     sb.append("CREATE TEMPORARY TABLE " + tableName);
     sb.append("(\n");
-    sb.append(IntStream.range(0, maxColNum).mapToObj(i -> String.format("c%d string", i)).collect(Collectors.joining(",\n")));
+    sb.append(IntStream.range(0, maxColNum+1).mapToObj(i -> String.format("c%d string", i)).collect(Collectors.joining(",\n")));
     sb.append(")\n");
     sb.append("ROW FORMAT DELIMITED FIELDS TERMINATED BY '" + sep + "'\n");
     sb.append("STORED AS TEXTFILE\n");

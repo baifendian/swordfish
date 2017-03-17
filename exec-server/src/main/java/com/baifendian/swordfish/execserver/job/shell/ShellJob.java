@@ -62,8 +62,8 @@ public class ShellJob extends AbstractProcessJob {
    */
   private String currentPath;
 
-  public ShellJob(String jobId, JobProps props, Logger logger) throws IOException {
-    super(jobId, props, logger);
+  public ShellJob(String jobIdLog, JobProps props, Logger logger) throws IOException {
+    super(jobIdLog, props, logger);
 
     if (!shellParam.checkValid()) {
       throw new ExecException("ShellJob script param can't be null");
@@ -84,7 +84,7 @@ public class ShellJob extends AbstractProcessJob {
   public ProcessBuilder createProcessBuilder() throws IOException {
     logger.info("script:\n{}", shellParam.getScript());
     logger.info("currentPath: {}", currentPath);
-    String fileName = currentPath + "/" + jobId + "_" + UUID.randomUUID().toString().substring(0, 8) + ".sh";
+    String fileName = currentPath + "/" + jobIdLog + "_" + UUID.randomUUID().toString().substring(0, 8) + ".sh";
     Path path = new File(fileName).toPath();
 
     Set<PosixFilePermission> perms = PosixFilePermissions.fromString("rwxr-xr-x");

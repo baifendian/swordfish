@@ -141,9 +141,11 @@ public class MasterServiceImpl implements Iface {
             executorServerInfo.setHost(workerInfo[0]);
             executorServerInfo.setPort(Integer.parseInt(workerInfo[1]));
             HeartBeatData heartBeatData = new HeartBeatData();
+            heartBeatData.setReportDate(System.currentTimeMillis());
             heartBeatData.setExecIds(new ArrayList<>());
             heartBeatData.getExecIds().add(executionFlow.getId());
             executorServerInfo.setHeartBeatData(heartBeatData);
+            executorServerInfoMap.put(worker, executorServerInfo);
           }
         } else {
           // 没有worker信息，提交到executionFlowQueue队列

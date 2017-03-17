@@ -39,29 +39,7 @@ public class UploadParam extends BaseParam {
 
   private List<MappingRelation> mappingRelation = new ArrayList<>();
 
-  private String writeMode;
-
-  public class MappingRelation {
-    private int originFieldIndex;
-
-    private String targetField;
-
-    public int getOriginFieldIndex() {
-      return originFieldIndex;
-    }
-
-    public void setOriginFieldIndex(int originFieldIndex) {
-      this.originFieldIndex = originFieldIndex;
-    }
-
-    public String getTargetField() {
-      return targetField;
-    }
-
-    public void setTargetField(String targetField) {
-      this.targetField = targetField;
-    }
-  }
+  private String writerMode;
 
   public String getFile() {
     return file;
@@ -119,12 +97,12 @@ public class UploadParam extends BaseParam {
     this.mappingRelation = mappingRelation;
   }
 
-  public String getWriteMode() {
-    return writeMode;
+  public String getWriterMode() {
+    return writerMode;
   }
 
-  public void setWriteMode(String writeMode) {
-    this.writeMode = writeMode;
+  public void setWriterMode(String writerMode) {
+    this.writerMode = writerMode;
   }
 
   @Override

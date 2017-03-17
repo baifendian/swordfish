@@ -69,14 +69,14 @@ public class JobTypeManager {
     jobTypeMap.put(jobType, jobClass);
   }
 
-  public static Job newJob(String jobId, String jobType, JobProps props, Logger logger) throws IllegalAccessException, InvocationTargetException, InstantiationException, NoSuchMethodException {
+  public static Job newJob(String jobIdLog, String jobType, JobProps props, Logger logger) throws IllegalAccessException, InvocationTargetException, InstantiationException, NoSuchMethodException {
     Job job = null;
     Class jobClass = jobTypeMap.get(jobType);
     if (jobClass == null) {
       throw new ExecException("unsupport job type:" + jobType);
     } else {
       Constructor<Job> constructor = jobClass.getConstructor(String.class, JobProps.class, Logger.class);
-      job = constructor.newInstance(jobId, props, logger);
+      job = constructor.newInstance(jobIdLog, props, logger);
     }
     return job;
   }

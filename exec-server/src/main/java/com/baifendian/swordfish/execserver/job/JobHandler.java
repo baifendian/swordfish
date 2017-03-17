@@ -61,7 +61,7 @@ public class JobHandler {
 
   private FlowDao flowDao;
 
-  private String jobId;
+  private String jobIdLog;
 
   private Job job;
 
@@ -88,8 +88,7 @@ public class JobHandler {
     this.systemParamMap = systemParamMap;
     this.customParamMap = customParamMap;
     this.startTime = System.currentTimeMillis();
-    this.jobId = String.format("%s_%s_%d_%d", node.getType().name(), BFDDateUtils.now(DATETIME_FORMAT),
-            node.getId(), executionNode.getId());
+    this.jobIdLog = String.format("%s_%s_%d", executionNode.getJobId(), BFDDateUtils.now(DATETIME_FORMAT), executionNode.getId());
     // custom参数会覆盖system参数
     allParamMap = new HashMap<>();
     allParamMap.putAll(systemParamMap);
@@ -101,7 +100,7 @@ public class JobHandler {
     String flowLocalPath = BaseConfig.getFlowExecPath(executionFlow.getProjectId(), executionFlow.getFlowId(), executionFlow.getId());
     String jobScriptPath = flowLocalPath;
     //FileUtils.forceMkdir(new File(jobScriptPath));
-    logger.info("job:{} script path:{}", jobId, jobScriptPath);
+    logger.info("job:{} script path:{}", jobIdLog, jobScriptPath);
 
     // 作业参数配置
     JobProps props = new JobProps();
@@ -116,13 +115,13 @@ public class JobHandler {
     props.setQueue(executionFlow.getQueue());
 
     //logger.info("props:{}", props);
-    job = JobTypeManager.newJob(jobId, node.getType().name(), props, logger);
+    job = JobTypeManager.newJob(jobIdLog, node.getType().name(), props, logger);
     Boolean result;
     try {
       result = submitJob(job);
     } catch (Exception e) {
       result = false;
-      logger.error("run job error, jobId:" + jobId, e);
+      logger.error("run job error, job:" + jobIdLog, e);
     }
     FlowStatus status;
     if (result) {
@@ -195,7 +194,7 @@ public class JobHandler {
     return job;
   }
 
-  public String getJobId() {
-    return jobId;
+  public String getJobIdLog() {
+    return jobIdLog;
   }
 }

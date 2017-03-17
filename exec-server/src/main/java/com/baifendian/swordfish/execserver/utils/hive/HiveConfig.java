@@ -19,6 +19,8 @@ import com.baifendian.swordfish.common.hive.HiveConnectionClient;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.hive.conf.HiveConf;
+import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
+import org.apache.hadoop.hive.metastore.api.MetaException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -63,6 +65,10 @@ public class HiveConfig {
   @Bean
   public HiveConnectionClient hiveConnectionClient() {
     return HiveConnectionClient.getInstance();
+  }
+
+  public HiveMetaStoreClient hiveMetaStoreClient() throws MetaException {
+    return new HiveMetaStoreClient(hiveConf());
   }
 
   @Bean
