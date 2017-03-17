@@ -19,6 +19,7 @@ import com.baifendian.swordfish.common.hadoop.HdfsClient;
 import com.baifendian.swordfish.common.job.exception.ExecException;
 import com.baifendian.swordfish.dao.DaoFactory;
 import com.baifendian.swordfish.dao.MasterDao;
+import com.baifendian.swordfish.execserver.utils.OsUtil;
 import com.baifendian.swordfish.execserver.utils.hadoop.ConfigurationUtil;
 import com.baifendian.swordfish.dao.model.MasterServer;
 import com.baifendian.swordfish.execserver.service.ExecServiceImpl;
@@ -155,6 +156,8 @@ public class ExecThriftServer {
           MasterServer masterServer = masterDao.getMasterServer();
           HeartBeatData heartBeatData = new HeartBeatData();
           heartBeatData.setReportDate(System.currentTimeMillis());
+          heartBeatData.setCpuUsed(OsUtil.cpuUsage());
+          heartBeatData.setMemUsed(OsUtil.memoryUsage());
           MasterClient client = new MasterClient(masterServer.getHost(), masterServer.getPort(), THRIFT_RPC_RETRIES);
           logger.debug("executor report heartbeat:{}", heartBeatData);
           boolean result = client.executorReport(host, port, heartBeatData);

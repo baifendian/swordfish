@@ -103,6 +103,9 @@ public class JobHandler {
     //FileUtils.forceMkdir(new File(jobScriptPath));
     logger.info("job:{} script path:{}", jobId, jobScriptPath);
 
+    executionNode.setJobId(jobId);
+    flowDao.updateExecutionFlow(executionFlow);
+
     // 作业参数配置
     JobProps props = new JobProps();
     props.setJobParams(node.getParam());

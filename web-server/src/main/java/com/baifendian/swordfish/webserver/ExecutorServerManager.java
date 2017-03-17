@@ -70,7 +70,9 @@ public class ExecutorServerManager {
 
   public synchronized List<ExecutorServerInfo> checkTimeoutServer(long timeoutInterval) {
     List<ExecutorServerInfo> faultServers = new ArrayList<>();
+    logger.debug("{} ", executorServers);
     for (Map.Entry<String, ExecutorServerInfo> entry : executorServers.entrySet()) {
+      logger.debug("{} {}", entry.getKey(), entry.getValue().getHeartBeatData());
       long nowTime = System.currentTimeMillis();
       long diff = nowTime - entry.getValue().getHeartBeatData().getReportDate();
       if (diff > timeoutInterval) {
@@ -87,7 +89,7 @@ public class ExecutorServerManager {
     return executorServers.remove(key);
   }
 
-  public void initServers(Map<String, ExecutorServerInfo> executorServerInfoMap) {
+  public synchronized void initServers(Map<String, ExecutorServerInfo> executorServerInfoMap) {
     for (Map.Entry<String, ExecutorServerInfo> entry : executorServerInfoMap.entrySet()) {
       executorServers.put(entry.getKey(), entry.getValue());
     }

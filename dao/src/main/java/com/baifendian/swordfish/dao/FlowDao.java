@@ -40,9 +40,6 @@ import java.util.List;
  */
 @Component
 public class FlowDao extends BaseDao {
-  // sql session
-  private SqlSession sqlSession;
-
   @Autowired
   private ExecutionFlowMapper executionFlowMapper;
 
@@ -66,14 +63,13 @@ public class FlowDao extends BaseDao {
 
   @Override
   protected void init() {
-    sqlSession = ConnectionFactory.getSqlSession();
-    executionFlowMapper = sqlSession.getMapper(ExecutionFlowMapper.class);
-    projectFlowMapper = sqlSession.getMapper(ProjectFlowMapper.class);
-    flowNodeMapper = sqlSession.getMapper(FlowNodeMapper.class);
-    flowNodeRelationMapper = sqlSession.getMapper(FlowNodeRelationMapper.class);
-    scheduleMapper = sqlSession.getMapper(ScheduleMapper.class);
-    executionNodeMapper = sqlSession.getMapper(ExecutionNodeMapper.class);
-    execNodeLogMapper = sqlSession.getMapper(ExecNodeLogMapper.class);
+    executionFlowMapper = ConnectionFactory.getSqlSession().getMapper(ExecutionFlowMapper.class);
+    projectFlowMapper = ConnectionFactory.getSqlSession().getMapper(ProjectFlowMapper.class);
+    flowNodeMapper = ConnectionFactory.getSqlSession().getMapper(FlowNodeMapper.class);
+    flowNodeRelationMapper = ConnectionFactory.getSqlSession().getMapper(FlowNodeRelationMapper.class);
+    scheduleMapper = ConnectionFactory.getSqlSession().getMapper(ScheduleMapper.class);
+    executionNodeMapper = ConnectionFactory.getSqlSession().getMapper(ExecutionNodeMapper.class);
+    execNodeLogMapper = ConnectionFactory.getSqlSession().getMapper(ExecNodeLogMapper.class);
   }
 
   /**

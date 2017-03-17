@@ -54,21 +54,27 @@ public class ExecutorCheckThread implements Runnable {
 
   @Override
   public void run() {
-    logger.debug("blocking queue size:{}, {}", executionFlowBlockingQueue.size(), executionFlowBlockingQueue);
+    logger.debug("blocking queue size:{} ", executionFlowBlockingQueue.size() );
     List<ExecutorServerInfo> faultServers = executorServerManager.checkTimeoutServer(timeoutInterval);
     if (faultServers != null) {
       logger.debug("get fault servers:{}", faultServers);
       for (ExecutorServerInfo executorServerInfo : faultServers) {
         if (executorServerInfo.getHeartBeatData() != null && executorServerInfo.getHeartBeatData().getExecIdsSize() > 0) {
+          logger.info("executor server {} fault, execIds:{} ", executorServerInfo, executorServerInfo.getHeartBeatData().getExecIds());
           for (Long execId : executorServerInfo.getHeartBeatData().getExecIds()) {
-            ExecutionFlow executionFlow = flowDao.queryExecutionFlow(execId);
-            if (executionFlow != null) {
-              if (!executionFlow.getStatus().typeIsFinished()) {
-                logger.info("executor server fault reschedule workflow execId:{}", execId);
-                executionFlowBlockingQueue.add(executionFlow);
+            logger.info("reschedule workflow execId:{} ", execId);
+            try {
+              ExecutionFlow executionFlow = flowDao.queryExecutionFlow(execId);
+              if (executionFlow != null) {
+                if (!executionFlow.getStatus().typeIsFinished()) {
+                  logger.info("executor server fault reschedule workflow execId:{}", execId);
+                  executionFlowBlockingQueue.add(executionFlow);
+                }
+              } else {
+                logger.warn("executor server fault reschedule workflow execId:{}, but execId:{} not exists", execId, execId);
               }
-            } else {
-              logger.warn("executor server fault reschedule workflow execId:{} not exists", execId);
+            } catch (Exception e){
+              logger.error("reschedule get error", e);
             }
           }
         }

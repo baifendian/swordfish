@@ -482,7 +482,6 @@ public class FlowRunner implements Runnable {
             executionNode.setAttempt(0);
             executionNode.setStartTime(new Date());
             executionNode.setStatus(FlowStatus.INIT);
-            executionNode.setJobId(LoggerUtil.genJobId(executionFlow.getFlowType(), executionFlow.getId(), nodeId));
             flowDao.insertExecutionNode(executionNode);
             // 插入执行队列
             executionNodes.add(executionNode);
@@ -608,7 +607,6 @@ public class FlowRunner implements Runnable {
           retryExecutionNode.setAttempt(executionNode.getAttempt() + 1);
           retryExecutionNode.setStartTime(new Date());
           retryExecutionNode.setStatus(FlowStatus.INIT);
-          retryExecutionNode.setJobId(LoggerUtil.genJobId(executionFlow.getFlowType(), executionFlow.getId(), executionNode.getNodeId()));
           flowDao.insertExecutionNode(retryExecutionNode);
           executionNodes.add(retryExecutionNode);
 

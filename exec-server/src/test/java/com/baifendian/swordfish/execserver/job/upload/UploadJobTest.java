@@ -15,6 +15,9 @@
  */
 package com.baifendian.swordfish.execserver.job.upload;
 
+import com.baifendian.swordfish.execserver.utils.hive.HiveConfig;
+import com.baifendian.swordfish.execserver.utils.hive.MyHiveFactoryUtil;
+
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
 import org.apache.hadoop.hive.metastore.api.Table;
@@ -33,9 +36,8 @@ public class UploadJobTest {
 
   @Before
   public void before() throws Exception {
-    HiveConf hiveConf = new HiveConf();
-    hiveConf.set(HiveConf.ConfVars.METASTOREURIS.name(), "thrift://172.18.1.22:9083");
-    hiveMetaStoreClient = new HiveMetaStoreClient(hiveConf);
+    HiveConfig hiveConfig = MyHiveFactoryUtil.getInstance();
+    hiveMetaStoreClient = hiveConfig.hiveMetaStoreClient();
   }
 
   @Test

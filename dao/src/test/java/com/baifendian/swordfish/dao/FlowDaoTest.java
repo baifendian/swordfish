@@ -48,4 +48,10 @@ public class FlowDaoTest {
     List<ExecutionFlow> executionNodeList = flowDao.queryAllNoFinishFlow();
     System.out.println(executionNodeList.size());
   }
+
+  @Test
+  public void testQueryExecutionFlow() {
+    ExecutionFlow executionFlow = flowDao.queryExecutionFlow(2549);
+    System.out.println(executionFlow);
+  }
 }
