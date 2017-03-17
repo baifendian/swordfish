@@ -134,7 +134,7 @@ public class NodeRunner implements Runnable {
       updateExecutionNode(status);
 
     } catch (Exception e) {
-      LOGGER.error("{}", jobHandler.getJobId() + e.getMessage(), e);
+      LOGGER.error("{}", jobHandler.getJobIdLog() + e.getMessage(), e);
     } finally {
       if (status == null) {
         updateExecutionNode(FlowStatus.FAILED);

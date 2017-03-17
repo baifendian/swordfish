@@ -54,8 +54,8 @@ public class SparkJob extends AbstractProcessJob {
    **/
   private String appid;
 
-  public SparkJob(String jobId, JobProps props, Logger logger) throws IllegalAccessException, IOException {
-    super(jobId, props, logger);
+  public SparkJob(String jobIdLog, JobProps props, Logger logger) throws IllegalAccessException, IOException {
+    super(jobIdLog, props, logger);
   }
 
   @Override

@@ -38,8 +38,8 @@ public class EtlSqlJob extends AbstractJob {
 
   protected List<ExecResult> results;
 
-  public EtlSqlJob(String jobId, JobProps props, Logger logger) throws IOException {
-    super(jobId, props, logger);
+  public EtlSqlJob(String jobIdLog, JobProps props, Logger logger) throws IOException {
+    super(jobIdLog, props, logger);
   }
 
   @Override
@@ -54,7 +54,7 @@ public class EtlSqlJob extends AbstractJob {
   public void process() throws Exception {
     String sqls = param.getSql();
     sqls = ParamHelper.resolvePlaceholders(sqls, definedParamMap);
-    List<String> funcs = FunctionUtil.createFuncs(param.getUdfs(), jobId, getWorkingDirectory());
+    List<String> funcs = FunctionUtil.createFuncs(param.getUdfs(), jobIdLog, getWorkingDirectory());
     logger.info("exec sql:{}, funcs:{}", sqls, funcs);
     List<String> execSqls = CommonUtil.sqlSplit(sqls);
     HiveSqlExec hiveSqlExec = new HiveSqlExec(funcs, execSqls, getProxyUser(), null, false, null, null, logger);

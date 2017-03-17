@@ -27,11 +27,11 @@ import java.util.List;
  */
 public interface Job {
   /**
-   * 获取 生成的作业ID: 节点类型_yyyyMMddHHmmss_NodeId_execId <p>
+   * 获取 生成的作业ID Log  <p>
    *
    * @return 执行 id
    */
-  String getJobId();
+  String getJobIdLog();
 
   /**
    * 作业前处理

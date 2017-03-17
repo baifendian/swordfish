@@ -26,15 +26,15 @@ import org.slf4j.Marker;
 public class JobLogger implements Logger {
 
   private Logger logger;
-  private String jobId;
+  private String jobIdLog;
 
-  public JobLogger(String jobId, Logger logger) {
-    this.jobId = jobId;
+  public JobLogger(String jobIdLog, Logger logger) {
+    this.jobIdLog = jobIdLog;
     this.logger = logger;
   }
 
   private String addJobId(String msg) {
-    return String.format("%s %s", jobId, msg);
+    return String.format("%s %s", jobIdLog, msg);
   }
 
   @Override

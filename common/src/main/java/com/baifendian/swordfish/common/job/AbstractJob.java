@@ -44,7 +44,7 @@ public abstract class AbstractJob implements Job {
   /**
    * jobId
    **/
-  protected final String jobId;
+  protected final String jobIdLog;
 
   /**
    * {@link Process}
@@ -71,23 +71,23 @@ public abstract class AbstractJob implements Job {
   protected int projectId;
 
   /**
-   * @param jobId  生成的作业id
+   * @param jobIdLog  生成的作业idLog
    * @param props  作业配置信息,各类作业根据此配置信息生成具体的作业
    * @param logger 日志
    */
-  protected AbstractJob(String jobId, JobProps props, Logger logger) throws IOException {
-    this.jobId = jobId;
+  protected AbstractJob(String jobIdLog, JobProps props, Logger logger) throws IOException {
+    this.jobIdLog = jobIdLog;
     this.props = props;
     this._logger = logger;
-    this.logger = new JobLogger(jobId, logger);
+    this.logger = new JobLogger(jobIdLog, logger);
     this.definedParamMap = props.getDefinedParams();
     this.projectId = props.getProjectId();
     initJobParams();
   }
 
   @Override
-  public String getJobId() {
-    return jobId;
+  public String getJobIdLog() {
+    return jobIdLog;
   }
 
   @Override

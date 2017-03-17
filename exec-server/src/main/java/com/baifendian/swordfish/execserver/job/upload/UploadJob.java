@@ -43,8 +43,8 @@ public class UploadJob extends AbstractProcessJob {
 
   private static final String DEFAULT_CHARSET = "UTF-8";
 
-  public UploadJob(String jobId, JobProps props, Logger logger) throws IOException{
-    super(jobId, props, logger);
+  public UploadJob(String jobIdLog, JobProps props, Logger logger) throws IOException{
+    super(jobIdLog, props, logger);
   }
 
   @Override
@@ -55,7 +55,7 @@ public class UploadJob extends AbstractProcessJob {
   @Override
   public ProcessBuilder createProcessBuilder() throws Exception {
     String sourceFile = getWorkingDirectory() + "/" + param.getFile();
-    String outFile = getWorkingDirectory() + "/" + jobId + ".data";
+    String outFile = getWorkingDirectory() + "/" + jobIdLog + ".data";
     String targetFile = sourceFile;
 
     // 文件标题行和字符集处理
@@ -76,7 +76,7 @@ public class UploadJob extends AbstractProcessJob {
 
     int maxColNum = param.getMappingRelation().stream().mapToInt(p -> p.getOriginFieldIndex()).max().getAsInt();
 
-    String tempTableName = jobId;
+    String tempTableName = jobIdLog;
     StringBuilder sb = new StringBuilder();
     String tempCreateTableSql = genTempCreateTableSql(tempTableName, param.getSeparator(), maxColNum);
     sb.append(tempCreateTableSql);
@@ -124,7 +124,7 @@ public class UploadJob extends AbstractProcessJob {
     sb.append("SELECT " + StringUtils.join(selectStatement, ",") + " FROM ");
     sb.append(tempTableName + ";\n");
 
-    String tempSqlFile = getWorkingDirectory() + "/" + jobId + ".hql";
+    String tempSqlFile = getWorkingDirectory() + "/" + jobIdLog + ".hql";
     FileUtils.writeStringToFile(new File(tempSqlFile), sb.toString());
 
     // 创建 ProcessBuilder

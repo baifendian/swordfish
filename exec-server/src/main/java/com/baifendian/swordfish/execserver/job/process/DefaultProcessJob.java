@@ -47,12 +47,12 @@ public class DefaultProcessJob extends AbstractProcessJob {
 
   /**
    *
-   * @param jobId
+   * @param jobIdLog
    * @param props
    * @param logger
    */
-  public DefaultProcessJob(String jobId, JobProps props, Logger logger) throws IOException {
-    super(jobId, props, logger);
+  public DefaultProcessJob(String jobIdLog, JobProps props, Logger logger) throws IOException {
+    super(jobIdLog, props, logger);
 
     if (param.getScript() == null || StringUtils.isEmpty(param.getScript())) {
       throw new ExecException("DefaultProcessJob script param must not null");

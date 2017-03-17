@@ -46,12 +46,12 @@ public abstract class AbstractProcessJob extends AbstractJob {
   protected final long KILL_TIME_MS = 5000;
 
   /**
-   * @param jobId  生成的作业id
+   * @param jobIdLog  生成的作业idLog
    * @param props  作业配置信息,各类作业根据此配置信息生成具体的作业
    * @param logger 日志
    */
-  protected AbstractProcessJob(String jobId, JobProps props, Logger logger) throws IOException {
-    super(jobId, props, logger);
+  protected AbstractProcessJob(String jobIdLog, JobProps props, Logger logger) throws IOException {
+    super(jobIdLog, props, logger);
     completeLatch = new CountDownLatch(1);
   }
 
@@ -78,9 +78,9 @@ public abstract class AbstractProcessJob extends AbstractJob {
 
       String proxyUser = getProxyUser();
       String workDir = getWorkingDirectory();
-      logger.info("jobId:{} proxyUser:{} workDir:{}", jobId, proxyUser, workDir);
+      logger.info("jobIdLog:{} proxyUser:{} workDir:{}", jobIdLog, proxyUser, workDir);
       if (proxyUser != null) {
-        String commandFile = workDir + File.separator + jobId + ".command";
+        String commandFile = workDir + File.separator + jobIdLog + ".command";
         logger.info("generate command file:{}", commandFile);
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("#!/bin/sh\n");
@@ -131,7 +131,7 @@ public abstract class AbstractProcessJob extends AbstractJob {
       throw new IllegalStateException("not started.");
     }
     int processId = getProcessId(process);
-    logger.info("job:{} cancel job. kill process:{}", jobId, processId);
+    logger.info("job:{} cancel job. kill process:{}", jobIdLog, processId);
 
     boolean killed = softKill(processId, KILL_TIME_MS, TimeUnit.MILLISECONDS);
     if (!killed) {
@@ -223,7 +223,7 @@ public abstract class AbstractProcessJob extends AbstractJob {
    * 获取进程的标准输出 <p>
    */
   protected void readProcessOutput() {
-    String threadLoggerInfoName = "LoggerInfo-" + jobId;
+    String threadLoggerInfoName = "LoggerInfo-" + jobIdLog;
 
     Thread loggerInfoThread = new Thread(new Runnable() {
       @Override

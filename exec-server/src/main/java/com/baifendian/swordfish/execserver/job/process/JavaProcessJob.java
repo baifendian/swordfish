@@ -61,8 +61,8 @@ public class JavaProcessJob extends AbstractProcessJob {
     }
   }
 
-  public JavaProcessJob(String jobId, JobProps props, Logger logger) throws IOException {
-    super(jobId, props, logger);
+  public JavaProcessJob(String jobIdLog, JobProps props, Logger logger) throws IOException {
+    super(jobIdLog, props, logger);
 
   }
 
