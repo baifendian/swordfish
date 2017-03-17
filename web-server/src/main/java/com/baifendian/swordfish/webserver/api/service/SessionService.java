@@ -15,6 +15,7 @@
  */
 package com.baifendian.swordfish.webserver.api.service;
 
+import com.baifendian.swordfish.common.utils.http.HttpUtil;
 import com.baifendian.swordfish.dao.mapper.SessionMapper;
 import com.baifendian.swordfish.dao.mapper.UserMapper;
 import com.baifendian.swordfish.dao.model.Session;
@@ -26,6 +27,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.ServletException;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
 import java.util.UUID;
 
@@ -33,63 +37,46 @@ import java.util.UUID;
 public class SessionService {
   private static Logger logger = LoggerFactory.getLogger(SessionService.class.getName());
 
+  private static final String SESSION_ID_NAME = "sessionId";
+
   @Value("${server.session.timeout}")
   private int sessionEffectiveTime;
 
   @Autowired
   private SessionMapper sessionMapper;
 
-  @Autowired
-  private UserMapper userMapper;
-
   /**
-   * 查询 session 信息
+   * 从请求中获取用户的 session
    *
-   * @param sessionId
-   * @param remoteIp
+   * @param req
    * @return
+   * @throws ServletException
    */
-//  private Session querySession(String sessionId, String remoteIp) {
-//    if (sessionId == null) {
-//      return null;
-//    }
-//
-//    // 查询 session 对象
-//    Session session = sessionMapper.findById(sessionId);
-//    if (session == null) {
-//      return null;
-//    }
-//
-//    if (!remoteIp.equals(session.getIp()) && !isDebug) {
-//      return null;
-//    }
-//
-//    return session;
-//  }
-//
-//  /**
-//   * 从请求中获取用户的 session
-//   *
-//   * @param req
-//   * @return
-//   * @throws ServletException
-//   */
-//  public Session getSessionFromRequest(HttpServletRequest req) throws ServletException {
-//    String remoteIp = HttpUtil.getClientIpAddress(req);
-//    Cookie cookie = HttpUtil.getCookieByName(req, Constants.SESSION_ID_NAME);
-//    String sessionId = null;
-//
-//    if (cookie != null) {
-//      sessionId = cookie.getValue();
-//    }
-//    if (sessionId == null && HttpUtil.hasParam(req, "sessionId")) {
-//      sessionId = req.getParameter("sessionId");
-//    }
-//
-//    LOGGER.info("session:{} from ip:{}", sessionId, remoteIp);
-//    boolean isDebug = req.getParameter("isDebug") != null;
-//    return querySession(sessionId, remoteIp, isDebug);
-//  }
+  public Session getSessionFromRequest(HttpServletRequest req) throws ServletException {
+    // 得到 ip 地址
+    String ip = HttpUtil.getClientIpAddress(req);
+
+    // 得到 cookie 信息
+    Cookie cookie = HttpUtil.getCookieByName(req, SESSION_ID_NAME);
+    String sessionId = null;
+
+    if (cookie != null) {
+      sessionId = cookie.getValue();
+    }
+
+    // 如果 sessionId 合法
+    if (sessionId == null) {
+      sessionId = req.getHeader(SESSION_ID_NAME);
+    }
+
+    if(sessionId == null) {
+      return null;
+    }
+
+    logger.info("session: {} from ip: {}", sessionId, ip);
+
+    return sessionMapper.queryByIdAndIp(sessionId, ip);
+  }
 
   /**
    * 创建一个 session:

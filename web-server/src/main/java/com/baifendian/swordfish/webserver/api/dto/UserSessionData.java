@@ -15,6 +15,7 @@
  */
 package com.baifendian.swordfish.webserver.api.dto;
 
+import com.baifendian.swordfish.dao.BaseData;
 import com.baifendian.swordfish.dao.model.User;
 
 /**

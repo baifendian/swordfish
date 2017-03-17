@@ -15,9 +15,11 @@
  */
 package com.baifendian.swordfish.dao.model;
 
+import com.baifendian.swordfish.dao.BaseData;
+
 import java.util.Date;
 
-public class Session {
+public class Session extends BaseData {
   private String id;
 
   private int userId;
@@ -64,10 +66,10 @@ public class Session {
   @Override
   public String toString() {
     return "Session{" +
-            "id='" + id + '\'' +
-            ", userId=" + userId +
-            ", ip='" + ip + '\'' +
-            ", lastLoginTime=" + lastLoginTime +
-            '}';
+        "id='" + id + '\'' +
+        ", userId=" + userId +
+        ", ip='" + ip + '\'' +
+        ", lastLoginTime=" + lastLoginTime +
+        '}';
   }
 }

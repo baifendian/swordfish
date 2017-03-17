@@ -13,10 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.baifendian.swordfish.webserver.api.controller;
+package com.baifendian.swordfish.dao;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.apache.commons.httpclient.HttpStatus;
 
 /**
- * 数据源的服务入口
+ * author: smile8
+ * date:   2017/3/16
+ * desc:
  */
-public class DatasourceController {
+public abstract class BaseData {
+  @JsonIgnore
+  protected int httpStatus = HttpStatus.SC_OK;
+
+  public int getHttpStatus() {
+    return httpStatus;
+  }
+
+  public void setHttpStatus(int httpStatus) {
+    this.httpStatus = httpStatus;
+  }
 }

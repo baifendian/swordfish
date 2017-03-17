@@ -16,9 +16,7 @@
 package com.baifendian.swordfish.webserver.api.controller;
 
 /**
- * author: smile8
- * date:   2017/3/15
- * desc:
+ * 调度设置和管理入口
  */
 public class ScheduleController {
 }

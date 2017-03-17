@@ -15,12 +15,13 @@
  */
 package com.baifendian.swordfish.dao.model;
 
+import com.baifendian.swordfish.dao.BaseData;
 import com.baifendian.swordfish.dao.enums.UserRoleType;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.util.Date;
 
-public class User {
+public class User extends BaseData {
   /**
    * 用户 ID
    */
@@ -157,16 +158,16 @@ public class User {
   @Override
   public String toString() {
     return "User{" +
-            "id=" + id +
-            ", name='" + name + '\'' +
-            ", email='" + email + '\'' +
-            ", desc='" + desc + '\'' +
-            ", password='" + password + '\'' +
-            ", phone='" + phone + '\'' +
-            ", role=" + role +
-            ", proxyUsers='" + proxyUsers + '\'' +
-            ", createTime=" + createTime +
-            ", modifyTime=" + modifyTime +
-            '}';
+        "id=" + id +
+        ", name='" + name + '\'' +
+        ", email='" + email + '\'' +
+        ", desc='" + desc + '\'' +
+        ", password='" + password + '\'' +
+        ", phone='" + phone + '\'' +
+        ", role=" + role +
+        ", proxyUsers='" + proxyUsers + '\'' +
+        ", createTime=" + createTime +
+        ", modifyTime=" + modifyTime +
+        '}';
   }
 }

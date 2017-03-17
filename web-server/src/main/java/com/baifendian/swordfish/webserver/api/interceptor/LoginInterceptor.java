@@ -15,69 +15,58 @@
  */
 package com.baifendian.swordfish.webserver.api.interceptor;
 
+import com.baifendian.swordfish.dao.mapper.UserMapper;
+import com.baifendian.swordfish.dao.model.Session;
+import com.baifendian.swordfish.dao.model.User;
 import com.baifendian.swordfish.webserver.api.service.SessionService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+/**
+ * 登录的拦截器, 在执行除 "/login" 的操作之前, 都会进行拦截
+ */
 public class LoginInterceptor implements HandlerInterceptor {
+  private static Logger logger = LoggerFactory.getLogger(LoginInterceptor.class.getName());
+
   @Autowired
   private SessionService sessionService;
 
+  @Autowired
+  private UserMapper userMapper;
+
   @Override
   public boolean preHandle(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Object o) throws Exception {
-//    Session session = sessionService.getSessionFromRequest(httpServletRequest);
-//
-//    //获取国际化语言
-//    Cookie language = HttpUtil.getCookieByName(httpServletRequest, Constants.SESSION_LANGUAGE);
-//    Locale locale = Constants.DEFAULT_LANGUAGE;
-//    if (language != null) {
-//      locale = chooseLocale(language.getValue());
-//    }
-//    LocaleContextHolder.setLocale(locale);
-//    //httpServletRequest.setAttribute("language",locale);
-//
-//    // 传 idDebug 参数，则不需要校验 ,by dsfan
-//    if (httpServletRequest.getParameter("isDebug") != null) {
-//      Session session2 = new Session();
-//      User user = new User();
-//      user.setName("dsfan");
-//      user.setId(2);
-//      user.setTenantId(1);
-//      user.setTenantName("bfd");
-//      session2.setUser(user);
-//      // httpServletRequest.setAttribute("session.userId", "2");
-//      httpServletRequest.setAttribute("session", session2);
-//      return true;
-//    }
-//
-//    String path = httpServletRequest.getServletPath();
-//    if (session != null) {
-//      httpServletRequest.setAttribute("session.userId", session.getUserId());
-//      httpServletRequest.setAttribute("session", session);
-//      return true;
-//    } else if (path.equals("/login") || path.equals("/isLogin")) {
-//      return true;
-//    } else if (path.equals("/user") && (httpServletRequest.getParameter("action").equals("create") || httpServletRequest.getParameter("action").equals("checkRegisterCode"))) {
-//      return true;
-//    } else {
-////            httpServletResponse.getWriter().write(JsonUtil.toJsonString(BaseResponse.SESSION_NOT_EXIST));
-//      return false;
-//    }
+    Session session = sessionService.getSessionFromRequest(httpServletRequest);
+
+    // session 如果没有获取到, 返回 false
+    if (session == null) {
+      return false;
+    }
+
+    // 获取到了, 则设置一下 session
+    User user = userMapper.queryById(session.getUserId());
+
+    if (user == null) {
+      return false;
+    }
+
+    httpServletRequest.setAttribute("session.user", user);
+
     return true;
   }
 
   @Override
   public void postHandle(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Object o, ModelAndView modelAndView) throws Exception {
-    System.out.print(httpServletResponse);
+    logger.info(httpServletResponse.toString());
   }
 
   @Override
   public void afterCompletion(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Object o, Exception e) throws Exception {
-
   }
 }

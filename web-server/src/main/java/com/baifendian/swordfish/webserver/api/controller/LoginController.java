@@ -17,13 +17,15 @@ package com.baifendian.swordfish.webserver.api.controller;
 
 import com.baifendian.swordfish.common.utils.http.HttpUtil;
 import com.baifendian.swordfish.dao.model.User;
-import com.baifendian.swordfish.webserver.api.dto.BaseData;
+import com.baifendian.swordfish.dao.BaseData;
 import com.baifendian.swordfish.webserver.api.dto.ErrorData;
 import com.baifendian.swordfish.webserver.api.dto.UserSessionData;
 import com.baifendian.swordfish.webserver.api.service.SessionService;
 import com.baifendian.swordfish.webserver.api.service.UserService;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -34,9 +36,14 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+/**
+ * 用户登录入口
+ */
 @RestController
 @RequestMapping("/login")
 public class LoginController {
+  private static Logger logger = LoggerFactory.getLogger(LoginController.class.getName());
+
   @Autowired
   private SessionService sessionService;
 
@@ -90,7 +97,9 @@ public class LoginController {
       return new ErrorData(ErrorData.Code.USER_NOT_EXIST, "登陆失败, 请检查账号/密码是否正确");
     }
 
+    response.setStatus(HttpStatus.SC_OK);
     response.addCookie(new Cookie("sessionId", data.getSessionId()));
+
     return data;
   }
 }

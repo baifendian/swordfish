@@ -26,7 +26,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
 public class ApplicationConfig extends WebMvcConfigurerAdapter {
   @Override
   public void addInterceptors(InterceptorRegistry registry) {
-    registry.addInterceptor(loginInterceptor()).addPathPatterns("/**/*").excludePathPatterns("/login/*");
+    registry.addInterceptor(loginInterceptor()).addPathPatterns("/**/*").excludePathPatterns("/login");
   }
 
   @Bean

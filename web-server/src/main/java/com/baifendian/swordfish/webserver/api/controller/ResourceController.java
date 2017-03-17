@@ -19,9 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * author: smile8
- * date:   2017/3/15
- * desc:
+ * 资源管理入口
  */
 @RestController
 @RequestMapping("/resources")

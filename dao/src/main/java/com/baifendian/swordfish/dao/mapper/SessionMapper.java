@@ -18,7 +18,6 @@ package com.baifendian.swordfish.dao.mapper;
 import com.baifendian.swordfish.dao.model.Session;
 import org.apache.ibatis.annotations.*;
 import org.apache.ibatis.type.JdbcType;
-import org.mybatis.spring.annotation.MapperScan;
 
 import java.sql.Timestamp;
 import java.util.Date;
@@ -39,6 +38,22 @@ public interface SessionMapper {
   })
   @SelectProvider(type = SessionMapperProvider.class, method = "queryById")
   Session queryById(@Param("sessionId") String sessionId);
+
+  /**
+   * 根据 session Id 和 ip 进行查询
+   *
+   * @param sessionId
+   * @param ip
+   * @return
+   */
+  @Results(value = {
+      @Result(property = "id", column = "id", id = true, javaType = String.class, jdbcType = JdbcType.VARCHAR),
+      @Result(property = "userId", column = "user_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
+      @Result(property = "ip", column = "ip", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+      @Result(property = "lastLoginTime", column = "last_login_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE)
+  })
+  @SelectProvider(type = SessionMapperProvider.class, method = "queryByIdAndIp")
+  Session queryByIdAndIp(@Param("sessionId") String sessionId, @Param("ip") String ip);
 
   /**
    * 根据 id 和 ip 查询

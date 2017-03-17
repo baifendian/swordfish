@@ -24,7 +24,6 @@ import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.type.EnumOrdinalTypeHandler;
 import org.apache.ibatis.type.JdbcType;
 
-import java.sql.Date;
 import java.sql.Timestamp;
 
 public interface UserMapper {
@@ -90,6 +89,26 @@ public interface UserMapper {
   })
   @SelectProvider(type = UserMapperProvider.class, method = "queryForCheck")
   User queryForCheck(@Param("name") String name, @Param("email") String email, @Param("password") String password);
+
+  /**
+   * 根据 user id 进行查询
+   *
+   * @param userId
+   * @return
+   */
+  @Results(value = {@Result(property = "id", column = "id", id = true, javaType = Integer.class, jdbcType = JdbcType.INTEGER),
+      @Result(property = "name", column = "name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+      @Result(property = "email", column = "email", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+      @Result(property = "desc", column = "desc", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+      @Result(property = "phone", column = "phone", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+      @Result(property = "password", column = "password", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+      @Result(property = "role", column = "role", typeHandler = EnumOrdinalTypeHandler.class, javaType = UserRoleType.class, jdbcType = JdbcType.TINYINT),
+      @Result(property = "proxyUsers", column = "proxy_users", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+      @Result(property = "createTime", column = "create_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE),
+      @Result(property = "modifyTime", column = "modify_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE)
+  })
+  @SelectProvider(type = UserMapperProvider.class, method = "queryById")
+  User queryById(@Param("userId") int userId);
 
 //
 //  @InsertProvider(type = UserMapperProvider.class, method = "insert")

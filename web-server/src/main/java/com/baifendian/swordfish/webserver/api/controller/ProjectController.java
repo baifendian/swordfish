@@ -23,9 +23,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletResponse;
 
 /**
- * author: smile8
- * date:   2017/3/15
- * desc:
+ * 项目管理入口
  */
 @RestController
 @RequestMapping("/projects")

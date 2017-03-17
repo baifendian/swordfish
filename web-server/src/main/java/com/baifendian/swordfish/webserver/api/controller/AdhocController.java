@@ -13,12 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.baifendian.swordfish.webserver.api.dto;
+package com.baifendian.swordfish.webserver.api.controller;
 
 /**
- * author: smile8
- * date:   2017/3/16
- * desc:
+ * 即席查询的服务入口
  */
-public abstract class BaseData {
+public class AdhocController {
 }

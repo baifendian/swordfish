@@ -71,6 +71,22 @@ public class UserMapperProvider {
     }.toString();
   }
 
+  /**
+   * 根据用户 id 查询 sql
+   *
+   * @param parameter
+   * @return
+   */
+  public String queryById(Map<String, Object> parameter) {
+    return new SQL() {
+      {
+        SELECT("*");
+        FROM("user");
+        WHERE("id = #{userId}");
+      }
+    }.toString();
+  }
+
 //
 //  public String insert(final User user) {
 //    return new SQL() {

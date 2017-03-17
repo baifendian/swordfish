@@ -15,6 +15,8 @@
  */
 package com.baifendian.swordfish.webserver.api.dto;
 
+import com.baifendian.swordfish.dao.BaseData;
+
 public class ErrorData extends BaseData {
   public enum Code {
     PARAM_NOT_VALID,
