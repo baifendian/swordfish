@@ -37,9 +37,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
-/**
- * author: smile8 date:   2017/3/16 desc:
- */
 public class ConnectionFactory {
   private static Logger logger = LoggerFactory.getLogger(ConnectionFactory.class.getName());
 

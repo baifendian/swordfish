@@ -51,7 +51,7 @@ public interface SessionMapper {
       @Result(property = "id", column = "id", id = true, javaType = String.class, jdbcType = JdbcType.VARCHAR),
       @Result(property = "userId", column = "user_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
       @Result(property = "ip", column = "ip", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-      @Result(property = "lastLoginTime", column = "last_login_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE)
+      @Result(property = "lastLoginTime", column = "last_login_time", javaType = Date.class, jdbcType = JdbcType.DATE)
   })
   @SelectProvider(type = SessionMapperProvider.class, method = "queryByUserIdAndIp")
   Session queryByUserIdAndIp(@Param("userId") int userId, @Param("ip") String ip);

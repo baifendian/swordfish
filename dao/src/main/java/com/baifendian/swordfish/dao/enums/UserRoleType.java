@@ -15,9 +15,6 @@
  */
 package com.baifendian.swordfish.dao.enums;
 
-/**
- * author: smile8 date:   2017/3/16 desc:   用户角色信息
- */
 public enum UserRoleType {
   ADMIN_USER(0),
   GENERAL_USER(1);

@@ -16,7 +16,6 @@
 package com.baifendian.swordfish.dao.datasource;
 
 import com.alibaba.druid.pool.DruidDataSource;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.SqlSessionFactoryBean;
@@ -57,9 +56,9 @@ public class DatabaseConfiguration {
   public DruidDataSource dataSource() throws SQLException {
     if (StringUtils.isEmpty(env.getProperty("url"))) {
       logger.error("Your database connection pool configuration is incorrect! Please check your Spring profile, " +
-              "current profiles are: {}", Arrays.toString(env.getActiveProfiles()));
+          "current profiles are: {}", Arrays.toString(env.getActiveProfiles()));
       throw new ApplicationContextException(
-              "Database connection pool is not configured correctly");
+          "Database connection pool is not configured correctly");
     }
 
     DruidDataSource druidDataSource = new DruidDataSource();
