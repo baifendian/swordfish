@@ -19,8 +19,8 @@
         <junit.version>4.12</junit.version>
         <java.version>1.8</java.version>
         <scala.version>2.10</scala.version>
-        <spring.version>4.3.5.RELEASE</spring.version>
-        <spring.boot.version>1.4.3.RELEASE</spring.boot.version>
+        <spring.version>4.3.7.RELEASE</spring.version>
+        <spring.boot.version>1.5.2.RELEASE</spring.boot.version>
 
         <!-- big data related version -->
         <hadoop.version>2.7.3</hadoop.version>
