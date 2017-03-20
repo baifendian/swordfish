@@ -40,11 +40,6 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.baifendian.swordfish</groupId>
-            <artifactId>swordfish-exec-server</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
             <groupId>org.quartz-scheduler</groupId>
             <artifactId>quartz-jobs</artifactId>
         </dependency>
