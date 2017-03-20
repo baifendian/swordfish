@@ -20,7 +20,8 @@
         <java.version>1.8</java.version>
         <scala.version>2.10</scala.version>
         <spring.version>4.3.7.RELEASE</spring.version>
-        <spring.boot.version>1.5.2.RELEASE</spring.boot.version>
+        <spring.boot.version>1.4.5.RELEASE</spring.boot.version>
+        <tomcat.version>7.0.63</tomcat.version>
 
         <!-- big data related version -->
         <hadoop.version>2.7.3</hadoop.version>
@@ -110,8 +111,13 @@
 
             <dependency>
                 <groupId>org.mybatis.spring.boot</groupId>
+                <artifactId>mybatis-spring-boot-autoconfigure</artifactId>
+                <version>1.2.0</version>
+            </dependency>
+            <dependency>
+                <groupId>org.mybatis.spring.boot</groupId>
                 <artifactId>mybatis-spring-boot-starter</artifactId>
-                <version>1.1.1</version>
+                <version>1.2.0</version>
             </dependency>
 
             <dependency>
@@ -158,7 +164,7 @@
             <dependency>
                 <groupId>org.apache.tomcat</groupId>
                 <artifactId>tomcat-jdbc</artifactId>
-                <version>7.0.25</version>
+                <version>${tomcat.version}</version>
             </dependency>
 
             <dependency>
@@ -199,15 +205,22 @@
                 <artifactId>commons-exec</artifactId>
                 <version>1.3</version>
             </dependency>
+
+            <dependency>
+                <groupId>org.quartz-scheduler</groupId>
+                <artifactId>quartz</artifactId>
+                <version>2.2.3</version>
+            </dependency>
             <dependency>
                 <groupId>org.quartz-scheduler</groupId>
                 <artifactId>quartz-jobs</artifactId>
                 <version>2.2.3</version>
             </dependency>
+
             <dependency>
-                <groupId>javax.validation</groupId>
-                <artifactId>validation-api</artifactId>
-                <version>1.1.0.Final</version>
+                <groupId>javax.servlet</groupId>
+                <artifactId>javax.servlet-api</artifactId>
+                <version>3.1.0</version>
             </dependency>
 
             <!-- spark -->
