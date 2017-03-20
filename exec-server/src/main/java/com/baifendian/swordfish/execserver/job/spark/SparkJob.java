@@ -18,21 +18,16 @@ package com.baifendian.swordfish.execserver.job.spark;
 import com.baifendian.swordfish.common.job.AbstractProcessJob;
 import com.baifendian.swordfish.common.job.BaseParam;
 import com.baifendian.swordfish.common.job.JobProps;
-import com.baifendian.swordfish.common.utils.PlaceholderUtil;
-import com.baifendian.swordfish.common.utils.json.JsonUtil;
+import com.baifendian.swordfish.dao.utils.json.JsonUtil;
 import com.baifendian.swordfish.execserver.parameter.ParamHelper;
-import com.baifendian.swordfish.execserver.utils.OsUtil;
 
-import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 

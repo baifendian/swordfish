@@ -15,7 +15,7 @@
  */
 package com.baifendian.swordfish.dao.model;
 
-import com.baifendian.swordfish.common.utils.BFDDateUtils;
+import com.baifendian.swordfish.dao.utils.BFDDateUtils;
 
 import org.apache.commons.lang3.ObjectUtils;
 

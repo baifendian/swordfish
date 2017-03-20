@@ -18,22 +18,9 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.baifendian</groupId>
-            <artifactId>harpc</artifactId>
-            <exclusions>
-                <exclusion>
-                    <artifactId>spring-context</artifactId>
-                    <groupId>org.springframework</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>spring-beans</artifactId>
-                    <groupId>org.springframework</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>quantity</artifactId>
-                    <groupId>com.twitter.common</groupId>
-                </exclusion>
-            </exclusions>
+            <groupId>org.apache.thrift</groupId>
+            <artifactId>libthrift</artifactId>
         </dependency>
+
     </dependencies>
 </project>

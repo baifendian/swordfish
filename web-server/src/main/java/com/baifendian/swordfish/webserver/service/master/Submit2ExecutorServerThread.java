@@ -16,17 +16,14 @@
 package com.baifendian.swordfish.webserver.service.master;
 
 import com.baifendian.swordfish.dao.FlowDao;
-import com.baifendian.swordfish.common.job.FlowStatus;
+import com.baifendian.swordfish.dao.enums.FlowStatus;
 import com.baifendian.swordfish.dao.model.ExecutionFlow;
-import com.baifendian.swordfish.rpc.WorkerService;
 import com.baifendian.swordfish.webserver.ExecutorClient;
 import com.baifendian.swordfish.webserver.ExecutorServerInfo;
 import com.baifendian.swordfish.webserver.ExecutorServerManager;
 import com.baifendian.swordfish.webserver.config.MasterConfig;
-import com.bfd.harpc.RpcException;
 
 import org.apache.thrift.TException;
-import org.apache.thrift.transport.TTransportException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

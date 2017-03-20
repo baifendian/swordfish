@@ -15,7 +15,7 @@
  */
 package com.baifendian.swordfish.dao.model;
 
-import com.baifendian.swordfish.common.consts.Constants;
+import com.baifendian.swordfish.dao.consts.Constants;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Date;

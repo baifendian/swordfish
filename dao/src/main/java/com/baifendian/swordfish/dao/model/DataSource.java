@@ -15,10 +15,10 @@
  */
 package com.baifendian.swordfish.dao.model;
 
-import com.baifendian.swordfish.common.utils.json.JsonUtil;
+import com.baifendian.swordfish.dao.utils.json.JsonUtil;
 import com.baifendian.swordfish.dao.enums.DbType;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.Date;
 

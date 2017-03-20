@@ -18,7 +18,7 @@ package com.baifendian.swordfish.execserver.job.hive;
 import com.baifendian.swordfish.common.job.ExecResult;
 import com.baifendian.swordfish.common.job.JobProps;
 import com.baifendian.swordfish.common.utils.CommonUtil;
-import com.baifendian.swordfish.common.utils.json.JsonUtil;
+import com.baifendian.swordfish.dao.utils.json.JsonUtil;
 import com.baifendian.swordfish.dao.datasource.ConnectionFactory;
 import com.baifendian.swordfish.dao.mapper.AdHocResultMapper;
 import com.baifendian.swordfish.dao.model.AdHocJsonObject;

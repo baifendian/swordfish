@@ -15,7 +15,7 @@
  */
 package com.baifendian.swordfish.dao.enums;
 
-import com.baifendian.swordfish.common.job.FlowStatus;
+import com.baifendian.swordfish.dao.enums.FlowStatus;
 
 /**
  * workflow 等运行的类型 <p>

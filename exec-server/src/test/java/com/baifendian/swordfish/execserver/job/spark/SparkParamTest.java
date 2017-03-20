@@ -15,7 +15,7 @@
  */
 package com.baifendian.swordfish.execserver.job.spark;
 
-import com.baifendian.swordfish.common.utils.json.JsonUtil;
+import com.baifendian.swordfish.dao.utils.json.JsonUtil;
 
 import org.junit.Before;
 import org.junit.Test;

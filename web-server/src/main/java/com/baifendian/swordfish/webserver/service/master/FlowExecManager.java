@@ -15,12 +15,13 @@
  */
 package com.baifendian.swordfish.webserver.service.master;
 
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
+
 import com.baifendian.swordfish.dao.FlowDao;
 import com.baifendian.swordfish.dao.enums.FlowRunType;
 import com.baifendian.swordfish.dao.model.ExecutionFlow;
 import com.baifendian.swordfish.dao.model.ProjectFlow;
-import com.baifendian.swordfish.execserver.utils.mail.EmailManager;
-import com.bfd.harpc.monitor.NamedThreadFactory;
+import com.baifendian.swordfish.common.mail.EmailManager;
 
 import org.apache.commons.lang.time.DateUtils;
 import org.quartz.CronExpression;
@@ -31,6 +32,7 @@ import java.util.*;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
 
 /**
  * workflow 的执行管理 <p>
@@ -72,7 +74,7 @@ public class FlowExecManager {
     this.executionFlowBlockingQueue = executionFlowBlockingQueue;
     this.flowDao = flowDao;
 
-    NamedThreadFactory flowThreadFactory = new NamedThreadFactory("Scheduler-Master-AddData");
+    ThreadFactory flowThreadFactory = new ThreadFactoryBuilder().setNameFormat("Scheduler-Master-AddData").build();
     appendFlowExecutorService = Executors.newCachedThreadPool(flowThreadFactory);
   }
 

@@ -15,13 +15,12 @@
  */
 package com.baifendian.swordfish.execserver.job.hive;
 
-import com.baifendian.swordfish.common.utils.json.JsonUtil;
+import com.baifendian.swordfish.dao.utils.json.JsonUtil;
 
 import org.apache.commons.lang.StringUtils;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;

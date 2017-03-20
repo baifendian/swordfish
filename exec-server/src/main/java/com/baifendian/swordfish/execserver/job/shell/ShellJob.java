@@ -15,24 +15,18 @@
  */
 package com.baifendian.swordfish.execserver.job.shell;
 
-import com.baifendian.swordfish.common.job.AbstractJob;
 import com.baifendian.swordfish.common.job.AbstractProcessJob;
 import com.baifendian.swordfish.common.job.BaseParam;
 import com.baifendian.swordfish.common.job.JobProps;
 import com.baifendian.swordfish.common.job.exception.ExecException;
-import com.baifendian.swordfish.common.utils.json.JsonUtil;
+import com.baifendian.swordfish.dao.utils.json.JsonUtil;
 import com.baifendian.swordfish.execserver.parameter.ParamHelper;
 
-import org.apache.commons.configuration.PropertiesConfiguration;
-import org.apache.commons.exec.*;
-import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.FileAttribute;
 import java.nio.file.attribute.PosixFilePermission;

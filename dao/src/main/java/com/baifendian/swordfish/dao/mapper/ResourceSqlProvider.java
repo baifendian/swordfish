@@ -20,7 +20,7 @@ import com.baifendian.swordfish.dao.enums.ResourcePubStatus;
 import com.baifendian.swordfish.dao.enums.ResourceType;
 import com.baifendian.swordfish.dao.model.Resource;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.jdbc.SQL;
 
 import java.util.List;

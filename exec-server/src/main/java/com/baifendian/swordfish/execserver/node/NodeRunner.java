@@ -16,10 +16,9 @@
 package com.baifendian.swordfish.execserver.node;
 
 import com.baifendian.swordfish.common.job.Job;
-import com.baifendian.swordfish.common.utils.BFDDateUtils;
 import com.baifendian.swordfish.dao.DaoFactory;
 import com.baifendian.swordfish.dao.FlowDao;
-import com.baifendian.swordfish.common.job.FlowStatus;
+import com.baifendian.swordfish.dao.enums.FlowStatus;
 import com.baifendian.swordfish.dao.model.ExecutionFlow;
 import com.baifendian.swordfish.dao.model.ExecutionNode;
 import com.baifendian.swordfish.dao.model.FlowNode;
@@ -31,8 +30,6 @@ import org.slf4j.LoggerFactory;
 import java.util.Date;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
-
-import static com.baifendian.swordfish.common.utils.StructuredArguments.jobValue;
 
 /**
  * 节点执行器 <p>

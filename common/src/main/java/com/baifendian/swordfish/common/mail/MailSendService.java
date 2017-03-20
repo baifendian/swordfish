@@ -15,7 +15,6 @@
  */
 package com.baifendian.swordfish.common.mail;
 
-import com.baifendian.swordfish.common.mail.MailSendUtil;
 import com.baifendian.swordfish.dao.BaseDao;
 import com.baifendian.swordfish.dao.datasource.ConnectionFactory;
 import com.baifendian.swordfish.dao.mapper.ProjectFlowMapper;

@@ -19,18 +19,12 @@ import com.baifendian.swordfish.common.job.AbstractProcessJob;
 import com.baifendian.swordfish.common.job.BaseParam;
 import com.baifendian.swordfish.common.job.JobProps;
 import com.baifendian.swordfish.common.job.exception.ExecException;
-import com.baifendian.swordfish.common.utils.PlaceholderUtil;
-import com.baifendian.swordfish.common.utils.json.JsonUtil;
-import com.baifendian.swordfish.execserver.job.shell.ShellJob;
+import com.baifendian.swordfish.dao.utils.json.JsonUtil;
 
-import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.List;
-import java.util.Map;
 
 /**
  * 默认的进程 job <p>

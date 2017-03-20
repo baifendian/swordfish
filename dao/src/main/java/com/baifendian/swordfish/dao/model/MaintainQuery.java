@@ -15,7 +15,7 @@
  */
 package com.baifendian.swordfish.dao.model;
 
-import com.baifendian.swordfish.common.job.FlowStatus;
+import com.baifendian.swordfish.dao.enums.FlowStatus;
 import com.baifendian.swordfish.dao.enums.FlowType;
 
 import java.util.Date;

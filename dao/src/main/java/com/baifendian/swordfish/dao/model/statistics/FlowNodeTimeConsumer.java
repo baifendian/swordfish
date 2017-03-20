@@ -15,8 +15,8 @@
  */
 package com.baifendian.swordfish.dao.model.statistics;
 
-import com.baifendian.swordfish.common.consts.Constants;
-import com.baifendian.swordfish.common.job.FlowStatus;
+import com.baifendian.swordfish.dao.consts.Constants;
+import com.baifendian.swordfish.dao.enums.FlowStatus;
 import com.baifendian.swordfish.dao.enums.FlowType;
 import com.baifendian.swordfish.dao.enums.NodeType;
 import com.fasterxml.jackson.annotation.JsonFormat;

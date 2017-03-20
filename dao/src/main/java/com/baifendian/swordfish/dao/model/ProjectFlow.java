@@ -15,9 +15,9 @@
  */
 package com.baifendian.swordfish.dao.model;
 
-import com.baifendian.swordfish.common.utils.json.JsonUtil;
-import com.baifendian.swordfish.common.utils.json.StringNodeJsonDeserializer;
-import com.baifendian.swordfish.common.utils.json.StringNodeJsonSerializer;
+import com.baifendian.swordfish.dao.utils.json.JsonUtil;
+import com.baifendian.swordfish.dao.utils.json.StringNodeJsonDeserializer;
+import com.baifendian.swordfish.dao.utils.json.StringNodeJsonSerializer;
 import com.baifendian.swordfish.dao.model.flow.params.Property;
 import com.baifendian.swordfish.dao.enums.FlowType;
 import com.baifendian.swordfish.dao.enums.ScheduleStatus;

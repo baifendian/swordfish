@@ -15,7 +15,7 @@
  */
 package com.baifendian.swordfish.execserver.parameter;
 
-import com.baifendian.swordfish.common.utils.BFDDateUtils;
+import com.baifendian.swordfish.dao.utils.BFDDateUtils;
 import com.baifendian.swordfish.execserver.utils.hadoop.hdfs.HdfsPathManager;
 import com.baifendian.swordfish.dao.enums.FlowRunType;
 import com.baifendian.swordfish.dao.model.ExecutionFlow;

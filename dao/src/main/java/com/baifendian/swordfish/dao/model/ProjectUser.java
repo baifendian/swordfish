@@ -15,9 +15,6 @@
  */
 package com.baifendian.swordfish.dao.model;
 
-import com.baifendian.swordfish.common.utils.BFDDateUtils;
-import com.baifendian.swordfish.common.utils.json.DateSerializer;
-
 import java.util.Date;
 
 /**

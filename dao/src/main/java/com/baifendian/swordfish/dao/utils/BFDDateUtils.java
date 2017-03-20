@@ -17,7 +17,7 @@ package com.baifendian.swordfish.dao.utils;
 
 import com.baifendian.swordfish.dao.consts.Constants;
 
-import org.apache.commons.lang.time.FastDateFormat;
+import org.apache.commons.lang3.time.FastDateFormat;
 
 import java.text.DateFormat;
 import java.text.ParseException;

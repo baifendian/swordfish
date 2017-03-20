@@ -22,10 +22,12 @@ import com.baifendian.swordfish.dao.exception.DaoSemanticException;
 import com.baifendian.swordfish.dao.exception.SqlException;
 import com.baifendian.swordfish.execserver.utils.hive.HiveJdbcExec;
 import com.baifendian.swordfish.common.job.ExecResult;
-import com.baifendian.swordfish.common.job.FlowStatus;
-import com.bfd.harpc.common.configure.PropertiesConfiguration;
+import com.baifendian.swordfish.dao.enums.FlowStatus;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.hive.jdbc.HiveConnection;
 import org.apache.hive.jdbc.HiveStatement;
 import org.slf4j.Logger;
@@ -57,7 +59,13 @@ public class HiveSqlExec {
 
   static {
     // hive job 配置
-    defualtQueryLimit = PropertiesConfiguration.getValue("job.hive.queryLimit", 1000);
+    Configuration conf = null;
+    try {
+      conf = new PropertiesConfiguration("job/hive.properties");
+    } catch (ConfigurationException e) {
+      e.printStackTrace();
+    }
+    defualtQueryLimit = conf.getInt("job.hive.queryLimit", 1000);
   }
 
   /**

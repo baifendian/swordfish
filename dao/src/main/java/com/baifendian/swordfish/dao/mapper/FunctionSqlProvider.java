@@ -19,7 +19,7 @@ import com.baifendian.swordfish.dao.mapper.utils.EnumFieldUtil;
 import com.baifendian.swordfish.dao.enums.FunctionType;
 import com.baifendian.swordfish.dao.model.Function;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.jdbc.SQL;
 
 import java.text.MessageFormat;

@@ -17,14 +17,14 @@ package com.baifendian.swordfish.execserver.flow;
 
 import com.baifendian.swordfish.common.hadoop.HdfsClient;
 import com.baifendian.swordfish.common.hadoop.HdfsUtil;
-import com.baifendian.swordfish.common.job.FlowStatus;
+import com.baifendian.swordfish.dao.enums.FlowStatus;
 import com.baifendian.swordfish.common.job.Job;
 import com.baifendian.swordfish.common.job.JobProps;
 import com.baifendian.swordfish.common.job.config.BaseConfig;
-import com.baifendian.swordfish.execserver.utils.mail.EmailManager;
+import com.baifendian.swordfish.common.mail.EmailManager;
 import com.baifendian.swordfish.common.utils.graph.DAGGraph;
 import com.baifendian.swordfish.common.utils.graph.Graph;
-import com.baifendian.swordfish.common.utils.json.JsonUtil;
+import com.baifendian.swordfish.dao.utils.json.JsonUtil;
 import com.baifendian.swordfish.dao.*;
 import com.baifendian.swordfish.dao.exception.SqlException;
 import com.baifendian.swordfish.dao.enums.*;

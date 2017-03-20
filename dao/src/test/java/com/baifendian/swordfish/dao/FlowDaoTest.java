@@ -15,7 +15,6 @@
  */
 package com.baifendian.swordfish.dao;
 
-import com.baifendian.swordfish.common.job.FlowStatus;
 import com.baifendian.swordfish.dao.model.ExecutionFlow;
 import com.baifendian.swordfish.dao.model.ExecutionNode;
 

@@ -15,6 +15,9 @@
  */
 package com.baifendian.swordfish.webserver;
 
+import com.baifendian.swordfish.common.utils.ThriftUtil;
+import com.baifendian.swordfish.dao.DaoFactory;
+import com.baifendian.swordfish.dao.MasterDao;
 import com.baifendian.swordfish.dao.model.MasterServer;
 import com.baifendian.swordfish.rpc.MasterService;
 import com.baifendian.swordfish.webserver.exception.MasterException;
@@ -37,7 +40,6 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 
-import static com.baifendian.swordfish.execserver.utils.ThriftUtil.getTThreadPoolServer;
 
 /**
  * @author : liujin
@@ -119,7 +121,7 @@ public class WebThriftServer {
     InetSocketAddress inetSocketAddress = new InetSocketAddress(host, port);
     int minThreads = conf.getInt(MASTER_MIN_THREADS, 50);
     int maxThreads = conf.getInt(MASTER_MAX_THREADS, 200);
-    server = getTThreadPoolServer(protocolFactory, tProcessor, tTransportFactory, inetSocketAddress, minThreads, maxThreads);
+    server = ThriftUtil.getTThreadPoolServer(protocolFactory, tProcessor, tTransportFactory, inetSocketAddress, minThreads, maxThreads);
     logger.info("start thrift server on port:{}", port);
 
   }

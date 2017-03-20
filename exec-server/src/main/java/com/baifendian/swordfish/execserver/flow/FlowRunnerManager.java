@@ -15,33 +15,29 @@
  */
 package com.baifendian.swordfish.execserver.flow;
 
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
+
 import com.baifendian.swordfish.common.job.exception.ExecException;
 import com.baifendian.swordfish.dao.DaoFactory;
 import com.baifendian.swordfish.dao.FlowDao;
 import com.baifendian.swordfish.dao.datasource.ConnectionFactory;
 import com.baifendian.swordfish.dao.enums.FailurePolicyType;
-import com.baifendian.swordfish.common.job.FlowStatus;
 import com.baifendian.swordfish.dao.enums.FlowType;
 import com.baifendian.swordfish.dao.mapper.ExecutionNodeMapper;
 import com.baifendian.swordfish.dao.model.ExecutionFlow;
-import com.baifendian.swordfish.dao.model.ExecutionNode;
 import com.baifendian.swordfish.dao.model.Schedule;
 import com.baifendian.swordfish.execserver.parameter.CustomParamManager;
 import com.baifendian.swordfish.execserver.parameter.SystemParamManager;
-import com.bfd.harpc.monitor.NamedThreadFactory;
 
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.util.Date;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
 
 /**
  * Flow 执行管理器 <p>
@@ -105,13 +101,13 @@ public class FlowRunnerManager {
     this.flowDao = DaoFactory.getDaoInstance(FlowDao.class);
     this.executionNodeMapper = ConnectionFactory.getSqlSession().getMapper(ExecutionNodeMapper.class);
 
-    NamedThreadFactory flowThreadFactory = new NamedThreadFactory("Exec-Worker-FlowRunner");
+    ThreadFactory flowThreadFactory = new ThreadFactoryBuilder().setNameFormat("Exec-Worker-FlowRunner").build();
     flowExecutorService = Executors.newCachedThreadPool(flowThreadFactory);
 
-    NamedThreadFactory nodeThreadFactory = new NamedThreadFactory("Exec-Worker-NodeRunner");
+    ThreadFactory nodeThreadFactory = new ThreadFactoryBuilder().setNameFormat("Exec-Worker-NodeRunner").build();
     nodeExecutorService = Executors.newCachedThreadPool(nodeThreadFactory);
 
-    NamedThreadFactory jobThreadFactory = new NamedThreadFactory("Exec-Worker-Job");
+    ThreadFactory jobThreadFactory = new ThreadFactoryBuilder().setNameFormat("Exec-Worker-Job").build();
     jobExecutorService = Executors.newCachedThreadPool(jobThreadFactory);
   }
 

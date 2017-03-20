@@ -18,9 +18,11 @@ package com.baifendian.swordfish.execserver.job.process;
 import com.baifendian.swordfish.common.job.AbstractProcessJob;
 import com.baifendian.swordfish.common.job.BaseParam;
 import com.baifendian.swordfish.common.job.JobProps;
-import com.baifendian.swordfish.common.utils.json.JsonUtil;
-import com.bfd.harpc.common.configure.PropertiesConfiguration;
+import com.baifendian.swordfish.dao.utils.json.JsonUtil;
 
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 
@@ -28,7 +30,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Java 进程 <p>
@@ -54,8 +55,14 @@ public class JavaProcessJob extends AbstractProcessJob {
   private ProcessParam param;
 
   static {
-    // java 可选参数
-    String javaOpts = PropertiesConfiguration.getValue("job.java.opts", "");
+      // java 可选参数
+      Configuration conf = null;
+      try {
+        conf = new PropertiesConfiguration("job/hive.properties");
+      } catch (ConfigurationException e) {
+        e.printStackTrace();
+      }
+    String javaOpts = conf.getString("job.java.opts", "");
     if (StringUtils.isNotEmpty(javaOpts)) {
       javaOptList.addAll(Arrays.asList(javaOpts.split(" ")));
     }

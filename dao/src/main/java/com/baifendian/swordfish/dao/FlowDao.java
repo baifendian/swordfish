@@ -15,18 +15,14 @@
  */
 package com.baifendian.swordfish.dao;
 
-import com.baifendian.swordfish.common.consts.Constants;
-import com.baifendian.swordfish.common.job.FlowStatus;
-import com.baifendian.swordfish.common.utils.BFDDateUtils;
-import com.baifendian.swordfish.common.utils.json.JsonUtil;
+import com.baifendian.swordfish.dao.enums.FlowStatus;
+import com.baifendian.swordfish.dao.utils.json.JsonUtil;
 import com.baifendian.swordfish.dao.datasource.ConnectionFactory;
 import com.baifendian.swordfish.dao.enums.*;
 import com.baifendian.swordfish.dao.mapper.*;
 import com.baifendian.swordfish.dao.model.*;
 import com.baifendian.swordfish.dao.model.flow.FlowDag;
-import com.baifendian.swordfish.dao.model.flow.ScheduleMeta;
 
-import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -288,6 +284,7 @@ public class FlowDao extends BaseDao {
   /**
    * 配置调度信息
    */
+  /*
   public void configSchedule(int workflowId, int userId, String time) throws Exception {
     Schedule schedule = scheduleMapper.selectByFlowId(workflowId);
     if (schedule == null) {
@@ -316,7 +313,6 @@ public class FlowDao extends BaseDao {
       Date endDate = BFDDateUtils.parse("2099-12-31 00:00:00");
       meta.setEndDate(endDate);
       schedule.setEndDate(endDate);
-      int startTime = BFDDateUtils.getSecs(BFDDateUtils.parse(time, Constants.BASE_TIME_FORMAT));
       schedule.setCrontabStr(JsonUtil.toJsonString(meta));
 
       int count = scheduleMapper.insert(schedule);
@@ -327,7 +323,6 @@ public class FlowDao extends BaseDao {
     } else {
       // 更新调度信息
       ScheduleMeta meta = JsonUtil.parseObject(schedule.getCrontabStr(), ScheduleMeta.class);
-      int startTime = BFDDateUtils.getSecs(BFDDateUtils.parse(time, Constants.BASE_TIME_FORMAT));
       schedule.setCrontabStr(JsonUtil.toJsonString(meta));
 
       schedule.setLastModifyBy(userId);
@@ -338,6 +333,7 @@ public class FlowDao extends BaseDao {
       }
     }
   }
+  */
 
   /**
    * 插入 ExecutionNode <p>

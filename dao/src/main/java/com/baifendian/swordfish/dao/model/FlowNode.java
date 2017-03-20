@@ -15,9 +15,9 @@
  */
 package com.baifendian.swordfish.dao.model;
 
-import com.baifendian.swordfish.common.utils.json.JsonUtil;
-import com.baifendian.swordfish.common.utils.json.StringNodeJsonDeserializer;
-import com.baifendian.swordfish.common.utils.json.StringNodeJsonSerializer;
+import com.baifendian.swordfish.dao.utils.json.JsonUtil;
+import com.baifendian.swordfish.dao.utils.json.StringNodeJsonDeserializer;
+import com.baifendian.swordfish.dao.utils.json.StringNodeJsonSerializer;
 import com.baifendian.swordfish.dao.enums.NodeType;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;

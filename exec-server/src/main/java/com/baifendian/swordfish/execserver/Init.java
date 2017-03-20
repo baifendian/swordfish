@@ -21,9 +21,11 @@ import com.baifendian.swordfish.dao.DaoFactory;
 import com.baifendian.swordfish.dao.FlowDao;
 import com.baifendian.swordfish.common.job.config.BaseConfig;
 import com.baifendian.swordfish.dao.enums.FlowRunType;
+import com.baifendian.swordfish.dao.enums.FlowType;
 import com.baifendian.swordfish.dao.model.ExecutionFlow;
 import com.baifendian.swordfish.execserver.job.JobTypeManager;
 import com.baifendian.swordfish.execserver.service.ExecServiceImpl;
+import com.baifendian.swordfish.rpc.ScheduleInfo;
 
 import org.apache.thrift.TException;
 import org.slf4j.Logger;
@@ -42,6 +44,15 @@ public class Init {
     FlowDao flowDao = DaoFactory.getDaoInstance(FlowDao.class);
     ExecutionFlow executionFlow = flowDao.scheduleFlowToExecution(1, 1, 1, new Date(), FlowRunType.DISPATCH);
     System.out.println(executionFlow.getId());
+  }
+
+  public static void initSchedule() {
+    MasterClient masterClient = new MasterClient("172.18.1.22", 9999, 3);
+    ScheduleInfo scheduleInfo = new ScheduleInfo();
+    scheduleInfo.setStartDate(System.currentTimeMillis() - 3600 * 24 * 1000);
+    scheduleInfo.setEndDate(4101494400000l);
+    scheduleInfo.setCronExpression("30 * * * * ?");
+    masterClient.setSchedule(1, 2, FlowType.SHORT.name(), scheduleInfo);
   }
 
   public static void testJob() throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {

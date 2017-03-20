@@ -45,7 +45,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import static com.baifendian.swordfish.execserver.utils.ThriftUtil.getTThreadPoolServer;
+import static com.baifendian.swordfish.common.utils.ThriftUtil.getTThreadPoolServer;
 
 /**
  * @author : liujin

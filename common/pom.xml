@@ -20,6 +20,11 @@
 
     <dependencies>
         <dependency>
+            <groupId>com.baifendian.swordfish</groupId>
+            <artifactId>swordfish-dao</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <scope>test</scope>
@@ -65,18 +70,6 @@
             <artifactId>spring-test</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-lang3</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-collections4</artifactId>
-        </dependency>
 
         <dependency>
             <groupId>org.apache.hbase</groupId>

@@ -15,6 +15,8 @@
  */
 package com.baifendian.swordfish.common.job;
 
+import com.baifendian.swordfish.dao.enums.FlowStatus;
+
 import java.util.ArrayList;
 import java.util.List;
 

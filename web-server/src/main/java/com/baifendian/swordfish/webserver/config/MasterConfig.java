@@ -15,7 +15,9 @@
  */
 package com.baifendian.swordfish.webserver.config;
 
-import com.bfd.harpc.common.configure.PropertiesConfiguration;
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.configuration.PropertiesConfiguration;
 
 /**
  * Master 配置信息 <p>
@@ -27,10 +29,21 @@ public class MasterConfig {
   /**
    * 失败重试次数,默认为 2 次
    */
-  public static int failRetryCount = PropertiesConfiguration.getValue("masterToWorker.failRetry.count", 2);
+  public static int failRetryCount;
 
   /**
    * 失败重试的队列大小,默认为 10000
    */
-  public static int failRetryQueueSize = PropertiesConfiguration.getValue("masterToWorker.failRetry.queueSize", 10000);
+  public static int failRetryQueueSize;
+
+  static {
+    Configuration conf = null;
+    try {
+      conf = new PropertiesConfiguration("master.properties");
+    } catch (ConfigurationException e) {
+      e.printStackTrace();
+    }
+    failRetryCount = conf.getInt("masterToWorker.failRetry.count", 2);
+    failRetryQueueSize = conf.getInt("masterToWorker.failRetry.queueSize", 10000);
+  }
 }

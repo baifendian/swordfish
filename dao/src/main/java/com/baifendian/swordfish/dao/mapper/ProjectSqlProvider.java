@@ -17,7 +17,7 @@ package com.baifendian.swordfish.dao.mapper;
 
 import com.baifendian.swordfish.dao.model.Project;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.jdbc.SQL;
 
