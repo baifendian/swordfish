@@ -75,6 +75,12 @@ public class ProjectController {
     return null;
   }
 
+  /**
+   * 查看所有项目
+   *
+   * @param response
+   * @return
+   */
   @RequestMapping(value = "", method = {RequestMethod.GET})
   public Project queryProjects(HttpServletResponse response) {
     return null;
