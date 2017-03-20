@@ -14,7 +14,7 @@
                 <include>*.*</include>
             </includes>
             <directoryMode>755</directoryMode>
-            <outputDirectory>/bin</outputDirectory>
+            <outputDirectory>bin</outputDirectory>
         </fileSet>
         <fileSet>
             <directory>src/main/resources</directory>
@@ -23,7 +23,7 @@
                 <include>**/*.xml</include>
                 <include>**/*.json</include>
             </includes>
-            <outputDirectory>/conf</outputDirectory>
+            <outputDirectory>conf</outputDirectory>
         </fileSet>
         <fileSet>
             <directory>${project.parent.basedir}/common/src/main/resources</directory>
@@ -32,7 +32,7 @@
                 <include>**/*.xml</include>
                 <include>**/*.json</include>
             </includes>
-            <outputDirectory>/conf</outputDirectory>
+            <outputDirectory>conf</outputDirectory>
         </fileSet>
         <fileSet>
             <directory>${project.parent.basedir}/dao/src/main/resources</directory>
@@ -41,14 +41,14 @@
                 <include>**/*.xml</include>
                 <include>**/*.json</include>
             </includes>
-            <outputDirectory>/conf</outputDirectory>
+            <outputDirectory>conf</outputDirectory>
         </fileSet>
         <fileSet>
             <directory>target/</directory>
             <includes>
                 <include>web-server-${project.version}.jar</include>
             </includes>
-            <outputDirectory>/lib</outputDirectory>
+            <outputDirectory>lib</outputDirectory>
         </fileSet>
     </fileSets>
     <dependencySets>
@@ -56,7 +56,6 @@
             <outputDirectory>lib</outputDirectory>
             <useProjectArtifact>true</useProjectArtifact>
             <excludes>
-                <exclude>junit:junit</exclude>
                 <exclude>javax.servlet:servlet-api</exclude>
                 <exclude>org.eclipse.jetty.aggregate:jetty-all</exclude>
             </excludes>

@@ -28,12 +28,6 @@
             <groupId>com.baifendian.swordfish</groupId>
             <artifactId>swordfish-common</artifactId>
             <version>${project.version}</version>
-            <exclusions>
-                <exclusion>
-                    <artifactId>servlet-api</artifactId>
-                    <groupId>javax.servlet</groupId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>com.baifendian.swordfish</groupId>

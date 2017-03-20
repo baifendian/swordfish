@@ -68,67 +68,67 @@ public class UserController {
 
     return data;
   }
-//
-//  /**
-//   * 修改用户信息, "系统管理员和用户自己" 操作
-//   *
-//   * @param name
-//   * @param email
-//   * @param desc
-//   * @param password
-//   * @param phone
-//   * @param proxyUsers: 代理用户信息, 普通用户无权限修改自身代理用户信息
-//   * @param response
-//   * @return
-//   */
-//  @RequestMapping(value = "/{name}", method = {RequestMethod.PATCH})
-//  public BaseData modifyUser(@PathVariable String name,
-//                             @RequestParam(value = "session.userId") int userId,
-//                             @RequestParam(value = "email", required = false) String email,
-//                             @RequestParam(value = "desc", required = false) String desc,
-//                             @RequestParam(value = "password", required = false) String password,
-//                             @RequestParam(value = "phone", required = false) String phone,
-//                             @RequestParam(value = "proxyUsers", required = false) String proxyUsers,
-//                             HttpServletResponse response) {
-//    return null;
-//  }
-//
-//  /**
-//   * 删除用户, "系统管理员" 操作
-//   *
-//   * @param name
-//   * @param response
-//   * @return
-//   */
-//  @RequestMapping(value = "/{name}", method = {RequestMethod.DELETE})
-//  public BaseData deleteUser(@PathVariable String name,
-//                             @RequestParam(value = "session.userId") int userId,
-//                             HttpServletResponse response) {
-//    return null;
-//  }
-//
-//
-//  /**
-//   * 删除用户, "系统管理员" 操作
-//   *
-//   * @param name
-//   * @param response
-//   * @return
-//   */
-//  @RequestMapping(value = "/{name}", method = {RequestMethod.GET})
-//  public BaseData queryUsers(@PathVariable String name,
-//                             @RequestParam(value = "session.userId") int userId,
-//                             @RequestParam(value = "allUser", required = false) boolean allUser,
-//                             HttpServletResponse response) {
-//    return null;
-//  }
-//
-//
-//  @RequestMapping(value = "/{name}/proxyUsers/{proxyUser}", method = {RequestMethod.GET})
-//  public BaseData modifyProxyUserPass(@PathVariable String name,
-//                                      @RequestParam(value = "session.userId") int userId,
-//                                      @RequestParam(value = "allUser", required = false) boolean allUser,
-//                                      HttpServletResponse response) {
-//    return null;
-//  }
+
+  /**
+   * 修改用户信息, "系统管理员和用户自己" 操作
+   *
+   * @param name
+   * @param email
+   * @param desc
+   * @param password
+   * @param phone
+   * @param proxyUsers: 代理用户信息, 普通用户无权限修改自身代理用户信息
+   * @param response
+   * @return
+   */
+  @RequestMapping(value = "/{name}", method = {RequestMethod.PATCH})
+  public BaseData modifyUser(@PathVariable String name,
+                             @RequestParam(value = "session.userId") int userId,
+                             @RequestParam(value = "email", required = false) String email,
+                             @RequestParam(value = "desc", required = false) String desc,
+                             @RequestParam(value = "password", required = false) String password,
+                             @RequestParam(value = "phone", required = false) String phone,
+                             @RequestParam(value = "proxyUsers", required = false) String proxyUsers,
+                             HttpServletResponse response) {
+    return null;
+  }
+
+  /**
+   * 删除用户, "系统管理员" 操作
+   *
+   * @param name
+   * @param response
+   * @return
+   */
+  @RequestMapping(value = "/{name}", method = {RequestMethod.DELETE})
+  public BaseData deleteUser(@PathVariable String name,
+                             @RequestParam(value = "session.userId") int userId,
+                             HttpServletResponse response) {
+    return null;
+  }
+
+
+  /**
+   * 删除用户, "系统管理员" 操作
+   *
+   * @param name
+   * @param response
+   * @return
+   */
+  @RequestMapping(value = "/{name}", method = {RequestMethod.GET})
+  public BaseData queryUsers(@PathVariable String name,
+                             @RequestParam(value = "session.userId") int userId,
+                             @RequestParam(value = "allUser", required = false) boolean allUser,
+                             HttpServletResponse response) {
+    return null;
+  }
+
+
+  @RequestMapping(value = "/{name}/proxyUsers/{proxyUser}", method = {RequestMethod.GET})
+  public BaseData modifyProxyUserPass(@PathVariable String name,
+                                      @RequestParam(value = "session.userId") int userId,
+                                      @RequestParam(value = "allUser", required = false) boolean allUser,
+                                      HttpServletResponse response) {
+    return null;
+  }
 }
