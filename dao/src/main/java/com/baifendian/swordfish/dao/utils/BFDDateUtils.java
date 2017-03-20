@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.baifendian.swordfish.common.utils;
+package com.baifendian.swordfish.dao.utils;
 
-import com.baifendian.swordfish.common.consts.Constants;
+import com.baifendian.swordfish.dao.consts.Constants;
 
 import org.apache.commons.lang.time.FastDateFormat;
 

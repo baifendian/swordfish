@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.baifendian.swordfish.execserver.utils.mail;
+package com.baifendian.swordfish.common.mail;
 
-import com.baifendian.swordfish.common.utils.BFDDateUtils;
+import com.baifendian.swordfish.dao.utils.BFDDateUtils;
 import com.baifendian.swordfish.dao.DaoFactory;
 import com.baifendian.swordfish.dao.enums.FlowRunType;
-import com.baifendian.swordfish.common.job.FlowStatus;
+import com.baifendian.swordfish.dao.enums.FlowStatus;
 import com.baifendian.swordfish.dao.enums.FlowType;
 import com.baifendian.swordfish.dao.model.ExecutionFlow;
 import com.baifendian.swordfish.dao.model.ProjectFlow;

@@ -60,22 +60,22 @@ public class ConnectionFactory {
   public static DataSource getDataSource() {
     DruidDataSource druidDataSource = new DruidDataSource();
 
-    druidDataSource.setDriverClassName(PROPERTIES.getProperty("driver-class-name"));
-    druidDataSource.setUrl(PROPERTIES.getProperty("url"));
-    druidDataSource.setUsername(PROPERTIES.getProperty("username"));
-    druidDataSource.setPassword(PROPERTIES.getProperty("password"));
-    druidDataSource.setInitialSize(Integer.parseInt(PROPERTIES.getProperty("initialSize")));
-    druidDataSource.setMinIdle(Integer.parseInt(PROPERTIES.getProperty("minIdle")));
-    druidDataSource.setMaxActive(Integer.parseInt(PROPERTIES.getProperty("maxActive")));
-    druidDataSource.setMaxWait(Integer.parseInt(PROPERTIES.getProperty("maxWait")));
-    druidDataSource.setTimeBetweenEvictionRunsMillis(Long.parseLong(PROPERTIES.getProperty("timeBetweenEvictionRunsMillis")));
-    druidDataSource.setMinEvictableIdleTimeMillis(Long.parseLong(PROPERTIES.getProperty("minEvictableIdleTimeMillis")));
-    druidDataSource.setValidationQuery(PROPERTIES.getProperty("validationQuery"));
-    druidDataSource.setTestWhileIdle(Boolean.parseBoolean(PROPERTIES.getProperty("testWhileIdle")));
-    druidDataSource.setTestOnBorrow(Boolean.parseBoolean(PROPERTIES.getProperty("testOnBorrow")));
-    druidDataSource.setTestOnReturn(Boolean.parseBoolean(PROPERTIES.getProperty("testOnReturn")));
-    druidDataSource.setPoolPreparedStatements(Boolean.parseBoolean(PROPERTIES.getProperty("poolPreparedStatements")));
-    druidDataSource.setMaxPoolPreparedStatementPerConnectionSize(Integer.parseInt(PROPERTIES.getProperty("maxPoolPreparedStatementPerConnectionSize")));
+    druidDataSource.setDriverClassName(PROPERTIES.getProperty("spring.datasource.driver-class-name"));
+    druidDataSource.setUrl(PROPERTIES.getProperty("spring.datasource.url"));
+    druidDataSource.setUsername(PROPERTIES.getProperty("spring.datasource.username"));
+    druidDataSource.setPassword(PROPERTIES.getProperty("spring.datasource.password"));
+    druidDataSource.setInitialSize(Integer.parseInt(PROPERTIES.getProperty("spring.datasource.initialSize")));
+    druidDataSource.setMinIdle(Integer.parseInt(PROPERTIES.getProperty("spring.datasource.minIdle")));
+    druidDataSource.setMaxActive(Integer.parseInt(PROPERTIES.getProperty("spring.datasource.maxActive")));
+    druidDataSource.setMaxWait(Integer.parseInt(PROPERTIES.getProperty("spring.datasource.maxWait")));
+    druidDataSource.setTimeBetweenEvictionRunsMillis(Long.parseLong(PROPERTIES.getProperty("spring.datasource.timeBetweenEvictionRunsMillis")));
+    druidDataSource.setMinEvictableIdleTimeMillis(Long.parseLong(PROPERTIES.getProperty("spring.datasource.minEvictableIdleTimeMillis")));
+    druidDataSource.setValidationQuery(PROPERTIES.getProperty("spring.datasource.validationQuery"));
+    druidDataSource.setTestWhileIdle(Boolean.parseBoolean(PROPERTIES.getProperty("spring.datasource.testWhileIdle")));
+    druidDataSource.setTestOnBorrow(Boolean.parseBoolean(PROPERTIES.getProperty("spring.datasource.testOnBorrow")));
+    druidDataSource.setTestOnReturn(Boolean.parseBoolean(PROPERTIES.getProperty("spring.datasource.testOnReturn")));
+    druidDataSource.setPoolPreparedStatements(Boolean.parseBoolean(PROPERTIES.getProperty("spring.datasource.poolPreparedStatements")));
+    druidDataSource.setMaxPoolPreparedStatementPerConnectionSize(Integer.parseInt(PROPERTIES.getProperty("spring.datasource.maxPoolPreparedStatementPerConnectionSize")));
 
     return druidDataSource;
   }

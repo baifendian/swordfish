@@ -23,7 +23,6 @@ import org.mybatis.spring.annotation.MapperScan;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.ApplicationContextException;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -32,15 +31,12 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import java.sql.SQLException;
 import java.util.Arrays;
 
 @Configuration
-@ConfigurationProperties(prefix = "spring.datasource")
 @PropertySource({"classpath:dao/data_source.properties"})
-@EnableTransactionManagement
 @MapperScan(basePackages = "com.baifendian.swordfish.dao.mapper", sqlSessionFactoryRef = "SqlSessionFactory")
 public class DatabaseConfiguration {
   private static Logger logger = LoggerFactory.getLogger(DatabaseConfiguration.class.getName());
@@ -54,7 +50,7 @@ public class DatabaseConfiguration {
   @Primary
   @Bean(name = "DataSource", initMethod = "init", destroyMethod = "close")
   public DruidDataSource dataSource() throws SQLException {
-    if (StringUtils.isEmpty(env.getProperty("url"))) {
+    if (StringUtils.isEmpty(env.getProperty("spring.datasource.url"))) {
       logger.error("Your database connection pool configuration is incorrect! Please check your Spring profile, " +
           "current profiles are: {}", Arrays.toString(env.getActiveProfiles()));
       throw new ApplicationContextException(
@@ -63,23 +59,23 @@ public class DatabaseConfiguration {
 
     DruidDataSource druidDataSource = new DruidDataSource();
 
-    druidDataSource.setDriverClassName(env.getProperty("driver-class-name"));
-    druidDataSource.setUrl(env.getProperty("url"));
-    druidDataSource.setUsername(env.getProperty("username"));
-    druidDataSource.setPassword(env.getProperty("password"));
-    druidDataSource.setInitialSize(Integer.parseInt(env.getProperty("initialSize")));
-    druidDataSource.setMinIdle(Integer.parseInt(env.getProperty("minIdle")));
-    druidDataSource.setMaxActive(Integer.parseInt(env.getProperty("maxActive")));
-    druidDataSource.setMaxWait(Integer.parseInt(env.getProperty("maxWait")));
-    druidDataSource.setTimeBetweenEvictionRunsMillis(Long.parseLong(env.getProperty("timeBetweenEvictionRunsMillis")));
-    druidDataSource.setMinEvictableIdleTimeMillis(Long.parseLong(env.getProperty("minEvictableIdleTimeMillis")));
-    druidDataSource.setValidationQuery(env.getProperty("validationQuery"));
-    druidDataSource.setTestWhileIdle(Boolean.parseBoolean(env.getProperty("testWhileIdle")));
-    druidDataSource.setTestOnBorrow(Boolean.parseBoolean(env.getProperty("testOnBorrow")));
-    druidDataSource.setTestOnReturn(Boolean.parseBoolean(env.getProperty("testOnReturn")));
-    druidDataSource.setPoolPreparedStatements(Boolean.parseBoolean(env.getProperty("poolPreparedStatements")));
-    druidDataSource.setMaxPoolPreparedStatementPerConnectionSize(Integer.parseInt(env.getProperty("maxPoolPreparedStatementPerConnectionSize")));
-    druidDataSource.setFilters(env.getProperty("filters"));
+    druidDataSource.setDriverClassName(env.getProperty("spring.datasource.driver-class-name"));
+    druidDataSource.setUrl(env.getProperty("spring.datasource.url"));
+    druidDataSource.setUsername(env.getProperty("spring.datasource.username"));
+    druidDataSource.setPassword(env.getProperty("spring.datasource.password"));
+    druidDataSource.setInitialSize(Integer.parseInt(env.getProperty("spring.datasource.initialSize")));
+    druidDataSource.setMinIdle(Integer.parseInt(env.getProperty("spring.datasource.minIdle")));
+    druidDataSource.setMaxActive(Integer.parseInt(env.getProperty("spring.datasource.maxActive")));
+    druidDataSource.setMaxWait(Integer.parseInt(env.getProperty("spring.datasource.maxWait")));
+    druidDataSource.setTimeBetweenEvictionRunsMillis(Long.parseLong(env.getProperty("spring.datasource.timeBetweenEvictionRunsMillis")));
+    druidDataSource.setMinEvictableIdleTimeMillis(Long.parseLong(env.getProperty("spring.datasource.minEvictableIdleTimeMillis")));
+    druidDataSource.setValidationQuery(env.getProperty("spring.datasource.validationQuery"));
+    druidDataSource.setTestWhileIdle(Boolean.parseBoolean(env.getProperty("spring.datasource.testWhileIdle")));
+    druidDataSource.setTestOnBorrow(Boolean.parseBoolean(env.getProperty("spring.datasource.testOnBorrow")));
+    druidDataSource.setTestOnReturn(Boolean.parseBoolean(env.getProperty("spring.datasource.testOnReturn")));
+    druidDataSource.setPoolPreparedStatements(Boolean.parseBoolean(env.getProperty("spring.datasource.poolPreparedStatements")));
+    druidDataSource.setMaxPoolPreparedStatementPerConnectionSize(Integer.parseInt(env.getProperty("spring.datasource.maxPoolPreparedStatementPerConnectionSize")));
+    druidDataSource.setFilters(env.getProperty("spring.datasource.filters"));
 
     return druidDataSource;
   }

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.baifendian.swordfish.execserver.utils.mail;
+package com.baifendian.swordfish.common.mail;
 
 import com.baifendian.swordfish.common.mail.MailSendUtil;
 import com.baifendian.swordfish.dao.BaseDao;

@@ -15,16 +15,11 @@
  */
 package com.baifendian.swordfish.webserver;
 
-import com.baifendian.swordfish.dao.DaoFactory;
-import com.baifendian.swordfish.dao.MasterDao;
 import com.baifendian.swordfish.dao.model.MasterServer;
-import com.baifendian.swordfish.execserver.service.ExecServiceImpl;
 import com.baifendian.swordfish.rpc.MasterService;
-import com.baifendian.swordfish.rpc.WorkerService;
 import com.baifendian.swordfish.webserver.exception.MasterException;
 import com.baifendian.swordfish.webserver.quartz.QuartzManager;
 import com.baifendian.swordfish.webserver.service.master.MasterServiceImpl;
-
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
@@ -34,7 +29,6 @@ import org.apache.thrift.protocol.TProtocolFactory;
 import org.apache.thrift.server.TServer;
 import org.apache.thrift.transport.TTransportException;
 import org.apache.thrift.transport.TTransportFactory;
-import org.apache.tools.ant.taskdefs.Exec;
 import org.quartz.SchedulerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,8 +36,6 @@ import org.slf4j.LoggerFactory;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 import static com.baifendian.swordfish.execserver.utils.ThriftUtil.getTThreadPoolServer;
 
