@@ -70,8 +70,6 @@ public class ProjectFlow {
 
   private String queue;
 
-  private String mailGroups;
-
   private int projectId;
 
   private String projectName;
@@ -192,14 +190,6 @@ public class ProjectFlow {
 
   public void setType(FlowType type) {
     this.type = type;
-  }
-
-  public String getMailGroups() {
-    return mailGroups;
-  }
-
-  public void setMailGroups(String mailGroups) {
-    this.mailGroups = mailGroups;
   }
 
   public String getProxyUser() {

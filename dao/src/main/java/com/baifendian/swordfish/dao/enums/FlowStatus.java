@@ -75,6 +75,10 @@ public enum FlowStatus {
     return this == SUCCESS;
   }
 
+  public boolean typeIsFailure() {
+    return this != SUCCESS;
+  }
+
   /**
    * 判断是否终止状态 <p>
    *

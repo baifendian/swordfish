@@ -62,9 +62,9 @@ public class Schedule {
 
   private Integer maxTryTimes;
 
-  private Boolean failureEmails;
+  private NotifyType notifyType;
 
-  private Boolean successEmails;
+  private String notifyEmails;
 
   private Integer timeout;
 
@@ -208,20 +208,20 @@ public class Schedule {
     this.maxTryTimes = maxTryTimes;
   }
 
-  public Boolean getFailureEmails() {
-    return failureEmails;
+  public NotifyType getNotifyType() {
+    return notifyType;
   }
 
-  public void setFailureEmails(Boolean failureEmails) {
-    this.failureEmails = failureEmails;
+  public void setNotifyType(NotifyType notifyType) {
+    this.notifyType = notifyType;
   }
 
-  public Boolean getSuccessEmails() {
-    return successEmails;
+  public String getNotifyEmails() {
+    return notifyEmails;
   }
 
-  public void setSuccessEmails(Boolean successEmails) {
-    this.successEmails = successEmails;
+  public void setNotifyEmails(String notifyEmails) {
+    this.notifyEmails = notifyEmails;
   }
 
   public Integer getTimeout() {

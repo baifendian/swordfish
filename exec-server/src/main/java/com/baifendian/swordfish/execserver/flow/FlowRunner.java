@@ -827,8 +827,9 @@ public class FlowRunner implements Runnable {
   private void sendEmail() {
     Schedule schedule = context.getSchedule();
     // 发送邮件
-    if (schedule != null && (BooleanUtils.isTrue(schedule.getSuccessEmails()) || BooleanUtils.isTrue(schedule.getFailureEmails()))) {
-      EmailManager.sendEmail(executionFlow);
+    if (schedule != null && ((executionFlow.getStatus().typeIsSuccess() && schedule.getNotifyType().typeIsSendSuccessMail())
+        || (executionFlow.getStatus().typeIsFailure() && schedule.getNotifyType().typeIsSendFailureMail()))){
+      EmailManager.sendEmail(executionFlow, schedule);
     }
   }
 

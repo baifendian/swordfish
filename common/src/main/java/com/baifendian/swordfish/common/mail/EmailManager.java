@@ -15,6 +15,7 @@
  */
 package com.baifendian.swordfish.common.mail;
 
+import com.baifendian.swordfish.dao.model.Schedule;
 import com.baifendian.swordfish.dao.utils.BFDDateUtils;
 import com.baifendian.swordfish.dao.DaoFactory;
 import com.baifendian.swordfish.dao.enums.FlowRunType;
@@ -78,11 +79,11 @@ public class EmailManager {
   /**
    * 发送 EMAIL（调度） <p>
    */
-  public static void sendEmail(ExecutionFlow executionFlow) {
+  public static void sendEmail(ExecutionFlow executionFlow, Schedule schedule) {
     String title = genTitle(executionFlow.getType(), executionFlow.getStatus());
     String content = genContent(executionFlow.getType(), executionFlow.getProjectName(), executionFlow.getFlowName(), executionFlow.getFlowType(),
             executionFlow.getScheduleTime(), executionFlow.getStatus());
-    mailSendService.sendToFlowMails(executionFlow.getFlowId(), title, content, true);
+    mailSendService.sendToFlowMails(executionFlow.getFlowId(), title, content, true, schedule);
   }
 
   /**
@@ -98,7 +99,7 @@ public class EmailManager {
       builder.append(item);
     }
     builder.append(ADD_DATA_TAIL_FORMAT);
-    mailSendService.sendToFlowMails(projectFlow.getProjectId(), title, builder.toString(), true);
+    mailSendService.sendToFlowMails(projectFlow.getProjectId(), title, builder.toString(), true, null);
   }
 
   /**

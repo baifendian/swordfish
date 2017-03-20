@@ -52,8 +52,8 @@ public class ScheduleMapperProvider {
       VALUES("failure_policy", EnumFieldUtil.genFieldStr("schedule.failurePolicy", FailurePolicyType.class));
       VALUES("dep_policy", EnumFieldUtil.genFieldStr("schedule.depPolicy", DepPolicyType.class));
       VALUES("max_try_times", "#{schedule.maxTryTimes}");
-      VALUES("failure_emails", "#{schedule.failureEmails}");
-      VALUES("success_emails", "#{schedule.successEmails}");
+      VALUES("notify_type", EnumFieldUtil.genFieldStr("schedule.notifyType", NotifyType.class));
+      VALUES("notify_emails", "#{schedule.notifyEmails}");
       VALUES("timeout", "#{schedule.timeout}");
 
     }}.toString();
@@ -77,11 +77,11 @@ public class ScheduleMapperProvider {
           SET("schedule_type = " + EnumFieldUtil.genFieldStr("schedule.scheduleType", ScheduleType.class));
           SET("crontab_str = #{schedule.crontabStr}");
         }
-        if (schedule.getSuccessEmails() != null) {
-          SET("success_emails = #{schedule.successEmails}");
+        if (schedule.getNotifyType() != null) {
+          SET("notify_type = " + EnumFieldUtil.genFieldStr("schedule.notifyType", NotifyType.class));
         }
-        if (schedule.getFailureEmails() != null) {
-          SET("failure_emails = #{schedule.failureEmails}");
+        if (schedule.getNotifyEmails() != null) {
+          SET("notify_emails = #{schedule.notifyEmails}");
         }
         if (schedule.getMaxTryTimes() != null) {
           SET("max_try_times = #{schedule.maxTryTimes}");
