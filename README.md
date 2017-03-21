@@ -1,11 +1,11 @@
-#swordfish 编译方法
+# swordfish 编译方法
 
-##1. 下载 swordfish 源码
+## 1.下载 swordfish 源码
 ```
 $ git clone https://github.com/baifendian/swordfish.git
 ```
 
-##2. 通过maven打包
+## 2.通过maven打包
 ```
   $ cd  {swordfish_source_code_home}
   $ mvn -U clean package assembly:assembly -Dmaven.test.skip=true
@@ -23,11 +23,11 @@ $ git clone https://github.com/baifendian/swordfish.git
 
 在 target 目录下看到 swordfish-all-{version}, 这个目录下面为打包好的项目信息
 
-#如何部署
+# 如何部署
 [服务部署手册](https://github.com/baifendian/swordfish/wiki/deploy)
 
-#插件开发
+# 插件开发
 [插件开发手册](https://github.com/baifendian/swordfish/wiki/plugin-dev)
 
-#Restful API
+# Restful API
 [API 说明](https://github.com/baifendian/swordfish/wiki)
