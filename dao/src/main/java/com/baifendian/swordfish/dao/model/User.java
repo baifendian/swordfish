@@ -15,13 +15,12 @@
  */
 package com.baifendian.swordfish.dao.model;
 
-import com.baifendian.swordfish.dao.BaseData;
 import com.baifendian.swordfish.dao.enums.UserRoleType;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.util.Date;
 
-public class User extends BaseData {
+public class User {
   /**
    * 用户 ID
    */

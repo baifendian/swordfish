@@ -15,7 +15,6 @@
  */
 package com.baifendian.swordfish.webserver.api.dto;
 
-import com.baifendian.swordfish.dao.BaseData;
 import com.baifendian.swordfish.dao.model.User;
 
 /**
@@ -23,7 +22,7 @@ import com.baifendian.swordfish.dao.model.User;
  * date:   2017/3/16
  * desc:
  */
-public class UserSessionData extends BaseData {
+public class UserSessionData {
   /**
    * 用户 session id
    */

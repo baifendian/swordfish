@@ -17,24 +17,19 @@ package com.baifendian.swordfish.dao.mapper.utils;
 
 import com.baifendian.swordfish.dao.enums.NodeType;
 import com.baifendian.swordfish.dao.enums.NodeTypeHandler;
-
 import org.apache.ibatis.type.EnumOrdinalTypeHandler;
 
-/**
- * mybatis enum类型字段的工具 <p>
- *
- * @author : dsfan
- * @date : 2016年8月26日
- */
 public class EnumFieldUtil {
 
   /**
-   * 生成enum字段的字符串 <p>
+   * 生成 enum 字段的字符串
    *
-   * @return 字段字符串
+   * @param field
+   * @param enumClass
+   * @return
    */
   public static String genFieldStr(String field, Class<?> enumClass) {
-    if (enumClass.equals(NodeType.class)) { // NodeType类型进行特殊处理
+    if (enumClass.equals(NodeType.class)) { // NodeType 类型进行特殊处理
       return "#{" + field + ",javaType=" + enumClass.getName() + ",typeHandler=" + NodeTypeHandler.class.getName() + "}";
     }
     return "#{" + field + ",javaType=" + enumClass.getName() + ",typeHandler=" + EnumOrdinalTypeHandler.class.getName() + "}";
