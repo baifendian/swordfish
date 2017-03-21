@@ -15,13 +15,139 @@
  */
 package com.baifendian.swordfish.webserver.api.controller;
 
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import com.baifendian.swordfish.dao.model.User;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * 资源管理入口
  */
 @RestController
-@RequestMapping("/resources")
+@RequestMapping("/projects/{projectName}/resources")
 public class ResourceController {
+
+  private static Logger logger = LoggerFactory.getLogger(ResourceController.class.getName());
+
+  /**
+   * 创建资源, 需要具备项目的 "w 权限"
+   *
+   * @param operator
+   * @param projectName
+   * @param name
+   * @param type
+   * @param desc
+   * @param response
+   */
+  @RequestMapping(value = "/{name}", method = {RequestMethod.POST})
+  public void createResource(@RequestAttribute(value = "session.user") User operator,
+                             @PathVariable String projectName,
+                             @PathVariable String name,
+                             @RequestParam(value = "type") String type,
+                             @RequestParam(value = "desc", required = false) String desc,
+                             HttpServletResponse response) {
+    logger.info("Operator user id {}, create resource, project name: {}, resource name: {}, type: {}, desc: {}",
+        operator.getId(), projectName, name, type, desc);
+
+
+  }
+
+  /**
+   * 修改资源, 需要具备项目的 "w 权限"
+   *
+   * @param operator
+   * @param projectName
+   * @param name
+   * @param type
+   * @param desc
+   * @param response
+   */
+  @RequestMapping(value = "/{name}", method = {RequestMethod.PATCH})
+  public void modifyResource(@RequestAttribute(value = "session.user") User operator,
+                             @PathVariable String projectName,
+                             @PathVariable String name,
+                             @RequestParam(value = "type") String type,
+                             @RequestParam(value = "desc", required = false) String desc,
+                             HttpServletResponse response) {
+    logger.info("Operator user id {}, modify resource, project name: {}, resource name: {}, type: {}, desc: {}",
+        operator.getId(), projectName, name, type, desc);
+
+
+  }
+
+  /**
+   * 需要具备项目的 "w 权限"
+   *
+   * @param operator
+   * @param projectName
+   * @param name
+   * @param response
+   */
+  @RequestMapping(value = "/{name}", method = {RequestMethod.PATCH})
+  public void deleteResource(@RequestAttribute(value = "session.user") User operator,
+                             @PathVariable String projectName,
+                             @PathVariable String name,
+                             HttpServletResponse response) {
+    logger.info("Operator user id {}, delete resource, project name: {}, resource name: {}",
+        operator.getId(), projectName, name);
+
+
+  }
+
+  /**
+   * 需要具备项目的 "r 权限"
+   *
+   * @param operator
+   * @param projectName
+   * @param response
+   */
+  @RequestMapping(value = "", method = {RequestMethod.GET})
+  public void getResources(@RequestAttribute(value = "session.user") User operator,
+                           @PathVariable String projectName,
+                           HttpServletResponse response) {
+    logger.info("Operator user id {}, retrieve resource, project name: {}",
+        operator.getId(), projectName);
+
+
+  }
+
+  /**
+   * 需要具备项目的 "r 权限"
+   *
+   * @param operator
+   * @param projectName
+   * @param name
+   * @param response
+   */
+  @RequestMapping(value = "", method = {RequestMethod.GET})
+  public void getResource(@RequestAttribute(value = "session.user") User operator,
+                          @PathVariable String projectName,
+                          @PathVariable String name,
+                          HttpServletResponse response) {
+    logger.info("Operator user id {}, retrieve resource, project name: {}, resource name: {}",
+        operator.getId(), projectName, name);
+
+
+  }
+
+  /**
+   * 下载资源, 须有资源的 'r 权限'
+   *
+   * @param operator
+   * @param projectName
+   * @param name
+   * @param response
+   */
+  @RequestMapping(value = "/{name}/file", method = {RequestMethod.GET})
+  public void downloadResource(@RequestAttribute(value = "session.user") User operator,
+                               @PathVariable String projectName,
+                               @PathVariable String name,
+                               HttpServletResponse response) {
+    logger.info("Operator user id {}, download resource, project name: {}, resource name: {}",
+        operator.getId(), projectName, name);
+
+
+  }
 }

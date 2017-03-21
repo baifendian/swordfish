@@ -70,6 +70,7 @@ CREATE TABLE `resources` (
   `create_time` datetime NOT NULL COMMENT 'resource create time',
   `modify_time` datetime NOT NULL COMMENT 'resource last modify time',
   PRIMARY KEY (`id`),
+  UNIQUE KEY `name` (`name`),
   FOREIGN KEY (`project_id`) REFERENCES `project`(`id`) ON DELETE CASCADE,
   FOREIGN KEY (`owner`) REFERENCES `user`(`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -87,6 +88,7 @@ CREATE TABLE `datasource` (
   `create_time` datetime NOT NULL COMMENT 'create time of the datasource',
   `modify_time` datetime NOT NULL COMMENT 'modify time of the datasource',
   PRIMARY KEY (`id`),
+  UNIQUE KEY `name` (`name`),
   FOREIGN KEY (`project_id`) REFERENCES `project`(`id`) ON DELETE CASCADE,
   FOREIGN KEY (`owner`) REFERENCES `user`(`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
