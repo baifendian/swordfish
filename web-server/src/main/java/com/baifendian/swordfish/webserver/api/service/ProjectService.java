@@ -17,11 +17,6 @@ package com.baifendian.swordfish.webserver.api.service;
 
 import org.springframework.stereotype.Service;
 
-/**
- * author: smile8
- * date:   2017/3/15
- * desc:
- */
 @Service
 public class ProjectService {
 

@@ -17,11 +17,6 @@ package com.baifendian.swordfish.webserver.api.dto;
 
 import com.baifendian.swordfish.dao.model.User;
 
-/**
- * author: smile8
- * date:   2017/3/16
- * desc:
- */
 public class UserSessionData {
   /**
    * 用户 session id
