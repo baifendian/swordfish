@@ -17,6 +17,7 @@ package com.baifendian.swordfish.webserver.api.service;
 
 import com.baifendian.swordfish.common.utils.http.HttpUtil;
 import com.baifendian.swordfish.dao.enums.UserRoleType;
+import com.baifendian.swordfish.dao.mapper.ProjectMapper;
 import com.baifendian.swordfish.dao.mapper.UserMapper;
 import com.baifendian.swordfish.dao.model.User;
 import org.apache.commons.httpclient.HttpStatus;
@@ -39,6 +40,9 @@ public class UserService {
   @Autowired
   private UserMapper userMapper;
 
+  @Autowired
+  private ProjectMapper projectMapper;
+
   /**
    * 创建用户, 只有系统管理员有权限增加用户
    *
@@ -49,6 +53,7 @@ public class UserService {
    * @param password
    * @param phone
    * @param proxyUsers
+   * @param response
    * @return
    */
   public User createUser(User operator,
@@ -98,6 +103,7 @@ public class UserService {
    * @param password
    * @param phone
    * @param proxyUsers
+   * @param response
    * @return
    */
   public User modifyUser(User operator,
@@ -153,6 +159,7 @@ public class UserService {
    *
    * @param operator
    * @param name
+   * @param response
    * @return
    */
   public void deleteUser(User operator,
@@ -170,6 +177,9 @@ public class UserService {
       return;
     }
 
+    // 删除用户的时候, 必须保证 "项目/资源/工作流" 的信息不为空
+    // projectMapper.queryByUserName(name);
+
     int count = userMapper.delete(name);
 
     if (count <= 0) {
@@ -185,6 +195,7 @@ public class UserService {
    *
    * @param operator
    * @param allUser
+   * @param response
    * @return
    */
   public List<User> queryUser(User operator,
