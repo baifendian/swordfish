@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.baifendian.swordfish.common.job.config;
+package com.baifendian.swordfish.common.config;
 
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;

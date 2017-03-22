@@ -19,7 +19,7 @@ import com.baifendian.swordfish.common.job.Job;
 import com.baifendian.swordfish.common.job.JobProps;
 import com.baifendian.swordfish.dao.DaoFactory;
 import com.baifendian.swordfish.dao.FlowDao;
-import com.baifendian.swordfish.common.job.config.BaseConfig;
+import com.baifendian.swordfish.common.config.BaseConfig;
 import com.baifendian.swordfish.dao.enums.FlowRunType;
 import com.baifendian.swordfish.dao.enums.FlowType;
 import com.baifendian.swordfish.dao.model.ExecutionFlow;
