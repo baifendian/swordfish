@@ -274,4 +274,31 @@ public class ProjectService {
 
     return projectUserMapper.queryForUser(project.getId());
   }
+
+  /**
+   * 查询一个用户在项目中是否有指定权限
+   * @param userName
+   * @param name
+   * @param perm
+   * @return
+   */
+  public boolean queryPerm(String userName,String name,int perm){
+    Project project = projectMapper.queryByName(name);
+    if (project == null){
+      return false;
+    }
+
+    User user = userMapper.queryByName(userName);
+    if (user == null){
+      return false;
+    }
+
+    ProjectUser projectUser = projectUserMapper.query(user.getId(),project.getId());
+    if (projectUser == null){
+      return false;
+    }
+
+    return  (projectUser.getPerm() & perm) == perm;
+  }
+
 }
