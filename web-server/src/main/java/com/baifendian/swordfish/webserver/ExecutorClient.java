@@ -87,6 +87,21 @@ public class ExecutorClient {
   }
 
   public boolean execFlow(int projectId, long execId, String flowType) throws TException {
+    boolean result = false;
+    for (int i = 0; i < retries; i++) {
+      result = execFlowOne(projectId, execId, flowType);
+      if(result)
+        break;
+      try {
+        Thread.sleep(1000);
+      } catch (InterruptedException e) {
+        e.printStackTrace();
+      }
+    }
+    return result;
+  }
+
+  public boolean execFlowOne(int projectId, long execId, String flowType) throws TException {
     connect();
     try {
       client.execFlow(projectId, execId, flowType);
