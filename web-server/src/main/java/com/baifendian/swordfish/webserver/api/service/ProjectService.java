@@ -147,20 +147,25 @@ public class ProjectService {
 
   /**
    * 查询项目列表
+   *
    * @param operator
    * @param response
    * @return
    */
   public List<Project> queryProject(User operator, HttpServletResponse response) {
-    switch (operator.getRole()){
-      case ADMIN_USER: return projectMapper.queryAllProject();
-      case GENERAL_USER: return projectMapper.queryUserProject(operator.getId());
-      default: return null;
+    switch (operator.getRole()) {
+      case ADMIN_USER:
+        return projectMapper.queryAllProject();
+      case GENERAL_USER:
+        return projectMapper.queryUserProject(operator.getId());
+      default:
+        return null;
     }
   }
 
   /**
    * 把一个用户添加到项目中
+   *
    * @param operator
    * @param name
    * @param userName
@@ -168,7 +173,7 @@ public class ProjectService {
    * @param response
    * @return
    */
-  public ProjectUser addProjectUser(User operator,String name,String userName ,int perm , HttpServletResponse response){
+  public ProjectUser addProjectUser(User operator, String name, String userName, int perm, HttpServletResponse response) {
     Project project = projectMapper.queryByName(name);
 
     //不存在的项目名
@@ -191,10 +196,10 @@ public class ProjectService {
       return null;
     }
 
-    ProjectUser projectUser = projectUserMapper.query(user.getId(),project.getId());
+    ProjectUser projectUser = projectUserMapper.query(user.getId(), project.getId());
 
     //增加用户已经存在
-    if (projectUser != null){
+    if (projectUser != null) {
       response.setStatus(HttpStatus.SC_NOT_MODIFIED);
       return null;
     }
@@ -214,12 +219,13 @@ public class ProjectService {
 
   /**
    * 删除一个项目中的用户
+   *
    * @param operator
    * @param name
    * @param userName
    * @param response
    */
-  public void deleteProjectUser(User operator,String name,String userName,HttpServletResponse response){
+  public void deleteProjectUser(User operator, String name, String userName, HttpServletResponse response) {
     Project project = projectMapper.queryByName(name);
 
     //不存在的项目名
@@ -242,7 +248,7 @@ public class ProjectService {
       return;
     }
 
-    int count = projectUserMapper.delete(project.getId(),user.getId());
+    int count = projectUserMapper.delete(project.getId(), user.getId());
 
     if (count <= 0) {
       response.setStatus(HttpStatus.SC_NOT_MODIFIED);
@@ -253,12 +259,13 @@ public class ProjectService {
 
   /**
    * 查询一个项目下所有用户
+   *
    * @param operator
    * @param name
    * @param response
    * @return
    */
-  public List<User> queryUser(User operator,String name,HttpServletResponse response){
+  public List<User> queryUser(User operator, String name, HttpServletResponse response) {
     Project project = projectMapper.queryByName(name);
 
     //不存在的项目名
@@ -277,50 +284,49 @@ public class ProjectService {
   }
 
   /**
-   * 查询一个用户在项目中是否有指定权限
+   * 查询一个用户在项目中具备的权限
+   *
    * @param userId
    * @param projectId
+   * @return
+   */
+  public int queryPerm(int userId, int projectId) {
+
+    ProjectUser projectUser = projectUserMapper.query(userId, projectId);
+    if (projectUser == null) {
+      return 0;
+    }
+
+    return projectUser.getPerm();
+  }
+
+  /**
+   * 判断一个用户在指定项目中是否有写权限
+   *
    * @param perm
    * @return
    */
-  public boolean queryPerm(int userId,int projectId,int perm){
-
-    ProjectUser projectUser = projectUserMapper.query(userId,projectId);
-    if (projectUser == null){
-      return false;
-    }
-
-    return  (projectUser.getPerm() & perm) == perm;
+  public boolean hasWritePerm(int perm) {
+    return (perm & Constants.PROJECT_USER_PERM_WRITE) != 0;
   }
 
   /**
-   * 查询一个用户在指定项目中是否有写权限
-   * @param userId
-   * @param projectId
+   * 判断一个用户在指定项目中是否有读权限
+   *
+   * @param perm
    * @return
    */
-  public boolean queryWritePerm(int userId,int projectId){
-    return queryPerm(userId,projectId, Constants.PROJECT_USER_PERM_WRITE);
+  public boolean hasReadPerm(int perm) {
+    return (perm & Constants.PROJECT_USER_PERM_READ) != 0;
   }
 
   /**
-   * 查询一个用户在指定项目中是否有读权限
-   * @param userId
-   * @param projectId
+   * 判断一个用户在指定项目中是否有读权限
+   *
+   * @param perm
    * @return
    */
-  public boolean queryReadPerm(int userId,int projectId){
-    return queryPerm(userId,projectId, Constants.PROJECT_USER_PERM_READ);
+  public boolean hasExecPerm(int perm) {
+    return (perm & Constants.PROJECT_USER_PERM_EXEC) != 0;
   }
-
-  /**
-   * 查询一个用户在指定项目中是否有执行权限
-   * @param userId
-   * @param projectId
-   * @return
-   */
-  public boolean queryExecPerm(int userId,int projectId){
-    return queryPerm(userId,projectId, Constants.PROJECT_USER_PERM_EXEC);
-  }
-
 }
