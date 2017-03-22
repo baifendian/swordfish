@@ -278,23 +278,14 @@ public class ProjectService {
 
   /**
    * 查询一个用户在项目中是否有指定权限
-   * @param userName
-   * @param name
+   * @param userId
+   * @param projectId
    * @param perm
    * @return
    */
-  public boolean queryPerm(String userName,String name,int perm){
-    Project project = projectMapper.queryByName(name);
-    if (project == null){
-      return false;
-    }
+  public boolean queryPerm(int userId,int projectId,int perm){
 
-    User user = userMapper.queryByName(userName);
-    if (user == null){
-      return false;
-    }
-
-    ProjectUser projectUser = projectUserMapper.query(user.getId(),project.getId());
+    ProjectUser projectUser = projectUserMapper.query(userId,projectId);
     if (projectUser == null){
       return false;
     }
@@ -304,32 +295,32 @@ public class ProjectService {
 
   /**
    * 查询一个用户在指定项目中是否有写权限
-   * @param userName
-   * @param name
+   * @param userId
+   * @param projectId
    * @return
    */
-  public boolean queryWritePerm(String userName,String name){
-    return queryPerm(userName,name, Constants.PROJECT_USER_PERM_WRITE);
+  public boolean queryWritePerm(int userId,int projectId){
+    return queryPerm(userId,projectId, Constants.PROJECT_USER_PERM_WRITE);
   }
 
   /**
    * 查询一个用户在指定项目中是否有读权限
-   * @param userName
-   * @param name
+   * @param userId
+   * @param projectId
    * @return
    */
-  public boolean queryReadPerm(String userName,String name){
-    return queryPerm(userName,name, Constants.PROJECT_USER_PERM_READ);
+  public boolean queryReadPerm(int userId,int projectId){
+    return queryPerm(userId,projectId, Constants.PROJECT_USER_PERM_READ);
   }
 
   /**
    * 查询一个用户在指定项目中是否有执行权限
-   * @param userName
-   * @param name
+   * @param userId
+   * @param projectId
    * @return
    */
-  public boolean queryExecPerm(String userName,String name){
-    return queryPerm(userName,name, Constants.PROJECT_USER_PERM_EXEC);
+  public boolean queryExecPerm(int userId,int projectId){
+    return queryPerm(userId,projectId, Constants.PROJECT_USER_PERM_EXEC);
   }
 
 }
