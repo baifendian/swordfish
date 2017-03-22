@@ -15,12 +15,17 @@
  */
 package com.baifendian.swordfish.webserver.api.controller;
 
+import com.baifendian.swordfish.dao.model.Project;
+import com.baifendian.swordfish.dao.model.ProjectUser;
+import com.baifendian.swordfish.dao.model.User;
 import com.baifendian.swordfish.webserver.api.service.ProjectService;
-import org.apache.tools.ant.Project;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
+import java.util.List;
 
 /**
  * 项目管理入口
@@ -28,6 +33,8 @@ import javax.servlet.http.HttpServletResponse;
 @RestController
 @RequestMapping("/projects")
 public class ProjectController {
+
+  private static Logger logger = LoggerFactory.getLogger(ProjectController.class.getName());
 
   @Autowired
   private ProjectService projectService;
@@ -41,10 +48,12 @@ public class ProjectController {
    * @return
    */
   @RequestMapping(value = "/{name}", method = {RequestMethod.POST})
-  public Project createProject(@PathVariable("name") String name,
+  public Project createProject(@RequestAttribute(value = "session.user") User operator,
+                               @PathVariable("name") String name,
                                @RequestParam(value = "desc", required = false) String desc,
                                HttpServletResponse response) {
-    return null;
+    logger.info("Operator user id {}, create project, name: {}, desc: {}", operator.getId(), name, desc);
+    return projectService.createProject(operator,name,desc,response);
   }
 
   /**
@@ -56,10 +65,11 @@ public class ProjectController {
    * @return
    */
   @RequestMapping(value = "/{name}", method = {RequestMethod.PUT})
-  public Project modifyProject(@PathVariable("name") String name,
+  public Project modifyProject(@RequestAttribute(value = "session.user") User operator,
+                               @PathVariable("name") String name,
                                @RequestParam(value = "desc", required = false) String desc,
                                HttpServletResponse response) {
-    return null;
+    return projectService.modifyProject(operator,name,desc,response);
   }
 
   /**
@@ -70,9 +80,10 @@ public class ProjectController {
    * @return
    */
   @RequestMapping(value = "/{name}", method = {RequestMethod.DELETE})
-  public Project deleteProject(@PathVariable("name") String name,
+  public void deleteProject(@RequestAttribute(value = "session.user") User operator,
+                               @PathVariable("name") String name,
                                HttpServletResponse response) {
-    return null;
+    projectService.deleteProject(operator,name,response);
   }
 
   /**
@@ -82,7 +93,55 @@ public class ProjectController {
    * @return
    */
   @RequestMapping(value = "", method = {RequestMethod.GET})
-  public Project queryProjects(HttpServletResponse response) {
-    return null;
+  public List<Project> queryProjects(@RequestAttribute(value = "session.user") User operator,
+                                     HttpServletResponse response) {
+    return projectService.queryProject(operator,response);
+  }
+
+  /**
+   * 项目增加一个用户
+   * @param operator
+   * @param name
+   * @param userName
+   * @param perm
+   * @param response
+   * @return
+   */
+  @RequestMapping(value = "/{name}/users/{user-name}", method = {RequestMethod.PUT})
+  public ProjectUser addProjectUser(@RequestAttribute(value = "session.user") User operator,
+                                    @PathVariable("name") String name,
+                                    @PathVariable("user-name") String userName,
+                                    @RequestParam(value = "perm", required = false) int perm,
+                                    HttpServletResponse response ){
+    return projectService.addProjectUser(operator,name,userName,perm,response);
+  }
+
+  /**
+   * 项目删除一个用户
+   * @param operator
+   * @param name
+   * @param userName
+   * @param response
+   */
+  @RequestMapping(value = "/{name}/users/{user-name}", method = {RequestMethod.DELETE})
+  public void deleteProjectUser(@RequestAttribute(value = "session.user") User operator,
+                                @PathVariable("name") String name,
+                                @PathVariable("user-name") String userName,
+                                HttpServletResponse response ){
+    projectService.deleteProjectUser(operator,name,userName,response);
+  }
+
+  /**
+   * 查询一个项目下所有的用户
+   * @param operator
+   * @param name
+   * @param response
+   * @return
+   */
+  @RequestMapping(value = "/{name}/users", method = {RequestMethod.GET})
+  public List<User> queryUser(@RequestAttribute(value = "session.user") User operator,
+                              @PathVariable("name") String name,
+                              HttpServletResponse response){
+    return projectService.queryUser(operator,name,response);
   }
 }

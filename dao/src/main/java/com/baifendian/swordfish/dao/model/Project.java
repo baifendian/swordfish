@@ -19,21 +19,21 @@ import com.baifendian.swordfish.dao.utils.BFDDateUtils;
 
 import org.apache.commons.lang3.ObjectUtils;
 
+import java.util.Date;
+
 /**
- * Created by caojingwei on 16/8/25.
+ * 项目实体
  */
 public class Project {
   private Integer id;
   private String name;
   private String desc;
-  private int createTime;
-  private int modifyTime;
+  private Date createTime;
+  private Date modifyTime;
   private Integer ownerId;
   private String ownerName;
 
-  public Project(Integer id, String name, String desc, Integer tenantId, String tenantName
-          , int createTime, int modifyTime, Integer ownerId, String ownerName
-          , Integer queueId, String queueName) {
+  public Project(Integer id, String name, String desc, Date createTime, Date modifyTime, Integer ownerId, String ownerName) {
     this.id = id;
     this.name = name;
     this.desc = desc;
@@ -60,8 +60,8 @@ public class Project {
     private Integer id;
     private String name;
     private String desc;
-    private int createTime;
-    private int modifyTime;
+    private Date createTime;
+    private Date modifyTime;
     private Integer ownerId;
     private String ownerName;
 
@@ -84,17 +84,17 @@ public class Project {
       return this;
     }
 
-    public ProjectBuilder createTime(int createTime) {
+    public ProjectBuilder createTime(Date createTime) {
       this.createTime = createTime;
       return this;
     }
 
     public ProjectBuilder createTime() {
-      this.createTime = BFDDateUtils.getSecs();
+      this.createTime = new Date();
       return this;
     }
 
-    public ProjectBuilder modifyTime(int modifyTime) {
+    public ProjectBuilder modifyTime(Date modifyTime) {
       this.modifyTime = modifyTime;
       return this;
     }
@@ -110,19 +110,19 @@ public class Project {
     }
   }
 
-  public int getCreateTime() {
+  public Date getCreateTime() {
     return createTime;
   }
 
-  public void setCreateTime(int createTime) {
+  public void setCreateTime(Date createTime) {
     this.createTime = createTime;
   }
 
-  public int getModifyTime() {
+  public Date getModifyTime() {
     return modifyTime;
   }
 
-  public void setModifyTime(int modifyTime) {
+  public void setModifyTime(Date modifyTime) {
     this.modifyTime = modifyTime;
   }
 
