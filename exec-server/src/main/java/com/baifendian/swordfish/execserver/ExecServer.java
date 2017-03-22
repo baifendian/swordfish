@@ -64,11 +64,6 @@ public class ExecServer {
   private static final String JOB_JAVA_CONFIG = "classpath:job/java.properties";
 
   /**
-   * server配置文件
-   */
-  private static final String SERVER_FILE_PATH = "classpath:worker-server.properties";
-
-  /**
    * 是否保持启动
    */
   private static boolean running = true;
