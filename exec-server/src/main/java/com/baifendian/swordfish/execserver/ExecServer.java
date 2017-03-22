@@ -34,10 +34,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Worker 服务 <p>
+ * Worker web 服务类
  *
- * @author : dsfan
- * @date : 2016年10月25日
  */
 public class ExecServer {
   /**
@@ -157,33 +155,6 @@ public class ExecServer {
       HdfsClient.init(ConfigurationUtil.getConfiguration());
 
       ExecServer execServer = new ExecServer();
-      //ExecServiceImpl impl = new ExecServiceImpl();
-
-      //impl.scheduleExecFlow(1, 4, "etl", System.currentTimeMillis());
-/*
-            final Server server = new Server(new String[] { SERVER_FILE_PATH }, impl);
-            server.start();
-
-            // 添加ShutdownHook
-            Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    server.close(); // 关闭服务
-                    impl.destory(); // 销毁资源
-                }
-            }));
-
-
-            synchronized (ExecServer.class) {
-                while (running) {
-                    try {
-                        ExecServer.class.wait();
-                    } catch (InterruptedException e) {
-                        LOGGER.error(e.getMessage(), e);
-                    }
-                }
-            }
-*/
     } catch (Exception e) {
       logger.error(e.getMessage(), e);
     }

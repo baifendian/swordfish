@@ -26,12 +26,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-/**
- * workflow 的 sql 生成器 <p>
- *
- * @author : dsfan
- * @date : 2016年8月27日
- */
 public class ProjectFlowMapperSqlProvider {
 
   /**

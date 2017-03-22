@@ -103,55 +103,6 @@ public class HiveJdbcExec extends BaseDao {
   }
 
   /**
-   * 生成创建数据库的sql语句 <p>
-   *
-   * @return {String}
-   */
-  private String generatioCreateDbSql(String dbName, String comment, String location, Map<String, String> parameters) {
-    StringBuilder stringBuilder = new StringBuilder();
-
-    stringBuilder.append("CREATE DATABASE ");
-    stringBuilder.append(dbName);
-    if (StringUtils.isNotEmpty(comment)) {
-      stringBuilder.append("COMMENT ");
-      stringBuilder.append(comment);
-    }
-    if (StringUtils.isNotEmpty(location)) {
-      stringBuilder.append("LOCATION ");
-      stringBuilder.append(location);
-    }
-    if (parameters != null && parameters.size() > 0) {
-      stringBuilder.append("WITH DBPROPERTIES (");
-      int i = 0;
-      for (Map.Entry<String, String> entry : parameters.entrySet()) {
-        String property;
-        if (i == 0) {
-          property = String.format("%s=%s", entry.getKey(), entry.getValue());
-        } else {
-          property = String.format(",%s=%s", entry.getKey(), entry.getValue());
-        }
-        i++;
-        stringBuilder.append(property);
-      }
-      stringBuilder.append(")");
-    }
-    return stringBuilder.toString();
-  }
-
-  /**
-   * 通过root用户创建数据库 <p>
-   *
-   * @return int
-   */
-  public ConnectionInfo getRootConnection() {
-    ConnectionInfo connectionInfo = new ConnectionInfo();
-    connectionInfo.setUser(hiveConfig.getRootUser());
-    connectionInfo.setPassword(hiveConfig.getPassword());
-    connectionInfo.setUri(String.format(hiveConfig.getThriftUris(), hiveConfig.getRootUser()));
-    return connectionInfo;
-  }
-
-  /**
    * 执行一条sql语句 不支持use database <p>
    */
   public void execSql(String sql, ConnectionInfo connectionInfo) throws SqlException {

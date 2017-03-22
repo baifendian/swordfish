@@ -26,11 +26,6 @@ import org.mybatis.spring.annotation.MapperScan;
 import java.sql.Timestamp;
 import java.util.List;
 
-/**
- * @auth: ronghua.yu
- * @time: 16/8/9
- * @desc:
- */
 @MapperScan
 public interface DataSourceMapper {
   /**

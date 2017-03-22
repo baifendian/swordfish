@@ -20,6 +20,7 @@ import com.baifendian.swordfish.dao.model.ExecutionFlow;
 import com.baifendian.swordfish.webserver.ExecutorServerInfo;
 import com.baifendian.swordfish.webserver.ExecutorServerManager;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,9 +29,6 @@ import java.util.concurrent.BlockingQueue;
 
 /**
  * executor server 容错处理服务线程
- *
- * @author : liujin
- * @date : 2017-03-13 10:04
  */
 public class ExecutorCheckThread implements Runnable {
 
@@ -59,16 +57,18 @@ public class ExecutorCheckThread implements Runnable {
     if (faultServers != null) {
       logger.debug("get fault servers:{}", faultServers);
       for (ExecutorServerInfo executorServerInfo : faultServers) {
-        if (executorServerInfo.getHeartBeatData() != null && executorServerInfo.getHeartBeatData().getExecIdsSize() > 0) {
-          logger.info("executor server {} fault, execIds:{} ", executorServerInfo, executorServerInfo.getHeartBeatData().getExecIds());
-          for (Long execId : executorServerInfo.getHeartBeatData().getExecIds()) {
+        // 这里使用数据库查询到的数据保证准确性，避免内存数据出现不一致的情况
+        List<ExecutionFlow> executionFlows = flowDao.queryRunningFlow(executorServerInfo.getHost()+":"+executorServerInfo.getPort());
+        if (!CollectionUtils.isEmpty(executionFlows)) {
+          logger.info("executor server {} fault, execIds size:{} ", executorServerInfo, executionFlows.size());
+          for (ExecutionFlow execFlow : executionFlows) {
+            Long execId = execFlow.getId();
             logger.info("reschedule workflow execId:{} ", execId);
             try {
               ExecutionFlow executionFlow = flowDao.queryExecutionFlow(execId);
               if (executionFlow != null) {
                 if (!executionFlow.getStatus().typeIsFinished()) {
                   logger.info("executor server fault reschedule workflow execId:{}", execId);
-                  executionFlowBlockingQueue.add(executionFlow);
                 }
               } else {
                 logger.warn("executor server fault reschedule workflow execId:{}, but execId:{} not exists", execId, execId);

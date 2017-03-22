@@ -29,9 +29,6 @@ import java.util.Properties;
 
 /**
  * 配置实例获取工具 <p>
- *
- * @author : dsfan
- * @date : 2016年11月3日
  */
 public class ConfigurationUtil {
   /**

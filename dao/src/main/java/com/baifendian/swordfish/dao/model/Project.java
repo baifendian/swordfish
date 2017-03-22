@@ -19,9 +19,6 @@ import com.baifendian.swordfish.dao.utils.BFDDateUtils;
 
 import org.apache.commons.lang3.ObjectUtils;
 
-/**
- * Created by caojingwei on 16/8/25.
- */
 public class Project {
   private Integer id;
   private String name;

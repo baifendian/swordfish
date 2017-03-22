@@ -17,9 +17,6 @@ package com.baifendian.swordfish.execserver.job.mr;
 
 /**
  * Hadoop jar 参数 <p>
- *
- * @author : dsfan
- * @date : 2016年11月22日
  */
 public class HadoopJarArgsConst {
 

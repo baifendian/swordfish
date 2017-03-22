@@ -36,8 +36,7 @@ import java.util.Map;
 import static com.baifendian.swordfish.execserver.ExecServer.SERVLET_CONTEXT_KEY;
 
 /**
- * @author : liujin
- * @date : 2017-03-09 11:19
+ * executor servlet
  */
 public class ExecutorServlet extends HttpServlet implements ConnectorParams {
 

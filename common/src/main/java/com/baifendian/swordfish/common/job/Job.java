@@ -22,8 +22,6 @@ import java.util.List;
 /**
  * 执行的 Job (用于执行某个具体任务，如 MR/Spark 等) <p>
  *
- * @author : liujin
- * @date : 2017年3月2日
  */
 public interface Job {
   /**
@@ -49,7 +47,7 @@ public interface Job {
   void after() throws Exception;
 
   /**
-   * 取消执行(执行 cancel 之前，必须要保证已经调用 run) <p>
+   * 取消执行 <p>
    */
   void cancel() throws Exception;
 
@@ -82,6 +80,10 @@ public interface Job {
    */
   boolean hasResults();
 
+  /**
+   * 获取job执行返回的结果
+   * @return
+   */
   List<ExecResult> getResults();
 
   /**

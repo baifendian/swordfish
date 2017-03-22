@@ -29,9 +29,6 @@ import java.util.Map;
 
 /**
  * 参数解析帮助类 <p>
- *
- * @author : dsfan
- * @date : 2016年12月13日
  */
 public class ParamHelper {
   /**

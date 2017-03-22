@@ -19,9 +19,6 @@ import java.util.Locale;
 
 /**
  * 常用的常量 <p>
- *
- * @author : dsfan
- * @date : 2016年8月19日
  */
 public class Constants {
   /**

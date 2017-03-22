@@ -15,12 +15,6 @@
  */
 package com.baifendian.swordfish.dao.model.flow.params;
 
-/**
- * 配置信息 <p>
- *
- * @author : dsfan
- * @date : 2016年10月10日
- */
 public class Property {
   /**
    * 配置名

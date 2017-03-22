@@ -21,18 +21,14 @@ import com.baifendian.swordfish.dao.model.ProjectFlow;
 import org.apache.ibatis.annotations.*;
 import org.apache.ibatis.type.EnumOrdinalTypeHandler;
 import org.apache.ibatis.type.JdbcType;
+import org.mybatis.spring.annotation.MapperScan;
 
 import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
-/**
- * workflow的相关操作 <p>
- *
- * @author : dsfan
- * @date : 2016年8月27日
- */
+@MapperScan
 public interface ProjectFlowMapper {
   /**
    * 插入记录并获取记录 id <p>

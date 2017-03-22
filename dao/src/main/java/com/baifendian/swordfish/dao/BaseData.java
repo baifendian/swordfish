@@ -18,11 +18,6 @@ package com.baifendian.swordfish.dao;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.apache.commons.httpclient.HttpStatus;
 
-/**
- * author: smile8
- * date:   2017/3/16
- * desc:
- */
 public abstract class BaseData {
   @JsonIgnore
   protected int httpStatus = HttpStatus.SC_OK;

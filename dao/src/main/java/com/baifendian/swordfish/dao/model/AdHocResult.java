@@ -19,12 +19,6 @@ import com.baifendian.swordfish.dao.enums.FlowStatus;
 
 import java.sql.Timestamp;
 
-/**
- * 即席查询执行结果 <p>
- *
- * @author : dsfan
- * @date : 2016年9月6日
- */
 public class AdHocResult {
   /**
    * 执行 id

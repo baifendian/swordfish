@@ -15,10 +15,6 @@
  */
 package com.baifendian.swordfish.webserver.exception;
 
-/**
- * @author : liujin
- * @date : 2017-03-14 8:45
- */
 public class MasterException extends RuntimeException {
 
   public MasterException(String msg) {

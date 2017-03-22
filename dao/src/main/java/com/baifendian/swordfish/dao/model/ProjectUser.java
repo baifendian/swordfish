@@ -17,9 +17,6 @@ package com.baifendian.swordfish.dao.model;
 
 import java.util.Date;
 
-/**
- * Created by caojingwei on 16/8/25.
- */
 public class ProjectUser {
   private int projectId;
   private int userId;

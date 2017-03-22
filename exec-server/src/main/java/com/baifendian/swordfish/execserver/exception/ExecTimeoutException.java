@@ -18,8 +18,6 @@ package com.baifendian.swordfish.execserver.exception;
 /**
  * 执行超时异常 <p>
  *
- * @author : dsfan
- * @date : 2016年11月15日
  */
 public class ExecTimeoutException extends RuntimeException {
   /**

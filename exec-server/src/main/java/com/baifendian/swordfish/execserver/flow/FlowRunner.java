@@ -53,9 +53,6 @@ import java.util.concurrent.Future;
 
 /**
  * flow 执行器 <p>
- *
- * @author : dsfan
- * @date : 2016年10月27日
  */
 public class FlowRunner implements Runnable {
 
@@ -310,9 +307,9 @@ public class FlowRunner implements Runnable {
       JobProps props = new JobProps();
       props.setJobParams(node.getParam());
       props.setDefinedParams(allParamMap);
-      String jobId = node.getType().name() + "_" + node.getId();
+      String jobId = node.getType() + "_" + node.getId();
 
-      Job job = JobTypeManager.newJob(jobId, node.getType().name(), props, LOGGER);
+      Job job = JobTypeManager.newJob(jobId, node.getType(), props, LOGGER);
       if (job.getParam() != null && job.getParam().getResourceFiles() != null) {
         projectFiles.addAll(job.getParam().getResourceFiles());
       }

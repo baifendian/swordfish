@@ -23,10 +23,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Date;
 
-/**
- * @author : liujin
- * @date : 2017-03-10 15:57
- */
 public class MasterDao extends BaseDao {
 
   @Autowired

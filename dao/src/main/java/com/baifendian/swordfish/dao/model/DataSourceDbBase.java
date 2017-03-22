@@ -15,10 +15,5 @@
  */
 package com.baifendian.swordfish.dao.model;
 
-/**
- * @auth: ronghua.yu
- * @time: 16/9/18
- * @desc:
- */
 public class DataSourceDbBase {
 }

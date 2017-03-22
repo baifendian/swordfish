@@ -30,8 +30,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * @author : liujin
- * @date : 2017-03-10 16:49
+ * Master thrift client
  */
 public class MasterClient {
 
@@ -73,6 +72,21 @@ public class MasterClient {
   }
 
   public boolean executorReport(String clientHost, int clientPort, HeartBeatData heartBeatData) {
+    boolean result = false;
+    for(int i=0; i<retries; i++){
+      result = executorReportOne(clientHost, clientPort, heartBeatData);
+      if(result)
+        break;
+      try {
+        Thread.sleep(1000);
+      } catch (InterruptedException e) {
+        e.printStackTrace();
+      }
+    }
+    return result;
+  }
+
+  public boolean executorReportOne(String clientHost, int clientPort, HeartBeatData heartBeatData) {
     connect();
     try {
       RetInfo retInfo = client.executorReport(clientHost, clientPort, heartBeatData);

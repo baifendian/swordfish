@@ -31,8 +31,6 @@ import java.util.StringTokenizer;
 /**
  * 操作系统工具类 <p>
  *
- * @author : dsfan
- * @date : 2016年11月2日
  */
 public class OsUtil {
 

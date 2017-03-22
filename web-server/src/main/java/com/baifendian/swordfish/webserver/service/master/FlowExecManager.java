@@ -36,9 +36,6 @@ import java.util.concurrent.ThreadFactory;
 
 /**
  * workflow 的执行管理 <p>
- *
- * @author : dsfan
- * @date : 2016年12月6日
  */
 public class FlowExecManager {
   /**

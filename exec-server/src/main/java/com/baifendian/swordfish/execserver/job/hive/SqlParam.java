@@ -16,22 +16,17 @@
 package com.baifendian.swordfish.execserver.job.hive;
 
 import com.baifendian.swordfish.common.job.BaseParam;
-import com.baifendian.swordfish.execserver.job.ResourceInfo;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.hive.ql.parse.ParseDriver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 /**
  * sql 节点参数 <p>
- *
- * @author : dsfan
- * @date : 2016年8月30日
  */
 public class SqlParam extends BaseParam {
 

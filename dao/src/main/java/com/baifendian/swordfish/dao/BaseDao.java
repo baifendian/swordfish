@@ -15,13 +15,7 @@
  */
 package com.baifendian.swordfish.dao;
 
-/**
- * author: dsfan date:   2017/3/16 desc:
- */
 public abstract class BaseDao {
 
-  /**
-   * 初始化一个 Dao 实例 <p>
-   */
   protected abstract void init();
 }

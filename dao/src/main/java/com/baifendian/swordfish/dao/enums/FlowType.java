@@ -17,9 +17,6 @@ package com.baifendian.swordfish.dao.enums;
 
 /**
  * workflow 类型 <p>
- *
- * @author : dsfan
- * @date : 2016年8月27日
  */
 public enum FlowType {
 

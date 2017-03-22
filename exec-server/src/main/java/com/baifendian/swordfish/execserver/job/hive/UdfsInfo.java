@@ -15,14 +15,8 @@
  */
 package com.baifendian.swordfish.execserver.job.hive;
 
-import com.baifendian.swordfish.execserver.job.ResourceInfo;
+import com.baifendian.swordfish.common.job.ResourceInfo;
 
-import java.util.List;
-
-/**
- * @author : liujin
- * @date : 2017-03-10 8:54
- */
 public class UdfsInfo {
   private String func;
 

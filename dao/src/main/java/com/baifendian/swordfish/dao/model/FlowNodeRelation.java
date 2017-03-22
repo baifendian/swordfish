@@ -23,13 +23,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
-/**
- * 已发布workflow节点关系信息 <p>
- *
- * @author : wenting.wang
- * @author : dsfan
- * @date : 2016年8月24日
- */
 public class FlowNodeRelation {
 
   private int flowId;

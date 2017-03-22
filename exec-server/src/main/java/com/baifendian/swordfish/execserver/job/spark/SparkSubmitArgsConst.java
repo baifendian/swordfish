@@ -17,9 +17,6 @@ package com.baifendian.swordfish.execserver.job.spark;
 
 /**
  * spark 提交的参数常量 <p>
- *
- * @author : dsfan
- * @date : 2016年11月9日
  */
 public class SparkSubmitArgsConst {
 

@@ -25,12 +25,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-/**
- * schedules 表操作SQL <p>
- *
- * @author : wenting.wang
- * @date : 2016年8月25日
- */
 public class ScheduleMapperProvider {
   public static final String DB_NAME = "schedules";
 
@@ -41,7 +35,6 @@ public class ScheduleMapperProvider {
       VALUES("create_time", "#{schedule.createTime}");
       VALUES("modify_time", "#{schedule.modifyTime}");
       VALUES("last_modify_by", "#{schedule.lastModifyBy}");
-      VALUES("pub_status", EnumFieldUtil.genFieldStr("schedule.pubStatus", PubStatus.class));
       VALUES("schedule_status", EnumFieldUtil.genFieldStr("schedule.scheduleStatus", ScheduleStatus.class));
       VALUES("start_date", "#{schedule.startDate}");
       VALUES("end_date", "#{schedule.endDate}");
@@ -65,9 +58,6 @@ public class ScheduleMapperProvider {
         UPDATE(DB_NAME);
         SET("modify_time = #{schedule.modifyTime}");
         SET("last_modify_by = #{schedule.lastModifyBy}");
-        if (schedule.getPubStatus() != null) {
-          SET("pub_status = " + EnumFieldUtil.genFieldStr("schedule.pubStatus", PubStatus.class));
-        }
         if (schedule.getScheduleStatus() != null) {
           SET("schedule_status = " + EnumFieldUtil.genFieldStr("schedule.scheduleStatus", ScheduleStatus.class));
         }
@@ -111,28 +101,6 @@ public class ScheduleMapperProvider {
     }}.toString();
   }
 
-  public String selectByProjectId(int projectId, PubStatus pubStatus, ScheduleStatus scheduleStatus) {
-    return new SQL() {
-      {
-        SELECT("a.*");
-        SELECT("b.name as flow_name");
-        SELECT("b.type as flow_type");
-        SELECT("b.publish_time");
-        SELECT("c.id as owner_id");
-        SELECT("c.name as owner_name");
-        FROM("schedules as a");
-        INNER_JOIN("project_flows as b on a.flow_id = b.id and b.project_id = #{projectId}");
-        INNER_JOIN("user as c on b.owner_id = c.id");
-        if (pubStatus != null) {
-          WHERE("pub_status = " + EnumFieldUtil.genFieldStr("pubStatus", PubStatus.class));
-        }
-        if (scheduleStatus != null) {
-          WHERE("schedule_status = " + EnumFieldUtil.genFieldStr("scheduleStatus", ScheduleStatus.class));
-        }
-      }
-    }.toString();
-  }
-
   public String selectByFlowIds(Set<Integer> flowIds) {
     StringBuilder sb = new StringBuilder();
     sb.append("select a.*, b.name as flow_name, b.type as flow_type, c.id as owner_id, c.name as owner_name, b.publish_time ");
@@ -153,7 +121,6 @@ public class ScheduleMapperProvider {
       {
         SELECT("flow_id,dep_workflows");
         FROM(DB_NAME);
-        WHERE("pub_status = 1");
       }
 
     }.toString();
@@ -164,20 +131,6 @@ public class ScheduleMapperProvider {
       {
         DELETE_FROM(DB_NAME);
         WHERE("flow_id = #{flowId}");
-      }
-    }.toString();
-  }
-
-  public String queryTaskTypeDis(Map<String, Object> parameter) {
-    return new SQL() {
-      {
-        SELECT("c.type as node_type , count(c.type) as num");
-        FROM("schedules as a");
-        INNER_JOIN("project_flows as b on a.flow_id = b.id and b.project_id = #{projectId}");
-        INNER_JOIN("flows_nodes as c on a.flow_id = c.flow_id ");
-        //WHERE("a.schedule_type is not null");
-        WHERE("b.type =" + FlowType.SHORT.getType() + " or b.type = " + FlowType.LONG.getType());
-        GROUP_BY("c.type");
       }
     }.toString();
   }

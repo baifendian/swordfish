@@ -17,11 +17,8 @@ package com.baifendian.swordfish.execserver.parameter;
 
 import com.baifendian.swordfish.common.utils.TimePlaceholderUtil;
 import com.baifendian.swordfish.dao.datasource.ConnectionFactory;
-import com.baifendian.swordfish.dao.mapper.FlowParamMapper;
 import com.baifendian.swordfish.dao.mapper.ProjectFlowMapper;
 import com.baifendian.swordfish.dao.model.ExecutionFlow;
-import com.baifendian.swordfish.dao.model.FlowParam;
-import com.baifendian.swordfish.dao.model.Project;
 import com.baifendian.swordfish.dao.model.ProjectFlow;
 
 import org.apache.commons.lang.StringUtils;
@@ -34,9 +31,6 @@ import java.util.*;
 
 /**
  * 自定义参数管理 <p>
- *
- * @author : liujin
- * @date : 2017年3月1日
  */
 public class CustomParamManager {
 

@@ -16,7 +16,7 @@
 package com.baifendian.swordfish.execserver.job.shell;
 
 import com.baifendian.swordfish.common.job.BaseParam;
-import com.baifendian.swordfish.execserver.job.ResourceInfo;
+import com.baifendian.swordfish.common.job.ResourceInfo;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,10 +24,6 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 import java.util.stream.Collectors;
 
-
-/**
- * author: smile8 date:   15/12/2016 desc:
- */
 public class ShellParam extends BaseParam {
 
   /**

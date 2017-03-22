@@ -22,9 +22,6 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 
 /**
  * 工作流调度类型分布,工作流类型分布,任务类型分布 <p>
- *
- * @author : wenting.wang
- * @date : 2016年9月30日
  */
 public class DisField {
 

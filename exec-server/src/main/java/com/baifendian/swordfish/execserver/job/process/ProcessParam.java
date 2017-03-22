@@ -20,10 +20,6 @@ import com.baifendian.swordfish.common.job.BaseParam;
 import java.util.List;
 import java.util.Map;
 
-/**
- * @author : liujin
- * @date : 2017-03-07 16:43
- */
 public class ProcessParam extends BaseParam {
 
   private String script;

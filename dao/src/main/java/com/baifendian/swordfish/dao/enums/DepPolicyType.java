@@ -15,12 +15,6 @@
  */
 package com.baifendian.swordfish.dao.enums;
 
-/**
- * workflow 依赖执行的策略 <p>
- *
- * @author : wenting.wang
- * @date : 2016年9月22日
- */
 public enum DepPolicyType {
 
   /**

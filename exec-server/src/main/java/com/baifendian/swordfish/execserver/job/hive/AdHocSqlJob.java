@@ -31,8 +31,7 @@ import java.io.IOException;
 import java.util.List;
 
 /**
- * @author : liujin
- * @date : 2017-03-08 12:47
+ * 即席查询作业
  */
 public class AdHocSqlJob extends EtlSqlJob {
 

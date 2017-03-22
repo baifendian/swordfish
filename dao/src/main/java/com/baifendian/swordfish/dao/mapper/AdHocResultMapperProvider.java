@@ -24,9 +24,6 @@ import java.util.Map;
 
 /**
  * 即席查询结果 sql 生成器 <p>
- *
- * @author : dsfan
- * @date : 2016年9月6日
  */
 public class AdHocResultMapperProvider {
   /**

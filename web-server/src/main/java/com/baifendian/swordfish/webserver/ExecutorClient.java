@@ -15,9 +15,6 @@
  */
 package com.baifendian.swordfish.webserver;
 
-import com.baifendian.swordfish.rpc.HeartBeatData;
-import com.baifendian.swordfish.rpc.MasterService;
-import com.baifendian.swordfish.rpc.RetInfo;
 import com.baifendian.swordfish.rpc.WorkerService;
 
 import org.apache.thrift.TException;
@@ -29,10 +26,6 @@ import org.apache.thrift.transport.TTransportException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * @author : liujin
- * @date : 2017-03-13 8:43
- */
 public class ExecutorClient {
 
   private static Logger logger = LoggerFactory.getLogger(ExecutorClient.class);

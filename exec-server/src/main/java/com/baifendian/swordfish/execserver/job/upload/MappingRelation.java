@@ -13,13 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.baifendian.swordfish.execserver.job.upload;
 
-/**
- * @author : liujin
- * @date : 2017-03-17 11:39
- */
 public class MappingRelation {
   private int originFieldIndex;
 

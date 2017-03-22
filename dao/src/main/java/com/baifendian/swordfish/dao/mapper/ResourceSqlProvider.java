@@ -16,9 +16,7 @@
 package com.baifendian.swordfish.dao.mapper;
 
 import com.baifendian.swordfish.dao.mapper.utils.EnumFieldUtil;
-import com.baifendian.swordfish.dao.enums.ResourcePubStatus;
 import com.baifendian.swordfish.dao.enums.ResourceType;
-import com.baifendian.swordfish.dao.model.Resource;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.jdbc.SQL;
@@ -27,12 +25,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-/**
- * 资源表 sql 生成器 <p>
- *
- * @author : dsfan
- * @date : 2016年8月24日
- */
 public class ResourceSqlProvider {
 
   private final String TABLE_NAME = "resources";
@@ -143,32 +135,6 @@ public class ResourceSqlProvider {
       {
         DELETE_FROM("resources");
         WHERE("id = #{resourceId}");
-      }
-    }.toString();
-  }
-
-  /**
-   * 更新某个资源 <p>
-   *
-   * @return sql 语句
-   */
-  public String updateById(Map<String, Object> parameter) {
-    Resource resource = (Resource) parameter.get("resource");
-    return new SQL() {
-      {
-        UPDATE("resources");
-        SET("`desc` = #{resource.desc}");
-        SET("modify_time = #{resource.modifyTime}");
-        if (resource.getPubStatus() != null) {
-          SET("pub_status = " + EnumFieldUtil.genFieldStr("resource.pubStatus", ResourcePubStatus.class));
-        }
-        if (resource.getPublishTime() != null) {
-          SET("publish_time = #{resource.publishTime}");
-        }
-        if (resource.getLastPublishBy() != null) {
-          SET("last_publish_by = #{resource.lastPublishBy}");
-        }
-        WHERE("id = #{resource.id}");
       }
     }.toString();
   }

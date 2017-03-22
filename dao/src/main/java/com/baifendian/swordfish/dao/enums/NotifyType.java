@@ -18,8 +18,6 @@ package com.baifendian.swordfish.dao.enums;
 
 /**
  * 报警类型
- * @author : liujin
- * @date : 2017-03-20 15:49
  */
 public enum NotifyType {
   /**

@@ -17,9 +17,6 @@ package com.baifendian.swordfish.dao.enums;
 
 /**
  * 资源的类型 <p>
- *
- * @author : dsfan
- * @date : 2016年8月26日
  */
 public enum ResourceType {
   /**

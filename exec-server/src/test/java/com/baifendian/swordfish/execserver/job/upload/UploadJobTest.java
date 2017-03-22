@@ -27,10 +27,6 @@ import org.junit.Test;
 
 import java.util.List;
 
-/**
- * @author : liujin
- * @date : 2017-03-16 13:21
- */
 public class UploadJobTest {
   private HiveMetaStoreClient hiveMetaStoreClient;
 

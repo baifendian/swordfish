@@ -31,12 +31,6 @@ import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-/**
- * 进程 Job <p>
- *
- * @author : dsfan
- * @date : 2016年10月26日
- */
 public abstract class AbstractProcessJob extends AbstractJob {
 
   protected boolean started = false;
@@ -199,7 +193,7 @@ public abstract class AbstractProcessJob extends AbstractJob {
     String cmdStr;
     try {
       cmdStr = ProcessUtil.genCmdStr(processBuilder.command());
-      logger.info("任务进程的启动命令 ：{}", cmdStr);
+      logger.info("job run command：{}", cmdStr);
     } catch (IOException e) {
       logger.error(e.getMessage(), e);
     }

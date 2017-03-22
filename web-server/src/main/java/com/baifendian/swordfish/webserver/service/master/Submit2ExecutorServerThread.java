@@ -30,10 +30,7 @@ import org.slf4j.LoggerFactory;
 import java.util.concurrent.BlockingQueue;
 
 /**
- * 重试请求 Worker 的线程 <p>
- *
- * @author : dsfan
- * @date : 2016年10月28日
+ * 提交exec flow到exec-server 的线程 <p>
  */
 public class Submit2ExecutorServerThread extends Thread {
 

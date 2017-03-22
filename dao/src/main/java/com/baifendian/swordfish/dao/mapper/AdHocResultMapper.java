@@ -25,9 +25,6 @@ import java.util.List;
 
 /**
  * 即席查询执行结果的操作 <p>
- *
- * @author : dsfan
- * @date : 2016年9月6日
  */
 public interface AdHocResultMapper {
   /**

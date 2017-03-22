@@ -28,9 +28,6 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.Date;
 import java.util.List;
 
-/**
- * Created by wenting on 8/24/16.
- */
 public class FlowNode {
 
   private Integer id;
@@ -49,7 +46,7 @@ public class FlowNode {
 
   private int lastModifyBy;
 
-  private NodeType type;
+  private String type;
 
   private int flowId;
 
@@ -135,11 +132,11 @@ public class FlowNode {
     this.lastModifyBy = lastModifyBy;
   }
 
-  public NodeType getType() {
+  public String getType() {
     return type;
   }
 
-  public void setType(NodeType type) {
+  public void setType(String type) {
     this.type = type;
   }
 

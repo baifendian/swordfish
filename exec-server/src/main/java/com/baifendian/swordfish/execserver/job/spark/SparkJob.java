@@ -33,9 +33,6 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * Spark 作业 <p>
- *
- * @author : dsfan
- * @date : 2016年11月3日
  */
 public class SparkJob extends AbstractProcessJob {
 
@@ -76,10 +73,6 @@ public class SparkJob extends AbstractProcessJob {
     }
 
     return processBuilder;
-  }
-
-  public String getAppId() {
-    return appid;
   }
 
   @Override

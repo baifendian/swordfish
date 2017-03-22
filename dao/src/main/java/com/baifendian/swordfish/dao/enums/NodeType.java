@@ -21,9 +21,6 @@ import org.apache.commons.lang3.StringUtils;
 
 /**
  * 节点类型 <p>
- *
- * @author : dsfan
- * @date : 2016年8月27日
  */
 public enum NodeType {
 

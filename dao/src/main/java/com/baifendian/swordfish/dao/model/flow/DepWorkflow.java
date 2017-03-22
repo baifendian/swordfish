@@ -15,12 +15,6 @@
  */
 package com.baifendian.swordfish.dao.model.flow;
 
-/**
- * workflow 依赖关系 <p>
- *
- * @author : wenting.wang
- * @date : 2016年8月26日
- */
 public class DepWorkflow {
 
   private int projectId;

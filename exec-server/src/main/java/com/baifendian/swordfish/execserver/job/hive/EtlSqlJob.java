@@ -29,8 +29,7 @@ import java.io.IOException;
 import java.util.List;
 
 /**
- * @author : liujin
- * @date : 2017-03-06 10:06
+ * hive sql job
  */
 public class EtlSqlJob extends AbstractJob {
 

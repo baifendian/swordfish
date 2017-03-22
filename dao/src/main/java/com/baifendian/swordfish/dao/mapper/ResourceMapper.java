@@ -15,7 +15,6 @@
  */
 package com.baifendian.swordfish.dao.mapper;
 
-import com.baifendian.swordfish.dao.enums.ResourcePubStatus;
 import com.baifendian.swordfish.dao.enums.ResourceType;
 import com.baifendian.swordfish.dao.model.Resource;
 
@@ -28,12 +27,6 @@ import java.sql.Timestamp;
 import java.util.List;
 import java.util.Set;
 
-/**
- * 资源相关操作 <p>
- *
- * @author : dsfan
- * @date : 2016年8月24日
- */
 @MapperScan
 public interface ResourceMapper {
   /**
@@ -63,7 +56,6 @@ public interface ResourceMapper {
           @Result(property = "publishTime", column = "publish_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE),
           @Result(property = "desc", column = "desc", javaType = String.class, jdbcType = JdbcType.VARCHAR),
           @Result(property = "projectId", column = "project_id", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
-          @Result(property = "pubStatus", column = "pub_status", typeHandler = EnumOrdinalTypeHandler.class, javaType = ResourcePubStatus.class, jdbcType = JdbcType.INTEGER),
           @Result(property = "projectName", column = "project_name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
           @Result(property = "orgId", column = "org_id", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
           @Result(property = "orgName", column = "org_name", javaType = String.class, jdbcType = JdbcType.VARCHAR),})
@@ -86,7 +78,6 @@ public interface ResourceMapper {
           @Result(property = "publishTime", column = "publish_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE),
           @Result(property = "desc", column = "desc", javaType = String.class, jdbcType = JdbcType.VARCHAR),
           @Result(property = "projectId", column = "project_id", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
-          @Result(property = "pubStatus", column = "pub_status", typeHandler = EnumOrdinalTypeHandler.class, javaType = ResourcePubStatus.class, jdbcType = JdbcType.INTEGER),
           @Result(property = "projectName", column = "project_name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
           @Result(property = "orgId", column = "org_id", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
           @Result(property = "orgName", column = "org_name", javaType = String.class, jdbcType = JdbcType.VARCHAR),})
@@ -100,14 +91,6 @@ public interface ResourceMapper {
    */
   @DeleteProvider(type = ResourceSqlProvider.class, method = "deleteById")
   int delete(@Param("resourceId") Integer resourceId);
-
-  /**
-   * 更新资源 <p>
-   *
-   * @return 更新记录数
-   */
-  @UpdateProvider(type = ResourceSqlProvider.class, method = "updateById")
-  int updateById(@Param("resource") Resource resource);
 
   /**
    * 删除项目的资源信息

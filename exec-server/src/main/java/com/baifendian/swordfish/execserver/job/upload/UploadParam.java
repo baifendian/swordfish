@@ -20,10 +20,6 @@ import com.baifendian.swordfish.common.job.BaseParam;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * @author : liujin
- * @date : 2017-03-16 10:23
- */
 public class UploadParam extends BaseParam {
   private String file;
 

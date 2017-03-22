@@ -32,12 +32,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-/**
- * workflow信息 <p>
- *
- * @author : wenting.wang
- * @date : 2016年8月24日
- */
 public class ProjectFlow {
 
   private int id;

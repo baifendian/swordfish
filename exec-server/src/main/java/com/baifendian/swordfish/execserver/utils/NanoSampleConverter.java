@@ -20,9 +20,6 @@ import ch.qos.logback.classic.spi.ILoggingEvent;
 
 /**
  * 纳秒转换 <p>
- *
- * @author : dsfan
- * @date : 2016年12月20日
  */
 public class NanoSampleConverter extends ClassicConverter {
 

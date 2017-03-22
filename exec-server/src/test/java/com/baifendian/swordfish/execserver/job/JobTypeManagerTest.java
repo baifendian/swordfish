@@ -32,10 +32,6 @@ import java.util.Properties;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-/**
- * @author : liujin
- * @date : 2017-03-07 16:17
- */
 public class JobTypeManagerTest {
 
   @Test

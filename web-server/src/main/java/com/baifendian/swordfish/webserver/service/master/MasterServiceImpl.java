@@ -48,9 +48,6 @@ import java.util.concurrent.*;
 
 /**
  * MasterService 实现 <p>
- *
- * @author : dsfan
- * @date : 2016年10月25日
  */
 public class MasterServiceImpl implements Iface {
 
@@ -162,8 +159,8 @@ public class MasterServiceImpl implements Iface {
   public RetInfo execFlow(int projectId, long execId, String flowType) throws TException {
     ExecutionFlow executionFlow = flowDao.queryExecutionFlow(execId);
     if (executionFlow == null) {
-      LOGGER.error("execId 对应的任务不存在");
-      return ResultHelper.createErrorResult("execId 对应的任务不存在");
+      LOGGER.error("execId is not exists");
+      return ResultHelper.createErrorResult("execId is not exists");
     }
     flowDao.updateExecutionFlowStatus(execId, FlowStatus.INIT);
 
