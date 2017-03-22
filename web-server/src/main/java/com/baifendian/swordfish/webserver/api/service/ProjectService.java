@@ -15,7 +15,7 @@
  */
 package com.baifendian.swordfish.webserver.api.service;
 
-import com.baifendian.swordfish.common.consts.Constants;
+import com.baifendian.swordfish.common.utils.PermUtil;
 import com.baifendian.swordfish.dao.mapper.ProjectMapper;
 import com.baifendian.swordfish.dao.mapper.ProjectUserMapper;
 import com.baifendian.swordfish.dao.mapper.UserMapper;
@@ -291,8 +291,8 @@ public class ProjectService {
    * @return
    */
   public int queryPerm(int userId, int projectId) {
-
     ProjectUser projectUser = projectUserMapper.query(userId, projectId);
+
     if (projectUser == null) {
       return 0;
     }
@@ -301,32 +301,35 @@ public class ProjectService {
   }
 
   /**
-   * 判断一个用户在指定项目中是否有写权限
+   * 是否具备写权限
    *
-   * @param perm
+   * @param userId
+   * @param projectId
    * @return
    */
-  public boolean hasWritePerm(int perm) {
-    return (perm & Constants.PROJECT_USER_PERM_WRITE) != 0;
+  public boolean hasWritePerm(int userId, int projectId) {
+    return PermUtil.hasWritePerm(queryPerm(userId, projectId));
   }
 
   /**
-   * 判断一个用户在指定项目中是否有读权限
+   * 是否具备读权限
    *
-   * @param perm
+   * @param userId
+   * @param projectId
    * @return
    */
-  public boolean hasReadPerm(int perm) {
-    return (perm & Constants.PROJECT_USER_PERM_READ) != 0;
+  public boolean hasReadPerm(int userId, int projectId) {
+    return PermUtil.hasReadPerm(queryPerm(userId, projectId));
   }
 
   /**
-   * 判断一个用户在指定项目中是否有读权限
+   * 是否具备执行权限
    *
-   * @param perm
+   * @param userId
+   * @param projectId
    * @return
    */
-  public boolean hasExecPerm(int perm) {
-    return (perm & Constants.PROJECT_USER_PERM_EXEC) != 0;
+  public boolean hasExecPerm(int userId, int projectId) {
+    return PermUtil.hasExecPerm(queryPerm(userId, projectId));
   }
 }

@@ -122,15 +122,15 @@ public class Constants {
   /**
    * 项目用户写权限
    */
-  public static final int PROJECT_USER_PERM_WRITE = 4;
+  public static final int PROJECT_USER_PERM_WRITE = 0x04;
 
   /**
    * 项目用户读权限
    */
-  public static final int PROJECT_USER_PERM_READ = 2;
+  public static final int PROJECT_USER_PERM_READ = 0x02;
 
   /**
    * 项目用户执行权限
    */
-  public static final int PROJECT_USER_PERM_EXEC = 1;
+  public static final int PROJECT_USER_PERM_EXEC = 0x01;
 }
