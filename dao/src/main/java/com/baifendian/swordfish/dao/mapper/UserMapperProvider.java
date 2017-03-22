@@ -15,6 +15,10 @@
  */
 package com.baifendian.swordfish.dao.mapper;
 
+import com.baifendian.swordfish.dao.enums.UserRoleType;
+import com.baifendian.swordfish.dao.mapper.utils.EnumFieldUtil;
+import com.baifendian.swordfish.dao.model.User;
+import org.apache.commons.lang.StringUtils;
 import org.apache.ibatis.jdbc.SQL;
 
 import java.util.Map;
@@ -87,115 +91,98 @@ public class UserMapperProvider {
     }.toString();
   }
 
-//
-//  public String insert(final User user) {
-//    return new SQL() {
-//      {
-//        INSERT_INTO("user");
-//        // VALUES("id", "#{user.id}");
-//        VALUES("name", "#{user.name}");
-//        VALUES("email", "#{user.email}");
-//        VALUES("password", "#{user.password}");
-//        if (StringUtils.isNotEmpty(user.getPhone())) {
-//          VALUES("phone", "#{user.phone}");
-//        }
-//        VALUES("create_time", "#{user.createTime}");
-//        VALUES("modify_time", "#{user.modifyTime}");
-//        VALUES("status", "#{user.status}");
-//
-//        VALUES("role", "#{user.roleType}");
-//      }
-//    }.toString();
-//  }
-//
-//  public String query(final User user, final boolean isJoin) {
-//    return new SQL() {
-//      {
-//        SELECT("u.id as id,u.`name` as `name`,u.email as email,u.phone as phone,u.create_time as create_time,u.modify_time as modify_time,u.password as password,u.status as status,u.is_system_user as is_system_user");
-//        FROM("user u");
-//        if (user.getId() != null) {
-//          WHERE("u.id = #{user.id}");
-//        }
-//        if (StringUtils.isNotEmpty(user.getName())) {
-//          WHERE("u.name = #{user.name}");
-//        }
-//        if (StringUtils.isNotEmpty(user.getPassword())) {
-//          WHERE("u.password = #{user.password}");
-//        }
-//        if (StringUtils.isNotEmpty(user.getEmail())) {
-//          WHERE("u.email = #{user.email}");
-//        }
-//        if (StringUtils.isNotEmpty(user.getPhone())) {
-//          WHERE("u.phone = #{user.phone}");
-//        }
-//               /*
-//                if (user.getStatus() !=null) {
-//                    WHERE("u.status = #{user.status}");
-//                }
-//                */
-//        //WHERE("u.is_system_user = #{user.isSystemUser}");
-//      }
-//    }.toString();
-//  }
-//
-//  public String updatePswById(Map<String, Object> parameter) {
-//    return new SQL() {
-//      {
-//        UPDATE("user");
-//        SET("password=#{user.password}");
-//        SET("modify_time=#{user.modifyTime}");
-//        WHERE("id = #{user.id}");
-//      }
-//    }.toString();
-//  }
-//
-//  public String findById(Map<String, Object> parameter) {
-//    return new SQL() {
-//      {
-//        SELECT("*");
-//        FROM("user");
-//        WHERE("id = #{id}");
-//      }
-//    }.toString();
-//  }
-//
-//  public String deleteByEmail(Map<String, Object> parameter) {
-//    return new SQL() {{
-//      DELETE_FROM("user");
-//      WHERE("email = #{email}");
-//    }}.toString();
-//  }
-//
-//  public String queryById(Map<String, Object> parameter) {
-//    return new SQL() {
-//      {
-//        SELECT("u.id AS id, u.`name` AS `name`, u.email AS email, u.phone AS phone, u.create_time AS create_time, u.modify_time AS modify_time, u.tenant_id AS tenant_id, u.join_time AS join_time, u.password AS password, u.status AS status, u.role AS role");
-//        SELECT("t.`name` as tenant_name");
-//        FROM("user u");
-//        LEFT_OUTER_JOIN("tenant t on u.tenant_id = t.id");
-//        WHERE("u.id = #{userId}");
-//      }
-//    }.toString();
-//  }
-//
-//
-//  public String updateStateById(final int id, final int status) {
-//    return new SQL() {
-//      {
-//        UPDATE("user");
-//        SET("status=#{status}");
-//        WHERE("id = #{id}");
-//      }
-//    }.toString();
-//  }
-//
-//  public String updateForJoinTenant(final Integer id, final Integer tenant_id) {
-//    return new SQL() {
-//      {
-//        UPDATE("user");
-//        SET("tenant_id = #{tenant_id}");
-//        WHERE("id = #{id}");
-//      }
-//    }.toString();
-//  }
+  /**
+   * 插入用户信息
+   *
+   * @param parameter
+   * @return
+   */
+  public String insert(Map<String, Object> parameter) {
+    return new SQL() {
+      {
+        INSERT_INTO("user");
+        VALUES("`name`", "#{user.name}");
+        VALUES("`email`", "#{user.email}");
+        VALUES("`desc`", "#{user.desc}");
+        VALUES("`phone`", "#{user.phone}");
+        VALUES("`password`", "#{user.password}");
+        VALUES("`role`", EnumFieldUtil.genFieldStr("user.role", UserRoleType.class));
+        VALUES("`proxy_users`", "#{user.proxyUsers}");
+        VALUES("`create_time`", "#{user.createTime}");
+        VALUES("`modify_time`", "#{user.modifyTime}");
+      }
+    }.toString();
+  }
+
+  /**
+   * 更新用户信息
+   *
+   * @param user
+   * @return
+   */
+  public String update(final User user) {
+    return new SQL() {
+      {
+        UPDATE("user");
+
+        if (StringUtils.isNotEmpty(user.getEmail())) {
+          SET("`email`=#{user.email}");
+        }
+
+        if (StringUtils.isNotEmpty(user.getDesc())) {
+          SET("`desc`=#{user.desc}");
+        }
+
+        if (StringUtils.isNotEmpty(user.getPhone())) {
+          SET("`phone`=#{user.phone}");
+        }
+
+        if (StringUtils.isNotEmpty(user.getPassword())) {
+          SET("`password`=#{user.password}");
+        }
+
+        if (user.getRole() != null) {
+          SET("`role`=" + EnumFieldUtil.genFieldStr("user.role", UserRoleType.class));
+        }
+
+        if (StringUtils.isNotEmpty(user.getProxyUsers())) {
+          SET("`proxy_users`=#{user.proxyUsers}");
+        }
+
+        SET("`modify_time`=#{user.modifyTime}");
+
+        WHERE("`name`=#{user.name}");
+      }
+    }.toString();
+  }
+
+  /**
+   * 删除用户
+   *
+   * @param name
+   * @return
+   */
+  public String delete(String name) {
+    return new SQL() {
+      {
+        DELETE_FROM("user");
+
+        WHERE("`name`=#{user.name}");
+      }
+    }.toString();
+  }
+
+  /**
+   * 查询所有用户信息
+   *
+   * @return
+   */
+  public String queryAllUsers() {
+    return new SQL() {
+      {
+        SELECT("*");
+        FROM("user");
+      }
+    }.toString();
+  }
 }

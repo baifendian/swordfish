@@ -15,15 +15,16 @@
  */
 package com.baifendian.swordfish.webserver.api.controller;
 
-import com.baifendian.swordfish.dao.BaseData;
 import com.baifendian.swordfish.dao.model.User;
 import com.baifendian.swordfish.webserver.api.service.UserService;
+import org.apache.commons.httpclient.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
+import java.util.List;
 
 /**
  * 用户管理的服务入口
@@ -51,22 +52,18 @@ public class UserController {
    * @return
    */
   @RequestMapping(value = "/{name}", method = {RequestMethod.POST})
-  public BaseData createUser(@ModelAttribute(value = "session.user") User operator,
-                             @PathVariable String name,
-                             @RequestParam(value = "email") String email,
-                             @RequestParam(value = "desc", required = false) String desc,
-                             @RequestParam(value = "password") String password,
-                             @RequestParam(value = "phone", required = false) String phone,
-                             @RequestParam(value = "proxyUsers") String proxyUsers,
-                             HttpServletResponse response) {
-    logger.info("Operator user id {}, create user, name: {}, email: {}, desc: {}, password: {}, phone: {}, proxyUsers: {}", operator.getId(),
-        name, email, desc, password, phone, proxyUsers);
+  public User createUser(@RequestAttribute(value = "session.user") User operator,
+                         @PathVariable String name,
+                         @RequestParam(value = "email") String email,
+                         @RequestParam(value = "desc", required = false) String desc,
+                         @RequestParam(value = "password") String password,
+                         @RequestParam(value = "phone", required = false) String phone,
+                         @RequestParam(value = "proxyUsers") String proxyUsers,
+                         HttpServletResponse response) {
+    logger.info("Operator user id {}, create user, name: {}, email: {}, desc: {}, password: {}, phone: {}, proxyUsers: {}",
+        operator.getId(), name, email, desc, "******", phone, proxyUsers);
 
-    BaseData data = userService.createUser(operator, name, email, desc, password, phone, proxyUsers);
-
-    response.setStatus(data.getHttpStatus());
-
-    return data;
+    return userService.createUser(operator, name, email, desc, password, phone, proxyUsers, response);
   }
 
   /**
@@ -82,15 +79,18 @@ public class UserController {
    * @return
    */
   @RequestMapping(value = "/{name}", method = {RequestMethod.PATCH})
-  public BaseData modifyUser(@PathVariable String name,
-                             @RequestParam(value = "session.userId") int userId,
-                             @RequestParam(value = "email", required = false) String email,
-                             @RequestParam(value = "desc", required = false) String desc,
-                             @RequestParam(value = "password", required = false) String password,
-                             @RequestParam(value = "phone", required = false) String phone,
-                             @RequestParam(value = "proxyUsers", required = false) String proxyUsers,
-                             HttpServletResponse response) {
-    return null;
+  public User modifyUser(@RequestAttribute(value = "session.user") User operator,
+                         @PathVariable String name,
+                         @RequestParam(value = "email", required = false) String email,
+                         @RequestParam(value = "desc", required = false) String desc,
+                         @RequestParam(value = "password", required = false) String password,
+                         @RequestParam(value = "phone", required = false) String phone,
+                         @RequestParam(value = "proxyUsers", required = false) String proxyUsers,
+                         HttpServletResponse response) {
+    logger.info("Operator user id {}, modify user, name: {}, email: {}, desc: {}, password: {}, phone: {}, proxyUsers: {}",
+        operator.getId(), name, email, desc, "******", phone, proxyUsers);
+
+    return userService.modifyUser(operator, name, email, desc, password, phone, proxyUsers, response);
   }
 
   /**
@@ -101,34 +101,52 @@ public class UserController {
    * @return
    */
   @RequestMapping(value = "/{name}", method = {RequestMethod.DELETE})
-  public BaseData deleteUser(@PathVariable String name,
-                             @RequestParam(value = "session.userId") int userId,
-                             HttpServletResponse response) {
-    return null;
+  public void deleteUser(@RequestAttribute(value = "session.user") User operator,
+                         @PathVariable String name,
+                         HttpServletResponse response) {
+    logger.info("Operator user id {}, delete user, name: {}",
+        operator.getId(), name);
+
+    userService.deleteUser(operator, name, response);
   }
 
-
   /**
-   * 删除用户, "系统管理员" 操作
+   * 查询用户
    *
-   * @param name
+   * @param operator
+   * @param allUser
    * @param response
    * @return
    */
-  @RequestMapping(value = "/{name}", method = {RequestMethod.GET})
-  public BaseData queryUsers(@PathVariable String name,
-                             @RequestParam(value = "session.userId") int userId,
-                             @RequestParam(value = "allUser", required = false) boolean allUser,
-                             HttpServletResponse response) {
-    return null;
+  @RequestMapping(value = "", method = {RequestMethod.GET})
+  public List<User> queryUsers(@RequestAttribute(value = "session.user") User operator,
+                               @RequestParam(value = "allUser", required = false) Boolean allUser,
+                               HttpServletResponse response) {
+    logger.info("Operator user id {}, query user, allUser: {}",
+        operator.getId(), allUser);
+
+    return userService.queryUser(operator, (allUser == null) ? false : allUser, response);
   }
 
-
+  /**
+   * 修改代理用户的账号信息
+   *
+   * @param operator
+   * @param name
+   * @param proxyUser
+   * @param password
+   * @param response
+   * @return
+   */
   @RequestMapping(value = "/{name}/proxyUsers/{proxyUser}", method = {RequestMethod.GET})
-  public BaseData modifyProxyUserPass(@PathVariable String name,
-                                      @RequestParam(value = "session.userId") int userId,
-                                      @RequestParam(value = "allUser", required = false) boolean allUser,
-                                      HttpServletResponse response) {
-    return null;
+  public void modifyProxyUserPass(@RequestAttribute(value = "session.user") User operator,
+                                  @PathVariable String name,
+                                  @PathVariable String proxyUser,
+                                  @RequestParam(value = "password") String password,
+                                  HttpServletResponse response) {
+    logger.info("Operator user id {}, modify proxy user, name: {}, proxyUser: {}, password: {}",
+        operator.getId(), name, proxyUser, "******");
+
+    response.setStatus(HttpStatus.SC_NOT_IMPLEMENTED);
   }
 }

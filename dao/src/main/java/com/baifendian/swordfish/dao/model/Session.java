@@ -15,11 +15,9 @@
  */
 package com.baifendian.swordfish.dao.model;
 
-import com.baifendian.swordfish.dao.BaseData;
-
 import java.util.Date;
 
-public class Session extends BaseData {
+public class Session  {
   private String id;
 
   private int userId;

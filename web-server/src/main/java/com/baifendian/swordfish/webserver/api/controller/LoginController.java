@@ -17,8 +17,6 @@ package com.baifendian.swordfish.webserver.api.controller;
 
 import com.baifendian.swordfish.common.utils.http.HttpUtil;
 import com.baifendian.swordfish.dao.model.User;
-import com.baifendian.swordfish.dao.BaseData;
-import com.baifendian.swordfish.webserver.api.dto.ErrorData;
 import com.baifendian.swordfish.webserver.api.dto.UserSessionData;
 import com.baifendian.swordfish.webserver.api.service.SessionService;
 import com.baifendian.swordfish.webserver.api.service.UserService;
@@ -57,28 +55,28 @@ public class LoginController {
    * @return
    */
   @RequestMapping(value = "", method = {RequestMethod.POST})
-  public BaseData login(@RequestParam(value = "name", required = false) String name,
-                        @RequestParam(value = "email", required = false) String email,
-                        @RequestParam(value = "password") String password,
-                        HttpServletRequest request,
-                        HttpServletResponse response) {
+  public UserSessionData login(@RequestParam(value = "name", required = false) String name,
+                               @RequestParam(value = "email", required = false) String email,
+                               @RequestParam(value = "password") String password,
+                               HttpServletRequest request,
+                               HttpServletResponse response) {
     // 必须存在一个
     if (StringUtils.isEmpty(name) && StringUtils.isEmpty(email)) {
       response.setStatus(HttpStatus.SC_BAD_REQUEST);
-      return new ErrorData(ErrorData.Code.PARAM_NOT_VALID, "用户名和邮箱必须存在一个");
+      return null;
     }
 
     // 且必须存在一个
     if (StringUtils.isNotEmpty(name) && StringUtils.isNotEmpty(email)) {
       response.setStatus(HttpStatus.SC_BAD_REQUEST);
-      return new ErrorData(ErrorData.Code.PARAM_NOT_VALID, "用户名和邮箱不能同时存在");
+      return null;
     }
 
     // 得到用户 ip 信息
     String ip = HttpUtil.getClientIpAddress(request);
     if (StringUtils.isEmpty(ip)) {
       response.setStatus(HttpStatus.SC_BAD_REQUEST);
-      return new ErrorData(ErrorData.Code.PARAM_NOT_VALID, "无法获取用户 ip 信息");
+      return null;
     }
 
     // 验证用户名和密码是否正确
@@ -86,7 +84,7 @@ public class LoginController {
 
     if (user == null) {
       response.setStatus(HttpStatus.SC_UNAUTHORIZED);
-      return new ErrorData(ErrorData.Code.USER_NOT_EXIST, "登陆失败, 请检查账号/密码是否正确");
+      return null;
     }
 
     // 创建 session
@@ -94,7 +92,7 @@ public class LoginController {
 
     if (data == null) {
       response.setStatus(HttpStatus.SC_UNAUTHORIZED);
-      return new ErrorData(ErrorData.Code.USER_NOT_EXIST, "登陆失败, 请检查账号/密码是否正确");
+      return null;
     }
 
     response.setStatus(HttpStatus.SC_OK);

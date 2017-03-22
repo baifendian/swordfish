@@ -19,9 +19,6 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 
 import org.apache.commons.lang3.StringUtils;
 
-/**
- * 节点类型 <p>
- */
 public enum NodeType {
 
   /**

@@ -15,9 +15,14 @@
  */
 package com.baifendian.swordfish.webserver.api.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 @Service
-public class ProjectService {
+public class ResourceService {
+
+  private static Logger logger = LoggerFactory.getLogger(ResourceService.class.getName());
+
 
 }
