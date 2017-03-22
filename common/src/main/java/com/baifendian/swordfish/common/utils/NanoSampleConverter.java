@@ -18,9 +18,6 @@ package com.baifendian.swordfish.common.utils;
 import ch.qos.logback.classic.pattern.ClassicConverter;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 
-/**
- * author: smile8 date:   2017/2/28 desc:
- */
 public class NanoSampleConverter extends ClassicConverter {
   @Override
   public String convert(ILoggingEvent event) {

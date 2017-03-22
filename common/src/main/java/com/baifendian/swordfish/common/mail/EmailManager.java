@@ -31,9 +31,6 @@ import java.util.Map;
 
 /**
  * 邮件内容管理 <p>
- *
- * @author : dsfan
- * @date : 2016年12月7日
  */
 public class EmailManager {
 

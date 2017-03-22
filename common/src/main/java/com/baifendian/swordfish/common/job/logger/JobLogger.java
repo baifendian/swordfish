@@ -15,14 +15,9 @@
  */
 package com.baifendian.swordfish.common.job.logger;
 
-import org.omg.CORBA.OBJ_ADAPTER;
 import org.slf4j.Logger;
 import org.slf4j.Marker;
 
-/**
- * @author : liujin
- * @date : 2017-03-03 15:33
- */
 public class JobLogger implements Logger {
 
   private Logger logger;

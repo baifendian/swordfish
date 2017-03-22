@@ -22,9 +22,6 @@ import java.util.List;
 
 /**
  * 执行结果 <p>
- *
- * @author : dsfan
- * @date : 2016年9月6日
  */
 public class ExecResult {
   /**

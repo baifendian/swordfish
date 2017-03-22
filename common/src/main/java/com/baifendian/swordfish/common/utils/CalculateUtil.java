@@ -23,9 +23,6 @@ import java.util.Stack;
 
 /**
  * 计算表达式工具类 <p>
- *
- * @author : dsfan
- * @date : 2016年11月28日
  */
 public class CalculateUtil {
 

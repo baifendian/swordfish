@@ -32,9 +32,7 @@ import java.util.Map;
 /**
  * 时间占位符工具类 <p>
  *
- * @author : dsfan
- * @date : 2016年12月9日
- * @see <a href="http://wiki.baifendian.com/pages/viewpage.action?pageId=13503112#id-14.参数设计说明-1.1时间相关的系统参数">系统参数定义</a>
+ * @see <a href="https://github.com/baifendian/swordfish/wiki/parameter-desc">系统参数定义</a>
  */
 public class TimePlaceholderUtil {
   /**

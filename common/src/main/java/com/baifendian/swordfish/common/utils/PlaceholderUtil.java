@@ -24,9 +24,6 @@ import java.util.Map;
 
 /**
  * 占位符工具类 <p>
- *
- * @author : dsfan
- * @date : 2016年10月11日
  */
 public class PlaceholderUtil {
 

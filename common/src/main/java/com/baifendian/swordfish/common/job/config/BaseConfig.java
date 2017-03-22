@@ -27,10 +27,6 @@ import java.io.InputStream;
 import java.text.MessageFormat;
 import java.util.Properties;
 
-/**
- * @author : liujin
- * @date : 2017-03-07 12:55
- */
 public class BaseConfig {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(BaseConfig.class);
