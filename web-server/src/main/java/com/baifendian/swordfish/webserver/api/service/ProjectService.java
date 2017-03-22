@@ -15,6 +15,7 @@
  */
 package com.baifendian.swordfish.webserver.api.service;
 
+import com.baifendian.swordfish.common.consts.Constants;
 import com.baifendian.swordfish.dao.mapper.ProjectMapper;
 import com.baifendian.swordfish.dao.mapper.ProjectUserMapper;
 import com.baifendian.swordfish.dao.mapper.UserMapper;
@@ -299,6 +300,36 @@ public class ProjectService {
     }
 
     return  (projectUser.getPerm() & perm) == perm;
+  }
+
+  /**
+   * 查询一个用户在指定项目中是否有写权限
+   * @param userName
+   * @param name
+   * @return
+   */
+  public boolean queryWritePerm(String userName,String name){
+    return queryPerm(userName,name, Constants.PROJECT_USER_PERM_WRITE);
+  }
+
+  /**
+   * 查询一个用户在指定项目中是否有读权限
+   * @param userName
+   * @param name
+   * @return
+   */
+  public boolean queryReadPerm(String userName,String name){
+    return queryPerm(userName,name, Constants.PROJECT_USER_PERM_READ);
+  }
+
+  /**
+   * 查询一个用户在指定项目中是否有执行权限
+   * @param userName
+   * @param name
+   * @return
+   */
+  public boolean queryExecPerm(String userName,String name){
+    return queryPerm(userName,name, Constants.PROJECT_USER_PERM_EXEC);
   }
 
 }

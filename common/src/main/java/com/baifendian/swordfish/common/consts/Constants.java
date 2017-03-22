@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.baifendian.swordfish.dao.consts;
+package com.baifendian.swordfish.common.consts;
 
 import java.util.Locale;
 
@@ -118,4 +118,19 @@ public class Constants {
    * 从字符串中抽取资源名称
    */
   public static final String RESOURCE_RULE_MATCHES = "# --@resource_reference\\{([^{}]+)\\}";
+
+  /**
+   * 项目用户写权限
+   */
+  public static final int PROJECT_USER_PERM_WRITE = 4;
+
+  /**
+   * 项目用户读权限
+   */
+  public static final int PROJECT_USER_PERM_READ = 2;
+
+  /**
+   * 项目用户执行权限
+   */
+  public static final int PROJECT_USER_PERM_EXEC = 1;
 }

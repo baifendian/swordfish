@@ -15,7 +15,7 @@
  */
 package com.baifendian.swordfish.dao.utils;
 
-import com.baifendian.swordfish.dao.consts.Constants;
+import com.baifendian.swordfish.common.consts.Constants;
 
 import org.apache.commons.lang3.time.FastDateFormat;
 

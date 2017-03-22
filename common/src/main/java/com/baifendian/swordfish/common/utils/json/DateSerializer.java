@@ -15,7 +15,7 @@
  */
 package com.baifendian.swordfish.common.utils.json;
 
-import com.baifendian.swordfish.dao.consts.Constants;
+import com.baifendian.swordfish.common.consts.Constants;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonSerializer;
