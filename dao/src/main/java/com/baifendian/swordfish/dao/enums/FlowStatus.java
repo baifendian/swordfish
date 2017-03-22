@@ -35,9 +35,6 @@ import com.fasterxml.jackson.annotation.JsonValue;
 
 /**
  * 描述一个 workflow和node的运行状态 <p>
- *
- * @author : wenting.wang
- * @date : 2016年8月30日
  */
 public enum FlowStatus {
   /**

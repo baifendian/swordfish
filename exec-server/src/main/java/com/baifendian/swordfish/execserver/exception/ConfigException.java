@@ -16,15 +16,10 @@
 package com.baifendian.swordfish.execserver.exception;
 
 /**
- * 配置信息错误 <p>
+ * 配置信息错误异常 <p>
  *
- * @author : liujin
- * @date : 2017年3月2日
  */
 public class ConfigException extends RuntimeException {
-  /**
-   * Serial version UID
-   */
   private static final long serialVersionUID = 1L;
 
   /**

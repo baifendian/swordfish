@@ -15,11 +15,6 @@
  */
 package com.baifendian.swordfish.dao.model;
 
-/**
- * @auth: ronghua.yu
- * @time: 16/8/19
- * @desc:
- */
 public class DataSourceMysql extends DataSourceDbBase {
   private String address;
   private String database;

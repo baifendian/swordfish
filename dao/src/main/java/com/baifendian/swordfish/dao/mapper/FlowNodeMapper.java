@@ -16,7 +16,6 @@
 package com.baifendian.swordfish.dao.mapper;
 
 import com.baifendian.swordfish.dao.enums.FlowType;
-import com.baifendian.swordfish.dao.enums.NodeTypeHandler;
 import com.baifendian.swordfish.dao.model.FlowNode;
 
 import org.apache.ibatis.annotations.*;
@@ -57,14 +56,6 @@ public interface FlowNodeMapper {
   int updateById(@Param("flowNode") FlowNode flowNode);
 
   /**
-   * 更新多条记录(更新pos信息) <p>
-   *
-   * @return 更新记录数
-   */
-  @UpdateProvider(type = FlowNodeMapperSqlProvider.class, method = "updateAllPos")
-  int updateAllPos(List<FlowNode> flowNodes);
-
-  /**
    * 更新多条记录(更新参数等详情信息) <p>
    *
    * @return 更新记录数
@@ -95,7 +86,7 @@ public interface FlowNodeMapper {
    */
   @Results(value = {@Result(property = "id", column = "id", id = true, javaType = int.class, jdbcType = JdbcType.INTEGER),
           @Result(property = "name", column = "name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-          @Result(property = "type", column = "type", typeHandler = NodeTypeHandler.class, jdbcType = JdbcType.TINYINT),
+          @Result(property = "type", column = "type", javaType = String.class, jdbcType = JdbcType.VARCHAR),
           @Result(property = "flowId", column = "flow_id", id = true, javaType = int.class, jdbcType = JdbcType.INTEGER),
           @Result(property = "posX", column = "pos_x", javaType = double.class, jdbcType = JdbcType.DOUBLE),
           @Result(property = "posY", column = "pos_y", javaType = double.class, jdbcType = JdbcType.DOUBLE),
@@ -112,7 +103,7 @@ public interface FlowNodeMapper {
    */
   @Results(value = {@Result(property = "id", column = "id", id = true, javaType = int.class, jdbcType = JdbcType.INTEGER),
           @Result(property = "name", column = "name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-          @Result(property = "type", column = "type", typeHandler = NodeTypeHandler.class, jdbcType = JdbcType.TINYINT),
+          @Result(property = "type", column = "type", javaType = String.class, jdbcType = JdbcType.VARCHAR),
           @Result(property = "flowId", column = "flow_id", id = true, javaType = int.class, jdbcType = JdbcType.INTEGER),
           @Result(property = "posX", column = "pos_x", javaType = double.class, jdbcType = JdbcType.DOUBLE),
           @Result(property = "posY", column = "pos_y", javaType = double.class, jdbcType = JdbcType.DOUBLE),
@@ -121,14 +112,6 @@ public interface FlowNodeMapper {
           @Result(property = "outputTables", column = "output_tables", javaType = String.class, jdbcType = JdbcType.VARCHAR),})
   @SelectProvider(type = FlowNodeMapperSqlProvider.class, method = "selectByFlowId")
   List<FlowNode> selectByFlowId(@Param("flowId") int flowId);
-
-  /**
-   * 查询一个组织里面的Node数量 <p>
-   *
-   * @return 查询记录数
-   */
-  @SelectProvider(type = FlowNodeMapperSqlProvider.class, method = "queryNodeNum")
-  int queryNodeNum(@Param("tenantId") int tenantId, @Param("flowTypes") List<FlowType> flowTypes);
 
   /**
    * 删除项目的结点信息

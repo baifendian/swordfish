@@ -25,9 +25,6 @@ import java.util.*;
 
 import static com.baifendian.swordfish.common.utils.CommonUtil.TokenType.BRACKET;
 
-/**
- * Created by caojingwei on 16/8/22.
- */
 public class CommonUtil {
   /**
    * 状态机描述

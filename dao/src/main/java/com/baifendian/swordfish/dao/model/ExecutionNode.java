@@ -20,12 +20,6 @@ import com.baifendian.swordfish.dao.enums.FlowStatus;
 import java.util.Date;
 import java.util.List;
 
-/**
- * Node 执行的信息 <p>
- *
- * @author : wenting.wang
- * @date : 2016年8月30日
- */
 public class ExecutionNode {
 
   /**
@@ -54,11 +48,6 @@ public class ExecutionNode {
   private String NodeName;
 
   /**
-   * 对应yarn任务 id
-   **/
-  private String appsId;
-
-  /**
    * 运行状态
    **/
   private FlowStatus status;
@@ -82,8 +71,6 @@ public class ExecutionNode {
    * 执行的job id
    **/
   private String jobId;
-
-  private List<ExecNodeLog> execNodeLogs;
 
   public Long getId() {
     return id;
@@ -125,14 +112,6 @@ public class ExecutionNode {
     NodeName = nodeName;
   }
 
-  public String getAppsId() {
-    return appsId;
-  }
-
-  public void setAppsId(String appsId) {
-    this.appsId = appsId;
-  }
-
   public FlowStatus getStatus() {
     return status;
   }
@@ -163,14 +142,6 @@ public class ExecutionNode {
 
   public void setAttempt(int attempt) {
     this.attempt = attempt;
-  }
-
-  public List<ExecNodeLog> getExecNodeLogs() {
-    return execNodeLogs;
-  }
-
-  public void setExecNodeLogs(List<ExecNodeLog> execNodeLogs) {
-    this.execNodeLogs = execNodeLogs;
   }
 
   public String getJobId() {

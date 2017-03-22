@@ -15,12 +15,6 @@
  */
 package com.baifendian.swordfish.dao.model.flow;
 
-/**
- * 边属性 <p>
- *
- * @author : dsfan
- * @date : 2016年9月9日
- */
 public class EdgeAttribute {
   /**
    * 边的方向

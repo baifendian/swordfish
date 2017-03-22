@@ -40,11 +40,6 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 
-
-/**
- * @author : liujin
- * @date : 2017-03-10 17:42
- */
 public class WebThriftServer {
 
   private static final Logger logger = LoggerFactory.getLogger(WebThriftServer.class);
@@ -77,15 +72,13 @@ public class WebThriftServer {
   }
 
   public WebThriftServer() throws UnknownHostException {
-    host = InetAddress.getLocalHost().getHostName();
+    host = InetAddress.getLocalHost().getHostAddress();
     port = conf.getInt(MASTER_PORT, 9999);
     masterDao = DaoFactory.getDaoInstance(MasterDao.class);
     executorServerManager = new ExecutorServerManager();
   }
 
   public void run() throws SchedulerException, TTransportException, MasterException {
-    // 启动调度
-    QuartzManager.start();
 
     Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
       @Override
@@ -104,13 +97,28 @@ public class WebThriftServer {
     try {
       registerMaster();
       init();
+      // 启动调度
+      QuartzManager.start();
+
+      Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
+        @Override
+        public void run() {
+          server.stop(); // 关闭 server
+          try {
+            // 关闭调度
+            QuartzManager.shutdown();
+            // 关闭资源
+          } catch (SchedulerException e) {
+            logger.error(e.getMessage(), e);
+          }
+        }
+      }));
+
       server.serve();
     } catch (Exception e) {
       QuartzManager.shutdown();
       throw e;
     }
-
-
   }
 
   private void init() throws MasterException, TTransportException {
@@ -129,10 +137,10 @@ public class WebThriftServer {
   public void registerMaster() throws MasterException {
     MasterServer masterServer = masterDao.getMasterServer();
     if (masterServer != null && !(masterServer.getHost().equals(host) && masterServer.getPort() == port)) {
-      logger.error(String.format("can't register more then one master, exist master:%s:%d",
-              masterServer.getHost(), masterServer.getPort()));
-      throw new MasterException(String.format("can't register more then one master, exist master:%s:%d",
-              masterServer.getHost(), masterServer.getPort()));
+      String msg = String.format("can't register more then one master, exist master:%s:%d, " +
+              "if you change the master deploy server please clean the table master_server and start up again",
+              masterServer.getHost(), masterServer.getPort());
+      throw new MasterException(msg);
     } else {
       if (masterServer == null)
         masterDao.registerMasterServer(host, port);

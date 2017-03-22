@@ -22,12 +22,6 @@ import com.baifendian.swordfish.dao.enums.FlowType;
 
 import java.util.Date;
 
-/**
- * workflow 执行的信息 <p>
- *
- * @author : wenting.wang
- * @date : 2016年8月29日
- */
 public class ExecutionFlow {
   /**
    * 具体执行的id

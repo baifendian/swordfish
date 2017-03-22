@@ -36,8 +36,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Date;
 
 /**
- * @author : liujin
- * @date : 2017-03-03 12:17
+ * 测试，数据初始化工具类
  */
 public class Init {
   public static void initFlow() {

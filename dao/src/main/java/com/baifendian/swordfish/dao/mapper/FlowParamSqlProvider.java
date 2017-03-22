@@ -19,12 +19,6 @@ import org.apache.ibatis.jdbc.SQL;
 
 import java.util.Map;
 
-/**
- * flows_params 表的 sql 生成器 <p>
- *
- * @author : dsfan
- * @date : 2016年10月12日
- */
 public class FlowParamSqlProvider {
 
   /**

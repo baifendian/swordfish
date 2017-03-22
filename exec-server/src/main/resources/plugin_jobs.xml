@@ -1,0 +1,7 @@
+<pluginJobs>
+    <pluginJob>
+        <name>FILE_IMPORT_SQL</name>
+        <className>com.baifendian.swordfish.execserver.job.upload.UploadJob</className>
+        <isLongJob>false</isLongJob>
+    </pluginJob>
+</pluginJobs>

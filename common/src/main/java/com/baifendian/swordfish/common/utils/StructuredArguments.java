@@ -17,9 +17,6 @@ package com.baifendian.swordfish.common.utils;
 
 import java.io.IOException;
 
-/**
- * author: smile8 date:   01/12/2016 desc:
- */
 public class StructuredArguments {
 
 //  private static AtomicLong COUNTER = new AtomicLong(0);

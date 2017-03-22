@@ -22,12 +22,6 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.Date;
 
-/**
- * @auth: ronghua.yu
- * @time: 16/8/9
- * @desc:
- * @modify by qifeng.dai(smile8) on 2016.11.08
- */
 public class DataSource {
   private Integer id;
   private Integer ownerId;

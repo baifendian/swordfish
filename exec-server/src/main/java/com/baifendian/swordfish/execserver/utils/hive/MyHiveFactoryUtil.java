@@ -27,9 +27,6 @@ import java.util.Properties;
 
 /**
  * 初始化hiveConf <p>
- *
- * @author : wenting.wang
- * @date : 2016年10月26日
  */
 
 public class MyHiveFactoryUtil {

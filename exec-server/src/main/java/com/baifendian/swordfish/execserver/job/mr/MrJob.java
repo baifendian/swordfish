@@ -33,9 +33,6 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * mr 作业 <p>
- *
- * @author : dsfan
- * @date : 2016年11月21日
  */
 public class MrJob extends AbstractProcessJob {
 

@@ -27,9 +27,6 @@ import java.util.TimeZone;
 
 /**
  * 时间操作工具类 <p>
- *
- * @author : dsfan
- * @date : 2016年8月23日
  */
 public class BFDDateUtils {
   /**

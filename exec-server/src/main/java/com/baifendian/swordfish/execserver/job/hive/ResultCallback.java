@@ -19,9 +19,6 @@ import com.baifendian.swordfish.common.job.ExecResult;
 
 /**
  * 执行结果回调处理 <p>
- *
- * @author : dsfan
- * @date : 2016年12月21日
  */
 public interface ResultCallback {
 

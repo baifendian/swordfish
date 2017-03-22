@@ -15,28 +15,13 @@
  */
 package com.baifendian.swordfish.common.job;
 
-import com.baifendian.swordfish.common.job.config.BaseConfig;
 import com.baifendian.swordfish.common.job.logger.JobLogger;
-import com.fasterxml.jackson.databind.deser.Deserializers;
-
 import org.slf4j.Logger;
-
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
-/**
- * @author : liujin
- * @date : 2017-03-06 10:56
- */
 public abstract class AbstractJob implements Job {
-  /**
-   * LOGGER
-   */
   protected final JobLogger logger;
 
   private final Logger _logger;

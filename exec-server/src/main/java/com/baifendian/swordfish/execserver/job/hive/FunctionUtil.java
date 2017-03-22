@@ -35,10 +35,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-/**
- * @author : liujin
- * @date : 2017-03-06 11:33
- */
 public class FunctionUtil {
 
   private static final Logger logger = LoggerFactory.getLogger(FunctionUtil.class);

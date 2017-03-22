@@ -28,9 +28,6 @@ import java.io.InputStream;
 import java.util.Collection;
 import java.util.Properties;
 
-/**
- * author: smile8 date:   2017/2/28 desc:
- */
 public class MailSendUtil {
   private static Logger LOGGER = LoggerFactory.getLogger(MailSendUtil.class.getName());
 

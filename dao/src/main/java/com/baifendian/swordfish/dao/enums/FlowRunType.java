@@ -15,13 +15,8 @@
  */
 package com.baifendian.swordfish.dao.enums;
 
-import com.baifendian.swordfish.dao.enums.FlowStatus;
-
 /**
  * workflow 等运行的类型 <p>
- *
- * @author : wenting.wang
- * @date : 2016年8月30日
  */
 public enum FlowRunType {
 

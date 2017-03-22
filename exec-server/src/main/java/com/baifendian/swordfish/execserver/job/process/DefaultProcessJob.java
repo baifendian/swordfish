@@ -28,9 +28,6 @@ import java.io.IOException;
 
 /**
  * 默认的进程 job <p>
- *
- * @author : liujin
- * @date : 2017年3月2日
  */
 public class DefaultProcessJob extends AbstractProcessJob {
 

@@ -42,10 +42,6 @@ import org.apache.thrift.transport.TTransportFactory;
 
 import java.net.InetSocketAddress;
 
-/**
- * @author : liujin
- * @date : 2017-03-10 17:40
- */
 public class ThriftUtil {
 
   public static TServer getTThreadPoolServer(TProtocolFactory protocolFactory, TProcessor processor,

@@ -15,9 +15,8 @@
  */
 package com.baifendian.swordfish.execserver.job.spark;
 
-import com.baifendian.swordfish.common.utils.CommonUtil;
 import com.baifendian.swordfish.dao.model.flow.params.Property;
-import com.baifendian.swordfish.execserver.job.ResourceInfo;
+import com.baifendian.swordfish.common.job.ResourceInfo;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -26,9 +25,6 @@ import java.util.List;
 
 /**
  * Spark 提交参数构建器 <p>
- *
- * @author : dsfan
- * @date : 2016年11月9日
  */
 public class SparkSubmitArgsUtil {
 

@@ -34,9 +34,6 @@ import java.util.Date;
 
 /**
  * ExecService 实现 <p>
- *
- * @author : dsfan
- * @date : 2016年10月25日
  */
 public class ExecServiceImpl implements Iface {
 

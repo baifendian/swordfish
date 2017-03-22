@@ -34,9 +34,6 @@ import static org.quartz.TriggerBuilder.newTrigger;
 
 /**
  * Quartz 调度管理 <p>
- *
- * @author : dsfan
- * @date : 2015-3-12
  */
 public class QuartzManager {
 

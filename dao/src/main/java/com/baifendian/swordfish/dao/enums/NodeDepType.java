@@ -19,9 +19,6 @@ import com.fasterxml.jackson.annotation.JsonValue;
 
 /**
  * 执行任务的节点依赖类型 <p>
- *
- * @author : dsfan
- * @date : 2016年8月31日
  */
 public enum NodeDepType {
   /**

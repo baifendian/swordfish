@@ -15,7 +15,6 @@
  */
 package com.baifendian.swordfish.webserver;
 
-
 import com.baifendian.swordfish.webserver.exception.MasterException;
 
 import org.slf4j.Logger;
@@ -24,10 +23,6 @@ import org.slf4j.LoggerFactory;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
-/**
- * @author : liujin
- * @date : 2017-03-10 18:01
- */
 public class ExecutorServerManager {
   private final Logger logger = LoggerFactory.getLogger(getClass());
 

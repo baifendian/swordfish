@@ -161,6 +161,17 @@ public class ExecutionFlowMapperProvider {
     }.toString();
   }
 
+  public String selectRunningFlow(String worker) {
+    return new SQL() {
+      {
+        SELECT("id, flow_id, worker, status ");
+        FROM(TABLE_NAME);
+        WHERE("status =" + FlowStatus.RUNNING.getType());
+        WHERE("worker = #{worker}");
+      }
+    }.toString();
+  }
+
   public String selectCount(MaintainQuery maintainQuery) {
 
     StringBuilder sb = new StringBuilder();

@@ -40,8 +40,6 @@ import java.util.concurrent.BlockingQueue;
 /**
  * Workflow 调度 Job <p>
  *
- * @author : dsfan
- * @date : 2016年10月24日
  */
 public class FlowScheduleJob implements Job {
 
@@ -110,6 +108,7 @@ public class FlowScheduleJob implements Job {
 
   @Override
   public void execute(JobExecutionContext context) throws JobExecutionException {
+    LOGGER.debug("trigger at:" + context.getFireTime());
     // 1. 获取参数
     JobDataMap dataMap = context.getJobDetail().getJobDataMap();
     int projectId = dataMap.getInt(PARAM_PROJECT_ID);

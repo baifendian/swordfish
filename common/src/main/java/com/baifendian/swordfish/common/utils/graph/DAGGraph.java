@@ -22,7 +22,7 @@ import java.util.LinkedList;
 import java.util.Queue;
 
 /**
- * author: smile8 date:   12/09/2016 desc:   有向无环图, 增加边需要判断是否符合无环的约束, 否则增加失败
+ * 有向无环图, 增加边需要判断是否符合无环的约束, 否则增加失败
  */
 public class DAGGraph<VD, ED> extends Graph<VD, ED> {
   private static final Logger LOG = LoggerFactory.getLogger(DAGGraph.class);

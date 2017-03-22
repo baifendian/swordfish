@@ -21,11 +21,6 @@ import org.apache.ibatis.jdbc.SQL;
 
 import java.util.Map;
 
-/**
- * @auth: ronghua.yu
- * @time: 16/8/9
- * @desc:
- */
 public class DataSourceMapperProvider {
   public static final String DB_NAME = "`data_source`";
 

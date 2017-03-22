@@ -22,9 +22,6 @@ import java.util.List;
 
 /**
  * Hadoop jar 参数构建器 <p>
- *
- * @author : dsfan
- * @date : 2016年11月22日
  */
 public class HadoopJarArgsUtil {
 

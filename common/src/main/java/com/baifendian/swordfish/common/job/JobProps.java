@@ -17,10 +17,6 @@ package com.baifendian.swordfish.common.job;
 
 import java.util.Map;
 
-/**
- * @author : liujin
- * @date : 2017-03-07 17:33
- */
 public class JobProps {
 
   /**

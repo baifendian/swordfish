@@ -33,9 +33,6 @@ import java.util.concurrent.ExecutorService;
 
 /**
  * 节点执行器 <p>
- *
- * @author : dsfan
- * @date : 2016年10月27日
  */
 public class NodeRunner implements Runnable {
 

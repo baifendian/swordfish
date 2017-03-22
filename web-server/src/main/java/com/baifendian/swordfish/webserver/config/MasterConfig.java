@@ -21,9 +21,6 @@ import org.apache.commons.configuration.PropertiesConfiguration;
 
 /**
  * Master 配置信息 <p>
- *
- * @author : dsfan
- * @date : 2016年10月28日
  */
 public class MasterConfig {
   /**

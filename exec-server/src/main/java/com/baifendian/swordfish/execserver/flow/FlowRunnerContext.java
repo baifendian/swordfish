@@ -24,9 +24,6 @@ import java.util.concurrent.ExecutorService;
 
 /**
  * workflow 执行的上下文 <p>
- *
- * @author : dsfan
- * @date : 2016年12月7日
  */
 public class FlowRunnerContext {
   /**

@@ -19,12 +19,6 @@ import com.baifendian.swordfish.dao.enums.ScheduleType;
 
 import java.util.Date;
 
-/**
- * schedule的基本 <p>
- *
- * @author : wenting.wang
- * @date : 2016年8月26日
- */
 public class ScheduleMeta {
 
   private Date startDate;

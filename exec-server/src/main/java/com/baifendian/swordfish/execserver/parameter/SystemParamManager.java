@@ -16,7 +16,6 @@
 package com.baifendian.swordfish.execserver.parameter;
 
 import com.baifendian.swordfish.dao.utils.BFDDateUtils;
-import com.baifendian.swordfish.execserver.utils.hadoop.hdfs.HdfsPathManager;
 import com.baifendian.swordfish.dao.enums.FlowRunType;
 import com.baifendian.swordfish.dao.model.ExecutionFlow;
 
@@ -28,9 +27,6 @@ import java.util.Map;
 
 /**
  * 系统参数管理 <p>
- *
- * @author : dsfan
- * @date : 2016年11月25日
  */
 public class SystemParamManager {
 
@@ -109,7 +105,6 @@ public class SystemParamManager {
     valueMap.put(BIZ_CUR_DATE, formatDate(bizCurDate));
     valueMap.put(CYC_TIME, formatTime(bizCurDate));
     valueMap.put(RUN_TIME, formatTime(runTime));
-    valueMap.put(FILES, HdfsPathManager.genNodeHdfsPath(executionFlow.getProjectName()));
     valueMap.put(FLOWNAME, executionFlow.getFlowName());
 
     return valueMap;

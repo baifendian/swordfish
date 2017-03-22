@@ -22,7 +22,7 @@ import org.slf4j.LoggerFactory;
 import java.util.*;
 
 /**
- * author: smile8 date:   09/09/2016 desc:   这里描述了一个图的结构, 图具有顶点和边, 顶点属性是 VD, 边的属性是 ED, 默认实现是考虑的普通的
+ * 这里描述了一个图的结构, 图具有顶点和边, 顶点属性是 VD, 边的属性是 ED, 默认实现是考虑的普通的
  * "有向图结构"
  */
 public class Graph<VD, ED> {

@@ -41,9 +41,6 @@ import java.util.concurrent.ThreadFactory;
 
 /**
  * Flow 执行管理器 <p>
- *
- * @author : liujin
- * @date : 2017年3月01日
  */
 public class FlowRunnerManager {
 

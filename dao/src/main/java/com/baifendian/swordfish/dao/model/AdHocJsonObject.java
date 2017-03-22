@@ -18,12 +18,6 @@ package com.baifendian.swordfish.dao.model;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * 即席查询结果的 JsonObject <p>
- *
- * @author : dsfan
- * @date : 2016年9月6日
- */
 public class AdHocJsonObject {
   /**
    * 返回的表头

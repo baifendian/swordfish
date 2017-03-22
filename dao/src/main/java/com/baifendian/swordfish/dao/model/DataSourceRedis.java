@@ -15,10 +15,5 @@
  */
 package com.baifendian.swordfish.dao.model;
 
-/**
- * @auth: ronghua.yu
- * @time: 16/12/22
- * @desc:
- */
 public class DataSourceRedis extends DataSourceDbBase {
 }

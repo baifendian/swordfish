@@ -17,10 +17,6 @@ package com.baifendian.swordfish.webserver;
 
 import com.baifendian.swordfish.rpc.HeartBeatData;
 
-/**
- * @author : liujin
- * @date : 2017-03-10 17:53
- */
 public class ExecutorServerInfo {
 
   private String host;

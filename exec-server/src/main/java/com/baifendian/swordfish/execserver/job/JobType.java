@@ -29,23 +29,42 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.baifendian.swordfish.dao.utils.json;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonSerializer;
-import com.fasterxml.jackson.databind.SerializerProvider;
+package com.baifendian.swordfish.execserver.job;
 
-import java.io.IOException;
+import com.baifendian.swordfish.common.job.Job;
 
 /**
- * 字符串节点的自定义序列化 <p>
+ * 作业类型定义
  */
-public class StringNodeJsonSerializer extends JsonSerializer<String> {
+public class JobType {
+  private boolean isLong;
 
-  @Override
-  public void serialize(String value, JsonGenerator jgen, SerializerProvider provider) throws IOException, JsonProcessingException {
-    jgen.writeRawValue(value);
+  private Class<? extends Job> className;
+
+  public JobType(Class<? extends Job> className, boolean isLong){
+    this.className = className;
+    this.isLong = isLong;
   }
 
+  public boolean isLong() {
+    return isLong;
+  }
+
+  public void setLong(boolean aLong) {
+    isLong = aLong;
+  }
+
+  public Class getClassName() {
+    return className;
+  }
+
+  public void setClassName(Class className) {
+    this.className = className;
+  }
+
+  @Override
+  public String toString(){
+    return "class name:" + className.getName() + " is long " + isLong;
+  }
 }

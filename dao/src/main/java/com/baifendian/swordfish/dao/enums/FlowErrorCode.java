@@ -17,9 +17,6 @@ package com.baifendian.swordfish.dao.enums;
 
 /**
  * workflow 运行失败时的详细错误码 <p>
- *
- * @author : dsfan
- * @date : 2017年1月3日
  */
 public enum FlowErrorCode {
   /**

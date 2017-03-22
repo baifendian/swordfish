@@ -25,9 +25,6 @@ import java.util.Map;
 
 /**
  * workflow 节点关系表 sql 生成器 <p>
- *
- * @author : dsfan
- * @date : 2016年8月29日
  */
 public class FlowNodeRelationMapperProvider {
 

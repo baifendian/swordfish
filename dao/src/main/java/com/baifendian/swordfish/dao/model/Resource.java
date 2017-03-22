@@ -15,17 +15,10 @@
  */
 package com.baifendian.swordfish.dao.model;
 
-import com.baifendian.swordfish.dao.enums.ResourcePubStatus;
 import com.baifendian.swordfish.dao.enums.ResourceType;
 
 import java.sql.Timestamp;
 
-/**
- * 资源实体 <p>
- *
- * @author : dsfan
- * @date : 2016年8月24日
- */
 public class Resource {
   /**
    * 资源id
@@ -96,16 +89,6 @@ public class Resource {
    * 修改时间
    */
   private Timestamp modifyTime;
-
-  /**
-   * 发布时间
-   */
-  private Timestamp publishTime;
-
-  /**
-   * 发布状态 {@link ResourcePubStatus}
-   */
-  private ResourcePubStatus pubStatus;
 
   /**
    * getter method
@@ -345,34 +328,6 @@ public class Resource {
    */
   public void setModifyTime(Timestamp modifyTime) {
     this.modifyTime = modifyTime;
-  }
-
-  public Timestamp getPublishTime() {
-    return publishTime;
-  }
-
-  public void setPublishTime(Timestamp publishTime) {
-    this.publishTime = publishTime;
-  }
-
-  /**
-   * getter method
-   *
-   * @return the pubStatus
-   * @see Resource#pubStatus
-   */
-  public ResourcePubStatus getPubStatus() {
-    return pubStatus;
-  }
-
-  /**
-   * setter method
-   *
-   * @param pubStatus the pubStatus to set
-   * @see Resource#pubStatus
-   */
-  public void setPubStatus(ResourcePubStatus pubStatus) {
-    this.pubStatus = pubStatus;
   }
 
   /**

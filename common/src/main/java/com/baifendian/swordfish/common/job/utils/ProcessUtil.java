@@ -24,9 +24,6 @@ import java.util.regex.Pattern;
 
 /**
  * 主要用于获取进程的启动命令行 <p>
- *
- * @author : dsfan
- * @date : 2016年11月22日
  */
 public class ProcessUtil {
 

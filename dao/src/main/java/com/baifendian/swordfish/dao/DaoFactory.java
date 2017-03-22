@@ -22,19 +22,10 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-/**
- * author: dsfan date:   2017/3/16 desc:   Dao 工厂
- */
 public class DaoFactory {
 
-  /**
-   * LOGGER
-   */
   private static final Logger LOGGER = LoggerFactory.getLogger(DaoFactory.class);
 
-  /**
-   * dao 实例 map
-   */
   private static Map<String, BaseDao> daoMap = new ConcurrentHashMap<>();
 
   /**

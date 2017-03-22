@@ -20,10 +20,6 @@ import com.baifendian.swordfish.dao.utils.json.JsonUtil;
 
 import org.junit.Test;
 
-/**
- * @author : liujin
- * @date : 2017-03-17 11:37
- */
 public class UploadParamTest {
 
   @Test

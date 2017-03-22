@@ -114,58 +114,6 @@ public class FlowNodeMapperSqlProvider {
   }
 
   /**
-   * 批量更新Pos <li>生成 UPDATE ... SET ... WHEN ... THEN 语句<br> 如： UPDATE flows_nodes SET pos_y = CASE
-   * id WHEN 0 THEN #{list[0].posY} WHEN 11 THEN #{list[1].posY} END,pos_x = CASE id WHEN 0 THEN
-   * #{list[0].posX} WHEN 11 THEN #{list[1].posX} END WHERE id IN (0,11) <p>
-   *
-   * @return sql语句
-   */
-  @SuppressWarnings("unchecked")
-  public String updateAllPos(Map<String, Object> parameter) {
-    List<FlowNode> flowNodes = (List<FlowNode>) parameter.get("list");
-    StringBuilder sb = new StringBuilder();
-    sb.append("UPDATE ");
-    sb.append(TABLE_NAME);
-    sb.append(" SET ");
-
-    // 待更新的字段
-    Map<String, String> fieldMap = new HashMap<>();
-    fieldMap.put("pos_x", "posX");
-    fieldMap.put("pos_y", "posY");
-    fieldMap.put("modify_time", "modifyTime");
-    fieldMap.put("last_modify_by", "lastModifyBy");
-
-    appendWhenThenStm(flowNodes, sb, fieldMap);
-    return sb.toString();
-  }
-  // public String updateAllPos(Map<String, Object> parameter) {
-  // List<FlowNode> flowNodes = (List<FlowNode>) parameter.get("list");
-  // StringBuilder sb = new StringBuilder();
-  // sb.append("INSERT INTO ");
-  // sb.append(TABLE_NAME);
-  // sb.append("(id, name, type, flow_id, pos_x, pos_y, param, input_tables,
-  // output_tables, create_time, modify_time, last_modify_by) ");
-  // sb.append("VALUES ");
-  // String fm = "(#'{'list[{0}].id}, #'{'list[{0}].name}, " +
-  // EnumFieldUtil.genFieldSpecialStr("list[{0}].type", NodeType.class)
-  // + ",#'{'list[{0}].flowId}, #'{'list[{0}].posX}, #'{'list[{0}].posY}," +
-  // "#'{'list[{0}].param}, #'{'list[{0}].inputTables},
-  // #'{'list[{0}].outputTables} "
-  // + ",#'{'list[{0}].createTime}, #'{'list[{0}].modifyTime},
-  // #'{'list[{0}].lastModifyBy})";
-  // MessageFormat mf = new MessageFormat(fm);
-  // for (int i = 0; i < flowNodes.size(); i++) {
-  // sb.append(mf.format(new Object[] { i }));
-  // if (i < flowNodes.size() - 1) {
-  // sb.append(",");
-  // }
-  // }
-  // sb.append(" ON DUPLICATE KEY UPDATE
-  // pos_x=VALUES(pos_x),pos_y=VALUES(pos_y)");
-  // return sb.toString();
-  // }
-
-  /**
    * <p>
    */
   private void appendWhenThenStm(List<FlowNode> flowNodes, StringBuilder sb, Map<String, String> fieldMap) {
@@ -262,25 +210,6 @@ public class FlowNodeMapperSqlProvider {
         WHERE("flow_id = #{flowId}");
       }
     }.toString();
-  }
-
-  public String queryNodeNum(int tenantId, List<FlowType> flowTypes) {
-
-    StringBuilder sb = new StringBuilder();
-    sb.append("select count(0) ");
-    sb.append("from project_flows as a ");
-    sb.append("inner join flows_nodes as d on a.id = d.flow_id ");
-    sb.append("inner join project as b on a.project_id = b.id ");
-    sb.append("inner join tenant as c on b.tenant_id = c.id and c.id = #{tenantId} ");
-    if (flowTypes != null && flowTypes.size() > 0) {
-      sb.append("where a.type in (-1 ");
-      for (FlowType flowType : flowTypes) {
-        sb.append(",");
-        sb.append(flowType.getType());
-      }
-      sb.append(") ");
-    }
-    return sb.toString();
   }
 
   /**

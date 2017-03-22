@@ -17,9 +17,6 @@ package com.baifendian.swordfish.dao.enums;
 
 /**
  * 调度的类型 <p>
- *
- * @author : wenting.wang
- * @date : 2016年9月14日
  */
 public enum ScheduleType {
   /**

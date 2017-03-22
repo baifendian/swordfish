@@ -17,10 +17,6 @@ package com.baifendian.swordfish.dao.model;
 
 import java.util.Date;
 
-/**
- * @author : liujin
- * @date : 2017-03-10 16:01
- */
 public class MasterServer {
 
   private String host;

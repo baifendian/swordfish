@@ -15,12 +15,6 @@
  */
 package com.baifendian.swordfish.dao.enums;
 
-/**
- * workflow 中一个节点失败后的策略类型 <p>
- *
- * @author : wenting.wang
- * @date : 2016年8月27日
- */
 public enum FailurePolicyType {
 
   /**

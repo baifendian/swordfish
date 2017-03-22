@@ -19,9 +19,6 @@ import com.baifendian.swordfish.dao.enums.FlowType;
 
 /**
  * 日志记录工具类 <p>
- *
- * @author : dsfan
- * @date : 2016年12月15日
  */
 public class LoggerUtil {
 

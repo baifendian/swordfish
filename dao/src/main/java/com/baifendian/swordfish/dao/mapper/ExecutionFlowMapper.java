@@ -17,10 +17,6 @@ package com.baifendian.swordfish.dao.mapper;
 
 import com.baifendian.swordfish.dao.model.ExecutionFlow;
 import com.baifendian.swordfish.dao.model.MaintainQuery;
-import com.baifendian.swordfish.dao.model.statistics.FlowAvgTime;
-import com.baifendian.swordfish.dao.model.statistics.FlowNodeErrorNum;
-import com.baifendian.swordfish.dao.model.statistics.FlowNodeTimeConsumer;
-import com.baifendian.swordfish.dao.model.statistics.FlowStatusNum;
 
 import org.apache.ibatis.annotations.*;
 import org.apache.ibatis.type.EnumOrdinalTypeHandler;
@@ -77,9 +73,6 @@ public interface ExecutionFlowMapper {
   @SelectProvider(type = ExecutionFlowMapperProvider.class, method = "select")
   List<ExecutionFlow> select(@Param("maintainQuery") MaintainQuery maintainQuery);
 
-  @SelectProvider(type = ExecutionFlowMapperProvider.class, method = "selectCount")
-  int selectCount(@Param("maintainQuery") MaintainQuery maintainQuery);
-
   @Results(value = {@Result(property = "id", column = "id", id = true, javaType = Long.class, jdbcType = JdbcType.BIGINT),
           @Result(property = "flowId", column = "flow_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
           @Result(property = "workId", column = "work_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
@@ -111,6 +104,12 @@ public interface ExecutionFlowMapper {
 
   @Results(value = {@Result(property = "id", column = "id", id = true, javaType = Long.class, jdbcType = JdbcType.BIGINT),
           @Result(property = "flowId", column = "flow_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
+  })
+  @SelectProvider(type = ExecutionFlowMapperProvider.class, method = "selectRunningFlow")
+  List<ExecutionFlow> selectRunningFlow(@Param("worker") String worker);
+
+  @Results(value = {@Result(property = "id", column = "id", id = true, javaType = Long.class, jdbcType = JdbcType.BIGINT),
+          @Result(property = "flowId", column = "flow_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
           @Result(property = "workId", column = "work_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
           @Result(property = "status", column = "status", typeHandler = EnumOrdinalTypeHandler.class, jdbcType = JdbcType.TINYINT),
           @Result(property = "scheduleTime", column = "schedule_time", javaType = int.class, jdbcType = JdbcType.INTEGER),
@@ -136,85 +135,5 @@ public interface ExecutionFlowMapper {
 
   @DeleteProvider(type = ExecutionFlowMapperProvider.class, method = "deleteByExecId")
   int deleteByExecId(@Param("execId") Long execId);
-
-  /**
-   * 查询某个项目执行的workflow 状态记录 <p>
-   */
-  @Results(value = {@Result(property = "status", column = "status", typeHandler = EnumOrdinalTypeHandler.class, jdbcType = JdbcType.TINYINT),
-          @Result(property = "num", column = "num", javaType = int.class, jdbcType = JdbcType.INTEGER),})
-  @SelectProvider(type = ExecutionFlowMapperProvider.class, method = "selectFlowStatus")
-  List<FlowStatusNum> selectFlowStatus(@Param("projectId") Integer projectId, @Param("queryDate") Date queryDate);
-
-  /**
-   * 查询某个项目的用户执行的workflow 状态记录 <p>
-   */
-  @Results(value = {@Result(property = "status", column = "status", typeHandler = EnumOrdinalTypeHandler.class, jdbcType = JdbcType.TINYINT),
-          @Result(property = "num", column = "num", javaType = int.class, jdbcType = JdbcType.INTEGER),})
-  @SelectProvider(type = ExecutionFlowMapperProvider.class, method = "selectUserFlowStatus")
-  List<FlowStatusNum> selectUserFlowStatus(@Param("projectId") Integer projectId, @Param("queryDate") Date queryDate, @Param("userId") int userId);
-
-  /**
-   * 查询某个项目每日工作流运行状态(每天趋势) <p>
-   */
-  @Results(value = {@Result(property = "day", column = "day", javaType = Date.class, jdbcType = JdbcType.DATE),
-          @Result(property = "status", column = "status", typeHandler = EnumOrdinalTypeHandler.class, jdbcType = JdbcType.TINYINT),
-          @Result(property = "num", column = "num", javaType = int.class, jdbcType = JdbcType.INTEGER),})
-  @SelectProvider(type = ExecutionFlowMapperProvider.class, method = "selectDayFlowStatus")
-  List<FlowStatusNum> selectDayFlowStatus(@Param("projectId") Integer projectId, @Param("startDate") Date startDate, @Param("endDate") Date endDate);
-
-  /**
-   * 查询某个项目每小时工作流运行状态(每小时趋势) <p>
-   */
-  @Results(value = {@Result(property = "hour", column = "hour", javaType = int.class, jdbcType = JdbcType.INTEGER),
-          @Result(property = "status", column = "status", typeHandler = EnumOrdinalTypeHandler.class, jdbcType = JdbcType.TINYINT),
-          @Result(property = "num", column = "num", javaType = int.class, jdbcType = JdbcType.INTEGER),})
-  @SelectProvider(type = ExecutionFlowMapperProvider.class, method = "selectHourFlowStatus")
-  List<FlowStatusNum> selectHourFlowStatus(@Param("projectId") Integer projectId, @Param("startDate") Date startDate, @Param("endDate") Date endDate);
-
-  /**
-   * 查询某个workflow每日平均时间 <p>
-   */
-  @Results(value = {@Result(property = "day", column = "day", javaType = Date.class, jdbcType = JdbcType.DATE),
-          @Result(property = "duration", column = "duration", javaType = int.class, jdbcType = JdbcType.INTEGER),
-          @Result(property = "num", column = "num", javaType = int.class, jdbcType = JdbcType.INTEGER),})
-  @SelectProvider(type = ExecutionFlowMapperProvider.class, method = "selectFlowDayAvgTime")
-  List<FlowAvgTime> selectFlowDayAvgTime(@Param("flowId") Integer flowId, @Param("startDate") Date startDate, @Param("endDate") Date endDate);
-
-  /**
-   * 查询某个workflow每小时平均时间 <p>
-   */
-  @Results(value = {@Result(property = "hour", column = "hour", javaType = int.class, jdbcType = JdbcType.INTEGER),
-          @Result(property = "duration", column = "duration", javaType = int.class, jdbcType = JdbcType.INTEGER),
-          @Result(property = "num", column = "num", javaType = int.class, jdbcType = JdbcType.INTEGER),})
-  @SelectProvider(type = ExecutionFlowMapperProvider.class, method = "selectFlowHourAvgTime")
-  List<FlowAvgTime> selectFlowHourAvgTime(@Param("flowId") Integer flowId, @Param("startDate") Date startDate, @Param("endDate") Date endDate);
-
-  /**
-   * 查询某个项目工作流耗时排行信息 <p>
-   */
-  @Results(value = {@Result(property = "execId", column = "id", id = true, javaType = Long.class, jdbcType = JdbcType.BIGINT),
-          @Result(property = "flowId", column = "flow_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
-          @Result(property = "flowName", column = "flow_name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-          @Result(property = "flowType", column = "flow_type", typeHandler = EnumOrdinalTypeHandler.class, jdbcType = JdbcType.TINYINT),
-          @Result(property = "status", column = "status", typeHandler = EnumOrdinalTypeHandler.class, jdbcType = JdbcType.TINYINT),
-          @Result(property = "submitUser", column = "submit_user", javaType = int.class, jdbcType = JdbcType.INTEGER),
-          @Result(property = "submitUserName", column = "submit_user_name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-          @Result(property = "startTime", column = "start_time", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP),
-          @Result(property = "endTime", column = "end_time", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP),
-          @Result(property = "duration", column = "duration", javaType = int.class, jdbcType = JdbcType.INTEGER),})
-  @SelectProvider(type = ExecutionFlowMapperProvider.class, method = "selectFlowTopTimes")
-  List<FlowNodeTimeConsumer> selectFlowTopTimes(@Param("projectId") Integer projectId, @Param("startDate") Date startDate, @Param("endDate") Date endDate, @Param("num") int num);
-
-  /**
-   * 查询某个项目工作流和任务出错排行信息 <p>
-   */
-  @Results(value = {@Result(property = "flowId", column = "flow_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
-          @Result(property = "flowName", column = "flow_name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-          @Result(property = "flowType", column = "flow_type", typeHandler = EnumOrdinalTypeHandler.class, jdbcType = JdbcType.TINYINT),
-          @Result(property = "submitUser", column = "submit_user", javaType = int.class, jdbcType = JdbcType.INTEGER),
-          @Result(property = "submitUserName", column = "submit_user_name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-          @Result(property = "num", column = "num", javaType = int.class, jdbcType = JdbcType.INTEGER),})
-  @SelectProvider(type = ExecutionFlowMapperProvider.class, method = "selectFlowErrorNum")
-  List<FlowNodeErrorNum> selectFlowErrorNum(@Param("projectId") Integer projectId, @Param("startDate") Date startDate, @Param("endDate") Date endDate, @Param("num") int num);
 
 }

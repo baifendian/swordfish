@@ -26,9 +26,6 @@ import java.io.IOException;
 
 /**
  * 空操作的作业 <p>
- *
- * @author : dsfan
- * @date : 2016年11月4日
  */
 public class NoopJob extends AbstractProcessJob {
 

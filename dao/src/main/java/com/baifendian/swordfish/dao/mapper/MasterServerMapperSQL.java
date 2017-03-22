@@ -15,15 +15,10 @@
  */
 package com.baifendian.swordfish.dao.mapper;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.ibatis.jdbc.SQL;
 
 import java.util.Map;
 
-/**
- * @author : liujin
- * @date : 2017-03-10 16:01
- */
 public class MasterServerMapperSQL {
   public String query() {
     return new SQL() {{

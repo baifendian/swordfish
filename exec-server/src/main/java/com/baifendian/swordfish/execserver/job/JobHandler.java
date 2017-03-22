@@ -36,15 +36,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.*;
 
-/**
- * @author : liujin
- * @date : 2017-03-02 12:56
- */
 public class JobHandler {
 
   private final Logger logger = LoggerFactory.getLogger(JobHandler.class);
-
-  private String JOB_SCRIPT_PATH_FORMAT = "{0}/job_script/{1}";
 
   private String DATETIME_FORMAT = "yyyyMMddHHmmss";
 
@@ -110,7 +104,7 @@ public class JobHandler {
     props.setQueue(executionFlow.getQueue());
 
     //logger.info("props:{}", props);
-    job = JobTypeManager.newJob(jobIdLog, node.getType().name(), props, logger);
+    job = JobTypeManager.newJob(jobIdLog, node.getType(), props, logger);
     Boolean result;
     try {
       result = submitJob(job);
@@ -157,7 +151,7 @@ public class JobHandler {
     boolean isSuccess = false;
 
     // 短任务，需要设置超时时间
-    if (!node.getType().typeIsLong()) {
+    if (JobTypeManager.isLongJob(node.getType())) {
       try {
         isSuccess = future.get(calcNodeTimeout(), TimeUnit.SECONDS);
       } catch (TimeoutException e) {
@@ -180,7 +174,7 @@ public class JobHandler {
   private int calcNodeTimeout() {
     int usedTime = (int) ((System.currentTimeMillis() - startTime) / 1000);
     if (timeout <= usedTime) {
-      throw new ExecTimeoutException("当前 workflow 已经执行超时");
+      throw new ExecTimeoutException("current workflow execution fetch time out");
     }
     return timeout - usedTime;
   }

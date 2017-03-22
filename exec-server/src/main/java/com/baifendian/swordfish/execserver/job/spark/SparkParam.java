@@ -17,7 +17,7 @@ package com.baifendian.swordfish.execserver.job.spark;
 
 import com.baifendian.swordfish.common.job.BaseParam;
 import com.baifendian.swordfish.dao.model.flow.params.Property;
-import com.baifendian.swordfish.execserver.job.ResourceInfo;
+import com.baifendian.swordfish.common.job.ResourceInfo;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -26,10 +26,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * MR 节点的参数 <p>
- *
- * @author : dsfan
- * @date : 2016年8月30日
+ * Spark 节点的参数 <p>
  */
 public class SparkParam extends BaseParam {
 

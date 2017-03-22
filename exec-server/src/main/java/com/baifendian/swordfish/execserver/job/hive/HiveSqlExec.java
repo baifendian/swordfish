@@ -41,9 +41,6 @@ import java.util.List;
 
 /**
  * Hive sql执行 <p>
- *
- * @author : dsfan
- * @date : 2016年11月9日
  */
 public class HiveSqlExec {
 

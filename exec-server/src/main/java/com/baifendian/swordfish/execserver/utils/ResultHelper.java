@@ -20,8 +20,6 @@ import com.baifendian.swordfish.rpc.RetInfo;
 /**
  * 返回结果帮助类 <p>
  *
- * @author : dsfan
- * @date : 2016年10月26日
  */
 public class ResultHelper {
   /**

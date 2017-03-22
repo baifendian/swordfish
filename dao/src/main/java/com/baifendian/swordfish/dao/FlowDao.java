@@ -31,9 +31,6 @@ import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
 
-/**
- * author: dsfan date:   2017/3/16 desc:
- */
 @Component
 public class FlowDao extends BaseDao {
   @Autowired
@@ -54,9 +51,6 @@ public class FlowDao extends BaseDao {
   @Autowired
   private ExecutionNodeMapper executionNodeMapper;
 
-  @Autowired
-  private ExecNodeLogMapper execNodeLogMapper;
-
   @Override
   protected void init() {
     executionFlowMapper = ConnectionFactory.getSqlSession().getMapper(ExecutionFlowMapper.class);
@@ -65,7 +59,6 @@ public class FlowDao extends BaseDao {
     flowNodeRelationMapper = ConnectionFactory.getSqlSession().getMapper(FlowNodeRelationMapper.class);
     scheduleMapper = ConnectionFactory.getSqlSession().getMapper(ScheduleMapper.class);
     executionNodeMapper = ConnectionFactory.getSqlSession().getMapper(ExecutionNodeMapper.class);
-    execNodeLogMapper = ConnectionFactory.getSqlSession().getMapper(ExecNodeLogMapper.class);
   }
 
   /**
@@ -91,6 +84,13 @@ public class FlowDao extends BaseDao {
    */
   public List<ExecutionFlow> queryAllNoFinishFlow() {
     return executionFlowMapper.selectNoFinishFlow();
+  }
+
+  /**
+   * 获取execserver正在运行的workflow
+   */
+  public List<ExecutionFlow> queryRunningFlow(String worker) {
+    return executionFlowMapper.selectRunningFlow(worker);
   }
 
   /**
@@ -263,7 +263,7 @@ public class FlowDao extends BaseDao {
    * 创建节点
    */
   @Transactional(value = "TransactionManager")
-  public void createNode(int projectId, int workflowId, NodeType nodeType, int userId, String name) throws Exception {
+  public void createNode(int projectId, int workflowId, String nodeType, int userId, String name) throws Exception {
     FlowNode flowNode = new FlowNode();
 
     flowNode.setName(name);
@@ -349,14 +349,6 @@ public class FlowDao extends BaseDao {
   public void updateExecutionNode(ExecutionNode executionNode) {
     // 更新执行节点信息
     executionNodeMapper.update(executionNode);
-  }
-
-  /**
-   * 插入 ExecNodeLog <p>
-   */
-  public void insertExecNodeLog(ExecNodeLog execNodeLog) {
-    // 插入执行节点执行日志
-    execNodeLogMapper.insert(execNodeLog);
   }
 
   /**

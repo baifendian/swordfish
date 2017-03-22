@@ -23,8 +23,6 @@ import java.util.Date;
 /**
  * 调度的设置基础数据 <p>
  *
- * @author : wenting.wang
- * @date : 2016年8月23日
  */
 public class Schedule {
 
@@ -39,8 +37,6 @@ public class Schedule {
   private Date modifyTime;
 
   private int lastModifyBy;
-
-  private PubStatus pubStatus;
 
   private ScheduleStatus scheduleStatus;
 
@@ -118,14 +114,6 @@ public class Schedule {
 
   public void setLastModifyBy(int lastModifyBy) {
     this.lastModifyBy = lastModifyBy;
-  }
-
-  public PubStatus getPubStatus() {
-    return pubStatus;
-  }
-
-  public void setPubStatus(PubStatus pubStatus) {
-    this.pubStatus = pubStatus;
   }
 
   public ScheduleStatus getScheduleStatus() {

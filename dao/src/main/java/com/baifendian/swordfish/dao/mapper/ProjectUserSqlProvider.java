@@ -19,9 +19,6 @@ import org.apache.ibatis.jdbc.SQL;
 
 import java.util.Map;
 
-/**
- * Created by caojingwei on 16/8/25.
- */
 public class ProjectUserSqlProvider {
 
   public String insert(Map<String, Object> parameter) {

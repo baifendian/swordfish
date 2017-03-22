@@ -48,8 +48,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import static com.baifendian.swordfish.common.utils.ThriftUtil.getTThreadPoolServer;
 
 /**
- * @author : liujin
- * @date : 2017-03-10 14:57
+ * exec thrift server service
  */
 public class ExecThriftServer {
   private static Logger logger = LoggerFactory.getLogger(ExecThriftServer.class);
@@ -107,7 +106,7 @@ public class ExecThriftServer {
     HdfsClient.init(ConfigurationUtil.getConfiguration());
 
     masterClient = new MasterClient(masterServer.getHost(), masterServer.getPort(), THRIFT_RPC_RETRIES);
-    host = InetAddress.getLocalHost().getHostName();
+    host = InetAddress.getLocalHost().getHostAddress();
 
     logger.info("register to master {}:{}", masterServer.getHost(), masterServer.getPort());
     /** 注册到master */

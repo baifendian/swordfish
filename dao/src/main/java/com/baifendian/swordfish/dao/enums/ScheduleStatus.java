@@ -19,9 +19,6 @@ import com.fasterxml.jackson.annotation.JsonValue;
 
 /**
  * 调度状态 <p>
- *
- * @author : wenting.wang
- * @date : 2016年8月27日
  */
 public enum ScheduleStatus {
 

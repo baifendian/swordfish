@@ -15,16 +15,7 @@
  */
 package com.baifendian.swordfish.dao.mapper;
 
-/**
- * schedules 表操作 <p>
- *
- * @author : wenting.wang
- * @date : 2016年8月25日
- */
-
 import com.baifendian.swordfish.dao.enums.FlowType;
-import com.baifendian.swordfish.dao.enums.NodeTypeHandler;
-import com.baifendian.swordfish.dao.enums.PubStatus;
 import com.baifendian.swordfish.dao.enums.ScheduleStatus;
 import com.baifendian.swordfish.dao.model.Schedule;
 import com.baifendian.swordfish.dao.model.statistics.DisField;
@@ -38,12 +29,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
-/**
- * 已发布workflow节点信息 <p>
- *
- * @author : wenting.wang
- * @date : 2016年8月24日
- */
 @MapperScan
 public interface ScheduleMapper {
   /**
@@ -70,7 +55,6 @@ public interface ScheduleMapper {
           @Result(property = "createTime", column = "create_time", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP),
           @Result(property = "modifyTime", column = "modify_time", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP),
           @Result(property = "lastModifyBy", column = "last_modify_by", javaType = int.class, jdbcType = JdbcType.INTEGER),
-          @Result(property = "pubStatus", column = "pub_status", typeHandler = EnumOrdinalTypeHandler.class, jdbcType = JdbcType.TINYINT),
           @Result(property = "scheduleStatus", column = "schedule_status", typeHandler = EnumOrdinalTypeHandler.class, jdbcType = JdbcType.TINYINT),
           @Result(property = "startDate", column = "start_date", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP),
           @Result(property = "endDate", column = "end_date", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP),
@@ -89,38 +73,6 @@ public interface ScheduleMapper {
   Schedule selectByFlowId(@Param("flowId") int flowId);
 
   /**
-   * 查询已发布 workflow 任务的调度情况列表 <p>
-   */
-  @Results(value = {
-          @Result(property = "flowId", column = "flow_id", id = true, javaType = int.class, jdbcType = JdbcType.INTEGER),
-          @Result(property = "flowName", column = "flow_name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-          @Result(property = "flowType", column = "flow_type", typeHandler = EnumOrdinalTypeHandler.class, jdbcType = JdbcType.TINYINT),
-          @Result(property = "createTime", column = "create_time", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP),
-          @Result(property = "modifyTime", column = "modify_time", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP),
-          @Result(property = "lastModifyBy", column = "last_modify_by", javaType = int.class, jdbcType = JdbcType.INTEGER),
-          @Result(property = "pubStatus", column = "pub_status", typeHandler = EnumOrdinalTypeHandler.class, jdbcType = JdbcType.TINYINT),
-          @Result(property = "scheduleStatus", column = "schedule_status", typeHandler = EnumOrdinalTypeHandler.class, jdbcType = JdbcType.TINYINT),
-          @Result(property = "startDate", column = "start_date", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP),
-          @Result(property = "endDate", column = "end_date", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP),
-          @Result(property = "publishTime", column = "publish_time", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP),
-          @Result(property = "scheduleType", column = "schedule_type", typeHandler = EnumOrdinalTypeHandler.class, jdbcType = JdbcType.TINYINT),
-          @Result(property = "crontabStr", column = "crontab_str", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-          @Result(property = "nextSubmitTime", column = "next_submit_time", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP),
-          @Result(property = "depWorkflows", column = "dep_workflows", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-          @Result(property = "failurePolicy", column = "failure_policy", typeHandler = EnumOrdinalTypeHandler.class, jdbcType = JdbcType.INTEGER),
-          @Result(property = "depPolicy", column = "dep_policy", typeHandler = EnumOrdinalTypeHandler.class, jdbcType = JdbcType.TINYINT),
-          @Result(property = "maxTryTimes", column = "max_try_times", javaType = Integer.class, jdbcType = JdbcType.TINYINT),
-          @Result(property = "notifyType", column = "notify_type", typeHandler = EnumOrdinalTypeHandler.class, jdbcType = JdbcType.TINYINT),
-          @Result(property = "notifyEmails", column = "notify_emails", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-          @Result(property = "timeout", column = "timeout", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
-          @Result(property = "ownerId", column = "owner_id", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
-          @Result(property = "ownerName", column = "owner_name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-  })
-  @SelectProvider(type = ScheduleMapperProvider.class, method = "selectByProjectId")
-  List<Schedule> selectByProjectId(@Param("projectId") int projectId, @Param("pubStatus") PubStatus pubStatus,
-                                   @Param("scheduleStatus") ScheduleStatus scheduleStatus);
-
-  /**
    * 查询多个workflow的调度信息 <p>
    */
   @Results(value = {
@@ -130,7 +82,6 @@ public interface ScheduleMapper {
           @Result(property = "createTime", column = "create_time", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP),
           @Result(property = "modifyTime", column = "modify_time", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP),
           @Result(property = "lastModifyBy", column = "last_modify_by", javaType = int.class, jdbcType = JdbcType.INTEGER),
-          @Result(property = "pubStatus", column = "pub_status", typeHandler = EnumOrdinalTypeHandler.class, jdbcType = JdbcType.TINYINT),
           @Result(property = "scheduleStatus", column = "schedule_status", typeHandler = EnumOrdinalTypeHandler.class, jdbcType = JdbcType.TINYINT),
           @Result(property = "startDate", column = "start_date", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP),
           @Result(property = "endDate", column = "end_date", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP),
@@ -160,15 +111,6 @@ public interface ScheduleMapper {
 
   @DeleteProvider(type = ScheduleMapperProvider.class, method = "deleteByFlowId")
   int deleteByFlowId(@Param("flowId") int flowId);
-
-  /**
-   * 任务类型分布 <p>
-   */
-  @Results(value = {@Result(property = "nodeType", column = "node_type", typeHandler = NodeTypeHandler.class, jdbcType = JdbcType.TINYINT),
-          @Result(property = "value", column = "num", javaType = int.class, jdbcType = JdbcType.INTEGER),
-  })
-  @SelectProvider(type = ScheduleMapperProvider.class, method = "queryTaskTypeDis")
-  List<DisField> queryTaskTypeDis(@Param("projectId") int projectId);
 
   /**
    * 工作流类型分布 <p>

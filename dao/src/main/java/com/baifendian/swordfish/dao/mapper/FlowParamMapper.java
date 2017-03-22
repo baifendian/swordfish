@@ -24,9 +24,6 @@ import java.util.List;
 
 /**
  * workflow 参数信息的操作 <p>
- *
- * @author : dsfan
- * @date : 2016年10月12日
  */
 public interface FlowParamMapper {
   /**

@@ -32,9 +32,6 @@ import java.util.TimeZone;
 
 /**
  * Json序列化工具类 <p>
- *
- * @author : dsfan
- * @date : 2016年7月29日
  */
 public class JsonUtil {
   /**

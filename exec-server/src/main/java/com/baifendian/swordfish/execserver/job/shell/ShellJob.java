@@ -34,20 +34,7 @@ import java.nio.file.attribute.PosixFilePermissions;
 import java.util.Set;
 import java.util.UUID;
 
-/**
- * author: smile8 date: 17/12/2016 desc:
- */
 public class ShellJob extends AbstractProcessJob {
-
-  /**
-   * pipe 的缓冲大小
-   */
-  private static int BUFFER_SIZE = 1024 * 10 * 4;
-
-  /**
-   * 监听间隔
-   */
-  private static int TIME_OUT = 500;
 
   private ShellParam shellParam;
 

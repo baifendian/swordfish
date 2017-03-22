@@ -23,10 +23,6 @@ import org.mybatis.spring.annotation.MapperScan;
 
 import java.util.Date;
 
-/**
- * @author : liujin
- * @date : 2017-03-10 16:01
- */
 @MapperScan
 public interface MasterServerMapper {
   @Results(value = {

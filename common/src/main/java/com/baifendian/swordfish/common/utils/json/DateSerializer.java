@@ -26,9 +26,6 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-/**
- * Created by caojingwei on 16/8/24.
- */
 public class DateSerializer extends JsonSerializer<Date> {
   @Override
   public void serialize(Date date, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException, JsonProcessingException {

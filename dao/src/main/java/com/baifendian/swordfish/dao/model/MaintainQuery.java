@@ -21,12 +21,6 @@ import com.baifendian.swordfish.dao.enums.FlowType;
 import java.util.Date;
 import java.util.List;
 
-/**
- * <p> 查询运行的任务列表情况的查询信息
- *
- * @author : wenting.wang
- * @date : 2016年8月30日
- */
 public class MaintainQuery {
 
   /**

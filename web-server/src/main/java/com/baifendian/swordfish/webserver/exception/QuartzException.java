@@ -15,12 +15,6 @@
  */
 package com.baifendian.swordfish.webserver.exception;
 
-/**
- * Quartz 调度的异常 <p>
- *
- * @author : dsfan
- * @date : 2016年10月24日
- */
 public class QuartzException extends RuntimeException {
   /**
    * Serial version UID

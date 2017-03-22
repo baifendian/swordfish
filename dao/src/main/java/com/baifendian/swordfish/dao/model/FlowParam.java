@@ -15,12 +15,6 @@
  */
 package com.baifendian.swordfish.dao.model;
 
-/**
- * workflow 的自定义参数 <p>
- *
- * @author : dsfan
- * @date : 2016年10月12日
- */
 public class FlowParam {
 
   /**

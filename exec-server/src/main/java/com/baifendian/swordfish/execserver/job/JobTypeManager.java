@@ -26,59 +26,113 @@ import com.baifendian.swordfish.execserver.job.mr.MrJob;
 import com.baifendian.swordfish.execserver.job.process.DefaultProcessJob;
 import com.baifendian.swordfish.execserver.job.shell.ShellJob;
 import com.baifendian.swordfish.execserver.job.spark.SparkJob;
-import com.baifendian.swordfish.execserver.job.upload.UploadJob;
-import com.baifendian.swordfish.execserver.utils.CommandUtil;
 
-import org.apache.commons.configuration.PropertiesConfiguration;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.util.ResourceUtils;
+import org.w3c.dom.Document;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+
 /**
  * job生成工厂类
- *
- * @author : liujin
- * @date : 2017-03-02 10:30
  */
 public class JobTypeManager {
 
-  private static Map<String, Class<? extends Job>> jobTypeMap = new HashMap<>();
+  private static final Logger logger = LoggerFactory.getLogger(JobTypeManager.class);
+
+  private static Map<String, JobType> jobTypeMap = new HashMap<>();
 
   static {
     initBaseJobType();
   }
 
   private static void initBaseJobType() {
-    jobTypeMap.put("MR", MrJob.class);
-    jobTypeMap.put("SHELL", ShellJob.class);
-    jobTypeMap.put("SPARK_BATCH", SparkJob.class);
-    jobTypeMap.put("VIRTUAL", NoopJob.class);
-    jobTypeMap.put("SQL", EtlSqlJob.class);
-    jobTypeMap.put("ADHOC_SQL", AdHocSqlJob.class);
-    jobTypeMap.put("ADHOC_SQL", AdHocSqlJob.class);
-    jobTypeMap.put("FILE_IMPORT_SQL", UploadJob.class);
+    jobTypeMap.put("MR", new JobType(MrJob.class, false));
+    jobTypeMap.put("SHELL", new JobType(ShellJob.class, false));
+    jobTypeMap.put("SPARK_BATCH", new JobType(SparkJob.class, false));
+    jobTypeMap.put("VIRTUAL", new JobType(NoopJob.class, false));
+    jobTypeMap.put("SQL", new JobType(EtlSqlJob.class, false));
+    jobTypeMap.put("ADHOC_SQL", new JobType(AdHocSqlJob.class, false));
+    addPluginJobs();
+
+    printPluginJobs();
   }
 
-  public static void addJobType(String jobType, Class<? extends Job> jobClass) {
-    if (jobTypeMap.containsKey(jobType)) {
-      throw new ConfigException(String.format("job type {0} is config for {1}", jobType, jobTypeMap.get(jobType)));
+  /**
+   * 根据配置文件解析plugin job
+   */
+  private static void addPluginJobs(){
+    try {
+      File pluginFile = ResourceUtils.getFile("classpath:plugin_jobs.xml");
+      DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+      DocumentBuilder builder = factory.newDocumentBuilder();
+      Document doc = builder.parse(pluginFile);
+      NodeList pluginJobs = doc.getElementsByTagName("pluginJob");
+      for (int i = 0; i < pluginJobs.getLength(); i++) {
+        String name = doc.getElementsByTagName("name").item(i).getFirstChild().getNodeValue();
+        String className = doc.getElementsByTagName("className").item(i).getFirstChild().getNodeValue();
+        String isLongStr = doc.getElementsByTagName("isLongJob").item(i).getFirstChild().getNodeValue();
+        boolean isLong = false;
+        if(isLongStr.equalsIgnoreCase("true")){
+          isLong = true;
+        }
+        Class <? extends Job> jobClassName = (Class<? extends Job>) Class.forName(className);
+        if(jobTypeMap.containsKey(name)){
+          logger.error("job type name {} is exists for {} ignore", name, jobTypeMap.get(name));
+        } else {
+          jobTypeMap.put(name, new JobType(jobClassName, isLong));
+        }
+      }
+    } catch (FileNotFoundException e) {
+      e.printStackTrace();
+    } catch (ParserConfigurationException e) {
+      e.printStackTrace();
+    } catch (SAXException e) {
+      e.printStackTrace();
+    } catch (IOException e) {
+      e.printStackTrace();
+    } catch (ClassNotFoundException e) {
+      e.printStackTrace();
     }
-    jobTypeMap.put(jobType, jobClass);
   }
 
-  public static Job newJob(String jobIdLog, String jobType, JobProps props, Logger logger) throws IllegalAccessException, InvocationTargetException, InstantiationException, NoSuchMethodException {
+  public static Job newJob(String jobIdLog, String jobTypeStr, JobProps props, Logger logger) throws IllegalAccessException, InvocationTargetException, InstantiationException, NoSuchMethodException {
     Job job = null;
-    Class jobClass = jobTypeMap.get(jobType);
-    if (jobClass == null) {
-      throw new ExecException("unsupport job type:" + jobType);
+    JobType jobType = jobTypeMap.get(jobTypeStr);
+    if (jobType == null) {
+      throw new ExecException("unsupport job type:" + jobTypeStr);
     } else {
-      Constructor<Job> constructor = jobClass.getConstructor(String.class, JobProps.class, Logger.class);
+      Constructor<Job> constructor = jobType.getClassName().getConstructor(String.class, JobProps.class, Logger.class);
       job = constructor.newInstance(jobIdLog, props, logger);
     }
     return job;
   }
 
+  public static boolean isLongJob(String jobTypeStr){
+    if(!jobTypeMap.containsKey(jobTypeStr)){
+      throw new IllegalArgumentException("not found job type " + jobTypeStr);
+    }
+    JobType jobType = jobTypeMap.get(jobTypeStr);
+    return jobType.isLong();
+  }
+
+  private static void printPluginJobs(){
+    logger.info("active plugin jobs:");
+    for(Map.Entry entry: jobTypeMap.entrySet()){
+      logger.info("job type {} {}", entry.getKey(), entry.getValue());
+    }
+  }
 }

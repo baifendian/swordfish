@@ -28,9 +28,6 @@ import org.mybatis.spring.annotation.MapperScan;
 import java.util.Date;
 import java.util.List;
 
-/**
- * Created by caojingwei on 16/8/25.
- */
 @MapperScan
 public interface ProjectUserMapper {
   @InsertProvider(type = ProjectUserSqlProvider.class, method = "insert")

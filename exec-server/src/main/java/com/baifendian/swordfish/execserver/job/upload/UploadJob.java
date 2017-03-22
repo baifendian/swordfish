@@ -34,10 +34,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-/**
- * @author : liujin
- * @date : 2017-03-16 10:38
- */
 public class UploadJob extends AbstractProcessJob {
   private UploadParam param;
 
