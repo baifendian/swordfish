@@ -24,6 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.DELETE;
 import java.util.List;
 
 /**
@@ -51,7 +52,7 @@ public class UserController {
    * @param response
    * @return
    */
-  @RequestMapping(value = "/{name}", method = {RequestMethod.POST})
+  @PostMapping(value = "/{name}")
   public User createUser(@RequestAttribute(value = "session.user") User operator,
                          @PathVariable String name,
                          @RequestParam(value = "email") String email,
@@ -69,6 +70,7 @@ public class UserController {
   /**
    * 修改用户信息, "系统管理员和用户自己" 操作
    *
+   * @param operator
    * @param name
    * @param email
    * @param desc
@@ -78,7 +80,7 @@ public class UserController {
    * @param response
    * @return
    */
-  @RequestMapping(value = "/{name}", method = {RequestMethod.PATCH})
+  @PatchMapping(value = "/{name}")
   public User modifyUser(@RequestAttribute(value = "session.user") User operator,
                          @PathVariable String name,
                          @RequestParam(value = "email", required = false) String email,
@@ -96,11 +98,12 @@ public class UserController {
   /**
    * 删除用户, "系统管理员" 操作
    *
+   * @param operator
    * @param name
    * @param response
    * @return
    */
-  @RequestMapping(value = "/{name}", method = {RequestMethod.DELETE})
+  @DeleteMapping(value = "/{name}")
   public void deleteUser(@RequestAttribute(value = "session.user") User operator,
                          @PathVariable String name,
                          HttpServletResponse response) {
@@ -118,7 +121,7 @@ public class UserController {
    * @param response
    * @return
    */
-  @RequestMapping(value = "", method = {RequestMethod.GET})
+  @GetMapping(value = "")
   public List<User> queryUsers(@RequestAttribute(value = "session.user") User operator,
                                @RequestParam(value = "allUser", required = false) Boolean allUser,
                                HttpServletResponse response) {
@@ -126,27 +129,5 @@ public class UserController {
         operator.getId(), allUser);
 
     return userService.queryUser(operator, (allUser == null) ? false : allUser, response);
-  }
-
-  /**
-   * 修改代理用户的账号信息
-   *
-   * @param operator
-   * @param name
-   * @param proxyUser
-   * @param password
-   * @param response
-   * @return
-   */
-  @RequestMapping(value = "/{name}/proxyUsers/{proxyUser}", method = {RequestMethod.GET})
-  public void modifyProxyUserPass(@RequestAttribute(value = "session.user") User operator,
-                                  @PathVariable String name,
-                                  @PathVariable String proxyUser,
-                                  @RequestParam(value = "password") String password,
-                                  HttpServletResponse response) {
-    logger.info("Operator user id {}, modify proxy user, name: {}, proxyUser: {}, password: {}",
-        operator.getId(), name, proxyUser, "******");
-
-    response.setStatus(HttpStatus.SC_NOT_IMPLEMENTED);
   }
 }

@@ -55,8 +55,8 @@ public class ResourceController {
                                  @RequestParam(value = "desc", required = false) String desc,
                                  @RequestParam("file") MultipartFile file,
                                  HttpServletResponse response) {
-    logger.info("Operator user id {}, create resource, project name: {}, resource name: {}, desc: {}",
-        operator.getId(), projectName, name, desc);
+    logger.info("Operator user id {}, create resource, project name: {}, resource name: {}, desc: {}, file: [{},{}]",
+        operator.getId(), projectName, name, desc, file.getName(), file.getOriginalFilename());
 
     return resourceService.createResource(operator, projectName, name, desc, file, response);
   }

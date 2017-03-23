@@ -69,49 +69,49 @@ public class BaseConfig {
   }
 
   /**
-   * 本地的资源数据缓存文件路径
+   * 本地的资源数据缓存文件目录
    *
    * @param projectId
-   * @param resName
+   * @param resourceId
    * @return
    */
-  public static String getLocalResourcePath(int projectId, String resName) {
-    return MessageFormat.format("{0}/{1}/resources/{2}", localDataBasePath, projectId, resName);
+  public static String getLocalResourcePath(int projectId, int resourceId) {
+    return MessageFormat.format("{0}/{1}/resources/{2}", localDataBasePath, projectId, resourceId);
   }
 
   /**
-   * 本地的工作流数据缓存文件路径
+   * 本地的工作流数据缓存文件目录
    *
    * @param projectId
-   * @param workflowName
+   * @param workflowId
    * @return
    */
-  public static String getLocalWorkflowPath(int projectId, String workflowName) {
-    return MessageFormat.format("{0}/{1}/workflows/{2}.{3}", localDataBasePath, projectId, workflowName, "zip");
+  public static String getLocalWorkflowPath(int projectId, int workflowId) {
+    return MessageFormat.format("{0}/{1}/workflows/{2}", localDataBasePath, projectId, workflowId);
   }
 
   /**
-   * hdfs 上资源的文件路径
-   *
-   * @param projectId
-   * @return
-   */
-  public static String getHdfsResourcesPath(int projectId, String resName) {
-    return MessageFormat.format("{0}/{1}/resources/{2}", hdfsDataBasePath, projectId, resName);
-  }
-
-  /**
-   * hdfs 上工作流数据的文件路径
+   * hdfs 上资源的文件目录
    *
    * @param projectId
    * @return
    */
-  public static String getHdfsFlowPath(int projectId, String workflowName) {
-    return MessageFormat.format("{0}/{1}/workflows/{2}.{3}", hdfsDataBasePath, projectId, workflowName, "zip");
+  public static String getHdfsResourcesPath(int projectId, int resourceId) {
+    return MessageFormat.format("{0}/{1}/resources/{2}", hdfsDataBasePath, projectId, resourceId);
   }
 
   /**
-   * 工作流执行的路径
+   * hdfs 上工作流数据的文件目录
+   *
+   * @param projectId
+   * @return
+   */
+  public static String getHdfsWorkflowPath(int projectId, int workflowId) {
+    return MessageFormat.format("{0}/{1}/workflows/{2}", hdfsDataBasePath, projectId, workflowId);
+  }
+
+  /**
+   * 工作流执行的目录
    *
    * @param projectId
    * @param workflowId

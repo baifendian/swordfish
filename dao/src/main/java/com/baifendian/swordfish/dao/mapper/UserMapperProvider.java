@@ -141,9 +141,9 @@ public class UserMapperProvider {
           SET("`password`=#{user.password}");
         }
 
-        if (user.getRole() != null) {
-          SET("`role`=" + EnumFieldUtil.genFieldStr("user.role", UserRoleType.class));
-        }
+//        if (user.getRole() != null) {
+//          SET("`role`=" + EnumFieldUtil.genFieldStr("user.role", UserRoleType.class));
+//        }
 
         if (StringUtils.isNotEmpty(user.getProxyUsers())) {
           SET("`proxy_users`=#{user.proxyUsers}");

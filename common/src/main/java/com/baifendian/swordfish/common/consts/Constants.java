@@ -133,4 +133,9 @@ public class Constants {
    * 项目用户执行权限
    */
   public static final int PROJECT_USER_PERM_EXEC = 0x01;
+
+  /**
+   * 所有权限
+   */
+  public static final int PROJECT_USER_PERM_ALL = PROJECT_USER_PERM_WRITE | PROJECT_USER_PERM_READ | PROJECT_USER_PERM_EXEC;
 }
