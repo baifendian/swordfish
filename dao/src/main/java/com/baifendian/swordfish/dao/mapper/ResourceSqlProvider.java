@@ -15,9 +15,6 @@
  */
 package com.baifendian.swordfish.dao.mapper;
 
-import com.baifendian.swordfish.dao.mapper.utils.EnumFieldUtil;
-import com.baifendian.swordfish.dao.enums.ResourceType;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.jdbc.SQL;
 
@@ -39,7 +36,6 @@ public class ResourceSqlProvider {
       {
         INSERT_INTO("resources");
         VALUES("name", "#{resource.name}");
-        VALUES("type", EnumFieldUtil.genFieldStr("resource.type", ResourceType.class));
         VALUES("project_id", "#{resource.projectId}");
         VALUES("owner_id", "#{resource.ownerId}");
         VALUES("modify_time", "#{resource.modifyTime}");
@@ -119,7 +115,6 @@ public class ResourceSqlProvider {
         FROM("dir_relation as dr");
         LEFT_OUTER_JOIN("resources as r on dr.file_id = r.id");
         //WHERE("dr.type = " + FolderType.RESOURCE.getType());
-        WHERE("r.type = " + EnumFieldUtil.genFieldStr("type", ResourceType.class));
         WHERE("r.project_id = #{projectId}");
       }
     }.toString();

@@ -25,12 +25,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.*;
 
-/**
- * hdfs 操作类 <p>
- *
- * @author : dsfan
- * @date : 2016年9月12日
- */
 public class HdfsClient implements Closeable {
 
   /**
@@ -56,12 +50,14 @@ public class HdfsClient implements Closeable {
     try {
       fileSystem = FileSystem.get(conf);
     } catch (IOException e) {
-      throw new HdfsException("创建 HdfsClient 实例失败", e);
+      throw new HdfsException("Create HdfsClient failed.", e);
     }
   }
 
   /**
-   * 初始化，仅需调用一次 <p>
+   * 初始化，仅需调用一次
+   *
+   * @param conf
    */
   public static void init(Configuration conf) {
     if (instance == null) {
@@ -74,20 +70,20 @@ public class HdfsClient implements Closeable {
   }
 
   /**
-   * 获取 HdfsClient 实例 （单例） <p>
+   * 获取 HdfsClient 实例 (单例)
    *
    * @return {@link HdfsClient}
    */
   public static HdfsClient getInstance() throws HdfsException {
     if (instance == null) {
-      LOGGER.error("获取 HdfsClient 实例失败，请先调用 init(Configuration conf) 方法初始化");
-      throw new HdfsException("获取 HdfsClient 实例失败，请先调用 init(Configuration conf) 方法初始化");
+      LOGGER.error("Get HdfsClient instance failed，please call init(Configuration conf) first");
+      throw new HdfsException("Get HdfsClient instance failed，please call init(Configuration conf) first");
     }
     return instance;
   }
 
   /**
-   * 添加文件到 HDFS 指定目录 <p>
+   * 添加文件到 HDFS 指定目录
    *
    * @param fileName    文件名称
    * @param content     文件内容
@@ -95,17 +91,19 @@ public class HdfsClient implements Closeable {
    * @param isOverwrite 当目标文件已经不存在时，是否覆盖
    */
   public void addFile(String fileName, byte[] content, String destPath, boolean isOverwrite) throws HdfsException {
-    LOGGER.debug("Begin addFile. fileName:" + fileName + ", path:" + destPath);
+    LOGGER.debug("Begin addFile. fileName: {}, path: {}", fileName, destPath);
+
     // 创建目标文件路径
     String destFile;
-    if (destPath.charAt(destPath.length() - 1) != '/') {
-      destFile = destPath + "/" + fileName;
+    if (destPath.charAt(destPath.length() - 1) != File.separatorChar) {
+      destFile = destPath + File.separatorChar + fileName;
     } else {
       destFile = destPath + fileName;
     }
 
     // 判断文件是否存在
     Path path = new Path(destFile);
+
     try {
       // 文件已经存在
       if (fileSystem.exists(path)) {
@@ -117,28 +115,30 @@ public class HdfsClient implements Closeable {
         }
       }
     } catch (IOException e) {
-      LOGGER.error("操作 Hdfs 异常", e);
-      throw new HdfsException("操作 Hdfs 异常", e);
+      LOGGER.error("Operator Hdfs exception", e);
+      throw new HdfsException("Operator Hdfs exception", e);
     }
 
     try (
-            FSDataOutputStream out = fileSystem.create(path);
-            InputStream in = new BufferedInputStream(new ByteArrayInputStream(content));) {
+        FSDataOutputStream out = fileSystem.create(path);
+        InputStream in = new BufferedInputStream(new ByteArrayInputStream(content));) {
       byte[] b = new byte[1024];
       int numBytes = 0;
       while ((numBytes = in.read(b)) > 0) {
         out.write(b, 0, numBytes);
       }
+
       out.hflush();
     } catch (IOException e) {
-      LOGGER.error("操作 Hdfs 异常", e);
-      throw new HdfsException("操作 Hdfs 异常", e);
+      LOGGER.error("Operator Hdfs exception", e);
+      throw new HdfsException("Operator Hdfs exception", e);
     }
+
     LOGGER.debug("End addFile. fileName:" + fileName + ", path:" + destPath);
   }
 
   /**
-   * 从 hdfs 读取文件内容，并写入到本地文件中 <p>
+   * 从 hdfs 读取文件内容，并写入到本地文件中
    *
    * @param hdfsFile  hdfs 文件路径
    * @param localFile 本地 文件路径
@@ -149,21 +149,22 @@ public class HdfsClient implements Closeable {
     // 文件路径
     Path pathObject = new Path(hdfsFile);
     File fileObject = new File(localFile);
+
     try {
       // 判断 hdfs 文件是否合法
       if (fileSystem.exists(pathObject)) {
         if (fileSystem.isDirectory(pathObject)) { // 是目录的情况
-          LOGGER.error(hdfsFile + " 是目录");
-          throw new HdfsException("hdfs 路径是个目录");
+          LOGGER.error(hdfsFile + " is a dir");
+          throw new HdfsException("hdfs is a dir");
         }
       } else {
-        LOGGER.error(hdfsFile + " 不存在");
-        throw new HdfsException("hdfs 文件不存在");
+        LOGGER.error(hdfsFile + " does not exist");
+        throw new HdfsException("hdfs does not exist");
       }
 
       // 不覆盖的情况下，已经存在的文件，则不处理
       if (!overwrite && fileObject.exists()) {
-        LOGGER.info(localFile + " 已经存在，不覆盖");
+        LOGGER.info("{} has exist, do not overwrite", localFile);
         return;
       }
 
@@ -173,13 +174,13 @@ public class HdfsClient implements Closeable {
         FileUtils.forceMkdir(parentPath);
       }
     } catch (IOException e) {
-      LOGGER.error("操作 Hdfs 异常", e);
-      throw new HdfsException("操作 Hdfs 异常", e);
+      LOGGER.error("Operator Hdfs exception", e);
+      throw new HdfsException("Operator Hdfs exception", e);
     }
 
     try (
-            FSDataInputStream in = fileSystem.open(pathObject);
-            OutputStream out = new BufferedOutputStream(new FileOutputStream(fileObject));) {
+        FSDataInputStream in = fileSystem.open(pathObject);
+        OutputStream out = new BufferedOutputStream(new FileOutputStream(fileObject));) {
       byte[] b = new byte[1024];
       int numBytes = 0;
       while ((numBytes = in.read(b)) > 0) {
@@ -187,13 +188,13 @@ public class HdfsClient implements Closeable {
       }
       out.flush();
     } catch (IOException e) {
-      LOGGER.error("操作 Hdfs 异常", e);
-      throw new HdfsException("操作 Hdfs 异常", e);
+      LOGGER.error("Operator Hdfs exception", e);
+      throw new HdfsException("Operator Hdfs exception", e);
     }
   }
 
   /**
-   * 从 hdfs 读取文件内容 <p>
+   * 从 hdfs 读取文件内容
    *
    * @param hdfsFile hdfs 文件路径
    * @return byte[]
@@ -219,7 +220,7 @@ public class HdfsClient implements Closeable {
     }
 
     try (
-            FSDataInputStream in = fileSystem.open(pathObject);) {
+        FSDataInputStream in = fileSystem.open(pathObject);) {
       return IOUtils.toByteArray(in);
     } catch (IOException e) {
       LOGGER.error("操作 Hdfs 异常", e);
@@ -358,7 +359,7 @@ public class HdfsClient implements Closeable {
   }
 
   /**
-   * 获取 hdfs url地址 <p>
+   * 获取 hdfs url地址
    *
    * @return url 地址
    */
@@ -372,14 +373,17 @@ public class HdfsClient implements Closeable {
       try {
         fileSystem.close();
       } catch (IOException e) {
-        LOGGER.error("关闭 HdfsClient 实例失败", e);
-        throw new HdfsException("关闭 HdfsClient 实例失败", e);
+        LOGGER.error("Close HdfsClient instance failed", e);
+        throw new HdfsException("Close HdfsClient instance failed", e);
       }
     }
   }
 
   /**
    * 得到 hdfs 空间总容量以及剩余容量信息
+   *
+   * @return
+   * @throws IOException
    */
   public FsStatus getCapacity() throws IOException {
     FsStatus ds = fileSystem.getStatus();

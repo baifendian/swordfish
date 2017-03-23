@@ -16,25 +16,27 @@
 package com.baifendian.swordfish.common.hadoop;
 
 import com.baifendian.swordfish.common.job.exception.ExecException;
-
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.fs.FileStatus;
 
+import java.io.File;
 import java.io.IOException;
 
-/**
- * @author : liujin
- * @date : 2017-03-03 16:59
- */
 public class HdfsUtil {
 
   /**
-   * 将hdfs上的文件或目录下载到本地
+   * 将 hdfs 上的文件或目录下载到本地
    *
-   * @param src hdfs目录
-   * @param dst 本地目录
+   * @param src hdfs 上的文件或者是目录
+   * @param dst 本地目录, 如果不存在会报错
    */
   public static void GetFile(String src, String dst) throws IOException, InterruptedException, ExecException {
+
+    File dstFile = new File(dst);
+    if (!dstFile.isDirectory()) {
+      String msg = String.format("Destination: {} must be a dir.", dst);
+      throw new ExecException(msg);
+    }
 
     String cmd = "";
     HdfsClient hdfsClient = HdfsClient.getInstance();
@@ -47,10 +49,12 @@ public class HdfsUtil {
     } else {
       cmd = String.format("hdfs dfs -get %s %s", src, dst);
     }
+
     ProcessBuilder processBuilder = new ProcessBuilder();
     processBuilder.command("sh", "-c", cmd);
     processBuilder.redirectErrorStream(true);
     Process process = processBuilder.start();
+
     int ret = process.waitFor();
     if (ret != 0) {
       String msg = String.format("call cmd %s error, %s", cmd, IOUtils.toString(process.getInputStream(), "UTF-8"));
