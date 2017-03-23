@@ -221,7 +221,7 @@ public class ProjectServiceTest {
     {
       //非项目所有者删除一个用户
       int perm = 1;
-      User user1 = mockDataService.;
+      User user1 = mockDataService.createGeneralUser();
       mockDataService.createProjectUser(project.getId(),user1.getId(),perm);
       MockHttpServletResponse mockHttpServletResponse = new MockHttpServletResponse();
       projectService.deleteProjectUser(userAdmin,project.getName(),user1.getName(),mockHttpServletResponse);

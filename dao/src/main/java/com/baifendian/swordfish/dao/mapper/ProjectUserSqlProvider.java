@@ -30,13 +30,22 @@ public class ProjectUserSqlProvider {
     }}.toString();
   }
 
-  public String queryForUser(Map<String, Object> parameter) {
+  public String queryByProject(Map<String, Object> parameter) {
     return new SQL() {{
       SELECT("p_u.*");
       SELECT("u.name as user_name,p.name as project_name");
       FROM("project_user p_u");
       JOIN("user u on p_u.user_id = u.id");
       JOIN("project p on p_u.project_id = p.id");
+      WHERE("p_u.project_id = #{projectId}");
+    }}.toString();
+  }
+
+  public String queryForUser(Map<String, Object> parameter) {
+    return new SQL() {{
+      SELECT("u.*");
+      FROM("project_user p_u");
+      JOIN("user u on p_u.user_id = u.id");
       WHERE("p_u.project_id = #{projectId}");
     }}.toString();
   }
