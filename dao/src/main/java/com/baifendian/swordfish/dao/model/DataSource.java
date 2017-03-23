@@ -23,10 +23,11 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.Date;
 
 public class DataSource {
-  private Integer id;
-  private Integer ownerId;
+  private int id;
+  private int ownerId;
   private String ownerName;
-  private Integer projectId;
+  private int projectId;
+  private String projectName;
   private String name;
   private String desc;
   private DbType type; // db 类型
@@ -38,19 +39,19 @@ public class DataSource {
   public DataSource() {
   }
 
-  public Integer getId() {
+  public int getId() {
     return id;
   }
 
-  public void setId(Integer id) {
+  public void setId(int id) {
     this.id = id;
   }
 
-  public Integer getOwnerId() {
+  public int getOwnerId() {
     return ownerId;
   }
 
-  public void setOwnerId(Integer ownerId) {
+  public void setOwnerId(int ownerId) {
     this.ownerId = ownerId;
   }
 
@@ -62,12 +63,20 @@ public class DataSource {
     this.ownerName = ownerName;
   }
 
-  public Integer getProjectId() {
+  public int getProjectId() {
     return projectId;
   }
 
-  public void setProjectId(Integer projectId) {
+  public void setProjectId(int projectId) {
     this.projectId = projectId;
+  }
+
+  public String getProjectName() {
+    return projectName;
+  }
+
+  public void setProjectName(String projectName) {
+    this.projectName = projectName;
   }
 
   public String getName() {
@@ -102,6 +111,14 @@ public class DataSource {
     this.params = params;
   }
 
+  public DataSourceDbBase getParamObj() {
+    return paramObj;
+  }
+
+  public void setParamObj(DataSourceDbBase paramObj) {
+    this.paramObj = paramObj;
+  }
+
   public Date getCreateTime() {
     return createTime;
   }
@@ -116,28 +133,6 @@ public class DataSource {
 
   public void setModifyTime(Date modifyTime) {
     this.modifyTime = modifyTime;
-  }
-
-  public DataSourceDbBase getParamObj() throws Exception {
-    if (paramObj == null && StringUtils.isNotEmpty(params)) {
-      switch (type) {
-        case MONGODB:
-          paramObj = JsonUtil.parseObject(params, DataSourceMongo.class);
-          break;
-        case MYSQL:
-          paramObj = JsonUtil.parseObject(params, DataSourceMysql.class);
-          break;
-        case HBASE11:
-          paramObj = JsonUtil.parseObject(params, DataSourceHbase.class);
-          break;
-        case REDIS:
-          paramObj = JsonUtil.parseObject(params, DataSourceRedis.class);
-        default:
-          throw new Exception("类型不支持");
-      }
-    }
-
-    return paramObj;
   }
 
   @Override

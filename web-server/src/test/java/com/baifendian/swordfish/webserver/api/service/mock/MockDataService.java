@@ -15,10 +15,13 @@
  */
 package com.baifendian.swordfish.webserver.api.service.mock;
 
+import com.baifendian.swordfish.dao.enums.DbType;
 import com.baifendian.swordfish.dao.enums.UserRoleType;
+import com.baifendian.swordfish.dao.mapper.DataSourceMapper;
 import com.baifendian.swordfish.dao.mapper.ProjectMapper;
 import com.baifendian.swordfish.dao.mapper.ProjectUserMapper;
 import com.baifendian.swordfish.dao.mapper.UserMapper;
+import com.baifendian.swordfish.dao.model.DataSource;
 import com.baifendian.swordfish.dao.model.Project;
 import com.baifendian.swordfish.dao.model.ProjectUser;
 import com.baifendian.swordfish.dao.model.User;
@@ -42,6 +45,9 @@ public class MockDataService {
 
   @Autowired
   private ProjectUserMapper projectUserMapper;
+
+  @Autowired
+  private DataSourceMapper dataSourceMapper;
 
   /**
    * 获取一个随机字符串
@@ -128,5 +134,29 @@ public class MockDataService {
     projectUserMapper.insert(projectUser);
 
     return projectUser;
+  }
+
+  /**
+   * 创建一个数据源
+   * @param projectId
+   * @param userId
+   * @return
+   */
+  public DataSource createDataSource(int projectId,int userId){
+    DataSource dataSource = new DataSource();
+    Date now = new Date();
+
+    dataSource.setName(getRandomString());
+    dataSource.setDesc(getRandomString());
+    dataSource.setType(DbType.MYSQL);
+    dataSource.setOwnerId(userId);
+    dataSource.setProjectId(projectId);
+    dataSource.setParams(getRandomString());
+    dataSource.setCreateTime(now);
+    dataSource.setModifyTime(now);
+
+    dataSourceMapper.insert(dataSource);
+
+    return dataSource;
   }
 }
