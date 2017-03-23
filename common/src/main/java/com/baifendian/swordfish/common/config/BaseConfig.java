@@ -59,7 +59,7 @@ public class BaseConfig {
 
       systemEnvPath = properties.getProperty("sf.env.file");
       // 没有配置时使用部署用户的环境变量文件
-      if(StringUtils.isEmpty(systemEnvPath))
+      if (StringUtils.isEmpty(systemEnvPath))
         systemEnvPath = System.getProperty("user.home") + File.separator + ".bash_profile";
     } catch (IOException e) {
       LOGGER.error(e.getMessage(), e);
@@ -72,22 +72,42 @@ public class BaseConfig {
    * 本地的资源数据缓存文件目录
    *
    * @param projectId
-   * @param resourceId
    * @return
    */
-  public static String getLocalResourcePath(int projectId, int resourceId) {
-    return MessageFormat.format("{0}/{1}/resources/{2}", localDataBasePath, projectId, resourceId);
+  public static String getLocalResourceDir(int projectId) {
+    return MessageFormat.format("{0}/{1}/resources", localDataBasePath, projectId);
+  }
+
+  /**
+   * 本地的资源数据缓存文件名称
+   *
+   * @param projectId
+   * @param resName
+   * @return
+   */
+  public static String getLocalResourceFilename(int projectId, String resName) {
+    return MessageFormat.format("{0}/{1}/resources/{2}", localDataBasePath, projectId, resName);
   }
 
   /**
    * 本地的工作流数据缓存文件目录
    *
    * @param projectId
-   * @param workflowId
    * @return
    */
-  public static String getLocalWorkflowPath(int projectId, int workflowId) {
-    return MessageFormat.format("{0}/{1}/workflows/{2}", localDataBasePath, projectId, workflowId);
+  public static String getLocalWorkflowDir(int projectId) {
+    return MessageFormat.format("{0}/{1}/workflows", localDataBasePath, projectId);
+  }
+
+  /**
+   * 本地的工作流数据缓存文件名称
+   *
+   * @param projectId
+   * @param workflowName
+   * @return
+   */
+  public static String getLocalWorkflowFilename(int projectId, String workflowName) {
+    return MessageFormat.format("{0}/{1}/workflows/{2}.{3}", localDataBasePath, projectId, workflowName, ".zip");
   }
 
   /**
@@ -96,8 +116,19 @@ public class BaseConfig {
    * @param projectId
    * @return
    */
-  public static String getHdfsResourcesPath(int projectId, int resourceId) {
-    return MessageFormat.format("{0}/{1}/resources/{2}", hdfsDataBasePath, projectId, resourceId);
+  public static String getHdfsResourcesDir(int projectId) {
+    return MessageFormat.format("{0}/{1}/resources", hdfsDataBasePath, projectId);
+  }
+
+  /**
+   * hdfs 上资源的文件名称
+   *
+   * @param projectId
+   * @param resName
+   * @return
+   */
+  public static String getHdfsResourcesFilename(int projectId, String resName) {
+    return MessageFormat.format("{0}/{1}/resources/{2}", hdfsDataBasePath, projectId, resName);
   }
 
   /**
@@ -106,8 +137,19 @@ public class BaseConfig {
    * @param projectId
    * @return
    */
-  public static String getHdfsWorkflowPath(int projectId, int workflowId) {
-    return MessageFormat.format("{0}/{1}/workflows/{2}", hdfsDataBasePath, projectId, workflowId);
+  public static String getHdfsWorkflowDir(int projectId) {
+    return MessageFormat.format("{0}/{1}/workflows", hdfsDataBasePath, projectId);
+  }
+
+  /**
+   * hdfs 上工作流数据的文件名称
+   *
+   * @param projectId
+   * @param workflowName
+   * @return
+   */
+  public static String getHdfsWorkflowFilename(int projectId, String workflowName) {
+    return MessageFormat.format("{0}/{1}/workflows/{2}.{3}", hdfsDataBasePath, projectId, workflowName, ".zip");
   }
 
   /**
@@ -118,7 +160,7 @@ public class BaseConfig {
    * @param execId
    * @return
    */
-  public static String getFlowExecPath(int projectId, int workflowId, long execId) {
+  public static String getFlowExecDir(int projectId, int workflowId, long execId) {
     return String.format("%s/%d/%d/%d", localExecBasePath, projectId, workflowId, execId);
   }
 
