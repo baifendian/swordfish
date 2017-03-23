@@ -210,8 +210,8 @@ public class FlowRunner implements Runnable {
       HdfsClient hdfsClient = HdfsClient.getInstance();
       if (hdfsClient.exists(workflowHdfsPath)) {
         HdfsUtil.GetFile(workflowHdfsPath, execLocalPath);
-        // 资源文件解压缩处理 workflow下的文件为 workflowId.zip
-        File zipFile = new File(execLocalPath, executionFlow.getFlowId() + ".zip");
+        // 资源文件解压缩处理 workflow下的文件为 workflowName.zip
+        File zipFile = new File(execLocalPath, executionFlow.getFlowName() + ".zip");
         if (zipFile.exists()) {
           String cmd = String.format("unzip -o %s -d %s", zipFile.getPath(), execLocalPath);
           LOGGER.info("call cmd:" + cmd);

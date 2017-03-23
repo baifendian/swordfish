@@ -16,6 +16,7 @@
 package com.baifendian.swordfish.common.config;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.ResourceUtils;
@@ -57,6 +58,9 @@ public class BaseConfig {
       localExecBasePath = properties.getProperty("local.exec.base.path");
 
       systemEnvPath = properties.getProperty("sf.env.file");
+      // 没有配置时使用部署用户的环境变量文件
+      if(StringUtils.isEmpty(systemEnvPath))
+        systemEnvPath = System.getProperty("user.home") + File.separator + ".bash_profile";
     } catch (IOException e) {
       LOGGER.error(e.getMessage(), e);
     } finally {
