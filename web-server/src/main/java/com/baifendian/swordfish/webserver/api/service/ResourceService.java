@@ -79,7 +79,7 @@ public class ResourceService {
       return null;
     }
 
-    if (!projectService.hasWritePerm(operator.getId(), project.getId())) {
+    if (!projectService.hasWritePerm(operator.getId(), project)) {
       response.setStatus(HttpStatus.SC_UNAUTHORIZED);
       return null;
     }
@@ -128,7 +128,7 @@ public class ResourceService {
       return null;
     }
 
-    if (!projectService.hasWritePerm(operator.getId(), project.getId())) {
+    if (!projectService.hasWritePerm(operator.getId(), project)) {
       response.setStatus(HttpStatus.SC_UNAUTHORIZED);
       return null;
     }

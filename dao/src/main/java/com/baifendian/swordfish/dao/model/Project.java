@@ -25,10 +25,10 @@ import java.util.Date;
  */
 public class Project {
   @JsonIgnore
-  private Integer id;
+  private int id;
 
   @JsonIgnore
-  private Integer ownerId;
+  private int ownerId;
 
   /**
    * owner 名称
@@ -55,19 +55,19 @@ public class Project {
    */
   private Date modifyTime;
 
-  public Integer getId() {
+  public int getId() {
     return id;
   }
 
-  public void setId(Integer id) {
+  public void setId(int id) {
     this.id = id;
   }
 
-  public Integer getOwnerId() {
+  public int getOwnerId() {
     return ownerId;
   }
 
-  public void setOwnerId(Integer ownerId) {
+  public void setOwnerId(int ownerId) {
     this.ownerId = ownerId;
   }
 

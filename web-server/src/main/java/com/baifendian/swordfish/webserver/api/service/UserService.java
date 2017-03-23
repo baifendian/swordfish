@@ -77,11 +77,12 @@ public class UserService {
     user.setDesc(desc);
     user.setPhone(phone);
     user.setPassword(HttpUtil.getMd5(password));
-    user.setRole(UserRoleType.GENERAL_USER);
+    user.setRole(UserRoleType.GENERAL_USER); // 创建的用户都是普通用户
     user.setProxyUsers(proxyUsers);
     user.setCreateTime(now);
     user.setModifyTime(now);
 
+    // 插入一条用户信息
     try {
       userMapper.insert(user);
     } catch (DuplicateKeyException e) {
@@ -89,6 +90,8 @@ public class UserService {
       response.setStatus(HttpStatus.SC_CONFLICT);
       return null;
     }
+
+    response.setStatus(HttpStatus.SC_CREATED);
 
     return user;
   }
@@ -121,7 +124,7 @@ public class UserService {
         return null;
       }
 
-      // 用户代理不能设置
+      // 普通用户不能进行用户代理设置
       if (StringUtils.isNotEmpty(proxyUsers)) {
         response.setStatus(HttpStatus.SC_UNAUTHORIZED);
         return null;
@@ -140,7 +143,6 @@ public class UserService {
       user.setPassword(HttpUtil.getMd5(password));
     }
 
-    user.setRole(UserRoleType.GENERAL_USER);
     user.setProxyUsers(proxyUsers);
     user.setModifyTime(now);
 
@@ -155,7 +157,7 @@ public class UserService {
   }
 
   /**
-   * 删除用户信息
+   * 删除用户信息, 只有管理员能够操作
    *
    * @param operator
    * @param name
@@ -172,13 +174,13 @@ public class UserService {
 
     // 删除, 是不能删除自己的
     if (StringUtils.equals(operator.getName(), name)) {
-      logger.error("Can't delete myself");
+      logger.error("Can't delete user self");
       response.setStatus(HttpStatus.SC_UNAUTHORIZED);
       return;
     }
 
     // 删除用户的时候, 必须保证 "项目/资源/工作流" 的信息不为空
-    // projectMapper.queryByUserName(name);
+    // TODO::
 
     int count = userMapper.delete(name);
 
@@ -204,7 +206,7 @@ public class UserService {
     List<User> users = new ArrayList<>();
 
     // 只查询自己
-    if (operator.getRole() != UserRoleType.ADMIN_USER || !allUser) {
+    if ((operator.getRole() != UserRoleType.ADMIN_USER) || !allUser) {
       users.add(operator);
 
       return users;
