@@ -17,9 +17,9 @@ package com.baifendian.swordfish.dao.enums;
 
 public enum DbType {
   /**
-   * 0 hive, 1 mysql, 2 mongodb, 3 hbase11, 4 redis
+   * 0 mysql, 1 oracle, 2 sqlserver, 3 mongodb, 4 hbase094x, 5 hbase11x, 6 ftp
    */
-  HIVE, MYSQL, MONGODB, HBASE11, REDIS;
+  MYSQL, ORACLE, SQLSERVER, MONOGODB, HBASE094X, HBASE11X, FTP;
 
   /**
    *
