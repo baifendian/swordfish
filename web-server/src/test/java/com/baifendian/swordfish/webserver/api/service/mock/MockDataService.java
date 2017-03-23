@@ -17,8 +17,10 @@ package com.baifendian.swordfish.webserver.api.service.mock;
 
 import com.baifendian.swordfish.dao.enums.UserRoleType;
 import com.baifendian.swordfish.dao.mapper.ProjectMapper;
+import com.baifendian.swordfish.dao.mapper.ProjectUserMapper;
 import com.baifendian.swordfish.dao.mapper.UserMapper;
 import com.baifendian.swordfish.dao.model.Project;
+import com.baifendian.swordfish.dao.model.ProjectUser;
 import com.baifendian.swordfish.dao.model.User;
 import org.apache.commons.lang.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +39,9 @@ public class MockDataService {
 
   @Autowired
   private ProjectMapper projectMapper;
+
+  @Autowired
+  private ProjectUserMapper projectUserMapper;
 
   /**
    * 获取一个随机字符串
@@ -101,5 +106,27 @@ public class MockDataService {
 
     projectMapper.insert(project);
     return project;
+  }
+
+  /**
+   * 创建一个用户项目关系
+   * @param projectId
+   * @param userId
+   * @param perm
+   * @return
+   */
+  public ProjectUser createProjectUser(int projectId, int userId, int perm){
+    ProjectUser projectUser = new ProjectUser();
+    Date now = new Date();
+
+    projectUser.setProjectId(projectId);
+    projectUser.setUserId(userId);
+    projectUser.setPerm(perm);
+    projectUser.setCreateTime(now);
+    projectUser.setModifyTime(now);
+
+    projectUserMapper.insert(projectUser);
+
+    return projectUser;
   }
 }

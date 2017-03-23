@@ -192,7 +192,7 @@ public class FlowRunner implements Runnable {
     FlowStatus status = null;
 
     try {
-      String execLocalPath = BaseConfig.getFlowExecPath(executionFlow.getProjectId(), executionFlow.getFlowId(),
+      String execLocalPath = BaseConfig.getFlowExecDir(executionFlow.getProjectId(), executionFlow.getFlowId(),
               executionFlow.getId());
       LOGGER.info("当前执行的目录是：{}", execLocalPath);
       File execLocalPathFile = new File(execLocalPath);
@@ -206,10 +206,10 @@ public class FlowRunner implements Runnable {
       FlowDag flowDag = JsonUtil.parseObject(executionFlow.getWorkflowData(), FlowDag.class);
 
       // 下载workflow的资源文件到本地exec目录
-      String workflowHdfsPath = BaseConfig.getHdfsFlowResourcesPath(executionFlow.getProjectId(), executionFlow.getFlowId());
+      String workflowHdfsFile = BaseConfig.getHdfsWorkflowFilename(executionFlow.getProjectId(), executionFlow.getFlowName());
       HdfsClient hdfsClient = HdfsClient.getInstance();
-      if (hdfsClient.exists(workflowHdfsPath)) {
-        HdfsUtil.GetFile(workflowHdfsPath, execLocalPath);
+      if (hdfsClient.exists(workflowHdfsFile)) {
+        HdfsUtil.GetFile(workflowHdfsFile, execLocalPath);
         // 资源文件解压缩处理 workflow下的文件为 workflowName.zip
         File zipFile = new File(execLocalPath, executionFlow.getFlowName() + ".zip");
         if (zipFile.exists()) {
@@ -227,12 +227,11 @@ public class FlowRunner implements Runnable {
       }
 
       // 解析作业参数获取需要的项目级资源文件清单
-      String projectHdfsPath = BaseConfig.getHdfsProjectResourcesPath(executionFlow.getProjectId());
       List<String> projectRes = genProjectResFiles(flowDag);
       for (String res : projectRes) {
         File resFile = new File(execLocalPath, res);
         if (!resFile.exists()) {
-          String resHdfsPath = projectHdfsPath + File.separator + res;
+          String resHdfsPath = BaseConfig.getHdfsResourcesFilename(executionFlow.getProjectId(), res);
           LOGGER.info("get project file:{}", resHdfsPath);
           HdfsUtil.GetFile(resHdfsPath, execLocalPath);
         } else {

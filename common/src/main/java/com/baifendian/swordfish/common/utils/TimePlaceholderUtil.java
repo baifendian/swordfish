@@ -15,8 +15,6 @@
  */
 package com.baifendian.swordfish.common.utils;
 
-import com.baifendian.swordfish.dao.utils.BFDDateUtils;
-
 import org.apache.commons.lang.time.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

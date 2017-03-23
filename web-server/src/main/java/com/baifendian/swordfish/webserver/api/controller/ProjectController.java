@@ -139,7 +139,7 @@ public class ProjectController {
    * @return
    */
   @RequestMapping(value = "/{name}/users", method = {RequestMethod.GET})
-  public List<User> queryUser(@RequestAttribute(value = "session.user") User operator,
+  public List<ProjectUser> queryUser(@RequestAttribute(value = "session.user") User operator,
                               @PathVariable("name") String name,
                               HttpServletResponse response){
     return projectService.queryUser(operator,name,response);

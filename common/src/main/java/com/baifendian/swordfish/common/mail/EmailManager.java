@@ -16,7 +16,7 @@
 package com.baifendian.swordfish.common.mail;
 
 import com.baifendian.swordfish.dao.model.Schedule;
-import com.baifendian.swordfish.dao.utils.BFDDateUtils;
+import com.baifendian.swordfish.common.utils.BFDDateUtils;
 import com.baifendian.swordfish.dao.DaoFactory;
 import com.baifendian.swordfish.dao.enums.FlowRunType;
 import com.baifendian.swordfish.dao.enums.FlowStatus;

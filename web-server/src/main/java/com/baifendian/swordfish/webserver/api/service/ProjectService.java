@@ -17,6 +17,7 @@ package com.baifendian.swordfish.webserver.api.service;
 
 import com.baifendian.swordfish.common.consts.Constants;
 import com.baifendian.swordfish.common.utils.PermUtil;
+import com.baifendian.swordfish.dao.enums.UserRoleType;
 import com.baifendian.swordfish.dao.mapper.ProjectMapper;
 import com.baifendian.swordfish.dao.mapper.ProjectUserMapper;
 import com.baifendian.swordfish.dao.mapper.UserMapper;
@@ -60,6 +61,12 @@ public class ProjectService {
    * @return
    */
   public Project createProject(User operator, String name, String desc, HttpServletResponse response) {
+
+    //管理员不能创建项目
+    if (operator.getRole() == UserRoleType.ADMIN_USER) {
+      response.setStatus(HttpStatus.SC_UNAUTHORIZED);
+      return null;
+    }
 
     Project project = new Project();
     Date now = new Date();
@@ -158,7 +165,7 @@ public class ProjectService {
       case ADMIN_USER:
         return projectMapper.queryAllProject();
       case GENERAL_USER:
-        return projectMapper.queryUserProject(operator.getId());
+        return projectMapper.queryProjectByUser(operator.getId());
       default:
         return null;
     }
@@ -199,6 +206,12 @@ public class ProjectService {
 
     ProjectUser projectUser = projectUserMapper.query(user.getId(), project.getId());
 
+    //不能删除自己
+    if (operator.getName() == userName){
+      response.setStatus(HttpStatus.SC_NOT_MODIFIED);
+      return null;
+    }
+
     //增加用户已经存在
     if (projectUser != null) {
       response.setStatus(HttpStatus.SC_NOT_MODIFIED);
@@ -209,9 +222,12 @@ public class ProjectService {
     Date now = new Date();
 
     projectUser.setProjectId(project.getId());
+    projectUser.setProjectName(project.getName());
     projectUser.setUserId(user.getId());
+    projectUser.setUserName(userName);
     projectUser.setPerm(perm);
     projectUser.setCreateTime(now);
+    projectUser.setModifyTime(now);
 
     projectUserMapper.insert(projectUser);
 
@@ -243,7 +259,13 @@ public class ProjectService {
 
     User user = userMapper.queryByName(userName);
 
-    //增加的用户不存在
+    //不能删除自己
+    if (operator.getName() == userName){
+      response.setStatus(HttpStatus.SC_NOT_MODIFIED);
+      return;
+    }
+
+    //删除的用户不存在
     if (user == null) {
       response.setStatus(HttpStatus.SC_NOT_MODIFIED);
       return;
@@ -266,7 +288,7 @@ public class ProjectService {
    * @param response
    * @return
    */
-  public List<User> queryUser(User operator, String name, HttpServletResponse response) {
+  public List<ProjectUser> queryUser(User operator, String name, HttpServletResponse response) {
     Project project = projectMapper.queryByName(name);
 
     //不存在的项目名

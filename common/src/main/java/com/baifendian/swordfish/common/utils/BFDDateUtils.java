@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.baifendian.swordfish.dao.utils;
+package com.baifendian.swordfish.common.utils;
 
 import com.baifendian.swordfish.common.consts.Constants;
 
@@ -120,14 +120,6 @@ public class BFDDateUtils {
     } catch (ParseException e) {
       throw new RuntimeException("时间转换失败异常", e);
     }
-  }
-
-  public static int getSecs() {
-    return (int) (System.currentTimeMillis() / 1000);
-  }
-
-  public static int getSecs(Date date) {
-    return (int) (date.getTime() / 1000);
   }
 
 }

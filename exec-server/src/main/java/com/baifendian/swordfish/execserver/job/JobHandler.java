@@ -18,7 +18,7 @@ package com.baifendian.swordfish.execserver.job;
 import com.baifendian.swordfish.common.job.Job;
 import com.baifendian.swordfish.common.job.JobProps;
 import com.baifendian.swordfish.common.job.exception.ExecException;
-import com.baifendian.swordfish.dao.utils.BFDDateUtils;
+import com.baifendian.swordfish.common.utils.BFDDateUtils;
 import com.baifendian.swordfish.dao.FlowDao;
 import com.baifendian.swordfish.common.config.BaseConfig;
 import com.baifendian.swordfish.dao.enums.FlowStatus;
