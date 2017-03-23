@@ -17,15 +17,22 @@ package com.baifendian.swordfish.webserver.api.dto;
 
 
 public class BaseResponse {
+  /**
+   * 状态为 0 表示成功, 否则失败
+   */
   private int status;
+
+  /**
+   * 错误消息
+   */
   private String message;
+
+  public BaseResponse() {
+  }
 
   public BaseResponse(int status, String message) {
     this.status = status;
     this.message = message;
-  }
-
-  public BaseResponse() {
   }
 
   public int getStatus() {
