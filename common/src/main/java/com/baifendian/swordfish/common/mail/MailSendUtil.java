@@ -61,6 +61,11 @@ public class MailSendUtil {
 
   /**
    * 发送邮件给具体的邮件接收人
+   *
+   * @param receivers
+   * @param title
+   * @param content
+   * @return
    */
   public static boolean sendMails(Collection<String> receivers, String title, String content) {
     if (receivers == null) {
