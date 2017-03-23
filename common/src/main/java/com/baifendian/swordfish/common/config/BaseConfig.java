@@ -32,9 +32,11 @@ public class BaseConfig {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(BaseConfig.class);
 
-  private static String hdfsBasePath;
+  private static String localDataBasePath; // 本地目录, 用于存放 资源和工作流 的数据
 
-  private static String localBasePath;
+  private static String hdfsDataBasePath; // hdfs 目录, 用于存放 资源和工作流 的数据
+
+  private static String localExecBasePath; // 本地目录, 用于执行工作流
 
   /**
    * 环境变量信息
@@ -46,11 +48,15 @@ public class BaseConfig {
   static {
     InputStream is = null;
     try {
-      File dataSourceFile = ResourceUtils.getFile("classpath:base_config.properties");
+      File dataSourceFile = ResourceUtils.getFile("classpath:common/base_config.properties");
       is = new FileInputStream(dataSourceFile);
+
       properties.load(is);
-      hdfsBasePath = properties.getProperty("hdfs.base.path");
-      localBasePath = properties.getProperty("local.base.path");
+
+      localDataBasePath = properties.getProperty("local.data.base.path");
+      hdfsDataBasePath = properties.getProperty("hdfs.data.base.path");
+      localExecBasePath = properties.getProperty("local.exec.base.path");
+
       systemEnvPath = properties.getProperty("sf.env.file");
       // 没有配置时使用部署用户的环境变量文件
       if(StringUtils.isEmpty(systemEnvPath))
@@ -63,27 +69,65 @@ public class BaseConfig {
   }
 
   /**
-   * workflow 执行本地目录 projectId/workflowId/execId
+   * 本地的资源数据缓存文件路径
+   *
+   * @param projectId
+   * @param resName
+   * @return
    */
-  private static final String FLOW_EXEC_PATH_FORMAT = "{0}/{1}/{2}";
+  public static String getLocalResourcePath(int projectId, String resName) {
+    return MessageFormat.format("{0}/{1}/resources/{2}", localDataBasePath, projectId, resName);
+  }
 
+  /**
+   * 本地的工作流数据缓存文件路径
+   *
+   * @param projectId
+   * @param workflowName
+   * @return
+   */
+  public static String getLocalWorkflowPath(int projectId, String workflowName) {
+    return MessageFormat.format("{0}/{1}/workflows/{2}.{3}", localDataBasePath, projectId, workflowName, "zip");
+  }
+
+  /**
+   * hdfs 上资源的文件路径
+   *
+   * @param projectId
+   * @return
+   */
+  public static String getHdfsResourcesPath(int projectId, String resName) {
+    return MessageFormat.format("{0}/{1}/resources/{2}", hdfsDataBasePath, projectId, resName);
+  }
+
+  /**
+   * hdfs 上工作流数据的文件路径
+   *
+   * @param projectId
+   * @return
+   */
+  public static String getHdfsFlowPath(int projectId, String workflowName) {
+    return MessageFormat.format("{0}/{1}/workflows/{2}.{3}", hdfsDataBasePath, projectId, workflowName, "zip");
+  }
+
+  /**
+   * 工作流执行的路径
+   *
+   * @param projectId
+   * @param workflowId
+   * @param execId
+   * @return
+   */
   public static String getFlowExecPath(int projectId, int workflowId, long execId) {
-    return String.format("%s/%d/%d/%d", localBasePath, projectId, workflowId, execId);
+    return String.format("%s/%d/%d/%d", localExecBasePath, projectId, workflowId, execId);
   }
 
-  public static String getHdfsProjectResourcesPath(int projectId) {
-    return MessageFormat.format("{0}/{1}/resources", hdfsBasePath, projectId);
-  }
-
-  public static String getHdfsFlowResourcesPath(int projectId, int flowId) {
-    return MessageFormat.format("{0}/{1}/workflows/{2}", hdfsBasePath, projectId, flowId);
-  }
-
+  /**
+   * 得到系统环境变量路径
+   *
+   * @return
+   */
   public static String getSystemEnvPath() {
     return systemEnvPath;
-  }
-
-  public static void main(String[] args) {
-    System.out.println(BaseConfig.localBasePath);
   }
 }

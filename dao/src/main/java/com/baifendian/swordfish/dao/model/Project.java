@@ -15,113 +15,45 @@
  */
 package com.baifendian.swordfish.dao.model;
 
-import com.baifendian.swordfish.dao.utils.BFDDateUtils;
-
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.apache.commons.lang3.ObjectUtils;
 
+import java.util.Date;
+
+/**
+ * 项目实体
+ */
 public class Project {
+  @JsonIgnore
   private Integer id;
-  private String name;
-  private String desc;
-  private int createTime;
-  private int modifyTime;
+
+  @JsonIgnore
   private Integer ownerId;
-  private String ownerName;
 
-  public Project(Integer id, String name, String desc, Integer tenantId, String tenantName
-          , int createTime, int modifyTime, Integer ownerId, String ownerName
-          , Integer queueId, String queueName) {
-    this.id = id;
-    this.name = name;
-    this.desc = desc;
-    this.createTime = createTime;
-    this.modifyTime = modifyTime;
-    this.ownerId = ownerId;
-    this.ownerName = ownerName;
-  }
+  /**
+   * owner 名称
+   */
+  private String owner;
 
-  public Project() {
-  }
+  /**
+   * 项目名称
+   */
+  private String name;
 
-  public Project(ProjectBuilder builder) {
-    this.id = builder.id;
-    this.name = builder.name;
-    this.desc = builder.desc;
-    this.createTime = builder.createTime;
-    this.modifyTime = builder.modifyTime;
-    this.ownerId = builder.ownerId;
-    this.ownerName = builder.ownerName;
-  }
+  /**
+   * 项目的描述
+   */
+  private String desc;
 
-  static public class ProjectBuilder {
-    private Integer id;
-    private String name;
-    private String desc;
-    private int createTime;
-    private int modifyTime;
-    private Integer ownerId;
-    private String ownerName;
+  /**
+   * 创建时间
+   */
+  private Date createTime;
 
-    public Project build() {
-      return new Project(this);
-    }
-
-    public ProjectBuilder id(int id) {
-      this.id = id;
-      return this;
-    }
-
-    public ProjectBuilder name(String name) {
-      this.name = name;
-      return this;
-    }
-
-    public ProjectBuilder desc(String desc) {
-      this.desc = desc;
-      return this;
-    }
-
-    public ProjectBuilder createTime(int createTime) {
-      this.createTime = createTime;
-      return this;
-    }
-
-    public ProjectBuilder createTime() {
-      this.createTime = BFDDateUtils.getSecs();
-      return this;
-    }
-
-    public ProjectBuilder modifyTime(int modifyTime) {
-      this.modifyTime = modifyTime;
-      return this;
-    }
-
-    public ProjectBuilder ownerId(int ownerId) {
-      this.ownerId = ownerId;
-      return this;
-    }
-
-    public ProjectBuilder ownerName(String ownerName) {
-      this.ownerName = ownerName;
-      return this;
-    }
-  }
-
-  public int getCreateTime() {
-    return createTime;
-  }
-
-  public void setCreateTime(int createTime) {
-    this.createTime = createTime;
-  }
-
-  public int getModifyTime() {
-    return modifyTime;
-  }
-
-  public void setModifyTime(int modifyTime) {
-    this.modifyTime = modifyTime;
-  }
+  /**
+   * 修改时间
+   */
+  private Date modifyTime;
 
   public Integer getId() {
     return id;
@@ -129,6 +61,22 @@ public class Project {
 
   public void setId(Integer id) {
     this.id = id;
+  }
+
+  public Integer getOwnerId() {
+    return ownerId;
+  }
+
+  public void setOwnerId(Integer ownerId) {
+    this.ownerId = ownerId;
+  }
+
+  public String getOwner() {
+    return owner;
+  }
+
+  public void setOwner(String owner) {
+    this.owner = owner;
   }
 
   public String getName() {
@@ -147,38 +95,32 @@ public class Project {
     this.desc = desc;
   }
 
-  public Integer getOwnerId() {
-    return ownerId;
+  public Date getCreateTime() {
+    return createTime;
   }
 
-  public void setOwnerId(Integer ownerId) {
-    this.ownerId = ownerId;
+  public void setCreateTime(Date createTime) {
+    this.createTime = createTime;
   }
 
-  public String getOwnerName() {
-    return ownerName;
+  public Date getModifyTime() {
+    return modifyTime;
   }
 
-  public void setOwnerName(String ownerName) {
-    this.ownerName = ownerName;
+  public void setModifyTime(Date modifyTime) {
+    this.modifyTime = modifyTime;
   }
 
-  public boolean equals(Object o) {
-    if (!(o instanceof Project))
-      return false;
-    Project project = (Project) o;
-    if (ObjectUtils.notEqual(this.id, project.getId())) {
-      return false;
-    }
-    if (ObjectUtils.notEqual(this.name, project.getName())) {
-      return false;
-    }
-    if (ObjectUtils.notEqual(this.desc, project.getDesc())) {
-      return false;
-    }
-    if (ObjectUtils.notEqual(this.ownerId, project.getOwnerId())) {
-      return false;
-    }
-    return true;
+  @Override
+  public String toString() {
+    return "Project{" +
+        "id=" + id +
+        ", ownerId=" + ownerId +
+        ", owner='" + owner + '\'' +
+        ", name='" + name + '\'' +
+        ", desc='" + desc + '\'' +
+        ", createTime=" + createTime +
+        ", modifyTime=" + modifyTime +
+        '}';
   }
 }

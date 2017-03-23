@@ -15,14 +15,15 @@
  */
 package com.baifendian.swordfish.dao.model;
 
-import com.baifendian.swordfish.dao.enums.ResourceType;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import java.sql.Timestamp;
+import java.util.Date;
 
 public class Resource {
   /**
    * 资源id
    */
+  @JsonIgnore
   private int id;
 
   /**
@@ -31,13 +32,25 @@ public class Resource {
   private String name;
 
   /**
-   * 资源类型
+   * 描述信息
    */
-  private ResourceType type;
+  private String desc;
+
+  /**
+   * owner 的 id
+   */
+  @JsonIgnore
+  private int ownerId;
+
+  /**
+   * 资源所有者
+   */
+  private String owner;
 
   /**
    * 项目 id
    */
+  @JsonIgnore
   private int projectId;
 
   /**
@@ -46,328 +59,99 @@ public class Resource {
   private String projectName;
 
   /**
-   * 组织 id
-   */
-  private Integer orgId;
-
-  /**
-   * 组织名
-   */
-  private String orgName;
-
-  /**
-   * owner 的 id
-   */
-  private int ownerId;
-
-  /**
-   * 资源所有者
-   */
-  private String ownerName;
-
-  /**
-   * 描述信息
-   */
-  private String desc;
-
-  /**
-   * 最后发布人 id
-   */
-  private Integer lastPublishBy;
-
-  /**
-   * 最后发布人 name
-   */
-  private String lastPublishByName;
-
-  /**
    * 创建时间
    */
-  private Timestamp createTime;
+  private Date createTime;
 
   /**
    * 修改时间
    */
-  private Timestamp modifyTime;
+  private Date modifyTime;
 
-  /**
-   * getter method
-   *
-   * @return the id
-   * @see Resource#id
-   */
   public int getId() {
     return id;
   }
 
-  /**
-   * setter method
-   *
-   * @param id the id to set
-   * @see Resource#id
-   */
   public void setId(int id) {
     this.id = id;
   }
 
-  /**
-   * getter method
-   *
-   * @return the name
-   * @see Resource#name
-   */
   public String getName() {
     return name;
   }
 
-  /**
-   * setter method
-   *
-   * @param name the name to set
-   * @see Resource#name
-   */
   public void setName(String name) {
     this.name = name;
   }
 
-  /**
-   * getter method
-   *
-   * @return the type
-   * @see Resource#type
-   */
-  public ResourceType getType() {
-    return type;
-  }
-
-  /**
-   * setter method
-   *
-   * @param type the type to set
-   * @see Resource#type
-   */
-  public void setType(ResourceType type) {
-    this.type = type;
-  }
-
-  /**
-   * getter method
-   *
-   * @return the projectId
-   * @see Resource#projectId
-   */
-  public int getProjectId() {
-    return projectId;
-  }
-
-  /**
-   * setter method
-   *
-   * @param projectId the projectId to set
-   * @see Resource#projectId
-   */
-  public void setProjectId(int projectId) {
-    this.projectId = projectId;
-  }
-
-  /**
-   * getter method
-   *
-   * @return the projectName
-   * @see Resource#projectName
-   */
-  public String getProjectName() {
-    return projectName;
-  }
-
-  /**
-   * setter method
-   *
-   * @param projectName the projectName to set
-   * @see Resource#projectName
-   */
-  public void setProjectName(String projectName) {
-    this.projectName = projectName;
-  }
-
-  /**
-   * getter method
-   *
-   * @return the orgId
-   * @see Resource#orgId
-   */
-  public Integer getOrgId() {
-    return orgId;
-  }
-
-  /**
-   * setter method
-   *
-   * @param orgId the orgId to set
-   * @see Resource#orgId
-   */
-  public void setOrgId(Integer orgId) {
-    this.orgId = orgId;
-  }
-
-  /**
-   * getter method
-   *
-   * @return the orgName
-   * @see Resource#orgName
-   */
-  public String getOrgName() {
-    return orgName;
-  }
-
-  /**
-   * setter method
-   *
-   * @param orgName the orgName to set
-   * @see Resource#orgName
-   */
-  public void setOrgName(String orgName) {
-    this.orgName = orgName;
-  }
-
-  /**
-   * getter method
-   *
-   * @return the ownerId
-   * @see Resource#ownerId
-   */
-  public int getOwnerId() {
-    return ownerId;
-  }
-
-  /**
-   * setter method
-   *
-   * @param ownerId the ownerId to set
-   * @see Resource#ownerId
-   */
-  public void setOwnerId(int ownerId) {
-    this.ownerId = ownerId;
-  }
-
-  /**
-   * getter method
-   *
-   * @return the ownerName
-   * @see Resource#ownerName
-   */
-  public String getOwnerName() {
-    return ownerName;
-  }
-
-  /**
-   * setter method
-   *
-   * @param ownerName the ownerName to set
-   * @see Resource#ownerName
-   */
-  public void setOwnerName(String ownerName) {
-    this.ownerName = ownerName;
-  }
-
-  /**
-   * getter method
-   *
-   * @return the desc
-   * @see Resource#desc
-   */
   public String getDesc() {
     return desc;
   }
 
-  /**
-   * setter method
-   *
-   * @param desc the desc to set
-   * @see Resource#desc
-   */
   public void setDesc(String desc) {
     this.desc = desc;
   }
 
-  /**
-   * getter method
-   *
-   * @return the createTime
-   * @see Resource#createTime
-   */
-  public Timestamp getCreateTime() {
+  public int getOwnerId() {
+    return ownerId;
+  }
+
+  public void setOwnerId(int ownerId) {
+    this.ownerId = ownerId;
+  }
+
+  public String getOwner() {
+    return owner;
+  }
+
+  public void setOwner(String owner) {
+    this.owner = owner;
+  }
+
+  public int getProjectId() {
+    return projectId;
+  }
+
+  public void setProjectId(int projectId) {
+    this.projectId = projectId;
+  }
+
+  public String getProjectName() {
+    return projectName;
+  }
+
+  public void setProjectName(String projectName) {
+    this.projectName = projectName;
+  }
+
+  public Date getCreateTime() {
     return createTime;
   }
 
-  /**
-   * setter method
-   *
-   * @param createTime the createTime to set
-   * @see Resource#createTime
-   */
-  public void setCreateTime(Timestamp createTime) {
+  public void setCreateTime(Date createTime) {
     this.createTime = createTime;
   }
 
-  /**
-   * getter method
-   *
-   * @return the modifyTime
-   * @see Resource#modifyTime
-   */
-  public Timestamp getModifyTime() {
+  public Date getModifyTime() {
     return modifyTime;
   }
 
-  /**
-   * setter method
-   *
-   * @param modifyTime the modifyTime to set
-   * @see Resource#modifyTime
-   */
-  public void setModifyTime(Timestamp modifyTime) {
+  public void setModifyTime(Date modifyTime) {
     this.modifyTime = modifyTime;
   }
 
-  /**
-   * getter method
-   *
-   * @return the lastPublishBy
-   * @see Resource#lastPublishBy
-   */
-  public Integer getLastPublishBy() {
-    return lastPublishBy;
+  @Override
+  public String toString() {
+    return "Resource{" +
+        "id=" + id +
+        ", name='" + name + '\'' +
+        ", desc='" + desc + '\'' +
+        ", ownerId=" + ownerId +
+        ", owner='" + owner + '\'' +
+        ", projectId=" + projectId +
+        ", projectName='" + projectName + '\'' +
+        ", createTime=" + createTime +
+        ", modifyTime=" + modifyTime +
+        '}';
   }
-
-  /**
-   * setter method
-   *
-   * @param lastPublishBy the lastPublishBy to set
-   * @see Resource#lastPublishBy
-   */
-  public void setLastPublishBy(Integer lastPublishBy) {
-    this.lastPublishBy = lastPublishBy;
-  }
-
-  /**
-   * getter method
-   *
-   * @return the lastPublishByName
-   * @see Resource#lastPublishByName
-   */
-  public String getLastPublishByName() {
-    return lastPublishByName;
-  }
-
-  /**
-   * setter method
-   *
-   * @param lastPublishByName the lastPublishByName to set
-   * @see Resource#lastPublishByName
-   */
-  public void setLastPublishByName(String lastPublishByName) {
-    this.lastPublishByName = lastPublishByName;
-  }
-
 }

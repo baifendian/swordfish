@@ -17,12 +17,23 @@ package com.baifendian.swordfish.dao.model;
 
 import java.util.Date;
 
+/**
+ * 项目用户关系实体
+ */
 public class ProjectUser {
   private int projectId;
   private int userId;
   private Date createTime;
+  private int perm;
 
   public ProjectUser() {
+  }
+
+  public ProjectUser(int projectId, int userId, Date createTime, int perm) {
+    this.projectId = projectId;
+    this.userId = userId;
+    this.createTime = createTime;
+    this.perm = perm;
   }
 
   public ProjectUser(int projectId, int userId, Date createTime) {
@@ -51,6 +62,14 @@ public class ProjectUser {
 
   public void setUserId(int userId) {
     this.userId = userId;
+  }
+
+  public int getPerm() {
+    return perm;
+  }
+
+  public void setPerm(int perm) {
+    this.perm = perm;
   }
 
   public Date getCreateTime() {
