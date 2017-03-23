@@ -18,7 +18,7 @@ package com.baifendian.swordfish.execserver;
 import com.baifendian.swordfish.common.hadoop.HdfsClient;
 import com.baifendian.swordfish.dao.DaoFactory;
 import com.baifendian.swordfish.dao.FlowDao;
-import com.baifendian.swordfish.execserver.utils.hadoop.ConfigurationUtil;
+import com.baifendian.swordfish.common.hadoop.ConfigurationUtil;
 import com.baifendian.swordfish.execserver.flow.FlowRunnerManager;
 import com.baifendian.swordfish.execserver.servlet.ExecutorServlet;
 import com.baifendian.swordfish.execserver.utils.OsUtil;

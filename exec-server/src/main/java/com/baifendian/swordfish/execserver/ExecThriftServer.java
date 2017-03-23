@@ -20,7 +20,7 @@ import com.baifendian.swordfish.common.job.exception.ExecException;
 import com.baifendian.swordfish.dao.DaoFactory;
 import com.baifendian.swordfish.dao.MasterDao;
 import com.baifendian.swordfish.execserver.utils.OsUtil;
-import com.baifendian.swordfish.execserver.utils.hadoop.ConfigurationUtil;
+import com.baifendian.swordfish.common.hadoop.ConfigurationUtil;
 import com.baifendian.swordfish.dao.model.MasterServer;
 import com.baifendian.swordfish.execserver.service.ExecServiceImpl;
 import com.baifendian.swordfish.rpc.HeartBeatData;
