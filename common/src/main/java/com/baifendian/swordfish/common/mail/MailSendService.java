@@ -22,6 +22,7 @@ import com.baifendian.swordfish.dao.mapper.ProjectMapper;
 import com.baifendian.swordfish.dao.mapper.ProjectUserMapper;
 import com.baifendian.swordfish.dao.mapper.UserMapper;
 import com.baifendian.swordfish.dao.model.ProjectFlow;
+import com.baifendian.swordfish.dao.model.ProjectUser;
 import com.baifendian.swordfish.dao.model.Schedule;
 import com.baifendian.swordfish.dao.model.User;
 
@@ -91,7 +92,7 @@ public class MailSendService extends BaseDao {
    * @param content   邮件内容(支持HTML)
    */
   public boolean sendToProjectUsers(int projectId, String title, String content) {
-    List<User> users = projectUserMapper.queryForUser(projectId);
+    List<ProjectUser> users = projectUserMapper.queryForUser(projectId);
 
     if (users == null) {
       LOGGER.error("Not find project: {}", projectId);
@@ -100,7 +101,8 @@ public class MailSendService extends BaseDao {
 
     List receivers = new ArrayList<>();
 
-    for (User user : users) {
+    for (ProjectUser projectUser : users) {
+      User user = userMapper.queryById(projectUser.getUserId());
       receivers.add(user.getEmail());
     }
 

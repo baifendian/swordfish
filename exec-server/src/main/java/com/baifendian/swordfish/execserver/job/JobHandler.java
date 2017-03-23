@@ -86,7 +86,7 @@ public class JobHandler {
   }
 
   public FlowStatus handle() throws IOException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException, InterruptedException {
-    String flowLocalPath = BaseConfig.getFlowExecPath(executionFlow.getProjectId(), executionFlow.getFlowId(), executionFlow.getId());
+    String flowLocalPath = BaseConfig.getFlowExecDir(executionFlow.getProjectId(), executionFlow.getFlowId(), executionFlow.getId());
     String jobScriptPath = flowLocalPath;
     //FileUtils.forceMkdir(new File(jobScriptPath));
     logger.info("job:{} script path:{}", jobIdLog, jobScriptPath);
