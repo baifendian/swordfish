@@ -32,24 +32,12 @@ public class ProjectUserSqlProvider {
 
   public String queryForUser(Map<String, Object> parameter) {
     return new SQL() {{
-      SELECT("u.id as id, u.name as name, email, phone, u.create_time as create_time");
-      SELECT("u.modify_time as modify_time, u.tenant_id as tenant_id, t.name as tenant_name");
-      SELECT("join_time, role_type, status");
-      FROM("project_user");
-      JOIN("user u on project_user.user_id = user.id");
-      LEFT_OUTER_JOIN("tenant t on u.tenant_id = t.id");
-      WHERE("project_user.project_id = #{projectId}");
-    }}.toString();
-  }
-
-  public String queryForProject(final int userId) {
-    return new SQL() {{
-      SELECT("p.id as id,p.name as name,p.`desc` as `desc`,p.tenant_id as tenant_id,p.create_time as create_time,p.modify_time as modify_time,p.owner as owner,p.queue_id as queue_id,p.mail_groups as mail_groups");
-
+      SELECT("p_u.*");
+      SELECT("u.name as user_name,p.name as project_name");
       FROM("project_user p_u");
+      JOIN("user u on p_u.user_id = u.id");
       JOIN("project p on p_u.project_id = p.id");
-
-      WHERE("p_u.user_id = #{userId}");
+      WHERE("p_u.project_id = #{projectId}");
     }}.toString();
   }
 

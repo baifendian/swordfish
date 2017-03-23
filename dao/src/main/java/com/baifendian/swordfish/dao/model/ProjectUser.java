@@ -15,18 +15,56 @@
  */
 package com.baifendian.swordfish.dao.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.util.Date;
 
 /**
  * 项目用户关系实体
  */
 public class ProjectUser {
+  /**
+   * 项目ID
+   */
+  @JsonIgnore
   private int projectId;
+  /**
+   * 项目名
+   */
+  private String projectName;
+  /**
+   * 用户ID
+   */
+  @JsonIgnore
   private int userId;
+  /**
+   * 用户名
+   */
+  private String userName;
+  /**
+   * 创建时间
+   */
   private Date createTime;
+  /**
+   * 创建时间
+   */
+  private Date modifyTime;
+  /**
+   * 用户在project中的权限
+   */
   private int perm;
 
   public ProjectUser() {
+  }
+
+  public ProjectUser(int projectId, String projectName, int userId, String userName, Date createTime, Date modifyTime, int perm) {
+    this.projectId = projectId;
+    this.projectName = projectName;
+    this.userId = userId;
+    this.userName = userName;
+    this.createTime = createTime;
+    this.modifyTime = modifyTime;
+    this.perm = perm;
   }
 
   public ProjectUser(int projectId, int userId, Date createTime, int perm) {
@@ -48,6 +86,22 @@ public class ProjectUser {
     this.createTime = new Date();
   }
 
+  public String getProjectName() {
+    return projectName;
+  }
+
+  public void setProjectName(String projectName) {
+    this.projectName = projectName;
+  }
+
+  public String getUserName() {
+    return userName;
+  }
+
+  public void setUserName(String userName) {
+    this.userName = userName;
+  }
+
   public int getProjectId() {
     return projectId;
   }
@@ -58,6 +112,14 @@ public class ProjectUser {
 
   public int getUserId() {
     return userId;
+  }
+
+  public Date getModifyTime() {
+    return modifyTime;
+  }
+
+  public void setModifyTime(Date modifyTime) {
+    this.modifyTime = modifyTime;
   }
 
   public void setUserId(int userId) {
