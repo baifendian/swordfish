@@ -15,12 +15,16 @@
  */
 package com.baifendian.swordfish.dao.mapper;
 
+import com.baifendian.swordfish.dao.enums.UserRoleType;
 import com.baifendian.swordfish.dao.model.ProjectUser;
 
+import com.baifendian.swordfish.dao.model.User;
 import org.apache.ibatis.annotations.*;
+import org.apache.ibatis.type.EnumOrdinalTypeHandler;
 import org.apache.ibatis.type.JdbcType;
 import org.mybatis.spring.annotation.MapperScan;
 
+import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
 
@@ -28,6 +32,8 @@ import java.util.List;
 public interface ProjectUserMapper {
   @InsertProvider(type = ProjectUserSqlProvider.class, method = "insert")
   int insert(@Param("projectUser") ProjectUser projectUser);
+
+
 
   @Results(value = {@Result(property = "id", column = "id", id = true, javaType = Integer.class, jdbcType = JdbcType.INTEGER),
           @Result(property = "projectId", column = "project_id", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
@@ -38,8 +44,22 @@ public interface ProjectUserMapper {
           @Result(property = "modifyTime", column = "modify_time", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP),
           @Result(property = "perm", column = "perm", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
   })
+  @SelectProvider(type = ProjectUserSqlProvider.class, method = "queryByProject")
+  List<ProjectUser> queryByProject(@Param("projectId") int projectId);
+
+  @Results(value = {@Result(property = "id", column = "id", id = true, javaType = Integer.class, jdbcType = JdbcType.INTEGER),
+          @Result(property = "name", column = "name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+          @Result(property = "email", column = "email", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+          @Result(property = "desc", column = "desc", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+          @Result(property = "phone", column = "phone", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+          @Result(property = "password", column = "password", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+          @Result(property = "role", column = "role", typeHandler = EnumOrdinalTypeHandler.class, javaType = UserRoleType.class, jdbcType = JdbcType.TINYINT),
+          @Result(property = "proxyUsers", column = "proxy_users", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+          @Result(property = "createTime", column = "create_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE),
+          @Result(property = "modifyTime", column = "modify_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE)
+  })
   @SelectProvider(type = ProjectUserSqlProvider.class, method = "queryForUser")
-  List<ProjectUser> queryForUser(@Param("projectId") int projectId);
+  List<User> queryForUser(@Param("projectId") int projectId);
 
   @DeleteProvider(type = ProjectUserSqlProvider.class, method = "delete")
   int delete(@Param("projectId") int projectId, @Param("userId") int userId);

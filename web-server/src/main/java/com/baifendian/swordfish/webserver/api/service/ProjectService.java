@@ -303,7 +303,7 @@ public class ProjectService {
       return null;
     }
 
-    return projectUserMapper.queryForUser(project.getId());
+    return projectUserMapper.queryByProject(project.getId());
   }
 
   /**
