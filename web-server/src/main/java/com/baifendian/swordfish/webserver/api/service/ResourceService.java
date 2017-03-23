@@ -15,20 +15,27 @@
  */
 package com.baifendian.swordfish.webserver.api.service;
 
+import com.baifendian.swordfish.common.config.BaseConfig;
+import com.baifendian.swordfish.common.hadoop.HdfsClient;
 import com.baifendian.swordfish.dao.mapper.ProjectMapper;
 import com.baifendian.swordfish.dao.mapper.ResourceMapper;
 import com.baifendian.swordfish.dao.model.Project;
 import com.baifendian.swordfish.dao.model.Resource;
 import com.baifendian.swordfish.dao.model.User;
+import com.baifendian.swordfish.webserver.api.service.storage.FileSystemStorageService;
 import org.apache.commons.httpclient.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
+import java.io.File;
+import java.io.IOException;
+import java.util.Date;
 
 @Service
 public class ResourceService {
@@ -47,6 +54,9 @@ public class ResourceService {
   @Autowired
   private ProjectMapper projectMapper;
 
+  @Autowired
+  FileSystemStorageService fileSystemStorageService;
+
   /**
    * 创建资源
    *
@@ -58,6 +68,7 @@ public class ResourceService {
    * @param response
    * @return
    */
+  @Transactional(value = "TransactionManager")
   public Resource createResource(User operator,
                                  String projectName,
                                  String name,
@@ -71,7 +82,7 @@ public class ResourceService {
       return null;
     }
 
-    // 判断是否具备相应的权限
+    // 判断是否具备相应的权限, 必须具备写权限
     Project project = projectMapper.queryByName(projectName);
 
     if (project == null) {
@@ -92,8 +103,48 @@ public class ResourceService {
       return null;
     }
 
-    // 上传 & 插入数据
+    // 保存到本地
+    String dir = BaseConfig.getLocalResourceDir(project.getId());
 
+    try {
+      fileSystemStorageService.createDir(dir);
+    } catch (IOException e) {
+      logger.error("Create dir failed", e);
+      throw new RuntimeException("Update failed");
+    }
+
+    String destFilename = dir + File.separator + name;
+
+    fileSystemStorageService.store(file, destFilename);
+
+    // 保存到 hdfs
+    String hdfsDestFilename = BaseConfig.getHdfsResourcesDir(project.getId()) + File.separator + name;
+    HdfsClient.getInstance().mkdir(BaseConfig.getHdfsResourcesDir(project.getId()));
+
+    HdfsClient.getInstance().copy(destFilename, hdfsDestFilename, true, true);
+
+    // 插入数据
+    resource = new Resource();
+
+    Date now = new Date();
+
+    resource.setName(name);
+    resource.setDesc(desc);
+    resource.setOwnerId(operator.getId());
+    resource.setOwner(operator.getName());
+    resource.setProjectId(project.getId());
+
+    resource.setCreateTime(now);
+    resource.setModifyTime(now);
+
+    int count = resourceMapper.insert(resource);
+
+    if (count == 1) {
+      response.setStatus(HttpStatus.SC_CREATED);
+      return resource;
+    }
+
+    response.setStatus(HttpStatus.SC_CONFLICT);
     return null;
   }
 

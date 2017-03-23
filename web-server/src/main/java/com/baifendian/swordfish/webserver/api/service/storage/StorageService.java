@@ -18,21 +18,44 @@ package com.baifendian.swordfish.webserver.api.service.storage;
 import org.springframework.core.io.Resource;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.nio.file.Path;
-import java.util.stream.Stream;
+import java.io.IOException;
 
 public interface StorageService {
 
-  void init();
+  /**
+   * 存储到目的文件
+   *
+   * @param file
+   * @param destFilename
+   */
+  void store(MultipartFile file, String destFilename);
 
-  void store(MultipartFile file);
-
-  Stream<Path> loadAll();
-
-  Path load(String filename);
-
+  /**
+   * 加载文件
+   *
+   * @param filename
+   * @return
+   */
   Resource loadAsResource(String filename);
 
-  void deleteAll();
+  /**
+   * 删除目录
+   *
+   * @param dir
+   */
+  void deleteDir(String dir) throws IOException;
 
+  /**
+   * 删除文件
+   *
+   * @param filename
+   */
+  void deleteFile(String filename) throws IOException;
+
+  /**
+   * 创建目录
+   *
+   * @param dir
+   */
+  void createDir(String dir) throws IOException;
 }

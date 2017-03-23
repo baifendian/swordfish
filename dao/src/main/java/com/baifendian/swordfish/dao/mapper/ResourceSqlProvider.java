@@ -35,13 +35,13 @@ public class ResourceSqlProvider {
     return new SQL() {
       {
         INSERT_INTO("resources");
-        VALUES("name", "#{resource.name}");
-        VALUES("project_id", "#{resource.projectId}");
-        VALUES("owner_id", "#{resource.ownerId}");
-        VALUES("modify_time", "#{resource.modifyTime}");
-        VALUES("create_time", "#{resource.createTime}");
-        VALUES("publish_time", "#{resource.publishTime}");
+
+        VALUES("`name`", "#{resource.name}");
         VALUES("`desc`", "#{resource.desc}");
+        VALUES("`owner`", "#{resource.ownerId}");
+        VALUES("`project_id`", "#{resource.projectId}");
+        VALUES("`create_time`", "#{resource.createTime}");
+        VALUES("`modify_time`", "#{resource.modifyTime}");
       }
     }.toString();
   }

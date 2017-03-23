@@ -1,53 +1,45 @@
 package com.baifendian.swordfish.webserver.api.service.storage;
 
+import org.apache.commons.io.FileUtils;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
-import org.springframework.util.FileSystemUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.stream.Stream;
+import java.nio.file.Paths;
 
 @Service
 public class FileSystemStorageService implements StorageService {
+
+  /**
+   * 将源文件, 放到目的文件中
+   *
+   * @param file
+   * @param destFilename
+   */
   @Override
-  public void store(MultipartFile file) {
+  public void store(MultipartFile file, String destFilename) {
     try {
       if (file.isEmpty()) {
         throw new StorageException("Failed to store empty file " + file.getOriginalFilename());
       }
 
-      Files.copy(file.getInputStream(), this.rootLocation.resolve(file.getOriginalFilename()));
+      Files.copy(file.getInputStream(), Paths.get(destFilename));
     } catch (IOException e) {
       throw new StorageException("Failed to store file " + file.getOriginalFilename(), e);
     }
   }
 
   @Override
-  public Stream<Path> loadAll() {
-    try {
-      return Files.walk(this.rootLocation, 1)
-          .filter(path -> !path.equals(this.rootLocation))
-          .map(path -> this.rootLocation.relativize(path));
-    } catch (IOException e) {
-      throw new StorageException("Failed to read stored files", e);
-    }
-
-  }
-
-  @Override
-  public Path load(String filename) {
-    return rootLocation.resolve(filename);
-  }
-
-  @Override
   public Resource loadAsResource(String filename) {
     try {
-      Path file = load(filename);
+      Path file = Paths.get(filename);
+
       Resource resource = new UrlResource(file.toUri());
       if (resource.exists() || resource.isReadable()) {
         return resource;
@@ -60,17 +52,33 @@ public class FileSystemStorageService implements StorageService {
     }
   }
 
+  /**
+   * 删除目录, 递归
+   *
+   * @param dir
+   */
   @Override
-  public void deleteAll() {
-    FileSystemUtils.deleteRecursively(rootLocation.toFile());
+  public void deleteDir(String dir) throws IOException {
+    FileUtils.deleteDirectory(new File(dir));
   }
 
+  /**
+   * 删除文件
+   *
+   * @param filename
+   */
   @Override
-  public void init() {
-    try {
-      Files.createDirectory(rootLocation);
-    } catch (IOException e) {
-      throw new StorageException("Could not initialize storage", e);
-    }
+  public void deleteFile(String filename) throws IOException {
+    FileUtils.forceDelete(new File(filename));
+  }
+
+  /**
+   * 创建目录
+   *
+   * @param dir
+   */
+  @Override
+  public void createDir(String dir) throws IOException {
+    FileUtils.forceMkdir(new File(dir));
   }
 }
