@@ -16,10 +16,8 @@
 package com.baifendian.swordfish.common.utils;
 
 import com.google.common.collect.Sets;
-
 import org.apache.commons.lang.StringUtils;
 
-import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.util.*;
 
@@ -44,7 +42,7 @@ public class CommonUtil {
    * 关键词, 不需要列举全
    */
   private final static Set<String> keywords = Sets.newHashSet("SELECT", "ALL", "DISTINCT", "FROM", "WHERE", "BY",
-          "WITH", "LIMIT", "JOIN", "UNION", "OVER", "IN", "IF", "AND", "OR", "PARTITION");
+      "WITH", "LIMIT", "JOIN", "UNION", "OVER", "IN", "IF", "AND", "OR", "PARTITION");
 
   private static MessageDigest md = null;
 
@@ -56,17 +54,23 @@ public class CommonUtil {
     }
   }
 
-
   /**
-   * 计算指定字符串的16位md5值
+   * 识别文件后缀名称
    *
-   * @param str 指定字符串
-   * @return 计算后的md5值
+   * @param filename
+   * @return
    */
-  public static String getMD5(String str) {
+  public static String fileSuffix(String filename) {
+    if (StringUtils.isEmpty(filename)) {
+      return StringUtils.EMPTY;
+    }
 
-    md.update(str.getBytes());
-    return new BigInteger(1, md.digest()).toString(16);
+    int index = filename.lastIndexOf(".");
+    if (index < 0) {
+      return StringUtils.EMPTY;
+    }
+
+    return filename.substring(index + 1);
   }
 
   /**
@@ -86,40 +90,6 @@ public class CommonUtil {
       resDate = calendar.getTime();
     }
     return resDate;
-  }
-
-  /**
-   * 增加日期的小时。失败返回null。
-   *
-   * @param date       日期
-   * @param hourAmount 增加数量。可为负数
-   * @return 增加小时后的日期
-   */
-  public static Date addHour(Date date, int hourAmount) {
-    return addInteger(date, Calendar.HOUR_OF_DAY, hourAmount);
-  }
-
-  /**
-   * 增加日期的天数。失败返回null。
-   *
-   * @param date      日期
-   * @param dayAmount 增加数量。可为负数
-   * @return 增加天数后的日期
-   */
-  public static Date addDay(Date date, int dayAmount) {
-    return addInteger(date, Calendar.DATE, dayAmount);
-  }
-
-  /**
-   * 解析整型 <p>
-   *
-   * @return 整型
-   */
-  public static Integer parseInteger(String integerStr) {
-    if (StringUtils.isEmpty(integerStr)) {
-      return null;
-    }
-    return Integer.valueOf(integerStr);
   }
 
   /**
@@ -390,9 +360,17 @@ public class CommonUtil {
   }
 
   /**
-   * 识别一个 sql 中的自定义 function, 这个算法是采用栈的方式来实现: 1) 首先将 sql 处理, 去除掉 ""; 2) 然后获取一个个的 Token, 对于 Token
-   * 有2种情况, 单词, 非单词(都是一个个字符); 3) 单词就符合单词的规则, 以 _ 或者字母开头, 后面都是数字; 4) 如果是 单词, 后面接上了 (, 考虑将 单词 作为
-   * function name, 否则抛弃; <p> 注意: 有可能多找关键词, 比如某些 hive 关键词后面跟上了 (), 会误认为是关键词, 不过这个不影响我们的正常处理.
+   * 识别一个 sql 中的自定义 function, 这个算法是采用栈的方式来实现:
+   * <p>
+   * 1) 首先将 sql 处理, 去除掉 ""
+   * 2) 然后获取一个个的 Token, 对于 Token 有2种情况, 单词, 非单词(都是一个个字符)
+   * 3) 单词就符合单词的规则, 以 _ 或者字母开头, 后面都是数字
+   * 4) 如果是 单词, 后面接上了 (, 考虑将 单词 作为 function name, 否则抛弃
+   * <p>
+   * 注意: 有可能多找关键词, 比如某些 hive 关键词后面跟上了 (), 会误认为是关键词, 不过这个不影响我们的正常处理
+   *
+   * @param sql
+   * @return
    */
   public static Set<String> sqlFunction(String sql) {
     Collection<Map.Entry<TokenType, String>> tokens = getToken(sql);
@@ -496,5 +474,10 @@ public class CommonUtil {
     for (String sr : r) {
       System.out.println(sr);
     }
+
+    System.out.println(fileSuffix("abc.txt"));
+    System.out.println(fileSuffix("abc.jar"));
+    System.out.println(fileSuffix("abc.zip"));
+    System.out.println(fileSuffix("abc"));
   }
 }

@@ -15,6 +15,8 @@
  */
 package com.baifendian.swordfish.webserver.api;
 
+import com.baifendian.swordfish.common.hadoop.ConfigurationUtil;
+import com.baifendian.swordfish.common.hadoop.HdfsClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
@@ -26,6 +28,9 @@ public class StartupRunner implements CommandLineRunner {
 
   public void run(String... args) {
     logger.info("begin startup...");
+
+    logger.info("init hdfs instance");
+    HdfsClient.init(ConfigurationUtil.getConfiguration());
 
     // TODO::
 

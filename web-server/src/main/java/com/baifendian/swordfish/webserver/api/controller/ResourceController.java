@@ -161,6 +161,11 @@ public class ResourceController {
 
     org.springframework.core.io.Resource file = resourceService.downloadResource(operator, projectName, name, response);
 
+    if(file == null) {
+      return ResponseEntity
+          .noContent().build();
+    }
+
     return ResponseEntity
         .ok()
         .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getFilename() + "\"")

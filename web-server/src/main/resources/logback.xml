@@ -42,7 +42,7 @@
         </encoder>
         <!-- Only log level WARN and above -->
         <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
-            <level>DEBUG</level>
+            <level>INFO</level>
         </filter>
     </appender>
 

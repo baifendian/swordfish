@@ -17,6 +17,7 @@ package com.baifendian.swordfish.webserver.api.service;
 
 import com.baifendian.swordfish.common.config.BaseConfig;
 import com.baifendian.swordfish.common.hadoop.HdfsClient;
+import com.baifendian.swordfish.common.utils.CommonUtil;
 import com.baifendian.swordfish.dao.mapper.ProjectMapper;
 import com.baifendian.swordfish.dao.mapper.ResourceMapper;
 import com.baifendian.swordfish.dao.model.Project;
@@ -24,10 +25,10 @@ import com.baifendian.swordfish.dao.model.Resource;
 import com.baifendian.swordfish.dao.model.User;
 import com.baifendian.swordfish.webserver.api.service.storage.FileSystemStorageService;
 import org.apache.commons.httpclient.HttpStatus;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -39,9 +40,6 @@ import java.util.Date;
 public class ResourceService {
 
   private static Logger logger = LoggerFactory.getLogger(ResourceService.class.getName());
-
-  @Value("${max.file.size}")
-  private long maxFileSize;
 
   @Autowired
   private ResourceMapper resourceMapper;
@@ -74,9 +72,9 @@ public class ResourceService {
                                  MultipartFile file,
                                  HttpServletResponse response) {
 
-    // 判断文件大小是否符合
-    if (file.isEmpty() || file.getSize() > maxFileSize * 1024 * 1024) {
-      response.setStatus(HttpStatus.SC_LENGTH_REQUIRED);
+    // 文件为空
+    if (file.isEmpty()) {
+      response.setStatus(HttpStatus.SC_BAD_REQUEST);
       return null;
     }
 
@@ -94,7 +92,7 @@ public class ResourceService {
     }
 
     // 判断文件是否已经存在
-    Resource resource = resourceMapper.queryResource(name);
+    Resource resource = resourceMapper.queryResource(project.getId(), name);
 
     if (resource != null) {
       response.setStatus(HttpStatus.SC_CONFLICT);
@@ -102,12 +100,15 @@ public class ResourceService {
     }
 
     // 保存到本地
-    String localFilename = BaseConfig.getLocalResourceFilename(project.getId(), name);
+    String fileSuffix = CommonUtil.fileSuffix(file.getOriginalFilename()); // file suffix
+    String filename = StringUtils.isEmpty(fileSuffix) ? name : String.format("%s.%s", name, fileSuffix);
+
+    String localFilename = BaseConfig.getLocalResourceFilename(project.getId(), filename);
 
     fileSystemStorageService.store(file, localFilename);
 
     // 保存到 hdfs
-    String hdfsFilename = BaseConfig.getHdfsResourcesFilename(project.getId(), name);
+    String hdfsFilename = BaseConfig.getHdfsResourcesFilename(project.getId(), filename);
 
     HdfsClient.getInstance().copyLocalToHdfs(localFilename, hdfsFilename, true, true);
 
@@ -117,11 +118,15 @@ public class ResourceService {
     Date now = new Date();
 
     resource.setName(name);
+    if (StringUtils.isNotEmpty(fileSuffix)) {
+      resource.setSuffix(fileSuffix);
+    }
+    resource.setOriginFilename(file.getOriginalFilename());
     resource.setDesc(desc);
     resource.setOwnerId(operator.getId());
     resource.setOwner(operator.getName());
     resource.setProjectId(project.getId());
-
+    resource.setProjectName(projectName);
     resource.setCreateTime(now);
     resource.setModifyTime(now);
 
@@ -153,9 +158,9 @@ public class ResourceService {
                                  String desc,
                                  MultipartFile file,
                                  HttpServletResponse response) {
-    // 判断文件大小是否符合
-    if (file != null && (file.isEmpty() || file.getSize() > maxFileSize * 1024 * 1024)) {
-      response.setStatus(HttpStatus.SC_REQUEST_TOO_LONG);
+    // 文件为空
+    if (file != null && file.isEmpty()) {
+      response.setStatus(HttpStatus.SC_BAD_REQUEST);
       return null;
     }
 
@@ -173,7 +178,7 @@ public class ResourceService {
     }
 
     // 判断文件是否已经存在
-    Resource resource = resourceMapper.queryResource(name);
+    Resource resource = resourceMapper.queryResource(project.getId(), name);
 
     if (resource != null) {
       response.setStatus(HttpStatus.SC_CONFLICT);
@@ -228,8 +233,17 @@ public class ResourceService {
     }
 
     // 下载文件
-    String localFilename = BaseConfig.getLocalResourceFilename(project.getId(), name);
-    String hdfsFilename = BaseConfig.getHdfsResourcesFilename(project.getId(), name);
+    Resource resource = resourceMapper.queryResource(project.getId(), name);
+
+    if (resource == null) {
+      logger.error("Download file not exist, project {}, resource {}", projectName, name);
+      return null;
+    }
+
+    String filename = StringUtils.isEmpty(resource.getSuffix()) ? name : String.format("%s.%s", name, resource.getSuffix());
+
+    String localFilename = BaseConfig.getLocalResourceFilename(project.getId(), filename);
+    String hdfsFilename = BaseConfig.getHdfsResourcesFilename(project.getId(), filename);
 
     HdfsClient.getInstance().copyHdfsToLocal(hdfsFilename, localFilename, false, true);
 

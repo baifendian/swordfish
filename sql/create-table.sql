@@ -63,14 +63,15 @@ DROP TABLE If Exists `resources`;
 CREATE TABLE `resources` (
   `id` int(20) NOT NULL AUTO_INCREMENT COMMENT 'resource id',
   `name` varchar(64) NOT NULL COMMENT 'resources name',
+  `suffix` varchar(20) NOT NULL COMMENT 'suffix of the file',
+  `origin_filename` varchar(64) NOT NULL COMMENT 'file name of the orgin file',
   `desc` varchar(256) DEFAULT NULL COMMENT 'resources description',
-  `type` int(11) NOT NULL COMMENT 'resources type, jar, zip etc.',
   `owner` int(20) NOT NULL COMMENT 'owner id of the resource',
   `project_id` int(20) NOT NULL COMMENT 'project id of this resource',
   `create_time` datetime NOT NULL COMMENT 'resource create time',
   `modify_time` datetime NOT NULL COMMENT 'resource last modify time',
   PRIMARY KEY (`id`),
-  UNIQUE KEY `name` (`name`),
+  UNIQUE KEY `project_resname` (`project_id`, `name`),
   FOREIGN KEY (`project_id`) REFERENCES `project`(`id`) ON DELETE CASCADE,
   FOREIGN KEY (`owner`) REFERENCES `user`(`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -88,7 +89,7 @@ CREATE TABLE `datasource` (
   `create_time` datetime NOT NULL COMMENT 'create time of the datasource',
   `modify_time` datetime NOT NULL COMMENT 'modify time of the datasource',
   PRIMARY KEY (`id`),
-  UNIQUE KEY `name` (`name`),
+  UNIQUE KEY `project_dsname` (`project_id`, `name`),
   FOREIGN KEY (`project_id`) REFERENCES `project`(`id`) ON DELETE CASCADE,
   FOREIGN KEY (`owner`) REFERENCES `user`(`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;

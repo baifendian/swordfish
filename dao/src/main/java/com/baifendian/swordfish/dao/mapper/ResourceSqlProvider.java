@@ -34,6 +34,8 @@ public class ResourceSqlProvider {
         INSERT_INTO("resources");
 
         VALUES("`name`", "#{resource.name}");
+        VALUES("`suffix`", "#{resource.suffix}");
+        VALUES("`origin_filename`", "#{resource.originFilename}");
         VALUES("`desc`", "#{resource.desc}");
         VALUES("`owner`", "#{resource.ownerId}");
         VALUES("`project_id`", "#{resource.projectId}");
@@ -54,6 +56,7 @@ public class ResourceSqlProvider {
       {
         SELECT("*");
         FROM("resources");
+        WHERE("project_id = #{projectId}");
         WHERE("name = #{name}");
       }
     }.toString();
