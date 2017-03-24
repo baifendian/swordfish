@@ -52,7 +52,7 @@ public class ProjectUserSqlProvider {
     }}.toString();
   }
 
-  public String delete(final int projectId, final int userId) {
+  public String delete(Map<String, Object> parameter) {
     return new SQL() {{
       DELETE_FROM("project_user");
       WHERE("user_id = #{userId}");

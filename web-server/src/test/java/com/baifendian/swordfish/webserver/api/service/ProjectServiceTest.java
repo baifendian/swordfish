@@ -255,6 +255,7 @@ public class ProjectServiceTest {
     }
   }
 
+  @Test
   public void testQueryUser(){
     {
       //正常查询所有用户

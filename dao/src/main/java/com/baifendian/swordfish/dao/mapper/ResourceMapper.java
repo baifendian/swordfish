@@ -49,7 +49,8 @@ public interface ResourceMapper {
       @Result(property = "createTime", column = "create_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE),
       @Result(property = "modifyTime", column = "modify_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE)
   })
-  @SelectProvider(type = ResourceSqlProvider.class, method = "queryDetail")
+  //@SelectProvider(type = ResourceSqlProvider.class, method = "queryDetail")
+  @SelectProvider(type = ResourceSqlProvider.class, method = "insert")
   Resource queryResource(@Param("name") String name);
 
   /**
