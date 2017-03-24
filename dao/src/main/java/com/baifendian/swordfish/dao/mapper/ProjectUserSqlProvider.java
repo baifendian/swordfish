@@ -26,7 +26,9 @@ public class ProjectUserSqlProvider {
       INSERT_INTO("project_user");
       VALUES("project_id", "#{projectUser.projectId}");
       VALUES("user_id", "#{projectUser.userId}");
+      VALUES("perm", "#{projectUser.perm}");
       VALUES("`create_time`", "#{projectUser.createTime}");
+      VALUES("`modify_time`", "#{projectUser.modifyTime}");
     }}.toString();
   }
 
@@ -50,7 +52,7 @@ public class ProjectUserSqlProvider {
     }}.toString();
   }
 
-  public String delete(final int projectId, final int userId) {
+  public String delete(Map<String, Object> parameter) {
     return new SQL() {{
       DELETE_FROM("project_user");
       WHERE("user_id = #{userId}");
@@ -58,10 +60,13 @@ public class ProjectUserSqlProvider {
     }}.toString();
   }
 
-  public String query(final int userId, final int projectId) {
+  public String query(Map<String, Object> parameter) {
     return new SQL() {{
       SELECT("*");
-      FROM("project_user");
+      SELECT("u.name as user_name,p.name as project_name");
+      FROM("project_user p_u");
+      JOIN("user u on p_u.user_id = u.id");
+      JOIN("project p on p_u.project_id = p.id");
       WHERE("project_id = #{projectId}");
       WHERE("user_id = #{userId}");
     }}.toString();

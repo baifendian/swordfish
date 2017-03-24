@@ -84,7 +84,6 @@ public class ProjectService {
       response.setStatus(HttpStatus.SC_CONFLICT);
       return null;
     }
-    projectMapper.insert(project);
     return project;
   }
 

@@ -30,11 +30,11 @@ public class ProjectSqlProvider {
       VALUES("`desc`", "#{project.desc}");
       VALUES("create_time", "#{project.createTime}");
       VALUES("modify_time", "#{project.modifyTime}");
-      VALUES("owner", "#{project.owenrId}");
+      VALUES("owner", "#{project.ownerId}");
     }}.toString();
   }
 
-  public String updateById(final Project project) {
+  public String updateById(Map<String, Object> parameter) {
     return new SQL() {{
       UPDATE("project");
       SET("`desc`=#{project.desc}");
@@ -43,7 +43,7 @@ public class ProjectSqlProvider {
     }}.toString();
   }
 
-  public String deleteById(final int id) {
+  public String deleteById(Map<String, Object> parameter) {
     return new SQL() {{
       DELETE_FROM("project");
       WHERE("id = #{id}");
@@ -66,11 +66,19 @@ public class ProjectSqlProvider {
         SELECT("p.*,p.owner as owner_id");
         SELECT("u.name as owner");
         FROM("project p");
-        JOIN("project_user p_u on p_u.project_id = p.id");
-        LEFT_OUTER_JOIN("user u on p.owner = u.id");
+        LEFT_OUTER_JOIN("project_user p_u on p.id = p_u.project_id");
+        JOIN("user u on p.owner = u.id");
         WHERE("p_u.user_id = #{userId} or p.owner = #{userId}");
       }
     }.toString();
   }
 
+  public String queryAllProject(Map<String, Object> parameter){
+    return new SQL() {{
+      SELECT("p.*,p.owner as owner_id");
+      SELECT("u.name as owner");
+      FROM("project p");
+      LEFT_OUTER_JOIN("user u on p.owner = u.id");
+    }}.toString();
+  }
 }

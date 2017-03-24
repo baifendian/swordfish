@@ -185,7 +185,7 @@ public class DataSourceServiceTest {
       User user1 = mockDataService.createGeneralUser();
       mockDataService.createProjectUser(project.getId(),user1.getId(), Constants.PROJECT_USER_PERM_WRITE);
       MockHttpServletResponse mockHttpServletResponse = new MockHttpServletResponse();
-      List<DataSource> dataSourceList = datasourceService.query(user,project.getName(),mockHttpServletResponse);
+      List<DataSource> dataSourceList = datasourceService.query(user1,project.getName(),mockHttpServletResponse);
       assertEquals(mockHttpServletResponse.getStatus(),HttpStatus.SC_UNAUTHORIZED);
       assertTrue(dataSourceList==null);
     }
