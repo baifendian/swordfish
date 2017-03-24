@@ -51,11 +51,4 @@ public interface StorageService {
    * @param filename
    */
   void deleteFile(String filename) throws IOException;
-
-  /**
-   * 创建目录
-   *
-   * @param dir
-   */
-  void createDir(String dir) throws IOException;
 }

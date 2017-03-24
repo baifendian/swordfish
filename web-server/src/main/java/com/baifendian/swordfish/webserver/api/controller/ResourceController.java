@@ -18,9 +18,12 @@ package com.baifendian.swordfish.webserver.api.controller;
 import com.baifendian.swordfish.dao.model.Resource;
 import com.baifendian.swordfish.dao.model.User;
 import com.baifendian.swordfish.webserver.api.service.ResourceService;
+import com.sun.tools.javac.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -111,13 +114,13 @@ public class ResourceController {
    * @param response
    */
   @GetMapping(value = "")
-  public void getResources(@RequestAttribute(value = "session.user") User operator,
-                           @PathVariable String projectName,
-                           HttpServletResponse response) {
-    logger.info("Operator user id {}, retrieve resource, project name: {}",
+  public List<Resource> getResources(@RequestAttribute(value = "session.user") User operator,
+                                     @PathVariable String projectName,
+                                     HttpServletResponse response) {
+    logger.info("Operator user id {}, retrieve resource of the project, project name: {}",
         operator.getId(), projectName);
 
-
+    return null;
   }
 
   /**
@@ -128,16 +131,16 @@ public class ResourceController {
    * @param name
    * @param response
    */
-//  @RequestMapping(value = "", method = {RequestMethod.GET})
-//  public void getResource(@RequestAttribute(value = "session.user") User operator,
-//                          @PathVariable String projectName,
-//                          @PathVariable String name,
-//                          HttpServletResponse response) {
-//    logger.info("Operator user id {}, retrieve resource, project name: {}, resource name: {}",
-//        operator.getId(), projectName, name);
-//
-//
-//  }
+  @GetMapping(value = "/{name}")
+  public List<Resource> getResource(@RequestAttribute(value = "session.user") User operator,
+                                    @PathVariable String projectName,
+                                    @PathVariable String name,
+                                    HttpServletResponse response) {
+    logger.info("Operator user id {}, retrieve resource, project name: {}, resource name: {}",
+        operator.getId(), projectName, name);
+
+    return null;
+  }
 
   /**
    * 下载资源, 须有资源的 'r 权限'
@@ -147,14 +150,20 @@ public class ResourceController {
    * @param name
    * @param response
    */
-  @RequestMapping(value = "/{name}/file", method = {RequestMethod.GET})
-  public void downloadResource(@RequestAttribute(value = "session.user") User operator,
-                               @PathVariable String projectName,
-                               @PathVariable String name,
-                               HttpServletResponse response) {
+  @GetMapping(value = "/{name}/file")
+  @ResponseBody
+  public ResponseEntity<org.springframework.core.io.Resource> downloadResource(@RequestAttribute(value = "session.user") User operator,
+                                                                               @PathVariable String projectName,
+                                                                               @PathVariable String name,
+                                                                               HttpServletResponse response) {
     logger.info("Operator user id {}, download resource, project name: {}, resource name: {}",
         operator.getId(), projectName, name);
 
+    org.springframework.core.io.Resource file = resourceService.downloadResource(operator, projectName, name, response);
 
+    return ResponseEntity
+        .ok()
+        .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getFilename() + "\"")
+        .body(file);
   }
 }

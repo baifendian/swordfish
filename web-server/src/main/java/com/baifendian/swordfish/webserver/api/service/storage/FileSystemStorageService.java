@@ -29,6 +29,13 @@ public class FileSystemStorageService implements StorageService {
         throw new StorageException("Failed to store empty file " + file.getOriginalFilename());
       }
 
+      File destFile = new File(destFilename);
+      File destDir = new File(destFile.getParent());
+
+      if (!destDir.exists()) {
+        FileUtils.forceMkdir(destDir);
+      }
+
       Files.copy(file.getInputStream(), Paths.get(destFilename));
     } catch (IOException e) {
       throw new StorageException("Failed to store file " + file.getOriginalFilename(), e);
@@ -70,15 +77,5 @@ public class FileSystemStorageService implements StorageService {
   @Override
   public void deleteFile(String filename) throws IOException {
     FileUtils.forceDelete(new File(filename));
-  }
-
-  /**
-   * 创建目录
-   *
-   * @param dir
-   */
-  @Override
-  public void createDir(String dir) throws IOException {
-    FileUtils.forceMkdir(new File(dir));
   }
 }

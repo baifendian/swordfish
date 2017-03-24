@@ -33,8 +33,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
-import java.io.File;
-import java.io.IOException;
 import java.util.Date;
 
 @Service
@@ -55,7 +53,7 @@ public class ResourceService {
   private ProjectMapper projectMapper;
 
   @Autowired
-  FileSystemStorageService fileSystemStorageService;
+  private FileSystemStorageService fileSystemStorageService;
 
   /**
    * 创建资源
@@ -78,7 +76,7 @@ public class ResourceService {
 
     // 判断文件大小是否符合
     if (file.isEmpty() || file.getSize() > maxFileSize * 1024 * 1024) {
-      response.setStatus(HttpStatus.SC_REQUEST_TOO_LONG);
+      response.setStatus(HttpStatus.SC_LENGTH_REQUIRED);
       return null;
     }
 
@@ -104,24 +102,14 @@ public class ResourceService {
     }
 
     // 保存到本地
-    String dir = BaseConfig.getLocalResourceDir(project.getId());
+    String localFilename = BaseConfig.getLocalResourceFilename(project.getId(), name);
 
-    try {
-      fileSystemStorageService.createDir(dir);
-    } catch (IOException e) {
-      logger.error("Create dir failed", e);
-      throw new RuntimeException("Update failed");
-    }
-
-    String destFilename = dir + File.separator + name;
-
-    fileSystemStorageService.store(file, destFilename);
+    fileSystemStorageService.store(file, localFilename);
 
     // 保存到 hdfs
-    String hdfsDestFilename = BaseConfig.getHdfsResourcesDir(project.getId()) + File.separator + name;
-    HdfsClient.getInstance().mkdir(BaseConfig.getHdfsResourcesDir(project.getId()));
+    String hdfsFilename = BaseConfig.getHdfsResourcesFilename(project.getId(), name);
 
-    HdfsClient.getInstance().copy(destFilename, hdfsDestFilename, true, true);
+    HdfsClient.getInstance().copyLocalToHdfs(localFilename, hdfsFilename, true, true);
 
     // 插入数据
     resource = new Resource();
@@ -211,5 +199,42 @@ public class ResourceService {
                                  HttpServletResponse response) {
     // 删除资源 & 数据库记录
     return null;
+  }
+
+  /**
+   * 下载资源文件
+   *
+   * @param operator
+   * @param projectName
+   * @param name
+   * @param response
+   * @return
+   */
+  public org.springframework.core.io.Resource downloadResource(User operator,
+                                                               String projectName,
+                                                               String name,
+                                                               HttpServletResponse response) {
+    // 判断是否具备相应的权限, 必须具备读权限
+    Project project = projectMapper.queryByName(projectName);
+
+    if (project == null) {
+      response.setStatus(HttpStatus.SC_BAD_REQUEST);
+      return null;
+    }
+
+    if (!projectService.hasReadPerm(operator.getId(), project)) {
+      response.setStatus(HttpStatus.SC_UNAUTHORIZED);
+      return null;
+    }
+
+    // 下载文件
+    String localFilename = BaseConfig.getLocalResourceFilename(project.getId(), name);
+    String hdfsFilename = BaseConfig.getHdfsResourcesFilename(project.getId(), name);
+
+    HdfsClient.getInstance().copyHdfsToLocal(hdfsFilename, localFilename, false, true);
+
+    org.springframework.core.io.Resource file = fileSystemStorageService.loadAsResource(localFilename);
+
+    return file;
   }
 }

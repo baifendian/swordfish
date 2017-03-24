@@ -15,12 +15,9 @@
  */
 package com.baifendian.swordfish.dao.mapper;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.jdbc.SQL;
 
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 public class ResourceSqlProvider {
 
@@ -45,30 +42,22 @@ public class ResourceSqlProvider {
       }
     }.toString();
   }
-//
-//  /**
-//   * 查询资源详情 <p>
-//   *
-//   * @return sql 语句
-//   */
-//  public String queryDetail(Map<String, Object> parameter) {
-//    return new SQL() {
-//      {
-//        SELECT("r.*");
-//        SELECT("u.name as owner_name");
-//        SELECT("u2.name as last_publish_by_name");
-//        SELECT("p.name as project_name");
-//        SELECT("p.org_id as org_id");
-//        SELECT("o.name as org_name");
-//        FROM("resources r");
-//        INNER_JOIN("user as u on u.id = r.owner_id");
-//        LEFT_OUTER_JOIN("user as u2 on u2.id = r.last_publish_by");
-//        INNER_JOIN("project as p on r.project_id = p.id");
-//        LEFT_OUTER_JOIN("org as o on p.org_id = o.id");
-//        WHERE("r.id = #{resourceId}");
-//      }
-//    }.toString();
-//  }
+
+  /**
+   * 查询资源详情
+   *
+   * @param parameter
+   * @return
+   */
+  public String queryResource(Map<String, Object> parameter) {
+    return new SQL() {
+      {
+        SELECT("*");
+        FROM("resources");
+        WHERE("name = #{name}");
+      }
+    }.toString();
+  }
 //
 //  /**
 //   * 查询资源详情 <p>
