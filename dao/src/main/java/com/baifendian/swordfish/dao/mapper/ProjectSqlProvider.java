@@ -30,7 +30,7 @@ public class ProjectSqlProvider {
       VALUES("`desc`", "#{project.desc}");
       VALUES("create_time", "#{project.createTime}");
       VALUES("modify_time", "#{project.modifyTime}");
-      VALUES("owner", "#{project.owenrId}");
+      VALUES("owner", "#{project.ownerId}");
     }}.toString();
   }
 
@@ -73,4 +73,13 @@ public class ProjectSqlProvider {
     }.toString();
   }
 
+  public String queryAllProject(Map<String, Object> parameter){
+    return new SQL() {{
+      SELECT("p.*,p.owner as owner_id");
+      SELECT("u.name as owner");
+      FROM("project p");
+      JOIN("project_user p_u on p_u.project_id = p.id");
+      LEFT_OUTER_JOIN("user u on p.owner = u.id");
+    }}.toString();
+  }
 }

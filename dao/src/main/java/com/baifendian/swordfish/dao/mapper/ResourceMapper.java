@@ -57,9 +57,8 @@ public interface ResourceMapper {
    *
    * @param name
    * @return
-   */
   @DeleteProvider(type = ResourceSqlProvider.class, method = "delete")
-  int delete(@Param("name") String name);
+  int delete(@Param("name") String name);*/
 //
 //  /**
 //   * 查询详情 <p>
