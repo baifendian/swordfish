@@ -15,6 +15,7 @@
  */
 package com.baifendian.swordfish.webserver.api.service;
 
+import com.baifendian.swordfish.common.consts.Constants;
 import com.baifendian.swordfish.dao.model.Project;
 import com.baifendian.swordfish.dao.model.ProjectUser;
 import com.baifendian.swordfish.dao.model.User;
@@ -24,6 +25,8 @@ import org.apache.commons.httpclient.HttpStatus;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.mock.web.MockHttpServletResponse;
@@ -44,6 +47,8 @@ import static junit.framework.TestCase.assertTrue;
 @WebAppConfiguration
 @Transactional
 public class ProjectServiceTest {
+
+  private static Logger logger = LoggerFactory.getLogger(ProjectServiceTest.class.getName());
 
   @Autowired
   private MockDataService mockDataService;
@@ -153,7 +158,7 @@ public class ProjectServiceTest {
       List<Project> projectList = projectService.queryProject(user,mockHttpServletResponse);
       assertEquals(mockHttpServletResponse.getStatus(),HttpStatus.SC_OK);
       assertTrue(projectList != null);
-      assertTrue(projectList.size() == 1);
+      assertTrue(projectList.size() > 0);
     }
     {
       //一个管理员查看所有项目
@@ -170,7 +175,7 @@ public class ProjectServiceTest {
   public void testAddProjectUser(){
     {
       //正常添加一个用户到项目中
-      int perm = 1;
+      int perm = Constants.PROJECT_USER_PERM_READ;
       User user1 = mockDataService.createGeneralUser();
       MockHttpServletResponse mockHttpServletResponse = new MockHttpServletResponse();
       ProjectUser projectUser = projectService.addProjectUser(user,project.getName(),user1.getName(),perm,mockHttpServletResponse);
@@ -250,6 +255,7 @@ public class ProjectServiceTest {
     }
   }
 
+  @Test
   public void testQueryUser(){
     {
       //正常查询所有用户

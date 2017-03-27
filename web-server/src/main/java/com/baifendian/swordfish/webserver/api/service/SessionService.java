@@ -56,17 +56,15 @@ public class SessionService {
     // 得到 ip 地址
     String ip = HttpUtil.getClientIpAddress(req);
 
-    // 得到 cookie 信息
-    Cookie cookie = HttpUtil.getCookieByName(req, SESSION_ID_NAME);
-    String sessionId = null;
+    String sessionId = req.getHeader(SESSION_ID_NAME);;
 
-    if (cookie != null) {
-      sessionId = cookie.getValue();
-    }
+    if(sessionId == null) {
+      // 得到 cookie 信息
+      Cookie cookie = HttpUtil.getCookieByName(req, SESSION_ID_NAME);
 
-    // 如果 sessionId 合法
-    if (sessionId == null) {
-      sessionId = req.getHeader(SESSION_ID_NAME);
+      if (cookie != null) {
+        sessionId = cookie.getValue();
+      }
     }
 
     if(sessionId == null) {

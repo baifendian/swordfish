@@ -15,10 +15,13 @@
  */
 package com.baifendian.swordfish.webserver.api.service.mock;
 
+import com.baifendian.swordfish.dao.enums.DbType;
 import com.baifendian.swordfish.dao.enums.UserRoleType;
+import com.baifendian.swordfish.dao.mapper.DataSourceMapper;
 import com.baifendian.swordfish.dao.mapper.ProjectMapper;
 import com.baifendian.swordfish.dao.mapper.ProjectUserMapper;
 import com.baifendian.swordfish.dao.mapper.UserMapper;
+import com.baifendian.swordfish.dao.model.DataSource;
 import com.baifendian.swordfish.dao.model.Project;
 import com.baifendian.swordfish.dao.model.ProjectUser;
 import com.baifendian.swordfish.dao.model.User;
@@ -43,12 +46,27 @@ public class MockDataService {
   @Autowired
   private ProjectUserMapper projectUserMapper;
 
+  @Autowired
+  private DataSourceMapper dataSourceMapper;
+
   /**
    * 获取一个随机字符串
    * @return
    */
   public String getRandomString(){
-    return RandomStringUtils.random(5, new char[]{'a', 'b', 'c', 'd', 'e', 'f'});
+    //return RandomStringUtils.random(10, new char[]{'a', 'b', 'c', 'd', 'e', 'f','g','h','i','j'});
+    return getRandomString(5);
+  }
+
+  public String getRandomString(int length) {
+    //随机字符串的随机字符库
+    String KeyString = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    StringBuffer sb = new StringBuffer();
+    int len = KeyString.length();
+    for (int i = 0; i < length; i++) {
+      sb.append(KeyString.charAt((int) Math.round(Math.random() * (len - 1))));
+    }
+    return sb.toString();
   }
 
   /**
@@ -124,9 +142,34 @@ public class MockDataService {
     projectUser.setPerm(perm);
     projectUser.setCreateTime(now);
     projectUser.setModifyTime(now);
+    projectUser.setPerm(0);
 
     projectUserMapper.insert(projectUser);
 
     return projectUser;
+  }
+
+  /**
+   * 创建一个数据源
+   * @param projectId
+   * @param userId
+   * @return
+   */
+  public DataSource createDataSource(int projectId,int userId){
+    DataSource dataSource = new DataSource();
+    Date now = new Date();
+
+    dataSource.setName(getRandomString());
+    dataSource.setDesc(getRandomString());
+    dataSource.setType(DbType.MYSQL);
+    dataSource.setOwnerId(userId);
+    dataSource.setProjectId(projectId);
+    dataSource.setParams(getRandomString());
+    dataSource.setCreateTime(now);
+    dataSource.setModifyTime(now);
+
+    dataSourceMapper.insert(dataSource);
+
+    return dataSource;
   }
 }

@@ -45,8 +45,8 @@ public interface ProjectMapper {
   @Results(value = {@Result(property = "id", column = "id", id = true, javaType = int.class, jdbcType = JdbcType.INTEGER),
           @Result(property = "name", column = "name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
           @Result(property = "desc", column = "desc", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-          @Result(property = "createTime", column = "create_time", javaType = int.class, jdbcType = JdbcType.INTEGER),
-          @Result(property = "modifyTime", column = "modify_time", javaType = int.class, jdbcType = JdbcType.INTEGER),
+          @Result(property = "createTime", column = "create_time", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP),
+          @Result(property = "modifyTime", column = "modify_time", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP),
           @Result(property = "ownerId", column = "owner_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
           @Result(property = "owner", column = "owner", javaType = String.class, jdbcType = JdbcType.VARCHAR),
   })
@@ -63,8 +63,8 @@ public interface ProjectMapper {
           @Result(property = "id", column = "id", id = true, javaType = int.class, jdbcType = JdbcType.INTEGER),
           @Result(property = "name", column = "name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
           @Result(property = "desc", column = "desc", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-          @Result(property = "createTime", column = "create_time", javaType = int.class, jdbcType = JdbcType.INTEGER),
-          @Result(property = "modifyTime", column = "modify_time", javaType = int.class, jdbcType = JdbcType.INTEGER),
+          @Result(property = "createTime", column = "create_time", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP),
+          @Result(property = "modifyTime", column = "modify_time", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP),
           @Result(property = "ownerId", column = "owner_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
           @Result(property = "owner", column = "owner", javaType = String.class, jdbcType = JdbcType.VARCHAR),
   })

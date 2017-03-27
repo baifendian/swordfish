@@ -54,7 +54,7 @@ public class LoginController {
    * @param response
    * @return
    */
-  @RequestMapping(value = "", method = {RequestMethod.POST})
+  @RequestMapping(value = "", method = {RequestMethod.POST, RequestMethod.GET})
   public UserSessionData login(@RequestParam(value = "name", required = false) String name,
                                @RequestParam(value = "email", required = false) String email,
                                @RequestParam(value = "password") String password,

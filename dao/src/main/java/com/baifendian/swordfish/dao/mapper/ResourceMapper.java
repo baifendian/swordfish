@@ -41,25 +41,25 @@ public interface ResourceMapper {
    */
   @Results(value = {@Result(property = "id", column = "id", id = true, javaType = int.class, jdbcType = JdbcType.INTEGER),
       @Result(property = "name", column = "name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+      @Result(property = "suffix", column = "suffix", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+      @Result(property = "originFilename", column = "origin_filename", javaType = String.class, jdbcType = JdbcType.VARCHAR),
       @Result(property = "desc", column = "desc", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-      @Result(property = "ownerId", column = "owner_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
-      @Result(property = "owner", column = "owner_name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+      @Result(property = "ownerId", column = "owner", javaType = int.class, jdbcType = JdbcType.INTEGER),
       @Result(property = "projectId", column = "project_id", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
-      @Result(property = "projectName", column = "project_name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
       @Result(property = "createTime", column = "create_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE),
       @Result(property = "modifyTime", column = "modify_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE)
   })
-  @SelectProvider(type = ResourceSqlProvider.class, method = "queryDetail")
-  Resource queryResource(@Param("name") String name);
-
-  /**
-   * 删除资源
-   *
-   * @param name
-   * @return
-   */
-  @DeleteProvider(type = ResourceSqlProvider.class, method = "delete")
-  int delete(@Param("name") String name);
+  @SelectProvider(type = ResourceSqlProvider.class, method = "queryResource")
+  Resource queryResource(@Param("projectId") int projectId, @Param("name") String name);
+//
+//  /**
+//   * 删除资源
+//   *
+//   * @param name
+//   * @return
+//   */
+//  @DeleteProvider(type = ResourceSqlProvider.class, method = "delete")
+//  int delete(@Param("name") String name);
 //
 //  /**
 //   * 查询详情 <p>

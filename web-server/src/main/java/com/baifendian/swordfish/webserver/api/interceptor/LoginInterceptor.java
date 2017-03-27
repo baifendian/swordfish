@@ -45,12 +45,12 @@ public class LoginInterceptor implements HandlerInterceptor {
     // 获取 session
     Session session = sessionService.getSessionFromRequest(httpServletRequest);
 
-    logger.info("session is: {}", session.getId());
-
     // session 如果没有获取到, 返回 false
     if (session == null) {
       return false;
     }
+
+    logger.info("session is: {}", session.getId());
 
     // 获取到了, 则设置一下 session
     User user = userMapper.queryById(session.getUserId());

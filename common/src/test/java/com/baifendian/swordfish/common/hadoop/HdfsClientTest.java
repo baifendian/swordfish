@@ -15,23 +15,36 @@
  */
 package com.baifendian.swordfish.common.hadoop;
 
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class HdfsClientTest {
 
   private static HdfsClient hdfsClient;
+
+  private static String tmpFilename;
+
+  private static String tmpFilenameCopy;
 
   @BeforeClass
   public static void runOnceBeforeClass() {
     HdfsClient.init(ConfigurationUtil.getConfiguration());
 
     hdfsClient = HdfsClient.getInstance();
+
+    String uuid = "a286e22a-4dc8-c093-a1db-f69af4f3b8ce";
+    tmpFilename = "/tmp/" + uuid + ".txt";
+    tmpFilenameCopy = tmpFilename + ".copy";
+  }
+
+  @AfterClass
+  public static void runOnceAfterClass() {
   }
 
   @Test
@@ -49,6 +62,21 @@ public class HdfsClientTest {
       assertEquals(hdfsClient.exists("/tmp/test-001"), false);
     } catch (IOException e) {
       assertTrue(true);
+    }
+  }
+
+  @Test
+  public void testCopy() throws IOException {
+    PrintWriter writer = new PrintWriter(tmpFilename, "UTF-8");
+    writer.println("The first line");
+    writer.println("The second line");
+    writer.close();
+
+    try {
+      assertTrue(hdfsClient.copyLocalToHdfs(tmpFilename, "/tmp", false, true));
+      assertTrue(hdfsClient.copyHdfsToLocal(tmpFilename, tmpFilenameCopy, false, true));
+    } catch (HdfsException e) {
+      assertFalse(true);
     }
   }
 }

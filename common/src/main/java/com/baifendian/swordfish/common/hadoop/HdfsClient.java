@@ -233,7 +233,7 @@ public class HdfsClient implements Closeable {
   /**
    * 删除目录或文件
    *
-   * @param path      目录和文件路径
+   * @param path      hdfs 目录和文件路径
    * @param recursive 当路径表示目录时，是否递归删除子目录
    * @return 是否删除成功
    */
@@ -251,8 +251,8 @@ public class HdfsClient implements Closeable {
   /**
    * 重命名目录或文件
    *
-   * @param path     目录和文件路径
-   * @param destPath 目标路径
+   * @param path     hdfs 目录和文件路径
+   * @param destPath hdfs 目标路径
    * @return 是否重命名成功
    */
   public boolean rename(String path, String destPath) throws HdfsException {
@@ -291,8 +291,8 @@ public class HdfsClient implements Closeable {
   /**
    * copy 一个文件到另一个目标文件
    *
-   * @param srcPath      源文件
-   * @param dstPath      目标文件
+   * @param srcPath      hdfs 源文件
+   * @param dstPath      hdfs 目标文件
    * @param deleteSource 是否删除源文件
    * @param overwrite    是否覆盖目标文件
    * @return 是否成功
@@ -307,6 +307,65 @@ public class HdfsClient implements Closeable {
       LOGGER.error("Copy exception", e);
       throw new HdfsException("Copy exception", e);
     }
+  }
+
+  /**
+   * 本地文件拷贝到 hdfs
+   *
+   * @param srcPath
+   * @param dstPath
+   * @param deleteSource
+   * @param overwrite
+   * @return
+   * @throws HdfsException
+   */
+  public boolean copyLocalToHdfs(String srcPath, String dstPath, boolean deleteSource, boolean overwrite) throws HdfsException {
+    Path srcPathObj = new Path(srcPath);
+    Path dstPathObj = new Path(dstPath);
+
+    try {
+      fileSystem.copyFromLocalFile(deleteSource, overwrite, srcPathObj, dstPathObj);
+    } catch (IOException e) {
+      LOGGER.error("Copy exception", e);
+      throw new HdfsException("Copy exception", e);
+    }
+
+    return true;
+  }
+
+  /**
+   * 拷贝 hdfs 文件到本地
+   *
+   * @param srcPath
+   * @param dstPath
+   * @param deleteSource
+   * @param overwrite
+   * @return
+   * @throws HdfsException
+   */
+  public boolean copyHdfsToLocal(String srcPath, String dstPath, boolean deleteSource, boolean overwrite) throws HdfsException {
+    Path srcPathObj = new Path(srcPath);
+    File dstFile = new File(dstPath);
+
+    try {
+      if (dstFile.exists()) {
+        if (dstFile.isFile()) {
+          if (overwrite) {
+            dstFile.delete();
+          }
+        } else {
+          throw new HdfsException("Destination must not be a dir");
+        }
+      }
+
+      // hdfs 文件拷贝到本地
+      FileUtil.copy(fileSystem, srcPathObj, dstFile, deleteSource, fileSystem.getConf());
+    } catch (IOException e) {
+      LOGGER.error("Copy exception", e);
+      throw new HdfsException("Copy exception", e);
+    }
+
+    return true;
   }
 
   /**

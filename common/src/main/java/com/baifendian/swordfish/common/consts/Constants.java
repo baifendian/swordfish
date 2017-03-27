@@ -31,43 +31,6 @@ public class Constants {
    */
   public static final String BASE_DATETIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
-  public static final String BASE_TIME_FORMAT = "HH:mm:ss";
-
-  public static final String BASE_DATE_FORMAT = "yyyy-MM-dd";
-
-  /**
-   * "GMT+8"
-   */
-  public static final String DEFAULT_TIME_ZONE = "GMT+8";
-
-    /*
-     * public static final String DATA_SOURCE_DB_TYPE_MYSQL = "MYSQL"; public
-     * static final String DATA_SOURCE_DB_TYPE_MONGO = "MONGO"; public static
-     * final String DATA_SOURCE_PARAMS_SOURCE_ID = "sourceId"; public static
-     * final String DATA_SOURCE_PARAMS_ACTION = "action"; public static final
-     * String DATA_SOURCE_PARAMS_SESSION_ID = "sessionId"; public static final
-     * String DATA_SOURCE_PARAMS_PROJECT_ID = "projectId"; public static final
-     * String DATA_SOURCE_PARAMS_TABLE_NAME = "tableName"; public static final
-     * String DATA_SOURCE_PARAMS_FIELD_NAME = "fieldName"; public static final
-     * String DATA_SOURCE_PARAMS_OWNER_ID = "ownerId"; public static final
-     * String DATA_SOURCE_PARAMS_NAME = "name"; public static final String
-     * DATA_SOURCE_PARAMS_DESC = "desc"; public static final String
-     * DATA_SOURCE_PARAMS_TYPE = "type"; public static final String
-     * DATA_SOURCE_PARAMS_PARAMS = "params";
-     */
-
-  /**
-   * private constructor
-   */
-  private Constants() {
-  }
-
-  public static final String SESSION_ID_NAME = "dw.browser.session.id";
-
-  public static final String SESSION_LANGUAGE = "language";
-
-  public static final Locale DEFAULT_LANGUAGE = new Locale("zh", "CN");
-
   /**
    * 判断邮箱正则表达式
    **/

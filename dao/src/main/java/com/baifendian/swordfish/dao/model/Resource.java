@@ -32,6 +32,16 @@ public class Resource {
   private String name;
 
   /**
+   * 文件后缀
+   */
+  private String suffix;
+
+  /**
+   * 资源文件名称
+   */
+  private String originFilename;
+
+  /**
    * 描述信息
    */
   private String desc;
@@ -82,6 +92,22 @@ public class Resource {
 
   public void setName(String name) {
     this.name = name;
+  }
+
+  public String getSuffix() {
+    return suffix;
+  }
+
+  public void setSuffix(String suffix) {
+    this.suffix = suffix;
+  }
+
+  public String getOriginFilename() {
+    return originFilename;
+  }
+
+  public void setOriginFilename(String originFilename) {
+    this.originFilename = originFilename;
   }
 
   public String getDesc() {
@@ -145,6 +171,8 @@ public class Resource {
     return "Resource{" +
         "id=" + id +
         ", name='" + name + '\'' +
+        ", suffix='" + suffix + '\'' +
+        ", originFilename='" + originFilename + '\'' +
         ", desc='" + desc + '\'' +
         ", ownerId=" + ownerId +
         ", owner='" + owner + '\'' +

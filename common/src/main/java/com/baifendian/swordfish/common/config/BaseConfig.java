@@ -34,6 +34,8 @@ public class BaseConfig {
 
   private static String localDataBasePath; // 本地目录, 用于存放 资源和工作流 的数据
 
+  private static String localDownloadBasePath;//本地目录, 用于存放下载的临时文件
+
   private static String hdfsDataBasePath; // hdfs 目录, 用于存放 资源和工作流 的数据
 
   private static String localExecBasePath; // 本地目录, 用于执行工作流
@@ -54,6 +56,7 @@ public class BaseConfig {
       properties.load(is);
 
       localDataBasePath = properties.getProperty("local.data.base.path");
+      localDownloadBasePath = properties.getProperty("local.download.base.path");
       hdfsDataBasePath = properties.getProperty("hdfs.data.base.path");
       localExecBasePath = properties.getProperty("local.exec.base.path");
 
@@ -79,6 +82,16 @@ public class BaseConfig {
   }
 
   /**
+   * 得到下载到本地的资源文件目录
+   *
+   * @param projectId
+   * @return
+   */
+  public static String getLocalDownloadResourceDir(int projectId) {
+    return MessageFormat.format("{0}/{1}/resources", localDownloadBasePath, projectId);
+  }
+
+  /**
    * 本地的资源数据缓存文件名称
    *
    * @param projectId
@@ -87,6 +100,17 @@ public class BaseConfig {
    */
   public static String getLocalResourceFilename(int projectId, String resName) {
     return MessageFormat.format("{0}/{1}/resources/{2}", localDataBasePath, projectId, resName);
+  }
+
+  /**
+   * 得到下载到本地的资源文件名称
+   *
+   * @param projectId
+   * @param resName
+   * @return
+   */
+  public static String getLocalDownloadResourceFilename(int projectId, String resName) {
+    return MessageFormat.format("{0}/{1}/resources/{2}", localDownloadBasePath, projectId, resName);
   }
 
   /**
