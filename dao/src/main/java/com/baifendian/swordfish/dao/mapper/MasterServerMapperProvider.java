@@ -19,7 +19,7 @@ import org.apache.ibatis.jdbc.SQL;
 
 import java.util.Map;
 
-public class MasterServerMapperSQL {
+public class MasterServerMapperProvider {
   public String query() {
     return new SQL() {{
       SELECT("*");
@@ -32,14 +32,14 @@ public class MasterServerMapperSQL {
       INSERT_INTO("master_server");
       VALUES("host", "#{masterServer.host}");
       VALUES("port", "#{masterServer.port}");
-      VALUES("update_time", "#{masterServer.updateTime}");
+      VALUES("create_time", "#{masterServer.createTime}");
     }}.toString();
   }
 
   public String update(Map<String, Object> parameter) {
     return new SQL() {{
       UPDATE("master_server");
-      SET("update_time=#{masterServer.updateTime}");
+      SET("modify_time=#{masterServer.modifyTime}");
       WHERE("host=#{masterServer.host}");
       WHERE("port=#{masterServer.port}");
     }}.toString();

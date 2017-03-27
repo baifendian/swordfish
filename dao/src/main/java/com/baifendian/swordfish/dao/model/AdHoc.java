@@ -25,6 +25,10 @@ public class AdHoc {
   private String proxyUser;
   private String queue;
   private AdHocStatus status;
+  private Date createTime;
+  private Date modifyTime;
+  private int owner;
+  private int lastModifyBy;
   private Date startTime;
   private Date endTime;
   private String jobId;
@@ -91,5 +95,37 @@ public class AdHoc {
 
   public void setJobId(String jobId) {
     this.jobId = jobId;
+  }
+
+  public Date getCreateTime() {
+    return createTime;
+  }
+
+  public void setCreateTime(Date createTime) {
+    this.createTime = createTime;
+  }
+
+  public Date getModifyTime() {
+    return modifyTime;
+  }
+
+  public void setModifyTime(Date modifyTime) {
+    this.modifyTime = modifyTime;
+  }
+
+  public int getOwner() {
+    return owner;
+  }
+
+  public void setOwner(int owner) {
+    this.owner = owner;
+  }
+
+  public int getLastModifyBy() {
+    return lastModifyBy;
+  }
+
+  public void setLastModifyBy(int lastModifyBy) {
+    this.lastModifyBy = lastModifyBy;
   }
 }

@@ -86,6 +86,15 @@ public class ExecutorClient {
     return true;
   }
 
+  public void execAdHoc(long id) throws TException {
+    connect();
+    try {
+      client.execAdHoc(id);
+    } finally {
+      close();
+    }
+  }
+
   public boolean execFlow(int projectId, long execId, String flowType) throws TException {
     boolean result = false;
     for (int i = 0; i < retries; i++) {

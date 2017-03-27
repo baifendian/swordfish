@@ -99,7 +99,7 @@ public class ExecThriftServer {
       throw new ExecException("can't found master server");
     }
 
-    port = conf.getInt("executor.port", 10000);
+    port = conf.getInt(Constants.EXECUTOR_PORT, 10000);
   }
 
   public void run() throws UnknownHostException, TTransportException {
@@ -114,7 +114,7 @@ public class ExecThriftServer {
     if (!ret) {
       throw new ExecException("register executor error");
     }
-    heartBeatInterval = conf.getInt("executor.heartbeat.interval", 60);
+    heartBeatInterval = conf.getInt(Constants.EXECUTOR_HEARTBEAT_INTERVAL, 60);
 
     executorService = Executors.newScheduledThreadPool(5);
     Runnable heartBeatThread = getHeartBeatThread();
@@ -122,7 +122,7 @@ public class ExecThriftServer {
 
     TProtocolFactory protocolFactory = new TBinaryProtocol.Factory();
     TTransportFactory tTransportFactory = new TTransportFactory();
-    workerService = new ExecServiceImpl(host, port);
+    workerService = new ExecServiceImpl(host, port, conf);
     TProcessor tProcessor = new WorkerService.Processor(workerService);
     inetSocketAddress = new InetSocketAddress(host, port);
     server = getTThreadPoolServer(protocolFactory, tProcessor, tTransportFactory, inetSocketAddress, 50, 200);

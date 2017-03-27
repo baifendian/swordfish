@@ -553,10 +553,6 @@ public class FlowRunner implements Runnable {
    * @return 超时时间
    */
   private int calcNodeTimeout() {
-    // 长任务，不需要设置超时时间
-    if (executionFlow.getFlowType() == FlowType.LONG) {
-      return -1;
-    }
 
     int usedTime = (int) ((System.currentTimeMillis() - startTime) / 1000);
     if (timeout <= usedTime) {
