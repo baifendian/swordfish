@@ -1,7 +1,7 @@
 -- `user` table
 DROP TABLE If Exists `user`;
 CREATE TABLE `user` (
-  `id` int(20) NOT NULL AUTO_INCREMENT COMMENT 'user id',
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'user id',
   `name` varchar(64) NOT NULL COMMENT 'user name',
   `email` varchar(64) NOT NULL COMMENT 'user email',
   `desc` varchar(64) DEFAULT NULL COMMENT 'description information of user',
@@ -22,7 +22,7 @@ INSERT INTO `user`(`name`, `email`, `desc`, `phone`, `password`, `role`, `create
 -- `project` table
 DROP TABLE If Exists `project`;
 CREATE TABLE `project` (
-  `id` int(20) NOT NULL AUTO_INCREMENT COMMENT 'project id',
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'project id',
   `name` varchar(64) NOT NULL COMMENT 'project name',
   `desc` varchar(256) DEFAULT NULL COMMENT 'project description',
   `owner` int(11) NOT NULL COMMENT 'owner of the project',
@@ -36,8 +36,8 @@ CREATE TABLE `project` (
 -- `project_user` table
 DROP TABLE If Exists `project_user`;
 CREATE TABLE `project_user` (
-  `project_id` int(20) NOT NULL COMMENT 'project id',
-  `user_id` int(20) NOT NULL COMMENT 'user id',
+  `project_id` int(11) NOT NULL COMMENT 'project id',
+  `user_id` int(11) NOT NULL COMMENT 'user id',
   `perm` int(11) NOT NULL COMMENT 'permission, w/r/x, 0x04-w, 0x02-r, 0x01-x',
   `create_time` datetime NOT NULL COMMENT 'create time',
   `modify_time` datetime NOT NULL COMMENT 'last modify time',
@@ -50,7 +50,7 @@ CREATE TABLE `project_user` (
 DROP TABLE If Exists `session`;
 CREATE TABLE `session` (
   `id` varchar(64) NOT NULL COMMENT 'session id',
-  `user_id` int(20) NOT NULL COMMENT 'user id',
+  `user_id` int(11) NOT NULL COMMENT 'user id',
   `ip` varchar(32) NOT NULL COMMENT 'ip address of login on',
   `last_login_time` datetime NOT NULL COMMENT 'last login time',
   PRIMARY KEY (`id`),
@@ -61,13 +61,13 @@ CREATE TABLE `session` (
 -- `resources` table
 DROP TABLE If Exists `resources`;
 CREATE TABLE `resources` (
-  `id` int(20) NOT NULL AUTO_INCREMENT COMMENT 'resource id',
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'resource id',
   `name` varchar(64) NOT NULL COMMENT 'resources name',
   `suffix` varchar(20) NOT NULL COMMENT 'suffix of the file',
   `origin_filename` varchar(64) NOT NULL COMMENT 'file name of the orgin file',
   `desc` varchar(256) DEFAULT NULL COMMENT 'resources description',
-  `owner` int(20) NOT NULL COMMENT 'owner id of the resource',
-  `project_id` int(20) NOT NULL COMMENT 'project id of this resource',
+  `owner` int(11) NOT NULL COMMENT 'owner id of the resource',
+  `project_id` int(11) NOT NULL COMMENT 'project id of this resource',
   `create_time` datetime NOT NULL COMMENT 'resource create time',
   `modify_time` datetime NOT NULL COMMENT 'resource last modify time',
   PRIMARY KEY (`id`),
@@ -79,12 +79,12 @@ CREATE TABLE `resources` (
 -- `datasource` table
 DROP TABLE If Exists `datasource`;
 CREATE TABLE `datasource` (
-  `id` int(20) NOT NULL AUTO_INCREMENT COMMENT 'datasource id',
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'datasource id',
   `name` varchar(64) NOT NULL COMMENT 'datasource name',
   `desc` varchar(256) DEFAULT NULL COMMENT 'datasource description',
   `type` int(11) NOT NULL COMMENT 'datasource type',
-  `owner` int(20) NOT NULL COMMENT 'owner id of the datasource.',
-  `project_id` int(20) NOT NULL COMMENT 'project id of the datasource.',
+  `owner` int(11) NOT NULL COMMENT 'owner id of the datasource.',
+  `project_id` int(11) NOT NULL COMMENT 'project id of the datasource.',
   `params` text NOT NULL COMMENT 'datasource params',
   `create_time` datetime NOT NULL COMMENT 'create time of the datasource',
   `modify_time` datetime NOT NULL COMMENT 'modify time of the datasource',
@@ -97,17 +97,16 @@ CREATE TABLE `datasource` (
 -- `project_flows` table
 DROP TABLE If Exists `project_flows`;
 CREATE TABLE `project_flows` (
-  `id` int(20) NOT NULL AUTO_INCREMENT COMMENT 'project_flows id',
-  `name` varchar(64) NOT NULL COMMENT 'project_flows name',
-  `project_id` int(20) NOT NULL COMMENT 'project id of the project_flows',
-  `create_time` datetime NOT NULL COMMENT 'create time of the project_flows',
-  `modify_time` datetime NOT NULL COMMENT 'modify time of the project_flows',
-  `last_modify_by` int(20) NOT NULL COMMENT 'last modify user id of the project_flows',
-  `owner` int(20) NOT NULL COMMENT 'owner id of the project_flows.',
-  `proxy_user` varchar(64) NOT NULL COMMENT 'proxy user of the project_flows.',
-  `user_defined_params` text DEFAULT NULL COMMENT 'user defined params of the project_flows.',
-  `extends` text DEFAULT NULL COMMENT 'extends of the project_flows',
-
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'project flows id',
+  `name` varchar(64) NOT NULL COMMENT 'project flows name',
+  `project_id` int(11) NOT NULL COMMENT 'project id of the project flows',
+  `create_time` datetime NOT NULL COMMENT 'create time of the project flows',
+  `modify_time` datetime NOT NULL COMMENT 'modify time of the project flows',
+  `last_modify_by` int(11) NOT NULL COMMENT 'last modify user id of the project flows',
+  `owner` int(11) NOT NULL COMMENT 'owner id of the project flows.',
+  `proxy_user` varchar(64) NOT NULL COMMENT 'proxy user of the project flows.',
+  `user_defined_params` text DEFAULT NULL COMMENT 'user defined params of the project flows.',
+  `extras` text DEFAULT NULL COMMENT 'extends of the project flows',
   PRIMARY KEY (`id`),
   UNIQUE KEY `project_flowname` (`project_id`, `name`),
   FOREIGN KEY (`project_id`) REFERENCES `project`(`id`) ON DELETE CASCADE,
@@ -117,33 +116,30 @@ CREATE TABLE `project_flows` (
 -- `flows_nodes` table
 DROP TABLE If Exists `flows_nodes`;
 CREATE TABLE `flows_nodes` (
-  `id` int(20) NOT NULL AUTO_INCREMENT COMMENT 'flows_nodes id',
-  `name` varchar(64) NOT NULL COMMENT 'flows_nodes name',
-  `flow_id` int(20) NOT NULL COMMENT 'project flow id of the flows_nodes',
-  `desc` VARCHAR(512) NOT NULL COMMENT 'create time of the flows_nodes',
-  `create_time` datetime NOT NULL COMMENT 'create time of the flows_nodes',
-  `modify_time` datetime NOT NULL COMMENT 'modify time of the flows_nodes',
-  `last_modify_by` int(20) NOT NULL COMMENT 'last modify user id of the flows_nodes',
-  `type` int(20) NOT NULL COMMENT 'type of the flows_nodes',
-  `param` text DEFAULT NULL COMMENT 'param of the flows_nodes.',
-  `extends` text DEFAULT NULL COMMENT 'extends of the flows_nodes',
-
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'flow nodes id',
+  `name` varchar(64) NOT NULL COMMENT 'flow nodes name',
+  `flow_id` int(11) NOT NULL COMMENT 'project flow id of the flow nodes',
+  `desc` VARCHAR(512) NOT NULL COMMENT 'create time of the flow nodes',
+  `create_time` datetime NOT NULL COMMENT 'create time of the flow nodes',
+  `modify_time` datetime NOT NULL COMMENT 'modify time of the flow nodes',
+  `last_modify_by` int(11) NOT NULL COMMENT 'last modify user id of the flow nodes',
+  `type` int(11) NOT NULL COMMENT 'type of the flow nodes',
+  `param` text DEFAULT NULL COMMENT 'param of the flow nodes.',
+  `extras` text DEFAULT NULL COMMENT 'extends of the flow nodes',
+  `dep` VARCHAR(512) DEFAULT NULL COMMENT 'dep of the flow nodes',
   PRIMARY KEY (`id`),
   UNIQUE KEY `flows_nodename` (`flow_id`, `name`),
   FOREIGN KEY (`flow_id`) REFERENCES `project_flows`(`id`) ON DELETE CASCADE,
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
--- `flows_nodes_relation` table
-DROP TABLE If Exists `flows_nodes_relation`;
-CREATE TABLE `flows_nodes_relation` (
-  `flow_id` int(20) NOT NULL COMMENT 'project flows id of the flows_nodes',
-  `start_id` int(20) NOT NULL COMMENT 'start node id',
-  `end_id` int(20) NOT NULL COMMENT 'end node id',
-  `attribute` VARCHAR(1024) DEFAULT NULL COMMENT 'attribute of the flows_nodes_relation',
-
+-- `master_server` table
+DROP TABLE If Exists `master_server`;
+CREATE TABLE `master_server` (
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'master id',
+  `host` varchar(20) NOT NULL COMMENT 'ip address of the master',
+  `port` int(11) NOT NULL COMMENT 'port of the master',
+  `create_time` datetime NOT NULL COMMENT 'create time of the records',
+  `modify_time` datetime NOT NULL COMMENT 'last modify time of the records',
   PRIMARY KEY (`id`),
-  UNIQUE KEY `flows_nodes_id` (`flow_id`, `start_id`, `end_id`),
-  FOREIGN KEY (`flow_id`) REFERENCES `project_flows`(`id`) ON DELETE CASCADE,
-  FOREIGN KEY (`start_id`) REFERENCES `flows_nodes`(`id`) ON DELETE CASCADE,
-  FOREIGN KEY (`end_id`) REFERENCES `flows_nodes`(`id`) ON DELETE CASCADE,
+  UNIQUE KEY `host_port` (`host`, `port`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;

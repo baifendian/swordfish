@@ -36,8 +36,10 @@ public class ProjectFlow {
 
   private int id;
 
+  @JsonIgnore
   private List<FlowNode> flowsNodes;
 
+  @JsonIgnore
   private List<FlowNodeRelation> flowsNodesRelation;
 
   private String name;
@@ -50,53 +52,19 @@ public class ProjectFlow {
 
   private String lastModifyByName;
 
-  private int lastPublishBy;
-
-  private String LastPublishByName;
-
   private int ownerId;
 
   private String ownerName;
 
-  private FlowType type;
-
   private String proxyUser;
-
-  private String queue;
 
   private int projectId;
 
   private String projectName;
 
-  private ScheduleStatus scheduleStatus;
+  private String extras;
 
-  @JsonDeserialize(using = StringNodeJsonDeserializer.class)
-  @JsonSerialize(using = StringNodeJsonSerializer.class)
-  private String inputTables;
-
-  @JsonIgnore
-  private List<Integer> inputTableList;
-
-  @JsonDeserialize(using = StringNodeJsonDeserializer.class)
-  @JsonSerialize(using = StringNodeJsonSerializer.class)
-  private String outputTables;
-
-  @JsonIgnore
-  private List<Integer> outputTableList;
-
-  @JsonDeserialize(using = StringNodeJsonDeserializer.class)
-  @JsonSerialize(using = StringNodeJsonSerializer.class)
-  private String resources;
-
-  @JsonIgnore
-  private List<Resource> resourceList;
-
-  @JsonDeserialize(using = StringNodeJsonDeserializer.class)
-  @JsonSerialize(using = StringNodeJsonSerializer.class)
-  private String datasources;
-
-  @JsonIgnore
-  private List<DataSource> datasourceList;
+  private String
 
   @JsonDeserialize(using = StringNodeJsonDeserializer.class)
   @JsonSerialize(using = StringNodeJsonSerializer.class)
@@ -141,25 +109,12 @@ public class ProjectFlow {
     return lastModifyBy;
   }
 
-
   public String getLastModifyByName() {
     return lastModifyByName;
   }
 
   public void setLastModifyByName(String lastModifyByName) {
     this.lastModifyByName = lastModifyByName;
-  }
-
-  public int getLastPublishBy() {
-    return lastPublishBy;
-  }
-
-  public String getLastPublishByName() {
-    return LastPublishByName;
-  }
-
-  public void setLastPublishByName(String lastPublishByName) {
-    LastPublishByName = lastPublishByName;
   }
 
   public int getOwnerId() {
@@ -176,14 +131,6 @@ public class ProjectFlow {
 
   public void setOwnerName(String ownerName) {
     this.ownerName = ownerName;
-  }
-
-  public FlowType getType() {
-    return type;
-  }
-
-  public void setType(FlowType type) {
-    this.type = type;
   }
 
   public String getProxyUser() {
@@ -210,52 +157,6 @@ public class ProjectFlow {
     this.projectName = projectName;
   }
 
-  public ScheduleStatus getScheduleStatus() {
-    return scheduleStatus;
-  }
-
-  public void setScheduleStatus(ScheduleStatus scheduleStatus) {
-    this.scheduleStatus = scheduleStatus;
-  }
-
-  public String getInputTables() {
-    return inputTables;
-  }
-
-  public void setInputTables(String inputTables) {
-    this.inputTables = inputTables;
-  }
-
-  public List<Integer> getInputTableList() {
-    if (inputTableList == null && StringUtils.isNotEmpty(inputTables)) {
-      inputTableList = JsonUtil.parseObjectList(inputTables, Integer.class);
-    }
-    return inputTableList;
-  }
-
-  public void setInputTableList(List<Integer> inputTableList) {
-    this.inputTableList = inputTableList;
-  }
-
-  public String getOutputTables() {
-    return outputTables;
-  }
-
-  public void setOutputTables(String outputTables) {
-    this.outputTables = outputTables;
-  }
-
-  public List<Integer> getOutputTableList() {
-    if (outputTableList == null && StringUtils.isNotEmpty(outputTables)) {
-      outputTableList = JsonUtil.parseObjectList(outputTables, Integer.class);
-    }
-    return outputTableList;
-  }
-
-  public void setOutputTableList(List<Integer> outputTableList) {
-    this.outputTableList = outputTableList;
-  }
-
   public Date getCreateTime() {
     return createTime;
   }
@@ -274,48 +175,6 @@ public class ProjectFlow {
 
   public void setLastModifyBy(int lastModifyBy) {
     this.lastModifyBy = lastModifyBy;
-  }
-
-  public void setLastPublishBy(int lastPublishBy) {
-    this.lastPublishBy = lastPublishBy;
-  }
-
-  public String getResources() {
-    return resources;
-  }
-
-  public void setResources(String resources) {
-    this.resources = resources;
-  }
-
-  public List<Resource> getResourceList() {
-    if (resourceList == null && StringUtils.isNotEmpty(resources)) {
-      resourceList = JsonUtil.parseObjectList(resources, Resource.class);
-    }
-    return resourceList;
-  }
-
-  public void setResourceList(List<Resource> resourceList) {
-    this.resourceList = resourceList;
-  }
-
-  public String getDatasources() {
-    return datasources;
-  }
-
-  public void setDatasources(String datasources) {
-    this.datasources = datasources;
-  }
-
-  public List<DataSource> getDatasourceList() {
-    if (datasourceList == null && StringUtils.isNotEmpty(datasources)) {
-      datasourceList = JsonUtil.parseObjectList(datasources, DataSource.class);
-    }
-    return datasourceList;
-  }
-
-  public void setDatasourceList(List<DataSource> datasourceList) {
-    this.datasourceList = datasourceList;
   }
 
   public String getUserDefinedParams() {
