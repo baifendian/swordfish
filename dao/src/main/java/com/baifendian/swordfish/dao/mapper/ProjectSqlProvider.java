@@ -18,19 +18,29 @@ package com.baifendian.swordfish.dao.mapper;
 import com.baifendian.swordfish.dao.model.Project;
 
 import org.apache.ibatis.jdbc.SQL;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 
 public class ProjectSqlProvider {
 
+  private static Logger logger = LoggerFactory.getLogger(ProjectSqlProvider.class.getName());
+
   public String insert(Map<String, Object> parameter) {
+    Project project = (Project) parameter.get("newProject");
+    logger.debug(project.getName());
+    logger.debug(project.getDesc());
+    logger.debug(String.valueOf(project.getOwnerId()));
+    logger.debug(String.valueOf(project.getCreateTime()));
+    logger.debug(String.valueOf(project.getModifyTime()));
     return new SQL() {{
       INSERT_INTO("project");
-      VALUES("name", "#{project.name}");
-      VALUES("`desc`", "#{project.desc}");
-      VALUES("create_time", "#{project.createTime}");
-      VALUES("modify_time", "#{project.modifyTime}");
-      VALUES("owner", "#{project.ownerId}");
+      VALUES("`name`", "#{newProject.name,jdbcType=VARCHAR}");
+      VALUES("`desc`", "#{newProject.desc,jdbcType=VARCHAR}");
+      VALUES("create_time", "#{newProject.createTime}");
+      VALUES("modify_time", "#{newProject.modifyTime}");
+      VALUES("owner", "#{newProject.ownerId}");
     }}.toString();
   }
 

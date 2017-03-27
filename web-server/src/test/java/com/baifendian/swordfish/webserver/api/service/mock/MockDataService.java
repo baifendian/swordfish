@@ -121,6 +121,7 @@ public class MockDataService {
     project.setCreateTime(now);
     project.setModifyTime(now);
     project.setOwnerId(user.getId());
+    project.setOwner(user.getName());
 
     projectMapper.insert(project);
     return project;

@@ -28,8 +28,8 @@ import java.util.List;
 public interface ProjectMapper {
 
   @InsertProvider(type = ProjectSqlProvider.class, method = "insert")
-  @SelectKey(statement = "SELECT LAST_INSERT_ID()", keyProperty = "project.id", before = false, resultType = int.class)
-  int insert(@Param("project") Project project);
+  @SelectKey(statement = "SELECT LAST_INSERT_ID()", keyProperty = "newProject.id", before = false, resultType = int.class)
+  int insert(@Param("newProject") Project project);
 
   @Results(value = {@Result(property = "id", column = "id", id = true, javaType = int.class, jdbcType = JdbcType.INTEGER),
           @Result(property = "name", column = "name", javaType = String.class, jdbcType = JdbcType.VARCHAR),

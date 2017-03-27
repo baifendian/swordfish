@@ -66,8 +66,8 @@ public class ProjectServiceTest {
   @Before
   public void setUp() throws Exception {
     user = mockDataService.createGeneralUser();
-    userAdmin = mockDataService.createAdminUser();
     project = mockDataService.createProject(user);
+    userAdmin = mockDataService.createAdminUser();
   }
 
   /**

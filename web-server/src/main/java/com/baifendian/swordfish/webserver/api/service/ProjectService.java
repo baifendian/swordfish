@@ -76,6 +76,7 @@ public class ProjectService {
     project.setOwnerId(operator.getId());
     project.setCreateTime(now);
     project.setModifyTime(now);
+    project.setOwner(operator.getName());
 
     try {
       projectMapper.insert(project);
