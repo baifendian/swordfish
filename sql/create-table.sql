@@ -106,7 +106,7 @@ CREATE TABLE `project_flows` (
   `owner` int(20) NOT NULL COMMENT 'owner id of the project_flows.',
   `proxy_user` varchar(64) NOT NULL COMMENT 'proxy user of the project_flows.',
   `user_defined_params` text DEFAULT NULL COMMENT 'user defined params of the project_flows.',
-  `extends` text DEFAULT NULL COMMENT 'extends of the project_flows',
+  `extras` text DEFAULT NULL COMMENT 'extends of the project_flows',
 
   PRIMARY KEY (`id`),
   UNIQUE KEY `project_flowname` (`project_id`, `name`),
@@ -126,24 +126,11 @@ CREATE TABLE `flows_nodes` (
   `last_modify_by` int(20) NOT NULL COMMENT 'last modify user id of the flows_nodes',
   `type` int(20) NOT NULL COMMENT 'type of the flows_nodes',
   `param` text DEFAULT NULL COMMENT 'param of the flows_nodes.',
-  `extends` text DEFAULT NULL COMMENT 'extends of the flows_nodes',
+  `extras` text DEFAULT NULL COMMENT 'extends of the flows_nodes',
+  `dep` VARCHAR(512) DEFAULT NULL COMMENT 'dep of the flows_nodes',
 
   PRIMARY KEY (`id`),
   UNIQUE KEY `flows_nodename` (`flow_id`, `name`),
   FOREIGN KEY (`flow_id`) REFERENCES `project_flows`(`id`) ON DELETE CASCADE,
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
--- `flows_nodes_relation` table
-DROP TABLE If Exists `flows_nodes_relation`;
-CREATE TABLE `flows_nodes_relation` (
-  `flow_id` int(20) NOT NULL COMMENT 'project flows id of the flows_nodes',
-  `start_id` int(20) NOT NULL COMMENT 'start node id',
-  `end_id` int(20) NOT NULL COMMENT 'end node id',
-  `attribute` VARCHAR(1024) DEFAULT NULL COMMENT 'attribute of the flows_nodes_relation',
-
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `flows_nodes_id` (`flow_id`, `start_id`, `end_id`),
-  FOREIGN KEY (`flow_id`) REFERENCES `project_flows`(`id`) ON DELETE CASCADE,
-  FOREIGN KEY (`start_id`) REFERENCES `flows_nodes`(`id`) ON DELETE CASCADE,
-  FOREIGN KEY (`end_id`) REFERENCES `flows_nodes`(`id`) ON DELETE CASCADE,
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;

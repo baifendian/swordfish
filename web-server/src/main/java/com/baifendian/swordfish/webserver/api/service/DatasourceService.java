@@ -15,6 +15,7 @@
  */
 package com.baifendian.swordfish.webserver.api.service;
 
+import com.baifendian.swordfish.common.datasource.DataSourceManager;
 import com.baifendian.swordfish.dao.enums.DbType;
 import com.baifendian.swordfish.dao.mapper.DataSourceMapper;
 import com.baifendian.swordfish.dao.mapper.ProjectMapper;
@@ -100,15 +101,21 @@ public class DatasourceService {
 
   /**
    * 测试一个数据源
-   * @param operator
-   * @param projectName
    * @param type
    * @param parameter
    * @param response
    * @return
    */
-  public BaseResponse testDataSource(User operator,String projectName, DbType type,String parameter, HttpServletResponse response){
-    return null;
+  public BaseResponse testDataSource(DbType type,String parameter, HttpServletResponse response){
+    int status = 0;
+    String msg = null;
+    try{
+      DataSourceManager.getHandler(type,parameter).isConnectable();
+    }catch (Exception e){
+      status = 1;
+      msg = e.toString();
+    }
+    return new BaseResponse(status,msg);
   }
 
   /**

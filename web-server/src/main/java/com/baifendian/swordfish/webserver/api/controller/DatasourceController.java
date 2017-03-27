@@ -75,7 +75,7 @@ public class DatasourceController {
                                      @RequestParam(value = "type", required = true) DbType type,
                                      @RequestParam(value = "parameter", required = true) String parameter,
                                      HttpServletResponse response){
-    return datasourceService.testDataSource(operator,projectName,type,parameter,response);
+    return datasourceService.testDataSource(type,parameter,response);
   }
 
   /**
