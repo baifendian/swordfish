@@ -17,15 +17,9 @@ package com.baifendian.swordfish.common.mail;
 
 import com.baifendian.swordfish.dao.BaseDao;
 import com.baifendian.swordfish.dao.datasource.ConnectionFactory;
-import com.baifendian.swordfish.dao.mapper.ProjectFlowMapper;
-import com.baifendian.swordfish.dao.mapper.ProjectMapper;
 import com.baifendian.swordfish.dao.mapper.ProjectUserMapper;
-import com.baifendian.swordfish.dao.mapper.UserMapper;
-import com.baifendian.swordfish.dao.model.ProjectFlow;
-import com.baifendian.swordfish.dao.model.ProjectUser;
 import com.baifendian.swordfish.dao.model.Schedule;
 import com.baifendian.swordfish.dao.model.User;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,48 +35,12 @@ public class MailSendService extends BaseDao {
   private final Logger LOGGER = LoggerFactory.getLogger(getClass());
 
   @Autowired
-  private UserMapper userMapper;
-
-  @Autowired
-  private ProjectFlowMapper projectFlowMapper;
-
-  @Autowired
   private ProjectUserMapper projectUserMapper;
-
-  @Autowired
-  private ProjectMapper projectMapper;
 
   @Override
   protected void init() {
-    userMapper = ConnectionFactory.getSqlSession().getMapper(UserMapper.class);
     projectUserMapper = ConnectionFactory.getSqlSession().getMapper(ProjectUserMapper.class);
-    projectFlowMapper = ConnectionFactory.getSqlSession().getMapper(ProjectFlowMapper.class);
-    projectMapper = ConnectionFactory.getSqlSession().getMapper(ProjectMapper.class);
   }
-
-  /**
-   * 发送邮件给个人
-   *
-   * @param receiverUserId 收件人的id
-   * @param title          邮件主题
-   * @param content        邮件内容(支持HTML)
-   * @return
-   */
-  /*
-  public boolean sendToUser(int receiverUserId, String title, String content) {
-    User user = userMapper.queryById(receiverUserId);
-    if (user == null) {
-      LOGGER.error("Not find user: {}", receiverUserId);
-      return false;
-    }
-
-    List receivers = new ArrayList<>();
-
-    receivers.add(user.getEmail());
-
-    return MailSendUtil.sendMails(receivers, title, content);
-  }
-  */
 
   /**
    * 发送邮件给项目所有成员
@@ -92,7 +50,7 @@ public class MailSendService extends BaseDao {
    * @param content   邮件内容(支持HTML)
    */
   public boolean sendToProjectUsers(int projectId, String title, String content) {
-    List<ProjectUser> users = projectUserMapper.queryForUser(projectId);
+    List<User> users = projectUserMapper.queryForUser(projectId);
 
     if (users == null) {
       LOGGER.error("Not find project: {}", projectId);
@@ -101,8 +59,7 @@ public class MailSendService extends BaseDao {
 
     List receivers = new ArrayList<>();
 
-    for (ProjectUser projectUser : users) {
-      User user = userMapper.queryById(projectUser.getUserId());
+    for (User user : users) {
       receivers.add(user.getEmail());
     }
 

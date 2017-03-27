@@ -79,6 +79,7 @@ public class HdfsClient implements Closeable {
       LOGGER.error("Get HdfsClient instance failed，please call init(Configuration conf) first");
       throw new HdfsException("Get HdfsClient instance failed，please call init(Configuration conf) first");
     }
+
     return instance;
   }
 
@@ -151,15 +152,8 @@ public class HdfsClient implements Closeable {
     File fileObject = new File(localFile);
 
     try {
-      // 判断 hdfs 文件是否合法
-      if (fileSystem.exists(pathObject)) {
-        if (fileSystem.isDirectory(pathObject)) { // 是目录的情况
-          LOGGER.error(hdfsFile + " is a dir");
-          throw new HdfsException("hdfs is a dir");
-        }
-      } else {
-        LOGGER.error(hdfsFile + " does not exist");
-        throw new HdfsException("hdfs does not exist");
+      if (!isFile(pathObject)) {
+        throw new HdfsException("File " + hdfsFile + " is not a valid file");
       }
 
       // 不覆盖的情况下，已经存在的文件，则不处理
@@ -200,36 +194,44 @@ public class HdfsClient implements Closeable {
    * @return byte[]
    */
   public byte[] readFile(String hdfsFile) throws HdfsException {
-
     // 文件路径
     Path pathObject = new Path(hdfsFile);
+
     try {
-      // 判断 hdfs 文件是否合法
-      if (fileSystem.exists(pathObject)) {
-        if (fileSystem.isDirectory(pathObject)) { // 是目录的情况
-          LOGGER.error(hdfsFile + " 是目录");
-          throw new HdfsException("hdfs 路径是个目录");
-        }
-      } else {
-        LOGGER.error(hdfsFile + " 不存在");
-        throw new HdfsException("hdfs 文件不存在");
+      if (!isFile(pathObject)) {
+        throw new HdfsException("File " + hdfsFile + " is not a valid file");
       }
     } catch (IOException e) {
-      LOGGER.error("操作 Hdfs 异常", e);
-      throw new HdfsException("操作 Hdfs 异常", e);
+      LOGGER.error("Operator Hdfs exception", e);
+      throw new HdfsException("Operator Hdfs exception", e);
     }
 
     try (
         FSDataInputStream in = fileSystem.open(pathObject);) {
       return IOUtils.toByteArray(in);
     } catch (IOException e) {
-      LOGGER.error("操作 Hdfs 异常", e);
-      throw new HdfsException("操作 Hdfs 异常", e);
+      LOGGER.error("Operator Hdfs exception", e);
+      throw new HdfsException("Operator Hdfs exception", e);
     }
   }
 
   /**
-   * 删除目录或文件 <p>
+   * 判断路径是否是一个已经存在的文件
+   *
+   * @param pathObject
+   * @return
+   * @throws IOException
+   */
+  private boolean isFile(Path pathObject) throws IOException {
+    if (!fileSystem.exists(pathObject) || fileSystem.isDirectory(pathObject)) {
+      return false;
+    }
+
+    return true;
+  }
+
+  /**
+   * 删除目录或文件
    *
    * @param path      目录和文件路径
    * @param recursive 当路径表示目录时，是否递归删除子目录
@@ -237,16 +239,17 @@ public class HdfsClient implements Closeable {
    */
   public boolean delete(String path, boolean recursive) throws HdfsException {
     Path pathObject = new Path(path);
+
     try {
       return fileSystem.delete(pathObject, recursive);
     } catch (IOException e) {
-      LOGGER.error("删除路径异常", e);
-      throw new HdfsException("删除路径异常", e);
+      LOGGER.error("Delete path exception", e);
+      throw new HdfsException("Delete path exception", e);
     }
   }
 
   /**
-   * 重命名目录或文件 <p>
+   * 重命名目录或文件
    *
    * @param path     目录和文件路径
    * @param destPath 目标路径
@@ -258,30 +261,35 @@ public class HdfsClient implements Closeable {
     try {
       return fileSystem.rename(pathObject, destPathObject);
     } catch (IOException e) {
-      LOGGER.error("重命名路径异常", e);
-      throw new HdfsException("重命名路径异常", e);
+      LOGGER.error("Rename path exception", e);
+      throw new HdfsException("Rename path exception", e);
     }
   }
 
   /**
    * 创建目录
+   *
+   * @param dir
+   * @throws HdfsException
    */
   public void mkdir(String dir) throws HdfsException {
     Path path = new Path(dir);
+
     try {
       if (fileSystem.exists(path)) {
-        LOGGER.error("Dir {} already not exists", dir);
+        LOGGER.error("Dir {} already exists", dir);
         return;
       }
+
       fileSystem.mkdirs(path);
     } catch (IOException e) {
-      LOGGER.error("创建目录异常", e);
-      throw new HdfsException("创建目录异常", e);
+      LOGGER.error("Create dir exception", e);
+      throw new HdfsException("Create dir exception", e);
     }
   }
 
   /**
-   * copy 一个文件到另一个目标文件 <p>
+   * copy 一个文件到另一个目标文件
    *
    * @param srcPath      源文件
    * @param dstPath      目标文件
@@ -292,30 +300,40 @@ public class HdfsClient implements Closeable {
   public boolean copy(String srcPath, String dstPath, boolean deleteSource, boolean overwrite) throws HdfsException {
     Path srcPathObj = new Path(srcPath);
     Path dstPathObj = new Path(dstPath);
+
     try {
       return FileUtil.copy(fileSystem, srcPathObj, fileSystem, dstPathObj, deleteSource, overwrite, fileSystem.getConf());
     } catch (IOException e) {
-      LOGGER.error("copy 异常", e);
-      throw new HdfsException("copy 异常", e);
+      LOGGER.error("Copy exception", e);
+      throw new HdfsException("Copy exception", e);
     }
   }
 
   /**
-   * 获取文件或目录的逻辑空间大小（单位为Byte） <p>
+   * 获取文件或目录的逻辑空间大小（单位为 Byte)
    *
+   * @param filePath
    * @return 文件或目录的大小
    */
   public long getFileLength(String filePath) {
     return getContentSummary(filePath).getLength();
   }
 
+  /**
+   * 判断文件是否存在
+   *
+   * @param filePath
+   * @return
+   * @throws IOException
+   */
   public boolean exists(String filePath) throws IOException {
     return fileSystem.exists(new Path(filePath));
   }
 
   /**
-   * 获取文件或目录的状态信息 <p>
+   * 获取文件或目录的状态信息
    *
+   * @param filePath
    * @return {@link FileStatus}
    */
   public FileStatus getFileStatus(String filePath) {
@@ -323,14 +341,15 @@ public class HdfsClient implements Closeable {
     try {
       return fileSystem.getFileStatus(path);
     } catch (IOException e) {
-      LOGGER.error("获取文件状态异常", e);
-      throw new HdfsException("获取文件状态异常", e);
+      LOGGER.error("Get file status exception", e);
+      throw new HdfsException("Get file status exception", e);
     }
   }
 
   /**
-   * 获取目录下的文件列表 <p>
+   * 获取目录下的文件列表
    *
+   * @param filePath
    * @return {@link FileStatus}
    */
   public FileStatus[] listFileStatus(String filePath) {
@@ -338,14 +357,15 @@ public class HdfsClient implements Closeable {
     try {
       return fileSystem.listStatus(new Path(filePath));
     } catch (IOException e) {
-      LOGGER.error("获取文件列表异常", e);
-      throw new HdfsException("获取文件列表异常", e);
+      LOGGER.error("Get file list exception", e);
+      throw new HdfsException("Get file list exception", e);
     }
   }
 
   /**
-   * 获取文件或目录的内容概要（包括逻辑空间大小、物理空间大小等） <p>
+   * 获取文件或目录的内容概要（包括逻辑空间大小、物理空间大小等）
    *
+   * @param filePath
    * @return {@link ContentSummary}
    */
   public ContentSummary getContentSummary(String filePath) {
@@ -353,8 +373,8 @@ public class HdfsClient implements Closeable {
     try {
       return fileSystem.getContentSummary(path);
     } catch (IOException e) {
-      LOGGER.error("获取文件的内容概要异常", e);
-      throw new HdfsException("获取文件的内容概要异常", e);
+      LOGGER.error("Get file summary information exception", e);
+      throw new HdfsException("Get file summary information exception", e);
     }
   }
 
@@ -367,6 +387,11 @@ public class HdfsClient implements Closeable {
     return fileSystem.getUri().toString();
   }
 
+  /**
+   * 关闭 hdfs client
+   *
+   * @throws HdfsException
+   */
   @Override
   public void close() throws HdfsException {
     if (fileSystem != null) {
