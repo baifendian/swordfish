@@ -202,7 +202,6 @@ public class FlowRunner implements Runnable {
       }
       FileUtils.forceMkdir(execLocalPathFile);
 
-      FlowType flowType = executionFlow.getFlowType();
       FlowDag flowDag = JsonUtil.parseObject(executionFlow.getWorkflowData(), FlowDag.class);
 
       // 下载workflow的资源文件到本地exec目录
@@ -239,20 +238,10 @@ public class FlowRunner implements Runnable {
         }
       }
 
-      switch (flowType) {
-        case ETL:
-          // 生成 etl sql 节点
-          FlowNode flowNode = genEtlSqlNode(flowDag);
-          flowNodes = Arrays.asList(flowNode);
-          // 执行单个节点
-          status = runNode(flowNode);
-          break;
-        default:
-          // 生成具体 Dag
-          Graph<FlowNode, FlowNodeRelation> dagGraph = genDagGraph(flowDag);
-          // 执行 flow
-          status = runFlow(dagGraph);
-      }
+      // 生成具体 Dag
+      Graph<FlowNode, FlowNodeRelation> dagGraph = genDagGraph(flowDag);
+      // 执行 flow
+      status = runFlow(dagGraph);
 
       // 更新 ExecutionFlow
       updateExecutionFlow(status);

@@ -53,12 +53,21 @@ public class JDBCHandler implements DataSourceHandler {
       return false;
     }
 
+    Connection con = null;
     try {
       Class.forName(dbDriverMap.get(dbType));
-      Connection con = DriverManager.getConnection(param.getAddress(), param.getUser(), param.getPassword());
+      con = DriverManager.getConnection(param.getAddress(), param.getUser(), param.getPassword());
     } catch (ClassNotFoundException | SQLException e) {
       logger.warn("connect error", e);
       return false;
+    } finally {
+      if(con != null) {
+        try {
+          con.close();
+        } catch (SQLException e) {
+          e.printStackTrace();
+        }
+      }
     }
     return true;
   }

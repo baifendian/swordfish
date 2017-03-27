@@ -33,8 +33,7 @@ public class DataSourceManager {
   static{
     dataSourceHandlerMap.put("MYSQL", JDBCHandler.class);
     dataSourceHandlerMap.put("ORACLE", JDBCHandler.class);
-    dataSourceHandlerMap.put("SQLSERVER", JDBCHandler.class);
-    dataSourceHandlerMap.put("HBASE11X", HBaseHandler.class);
+    dataSourceHandlerMap.put("HBASE", HBaseHandler.class);
     dataSourceHandlerMap.put("FTP", FtpHandler.class);
   }
 

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.baifendian.swordfish.common.datasource.hbase;
+package com.baifendian.swordfish.common.datasource.mongodb;
 
 import com.baifendian.swordfish.dao.enums.DbType;
 
@@ -21,12 +21,12 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertTrue;
 
-public class HBaseHandlerTest {
+public class MongoDBHandlerTest {
 
   @Test
-  public void testIsConnectable(){
-    String paramStr = "{ \"zkQuorum\": \"bgsbtsp0006-dqf,bgsbtsp0007-dqf,bgsbtsp0008-dqf\", \"zkZnodeParent\": \"/hbase\" }\n";
-    HBaseHandler handler = new HBaseHandler(DbType.HBASE11X, paramStr);
+  public void testIsConnectable() {
+    String paramStr = "{ \"address\": \"mongodb://bgsbtsp0006-dqf:27017\", \"database\": \"test\" }\n";
+    MongoDBHandler handler = new MongoDBHandler(DbType.MONOGODB, paramStr);
     assertTrue(handler.isConnectable());
   }
 }

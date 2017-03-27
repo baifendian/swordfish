@@ -18,11 +18,31 @@ package com.baifendian.swordfish.common.datasource.hbase;
 public class HBaseParam {
   private String zkQuorum;
 
+  private String zkZnodeParent;
+
+  private int zkPort;
+
   public String getZkQuorum() {
     return zkQuorum;
   }
 
   public void setZkQuorum(String zkQuorum) {
     this.zkQuorum = zkQuorum;
+  }
+
+  public String getZkZnodeParent() {
+    return zkZnodeParent;
+  }
+
+  public void setZkZnodeParent(String zkZnodeParent) {
+    this.zkZnodeParent = zkZnodeParent;
+  }
+
+  public int getZkPort() {
+    return zkPort;
+  }
+
+  public void setZkPort(int zkPort) {
+    this.zkPort = zkPort;
   }
 }

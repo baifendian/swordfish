@@ -19,6 +19,7 @@ import com.baifendian.swordfish.common.datasource.DataSourceHandler;
 import com.baifendian.swordfish.dao.enums.DbType;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.client.Connection;
@@ -41,13 +42,25 @@ public class HBaseHandler implements DataSourceHandler {
   }
 
   public boolean isConnectable(){
+    Connection con = null;
     try{
       Configuration config = HBaseConfiguration.create();
       config.set("hbase.zookeeper.quorum", param.getZkQuorum());
-      Connection con = ConnectionFactory.createConnection(config);
+      if(!StringUtils.isEmpty(param.getZkZnodeParent())){
+        config.set("zookeeper.znode.parent", param.getZkZnodeParent());
+      }
+      con = ConnectionFactory.createConnection(config);
     } catch (IOException e) {
       logger.info("hbase get connection error", e);
       return false;
+    } finally {
+      if (con != null) {
+        try {
+          con.close();
+        } catch (IOException e) {
+          e.printStackTrace();
+        }
+      }
     }
     return true;
   }
