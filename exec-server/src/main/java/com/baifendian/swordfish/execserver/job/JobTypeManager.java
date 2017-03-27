@@ -62,9 +62,9 @@ public class JobTypeManager {
   private static void initBaseJobType() {
     jobTypeMap.put("MR", new JobType(MrJob.class, false));
     jobTypeMap.put("SHELL", new JobType(ShellJob.class, false));
-    jobTypeMap.put("SPARK_BATCH", new JobType(SparkJob.class, false));
+    jobTypeMap.put("SPARK", new JobType(SparkJob.class, false));
     jobTypeMap.put("VIRTUAL", new JobType(NoopJob.class, false));
-    jobTypeMap.put("SQL", new JobType(EtlSqlJob.class, false));
+    jobTypeMap.put("HQL", new JobType(EtlSqlJob.class, false));
     jobTypeMap.put("ADHOC_SQL", new JobType(AdHocSqlJob.class, false));
     addPluginJobs();
 
