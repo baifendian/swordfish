@@ -20,7 +20,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
 /**
  * 描述一个 workflow和node的运行状态 <p>
  */
-public enum FlowStatus {
+public enum AdHocStatus {
   /**
    * 0(初始化) 1(调度依赖任务中) 2(调度依赖资源中) 3(正在运行) 4(运行成功) 5(kill掉) 6(运行失败)
    **/
@@ -34,16 +34,16 @@ public enum FlowStatus {
   /**
    * 通过 type 获取枚举对象 <p>
    *
-   * @return {@link FlowStatus}
+   * @return {@link AdHocStatus}
    */
-  public static FlowStatus valueOfType(Integer type) throws IllegalArgumentException {
+  public static AdHocStatus valueOfType(Integer type) throws IllegalArgumentException {
     if (type == null) {
       return null;
     }
     try {
-      return FlowStatus.values()[type];
+      return AdHocStatus.values()[type];
     } catch (Exception ex) {
-      throw new IllegalArgumentException("Cannot convert " + type + " to " + FlowStatus.class.getSimpleName() + " .", ex);
+      throw new IllegalArgumentException("Cannot convert " + type + " to " + AdHocStatus.class.getSimpleName() + " .", ex);
     }
   }
 

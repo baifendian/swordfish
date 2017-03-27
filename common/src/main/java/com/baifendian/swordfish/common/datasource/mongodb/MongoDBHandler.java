@@ -36,7 +36,7 @@ public class MongoDBHandler {
     param = JsonUtil.parseObject(paramStr, MongoDBParam.class);
   }
 
-  public boolean isConnectable(){
+  public void isConnectable(){
     MongoClient mongoClient = new MongoClient(new MongoClientURI(param.getAddress()));
     try {
       MongoClientOptions  options = MongoClientOptions.builder().connectTimeout(10)
@@ -46,11 +46,8 @@ public class MongoDBHandler {
       for (Document doc : db.listCollections()) {
         logger.debug("{}", doc);
       }
-    } catch (Exception e){
-      logger.info("connect error", e);
-      return false;
+    } finally {
+      mongoClient.close();
     }
-    mongoClient.close();
-    return true;
   }
 }

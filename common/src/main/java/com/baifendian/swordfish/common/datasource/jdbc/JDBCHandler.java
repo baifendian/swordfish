@@ -47,19 +47,15 @@ public class JDBCHandler implements DataSourceHandler {
     this.dbType = dbType;
     param = JsonUtil.parseObject(paramStr, JDBCParam.class);
   }
-  public boolean isConnectable(){
+  public void isConnectable() throws Exception {
     if(!dbDriverMap.containsKey(dbType)){
-      logger.info("can't found db type {} driver info", dbType.name());
-      return false;
+      throw new Exception(String.format("can't found db type %s driver info", dbType.name()));
     }
 
     Connection con = null;
     try {
       Class.forName(dbDriverMap.get(dbType));
       con = DriverManager.getConnection(param.getAddress(), param.getUser(), param.getPassword());
-    } catch (ClassNotFoundException | SQLException e) {
-      logger.warn("connect error", e);
-      return false;
     } finally {
       if(con != null) {
         try {
@@ -69,6 +65,5 @@ public class JDBCHandler implements DataSourceHandler {
         }
       }
     }
-    return true;
   }
 }

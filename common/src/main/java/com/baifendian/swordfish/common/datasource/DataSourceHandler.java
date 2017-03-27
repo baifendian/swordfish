@@ -15,8 +15,10 @@
  */
 package com.baifendian.swordfish.common.datasource;
 
+import java.io.IOException;
+
 public interface DataSourceHandler {
 
-  public boolean isConnectable();
+  public void isConnectable() throws Exception;
 
 }

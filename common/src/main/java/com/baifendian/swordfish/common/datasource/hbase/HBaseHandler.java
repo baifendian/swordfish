@@ -41,7 +41,7 @@ public class HBaseHandler implements DataSourceHandler {
     param = JsonUtil.parseObject(paramStr, HBaseParam.class);
   }
 
-  public boolean isConnectable(){
+  public void isConnectable() throws IOException {
     Connection con = null;
     try{
       Configuration config = HBaseConfiguration.create();
@@ -50,9 +50,6 @@ public class HBaseHandler implements DataSourceHandler {
         config.set("zookeeper.znode.parent", param.getZkZnodeParent());
       }
       con = ConnectionFactory.createConnection(config);
-    } catch (IOException e) {
-      logger.info("hbase get connection error", e);
-      return false;
     } finally {
       if (con != null) {
         try {
@@ -62,6 +59,5 @@ public class HBaseHandler implements DataSourceHandler {
         }
       }
     }
-    return true;
   }
 }

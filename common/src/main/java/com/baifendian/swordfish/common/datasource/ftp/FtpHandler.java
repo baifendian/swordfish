@@ -34,15 +34,9 @@ public class FtpHandler implements DataSourceHandler {
     param = JsonUtil.parseObject(paramStr, FtpParam.class);
   }
 
-  public boolean isConnectable(){
+  public void isConnectable() throws IOException {
     FTPClient ftpClient = new FTPClient();
-    try {
-      ftpClient.connect(param.getHost(), param.getPort());
-      ftpClient.login(param.getUser(), param.getPassword());
-    } catch (IOException e) {
-      logger.info("connect ftp error", e);
-      return false;
-    }
-    return true;
+    ftpClient.connect(param.getHost(), param.getPort());
+    ftpClient.login(param.getUser(), param.getPassword());
   }
 }
