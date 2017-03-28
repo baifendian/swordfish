@@ -17,6 +17,7 @@ package com.baifendian.swordfish.execserver.adhoc;
 
 import com.baifendian.swordfish.common.job.JobProps;
 import com.baifendian.swordfish.common.job.logger.JobLogger;
+import com.baifendian.swordfish.dao.AdHocDao;
 import com.baifendian.swordfish.dao.enums.AdHocStatus;
 import com.baifendian.swordfish.dao.model.AdHoc;
 import com.baifendian.swordfish.execserver.job.hive.AdHocSqlJob;
@@ -33,36 +34,33 @@ public class AdHocRunner implements Runnable {
 
   private Logger logger = LoggerFactory.getLogger(AdHocRunner.class);
 
-  private AdHoc adhoc;
+  private AdHoc adHoc;
 
-  public AdHocRunner(AdHoc adHoc){
-    this.adhoc = adHoc;
+  private AdHocDao adHocDao;
+
+  public AdHocRunner(AdHoc adHoc, AdHocDao adHocDao){
+    this.adHocDao = adHocDao;
+    this.adHoc = adHoc;
   }
 
   @Override
   public void run(){
     JobProps props = new JobProps();
-    props.setJobParams(adhoc.getParams());
-    props.setProxyUser(adhoc.getProxyUser());
-    props.setQueue(adhoc.getQueue());
-    /*
-    Map<String, String> systemParamMap = SystemParamManager.buildSystemParam(executionFlow, scheduleDate, addDate);
+    props.setJobParams(adHoc.getParams());
+    props.setProxyUser(adHoc.getProxyUser());
+    props.setQueue(adHoc.getQueue());
 
-    // 自定义参数
-    String cycTimeStr = systemParamMap.get(SystemParamManager.CYC_TIME);
-    Map<String, String> customParamMap = CustomParamManager.buildCustomParam(executionFlow, cycTimeStr);
-    props.setDefinedParams();
-    */
-
-    Logger jobLogger = new JobLogger(adhoc.getJobId(), logger);
+    Logger jobLogger = new JobLogger(adHoc.getJobId(), logger);
     AdHocSqlJob job = null;
     AdHocStatus status = AdHocStatus.SUCCESS;
     try {
-      job = new AdHocSqlJob(adhoc.getJobId(), props, logger);
+      adHoc.setStatus(AdHocStatus.RUNNING);
+      adHocDao.updateAdHoc(adHoc);
+      job = new AdHocSqlJob(adHoc.getJobId(), props, jobLogger);
       job.before();
       job.process();
     } catch (Exception e) {
-      logger.debug("run adhoc job error", e);
+      logger.debug("run adHoc job error", e);
       status = AdHocStatus.FAILED;
     } finally {
       try {
@@ -72,8 +70,9 @@ public class AdHocRunner implements Runnable {
       }
     }
 
-    adhoc.setStatus(status);
-    adhoc.setEndTime(new Date());
+    adHoc.setStatus(status);
+    adHoc.setEndTime(new Date());
+    adHocDao.updateAdHoc(adHoc);
 
   }
 }

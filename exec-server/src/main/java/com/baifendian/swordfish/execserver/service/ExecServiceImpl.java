@@ -15,16 +15,20 @@
  */
 package com.baifendian.swordfish.execserver.service;
 
+import com.baifendian.swordfish.dao.AdHocDao;
 import com.baifendian.swordfish.dao.DaoFactory;
 import com.baifendian.swordfish.dao.FlowDao;
 import com.baifendian.swordfish.dao.enums.FlowStatus;
+import com.baifendian.swordfish.dao.model.AdHoc;
 import com.baifendian.swordfish.dao.model.ExecutionFlow;
 import com.baifendian.swordfish.dao.model.Schedule;
+import com.baifendian.swordfish.execserver.adhoc.AdHocRunnerManager;
 import com.baifendian.swordfish.execserver.flow.FlowRunnerManager;
 import com.baifendian.swordfish.execserver.utils.ResultHelper;
 import com.baifendian.swordfish.rpc.WorkerService.Iface;
 import com.baifendian.swordfish.rpc.RetInfo;
 
+import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
 import org.apache.thrift.TException;
 import org.slf4j.Logger;
@@ -47,23 +51,32 @@ public class ExecServiceImpl implements Iface {
    */
   private final FlowDao flowDao;
 
+  private final AdHocDao adHocDao;
+
   /**
    * {@link FlowRunnerManager}
    */
   private final FlowRunnerManager flowRunnerManager;
 
+  private final AdHocRunnerManager adHocRunnerManager;
+
   private String host;
 
   private int port;
 
+  private Configuration conf;
+
   /**
    * constructor
    */
-  public ExecServiceImpl(String host, int port) {
+  public ExecServiceImpl(String host, int port, Configuration conf) {
     this.flowDao = DaoFactory.getDaoInstance(FlowDao.class);
-    this.flowRunnerManager = new FlowRunnerManager();
+    this.adHocDao = DaoFactory.getDaoInstance(AdHocDao.class);
+    this.flowRunnerManager = new FlowRunnerManager(conf);
+    this.adHocRunnerManager = new AdHocRunnerManager(conf);
     this.host = host;
     this.port = port;
+    this.conf = conf;
   }
 
   @Override
@@ -121,6 +134,17 @@ public class ExecServiceImpl implements Iface {
       LOGGER.error(e.getMessage(), e);
       return ResultHelper.createErrorResult(e.getMessage());
     }
+    return ResultHelper.SUCCESS;
+  }
+
+  @Override
+  public RetInfo execAdHoc(long adHocId){
+    AdHoc adHoc = adHocDao.getAdHoc(adHocId);
+    if(adHoc == null){
+      LOGGER.error("adhoc id {} not exists", adHocId);
+      return ResultHelper.createErrorResult("adhoc id not exists");
+    }
+    adHocRunnerManager.submitAdHoc(adHoc);
     return ResultHelper.SUCCESS;
   }
 

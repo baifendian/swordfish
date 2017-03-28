@@ -23,7 +23,9 @@ public class MasterServer {
 
   private int port;
 
-  private Date updateTime;
+  private Date createTime;
+
+  private Date modifyTime;
 
   public String getHost() {
     return host;
@@ -41,11 +43,19 @@ public class MasterServer {
     this.port = port;
   }
 
-  public Date getUpdateTime() {
-    return updateTime;
+  public Date getCreateTime() {
+    return createTime;
   }
 
-  public void setUpdateTime(Date updateTime) {
-    this.updateTime = updateTime;
+  public void setCreateTime(Date createTime) {
+    this.createTime = createTime;
+  }
+
+  public Date getModifyTime() {
+    return modifyTime;
+  }
+
+  public void setModifyTime(Date modifyTime) {
+    this.modifyTime = modifyTime;
   }
 }

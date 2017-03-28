@@ -17,9 +17,13 @@ package com.baifendian.swordfish.execserver.adhoc;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
+import com.baifendian.swordfish.dao.AdHocDao;
+import com.baifendian.swordfish.dao.DaoFactory;
 import com.baifendian.swordfish.dao.enums.AdHocStatus;
 import com.baifendian.swordfish.dao.model.AdHoc;
+import com.baifendian.swordfish.execserver.Constants;
 
+import org.apache.commons.configuration.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,19 +36,26 @@ public class AdHocRunnerManager {
   private static final Logger LOGGER = LoggerFactory.getLogger(AdHocRunnerManager.class);
 
   private final ExecutorService adHocExecutorService;
+  private AdHocDao adHocDao;
+  private Configuration conf;
 
-  public AdHocRunnerManager(){
-    ThreadFactory flowThreadFactory = new ThreadFactoryBuilder().setNameFormat("Exec-Worker-FlowRunner").build();
-    adHocExecutorService = Executors.newCachedThreadPool(flowThreadFactory);
+  public AdHocRunnerManager(Configuration conf){
+    this.conf = conf;
+    this.adHocDao = DaoFactory.getDaoInstance(AdHocDao.class);
+    int threads = conf.getInt(Constants.EXECUTOR_ADHOCRUNNER_THREADS, 20);
+    ThreadFactory flowThreadFactory = new ThreadFactoryBuilder().setNameFormat("Exec-Server-AdHocRunner").build();
+    adHocExecutorService = Executors.newFixedThreadPool(threads, flowThreadFactory);
+
   }
 
   public void submitAdHoc(AdHoc adHoc){
     String jobId = "ADHOC_" + adHoc.getId();
     adHoc.setStartTime(new Date());
-    adHoc.setStatus(AdHocStatus.RUNNING);
+    adHoc.setStatus(AdHocStatus.INIT);
     adHoc.setJobId(jobId);
+    adHocDao.updateAdHoc(adHoc);
 
-    AdHocRunner adHocRunner = new AdHocRunner(adHoc);
+    AdHocRunner adHocRunner = new AdHocRunner(adHoc, adHocDao);
     adHocExecutorService.submit(adHocRunner);
   }
 }

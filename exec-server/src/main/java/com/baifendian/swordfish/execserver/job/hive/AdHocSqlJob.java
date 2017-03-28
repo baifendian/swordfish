@@ -45,7 +45,8 @@ public class AdHocSqlJob extends EtlSqlJob {
   @Override
   public void process() throws Exception {
     String sqls = param.getSql();
-    sqls = ParamHelper.resolvePlaceholders(sqls, definedParamMap);
+    // 不支持参数替换
+    //sqls = ParamHelper.resolvePlaceholders(sqls, definedParamMap);
     List<String> funcs = FunctionUtil.createFuncs(param.getUdfs(), jobIdLog, getWorkingDirectory());
     List<String> execSqls = CommonUtil.sqlSplit(sqls);
     /** 查询结果写入数据库 */

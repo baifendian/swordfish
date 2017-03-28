@@ -28,19 +28,20 @@ public interface MasterServerMapper {
   @Results(value = {
           @Result(property = "host", column = "host", javaType = String.class, jdbcType = JdbcType.VARCHAR),
           @Result(property = "port", column = "port", javaType = int.class, jdbcType = JdbcType.INTEGER),
-          @Result(property = "updateTime", column = "update_time", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP),
+          @Result(property = "createTime", column = "create_time", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP),
+          @Result(property = "modifyTime", column = "modify_time", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP),
   })
-  @SelectProvider(type = MasterServerMapperSQL.class, method = "query")
+  @SelectProvider(type = MasterServerMapperProvider.class, method = "query")
   MasterServer query();
 
 
-  @InsertProvider(type = MasterServerMapperSQL.class, method = "insert")
+  @InsertProvider(type = MasterServerMapperProvider.class, method = "insert")
   int insert(@Param("masterServer") MasterServer masterServer);
 
-  @UpdateProvider(type = MasterServerMapperSQL.class, method = "update")
+  @UpdateProvider(type = MasterServerMapperProvider.class, method = "update")
   int update(@Param("masterServer") MasterServer masterServer);
 
-  @SelectProvider(type = MasterServerMapperSQL.class, method = "delete")
+  @SelectProvider(type = MasterServerMapperProvider.class, method = "delete")
   void delete();
 
 }

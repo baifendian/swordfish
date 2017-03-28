@@ -22,13 +22,14 @@ import com.baifendian.swordfish.dao.DaoFactory;
 import com.baifendian.swordfish.dao.FlowDao;
 import com.baifendian.swordfish.dao.datasource.ConnectionFactory;
 import com.baifendian.swordfish.dao.enums.FailurePolicyType;
-import com.baifendian.swordfish.dao.enums.FlowType;
 import com.baifendian.swordfish.dao.mapper.ExecutionNodeMapper;
 import com.baifendian.swordfish.dao.model.ExecutionFlow;
 import com.baifendian.swordfish.dao.model.Schedule;
+import com.baifendian.swordfish.execserver.Constants;
 import com.baifendian.swordfish.execserver.parameter.CustomParamManager;
 import com.baifendian.swordfish.execserver.parameter.SystemParamManager;
 
+import org.apache.commons.configuration.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -91,18 +92,23 @@ public class FlowRunnerManager {
 
   private final Map<Long, FlowRunner> runningFlows = new ConcurrentHashMap<>();
 
+  private final Configuration conf;
+
   /**
    * constructor
    */
-  public FlowRunnerManager() {
+  public FlowRunnerManager(Configuration conf) {
     this.flowDao = DaoFactory.getDaoInstance(FlowDao.class);
     this.executionNodeMapper = ConnectionFactory.getSqlSession().getMapper(ExecutionNodeMapper.class);
+    this.conf = conf;
 
+    int flowThreads = conf.getInt(Constants.EXECUTOR_FLOWRUNNER_THREADS, 20);
     ThreadFactory flowThreadFactory = new ThreadFactoryBuilder().setNameFormat("Exec-Worker-FlowRunner").build();
-    flowExecutorService = Executors.newCachedThreadPool(flowThreadFactory);
+    flowExecutorService = Executors.newFixedThreadPool(flowThreads, flowThreadFactory);
 
+    int nodeThreads = conf.getInt(Constants.EXECUTOR_NODERUNNER_THREADS, 100);
     ThreadFactory nodeThreadFactory = new ThreadFactoryBuilder().setNameFormat("Exec-Worker-NodeRunner").build();
-    nodeExecutorService = Executors.newCachedThreadPool(nodeThreadFactory);
+    nodeExecutorService = Executors.newFixedThreadPool(nodeThreads, nodeThreadFactory);
 
     ThreadFactory jobThreadFactory = new ThreadFactoryBuilder().setNameFormat("Exec-Worker-Job").build();
     jobExecutorService = Executors.newCachedThreadPool(jobThreadFactory);
@@ -122,9 +128,6 @@ public class FlowRunnerManager {
     Map<String, String> customParamMap = CustomParamManager.buildCustomParam(executionFlow, cycTimeStr);
 
     int maxTryTimes = defaultMaxTryTimes;
-    if (executionFlow.getFlowType() == FlowType.LONG) {
-      maxTryTimes = 0; // 长任务暂时不重试
-    }
 
     // 构造 flow runner
     FlowRunnerContext context = new FlowRunnerContext();

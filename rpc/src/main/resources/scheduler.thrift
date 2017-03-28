@@ -94,6 +94,12 @@ service MasterService {
      */
 	RetInfo executorReport(1:string ip, 2:i32 port, 3:HeartBeatData heartBeatData),
 
+	/**
+     * 执行某个 adHoc SQL
+     * adHocId : adHoc id
+     */
+	RetInfo execAdHoc(1:i64 adHocId);
+
 }
 
 /* Worker 服务接口 */	
@@ -123,6 +129,12 @@ service WorkerService {
      * flowType : workflow 类型（枚举字符串）
      */
 	RetInfo cancelExecFlow(1:i32 projectId, 2:i64 execId, 3:string flowType),
+
+	/**
+     * 执行某个 adHoc SQL
+     * adHocId : adHoc id
+     */
+	RetInfo execAdHoc(1:i64 adHocId);
 
 
 	

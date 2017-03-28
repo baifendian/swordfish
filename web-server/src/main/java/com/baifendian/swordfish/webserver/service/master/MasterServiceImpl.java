@@ -15,6 +15,8 @@
  */
 package com.baifendian.swordfish.webserver.service.master;
 
+import com.baifendian.swordfish.dao.AdHocDao;
+import com.baifendian.swordfish.dao.model.AdHoc;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
 import com.baifendian.swordfish.dao.DaoFactory;
 import com.baifendian.swordfish.dao.FlowDao;
@@ -28,6 +30,7 @@ import com.baifendian.swordfish.rpc.HeartBeatData;
 import com.baifendian.swordfish.rpc.MasterService.Iface;
 import com.baifendian.swordfish.rpc.RetInfo;
 import com.baifendian.swordfish.rpc.ScheduleInfo;
+import com.baifendian.swordfish.webserver.ExecutorClient;
 import com.baifendian.swordfish.webserver.ExecutorServerInfo;
 import com.baifendian.swordfish.webserver.ExecutorServerManager;
 import com.baifendian.swordfish.webserver.config.MasterConfig;
@@ -66,6 +69,7 @@ public class MasterServiceImpl implements Iface {
    */
   private final FlowDao flowDao;
 
+  private final AdHocDao adHocDao;
   /**
    * workflow 执行队列
    */
@@ -96,6 +100,7 @@ public class MasterServiceImpl implements Iface {
     this.executorServerManager = executorServerManager;
     this.conf = conf;
     this.flowDao = DaoFactory.getDaoInstance(FlowDao.class);
+    this.adHocDao = DaoFactory.getDaoInstance(AdHocDao.class);
     this.executorService = Executors.newScheduledThreadPool(5);
 
     // 启动请求 executor server的处理线程
@@ -166,6 +171,26 @@ public class MasterServiceImpl implements Iface {
 
     executionFlowQueue.add(executionFlow);
 
+    return ResultHelper.SUCCESS;
+  }
+
+  @Override
+  public RetInfo execAdHoc(long adHocId) {
+    AdHoc adHoc = adHocDao.getAdHoc(adHocId);
+    if (adHoc == null) {
+      LOGGER.error("adhoc id {} not exists", adHocId);
+      return ResultHelper.createErrorResult("adhoc id not exists");
+    }
+    ExecutorServerInfo executorServerInfo = executorServerManager.getExecutorServer();
+    if(executorServerInfo == null){
+      return ResultHelper.createErrorResult("can't found active executor server");
+    }
+    ExecutorClient executorClient = new ExecutorClient(executorServerInfo);
+    try {
+      executorClient.execAdHoc(adHocId);
+    } catch (TException e) {
+      return ResultHelper.createErrorResult(e.getMessage());
+    }
     return ResultHelper.SUCCESS;
   }
 
