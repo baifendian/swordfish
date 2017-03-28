@@ -107,6 +107,7 @@ CREATE TABLE `project_flows` (
   `proxy_user` varchar(64) NOT NULL COMMENT 'proxy user of the project_flows.',
   `user_defined_params` text DEFAULT NULL COMMENT 'user defined params of the project_flows.',
   `extras` text DEFAULT NULL COMMENT 'extends of the project_flows',
+  `queue` varchar(64) DEFAULT NULL COMMENT 'queue of the project_flows',
 
   PRIMARY KEY (`id`),
   UNIQUE KEY `project_flowname` (`project_id`, `name`),

@@ -15,15 +15,11 @@
  */
 package com.baifendian.swordfish.dao.model;
 
-import com.baifendian.swordfish.dao.utils.json.JsonUtil;
 import com.baifendian.swordfish.dao.utils.json.StringNodeJsonDeserializer;
 import com.baifendian.swordfish.dao.utils.json.StringNodeJsonSerializer;
-import com.baifendian.swordfish.dao.enums.NodeType;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-
-import org.apache.commons.lang3.StringUtils;
 
 import java.util.Date;
 import java.util.List;
@@ -40,10 +36,6 @@ public class FlowNode {
 
   private Date modifyTime;
 
-  private double posX;
-
-  private double posY;
-
   private int lastModifyBy;
 
   private String type;
@@ -54,19 +46,12 @@ public class FlowNode {
   @JsonSerialize(using = StringNodeJsonSerializer.class)
   private String param;
 
-  @JsonDeserialize(using = StringNodeJsonDeserializer.class)
-  @JsonSerialize(using = StringNodeJsonSerializer.class)
-  private String inputTables;
+  private String dep;
+
+  private String extras;
 
   @JsonIgnore
-  private List<Integer> inputTableList;
-
-  @JsonDeserialize(using = StringNodeJsonDeserializer.class)
-  @JsonSerialize(using = StringNodeJsonSerializer.class)
-  private String outputTables;
-
-  @JsonIgnore
-  private List<Integer> outputTableList;
+  private List<String> depList;
 
   public Integer getId() {
     return id;
@@ -108,22 +93,6 @@ public class FlowNode {
     this.modifyTime = modifyTime;
   }
 
-  public double getPosX() {
-    return posX;
-  }
-
-  public void setPosX(double posX) {
-    this.posX = posX;
-  }
-
-  public double getPosY() {
-    return posY;
-  }
-
-  public void setPosY(double posY) {
-    this.posY = posY;
-  }
-
   public int getLastModifyBy() {
     return lastModifyBy;
   }
@@ -156,43 +125,27 @@ public class FlowNode {
     this.param = param;
   }
 
-  public String getInputTables() {
-    return inputTables;
+  public String getDep() {
+    return dep;
   }
 
-  public void setInputTables(String inputTables) {
-    this.inputTables = inputTables;
+  public void setDep(String dep) {
+    this.dep = dep;
   }
 
-  public String getOutputTables() {
-    return outputTables;
+  public List<String> getDepList() {
+    return depList;
   }
 
-  public void setOutputTables(String ouputTables) {
-    this.outputTables = ouputTables;
+  public void setDepList(List<String> depList) {
+    this.depList = depList;
   }
 
-  /**
-   * 获取 Input Table 列表 <p>
-   *
-   * @return Input Table 列表
-   */
-  public List<Integer> getInputTableList() {
-    if (inputTableList == null && StringUtils.isNotEmpty(inputTables)) {
-      inputTableList = JsonUtil.parseObjectList(inputTables, Integer.class);
-    }
-    return inputTableList;
+  public String getExtras() {
+    return extras;
   }
 
-  /**
-   * 获取 Output Table 列表 <p>
-   *
-   * @return Output Table 列表
-   */
-  public List<Integer> getOutputTableList() {
-    if (outputTableList == null && StringUtils.isNotEmpty(outputTables)) {
-      outputTableList = JsonUtil.parseObjectList(outputTables, Integer.class);
-    }
-    return outputTableList;
+  public void setExtras(String extras) {
+    this.extras = extras;
   }
 }
