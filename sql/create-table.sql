@@ -97,16 +97,18 @@ CREATE TABLE `datasource` (
 -- `project_flows` table
 DROP TABLE If Exists `project_flows`;
 CREATE TABLE `project_flows` (
-  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'project flows id',
-  `name` varchar(64) NOT NULL COMMENT 'project flows name',
-  `project_id` int(11) NOT NULL COMMENT 'project id of the project flows',
-  `create_time` datetime NOT NULL COMMENT 'create time of the project flows',
-  `modify_time` datetime NOT NULL COMMENT 'modify time of the project flows',
-  `last_modify_by` int(11) NOT NULL COMMENT 'last modify user id of the project flows',
-  `owner` int(11) NOT NULL COMMENT 'owner id of the project flows.',
-  `proxy_user` varchar(64) NOT NULL COMMENT 'proxy user of the project flows.',
-  `user_defined_params` text DEFAULT NULL COMMENT 'user defined params of the project flows.',
-  `extras` text DEFAULT NULL COMMENT 'extends of the project flows',
+  `id` int(20) NOT NULL AUTO_INCREMENT COMMENT 'project_flows id',
+  `name` varchar(64) NOT NULL COMMENT 'project_flows name',
+  `project_id` int(20) NOT NULL COMMENT 'project id of the project_flows',
+  `create_time` datetime NOT NULL COMMENT 'create time of the project_flows',
+  `modify_time` datetime NOT NULL COMMENT 'modify time of the project_flows',
+  `last_modify_by` int(20) NOT NULL COMMENT 'last modify user id of the project_flows',
+  `owner` int(20) NOT NULL COMMENT 'owner id of the project_flows.',
+  `proxy_user` varchar(64) NOT NULL COMMENT 'proxy user of the project_flows.',
+  `user_defined_params` text DEFAULT NULL COMMENT 'user defined params of the project_flows.',
+  `extras` text DEFAULT NULL COMMENT 'extends of the project_flows',
+  `queue` varchar(64) DEFAULT NULL COMMENT 'queue of the project_flows',
+
   PRIMARY KEY (`id`),
   UNIQUE KEY `project_flowname` (`project_id`, `name`),
   FOREIGN KEY (`project_id`) REFERENCES `project`(`id`) ON DELETE CASCADE,

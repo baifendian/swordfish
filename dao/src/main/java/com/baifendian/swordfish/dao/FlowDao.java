@@ -231,7 +231,6 @@ public class FlowDao extends BaseDao {
     projectFlow.setOwnerId(userId);
     projectFlow.setLastModifyBy(userId);
     projectFlow.setProjectId(projectId);
-    projectFlow.setType(type);
 
     int count = projectFlowMapper.insertAndGetId(projectFlow); // 插入函数记录
     if (count <= 0) {
@@ -269,8 +268,6 @@ public class FlowDao extends BaseDao {
     flowNode.setName(name);
     flowNode.setFlowId(workflowId);
     flowNode.setType(nodeType);
-    flowNode.setPosX(0.0);
-    flowNode.setPosY(0.0);
     Timestamp timestamp = new Timestamp(System.currentTimeMillis());
     flowNode.setCreateTime(timestamp);
     flowNode.setModifyTime(timestamp);

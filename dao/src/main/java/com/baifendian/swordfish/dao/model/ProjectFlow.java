@@ -64,8 +64,6 @@ public class ProjectFlow {
 
   private String extras;
 
-//  private String
-
   @JsonDeserialize(using = StringNodeJsonDeserializer.class)
   @JsonSerialize(using = StringNodeJsonSerializer.class)
   private String userDefinedParams;
@@ -183,6 +181,14 @@ public class ProjectFlow {
 
   public void setUserDefinedParams(String userDefinedParams) {
     this.userDefinedParams = userDefinedParams;
+  }
+
+  public String getExtras() {
+    return extras;
+  }
+
+  public void setExtras(String extras) {
+    this.extras = extras;
   }
 
   public Map<String, String> getUserDefinedParamMap() {

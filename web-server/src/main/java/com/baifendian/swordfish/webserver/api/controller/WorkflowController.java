@@ -23,6 +23,7 @@ import com.baifendian.swordfish.dao.model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -78,7 +79,7 @@ public class WorkflowController {
                              @RequestParam(value = "proxyUser") String proxyUser,
                              @RequestParam(value = "queue") String queue,
                              @RequestParam(value = "data") String data,
-                             @RequestParam(value = "file") String file,
+                             @RequestParam("file") MultipartFile file,
                              HttpServletResponse response) {
 
 

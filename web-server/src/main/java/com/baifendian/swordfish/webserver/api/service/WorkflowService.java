@@ -15,13 +15,34 @@
  */
 package com.baifendian.swordfish.webserver.api.service;
 
+import com.baifendian.swordfish.dao.model.FlowNode;
+import com.baifendian.swordfish.dao.model.ProjectFlow;
+import com.baifendian.swordfish.dao.model.User;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.type.TypeFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 @Service
 public class WorkflowService {
 
   private static Logger logger = LoggerFactory.getLogger(WorkflowService.class.getName());
 
+  public ProjectFlow createWorkflow(User operator, String projectName, String name, String desc, String proxyUser, String queue, String data, MultipartFile file){
+
+    List<FlowNode> flowNodeList;
+
+    try{
+      ObjectMapper mapper = new ObjectMapper();
+      //flowNodeList = mapper.readValues(data, TypeFactory.defaultInstance(List.class,FlowNode.class));
+    }catch (Exception e){
+
+    }
+
+    return null;
+  }
 }

@@ -89,7 +89,7 @@ public class EmailManager {
   public static void sendAddDataEmail(ProjectFlow projectFlow, boolean isSuccess, List<Map.Entry<Date, Boolean>> resultList) {
     String title = MessageFormat.format(TITLE_FORMAT, "补数据", isSuccess ? "成功" : "失败");
     StringBuilder builder = new StringBuilder();
-    String head = MessageFormat.format(ADD_DATA_HEAD_FORMAT, "补数据", projectFlow.getProjectName(), projectFlow.getName(), getFlowTypeCnName(projectFlow.getType()));
+    String head = MessageFormat.format(ADD_DATA_HEAD_FORMAT, "补数据", projectFlow.getProjectName(), projectFlow.getName());
     builder.append(head);
     for (Map.Entry<Date, Boolean> entry : resultList) {
       String item = MessageFormat.format(ADD_DATA_ITEM_FORMAT, BFDDateUtils.defaultFormat(entry.getKey()), getResultStatus(entry.getValue()));

@@ -73,21 +73,6 @@ public class ProjectFlowMapperSqlProvider {
         if (projectFlow.getLastModifyBy() != 0) {
           SET("last_modify_by = #{flow.lastModifyBy}");
         }
-        if (projectFlow.getLastPublishBy() != 0) {
-          SET("last_publish_by = #{flow.lastPublishBy}");
-        }
-        if (projectFlow.getModifyTime() != null) {
-          SET("modify_time = #{flow.modifyTime}");
-        }
-        if (projectFlow.getInputTables() != null) {
-          SET("input_tables = #{flow.inputTables}");
-        }
-        if (projectFlow.getOutputTables() != null) {
-          SET("output_tables = #{flow.outputTables}");
-        }
-        if (projectFlow.getResources() != null) {
-          SET("resources = #{flow.resources}");
-        }
         WHERE("id = #{flow.id}");
       }
     }.toString();
