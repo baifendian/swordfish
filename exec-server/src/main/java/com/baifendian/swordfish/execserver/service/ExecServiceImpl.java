@@ -80,11 +80,7 @@ public class ExecServiceImpl implements Iface {
   }
 
   @Override
-  public RetInfo execFlow(int projectId, long execId, String flowType) throws TException {
-    if (StringUtils.isEmpty(flowType)) {
-      return ResultHelper.createErrorResult("flowType 参数不能为空");
-    }
-
+  public RetInfo execFlow(long execId) throws TException {
     try {
       // 查询 ExecutionFlow
       ExecutionFlow executionFlow = flowDao.queryExecutionFlow(execId);
@@ -106,11 +102,7 @@ public class ExecServiceImpl implements Iface {
   }
 
   @Override
-  public RetInfo scheduleExecFlow(int projectId, long execId, String flowType, long scheduleDate) throws TException {
-    if (StringUtils.isEmpty(flowType)) {
-      return ResultHelper.createErrorResult("flowType 参数不能为空");
-    }
-
+  public RetInfo scheduleExecFlow(long execId, long scheduleDate) throws TException {
     try {
       // 查询 ExecutionFlow
       ExecutionFlow executionFlow = flowDao.queryExecutionFlow(execId);
@@ -155,7 +147,7 @@ public class ExecServiceImpl implements Iface {
     flowRunnerManager.destroy();
   }
 
-  public RetInfo cancelExecFlow(int projectId, long execId, String flowType) throws TException {
+  public RetInfo cancelExecFlow(long execId)  throws TException {
     try {
       // 查询 ExecutionFlow
       ExecutionFlow executionFlow = flowDao.queryExecutionFlow(execId);

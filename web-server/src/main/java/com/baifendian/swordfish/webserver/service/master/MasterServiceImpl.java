@@ -161,7 +161,7 @@ public class MasterServiceImpl implements Iface {
   }
 
   @Override
-  public RetInfo execFlow(int projectId, long execId, String flowType) throws TException {
+  public RetInfo execFlow(long execId) throws TException {
     ExecutionFlow executionFlow = flowDao.queryExecutionFlow(execId);
     if (executionFlow == null) {
       LOGGER.error("execId is not exists");
@@ -194,66 +194,12 @@ public class MasterServiceImpl implements Iface {
     return ResultHelper.SUCCESS;
   }
 
-
-  /**
-   * 保证 flow 事务执行:
-   * 1. 首先更新执行状态为 INIT (在 Api 中状态为 null)
-   * 2. Master 调用 Worker ：
-   *   1) 调用成功，直接返回；
-   *   2) 调用失败，若状态为 INIT 插入失败重试队列，并返回成功
-   * 3. 其他异常，返回失败(需要排查错误)
-   *
-   * @param projectId
-   * @param execId
-   * @param flowType
-   * @return
-   * @throws TException
-   */
-    /*
-    @Override
-    public RetInfo execFlow(int projectId, long execId, String flowType) throws TException {
-        // 更新状态
-        flowDao.updateExecutionFlowStatus(execId, FlowStatus.INIT);
-
-        try {
-            return worker.execFlow(projectId, execId, flowType);
-        } catch (RpcException e) {
-            LOGGER.error(e.getMessage(), e);
-
-            ExecutionFlow executionFlow = flowDao.queryExecutionFlow(execId);
-            if (executionFlow != null) {
-                // 如果状态仍然为 INIT,表示请求没有达到 worker，那么插入失败重试队列
-                if (executionFlow.getStatus() == FlowStatus.INIT) {
-                    boolean isInsert = executionFlowQueue.offer(executionFlow);
-                    if (!isInsert) { // 插入失败，那么重试队列已满，直接返回失败
-                        flowDao.updateExecutionFlowStatus(execId, FlowStatus.FAILED);
-                        return ResultHelper.createErrorResult("服务忙，请稍后再试");
-                    }
-                }
-            } else {
-                LOGGER.error("execId 对应的任务不存在");
-                return ResultHelper.createErrorResult("execId 对应的任务不存在");
-            }
-
-        } catch (Exception e) { // 内部错误
-            LOGGER.error(e.getMessage(), e);
-            flowDao.updateExecutionFlowStatus(execId, FlowStatus.FAILED);
-            return ResultHelper.createErrorResult("Master 异常");
-        }
-
-        return ResultHelper.SUCCESS;
-    }
-    */
-
   /**
    * 设置调度信息, 最终设置的是 Crontab 表达式(其实是按照 Quartz 的语法)
    */
   @Override
-  public RetInfo setSchedule(int projectId, int flowId, String flowType, ScheduleInfo scheduleInfo) throws TException {
+  public RetInfo setSchedule(int projectId, int flowId, ScheduleInfo scheduleInfo) throws TException {
     LOGGER.info("set schedule {} {}", projectId, flowId);
-    if (StringUtils.isEmpty(flowType)) {
-      return ResultHelper.createErrorResult("flowType 参数不能为空");
-    }
 
     if (scheduleInfo == null || StringUtils.isEmpty(scheduleInfo.getCronExpression())) {
       return ResultHelper.createErrorResult("scheduleInfo 参数内容不能为空");
@@ -266,13 +212,12 @@ public class MasterServiceImpl implements Iface {
       }
 
       // 解析参数
-      FlowType type = FlowType.valueOf(flowType);
       Date startDate = new Date(scheduleInfo.getStartDate());
       Date endDate = new Date(scheduleInfo.getEndDate());
 
-      String jobName = FlowScheduleJob.genJobName(flowId, type);
+      String jobName = FlowScheduleJob.genJobName(flowId);
       String jobGroupName = FlowScheduleJob.genJobGroupName(projectId);
-      Map<String, Object> dataMap = FlowScheduleJob.genDataMap(projectId, flowId, type, schedule);
+      Map<String, Object> dataMap = FlowScheduleJob.genDataMap(projectId, flowId, schedule);
       QuartzManager.addJobAndTrigger(jobName, jobGroupName, FlowScheduleJob.class, startDate, endDate, scheduleInfo.getCronExpression(), dataMap);
     } catch (Exception e) {
       LOGGER.error(e.getMessage(), e);
@@ -286,14 +231,10 @@ public class MasterServiceImpl implements Iface {
    * 删除调度信息
    */
   @Override
-  public RetInfo deleteSchedule(int projectId, int flowId, String flowType) throws TException {
-    if (StringUtils.isEmpty(flowType)) {
-      return ResultHelper.createErrorResult("flowType 参数不能为空");
-    }
+  public RetInfo deleteSchedule(int projectId, int flowId) throws TException {
 
     try {
-      FlowType type = FlowType.valueOf(flowType);
-      String jobName = FlowScheduleJob.genJobName(flowId, type);
+      String jobName = FlowScheduleJob.genJobName(flowId);
       String jobGroupName = FlowScheduleJob.genJobGroupName(projectId);
       QuartzManager.deleteJob(jobName, jobGroupName);
     } catch (Exception e) {

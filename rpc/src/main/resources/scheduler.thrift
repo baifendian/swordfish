@@ -42,29 +42,25 @@ service MasterService {
 
 	/**
      * 执行某个 workflow 
-     * projectId : 项目 id
      * execId : 执行 id
-     * flowType : workflow 类型（枚举字符串）
      */
-	RetInfo execFlow(1:i32 projectId, 2:i64 execId, 3:string flowType),
+	RetInfo execFlow(1:i64 execId),
 
 
 	/**
      * 设置某个 workflow 的调度信息
      * projectId : 项目 id
      * flowId : workflow id
-     * flowType : workflow 类型（枚举字符串）
      * scheduleInfo : schedule 详情
      */
-	RetInfo setSchedule(1:i32 projectId, 2:i32 flowId, 3:string flowType, 4:ScheduleInfo scheduleInfo),
+	RetInfo setSchedule(1:i32 projectId, 2:i32 flowId, 3:ScheduleInfo scheduleInfo),
 	
 	/**
      * 删除某个 workflow 的调度
      * projectId : 项目 id
      * flowId : workflowId
-     * flowType : workflow 类型（枚举字符串）
      */
-	RetInfo deleteSchedule(1:i32 projectId, 2:i32 flowId, 3:string flowType),
+	RetInfo deleteSchedule(1:i32 projectId, 2:i32 flowId),
 	
 	/**
      * 删除某个项目的所有调度
@@ -107,28 +103,22 @@ service WorkerService {
 
 	/**
      * 执行某个 workflow 
-     * projectId : 项目 id
      * execId : 执行 id
-     * flowType : workflow 类型（枚举字符串）
      */
-	RetInfo execFlow(1:i32 projectId, 2:i64 execId, 3:string flowType),
+	RetInfo execFlow(1:i64 execId),
 	
 	/**
      * 调度执行某个 workflow 
-     * projectId : 项目 id
      * execId : 执行 id
-     * flowType : workflow 类型（枚举字符串）
      * scheduleDate : 调度时间（预期的）
      */
-	RetInfo scheduleExecFlow(1:i32 projectId, 2:i64 execId, 3:string flowType, 4:i64 scheduleDate),
+	RetInfo scheduleExecFlow(1:i64 execId, 2:i64 scheduleDate),
 
 	/**
      * 取消在执行的指定workflow
-     * projectId : 项目 id
      * execId : 执行 id
-     * flowType : workflow 类型（枚举字符串）
      */
-	RetInfo cancelExecFlow(1:i32 projectId, 2:i64 execId, 3:string flowType),
+	RetInfo cancelExecFlow(1:i64 execId),
 
 	/**
      * 执行某个 adHoc SQL

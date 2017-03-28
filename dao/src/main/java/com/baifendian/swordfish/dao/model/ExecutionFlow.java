@@ -89,11 +89,6 @@ public class ExecutionFlow {
   private FlowRunType type;
 
   /**
-   * worklow 的类型
-   */
-  private FlowType flowType;
-
-  /**
    * workflow 所在项目的id
    */
   private Integer projectId;
@@ -226,14 +221,6 @@ public class ExecutionFlow {
 
   public void setType(FlowRunType type) {
     this.type = type;
-  }
-
-  public FlowType getFlowType() {
-    return flowType;
-  }
-
-  public void setFlowType(FlowType flowType) {
-    this.flowType = flowType;
   }
 
   public Integer getProjectId() {

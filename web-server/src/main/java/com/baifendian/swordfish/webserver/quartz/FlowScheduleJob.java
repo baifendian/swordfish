@@ -74,11 +74,6 @@ public class FlowScheduleJob implements Job {
   public static final String PARAM_FLOW_ID = "flowId";
 
   /**
-   * flowType
-   */
-  public static final String PARAM_FLOW_TYPE = "flowType";
-
-  /**
    * schedule
    */
   private static final String PARAM_SCHEDULE = "schedule";
@@ -113,7 +108,6 @@ public class FlowScheduleJob implements Job {
     JobDataMap dataMap = context.getJobDetail().getJobDataMap();
     int projectId = dataMap.getInt(PARAM_PROJECT_ID);
     int flowId = dataMap.getInt(PARAM_FLOW_ID);
-    FlowType flowType = (FlowType) dataMap.get(PARAM_FLOW_TYPE);
     // Schedule schedule =
     // JsonUtil.parseObject(dataMap.getString(PARAM_SCHEDULE),
     // Schedule.class);
@@ -124,7 +118,7 @@ public class FlowScheduleJob implements Job {
     ProjectFlow flow = flowDao.queryFlow(flowId);
     // 若 workflow 被删除，那么直接删除当前 job
     if (flow == null) {
-      deleteJob(projectId, flowId, flowType);
+      deleteJob(projectId, flowId);
       LOGGER.warn("workflow 不存在，删除 projectId:{},flowId:{} 的调度作业", projectId, flowId);
       return;
     }
@@ -132,7 +126,7 @@ public class FlowScheduleJob implements Job {
     // 获取依赖的 workflow 的调度信息，判断当前 workflow 是否可以执行
     Schedule schedule = flowDao.querySchedule(flowId);
     if (schedule == null) {
-      deleteJob(projectId, flowId, flowType);
+      deleteJob(projectId, flowId);
       LOGGER.warn("workflow 的调度信息不存在，删除 projectId:{},flowId:{} 的调度作业", projectId, flowId);
       return;
     }
@@ -140,7 +134,6 @@ public class FlowScheduleJob implements Job {
     // 插入 ExecutionFlow
     ExecutionFlow executionFlow = flowDao.scheduleFlowToExecution(projectId, flowId, flow.getOwnerId(), scheduledFireTime, FlowRunType.DISPATCH);
     executionFlow.setProjectId(projectId);
-    executionFlow.setFlowType(flowType);
 
     // 自动依赖上一调度周期才能结束
     boolean isNotUpdateWaitingDep = true;
@@ -417,8 +410,8 @@ public class FlowScheduleJob implements Job {
   /**
    * 删除 job <p>
    */
-  private void deleteJob(int projectId, int flowId, FlowType flowType) {
-    String jobName = genJobName(flowId, flowType);
+  private void deleteJob(int projectId, int flowId) {
+    String jobName = genJobName(flowId);
     String jobGroupName = genJobGroupName(projectId);
     QuartzManager.deleteJob(jobName, jobGroupName);
   }
@@ -435,9 +428,8 @@ public class FlowScheduleJob implements Job {
    *
    * @return Job名称
    */
-  public static String genJobName(int flowId, FlowType flowType) {
+  public static String genJobName(int flowId) {
     StringBuilder builder = new StringBuilder(FLOW_SCHEDULE_JOB_NAME_PRIFIX);
-    appendParam(builder, flowType);
     appendParam(builder, flowId);
     return builder.toString();
   }
@@ -458,11 +450,10 @@ public class FlowScheduleJob implements Job {
    *
    * @return 参数映射
    */
-  public static Map<String, Object> genDataMap(int projectId, int flowId, FlowType flowType, Schedule schedule) {
+  public static Map<String, Object> genDataMap(int projectId, int flowId, Schedule schedule) {
     Map<String, Object> dataMap = new HashMap<>();
     dataMap.put(PARAM_PROJECT_ID, projectId);
     dataMap.put(PARAM_FLOW_ID, flowId);
-    dataMap.put(PARAM_FLOW_TYPE, flowType);
     dataMap.put(PARAM_SCHEDULE, JsonUtil.toJsonString(schedule));
     return dataMap;
   }
