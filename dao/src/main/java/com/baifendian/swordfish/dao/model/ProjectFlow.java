@@ -64,7 +64,7 @@ public class ProjectFlow {
 
   private String extras;
 
-  private String
+//  private String
 
   @JsonDeserialize(using = StringNodeJsonDeserializer.class)
   @JsonSerialize(using = StringNodeJsonSerializer.class)

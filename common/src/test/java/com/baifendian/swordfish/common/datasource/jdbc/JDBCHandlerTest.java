@@ -17,22 +17,29 @@ package com.baifendian.swordfish.common.datasource.jdbc;
 
 import com.baifendian.swordfish.dao.enums.DbType;
 
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class JDBCHandlerTest {
 
+  @Rule
+  public ExpectedException thrown = ExpectedException.none();
+
   @Test
-  public void testIsConnectable(){
+  public void testIsConnectable() throws Exception {
     String paramStr = "{ \"address\": \"jdbc:mysql://swordfish.dev:3306\", \"database\": \"swordfish\", \"user\": \"swordfish\", \"password\": \"myswordfish\", \"autoReconnect\": true, \"maxReconnect\": 3, \"useUnicode\": true, \"characterEncoding\": \"UTF-8\" } \n";
     JDBCHandler jdbcHandler = new JDBCHandler(DbType.MYSQL, paramStr);
-    assertTrue(jdbcHandler.isConnectable());
+    jdbcHandler.isConnectable();
     paramStr = "{ \"address\": \"jdbc:mysql://swordfish.dev1:3306\", \"database\": \"swordfish\", \"user\": \"swordfish\", \"password\": \"myswordfish\", \"autoReconnect\": true, \"maxReconnect\": 3, \"useUnicode\": true, \"characterEncoding\": \"UTF-8\" } \n";
     jdbcHandler = new JDBCHandler(DbType.MYSQL, paramStr);
-    assertFalse(jdbcHandler.isConnectable());
+    thrown.expect(Exception.class);
+    jdbcHandler.isConnectable();
     jdbcHandler = new JDBCHandler(DbType.ORACLE, paramStr);
-    assertFalse(jdbcHandler.isConnectable());
+    thrown.expect(Exception.class);
+    jdbcHandler.isConnectable();
   }
 }

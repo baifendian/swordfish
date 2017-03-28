@@ -151,7 +151,7 @@ public class JobHandler {
     boolean isSuccess = false;
 
     // 短任务，需要设置超时时间
-    if (JobTypeManager.isLongJob(node.getType())) {
+    if (!JobTypeManager.isLongJob(node.getType())) {
       try {
         isSuccess = future.get(calcNodeTimeout(), TimeUnit.SECONDS);
       } catch (TimeoutException e) {

@@ -120,10 +120,10 @@ public class MasterClient {
     return true;
   }
 
-  public boolean setSchedule(int projectId, int flowId, String flowType, ScheduleInfo scheduleInfo) {
+  public boolean setSchedule(int projectId, int flowId, ScheduleInfo scheduleInfo) {
     connect();
     try {
-      RetInfo ret = client.setSchedule(projectId, flowId, flowType, scheduleInfo);
+      RetInfo ret = client.setSchedule(projectId, flowId, scheduleInfo);
       if (ret.getStatus() != 0) {
         logger.error("set schedule error:{}", ret.getMsg());
         return false;

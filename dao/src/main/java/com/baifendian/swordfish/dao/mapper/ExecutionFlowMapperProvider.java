@@ -102,7 +102,7 @@ public class ExecutionFlowMapperProvider {
 
   public String select(MaintainQuery maintainQuery) {
     StringBuilder sb = new StringBuilder();
-    sb.append("select a.*, b.type as flow_type, b.name as flow_name, c.name as submit_user_name ");
+    sb.append("select a.*, b.name as flow_name, c.name as submit_user_name ");
     sb.append("from execution_flows as a ");
     sb.append("inner join project_flows as b on a.flow_id = b.id and b.project_id = #{maintainQuery.projectId} ");
     sb.append("inner join user as c on a.submit_user = c.id where 1=1 ");
@@ -223,7 +223,6 @@ public class ExecutionFlowMapperProvider {
     return new SQL() {
       {
         SELECT("a.*");
-        SELECT("b.type as flow_type");
         SELECT("b.name as flow_name");
         SELECT("b.project_id as project_id");
         SELECT("b.queue as queue");
