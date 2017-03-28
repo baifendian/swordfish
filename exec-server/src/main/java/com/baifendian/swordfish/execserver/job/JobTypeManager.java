@@ -66,6 +66,8 @@ public class JobTypeManager {
     jobTypeMap.put("VIRTUAL", new JobType(NoopJob.class, false));
     jobTypeMap.put("HQL", new JobType(EtlSqlJob.class, false));
     jobTypeMap.put("ADHOC_SQL", new JobType(AdHocSqlJob.class, false));
+
+    jobTypeMap.put("SPARK-STREAMING", new JobType(SparkJob.class, true));
     addPluginJobs();
 
     printPluginJobs();

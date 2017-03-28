@@ -32,24 +32,14 @@ public class LoggerUtil {
    *
    * @return jobId
    */
-  public static String genJobId(FlowType flowType, long execId) {
-    return genJobId(flowType, execId, null);
-  }
-
-  /**
-   * 生成 jobId <p>
-   *
-   * @return jobId
-   */
-  public static String genJobId(FlowType flowType, long execId, Integer nodeId) {
+  public static String genJobId(String prefix, long execId, Integer nodeId) {
     if (nodeId == null) {
-      return flowType + SEPARATOR + execId;
+      return prefix + SEPARATOR + execId;
     }
-    return flowType + SEPARATOR + execId + SEPARATOR + nodeId;
+    return prefix + SEPARATOR + execId + SEPARATOR + nodeId;
   }
 
   public static void main(String[] args) {
-    System.out.println(genJobId(FlowType.SHORT, 123));
-    System.out.println(genJobId(FlowType.ADHOC, 123, 13));
+    System.out.println(genJobId("FLOW", 123, 13));
   }
 }

@@ -173,7 +173,7 @@ public class BaseConfig {
    * @return
    */
   public static String getHdfsWorkflowFilename(int projectId, String workflowName) {
-    return MessageFormat.format("{0}/{1}/workflows/{2}.{3}", hdfsDataBasePath, projectId, workflowName, ".zip");
+    return MessageFormat.format("{0}/{1}/workflows/{2}.{3}", hdfsDataBasePath, projectId, workflowName, "zip");
   }
 
   /**

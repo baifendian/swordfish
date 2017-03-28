@@ -473,4 +473,5 @@ public class HdfsClient implements Closeable {
     FsStatus ds = fileSystem.getStatus();
     return ds;
   }
+
 }

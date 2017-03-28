@@ -30,9 +30,12 @@ import org.apache.hadoop.hive.metastore.api.Table;
 import org.slf4j.Logger;
 
 import java.io.*;
+import java.nio.charset.Charset;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 public class UploadJob extends AbstractProcessJob {
   private UploadParam param;
@@ -121,7 +124,7 @@ public class UploadJob extends AbstractProcessJob {
     sb.append(tempTableName + ";\n");
 
     String tempSqlFile = getWorkingDirectory() + "/" + jobIdLog + ".hql";
-    FileUtils.writeStringToFile(new File(tempSqlFile), sb.toString());
+    FileUtils.writeStringToFile(new File(tempSqlFile), sb.toString(), Charset.forName("UTF-8"));
 
     // 创建 ProcessBuilder
     ProcessBuilder processBuilder = new ProcessBuilder();

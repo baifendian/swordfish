@@ -15,6 +15,7 @@
  */
 package com.baifendian.swordfish.dao.mapper;
 
+import com.baifendian.swordfish.dao.enums.FlowStatus;
 import com.baifendian.swordfish.dao.model.AdHocResult;
 
 import org.apache.ibatis.annotations.*;
@@ -43,40 +44,29 @@ public interface AdHocResultMapper {
   @UpdateProvider(type = AdHocResultMapperProvider.class, method = "update")
   int update(@Param("adHocResult") AdHocResult adHocResult);
 
+  @DeleteProvider(type = AdHocResultMapperProvider.class, method = "delete")
+  int delete(@Param("adHocId") Long adHocId);
+
   /**
-   * 查询即席查询的执行结果(通过 execId 和 nodeId) <p>
+   * 查询即席查询的执行结果(通过 adHocId ) <p>
    *
    * @return 执行结果
    */
-  @Results(value = {@Result(property = "execId", column = "exec_id", javaType = long.class, jdbcType = JdbcType.BIGINT),
-          @Result(property = "nodeId", column = "node_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
+  @Results(value = {
+          @Result(property = "execId", column = "exec_id", javaType = long.class, jdbcType = JdbcType.BIGINT),
           @Result(property = "index", column = "index", javaType = int.class, jdbcType = JdbcType.INTEGER),
-          @Result(property = "status", column = "status", typeHandler = EnumOrdinalTypeHandler.class, jdbcType = JdbcType.TINYINT),
+          @Result(property = "status", column = "status", typeHandler = EnumOrdinalTypeHandler.class, javaType = FlowStatus.class, jdbcType = JdbcType.TINYINT),
           @Result(property = "stm", column = "stm", javaType = String.class, jdbcType = JdbcType.VARCHAR),
           @Result(property = "result", column = "result", javaType = String.class, jdbcType = JdbcType.VARCHAR)})
-  @SelectProvider(type = AdHocResultMapperProvider.class, method = "selectByExecIdAndNodeId")
-  List<AdHocResult> selectByExecIdAndNodeId(@Param("execId") long execId, @Param("nodeId") int nodeId);
+  @SelectProvider(type = AdHocResultMapperProvider.class, method = "selectByAdHocId")
+  List<AdHocResult> selectByAdHocId(@Param("adHocId") long adHocId);
 
-  /**
-   * 查询即席查询的执行结果(通过 execId 和 flowId) <p>
-   *
-   * @return 执行结果
-   */
-  @Results(value = {@Result(property = "execId", column = "exec_id", javaType = long.class, jdbcType = JdbcType.BIGINT),
-          @Result(property = "nodeId", column = "node_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
+  @Results(value = {
+          @Result(property = "execId", column = "exec_id", javaType = long.class, jdbcType = JdbcType.BIGINT),
           @Result(property = "index", column = "index", javaType = int.class, jdbcType = JdbcType.INTEGER),
-          @Result(property = "status", column = "status", typeHandler = EnumOrdinalTypeHandler.class, jdbcType = JdbcType.TINYINT),
+          @Result(property = "status", column = "status", typeHandler = EnumOrdinalTypeHandler.class, javaType = FlowStatus.class, jdbcType = JdbcType.TINYINT),
           @Result(property = "stm", column = "stm", javaType = String.class, jdbcType = JdbcType.VARCHAR),
           @Result(property = "result", column = "result", javaType = String.class, jdbcType = JdbcType.VARCHAR)})
-  @SelectProvider(type = AdHocResultMapperProvider.class, method = "selectByExecIdAndFlowId")
-  List<AdHocResult> selectByExecIdAndFlowId(@Param("execId") long execId, @Param("flowId") int flowId);
-
-  @Results(value = {@Result(property = "execId", column = "exec_id", javaType = long.class, jdbcType = JdbcType.BIGINT),
-          @Result(property = "nodeId", column = "node_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
-          @Result(property = "index", column = "index", javaType = int.class, jdbcType = JdbcType.INTEGER),
-          @Result(property = "status", column = "status", typeHandler = EnumOrdinalTypeHandler.class, jdbcType = JdbcType.TINYINT),
-          @Result(property = "stm", column = "stm", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-          @Result(property = "result", column = "result", javaType = String.class, jdbcType = JdbcType.VARCHAR)})
-  @SelectProvider(type = AdHocResultMapperProvider.class, method = "selectByExecIdAndFlowIdAndIndex")
-  List<AdHocResult> selectByExecIdAndFlowIdAndIndex(@Param("execId") long execId, @Param("flowId") int flowId, @Param("index") int index);
+  @SelectProvider(type = AdHocResultMapperProvider.class, method = "selectByAdHocIdAndIndex")
+  List<AdHocResult> selectByAdHocIdAndIndex(@Param("adHocId") long adHocId, @Param("index") int index);
 }

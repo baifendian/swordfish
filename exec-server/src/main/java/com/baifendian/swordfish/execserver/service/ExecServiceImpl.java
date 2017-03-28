@@ -145,6 +145,7 @@ public class ExecServiceImpl implements Iface {
    */
   public void destory() {
     flowRunnerManager.destroy();
+    adHocRunnerManager.destory();
   }
 
   public RetInfo cancelExecFlow(long execId)  throws TException {

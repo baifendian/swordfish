@@ -15,7 +15,6 @@
  */
 package com.baifendian.swordfish.dao.mapper;
 
-import com.baifendian.swordfish.dao.enums.AdHocStatus;
 import com.baifendian.swordfish.dao.enums.FlowStatus;
 import com.baifendian.swordfish.dao.mapper.utils.EnumFieldUtil;
 
@@ -27,7 +26,7 @@ public class AdHocMapperProvider {
   /**
    * table name
    */
-  private static final String TABLE_NAME = "ad_hoc";
+  private static final String TABLE_NAME = "ad_hocs";
 
   /**
    * 生成插入语句 <p>
@@ -41,7 +40,7 @@ public class AdHocMapperProvider {
         VALUES("params", "#{adHoc.params}");
         VALUES("proxy_user", "#{adHoc.proxyUser}");
         VALUES("queue", "#{adHoc.queue}");
-        VALUES("status", EnumFieldUtil.genFieldStr("adHoc.status", AdHocStatus.class));
+        VALUES("status", EnumFieldUtil.genFieldStr("adHoc.status", FlowStatus.class));
         VALUES("create_time", "#{adHoc.createTime}");
         VALUES("owner", "#{adHoc.owner}");
       }
@@ -62,7 +61,7 @@ public class AdHocMapperProvider {
         SET("start_time = #{adHoc.startTime}");
         SET("end_time = #{adHoc.endTime}");
         SET("job_id = #{adHoc.jobId}");
-        SET("status = " + EnumFieldUtil.genFieldStr("adHoc.status", AdHocStatus.class));
+        SET("status = " + EnumFieldUtil.genFieldStr("adHoc.status", FlowStatus.class));
         WHERE("id = #{adHoc.id}");
       }
     }.toString();

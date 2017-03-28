@@ -44,6 +44,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
+import java.nio.charset.Charset;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -59,6 +60,8 @@ public class FlowRunner implements Runnable {
    * LOGGER
    */
   private final Logger LOGGER = LoggerFactory.getLogger(getClass());
+
+  private static final String JOB_PREFIX = "FLOW";
 
   /**
    * {@link FlowDao}
@@ -146,9 +149,6 @@ public class FlowRunner implements Runnable {
    */
   private boolean isSuccess = true;
 
-  /** ETL 生成 sql */
-  //---private final EtlAutoGen etlAutoGen = new EtlAutoGen();
-
   /**
    * 系统参数
    */
@@ -171,8 +171,6 @@ public class FlowRunner implements Runnable {
    */
   public FlowRunner(FlowRunnerContext context) {
     this.flowDao = DaoFactory.getDaoInstance(FlowDao.class);
-    //--this.projectDbHelp = DaoFactory.getDaoInstance(ProjectDbHelp.class);
-    //--this.tableDao = DaoFactory.getDaoInstance(TableDao.class);
     this.context = context;
     this.executionFlow = context.getExecutionFlow();
     this.executorService = context.getExecutorService();
@@ -208,6 +206,7 @@ public class FlowRunner implements Runnable {
       String workflowHdfsFile = BaseConfig.getHdfsWorkflowFilename(executionFlow.getProjectId(), executionFlow.getFlowName());
       HdfsClient hdfsClient = HdfsClient.getInstance();
       if (hdfsClient.exists(workflowHdfsFile)) {
+        LOGGER.debug("get hdfs workflow file:{}",workflowHdfsFile);
         HdfsUtil.GetFile(workflowHdfsFile, execLocalPath);
         // 资源文件解压缩处理 workflow下的文件为 workflowName.zip
         File zipFile = new File(execLocalPath, executionFlow.getFlowName() + ".zip");
@@ -218,11 +217,13 @@ public class FlowRunner implements Runnable {
           int ret = process.waitFor();
           if (ret != 0) {
             LOGGER.error("run cmd:" + cmd + " error");
-            LOGGER.error(IOUtils.toString(process.getErrorStream()));
+            LOGGER.error(IOUtils.toString(process.getErrorStream(), Charset.forName("UTF-8")));
           }
         } else {
           LOGGER.error("can't found workflow zip file:" + zipFile.getPath());
         }
+      } else {
+        LOGGER.debug("hdfs workflow file:{} not exists",workflowHdfsFile);
       }
 
       // 解析作业参数获取需要的项目级资源文件清单
@@ -373,7 +374,7 @@ public class FlowRunner implements Runnable {
       executionNode.setAttempt(0);
       executionNode.setStartTime(new Date());
       executionNode.setStatus(FlowStatus.INIT);
-      executionNode.setJobId(LoggerUtil.genJobId(executionFlow.getFlowType(), executionFlow.getId(), flowNode.getId()));
+      executionNode.setJobId(LoggerUtil.genJobId(JOB_PREFIX, executionFlow.getId(), flowNode.getId()));
 
       flowDao.insertExecutionNode(executionNode);
 
@@ -466,7 +467,7 @@ public class FlowRunner implements Runnable {
             executionNode.setAttempt(0);
             executionNode.setStartTime(new Date());
             executionNode.setStatus(FlowStatus.INIT);
-            executionNode.setJobId(LoggerUtil.genJobId(executionFlow.getFlowType(), executionFlow.getId(), nodeId));
+            executionNode.setJobId(LoggerUtil.genJobId(JOB_PREFIX, executionFlow.getId(), nodeId));
             flowDao.insertExecutionNode(executionNode);
             // 插入执行队列
             executionNodes.add(executionNode);
@@ -588,7 +589,7 @@ public class FlowRunner implements Runnable {
           retryExecutionNode.setAttempt(executionNode.getAttempt() + 1);
           retryExecutionNode.setStartTime(new Date());
           retryExecutionNode.setStatus(FlowStatus.INIT);
-          retryExecutionNode.setJobId(LoggerUtil.genJobId(executionFlow.getFlowType(), executionFlow.getId(), executionNode.getNodeId()));
+          retryExecutionNode.setJobId(LoggerUtil.genJobId(JOB_PREFIX, executionFlow.getId(), executionNode.getNodeId()));
           flowDao.insertExecutionNode(retryExecutionNode);
           executionNodes.add(retryExecutionNode);
 
@@ -641,7 +642,7 @@ public class FlowRunner implements Runnable {
           retryExecutionNode.setAttempt(executionNode.getAttempt() + 1);
           retryExecutionNode.setStartTime(new Date());
           retryExecutionNode.setStatus(FlowStatus.INIT);
-          retryExecutionNode.setJobId(LoggerUtil.genJobId(executionFlow.getFlowType(), executionFlow.getId(), executionNode.getNodeId()));
+          retryExecutionNode.setJobId(LoggerUtil.genJobId(JOB_PREFIX, executionFlow.getId(), executionNode.getNodeId()));
           flowDao.insertExecutionNode(retryExecutionNode);
           executionNodes.add(retryExecutionNode);
 

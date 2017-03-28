@@ -40,6 +40,10 @@ public class JobProps {
   private long execId;
 
   /**
+   * 即席查询时的adHocId
+   */
+  private long adHocId;
+  /**
    * 作业执行用户
    **/
   private String proxyUser;
@@ -147,5 +151,13 @@ public class JobProps {
 
   public void setQueue(String queue) {
     this.queue = queue;
+  }
+
+  public long getAdHocId() {
+    return adHocId;
+  }
+
+  public void setAdHocId(long adHocId) {
+    this.adHocId = adHocId;
   }
 }

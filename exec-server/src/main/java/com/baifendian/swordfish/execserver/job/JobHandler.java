@@ -32,6 +32,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.sql.Time;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.*;
@@ -77,7 +78,7 @@ public class JobHandler {
     this.systemParamMap = systemParamMap;
     this.customParamMap = customParamMap;
     this.startTime = System.currentTimeMillis();
-    this.jobIdLog = String.format("%s_%s_%d", executionNode.getJobId(), BFDDateUtils.now(DATETIME_FORMAT), executionNode.getId());
+    this.jobIdLog = String.format("%s_%d_%s", executionNode.getJobId(), executionNode.getId(), BFDDateUtils.now(DATETIME_FORMAT));
     // custom参数会覆盖system参数
     allParamMap = new HashMap<>();
     allParamMap.putAll(systemParamMap);
@@ -159,8 +160,16 @@ public class JobHandler {
       } catch (InterruptedException | ExecutionException e) {
         throw new ExecException("execute task get error", e);
       }
-    } else { // 长任务则不需要等待执行完成
-      isSuccess = true;
+    } else { // 长任务定时检查作业是否有报错，如果报错就返回
+      while(true){
+        try {
+          isSuccess = future.get(60, TimeUnit.SECONDS);
+        } catch (InterruptedException | ExecutionException e) {
+          throw new ExecException("execute task get error", e);
+        } catch (TimeoutException e) {
+
+        }
+      }
     }
 
     return isSuccess;

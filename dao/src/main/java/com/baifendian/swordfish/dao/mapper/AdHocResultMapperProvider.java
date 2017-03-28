@@ -40,8 +40,7 @@ public class AdHocResultMapperProvider {
     return new SQL() {
       {
         INSERT_INTO(TABLE_NAME);
-        VALUES("exec_id", "#{adHocResult.execId}");
-        VALUES("node_id", "#{adHocResult.nodeId}");
+        VALUES("ad_hoc_id", "#{adHocResult.adHocId}");
         VALUES("`index`", "#{adHocResult.index}");
         VALUES("stm", "#{adHocResult.stm}");
         VALUES("result", "#{adHocResult.result}");
@@ -62,25 +61,17 @@ public class AdHocResultMapperProvider {
         UPDATE(TABLE_NAME);
         SET("result = #{adHocResult.result}");
         SET("status = " + EnumFieldUtil.genFieldStr("adHocResult.status", FlowStatus.class));
-        WHERE("exec_id = #{adHocResult.execId}");
-        WHERE("node_id = #{adHocResult.nodeId}");
+        WHERE("ad_hoc_id = #{adHocResult.adHocId}");
         WHERE("`index` = #{adHocResult.index}");
       }
     }.toString();
   }
 
-  /**
-   * 生成查询语句 <p>
-   *
-   * @return sql语句
-   */
-  public String selectByExecIdAndNodeId(Map<String, Object> parameter) {
+  public String delete(Map<String, Object> parameter) {
     return new SQL() {
       {
-        SELECT("*");
-        FROM(TABLE_NAME);
-        WHERE("node_id = #{nodeId}");
-        WHERE("exec_id = #{execId}");
+        DELETE_FROM(TABLE_NAME);
+        WHERE("ad_hoc_id = #{adHocId}");
       }
     }.toString();
   }
@@ -90,47 +81,29 @@ public class AdHocResultMapperProvider {
    *
    * @return sql语句
    */
-  public String selectByExecIdAndFlowId(Map<String, Object> parameter) {
-//        new SQL() {
-//            {
-//                SELECT("ad_hoc_results.index, max(create_time) create_time");
-//                FROM(TABLE_NAME);
-//                LEFT_OUTER_JOIN("flows_nodes as fn ON ad_hoc_results.node_id = fn.id");
-//                WHERE("flow_id = #{flowId}");
-//                WHERE("exec_id = #{execId}");
-//                GROUP_BY("ad_hoc_results.index");
-//            }
-//        }.toString();
-
-    return "SELECT a.* " +
-            "FROM ad_hoc_results a, " +
-            "  (SELECT ad_hoc_results.index, " +
-            "          max(ad_hoc_results.create_time) create_time " +
-            "   FROM ad_hoc_results " +
-            "   LEFT OUTER JOIN flows_nodes AS fn ON ad_hoc_results.node_id = fn.id " +
-            "   WHERE (flow_id = #{flowId} " +
-            "          AND exec_id = #{execId}) " +
-            "   GROUP BY ad_hoc_results.index)b " +
-            "WHERE a.index = b.index " +
-            "  AND a.create_time = b.create_time " +
-            "ORDER BY a.index";
-  }
-
-  public String selectByExecIdAndFlowIdAndIndex(Map<String, Object> parameter) {
+  public String selectByAdHocId(Map<String, Object> parameter) {
     return new SQL() {
       {
-        SELECT("ad_hoc_results.*");
+        SELECT("*");
         FROM(TABLE_NAME);
-        LEFT_OUTER_JOIN("flows_nodes as fn ON ad_hoc_results.node_id = fn.id");
-        WHERE("flow_id = #{flowId}");
-        WHERE("exec_id = #{execId}");
-        WHERE("ad_hoc_results.index = #{index}");
-        ORDER_BY("create_time DESC limit 1 ");
+        WHERE("ad_hoc_id = #{adHocId}");
+        ORDER_BY("create_time DESC ");
+      }
+    }.toString();
+  }
+
+  public String selectByAdHocIdAndIndex(Map<String, Object> parameter) {
+    return new SQL() {
+      {
+        SELECT("*");
+        FROM(TABLE_NAME);
+        WHERE("ad_hoc_id = #{adHocId}");
+        WHERE("`index` = #{index}");
+        ORDER_BY("create_time DESC limit 1");
       }
     }.toString();
   }
 
   public static void main(String[] args) {
-    System.out.println(new AdHocResultMapperProvider().selectByExecIdAndFlowIdAndIndex(null));
   }
 }

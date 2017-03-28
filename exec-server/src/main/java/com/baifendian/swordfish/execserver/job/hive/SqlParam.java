@@ -42,6 +42,8 @@ public class SqlParam extends BaseParam {
 
   private List<UdfsInfo> udfs;
 
+  private boolean beContinue;
+
   @Override
   public boolean checkValid() {
     if (StringUtils.isEmpty(sql)) {
@@ -78,6 +80,14 @@ public class SqlParam extends BaseParam {
 
   public void setUdfs(List<UdfsInfo> udfs) {
     this.udfs = udfs;
+  }
+
+  public boolean isBeContinue() {
+    return beContinue;
+  }
+
+  public void setBeContinue(boolean beContinue) {
+    this.beContinue = beContinue;
   }
 
   @Override

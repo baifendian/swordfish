@@ -39,7 +39,6 @@ public class JDBCHandlerTest {
     thrown.expect(Exception.class);
     jdbcHandler.isConnectable();
     jdbcHandler = new JDBCHandler(DbType.ORACLE, paramStr);
-    thrown.expect(Exception.class);
     jdbcHandler.isConnectable();
   }
 }

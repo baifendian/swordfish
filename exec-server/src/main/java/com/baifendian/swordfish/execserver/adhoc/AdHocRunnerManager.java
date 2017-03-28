@@ -17,9 +17,10 @@ package com.baifendian.swordfish.execserver.adhoc;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
+import com.baifendian.swordfish.common.utils.BFDDateUtils;
 import com.baifendian.swordfish.dao.AdHocDao;
 import com.baifendian.swordfish.dao.DaoFactory;
-import com.baifendian.swordfish.dao.enums.AdHocStatus;
+import com.baifendian.swordfish.dao.enums.FlowStatus;
 import com.baifendian.swordfish.dao.model.AdHoc;
 import com.baifendian.swordfish.execserver.Constants;
 
@@ -49,13 +50,19 @@ public class AdHocRunnerManager {
   }
 
   public void submitAdHoc(AdHoc adHoc){
-    String jobId = "ADHOC_" + adHoc.getId();
+    String jobId = "ADHOC_" + adHoc.getId() + "_" + BFDDateUtils.now(Constants.DATETIME_FORMAT);
     adHoc.setStartTime(new Date());
-    adHoc.setStatus(AdHocStatus.INIT);
+    adHoc.setStatus(FlowStatus.INIT);
     adHoc.setJobId(jobId);
     adHocDao.updateAdHoc(adHoc);
 
     AdHocRunner adHocRunner = new AdHocRunner(adHoc, adHocDao);
     adHocExecutorService.submit(adHocRunner);
+  }
+
+  public void destory(){
+    if(!adHocExecutorService.isShutdown()){
+      adHocExecutorService.shutdownNow();
+    }
   }
 }

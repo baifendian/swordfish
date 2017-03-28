@@ -16,6 +16,7 @@
 package com.baifendian.swordfish.execserver;
 
 public class Constants {
+  public static final String DATETIME_FORMAT = "yyyyMMddHHmmss";
 
   public static final String EXECUTOR_PORT="executor.port";
 

@@ -42,6 +42,7 @@ public class MasterDao extends BaseDao {
     masterServer.setHost(host);
     masterServer.setPort(port);
     masterServer.setCreateTime(new Date());
+    masterServer.setModifyTime(new Date());
     return masterServerMapper.insert(masterServer);
   }
 

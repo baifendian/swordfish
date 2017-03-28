@@ -51,7 +51,7 @@ public class EmailManager {
   /**
    * 获取邮件任务
    */
-  private static final String CONTENT_FORMAT = "<b>{0}</b><hr/>项目：{1}<br/>工作流名称：{2}<br/>工作流类型：{3}<br/>调度时间：{4}<br/>执行结果：{5}<br/><br/><I>备注：详细执行情况见【运维中心】-【调度日志】</I>";
+  private static final String CONTENT_FORMAT = "<b>{0}</b><hr/>项目：{1}<br/>工作流名称：{2}<br/>调度时间：{3}<br/>执行结果：{4}<br/><br/><I>备注：详细执行情况见【运维中心】-【调度日志】</I>";
 
   /**
    * 邮件内容的结尾
@@ -78,7 +78,7 @@ public class EmailManager {
    */
   public static void sendEmail(ExecutionFlow executionFlow, Schedule schedule) {
     String title = genTitle(executionFlow.getType(), executionFlow.getStatus());
-    String content = genContent(executionFlow.getType(), executionFlow.getProjectName(), executionFlow.getFlowName(), executionFlow.getFlowType(),
+    String content = genContent(executionFlow.getType(), executionFlow.getProjectName(), executionFlow.getFlowName(),
             executionFlow.getScheduleTime(), executionFlow.getStatus());
     mailSendService.sendToFlowMails(executionFlow.getFlowId(), title, content, true, schedule);
   }
@@ -126,10 +126,9 @@ public class EmailManager {
    *
    * @return 内容
    */
-  public static String genContent(FlowRunType runType, String projectName, String flowName, FlowType flowType, Date scheduleDate, FlowStatus flowStatus) {
+  public static String genContent(FlowRunType runType, String projectName, String flowName, Date scheduleDate, FlowStatus flowStatus) {
     return MessageFormat.format(CONTENT_FORMAT, getRunTypeCnName(runType), projectName, flowName,
-            getFlowTypeCnName(flowType), BFDDateUtils.defaultFormat(scheduleDate),
-            getFlowStatusCnNameH5(flowStatus));
+            BFDDateUtils.defaultFormat(scheduleDate), getFlowStatusCnNameH5(flowStatus));
   }
 
   /**

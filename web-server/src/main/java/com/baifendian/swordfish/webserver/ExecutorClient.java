@@ -73,10 +73,10 @@ public class ExecutorClient {
     }
   }
 
-  public boolean scheduleExecFlow(int projectId, long execId, String flowType, long scheduleDate) {
+  public boolean scheduleExecFlow(long execId, long scheduleDate) {
     connect();
     try {
-      client.scheduleExecFlow(projectId, execId, flowType, scheduleDate);
+      client.scheduleExecFlow(execId, scheduleDate);
     } catch (TException e) {
       logger.error("report info error", e);
       return false;
@@ -95,10 +95,10 @@ public class ExecutorClient {
     }
   }
 
-  public boolean execFlow(int projectId, long execId, String flowType) throws TException {
+  public boolean execFlow(long execId) throws TException {
     boolean result = false;
     for (int i = 0; i < retries; i++) {
-      result = execFlowOne(projectId, execId, flowType);
+      result = execFlowOne(execId);
       if(result)
         break;
       try {
@@ -110,10 +110,10 @@ public class ExecutorClient {
     return result;
   }
 
-  public boolean execFlowOne(int projectId, long execId, String flowType) throws TException {
+  public boolean execFlowOne(long execId) throws TException {
     connect();
     try {
-      client.execFlow(projectId, execId, flowType);
+      client.execFlow(execId);
     } catch (TException e) {
       logger.error("exec flow error", e);
       throw e;

@@ -27,6 +27,6 @@ public class MongoDBHandlerTest {
   public void testIsConnectable() {
     String paramStr = "{ \"address\": \"mongodb://bgsbtsp0006-dqf:27017\", \"database\": \"test\" }\n";
     MongoDBHandler handler = new MongoDBHandler(DbType.MONOGODB, paramStr);
-    assertTrue(handler.isConnectable());
+    handler.isConnectable();
   }
 }

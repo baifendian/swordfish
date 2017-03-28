@@ -33,6 +33,7 @@ public class MasterServerMapperProvider {
       VALUES("host", "#{masterServer.host}");
       VALUES("port", "#{masterServer.port}");
       VALUES("create_time", "#{masterServer.createTime}");
+      VALUES("modify_time", "#{masterServer.modifyTime}");
     }}.toString();
   }
 

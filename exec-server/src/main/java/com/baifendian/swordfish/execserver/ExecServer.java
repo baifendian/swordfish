@@ -90,9 +90,9 @@ public class ExecServer {
    */
   public ExecServer() throws Exception {
     this.flowDao = DaoFactory.getDaoInstance(FlowDao.class);
-    this.flowRunnerManager = new FlowRunnerManager();
-
     Configuration conf = new PropertiesConfiguration("worker.properties");
+    this.flowRunnerManager = new FlowRunnerManager(conf);
+
     Server server = createJettyServer(conf);
     server.start();
   }

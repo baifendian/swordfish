@@ -40,7 +40,7 @@ public class MasterClient {
 
   private int port;
 
-  private int timeout = 3000;
+  private int timeout = 10000;
 
   private TTransport tTransport;
 
@@ -130,6 +130,40 @@ public class MasterClient {
       }
     } catch (TException e) {
       logger.error("set schedule error", e);
+      return false;
+    } finally {
+      close();
+    }
+    return true;
+  }
+
+  public boolean execAdHoc(long id) {
+    connect();
+    try {
+      RetInfo ret = client.execAdHoc(id);
+      if (ret.getStatus() != 0) {
+        logger.error("exec ad hoc error:{}", ret.getMsg());
+        return false;
+      }
+    } catch (TException e) {
+      logger.error("exec ad hoc error", e);
+      return false;
+    } finally {
+      close();
+    }
+    return true;
+  }
+
+  public boolean execFlow(long id) {
+    connect();
+    try {
+      RetInfo ret = client.execFlow(id);
+      if (ret.getStatus() != 0) {
+        logger.error("exec flow error:{}", ret.getMsg());
+        return false;
+      }
+    } catch (TException e) {
+      logger.error("exec flow error", e);
       return false;
     } finally {
       close();

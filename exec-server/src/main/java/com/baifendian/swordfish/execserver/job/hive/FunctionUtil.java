@@ -24,10 +24,12 @@ import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.hadoop.fs.Path;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -58,7 +60,7 @@ public class FunctionUtil {
     }
   }
 
-  public static List<String> createFuncs(List<UdfsInfo> udfsInfos, String jobIdLog, String workingDir) throws IOException, InterruptedException {
+  public static List<String> createFuncs(List<UdfsInfo> udfsInfos, String jobIdLog, String srcDir, boolean isHdfsFile) throws IOException, InterruptedException {
     List<String> funcList = new ArrayList<>();
     if (CollectionUtils.isNotEmpty(udfsInfos)) {
       Set<String> resources = getFuncResouces(udfsInfos);
@@ -68,7 +70,12 @@ public class FunctionUtil {
           throw new ExecException(JOB_HIVE_UDFJAR_BASEPATH + " not defined ");
         }
         String uploadPath = hiveUdfJarBasePath + "/" + jobIdLog;
-        uploadUdfJars(resources, uploadPath, workingDir);
+        // adHoc查询时直接通过复制hdfs上文件的方式来处理
+        if(isHdfsFile){
+          copyJars(resources, uploadPath, srcDir);
+        } else {
+          uploadUdfJars(resources, uploadPath, srcDir);
+        }
         addJarSql(funcList, resources, uploadPath);
       }
     }
@@ -91,22 +98,41 @@ public class FunctionUtil {
     return resources;
   }
 
-  private static void uploadUdfJars(Set<String> resources, String path, String workingDir) throws IOException, InterruptedException {
+  private static void uploadUdfJars(Set<String> resources, String tarDir, String srcDir) throws IOException, InterruptedException {
     HdfsClient hdfsClient = HdfsClient.getInstance();
-    if (!hdfsClient.exists(path)) {
-      hdfsClient.mkdir(path);
+    if (!hdfsClient.exists(tarDir)) {
+      hdfsClient.mkdir(tarDir);
     }
     for (String res : resources) {
-      String cmd = String.format("hdfs dfs -put %s/%s %s", workingDir, res, path);
-      logger.debug("cmd:%s", cmd);
+      String cmd = String.format("hdfs dfs -put %s/%s %s", srcDir, res, tarDir);
+      logger.debug("cmd:{}", cmd);
       Process process = Runtime.getRuntime().exec(cmd);
       int ret = process.waitFor();
       if (ret != 0) {
         logger.error("run cmd:" + cmd + " error");
-        String msg = IOUtils.toString(process.getErrorStream());
+        String msg = IOUtils.toString(process.getErrorStream(), Charset.forName("UTF-8"));
         logger.error(msg);
         throw new ExecException(msg);
       }
+    }
+  }
+
+  /**
+   * 复制资源文件到目标目录
+   * @param resources
+   * @param tarDir
+   * @param srcDir
+   * @throws IOException
+   * @throws InterruptedException
+   */
+  private static void copyJars(Set<String> resources, String tarDir, String srcDir) throws IOException, InterruptedException {
+    HdfsClient hdfsClient = HdfsClient.getInstance();
+    if (!hdfsClient.exists(tarDir)) {
+      hdfsClient.mkdir(tarDir);
+    }
+    for (String res : resources) {
+      logger.debug("create symlink {}/{} -> {}/{}", tarDir, res, srcDir, res);
+      hdfsClient.copy(String.format("%s/%s", srcDir, res), String.format("%s/%s", tarDir, res), false, false);
     }
   }
 

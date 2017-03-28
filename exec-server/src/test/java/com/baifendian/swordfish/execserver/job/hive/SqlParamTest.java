@@ -34,7 +34,7 @@ public class SqlParamTest {
 
   @Before
   public void before() {
-    String paramStr = "{\"sql\":\"select count(*) from bfd_test.test;\", \"udfs\":[{ \"func\": \"md4\", \"className\": \"com.baifendian.hive.udf.Md5\", \"libJar\": { \"scope\": \"project\", \"res\": \"udf.jar\" } }]}\n";
+    String paramStr = "{\"sql\":\"use bfd_test; use bfd;select count(*) from bfd_test.test;\",\"udfs\":[{\"func\":\"md5\",\"className\":\"com.baifendian.hive.udf.Md5\",\"libJar\":{\"scope\":\"project\",\"res\":\"udf.jar\",\"alias\":null,\"projectScope\":true,\"symbolicRes\":\"udf.jar\"}}],\"resourceFiles\":[\"udf.jar\"],\"beContinue\":true}\n";
     param = JsonUtil.parseObject(paramStr, SqlParam.class);
   }
 
@@ -43,5 +43,14 @@ public class SqlParamTest {
     List<String> resources = param.getResourceFiles();
     String result = "udf.jar";
     assertEquals(result, StringUtils.join(resources, ""));
+  }
+
+  @Test
+  public void testIsContinue() {
+    System.out.println(param.isBeContinue());
+    System.out.println(JsonUtil.toJsonString(param));
+    param.setBeContinue(true);
+    SqlParam param1 = JsonUtil.parseObject(JsonUtil.toJsonString(param), SqlParam.class);
+    System.out.println(param1.isBeContinue());
   }
 }

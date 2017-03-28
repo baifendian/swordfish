@@ -15,16 +15,18 @@
  */
 package com.baifendian.swordfish.dao.model;
 
-import com.baifendian.swordfish.dao.enums.AdHocStatus;
+import com.baifendian.swordfish.dao.enums.FlowStatus;
+import com.baifendian.swordfish.dao.enums.FlowStatus;
 
 import java.util.Date;
 
 public class AdHoc {
-  private int id;
+  private long id;
+  private int projectId;
   private String params;
   private String proxyUser;
   private String queue;
-  private AdHocStatus status;
+  private FlowStatus status;
   private Date createTime;
   private Date modifyTime;
   private int owner;
@@ -33,12 +35,20 @@ public class AdHoc {
   private Date endTime;
   private String jobId;
 
-  public int getId() {
+  public long getId() {
     return id;
   }
 
-  public void setId(int id) {
+  public void setId(long id) {
     this.id = id;
+  }
+
+  public int getProjectId() {
+    return projectId;
+  }
+
+  public void setProjectId(int projectId) {
+    this.projectId = projectId;
   }
 
   public String getParams() {
@@ -65,11 +75,11 @@ public class AdHoc {
     this.queue = queue;
   }
 
-  public AdHocStatus getStatus() {
+  public FlowStatus getStatus() {
     return status;
   }
 
-  public void setStatus(AdHocStatus status) {
+  public void setStatus(FlowStatus status) {
     this.status = status;
   }
 

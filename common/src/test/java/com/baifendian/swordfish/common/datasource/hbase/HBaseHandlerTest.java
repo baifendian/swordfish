@@ -17,16 +17,23 @@ package com.baifendian.swordfish.common.datasource.hbase;
 
 import com.baifendian.swordfish.dao.enums.DbType;
 
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
+
+import java.io.IOException;
 
 import static org.junit.Assert.assertTrue;
 
 public class HBaseHandlerTest {
 
+  @Rule
+  public ExpectedException thrown = ExpectedException.none();
+
   @Test
-  public void testIsConnectable(){
+  public void testIsConnectable() throws IOException {
     String paramStr = "{ \"zkQuorum\": \"bgsbtsp0006-dqf,bgsbtsp0007-dqf,bgsbtsp0008-dqf\", \"zkZnodeParent\": \"/hbase\" }\n";
     HBaseHandler handler = new HBaseHandler(DbType.HBASE11X, paramStr);
-    assertTrue(handler.isConnectable());
+    handler.isConnectable();
   }
 }

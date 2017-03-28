@@ -15,6 +15,7 @@
  */
 package com.baifendian.swordfish.dao.mapper;
 
+import com.baifendian.swordfish.dao.enums.FlowStatus;
 import com.baifendian.swordfish.dao.model.ExecutionNode;
 
 import org.apache.ibatis.annotations.*;
@@ -57,7 +58,7 @@ public interface ExecutionNodeMapper {
           @Result(property = "flowId", column = "flow_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
           @Result(property = "nodeId", column = "node_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
           @Result(property = "appsId", column = "apps_id", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-          @Result(property = "status", column = "status", typeHandler = EnumOrdinalTypeHandler.class, jdbcType = JdbcType.TINYINT),
+          @Result(property = "status", column = "status", typeHandler = EnumOrdinalTypeHandler.class, javaType = FlowStatus.class, jdbcType = JdbcType.TINYINT),
           @Result(property = "startTime", column = "start_time", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP),
           @Result(property = "endTime", column = "end_time", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP),
           @Result(property = "attempt", column = "attempt", javaType = int.class, jdbcType = JdbcType.TINYINT),
@@ -76,7 +77,7 @@ public interface ExecutionNodeMapper {
           @Result(property = "flowId", column = "flow_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
           @Result(property = "nodeId", column = "node_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
           @Result(property = "appsId", column = "apps_id", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-          @Result(property = "status", column = "status", typeHandler = EnumOrdinalTypeHandler.class, jdbcType = JdbcType.TINYINT),
+          @Result(property = "status", column = "status", typeHandler = EnumOrdinalTypeHandler.class, javaType = FlowStatus.class, jdbcType = JdbcType.TINYINT),
           @Result(property = "attempt", column = "attempt", javaType = int.class, jdbcType = JdbcType.TINYINT)
   })
   @SelectProvider(type = ExecutionNodeMapperProvider.class, method = "selectExecNodeLastAttempt")
@@ -92,7 +93,7 @@ public interface ExecutionNodeMapper {
           @Result(property = "flowId", column = "flow_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
           @Result(property = "nodeId", column = "node_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
           @Result(property = "appsId", column = "apps_id", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-          @Result(property = "status", column = "status", typeHandler = EnumOrdinalTypeHandler.class, jdbcType = JdbcType.TINYINT),
+          @Result(property = "status", column = "status", typeHandler = EnumOrdinalTypeHandler.class, javaType = FlowStatus.class, jdbcType = JdbcType.TINYINT),
           @Result(property = "startTime", column = "start_time", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP),
           @Result(property = "endTime", column = "end_time", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP),
           @Result(property = "attempt", column = "attempt", javaType = int.class, jdbcType = JdbcType.TINYINT),
@@ -107,7 +108,7 @@ public interface ExecutionNodeMapper {
    */
   @Results(value = {@Result(property = "flowId", column = "flow_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
           @Result(property = "nodeId", column = "node_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
-          @Result(property = "status", column = "status", typeHandler = EnumOrdinalTypeHandler.class, jdbcType = JdbcType.TINYINT),
+          @Result(property = "status", column = "status", typeHandler = EnumOrdinalTypeHandler.class, javaType = FlowStatus.class, jdbcType = JdbcType.TINYINT),
           @Result(property = "attempt", column = "attempt", javaType = int.class, jdbcType = JdbcType.TINYINT),})
   @SelectProvider(type = ExecutionNodeMapperProvider.class, method = "selectStatusByFlowId")
   List<ExecutionNode> selectExecNodesStatus(@Param("execId") Long execId, @Param("flowId") int flowId);

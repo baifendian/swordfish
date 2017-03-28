@@ -131,6 +131,15 @@ public class ExecThriftServer {
     serverThread.setDaemon(true);
     serverThread.start();
 
+    Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
+      @Override
+      public void run() {
+        executorService.shutdownNow();
+        workerService.destory();
+        server.stop();
+      }
+    }));
+
     synchronized (syncObject) {
       while (running.get()) {
         try {
@@ -140,7 +149,8 @@ public class ExecThriftServer {
           logger.error("error", e);
         }
       }
-      executorService.shutdown();
+      executorService.shutdownNow();
+      workerService.destory();
       server.stop();
       logger.info("exec server stop");
     }

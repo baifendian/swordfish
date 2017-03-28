@@ -50,7 +50,9 @@ public interface AdHocMapper {
   int update(@Param("adHoc") AdHoc adHoc);
 
   @SelectProvider(type = AdHocMapperProvider.class, method = "selectById")
-  @Results(value = {@Result(property = "id", column = "id", id = true, javaType = Long.class, jdbcType = JdbcType.BIGINT),
+  @Results(value = {
+          @Result(property = "id", column = "id", id = true, javaType = Long.class, jdbcType = JdbcType.BIGINT),
+          @Result(property = "projectId", column = "project_id", id = true, javaType = int.class, jdbcType = JdbcType.INTEGER),
           @Result(property = "params", column = "params", javaType = String.class, jdbcType = JdbcType.VARCHAR),
           @Result(property = "proxyUser", column = "proxy_user", javaType = String.class, jdbcType = JdbcType.VARCHAR),
           @Result(property = "queue", column = "queue", javaType = String.class, jdbcType = JdbcType.VARCHAR),

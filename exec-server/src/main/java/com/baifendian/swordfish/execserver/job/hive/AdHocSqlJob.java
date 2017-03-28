@@ -15,19 +15,22 @@
  */
 package com.baifendian.swordfish.execserver.job.hive;
 
+import com.baifendian.swordfish.common.config.BaseConfig;
 import com.baifendian.swordfish.common.job.ExecResult;
 import com.baifendian.swordfish.common.job.JobProps;
 import com.baifendian.swordfish.common.utils.CommonUtil;
+import com.baifendian.swordfish.dao.enums.FlowStatus;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
 import com.baifendian.swordfish.dao.datasource.ConnectionFactory;
 import com.baifendian.swordfish.dao.mapper.AdHocResultMapper;
 import com.baifendian.swordfish.dao.model.AdHocJsonObject;
 import com.baifendian.swordfish.dao.model.AdHocResult;
-import com.baifendian.swordfish.execserver.parameter.ParamHelper;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 
 import java.io.IOException;
+import java.sql.Timestamp;
 import java.util.List;
 
 /**
@@ -44,18 +47,20 @@ public class AdHocSqlJob extends EtlSqlJob {
 
   @Override
   public void process() throws Exception {
+    logger.debug("{}", props.getJobParams());
+    logger.debug("is continue:{}", param.isBeContinue());
     String sqls = param.getSql();
     // 不支持参数替换
     //sqls = ParamHelper.resolvePlaceholders(sqls, definedParamMap);
-    List<String> funcs = FunctionUtil.createFuncs(param.getUdfs(), jobIdLog, getWorkingDirectory());
+    List<String> funcs = FunctionUtil.createFuncs(param.getUdfs(), jobIdLog, BaseConfig.getHdfsResourcesDir(props.getProjectId()) , true);
     List<String> execSqls = CommonUtil.sqlSplit(sqls);
+    logger.info("exec sql:{}, funcs:{}", sqls, funcs);
     /** 查询结果写入数据库 */
     ResultCallback resultCallback = new ResultCallback() {
       @Override
       public void handleResult(ExecResult execResult) {
         AdHocResult adHocResult = new AdHocResult();
-        adHocResult.setExecId(props.getExecId());
-        adHocResult.setNodeId(props.getNodeId());
+        adHocResult.setAdHocId(props.getAdHocId());
         adHocResult.setStm(execResult.getStm());
         adHocResult.setIndex(execResult.getIndex());
         adHocResult.setStatus(execResult.getStatus());
@@ -67,8 +72,26 @@ public class AdHocSqlJob extends EtlSqlJob {
         adHocResultMapper.update(adHocResult); // 更新结果到数据库中
       }
     };
-    HiveSqlExec hiveSqlExec = new HiveSqlExec(funcs, execSqls, getProxyUser(), null, false, resultCallback, null, logger);
+    HiveSqlExec hiveSqlExec = new HiveSqlExec(funcs, execSqls, getProxyUser(), null, param.isBeContinue(), resultCallback, null, logger);
+    initAdHocResult(execSqls);
     hiveSqlExec.run();
     results = hiveSqlExec.getResults();
   }
+
+  private void initAdHocResult(List<String> execSqls){
+    if(CollectionUtils.isNotEmpty(execSqls)){
+      adHocResultMapper.delete(props.getAdHocId());
+      int index=0;
+      for(String stm: execSqls){
+        AdHocResult adHocResult = new AdHocResult();
+        adHocResult.setAdHocId(props.getAdHocId());
+        adHocResult.setStm(stm);
+        adHocResult.setIndex(index++);
+        adHocResult.setStatus(FlowStatus.INIT);
+        adHocResult.setCreateTime(new Timestamp(System.currentTimeMillis()));
+        adHocResultMapper.insert(adHocResult);
+      }
+    }
+  }
+
 }

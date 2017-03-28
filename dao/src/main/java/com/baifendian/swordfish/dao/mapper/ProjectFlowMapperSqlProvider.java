@@ -43,7 +43,6 @@ public class ProjectFlowMapperSqlProvider {
       {
         INSERT_INTO(TABLE_NAME);
         VALUES("name", "#{flow.name}");
-        VALUES("type", EnumFieldUtil.genFieldStr("flow.type", FlowType.class));
         VALUES("project_id", "#{flow.projectId}");
         VALUES("owner_id", "#{flow.ownerId}");
         VALUES("modify_time", "#{flow.modifyTime}");

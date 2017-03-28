@@ -44,19 +44,17 @@ public class EtlSqlJob extends AbstractJob {
   @Override
   public void initJobParams() {
     this.param = JsonUtil.parseObject(props.getJobParams(), SqlParam.class);
-    String value = param.getSql();
-    value = ParamHelper.resolvePlaceholders(value, props.getDefinedParams());
-    param.setSql(value);
   }
 
   @Override
   public void process() throws Exception {
     String sqls = param.getSql();
     sqls = ParamHelper.resolvePlaceholders(sqls, definedParamMap);
-    List<String> funcs = FunctionUtil.createFuncs(param.getUdfs(), jobIdLog, getWorkingDirectory());
+    List<String> funcs = FunctionUtil.createFuncs(param.getUdfs(), jobIdLog, getWorkingDirectory(), false);
     logger.info("exec sql:{}, funcs:{}", sqls, funcs);
     List<String> execSqls = CommonUtil.sqlSplit(sqls);
-    HiveSqlExec hiveSqlExec = new HiveSqlExec(funcs, execSqls, getProxyUser(), null, false, null, null, logger);
+    param.setBeContinue(false);
+    HiveSqlExec hiveSqlExec = new HiveSqlExec(funcs, execSqls, getProxyUser(), null, param.isBeContinue(), null, null, logger);
     hiveSqlExec.run();
     results = hiveSqlExec.getResults();
   }

@@ -93,7 +93,6 @@ public class FlowExecManager {
               // 插入 ExecutionFlow
               ExecutionFlow executionFlow = flowDao.scheduleFlowToExecution(flow.getProjectId(), flow.getId(), flow.getOwnerId(), scheduleDate, FlowRunType.ADD_DATA);
               executionFlow.setProjectId(flow.getProjectId());
-              executionFlow.setFlowType(flow.getType());
 
               // 发送请求到 executor server 中执行
               executionFlowBlockingQueue.add(executionFlow);

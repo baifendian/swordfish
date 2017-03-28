@@ -18,17 +18,14 @@ package com.baifendian.swordfish.execserver.adhoc;
 import com.baifendian.swordfish.common.job.JobProps;
 import com.baifendian.swordfish.common.job.logger.JobLogger;
 import com.baifendian.swordfish.dao.AdHocDao;
-import com.baifendian.swordfish.dao.enums.AdHocStatus;
+import com.baifendian.swordfish.dao.enums.FlowStatus;
 import com.baifendian.swordfish.dao.model.AdHoc;
 import com.baifendian.swordfish.execserver.job.hive.AdHocSqlJob;
-import com.baifendian.swordfish.execserver.parameter.CustomParamManager;
-import com.baifendian.swordfish.execserver.parameter.SystemParamManager;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Date;
-import java.util.Map;
 
 public class AdHocRunner implements Runnable {
 
@@ -49,22 +46,25 @@ public class AdHocRunner implements Runnable {
     props.setJobParams(adHoc.getParams());
     props.setProxyUser(adHoc.getProxyUser());
     props.setQueue(adHoc.getQueue());
+    props.setProjectId(adHoc.getProjectId());
+    props.setAdHocId(adHoc.getId());
 
     Logger jobLogger = new JobLogger(adHoc.getJobId(), logger);
     AdHocSqlJob job = null;
-    AdHocStatus status = AdHocStatus.SUCCESS;
+    FlowStatus status = FlowStatus.SUCCESS;
     try {
-      adHoc.setStatus(AdHocStatus.RUNNING);
+      adHoc.setStatus(FlowStatus.RUNNING);
       adHocDao.updateAdHoc(adHoc);
       job = new AdHocSqlJob(adHoc.getJobId(), props, jobLogger);
       job.before();
       job.process();
     } catch (Exception e) {
       logger.debug("run adHoc job error", e);
-      status = AdHocStatus.FAILED;
+      status = FlowStatus.FAILED;
     } finally {
       try {
-        job.after();
+        if(job != null)
+          job.after();
       } catch (Exception e) {
         e.printStackTrace();
       }

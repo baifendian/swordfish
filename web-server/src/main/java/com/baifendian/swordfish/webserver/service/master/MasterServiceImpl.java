@@ -176,6 +176,7 @@ public class MasterServiceImpl implements Iface {
 
   @Override
   public RetInfo execAdHoc(long adHocId) {
+    LOGGER.debug("receive exec ad hoc request, id:{}", adHocId);
     AdHoc adHoc = adHocDao.getAdHoc(adHocId);
     if (adHoc == null) {
       LOGGER.error("adhoc id {} not exists", adHocId);
