@@ -108,7 +108,6 @@ CREATE TABLE `project_flows` (
   `user_defined_params` text DEFAULT NULL COMMENT 'user defined params of the project_flows.',
   `extras` text DEFAULT NULL COMMENT 'extends of the project_flows',
   `queue` varchar(64) DEFAULT NULL COMMENT 'queue of the project_flows',
-
   PRIMARY KEY (`id`),
   UNIQUE KEY `project_flowname` (`project_id`, `name`),
   FOREIGN KEY (`project_id`) REFERENCES `project`(`id`) ON DELETE CASCADE,
@@ -132,6 +131,40 @@ CREATE TABLE `flows_nodes` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `flows_nodename` (`flow_id`, `name`),
   FOREIGN KEY (`flow_id`) REFERENCES `project_flows`(`id`) ON DELETE CASCADE,
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- `ad_hocs` table
+DROP TABLE If Exists `ad_hocs`;
+CREATE TABLE `ad_hocs` (
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'exec id of ad hoc query',
+  `project_id` int(11) NOT NULL COMMENT 'project id of the ad hoc',
+  `owner` int(11) NOT NULL COMMENT 'owner id of the ad hoc',
+  `stms` text NOT NULL COMMENT 'statements of this ad hoc query',
+  `number` int(11) NOT NULL COMMENT 'results number of this ad hoc query',
+  `proxy_user` varchar(30) NOT NULL COMMENT 'proxy user name',
+  `queue` varchar(40) NOT NULL COMMENT 'queue name',
+  `status` tinyint(4) NOT NULL COMMENT 'status, refer https://github.com/baifendian/swordfish/wiki/workflow-exec%26maintain',
+  `create_time` datetime NOT NULL COMMENT 'create time of the ad hoc query',
+  `start_time` datetime DEFAULT NULL COMMENT 'start time of this exec',
+  `end_time` datetime DEFAULT NULL COMMENT 'end time of this exec',
+  `job_id` varchar(64) DEFAULT NULL COMMENT 'job id of this exec',
+  PRIMARY KEY (`id`),
+  FOREIGN KEY (`project_id`) REFERENCES `project`(`id`) ON DELETE CASCADE,
+  FOREIGN KEY (`owner`) REFERENCES `user`(`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- `ad_hoc_results` table
+DROP TABLE If Exists `ad_hoc_results`;
+CREATE TABLE `ad_hoc_results` (
+  `exec_id` int(11) NOT NULL COMMENT 'exec id of ad hoc query',
+  `index` int(11) NOT NULL COMMENT 'index of the stm',
+  `stm` text NOT NULL COMMENT 'sql clause',
+  `result` text DEFAULT NULL COMMENT 'result of this exec',
+  `status` tinyint(4) NOT NULL COMMENT 'status of this exec',
+  `create_time` datetime NOT NULL COMMENT 'create time of the records',
+  `start_time` datetime DEFAULT NULL COMMENT 'start time of this exec',
+  `end_time` datetime DEFAULT NULL COMMENT 'end time of this exec',
+  PRIMARY KEY (`exec_id`,`index`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- `master_server` table
