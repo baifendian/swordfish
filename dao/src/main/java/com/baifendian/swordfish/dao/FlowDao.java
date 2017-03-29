@@ -83,14 +83,14 @@ public class FlowDao extends BaseDao {
    * 获取所有未完成的 flow 列表 <p>
    */
   public List<ExecutionFlow> queryAllNoFinishFlow() {
-    return executionFlowMapper.selectNoFinishFlow();
+    return executionFlowMapper.selectAllNoFinishFlow();
   }
 
   /**
-   * 获取execserver正在运行的workflow
+   * 获取execserver没有运行完成的workflow
    */
-  public List<ExecutionFlow> queryRunningFlow(String worker) {
-    return executionFlowMapper.selectRunningFlow(worker);
+  public List<ExecutionFlow> queryNoFinishFlow(String worker) {
+    return executionFlowMapper.selectNoFinishFlow(worker);
   }
 
   /**
@@ -193,7 +193,8 @@ public class FlowDao extends BaseDao {
    *
    * @return {@link ExecutionFlow}
    */
-  public ExecutionFlow scheduleFlowToExecution(Integer projectId, Integer workflowId, int submitUser, Date scheduleTime, FlowRunType runType) {
+  public ExecutionFlow scheduleFlowToExecution(Integer projectId, Integer workflowId, int submitUser, Date scheduleTime, FlowRunType runType,
+                                               int maxTryTimes, int timeout) {
     List<FlowNodeRelation> flowNodeRelations = flowNodeRelationMapper.selectByFlowId(workflowId); // 边信息
     List<FlowNode> flowNodes = flowNodeMapper.selectByFlowId(workflowId); // 节点信息
     ProjectFlow projectFlow = projectFlowMapper.findById(workflowId);
@@ -211,6 +212,8 @@ public class FlowDao extends BaseDao {
     executionFlow.setType(runType);
     executionFlow.setStatus(FlowStatus.INIT);
     executionFlow.setWorkflowData(JsonUtil.toJsonString(flowDag));
+    executionFlow.setMaxTryTimes(maxTryTimes);
+    executionFlow.setTimeout(timeout);
 
     executionFlowMapper.insertAndGetId(executionFlow); // 插入执行信息
 

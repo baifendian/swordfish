@@ -22,6 +22,7 @@ import com.baifendian.swordfish.dao.enums.FlowRunType;
 import com.baifendian.swordfish.dao.model.ExecutionFlow;
 import com.baifendian.swordfish.dao.model.ProjectFlow;
 import com.baifendian.swordfish.common.mail.EmailManager;
+import com.baifendian.swordfish.dao.model.Schedule;
 
 import org.apache.commons.lang.time.DateUtils;
 import org.quartz.CronExpression;
@@ -51,7 +52,7 @@ public class FlowExecManager {
   /**
    * execution flow queue
    **/
-  private final BlockingQueue<ExecutionFlow> executionFlowBlockingQueue;
+  private final BlockingQueue<ExecFlowInfo> executionFlowBlockingQueue;
 
   /**
    * {@link FlowDao}
@@ -67,7 +68,7 @@ public class FlowExecManager {
    * @param executionFlowBlockingQueue
    * @param flowDao
    */
-  public FlowExecManager(BlockingQueue<ExecutionFlow> executionFlowBlockingQueue, FlowDao flowDao) {
+  public FlowExecManager(BlockingQueue<ExecFlowInfo> executionFlowBlockingQueue, FlowDao flowDao) {
     this.executionFlowBlockingQueue = executionFlowBlockingQueue;
     this.flowDao = flowDao;
 
@@ -91,11 +92,21 @@ public class FlowExecManager {
             Boolean execStatus = null;
             if (!isFailed) {
               // 插入 ExecutionFlow
-              ExecutionFlow executionFlow = flowDao.scheduleFlowToExecution(flow.getProjectId(), flow.getId(), flow.getOwnerId(), scheduleDate, FlowRunType.ADD_DATA);
+              Schedule schedule = flowDao.querySchedule(flow.getId());
+              int maxTryTimes = 3;
+              int timeout = 10 * 3600;
+              if(schedule != null){
+                maxTryTimes = schedule.getMaxTryTimes();
+                timeout = schedule.getTimeout();
+              }
+              ExecutionFlow executionFlow = flowDao.scheduleFlowToExecution(flow.getProjectId(), flow.getId(),
+                      flow.getOwnerId(), scheduleDate, FlowRunType.ADD_DATA, maxTryTimes, timeout);
               executionFlow.setProjectId(flow.getProjectId());
+              ExecFlowInfo execFlowInfo = new ExecFlowInfo();
+              execFlowInfo.setExecId(executionFlow.getId());
 
               // 发送请求到 executor server 中执行
-              executionFlowBlockingQueue.add(executionFlow);
+              executionFlowBlockingQueue.add(execFlowInfo);
 
               // 如果当前任务补数据任务失败，后续任务不再执行
               execStatus = checkExecStatus(executionFlow.getId());

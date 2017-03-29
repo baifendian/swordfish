@@ -72,6 +72,8 @@ public class ExecutionFlowMapperProvider {
         VALUES("workflow_data", "#{executionFlow.workflowData}");
         VALUES("type", EnumFieldUtil.genFieldStr("executionFlow.type", FlowRunType.class));
         VALUES("error_code", EnumFieldUtil.genFieldStr("executionFlow.errorCode", FlowErrorCode.class));
+        VALUES("max_try_times", "#{executionFlow.maxTryTimes}");
+        VALUES("timeout", "#{executionFlow.timeout}");
       }
     }.toString();
   }
@@ -94,6 +96,12 @@ public class ExecutionFlowMapperProvider {
         }
         if (executionFlow.getWorker() != null) {
           SET("worker = #{executionFlow.worker}");
+        }
+        if (executionFlow.getMaxTryTimes() != null) {
+          SET("max_try_times = #{executionFlow.maxTryTimes}");
+        }
+        if (executionFlow.getTimeout() != null) {
+          SET("timeout = #{executionFlow.timeout}");
         }
         WHERE("id = #{executionFlow.id}");
       }
@@ -151,7 +159,7 @@ public class ExecutionFlowMapperProvider {
     return sb.toString();
   }
 
-  public String selectNoFinishFlow() {
+  public String selectAllNoFinishFlow() {
     return new SQL() {
       {
         SELECT("id, flow_id, worker, status ");
@@ -161,12 +169,12 @@ public class ExecutionFlowMapperProvider {
     }.toString();
   }
 
-  public String selectRunningFlow(String worker) {
+  public String selectNoFinishFlow(Map<String, Object> paramter) {
     return new SQL() {
       {
-        SELECT("id, flow_id, worker, status ");
+        SELECT("id, flow_id, worker ");
         FROM(TABLE_NAME);
-        WHERE("status =" + FlowStatus.RUNNING.getType());
+        WHERE("status <=" + FlowStatus.RUNNING.getType());
         WHERE("worker = #{worker}");
       }
     }.toString();

@@ -16,6 +16,7 @@
 package com.baifendian.swordfish.webserver.service.master;
 
 import com.baifendian.swordfish.dao.AdHocDao;
+import com.baifendian.swordfish.dao.enums.FlowRunType;
 import com.baifendian.swordfish.dao.model.AdHoc;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
 import com.baifendian.swordfish.dao.DaoFactory;
@@ -73,7 +74,7 @@ public class MasterServiceImpl implements Iface {
   /**
    * workflow 执行队列
    */
-  private final BlockingQueue<ExecutionFlow> executionFlowQueue;
+  private final BlockingQueue<ExecFlowInfo> executionFlowQueue;
 
   /**
    * {@link Submit2ExecutorServerThread}
@@ -151,8 +152,9 @@ public class MasterServiceImpl implements Iface {
         } else {
           // 没有worker信息，提交到executionFlowQueue队列
           LOGGER.info("no worker info, add execution flow[execId:{}] to queue", executionFlow.getId());
-          ExecutionFlow execFlow = flowDao.queryExecutionFlow(executionFlow.getId());
-          executionFlowQueue.add(execFlow);
+          ExecFlowInfo execFlowInfo = new ExecFlowInfo();
+          execFlowInfo.setExecId(executionFlow.getId());
+          executionFlowQueue.add(execFlowInfo);
         }
       }
       executorServerManager.initServers(executorServerInfoMap);
@@ -168,8 +170,10 @@ public class MasterServiceImpl implements Iface {
       return ResultHelper.createErrorResult("execId is not exists");
     }
     flowDao.updateExecutionFlowStatus(execId, FlowStatus.INIT);
+    ExecFlowInfo execFlowInfo = new ExecFlowInfo();
+    execFlowInfo.setExecId(executionFlow.getId());
 
-    executionFlowQueue.add(executionFlow);
+    executionFlowQueue.add(execFlowInfo);
 
     return ResultHelper.SUCCESS;
   }

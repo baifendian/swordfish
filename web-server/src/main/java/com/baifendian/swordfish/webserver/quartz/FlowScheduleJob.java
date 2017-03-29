@@ -24,6 +24,7 @@ import com.baifendian.swordfish.dao.model.ProjectFlow;
 import com.baifendian.swordfish.dao.model.Schedule;
 import com.baifendian.swordfish.dao.model.flow.DepWorkflow;
 import com.baifendian.swordfish.common.mail.EmailManager;
+import com.baifendian.swordfish.webserver.service.master.ExecFlowInfo;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.BooleanUtils;
@@ -81,7 +82,7 @@ public class FlowScheduleJob implements Job {
   /**
    * worker rpc client
    */
-  private static BlockingQueue<ExecutionFlow> executionFlowQueue;
+  private static BlockingQueue<ExecFlowInfo> executionFlowQueue;
 
   /**
    * {@link FlowDao}
@@ -96,7 +97,7 @@ public class FlowScheduleJob implements Job {
   /**
    * 初始化 Job （使用该调度 Job 前，必须先调用该函数初始化） <p>
    */
-  public static void init(BlockingQueue<ExecutionFlow> executionFlowQueue, FlowDao flowDao) {
+  public static void init(BlockingQueue<ExecFlowInfo> executionFlowQueue, FlowDao flowDao) {
     FlowScheduleJob.executionFlowQueue = executionFlowQueue;
     FlowScheduleJob.flowDao = flowDao;
   }
@@ -132,7 +133,8 @@ public class FlowScheduleJob implements Job {
     }
 
     // 插入 ExecutionFlow
-    ExecutionFlow executionFlow = flowDao.scheduleFlowToExecution(projectId, flowId, flow.getOwnerId(), scheduledFireTime, FlowRunType.DISPATCH);
+    ExecutionFlow executionFlow = flowDao.scheduleFlowToExecution(projectId, flowId, flow.getOwnerId(), scheduledFireTime,
+            FlowRunType.DISPATCH, schedule.getMaxTryTimes(), schedule.getTimeout());
     executionFlow.setProjectId(projectId);
 
     // 自动依赖上一调度周期才能结束
@@ -420,7 +422,9 @@ public class FlowScheduleJob implements Job {
    * 发送执行任务到 worker <p>
    */
   private void sendToExecution(ExecutionFlow executionFlow, Date scheduleDate) {
-    executionFlowQueue.add(executionFlow);
+    ExecFlowInfo execFlowInfo = new ExecFlowInfo();
+    execFlowInfo.setExecId(executionFlow.getId());
+    executionFlowQueue.add(execFlowInfo);
   }
 
   /**

@@ -119,15 +119,16 @@ public class FlowRunnerManager {
    */
   public void submitFlow(ExecutionFlow executionFlow) {
     // 系统参数
-    Date scheduleDate = new Date();
+    Date scheduleDate = executionFlow.getScheduleTime();
     Date addDate = new Date();
     Map<String, String> systemParamMap = SystemParamManager.buildSystemParam(executionFlow, scheduleDate, addDate);
 
-    // 自定义参数
+    // 自定义参数ex
     String cycTimeStr = systemParamMap.get(SystemParamManager.CYC_TIME);
     Map<String, String> customParamMap = CustomParamManager.buildCustomParam(executionFlow, cycTimeStr);
 
-    int maxTryTimes = defaultMaxTryTimes;
+    int maxTryTimes = executionFlow.getMaxTryTimes() != null ? executionFlow.getMaxTryTimes() : defaultMaxTryTimes;
+    int timeout = executionFlow.getTimeout() != null ? executionFlow.getTimeout() : defaultMaxTimeout;
 
     // 构造 flow runner
     FlowRunnerContext context = new FlowRunnerContext();
@@ -136,7 +137,7 @@ public class FlowRunnerManager {
     context.setExecutorService(nodeExecutorService);
     context.setJobExecutorService(jobExecutorService);
     context.setMaxTryTimes(maxTryTimes);
-    context.setTimeout(defaultMaxTimeout);
+    context.setTimeout(timeout);
     context.setFailurePolicyType(defaultFailurePolicyType);
     context.setSystemParamMap(systemParamMap);
     context.setCustomParamMap(customParamMap);
@@ -222,6 +223,17 @@ public class FlowRunnerManager {
     }
 
     flowRunner.kill(user);
+    runningFlows.remove(execId);
+  }
+
+  public void cancelFlow(long execId) {
+    FlowRunner flowRunner = runningFlows.get(execId);
+
+    if (flowRunner == null) {
+      throw new ExecException("Execution " + execId + "is not running");
+    }
+
+    flowRunner.kill();
     runningFlows.remove(execId);
   }
 

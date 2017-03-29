@@ -57,7 +57,7 @@ public enum FlowStatus {
   }
 
   public boolean typeIsFailure() {
-    return this != SUCCESS;
+    return this == KILL || this == FAILED;
   }
 
   /**

@@ -43,7 +43,7 @@ import java.util.Date;
 public class Init {
   public static void initFlow() {
     FlowDao flowDao = DaoFactory.getDaoInstance(FlowDao.class);
-    ExecutionFlow executionFlow = flowDao.scheduleFlowToExecution(1, 3, 1, new Date(), FlowRunType.DISPATCH);
+    ExecutionFlow executionFlow = flowDao.scheduleFlowToExecution(1, 2, 1, new Date(), FlowRunType.DISPATCH, 3, 3*3600);
     System.out.println(executionFlow.getId());
   }
 

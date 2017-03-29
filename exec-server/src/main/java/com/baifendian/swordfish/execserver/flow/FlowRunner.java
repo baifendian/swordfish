@@ -256,10 +256,10 @@ public class FlowRunner implements Runnable {
       if (status == null) { // 执行失败
         updateExecutionFlow(FlowStatus.FAILED);
       }
+      // 后置处理
+      after();
     }
 
-    // 后置处理
-    after();
   }
 
   /**
@@ -303,52 +303,6 @@ public class FlowRunner implements Runnable {
       }
     }
     return new ArrayList<>(projectFiles);
-  }
-
-  /**
-   * 生成 ETL SQL 节点 <p>
-   *
-   * @return {@link FlowNode}
-   */
-  private FlowNode genEtlSqlNode(FlowDag flowDag) {
-/*        Pair<EtlStatus, MessageObj> result = etlAutoGen.autoCodeGen(flowDag.getEdges(), flowDag.getNodes(), null);
-        if (result.getKey() != EtlStatus.OK) {
-            String errorMsg = MessageFormat.format(result.getValue().getCode(), result.getValue().getArgs());
-            String jobId = LoggerUtil.genJobId(FlowType.ETL, executionFlow.getId());
-            LOGGER.error("{}{}", jobValue(jobId), "ETL 生成 SQL 失败");
-            LOGGER.error("{}{}", jobValue(jobId), errorMsg);
-
-            // 失败了，也需要需要插入执行节点信息
-            ExecutionNode executionNode = new ExecutionNode();
-            executionNode.setExecId(executionFlow.getId());
-            executionNode.setFlowId(executionFlow.getFlowId());
-            executionNode.setAttempt(0);
-            executionNode.setStartTime(new Date(startTime));
-            executionNode.setEndTime(new Date());
-            executionNode.setStatus(FlowStatus.FAILED);
-            executionNode.setJobId(jobId);
-            flowDao.insertExecutionNode(executionNode);
-            throw new ExecException(errorMsg);
-        }
-        LOGGER.info("EtlAutoGen result : {}", result.getValue());
-
-        FlowNode flowNode = new FlowNode();
-        // flowNode.setId(1);
-        flowNode.setFlowId(executionFlow.getFlowId());
-        flowNode.setType(NodeType.ETL_SQL);
-        flowNode.setName(executionFlow.getFlowName());
-        flowNode.setDesc("ETL_SQL");
-
-        SqlParam sqlParam = new SqlParam();
-        sqlParam.setValue(result.getValue().getCode());
-        flowNode.setParam(JsonUtil.toJsonString(sqlParam));
-
-        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-        flowNode.setCreateTime(timestamp);
-        flowNode.setModifyTime(timestamp);
-        return flowNode;
- */
-    return null;
   }
 
   /**
@@ -576,34 +530,34 @@ public class FlowRunner implements Runnable {
         executionNodes.remove(executionNode);
         finishedExecutionNodes.add(executionNode);
       } else if (status.typeIsFinished()) {
-        // 失败的情况：判断是否到达重试次数
-        if (executionNode.getAttempt() < maxTryTimes) {
-          // 从执行队列中删除
-          // 插入一个重试的节点，提交一个重试的 jobrunner
+        FlowNode node = flowDao.queryNodeInfo(executionNode.getNodeId());
+        if(JobTypeManager.isLongJob(node.getType())){
+          // 长任务处理
+          // 报错发送邮件，避免出现程序问题，一直重复调度
+          EmailManager.sendEmail(executionFlow, executionNode);
           executionNodes.remove(executionNode);
-
-          ExecutionNode retryExecutionNode = new ExecutionNode();
-          retryExecutionNode.setExecId(executionNode.getExecId());
-          retryExecutionNode.setFlowId(executionNode.getFlowId());
-          retryExecutionNode.setNodeId(executionNode.getNodeId());
-          retryExecutionNode.setAttempt(executionNode.getAttempt() + 1);
-          retryExecutionNode.setStartTime(new Date());
-          retryExecutionNode.setStatus(FlowStatus.INIT);
-          retryExecutionNode.setJobId(LoggerUtil.genJobId(JOB_PREFIX, executionFlow.getId(), executionNode.getNodeId()));
-          flowDao.insertExecutionNode(retryExecutionNode);
-          executionNodes.add(retryExecutionNode);
-
-          submitNodeRunner(dagGraph, retryExecutionNode);
+          reSubmitNodeRunner(executionNode, dagGraph);
 
           isAllFinished = false;
         } else {
-          // 达到最大重试次数，认为已经失败：从执行队列删除，插入完成队列
-          executionNodes.remove(executionNode);
-          finishedExecutionNodes.add(executionNode);
+          // 失败的情况：判断是否到达重试次数
+          if (executionNode.getAttempt() < maxTryTimes) {
+            // 从执行队列中删除
+            // 插入一个重试的节点，提交一个重试的 jobrunner
+            executionNodes.remove(executionNode);
+            reSubmitNodeRunner(executionNode, dagGraph);
 
-          // 如果失败后的策略是停止执行 DAG，那么修改 isSuccess
-          if (failurePolicyType == FailurePolicyType.END) {
-            isSuccess = false;
+            isAllFinished = false;
+          } else {
+            LOGGER.debug("exec id:{} fetch max try times {}", executionNode.getId(), maxTryTimes);
+            // 达到最大重试次数，认为已经失败：从执行队列删除，插入完成队列
+            executionNodes.remove(executionNode);
+            finishedExecutionNodes.add(executionNode);
+
+            // 如果失败后的策略是停止执行 DAG，那么修改 isSuccess
+            if (failurePolicyType == FailurePolicyType.END) {
+              isSuccess = false;
+            }
           }
         }
       } else {
@@ -613,6 +567,23 @@ public class FlowRunner implements Runnable {
     }
 
     return isAllFinished;
+  }
+
+  private void reSubmitNodeRunner(ExecutionNode executionNode, Graph<FlowNode, FlowNodeRelation> dagGraph){
+    ExecutionNode retryExecutionNode = new ExecutionNode();
+    retryExecutionNode.setExecId(executionNode.getExecId());
+    retryExecutionNode.setFlowId(executionNode.getFlowId());
+    retryExecutionNode.setNodeId(executionNode.getNodeId());
+    retryExecutionNode.setAttempt(executionNode.getAttempt() + 1);
+    retryExecutionNode.setStartTime(new Date());
+    retryExecutionNode.setStatus(FlowStatus.INIT);
+    retryExecutionNode.setJobId(LoggerUtil.genJobId(JOB_PREFIX, executionFlow.getId(), executionNode.getNodeId()));
+    flowDao.insertExecutionNode(retryExecutionNode);
+    executionNodes.add(retryExecutionNode);
+
+    LOGGER.debug("exec id:{} failed retrys:{}", executionNode.getId(), executionNode.getAttempt()+1);
+
+    submitNodeRunner(dagGraph, retryExecutionNode);
   }
 
   /**
@@ -782,7 +753,7 @@ public class FlowRunner implements Runnable {
         LOGGER.error(e.getMessage(), e);
       }
     }
-
+/*
     // 调度或者补数据，需要执行数据质量
     if (flowRunType == FlowRunType.DISPATCH || flowRunType == FlowRunType.ADD_DATA) {
       // 计算数据质量
@@ -799,6 +770,7 @@ public class FlowRunner implements Runnable {
     } catch (Exception e) {
       LOGGER.error(e.getMessage(), e);
     }
+    */
 
   }
 
@@ -822,7 +794,7 @@ public class FlowRunner implements Runnable {
     }
   }
 
-  private void kill() {
+  public void kill() {
     synchronized (synObject) {
       LOGGER.info("Kill has been called on exec:" + executionFlow.getId());
 
@@ -836,170 +808,4 @@ public class FlowRunner implements Runnable {
 
   }
 
-  /**
-   * 执行数据质量计算 <p>
-   */
-  private void execDqCalc() {
-        /*
-        DQExecDao dqExecDao = DaoFactory.getDaoInstance(DQExecDao.class);
-        int flowId = executionFlow.getFlowId();
-        List<Integer> entityIds = dqExecDao.getConfEntityListByFlow(flowId);
-        if (CollectionUtils.isNotEmpty(entityIds)) {
-            LOGGER.info("开始执行 DQ 任务");
-            for (Integer entityId : entityIds) {
-                jobExecutorService.submit(new Runnable() {
-                    @Override
-                    public void run() {
-                        DQCalculator dqCalculator = new DQCalculator(flowId, entityId);
-                        try {
-                            DQSQLInfo dqSqlInfo = dqCalculator.preProcess();
-                            List<String> sqlList = dqSqlInfo.getSqls();
-                            List<String> execSqlList = new ArrayList<>();
-                            Map<String, String> paramMap = dqSqlInfo.getParamMap();
-                            String cycTimeStr = systemParamMap.get(SystemParamManager.CYC_TIME);
-                            paramMap = CustomParamManager.buildCustomParam(executionFlow, cycTimeStr, paramMap);
-                            for (String sql : sqlList) {
-                                sql = PlaceholderUtil.resolvePlaceholders(sql, systemParamMap, true);
-                                sql = PlaceholderUtil.resolvePlaceholders(sql, paramMap, true);
-                                execSqlList.add(sql);
-                            }
-
-                            String jobId = LoggerUtil.genJobId(FlowType.DQ, executionFlow.getId(), entityId);
-                            HiveJob hiveJob = new HiveJob(execSqlList, executionFlow.getProjectId(), true, jobValue(jobId));
-                            hiveJob.run(); // run job
-                            if (hiveJob.getFlowStatus() == FlowStatus.SUCCESS) {
-                                HiveJobContext hiveJobContext = (HiveJobContext) hiveJob.getContext();
-                                dqCalculator.postProcess(hiveJobContext.getExecResults(), jobId, paramMap);
-                            } else {
-                                LOGGER.error("flowId:{},entityId:{} DQ 执行失败", flowId, entityId);
-                            }
-                        } catch (Exception e) {
-                            LOGGER.error(e.getMessage(), e);
-                        }
-                    }
-                });
-            }
-            LOGGER.info("结束执行 DQ 任务");
-        } else {
-            LOGGER.info("不需要执行 DQ 任务");
-        }
-        */
-  }
-
-  /**
-   * 执行统计 <p>
-   */
-  private void doStatistics(FlowRunType flowRunType) {
-        /*
-        // 输入输出表
-        Set<Integer> inputTables = new HashSet<>();
-        Set<Integer> outputTables = new HashSet<>();
-
-        switch (flowRunType) {
-            case DIRECT_RUN:
-                if (CollectionUtils.isNotEmpty(flowNodes)) {
-                    for (FlowNode flowNode : flowNodes) {
-                        BaseParam baseParam = flowNode.getParamObject();
-
-                        if (baseParam != null && (flowNode.getType() == NodeType.SQL || flowNode.getType() == NodeType.ETL_SQL)) {
-                            SqlParam sqlParam = (SqlParam) baseParam;
-                            getSqlTableAndResources(executionFlow.getProjectId(), sqlParam.getValue(), inputTables, outputTables);
-
-                        } else if (baseParam != null && (flowNode.getType() == NodeType.ADHOC_SQL)) {
-                            AdHocSqlParam sqlParam = (AdHocSqlParam) baseParam;
-                            getSqlTableAndResources(executionFlow.getProjectId(), sqlParam.getValue(), inputTables, outputTables);
-                        } else {
-                            if (CollectionUtils.isNotEmpty(flowNode.getInputTableList())) {
-                                inputTables.addAll(flowNode.getInputTableList());
-                            }
-                            if (CollectionUtils.isNotEmpty(flowNode.getOutputTableList())) {
-                                outputTables.addAll(flowNode.getOutputTableList());
-                            }
-                        }
-                    }
-                }
-                break;
-
-            case DISPATCH:
-            case ADD_DATA:
-                ProjectFlow flow = flowDao.queryFlow(executionFlow.getFlowId());
-                List<Integer> inputTableList = flow.getInputTableList();
-                List<Integer> outputTableList = flow.getOutputTableList();
-
-                if (CollectionUtils.isNotEmpty(inputTableList)) {
-                    inputTables.addAll(inputTableList);
-                }
-                if (CollectionUtils.isNotEmpty(outputTableList)) {
-                    outputTables.addAll(outputTableList);
-                }
-                break;
-
-            default:
-                break;
-        }
-
-        // 统计 热门表
-        if (CollectionUtils.isNotEmpty(inputTables)) {
-            DataAnalysisTableProduceMapper produceMapper = MyBatisSqlSessionFactoryUtil.getSqlSession().getMapper(DataAnalysisTableProduceMapper.class);
-            DataAnalysisTableProduce dataAnalysisTableProduce = new DataAnalysisTableProduce();
-            dataAnalysisTableProduce.setExecId(executionFlow.getId());
-            dataAnalysisTableProduce.setCreateTime(new Date());
-            dataAnalysisTableProduce.setAnalysisTableProduceType(AnalysisTableProduceType.READ);
-            for (Integer tableId : inputTables) {
-                dataAnalysisTableProduce.setTableId(tableId);
-                produceMapper.insert(dataAnalysisTableProduce);
-            }
-        }
-        if (CollectionUtils.isNotEmpty(outputTables)) {
-            DataAnalysisTableProduceMapper produceMapper = MyBatisSqlSessionFactoryUtil.getSqlSession().getMapper(DataAnalysisTableProduceMapper.class);
-            DataAnalysisTableProduce dataAnalysisTableProduce = new DataAnalysisTableProduce();
-            dataAnalysisTableProduce.setExecId(executionFlow.getId());
-            dataAnalysisTableProduce.setCreateTime(new Date());
-            dataAnalysisTableProduce.setAnalysisTableProduceType(AnalysisTableProduceType.WRITE);
-            for (Integer tableId : outputTables) {
-                dataAnalysisTableProduce.setTableId(tableId);
-                produceMapper.insert(dataAnalysisTableProduce);
-            }
-        }
-        */
-  }
-
-  /**
-   * 通过sql 语句获取资源id 列表 和输入输出表id信息 <p>
-   */
-  private void getSqlTableAndResources(int projectId, String sql, Set<Integer> inputTables, Set<Integer> outputTables) throws SqlException {
-/*
-        String dbName = projectDbHelp.getDatabaseName(projectId);
-
-        if (!StringUtils.isNotEmpty(dbName)) {
-            LOGGER.error("getSqlTableAndResources projectId:%s not exist database", projectId);
-            throw new SqlException("data base not exist");
-        }
-
-        HqlInfoHandler hqlInfoHandler = new HqlInfoHandler(dbName);
-        List<String> sqls = CommonUtil.sqlSplit(sql);
-        List<StmInfo> stmInfos = hqlInfoHandler.parseStms(sqls);
-
-        Set<TableInfo> inputTableInfos = new HashSet<>();
-        Set<TableInfo> outputTbaleInfos = new HashSet<>();
-
-        // 合并防止多次请求
-        for (StmInfo stmInfo : stmInfos) {
-            inputTableInfos.addAll(stmInfo.getInputTables());
-            outputTbaleInfos.addAll(stmInfo.getOuputTables());
-        }
-
-        // 获取输入表物理实体id
-        Set<Integer> inputTableIds = tableDao.getTableIds(inputTableInfos);
-        if (CollectionUtils.isNotEmpty(inputTableIds)) {
-            inputTables.addAll(inputTableIds);
-        }
-
-        // 获取输出表物理实体id
-        Set<Integer> outputTableIds = tableDao.getTableIds(outputTbaleInfos);
-        if (CollectionUtils.isNotEmpty(outputTableIds)) {
-            outputTables.addAll(outputTableIds);
-        }
-*/
-  }
 }

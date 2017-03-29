@@ -215,4 +215,15 @@ public class ProjectFlowMapperSqlProvider {
       }
     }.toString();
   }
+
+  public String queryFlowOwner(Map<String, Object> parameter) {
+    return new SQL() {
+      {
+        SELECT("u.id, u.name, u.email");
+        FROM(TABLE_NAME + " as f");
+        INNER_JOIN("user as u on u.id = f.owner");
+        WHERE("f.id = #{id}");
+      }
+    }.toString();
+  }
 }
