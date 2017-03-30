@@ -17,12 +17,21 @@ package com.baifendian.swordfish.webserver;
 
 import com.baifendian.swordfish.common.utils.ThriftUtil;
 import com.baifendian.swordfish.dao.DaoFactory;
+import com.baifendian.swordfish.dao.FlowDao;
 import com.baifendian.swordfish.dao.MasterDao;
+import com.baifendian.swordfish.dao.model.ExecutionFlow;
 import com.baifendian.swordfish.dao.model.MasterServer;
+import com.baifendian.swordfish.rpc.HeartBeatData;
 import com.baifendian.swordfish.rpc.MasterService;
+import com.baifendian.swordfish.webserver.config.MasterConfig;
 import com.baifendian.swordfish.webserver.exception.MasterException;
 import com.baifendian.swordfish.webserver.quartz.QuartzManager;
+import com.baifendian.swordfish.webserver.service.master.ExecFlowInfo;
+import com.baifendian.swordfish.webserver.service.master.ExecutorCheckThread;
+import com.baifendian.swordfish.webserver.service.master.Master;
 import com.baifendian.swordfish.webserver.service.master.MasterServiceImpl;
+import com.baifendian.swordfish.webserver.service.master.Submit2ExecutorServerThread;
+
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
@@ -39,12 +48,19 @@ import org.slf4j.LoggerFactory;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class WebThriftServer {
 
   private static final Logger logger = LoggerFactory.getLogger(WebThriftServer.class);
-
-  private static Configuration conf;
 
   private TServer server;
 
@@ -52,58 +68,34 @@ public class WebThriftServer {
 
   private final int port;
 
-  private final String MASTER_PORT = "master.port";
-
-  private final String MASTER_MIN_THREADS = "master.min.threads";
-  private final String MASTER_MAX_THREADS = "master.max.threads";
-
   private MasterDao masterDao;
 
-  private ExecutorServerManager executorServerManager;
+  private FlowDao flowDao;
 
   private MasterServiceImpl masterService;
 
-  static {
-    try {
-      conf = new PropertiesConfiguration("master.properties");
-    } catch (ConfigurationException e) {
-      e.printStackTrace();
-    }
-  }
+  private Master master;
 
   public WebThriftServer() throws UnknownHostException {
     host = InetAddress.getLocalHost().getHostAddress();
-    port = conf.getInt(MASTER_PORT, 9999);
+    port = MasterConfig.masterPort;
     masterDao = DaoFactory.getDaoInstance(MasterDao.class);
-    executorServerManager = new ExecutorServerManager();
+    flowDao = DaoFactory.getDaoInstance(FlowDao.class);
   }
 
   public void run() throws SchedulerException, TTransportException, MasterException {
 
-    Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
-      @Override
-      public void run() {
-        server.stop(); // 关闭 server
-        try {
-          // 关闭调度
-          QuartzManager.shutdown();
-          // 关闭资源
-        } catch (SchedulerException e) {
-          logger.error(e.getMessage(), e);
-        }
-      }
-    }));
-
     try {
       registerMaster();
       init();
-      // 启动调度
-      QuartzManager.start();
 
       Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
         @Override
         public void run() {
           server.stop(); // 关闭 server
+          if(master != null) {
+            master.stop();
+          }
           try {
             // 关闭调度
             QuartzManager.shutdown();
@@ -114,6 +106,9 @@ public class WebThriftServer {
         }
       }));
 
+      master.run();
+      // 启动调度
+      QuartzManager.start();
       server.serve();
     } catch (Exception e) {
       QuartzManager.shutdown();
@@ -122,14 +117,14 @@ public class WebThriftServer {
   }
 
   private void init() throws MasterException, TTransportException {
-    masterService = new MasterServiceImpl(executorServerManager, conf);
+    master = new Master(flowDao);
+    masterService = new MasterServiceImpl(flowDao, master);
     TProtocolFactory protocolFactory = new TBinaryProtocol.Factory();
     TTransportFactory tTransportFactory = new TTransportFactory();
     TProcessor tProcessor = new MasterService.Processor(masterService);
     InetSocketAddress inetSocketAddress = new InetSocketAddress(host, port);
-    int minThreads = conf.getInt(MASTER_MIN_THREADS, 50);
-    int maxThreads = conf.getInt(MASTER_MAX_THREADS, 200);
-    server = ThriftUtil.getTThreadPoolServer(protocolFactory, tProcessor, tTransportFactory, inetSocketAddress, minThreads, maxThreads);
+    server = ThriftUtil.getTThreadPoolServer(protocolFactory, tProcessor, tTransportFactory, inetSocketAddress,
+            MasterConfig.masterMinThreads, MasterConfig.masterMaxThreads);
     logger.info("start thrift server on port:{}", port);
 
   }
@@ -138,7 +133,7 @@ public class WebThriftServer {
     MasterServer masterServer = masterDao.getMasterServer();
     if (masterServer != null && !(masterServer.getHost().equals(host) && masterServer.getPort() == port)) {
       String msg = String.format("can't register more then one master, exist master:%s:%d, " +
-              "if you change the master deploy server please clean the table master_server and start up again",
+                      "if you change the master deploy server please clean the table master_server and start up again",
               masterServer.getHost(), masterServer.getPort());
       throw new MasterException(msg);
     } else {

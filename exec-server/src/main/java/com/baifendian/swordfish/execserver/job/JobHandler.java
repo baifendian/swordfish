@@ -163,8 +163,9 @@ public class JobHandler {
     } else { // 长任务定时检查作业是否有报错，如果报错就返回
       while(true){
         try {
-          isSuccess = future.get(60, TimeUnit.SECONDS);
+          future.get(60, TimeUnit.SECONDS);
         } catch (InterruptedException | ExecutionException e) {
+          isSuccess = false;
           throw new ExecException("execute task get error", e);
         } catch (TimeoutException e) {
 

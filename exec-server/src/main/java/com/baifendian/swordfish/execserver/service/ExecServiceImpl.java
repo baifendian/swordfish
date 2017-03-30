@@ -160,7 +160,7 @@ public class ExecServiceImpl implements Iface {
         return ResultHelper.createErrorResult("execId run finished");
       }
 
-      flowRunnerManager.cancelFlow(execId, "user");
+      flowRunnerManager.cancelFlow(execId);
     } catch (Exception e) {
       LOGGER.error(e.getMessage(), e);
       return ResultHelper.createErrorResult(e.getMessage());

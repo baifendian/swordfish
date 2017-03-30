@@ -18,6 +18,7 @@ package com.baifendian.swordfish.dao.mapper;
 import com.baifendian.swordfish.dao.enums.FlowType;
 import com.baifendian.swordfish.dao.enums.ScheduleType;
 import com.baifendian.swordfish.dao.model.ProjectFlow;
+import com.baifendian.swordfish.dao.model.User;
 
 import org.apache.ibatis.annotations.*;
 import org.apache.ibatis.type.EnumOrdinalTypeHandler;
@@ -221,4 +222,13 @@ public interface ProjectFlowMapper {
    */
   @UpdateProvider(type = ProjectFlowMapperSqlProvider.class, method = "updateByName")
   int updateByName(@Param("flow") ProjectFlow projectFlow);
+
+  @Results(value = {@Result(property = "id", column = "id", id = true, javaType = Integer.class, jdbcType = JdbcType.INTEGER),
+          @Result(property = "name", column = "name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+          @Result(property = "email", column = "email", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+  })
+  @SelectProvider(type = ProjectFlowMapperSqlProvider.class, method = "queryFlowOwner")
+  User queryFlowOwner(@Param("id") Integer id);
+
+
 }

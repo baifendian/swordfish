@@ -70,7 +70,8 @@ public interface ExecutionFlowMapper {
           @Result(property = "flowName", column = "flow_name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
           @Result(property = "submitUserName", column = "submit_user_name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
           @Result(property = "errorCode", column = "error_code", typeHandler = EnumOrdinalTypeHandler.class, jdbcType = JdbcType.TINYINT),
-
+          @Result(property = "maxTryTimes", column = "max_try_times", javaType = int.class, jdbcType = JdbcType.INTEGER),
+          @Result(property = "timeout", column = "timeout", javaType = int.class, jdbcType = JdbcType.INTEGER),
   })
   @SelectProvider(type = ExecutionFlowMapperProvider.class, method = "select")
   List<ExecutionFlow> select(@Param("maintainQuery") MaintainQuery maintainQuery);
@@ -92,6 +93,8 @@ public interface ExecutionFlowMapper {
           @Result(property = "flowName", column = "flow_name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
           @Result(property = "errorCode", column = "error_code", typeHandler = EnumOrdinalTypeHandler.class, javaType = FlowErrorCode.class, jdbcType = JdbcType.TINYINT),
           @Result(property = "queue", column = "queue", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+          @Result(property = "maxTryTimes", column = "max_try_times", javaType = int.class, jdbcType = JdbcType.INTEGER),
+          @Result(property = "timeout", column = "timeout", javaType = int.class, jdbcType = JdbcType.INTEGER),
   })
   @SelectProvider(type = ExecutionFlowMapperProvider.class, method = "selectByExecId")
   ExecutionFlow selectByExecId(@Param("execId") Long execId);
@@ -101,14 +104,14 @@ public interface ExecutionFlowMapper {
           @Result(property = "worker", column = "worker", javaType = String.class, jdbcType = JdbcType.VARCHAR),
           @Result(property = "status", column = "status", typeHandler = EnumOrdinalTypeHandler.class, javaType = FlowStatus.class, jdbcType = JdbcType.TINYINT),
   })
-  @SelectProvider(type = ExecutionFlowMapperProvider.class, method = "selectNoFinishFlow")
-  List<ExecutionFlow> selectNoFinishFlow();
+  @SelectProvider(type = ExecutionFlowMapperProvider.class, method = "selectAllNoFinishFlow")
+  List<ExecutionFlow> selectAllNoFinishFlow();
 
   @Results(value = {@Result(property = "id", column = "id", id = true, javaType = Long.class, jdbcType = JdbcType.BIGINT),
           @Result(property = "flowId", column = "flow_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
   })
-  @SelectProvider(type = ExecutionFlowMapperProvider.class, method = "selectRunningFlow")
-  List<ExecutionFlow> selectRunningFlow(@Param("worker") String worker);
+  @SelectProvider(type = ExecutionFlowMapperProvider.class, method = "selectNoFinishFlow")
+  List<ExecutionFlow> selectNoFinishFlow(@Param("worker") String worker);
 
   @Results(value = {@Result(property = "id", column = "id", id = true, javaType = Long.class, jdbcType = JdbcType.BIGINT),
           @Result(property = "flowId", column = "flow_id", javaType = int.class, jdbcType = JdbcType.INTEGER),

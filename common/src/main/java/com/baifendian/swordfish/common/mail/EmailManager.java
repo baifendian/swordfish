@@ -15,6 +15,7 @@
  */
 package com.baifendian.swordfish.common.mail;
 
+import com.baifendian.swordfish.dao.model.ExecutionNode;
 import com.baifendian.swordfish.dao.model.Schedule;
 import com.baifendian.swordfish.common.utils.BFDDateUtils;
 import com.baifendian.swordfish.dao.DaoFactory;
@@ -23,6 +24,9 @@ import com.baifendian.swordfish.dao.enums.FlowStatus;
 import com.baifendian.swordfish.dao.enums.FlowType;
 import com.baifendian.swordfish.dao.model.ExecutionFlow;
 import com.baifendian.swordfish.dao.model.ProjectFlow;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.text.MessageFormat;
 import java.util.Date;
@@ -34,6 +38,7 @@ import java.util.Map;
  */
 public class EmailManager {
 
+  private static final Logger logger = LoggerFactory.getLogger(EmailManager.class);
   /**
    * {@link MailSendService}
    */
@@ -52,6 +57,9 @@ public class EmailManager {
    * 获取邮件任务
    */
   private static final String CONTENT_FORMAT = "<b>{0}</b><hr/>项目：{1}<br/>工作流名称：{2}<br/>调度时间：{3}<br/>执行结果：{4}<br/><br/><I>备注：详细执行情况见【运维中心】-【调度日志】</I>";
+
+
+  private static final String CONTENT_NODE_FORMAT = "<br>Long job Node:{0} RUN ERROR";
 
   /**
    * 邮件内容的结尾
@@ -81,6 +89,22 @@ public class EmailManager {
     String content = genContent(executionFlow.getType(), executionFlow.getProjectName(), executionFlow.getFlowName(),
             executionFlow.getScheduleTime(), executionFlow.getStatus());
     mailSendService.sendToFlowMails(executionFlow.getFlowId(), title, content, true, schedule);
+  }
+
+  /**
+   * 长任务，如果node报错，就发邮件通知
+   * @param executionNode
+   */
+  public static void sendEmail(ExecutionFlow executionFlow, ExecutionNode executionNode) {
+    try {
+      String title = genTitle(executionFlow.getType(), executionNode.getStatus());
+      String content = genContent(executionFlow.getType(), executionFlow.getProjectName(), executionFlow.getFlowName(),
+              executionFlow.getScheduleTime(), executionNode.getStatus());
+      content += MessageFormat.format(CONTENT_NODE_FORMAT, executionNode.getNodeId());
+      mailSendService.sendToFlowUserMails(executionFlow.getFlowId(), title, content);
+    } catch (Exception e){
+      logger.error("send mail error", e);
+    }
   }
 
   /**

@@ -113,6 +113,10 @@ public class ExecutionFlow {
    **/
   private Date scheduleTime;
 
+  private Integer maxTryTimes;
+
+  private Integer timeout;
+
   /**
    * 执行的错误码
    */
@@ -293,5 +297,21 @@ public class ExecutionFlow {
 
   public Date getScheduleTime() {
     return scheduleTime;
+  }
+
+  public Integer getMaxTryTimes() {
+    return maxTryTimes;
+  }
+
+  public void setMaxTryTimes(Integer maxTryTimes) {
+    this.maxTryTimes = maxTryTimes;
+  }
+
+  public Integer getTimeout() {
+    return timeout;
+  }
+
+  public void setTimeout(Integer timeout) {
+    this.timeout = timeout;
   }
 }

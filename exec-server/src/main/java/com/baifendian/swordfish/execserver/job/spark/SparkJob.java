@@ -116,6 +116,7 @@ public class SparkJob extends AbstractProcessJob {
       if (props.getProxyUser() != null) {
         cmd = "sudo -u " + props.getProxyUser() + " " + cmd;
       }
+      logger.info("run cmd:{}", cmd);
       Runtime.getRuntime().exec(cmd);
 
       completeLatch.await(KILL_TIME_MS, TimeUnit.MILLISECONDS);

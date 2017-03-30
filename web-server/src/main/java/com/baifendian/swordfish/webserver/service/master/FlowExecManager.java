@@ -22,6 +22,9 @@ import com.baifendian.swordfish.dao.enums.FlowRunType;
 import com.baifendian.swordfish.dao.model.ExecutionFlow;
 import com.baifendian.swordfish.dao.model.ProjectFlow;
 import com.baifendian.swordfish.common.mail.EmailManager;
+import com.baifendian.swordfish.dao.model.Schedule;
+import com.baifendian.swordfish.rpc.HeartBeatData;
+import com.baifendian.swordfish.webserver.ExecutorServerInfo;
 
 import org.apache.commons.lang.time.DateUtils;
 import org.quartz.CronExpression;
@@ -41,7 +44,7 @@ public class FlowExecManager {
   /**
    * LOGGER
    */
-  private final Logger LOGGER = LoggerFactory.getLogger(getClass());
+  private final Logger logger = LoggerFactory.getLogger(getClass());
 
   /**
    * {@link ExecutorService}
@@ -51,7 +54,7 @@ public class FlowExecManager {
   /**
    * execution flow queue
    **/
-  private final BlockingQueue<ExecutionFlow> executionFlowBlockingQueue;
+  private final Master master;
 
   /**
    * {@link FlowDao}
@@ -64,11 +67,11 @@ public class FlowExecManager {
   private static long checkInterval = 30 * 1000;
 
   /**
-   * @param executionFlowBlockingQueue
+   * @param master
    * @param flowDao
    */
-  public FlowExecManager(BlockingQueue<ExecutionFlow> executionFlowBlockingQueue, FlowDao flowDao) {
-    this.executionFlowBlockingQueue = executionFlowBlockingQueue;
+  public FlowExecManager(Master master, FlowDao flowDao) {
+    this.master = master;
     this.flowDao = flowDao;
 
     ThreadFactory flowThreadFactory = new ThreadFactoryBuilder().setNameFormat("Scheduler-Master-AddData").build();
@@ -91,11 +94,21 @@ public class FlowExecManager {
             Boolean execStatus = null;
             if (!isFailed) {
               // 插入 ExecutionFlow
-              ExecutionFlow executionFlow = flowDao.scheduleFlowToExecution(flow.getProjectId(), flow.getId(), flow.getOwnerId(), scheduleDate, FlowRunType.ADD_DATA);
+              Schedule schedule = flowDao.querySchedule(flow.getId());
+              Integer maxTryTimes = 3;
+              Integer timeout = 10 * 3600;
+              if(schedule != null){
+                maxTryTimes = schedule.getMaxTryTimes();
+                timeout = schedule.getTimeout();
+              }
+              ExecutionFlow executionFlow = flowDao.scheduleFlowToExecution(flow.getProjectId(), flow.getId(),
+                      flow.getOwnerId(), scheduleDate, FlowRunType.ADD_DATA, maxTryTimes, timeout);
               executionFlow.setProjectId(flow.getProjectId());
+              ExecFlowInfo execFlowInfo = new ExecFlowInfo();
+              execFlowInfo.setExecId(executionFlow.getId());
 
               // 发送请求到 executor server 中执行
-              executionFlowBlockingQueue.add(executionFlow);
+              master.addExecFlow(execFlowInfo);
 
               // 如果当前任务补数据任务失败，后续任务不再执行
               execStatus = checkExecStatus(executionFlow.getId());
@@ -109,7 +122,7 @@ public class FlowExecManager {
           // 发送邮件
           EmailManager.sendAddDataEmail(flow, !isFailed, resultList);
         } catch (Exception e) {
-          LOGGER.error(e.getMessage(), e);
+          logger.error(e.getMessage(), e);
         }
 
       }
@@ -126,7 +139,7 @@ public class FlowExecManager {
       try {
         Thread.sleep(checkInterval);
       } catch (InterruptedException e) {
-        LOGGER.error(e.getMessage(), e);
+        logger.error(e.getMessage(), e);
         return false;
       }
 
@@ -139,6 +152,7 @@ public class FlowExecManager {
     }
   }
 
+
   /**
    * 销毁资源 <p>
    */
@@ -147,7 +161,7 @@ public class FlowExecManager {
       try {
         appendFlowExecutorService.shutdownNow();
       } catch (Exception e) {
-        LOGGER.error(e.getMessage(), e);
+        logger.error(e.getMessage(), e);
       }
     }
   }

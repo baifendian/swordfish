@@ -16,6 +16,7 @@
 package com.baifendian.swordfish.webserver.service.master;
 
 import com.baifendian.swordfish.dao.FlowDao;
+import com.baifendian.swordfish.dao.enums.FlowRunType;
 import com.baifendian.swordfish.dao.enums.FlowStatus;
 import com.baifendian.swordfish.dao.model.ExecutionFlow;
 import com.baifendian.swordfish.webserver.ExecutorClient;
@@ -23,10 +24,13 @@ import com.baifendian.swordfish.webserver.ExecutorServerInfo;
 import com.baifendian.swordfish.webserver.ExecutorServerManager;
 import com.baifendian.swordfish.webserver.config.MasterConfig;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.thrift.TException;
+import org.apache.tools.ant.taskdefs.Exec;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.List;
 import java.util.concurrent.BlockingQueue;
 
 /**
@@ -52,14 +56,14 @@ public class Submit2ExecutorServerThread extends Thread {
   /**
    * workflow 执行队列
    */
-  private final BlockingQueue<ExecutionFlow> executionFlowQueue;
+  private final BlockingQueue<ExecFlowInfo> executionFlowQueue;
 
   /**
    * @param executorServerManager
    * @param flowDao
    * @param executionFlowQueue
    */
-  public Submit2ExecutorServerThread(ExecutorServerManager executorServerManager, FlowDao flowDao, BlockingQueue<ExecutionFlow> executionFlowQueue) {
+  public Submit2ExecutorServerThread(ExecutorServerManager executorServerManager, FlowDao flowDao, BlockingQueue<ExecFlowInfo> executionFlowQueue) {
     this.executorServerManager = executorServerManager;
     this.flowDao = flowDao;
     this.executionFlowQueue = executionFlowQueue;
@@ -70,16 +74,16 @@ public class Submit2ExecutorServerThread extends Thread {
   @Override
   public void run() {
     while (true) {
-      ExecutionFlow executionFlow;
+      ExecFlowInfo execFlowInfo;
       try {
-        executionFlow = executionFlowQueue.take();
-        logger.info("get execution flow from queue, flowId:{} execId:{}", executionFlow.getFlowId(), executionFlow.getId());
+        execFlowInfo = executionFlowQueue.take();
+        logger.info("get execution flow from queue, exec info:{}", execFlowInfo);
       } catch (InterruptedException e) {
         logger.error(e.getMessage(), e);
         break; // 中断则退出
       }
 
-      long execId = executionFlow.getId();
+      long execId = execFlowInfo.getExecId();
       boolean isSucess = false; // 是否请求成功
       boolean isExecutorServerError = false;
       ExecutorServerInfo executorServerInfo = executorServerManager.getExecutorServer();
@@ -90,15 +94,16 @@ public class Submit2ExecutorServerThread extends Thread {
         } catch (InterruptedException e) {
           e.printStackTrace();
         }
-        executionFlowQueue.add(executionFlow);
+        executionFlowQueue.add(execFlowInfo);
         continue;
       }
-      logger.info("get execution flow from queue, flowId:{} execId:{} submit to exec {}:{}",
-              executionFlow.getFlowId(), executionFlow.getId(), executorServerInfo.getHost(), executorServerInfo.getPort());
+      logger.info("get execution flow from queue, execId:{} submit to exec {}:{}",
+              execId, executorServerInfo.getHost(), executorServerInfo.getPort());
       for (int i = 0; i < MasterConfig.failRetryCount; i++) {
         isExecutorServerError = false;
         try {
           ExecutorClient executorClient = new ExecutorClient(executorServerInfo);
+          ExecutionFlow executionFlow = flowDao.queryExecutionFlow(execId);
           executionFlow.setWorker(String.format("%s:%d", executorServerInfo.getHost(), executorServerInfo.getPort()));
           logger.debug("execId:{}", execId);
           logger.debug("projectId:{}", executionFlow.getProjectId());
@@ -109,8 +114,8 @@ public class Submit2ExecutorServerThread extends Thread {
           break; // 请求成功，结束重试请求
         } catch (TException e) {
           ExecutionFlow temp = flowDao.queryExecutionFlow(execId);
-          // 如果执行被取消或者状态已经更新，结束重试请求
-          if (temp == null || temp.getStatus() != FlowStatus.INIT) {
+          // 如果执行被取消，结束重试请求
+          if (temp == null) {
             break;
           }
           logger.error("run executor get error", e);
@@ -124,7 +129,7 @@ public class Submit2ExecutorServerThread extends Thread {
       if (!isSucess) {
         if (isExecutorServerError) {
           /** executor server error，将执行数据放回队列，将该executor server从executor server列表删除 */
-          executionFlowQueue.add(executionFlow);
+          executionFlowQueue.add(execFlowInfo);
           logger.info("connect to executor server error, remove {}:{}", executorServerInfo.getHost(), executorServerInfo.getPort());
           ExecutorServerInfo removedExecutionServerInfo = executorServerManager.removeServer(executorServerInfo);
           resubmitExecFlow(removedExecutionServerInfo);
@@ -136,13 +141,20 @@ public class Submit2ExecutorServerThread extends Thread {
   }
 
   private void resubmitExecFlow(ExecutorServerInfo executorServerInfo) {
-    if (executorServerInfo.getHeartBeatData() != null && executorServerInfo.getHeartBeatData().getExecIdsSize() > 0) {
-      for (Long execId : executorServerInfo.getHeartBeatData().getExecIds()) {
+    // 这里使用数据库查询到的数据保证准确性，避免内存数据出现不一致的情况
+    List<ExecutionFlow> executionFlows = flowDao.queryNoFinishFlow(executorServerInfo.getHost()+":"+executorServerInfo.getPort());
+    if (!CollectionUtils.isEmpty(executionFlows)) {
+      logger.info("executor server {} fault, execIds size:{} ", executorServerInfo, executionFlows.size());
+      for (ExecutionFlow execFlow : executionFlows) {
+        Long execId = execFlow.getId();
+        logger.info("reschedule workflow execId:{} ", execId);
         ExecutionFlow executionFlow = flowDao.queryExecutionFlow(execId);
         if (executionFlow != null) {
           if (!executionFlow.getStatus().typeIsFinished()) {
             logger.info("executor server fault reschedule workflow execId:{}", execId);
-            executionFlowQueue.add(executionFlow);
+            ExecFlowInfo execFlowInfo = new ExecFlowInfo();
+            execFlowInfo.setExecId(executionFlow.getId());
+            executionFlowQueue.add(execFlowInfo);
           }
         } else {
           logger.warn("executor server fault reschedule workflow execId:{} not exists", execId);

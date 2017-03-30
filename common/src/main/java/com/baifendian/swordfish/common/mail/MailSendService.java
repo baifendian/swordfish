@@ -17,6 +17,7 @@ package com.baifendian.swordfish.common.mail;
 
 import com.baifendian.swordfish.dao.BaseDao;
 import com.baifendian.swordfish.dao.datasource.ConnectionFactory;
+import com.baifendian.swordfish.dao.mapper.ProjectFlowMapper;
 import com.baifendian.swordfish.dao.mapper.ProjectUserMapper;
 import com.baifendian.swordfish.dao.model.Schedule;
 import com.baifendian.swordfish.dao.model.User;
@@ -37,9 +38,13 @@ public class MailSendService extends BaseDao {
   @Autowired
   private ProjectUserMapper projectUserMapper;
 
+  @Autowired
+  private ProjectFlowMapper projectFlowMapper;
+
   @Override
   protected void init() {
     projectUserMapper = ConnectionFactory.getSqlSession().getMapper(ProjectUserMapper.class);
+    projectFlowMapper = ConnectionFactory.getSqlSession().getMapper(ProjectFlowMapper.class);
   }
 
   /**
@@ -88,5 +93,20 @@ public class MailSendService extends BaseDao {
     Collection<String> mails = Arrays.asList(mailsArr);
 
     return MailSendUtil.sendMails(mails, title, content);
+  }
+
+  public boolean sendToFlowUserMails(int flowId, String title, String content) {
+    User user = projectFlowMapper.queryFlowOwner(flowId);
+
+    if (user == null) {
+      LOGGER.error("Not find workflow: {}", flowId);
+      return false;
+    }
+
+    List receivers = new ArrayList<>();
+
+    receivers.add(user.getEmail());
+
+    return MailSendUtil.sendMails(receivers, title, content);
   }
 }

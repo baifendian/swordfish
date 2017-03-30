@@ -15,7 +15,9 @@
  */
 package com.baifendian.swordfish.webserver.service.master;
 
+import com.baifendian.swordfish.common.job.exception.ExecException;
 import com.baifendian.swordfish.dao.AdHocDao;
+import com.baifendian.swordfish.dao.enums.FlowRunType;
 import com.baifendian.swordfish.dao.model.AdHoc;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
 import com.baifendian.swordfish.dao.DaoFactory;
@@ -60,136 +62,57 @@ public class MasterServiceImpl implements Iface {
   private final Logger LOGGER = LoggerFactory.getLogger(getClass());
 
   /**
-   * worker rpc client
-   */
-  private final ExecutorServerManager executorServerManager;
-
-  /**
    * {@link FlowDao}
    */
   private final FlowDao flowDao;
 
   private final AdHocDao adHocDao;
-  /**
-   * workflow 执行队列
-   */
-  private final BlockingQueue<ExecutionFlow> executionFlowQueue;
-
-  /**
-   * {@link Submit2ExecutorServerThread}
-   */
-  private final Submit2ExecutorServerThread retryToWorkerThread;
 
   /**
    * {@link FlowExecManager}
    */
-  private final FlowExecManager flowExecManager;
 
-  /**
-   * executor server服务检查线程
-   **/
-  private ExecutorCheckThread executorCheckThread;
+  private final Master master;
 
-  private ScheduledExecutorService executorService;
-
-  private Configuration conf;
-
-  /**
-   */
-  public MasterServiceImpl(ExecutorServerManager executorServerManager, Configuration conf) {
-    this.executorServerManager = executorServerManager;
-    this.conf = conf;
-    this.flowDao = DaoFactory.getDaoInstance(FlowDao.class);
+  public MasterServiceImpl(FlowDao flowDao, Master master) {
+    this.flowDao = flowDao;
     this.adHocDao = DaoFactory.getDaoInstance(AdHocDao.class);
-    this.executorService = Executors.newScheduledThreadPool(5);
-
-    // 启动请求 executor server的处理线程
-    executionFlowQueue = new LinkedBlockingQueue<>(MasterConfig.failRetryQueueSize);
-    retryToWorkerThread = new Submit2ExecutorServerThread(executorServerManager, flowDao, executionFlowQueue);
-    retryToWorkerThread.setDaemon(true);
-    retryToWorkerThread.start();
-
-    // 恢复运行中的workflow
-    recoveryExecFlow();
-
-    int timeoutInterval = conf.getInt("master.heartbeat.timeout.interval", 60) * 1000;
-    int checkInterval = conf.getInt("master.heartbeat.check.interval", 30);
-    executorCheckThread = new ExecutorCheckThread(executorServerManager, timeoutInterval, executionFlowQueue, flowDao);
-    executorService.scheduleAtFixedRate(executorCheckThread, 10, checkInterval, TimeUnit.SECONDS);
-
-    flowExecManager = new FlowExecManager(executionFlowQueue, flowDao);
-
-    // 初始化调度作业
-    FlowScheduleJob.init(executionFlowQueue, flowDao);
-  }
-
-  /**
-   * 从调度信息表中恢复在运行的workflow信息
-   */
-  private void recoveryExecFlow() {
-    List<ExecutionFlow> executionFlowList = flowDao.queryAllNoFinishFlow();
-    Map<String, ExecutorServerInfo> executorServerInfoMap = new HashMap<>();
-    if (executionFlowList != null) {
-      for (ExecutionFlow executionFlow : executionFlowList) {
-        String worker = executionFlow.getWorker();
-        if (worker != null && worker.contains(":")) {
-          LOGGER.info("recovery execId:{} executor server:{}", executionFlow.getId(), executionFlow.getWorker());
-          String[] workerInfo = worker.split(":");
-          if (executorServerInfoMap.containsKey(worker)) {
-            executorServerInfoMap.get(worker).getHeartBeatData().getExecIds().add(executionFlow.getId());
-          } else {
-            ExecutorServerInfo executorServerInfo = new ExecutorServerInfo();
-            executorServerInfo.setHost(workerInfo[0]);
-            executorServerInfo.setPort(Integer.parseInt(workerInfo[1]));
-            HeartBeatData heartBeatData = new HeartBeatData();
-            heartBeatData.setReportDate(System.currentTimeMillis());
-            heartBeatData.setExecIds(new ArrayList<>());
-            heartBeatData.getExecIds().add(executionFlow.getId());
-            executorServerInfo.setHeartBeatData(heartBeatData);
-            executorServerInfoMap.put(worker, executorServerInfo);
-          }
-        } else {
-          // 没有worker信息，提交到executionFlowQueue队列
-          LOGGER.info("no worker info, add execution flow[execId:{}] to queue", executionFlow.getId());
-          ExecutionFlow execFlow = flowDao.queryExecutionFlow(executionFlow.getId());
-          executionFlowQueue.add(execFlow);
-        }
-      }
-      executorServerManager.initServers(executorServerInfoMap);
-    }
+    this.master = master;
 
   }
 
   @Override
   public RetInfo execFlow(long execId) throws TException {
-    ExecutionFlow executionFlow = flowDao.queryExecutionFlow(execId);
-    if (executionFlow == null) {
-      LOGGER.error("execId is not exists");
-      return ResultHelper.createErrorResult("execId is not exists");
+    try {
+      ExecutionFlow executionFlow = flowDao.queryExecutionFlow(execId);
+      if (executionFlow == null) {
+        LOGGER.error("execId is not exists");
+        return ResultHelper.createErrorResult("execId is not exists");
+      }
+      flowDao.updateExecutionFlowStatus(execId, FlowStatus.INIT);
+      ExecFlowInfo execFlowInfo = new ExecFlowInfo();
+      execFlowInfo.setExecId(executionFlow.getId());
+
+      master.addExecFlow(execFlowInfo);
+    } catch (Exception e){
+      LOGGER.error(e.getMessage(), e);
+      return ResultHelper.createErrorResult(e.getMessage());
     }
-    flowDao.updateExecutionFlowStatus(execId, FlowStatus.INIT);
-
-    executionFlowQueue.add(executionFlow);
-
     return ResultHelper.SUCCESS;
   }
 
   @Override
   public RetInfo execAdHoc(long adHocId) {
-    LOGGER.debug("receive exec ad hoc request, id:{}", adHocId);
-    AdHoc adHoc = adHocDao.getAdHoc(adHocId);
-    if (adHoc == null) {
-      LOGGER.error("adhoc id {} not exists", adHocId);
-      return ResultHelper.createErrorResult("adhoc id not exists");
-    }
-    ExecutorServerInfo executorServerInfo = executorServerManager.getExecutorServer();
-    if(executorServerInfo == null){
-      return ResultHelper.createErrorResult("can't found active executor server");
-    }
-    ExecutorClient executorClient = new ExecutorClient(executorServerInfo);
     try {
-      executorClient.execAdHoc(adHocId);
-    } catch (TException e) {
+      LOGGER.debug("receive exec ad hoc request, id:{}", adHocId);
+      AdHoc adHoc = adHocDao.getAdHoc(adHocId);
+      if (adHoc == null) {
+        LOGGER.error("adhoc id {} not exists", adHocId);
+        return ResultHelper.createErrorResult("adhoc id not exists");
+      }
+      master.execAdHoc(adHocId);
+    } catch (TException | ExecException e) {
+      LOGGER.error(e.getMessage(), e);
       return ResultHelper.createErrorResult(e.getMessage());
     }
     return ResultHelper.SUCCESS;
@@ -267,15 +190,15 @@ public class MasterServiceImpl implements Iface {
    */
   @Override
   public RetInfo appendWorkFlow(int projectId, int flowId, String scheduleMeta) throws TException {
-    ProjectFlow flow = flowDao.queryFlow(flowId);
-    // 若 workflow 被删除
-    if (flow == null) {
-      LOGGER.error("projectId:{},flowId:{} 的工作流不存在", projectId, flowId);
-      return ResultHelper.createErrorResult("当前workflow 不存在");
-    }
-
     ScheduleMeta meta = null;
     try {
+      ProjectFlow flow = flowDao.queryFlow(flowId);
+      // 若 workflow 被删除
+      if (flow == null) {
+        LOGGER.error("projectId:{},flowId:{} 的工作流不存在", projectId, flowId);
+        return ResultHelper.createErrorResult("当前workflow 不存在");
+      }
+
       meta = JsonUtil.parseObject(scheduleMeta, ScheduleMeta.class);
       String crontabStr = meta.getCrontab();
       CronExpression cron = new CronExpression(crontabStr);
@@ -284,7 +207,7 @@ public class MasterServiceImpl implements Iface {
       Date endDateTime = meta.getEndDate();
 
       // 提交补数据任务
-      flowExecManager.submitAddData(flow, cron, startDateTime, endDateTime);
+      master.submitAddData(flow, cron, startDateTime, endDateTime);
     } catch (Exception e) {
       LOGGER.error(e.getMessage(), e);
       return ResultHelper.createErrorResult(e.getMessage());
@@ -297,31 +220,9 @@ public class MasterServiceImpl implements Iface {
     return ResultHelper.SUCCESS;
   }
 
-  /**
-   * 销毁资源 <p>
-   */
-  public void destory() {
-    flowExecManager.destroy();
-  }
-
   public RetInfo registerExecutor(String host, int port, long registerTime) throws TException {
-    LOGGER.info("register executor server[{}:{}]", host, port);
-    String key = String.format("%s:%d", host, port);
-    /** 时钟差异检查 **/
-    long nowTime = System.currentTimeMillis();
-    if (registerTime > nowTime + 10000) {
-      return ResultHelper.createErrorResult("executor master clock time diff then 10 seconds");
-    }
-
-    ExecutorServerInfo executorServerInfo = new ExecutorServerInfo();
-    executorServerInfo.setHost(host);
-    executorServerInfo.setPort(port);
-    HeartBeatData heartBeatData = new HeartBeatData();
-    heartBeatData.setReportDate(registerTime);
-    executorServerInfo.setHeartBeatData(heartBeatData);
-
     try {
-      executorServerManager.addServer(key, executorServerInfo);
+      master.registerExecutor(host, port, registerTime);
     } catch (MasterException e) {
       LOGGER.warn("executor register error", e);
       return ResultHelper.createErrorResult(e.getMessage());
@@ -333,16 +234,8 @@ public class MasterServiceImpl implements Iface {
    * execServer汇报心跳 host : host地址 port : 端口号
    */
   public RetInfo executorReport(String host, int port, HeartBeatData heartBeatData) throws org.apache.thrift.TException {
-    LOGGER.debug("executor server[{}:{}] report info {}", host, port, heartBeatData);
-    String key = String.format("%s:%d", host, port);
-
-    ExecutorServerInfo executorServerInfo = new ExecutorServerInfo();
-    executorServerInfo.setHost(host);
-    executorServerInfo.setPort(port);
-    executorServerInfo.setHeartBeatData(heartBeatData);
-
     try {
-      executorServerManager.updateServer(key, executorServerInfo);
+      master.executorReport(host, port, heartBeatData);
     } catch (MasterException e) {
       LOGGER.warn("executor report error", e);
       return ResultHelper.createErrorResult(e.getMessage());
