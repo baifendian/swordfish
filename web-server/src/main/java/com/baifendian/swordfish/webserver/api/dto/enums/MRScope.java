@@ -18,15 +18,21 @@ public enum MRScope {
 
   @JsonValue
   public String getScope() {
-    return scope;
+    return this.scope;
   }
 
+
   @JsonCreator
-  public static MRScope valueOfName(String name) throws IllegalArgumentException {
-    if (StringUtils.isEmpty(name)) {
+  public static MRScope valueOfType(Integer type) throws IllegalArgumentException {
+    if (type == null) {
       return null;
     }
-    return MRScope.valueOf(name);
+    for (MRScope mrScope : MRScope.values()) {
+      if (mrScope.getScope().equals(type)) {
+        return mrScope;
+      }
+    }
+    throw new IllegalArgumentException("Cannot convert " + type + " to " + MRScope.class.getSimpleName() + " .");
   }
 
 }
