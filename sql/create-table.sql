@@ -124,7 +124,7 @@ CREATE TABLE `flows_nodes` (
   `create_time` datetime NOT NULL COMMENT 'create time of the flow nodes',
   `modify_time` datetime NOT NULL COMMENT 'modify time of the flow nodes',
   `last_modify_by` int(11) NOT NULL COMMENT 'last modify user id of the flow nodes',
-  `type` tinyint(4) NOT NULL COMMENT 'type of the flow nodes',
+  `type` varchar(32) NOT NULL COMMENT 'type of the flow nodes, string type',
   `parameter` text DEFAULT NULL COMMENT 'parameter of the flow nodes.',
   `extras` text DEFAULT NULL COMMENT 'extends of the flow nodes',
   `dep` text DEFAULT NULL COMMENT 'dep of the flow nodes, is a json array, array element is a node name',
