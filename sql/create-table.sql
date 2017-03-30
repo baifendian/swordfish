@@ -179,36 +179,6 @@ CREATE TABLE `master_server` (
   UNIQUE KEY `host_port` (`host`, `port`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
--- ad_hoc_result table
-DROP TABLE IF EXISTS `ad_hoc_results`;
-CREATE TABLE `ad_hoc_results` (
-  `ad_hoc_id` bigint(20) NOT NULL,
-  `index` int(11) NOT NULL,
-  `stm` text NOT NULL,
-  `result` text,
-  `status` tinyint(4) NOT NULL,
-  `create_time` datetime NOT NULL,
-  PRIMARY KEY (`ad_hoc_id`, `index`),
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-DROP TABLE IF EXISTS `ad_hocs`;
-CREATE TABLE `ad_hocs` (
-  `id` bigint(11) NOT NULL AUTO_INCREMENT,
-  `project_id` int(11) NOT NULL,
-  `params` text NOT NULL,
-  `proxy_user` varchar(30) NOT NULL,
-  `queue` varchar(40) DEFAULT NULL,
-  `status` tinyint(4) DEFAULT NULL,
-  `create_time` datetime DEFAULT NULL,
-  `modify_time` datetime DEFAULT NULL,
-  `owner` int(11) DEFAULT NULL,
-  `last_modify_by` int(11) DEFAULT NULL,
-  `start_time` datetime DEFAULT NULL,
-  `end_time` datetime DEFAULT NULL,
-  `job_id` varchar(64) DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
 DROP TABLE IF EXISTS `schedules`;
 CREATE TABLE `schedules` (
   `flow_id` int(11) NOT NULL AUTO_INCREMENT,
