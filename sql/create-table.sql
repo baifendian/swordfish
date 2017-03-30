@@ -82,7 +82,7 @@ CREATE TABLE `datasource` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'datasource id',
   `name` varchar(64) NOT NULL COMMENT 'datasource name',
   `desc` varchar(256) DEFAULT NULL COMMENT 'datasource description',
-  `type` int(11) NOT NULL COMMENT 'datasource type',
+  `type` tinyint(4) NOT NULL COMMENT 'datasource type',
   `owner` int(11) NOT NULL COMMENT 'owner id of the datasource.',
   `project_id` int(11) NOT NULL COMMENT 'project id of the datasource.',
   `parameter` text NOT NULL COMMENT 'datasource parameter',
@@ -97,18 +97,17 @@ CREATE TABLE `datasource` (
 -- `project_flows` table
 DROP TABLE If Exists `project_flows`;
 CREATE TABLE `project_flows` (
-  `id` int(20) NOT NULL AUTO_INCREMENT COMMENT 'project_flows id',
-  `name` varchar(64) NOT NULL COMMENT 'project_flows name',
-  `desc` varchar(64) NOT NULL COMMENT 'project_flows desc',
-  `project_id` int(20) NOT NULL COMMENT 'project id of the project_flows',
-  `create_time` datetime NOT NULL COMMENT 'create time of the project_flows',
-  `modify_time` datetime NOT NULL COMMENT 'modify time of the project_flows',
-  `last_modify_by` int(20) NOT NULL COMMENT 'last modify user id of the project_flows',
-  `owner` int(20) NOT NULL COMMENT 'owner id of the project_flows.',
-  `proxy_user` varchar(64) NOT NULL COMMENT 'proxy user of the project_flows.',
-  `user_defined_params` text DEFAULT NULL COMMENT 'user defined params of the project_flows.',
-  `extras` text DEFAULT NULL COMMENT 'extends of the project_flows',
-  `queue` varchar(64) DEFAULT NULL COMMENT 'queue of the project_flows',
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'project flows id',
+  `name` varchar(64) NOT NULL COMMENT 'project flows name',
+  `project_id` int(11) NOT NULL COMMENT 'project id of the project flows',
+  `create_time` datetime NOT NULL COMMENT 'create time of the project flows',
+  `modify_time` datetime NOT NULL COMMENT 'modify time of the project flows',
+  `last_modify_by` int(11) NOT NULL COMMENT 'last modify user id of the project flows',
+  `owner` int(11) NOT NULL COMMENT 'owner id of the project flows.',
+  `proxy_user` varchar(32) NOT NULL COMMENT 'proxy user of the project flows.',
+  `user_defined_params` text DEFAULT NULL COMMENT 'user defined params of the project flows.',
+  `extras` text DEFAULT NULL COMMENT 'extends of the project flows',
+  `queue` varchar(64) DEFAULT NULL COMMENT 'queue of the project flows',
   PRIMARY KEY (`id`),
   UNIQUE KEY `project_flowname` (`project_id`, `name`),
   FOREIGN KEY (`project_id`) REFERENCES `project`(`id`) ON DELETE CASCADE,
@@ -121,14 +120,83 @@ CREATE TABLE `flows_nodes` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'flow nodes id',
   `name` varchar(64) NOT NULL COMMENT 'flow nodes name',
   `flow_id` int(11) NOT NULL COMMENT 'project flow id of the flow nodes',
-  `desc` VARCHAR(512) NOT NULL COMMENT 'create time of the flow nodes',
-  `type` int(11) NOT NULL COMMENT 'type of the flow nodes',
+  `desc` VARCHAR(256) NOT NULL COMMENT 'create time of the flow nodes',
+  `create_time` datetime NOT NULL COMMENT 'create time of the flow nodes',
+  `modify_time` datetime NOT NULL COMMENT 'modify time of the flow nodes',
+  `last_modify_by` int(11) NOT NULL COMMENT 'last modify user id of the flow nodes',
+  `type` varchar(32) NOT NULL COMMENT 'type of the flow nodes, string type',
   `parameter` text DEFAULT NULL COMMENT 'parameter of the flow nodes.',
   `extras` text DEFAULT NULL COMMENT 'extends of the flow nodes',
-  `dep` VARCHAR(512) DEFAULT NULL COMMENT 'dep of the flow nodes',
+  `dep` text DEFAULT NULL COMMENT 'dep of the flow nodes, is a json array, array element is a node name',
   PRIMARY KEY (`id`),
   UNIQUE KEY `flows_nodename` (`flow_id`, `name`),
   FOREIGN KEY (`flow_id`) REFERENCES `project_flows`(`id`) ON DELETE CASCADE,
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- `schedules` table
+DROP TABLE IF EXISTS `schedules`;
+CREATE TABLE `schedules` (
+  `flow_id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'flow id',
+  `start_date` datetime NOT NULL COMMENT 'start date of the scheduler',
+  `end_date` datetime NOT NULL COMMENT 'end date of the scheduler',
+  `schedule_type` tinyint(4) NOT NULL COMMENT 'schedule type',
+  `crontab_str` varchar(256) NOT NULL COMMENT 'cron tab str',
+  `next_submit_time` datetime DEFAULT NULL COMMENT 'next submit time',
+  `dep_workflows` text DEFAULT NULL COMMENT 'dep workflows, is a json array, array element is a flow id',
+  `dep_policy` tinyint(4) NOT NULL COMMENT 'dep policy',
+  `failure_policy` tinyint(4) NOT NULL COMMENT 'failure policy',
+  `max_try_times` tinyint(4) NOT NULL COMMENT 'max try times',
+  `notify_type` tinyint(4) NOT NULL COMMENT 'notify type',
+  `notify_mails` text DEFAULT NULL COMMENT 'notify emails',
+  `timeout` int(11) NOT NULL COMMENT 'timeout, unit: seconds',
+  `create_time` datetime NOT NULL COMMENT 'create time of this records',
+  `modify_time` datetime NOT NULL COMMENT 'modify time of this records',
+  `owner` int(11) NOT NULL COMMENT 'owner id of the schedule',
+  `last_modify_by` int(11) NOT NULL COMMENT 'last modify user id',
+  `status` tinyint(4) NOT NULL,
+  PRIMARY KEY (`flow_id`),
+  FOREIGN KEY (`flow_id`) REFERENCES `project_flows`(`id`) ON DELETE CASCADE,
+  FOREIGN KEY (`owner`) REFERENCES `user`(`id`),
+  FOREIGN KEY (`last_modify_by`) REFERENCES `user`(`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- `execution_flows` table
+DROP TABLE IF EXISTS `execution_flows`;
+CREATE TABLE `execution_flows` (
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'exec id',
+  `flow_id` int(11) NOT NULL COMMENT 'flow id of this exec',
+  `worker` varchar(64) DEFAULT NULL COMMENT 'exec work information, host:port',
+  `submit_user` int(11) NOT NULL COMMENT 'submit user',
+  `submit_time` datetime NOT NULL COMMENT 'submit time',
+  `queue` varchar(64) NOT NULL COMMENT 'queue of this exec',
+  `proxy_user` varchar(32) NOT NULL COMMENT 'proxy user of this exec',
+  `schedule_time` datetime DEFAULT NULL COMMENT 'real schedule time of this exec',
+  `start_time` datetime NOT NULL COMMENT 'real start time of this exec',
+  `end_time` datetime DEFAULT NULL COMMENT 'end time of this exec',
+  `workflow_data` text NOT NULL COMMENT 'short desc of the workflow, contain keys: edges, nodes; edges: [{"startNode": "xxx", "startNode": "xxx"}, ...], nodes: [{"name": "shelljob1", "desc":"shell", "type":"VIRTUAL", "param": {"script": "echo shelljob1"}}, ...]',
+  `type` tinyint(4) NOT NULL COMMENT 'exec ways, schedule, add data or run ad-hoc.',
+  `max_try_times` tinyint(4) DEFAULT NULL COMMENT 'max try times of the exec',
+  `timeout` int(4) DEFAULT NULL COMMENT 'timeout, unit: seconds',
+  `status` tinyint(4) NOT NULL COMMENT 'exec status',
+  `extras` text DEFAULT NULL COMMENT 'extra information of the flows',
+  PRIMARY KEY (`id`),
+  FOREIGN KEY (`flow_id`) REFERENCES `project_flows`(`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- `execution_nodes` table
+DROP TABLE IF EXISTS `execution_nodes`;
+CREATE TABLE `execution_nodes` (
+  `exec_id` int(11) NOT NULL COMMENT 'exec id',
+  `name` varchar(64) NOT NULL COMMENT 'node name for exec',
+  `start_time` datetime NOT NULL COMMENT 'the start time of the node exec',
+  `end_time` datetime DEFAULT NULL COMMENT 'the end time of the node exec',
+  `attempt` tinyint(4) NOT NULL COMMENT 'attempt exec times',
+  `log_links` text DEFAULT NULL COMMENT 'log links, is a json array, element is a string',
+  `job_id` varchar(64) NOT NULL COMMENT 'job id',
+  `status` tinyint(4) NOT NULL COMMENT 'status',
+  `extras` text DEFAULT NULL COMMENT 'extra information of the nodes',
+  PRIMARY KEY (`exec_id`, `name`),
+  FOREIGN KEY (`exec_id`) REFERENCES `execution_flows`(`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- `ad_hocs` table
@@ -137,9 +205,9 @@ CREATE TABLE `ad_hocs` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'exec id of ad hoc query',
   `project_id` int(11) NOT NULL COMMENT 'project id of the ad hoc',
   `owner` int(11) NOT NULL COMMENT 'owner id of the ad hoc',
-  `parameter` text NOT NULL COMMENT 'parameter is a object, contains key: stms, limit, udfs',
-  `proxy_user` varchar(30) NOT NULL COMMENT 'proxy user name',
-  `queue` varchar(40) NOT NULL COMMENT 'queue name',
+  `parameter` text NOT NULL COMMENT 'parameter is a object, contains keys: stms, limit, udfs',
+  `proxy_user` varchar(32) NOT NULL COMMENT 'proxy user name',
+  `queue` varchar(64) NOT NULL COMMENT 'queue name',
   `status` tinyint(4) NOT NULL COMMENT 'status, refer https://github.com/baifendian/swordfish/wiki/workflow-exec%26maintain',
   `job_id` varchar(64) DEFAULT NULL COMMENT 'job id of this exec',
   `create_time` datetime NOT NULL COMMENT 'create time of the ad hoc query',
@@ -161,7 +229,8 @@ CREATE TABLE `ad_hoc_results` (
   `create_time` datetime NOT NULL COMMENT 'create time of the records',
   `start_time` datetime DEFAULT NULL COMMENT 'start time of this exec',
   `end_time` datetime DEFAULT NULL COMMENT 'end time of this exec',
-  PRIMARY KEY (`exec_id`,`index`)
+  PRIMARY KEY (`exec_id`,`index`),
+  FOREIGN KEY (`exec_id`) REFERENCES `ad_hocs`(`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- `master_server` table
@@ -174,60 +243,4 @@ CREATE TABLE `master_server` (
   `modify_time` datetime NOT NULL COMMENT 'last modify time of the records',
   PRIMARY KEY (`id`),
   UNIQUE KEY `host_port` (`host`, `port`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-DROP TABLE IF EXISTS `schedules`;
-CREATE TABLE `schedules` (
-  `flow_id` int(11) NOT NULL AUTO_INCREMENT,
-  `create_time` datetime NOT NULL,
-  `modify_time` datetime NOT NULL,
-  `last_modify_by` int(11) NOT NULL,
-  `schedule_status` tinyint(4) NOT NULL,
-  `start_date` datetime DEFAULT NULL,
-  `end_date` datetime DEFAULT NULL,
-  `schedule_type` tinyint(4) DEFAULT NULL,
-  `crontab_str` varchar(256) DEFAULT NULL,
-  `next_submit_time` datetime DEFAULT NULL,
-  `dep_workflows` varchar(2048) DEFAULT NULL,
-  `dep_policy` tinyint(4) DEFAULT NULL,
-  `failure_policy` tinyint(4) NOT NULL,
-  `max_try_times` tinyint(4) NOT NULL,
-  `notify_type` tinyint(4) NOT NULL,
-  `notify_mails` varchar(512) DEFAULT NULL,
-  `timeout` int(11) DEFAULT NULL,
-  PRIMARY KEY (`flow_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-DROP TABLE IF EXISTS `execution_flows`;
-CREATE TABLE `execution_flows` (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT,
-  `flow_id` int(11) NOT NULL,
-  `worker` varchar(100) DEFAULT NULL,
-  `status` tinyint(4) NOT NULL,
-  `submit_user` int(11) NOT NULL,
-  `submit_time` datetime NOT NULL,
-  `proxy_user` varchar(64) NOT NULL,
-  `schedule_time` datetime DEFAULT NULL,
-  `start_time` datetime NOT NULL,
-  `end_time` datetime DEFAULT NULL,
-  `workflow_data` text NOT NULL,
-  `type` tinyint(4) NOT NULL,
-  `max_try_times` tinyint(4) DEFAULT NULL,
-  `timeout` int(4) DEFAULT NULL,
-  `error_code` tinyint(4) DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-DROP TABLE IF EXISTS `execution_nodes`;
-CREATE TABLE `execution_nodes` (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT,
-  `attempt` tinyint(4) NOT NULL,
-  `end_time` datetime DEFAULT NULL,
-  `exec_id` bigint(20) NOT NULL,
-  `flow_id` int(11) NOT NULL,
-  `job_id` varchar(64) NOT NULL,
-  `node_id` int(11) NOT NULL,
-  `start_time` datetime NOT NULL,
-  `status` tinyint(4) NOT NULL,
-  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
