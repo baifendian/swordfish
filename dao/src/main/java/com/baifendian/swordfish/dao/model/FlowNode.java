@@ -19,6 +19,8 @@ import com.baifendian.swordfish.dao.enums.NodeType;
 import com.baifendian.swordfish.dao.utils.json.StringNodeJsonDeserializer;
 import com.baifendian.swordfish.dao.utils.json.StringNodeJsonSerializer;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
@@ -117,7 +119,9 @@ public class FlowNode {
     return depList;
   }
 
-  public void setDepList(List<String> depList) {
+  public void setDepList(List<String> depList) throws JsonProcessingException {
+    ObjectMapper mapper = new ObjectMapper();
+    this.dep = mapper.writeValueAsString(depList);
     this.depList = depList;
   }
 }

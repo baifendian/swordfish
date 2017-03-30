@@ -20,7 +20,7 @@ import org.apache.ibatis.type.EnumOrdinalTypeHandler;
 public class EnumFieldUtil {
 
   /**
-   * 生成 enum 字段的字符串
+   * 生成 enums 字段的字符串
    *
    * @param field
    * @param enumClass

@@ -15,6 +15,8 @@
  */
 package com.baifendian.swordfish.webserver.api.service;
 
+import com.baifendian.swordfish.common.utils.graph.Graph;
+import com.baifendian.swordfish.dao.enums.NodeType;
 import com.baifendian.swordfish.dao.mapper.FlowNodeMapper;
 import com.baifendian.swordfish.dao.mapper.ProjectFlowMapper;
 import com.baifendian.swordfish.dao.mapper.ProjectMapper;
@@ -22,6 +24,7 @@ import com.baifendian.swordfish.dao.model.FlowNode;
 import com.baifendian.swordfish.dao.model.Project;
 import com.baifendian.swordfish.dao.model.ProjectFlow;
 import com.baifendian.swordfish.dao.model.User;
+import com.baifendian.swordfish.webserver.api.dto.NodeParamMR;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.httpclient.HttpStatus;
@@ -32,8 +35,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.dao.DuplicateKeyException;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -43,7 +44,9 @@ import java.io.ByteArrayInputStream;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class WorkflowService {
@@ -98,6 +101,8 @@ public class WorkflowService {
       return null;
     }
 
+    List<FlowNode> flowNodes = projectFlowData.getNodes();
+
     ProjectFlow projectFlow = new ProjectFlow();
     Date now = new Date();
 
@@ -105,7 +110,7 @@ public class WorkflowService {
     projectFlow.setProjectId(project.getId());
     projectFlow.setProjectName(projectName);
     projectFlow.setDesc(desc);
-    projectFlow.setFlowsNodes(projectFlowData.getNodes());
+    projectFlow.setFlowsNodes(flowNodes);
     projectFlow.setCreateTime(now);
     projectFlow.setModifyTime(now);
     projectFlow.setProxyUser(proxyUser);
@@ -124,8 +129,14 @@ public class WorkflowService {
     }
 
 
-    if (projectFlow.getFlowsNodes() != null) {
-      for (FlowNode flowNode : projectFlow.getFlowsNodes()) {
+    if (flowNodes != null) {
+      //闭环检测未通过
+      if (!graphCheck(flowNodes)){
+        response.setStatus(HttpStatus.SC_BAD_REQUEST);
+        return null;
+      }
+
+      for (FlowNode flowNode : flowNodes) {
         flowNode.setFlowId(projectFlow.getId());
         flowNodeMapper.insert(flowNode);
       }
@@ -362,7 +373,7 @@ public class WorkflowService {
    * @param file
    * @return
    */
-  private ProjectFlow.ProjectFlowData ProjectFlowDataDes11n(String data, MultipartFile file) {
+  public ProjectFlow.ProjectFlowData ProjectFlowDataDes11n(String data, MultipartFile file) {
     ProjectFlow.ProjectFlowData projectFlowData = null;
     ObjectMapper mapper = new ObjectMapper();
     try {
@@ -381,5 +392,55 @@ public class WorkflowService {
       }
     }
     return projectFlowData;
+  }
+
+  /**
+   * 闭环检测
+   * @param flowNodeList
+   * @return
+   */
+  public boolean graphCheck(List<FlowNode> flowNodeList){
+    Graph<String,String> graph = new Graph<>();
+
+    //缓存边关系
+    Map<String,Integer> flowNodeIdMap = new HashMap<>();
+
+    //填充顶点
+    int index = 0;
+    for (FlowNode flowNode:flowNodeList){
+      graph.addVertex(index,flowNode.getName());
+      flowNodeIdMap.put(flowNode.getName(),index++);
+    }
+
+    //填充边关系
+    index = 0;
+    for (FlowNode flowNode:flowNodeList){
+      for(String dep:flowNode.getDepList()){
+        graph.addEdge(flowNodeIdMap.get(dep),index);
+      }
+    }
+
+    return graph.hasCycle();
+  }
+
+  /**
+   * 检测flowNode parameter格式是否正常
+   * @return
+   */
+  public boolean flowNodeParamCheck(String parameter, NodeType nodeType){
+    ObjectMapper mapper = new ObjectMapper();
+
+    try {
+      switch (nodeType) {
+        case MR:
+          mapper.readValue(parameter, NodeParamMR.class);
+          break;
+        default:return false;
+      }
+    }catch (Exception e){
+      logger.error(e.toString());
+      return false;
+    }
+    return true;
   }
 }

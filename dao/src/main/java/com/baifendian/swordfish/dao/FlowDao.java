@@ -62,15 +62,6 @@ public class FlowDao extends BaseDao {
   }
 
   /**
-   * @param nodeId
-   * @return
-   */
-  public FlowNode queryNodeInfo(Integer nodeId) {
-    FlowNode flowNode = flowNodeMapper.selectByNodeId(nodeId);
-    return flowNode;
-  }
-
-  /**
    * 获取 flow 执行详情 <p>
    *
    * @return {@link ExecutionFlow}
@@ -261,25 +252,6 @@ public class FlowDao extends BaseDao {
     return flowNodes;
   }
 
-  /**
-   * 创建节点
-   */
-  @Transactional(value = "TransactionManager")
-  public void createNode(int projectId, int workflowId, String nodeType, int userId, String name) throws Exception {
-    FlowNode flowNode = new FlowNode();
-
-    flowNode.setName(name);
-    flowNode.setFlowId(workflowId);
-    flowNode.setType(nodeType);
-    Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-    flowNode.setCreateTime(timestamp);
-    flowNode.setModifyTime(timestamp);
-    flowNode.setLastModifyBy(userId);
-    int count = flowNodeMapper.insert(flowNode);
-    if (count <= 0) {
-      throw new Exception("插入节点失败");
-    }
-  }
 
   /**
    * 配置调度信息
