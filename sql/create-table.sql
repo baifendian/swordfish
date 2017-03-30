@@ -99,6 +99,7 @@ DROP TABLE If Exists `project_flows`;
 CREATE TABLE `project_flows` (
   `id` int(20) NOT NULL AUTO_INCREMENT COMMENT 'project_flows id',
   `name` varchar(64) NOT NULL COMMENT 'project_flows name',
+  `desc` varchar(64) NOT NULL COMMENT 'project_flows desc',
   `project_id` int(20) NOT NULL COMMENT 'project id of the project_flows',
   `create_time` datetime NOT NULL COMMENT 'create time of the project_flows',
   `modify_time` datetime NOT NULL COMMENT 'modify time of the project_flows',
@@ -121,9 +122,6 @@ CREATE TABLE `flows_nodes` (
   `name` varchar(64) NOT NULL COMMENT 'flow nodes name',
   `flow_id` int(11) NOT NULL COMMENT 'project flow id of the flow nodes',
   `desc` VARCHAR(512) NOT NULL COMMENT 'create time of the flow nodes',
-  `create_time` datetime NOT NULL COMMENT 'create time of the flow nodes',
-  `modify_time` datetime NOT NULL COMMENT 'modify time of the flow nodes',
-  `last_modify_by` int(11) NOT NULL COMMENT 'last modify user id of the flow nodes',
   `type` int(11) NOT NULL COMMENT 'type of the flow nodes',
   `parameter` text DEFAULT NULL COMMENT 'parameter of the flow nodes.',
   `extras` text DEFAULT NULL COMMENT 'extends of the flow nodes',

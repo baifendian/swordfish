@@ -149,20 +149,79 @@ public interface ProjectFlowMapper {
    */
   @Results(value = {@Result(property = "id", column = "id", id = true, javaType = int.class, jdbcType = JdbcType.INTEGER),
           @Result(property = "name", column = "name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-          @Result(property = "canvas", column = "canvas", javaType = String.class, jdbcType = JdbcType.VARCHAR),
           @Result(property = "createTime", column = "create_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE),
           @Result(property = "modifyTime", column = "modify_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE),
-          @Result(property = "publishTime", column = "publish_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE),
+          @Result(property = "desc", column = "desc", javaType = String.class, jdbcType = JdbcType.VARCHAR),
           @Result(property = "projectId", column = "project_id", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
           @Result(property = "projectName", column = "project_name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
           @Result(property = "lastModifyBy", column = "last_modify_by", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
           @Result(property = "lastPublishBy", column = "last_publish_by", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
           @Result(property = "ownerId", column = "owner_id", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
-          @Result(property = "inputTables", column = "input_tables", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-          @Result(property = "outputTables", column = "output_tables", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-          @Result(property = "resourceIds", column = "resource_ids", javaType = String.class, jdbcType = JdbcType.VARCHAR),})
+          @Result(property = "owner", column = "owner", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+          @Result(property = "proxyUser", column = "proxy_user", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+          @Result(property = "userDefinedParams", column = "user_defined_params", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+          @Result(property = "extras", column = "extras", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+          @Result(property = "queue", column = "queue", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+          @Result(property = "flowsNodes", column = "id", javaType = List.class, many = @Many(select = "selectByFlowId")),
+          })
   @SelectProvider(type = ProjectFlowMapperSqlProvider.class, method = "queryByName")
   ProjectFlow findByName(@Param("projectId") Integer projectId, @Param("name") String name);
+
+  @Results(value = {@Result(property = "id", column = "id", id = true, javaType = int.class, jdbcType = JdbcType.INTEGER),
+          @Result(property = "name", column = "name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+          @Result(property = "createTime", column = "create_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE),
+          @Result(property = "modifyTime", column = "modify_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE),
+          @Result(property = "desc", column = "desc", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+          @Result(property = "projectId", column = "project_id", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
+          @Result(property = "projectName", column = "project_name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+          @Result(property = "lastModifyBy", column = "last_modify_by", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
+          @Result(property = "lastPublishBy", column = "last_publish_by", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
+          @Result(property = "ownerId", column = "owner_id", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
+          @Result(property = "owner", column = "owner", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+          @Result(property = "proxyUser", column = "proxy_user", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+          @Result(property = "userDefinedParams", column = "user_defined_params", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+          @Result(property = "extras", column = "extras", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+          @Result(property = "queue", column = "queue", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+          @Result(property = "flowsNodes", column = "id", javaType = List.class, many = @Many(select = "selectByFlowId")),
+  })
+  @SelectProvider(type = ProjectFlowMapperSqlProvider.class, method = "findByProjectNameAndName")
+  ProjectFlow findByProjectNameAndName(@Param("projectName") String projectName, @Param("name") String name);
+
+  @Results(value = {@Result(property = "id", column = "id", id = true, javaType = int.class, jdbcType = JdbcType.INTEGER),
+          @Result(property = "name", column = "name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+          @Result(property = "createTime", column = "create_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE),
+          @Result(property = "modifyTime", column = "modify_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE),
+          @Result(property = "desc", column = "desc", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+          @Result(property = "projectId", column = "project_id", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
+          @Result(property = "projectName", column = "project_name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+          @Result(property = "lastModifyBy", column = "last_modify_by", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
+          @Result(property = "lastPublishBy", column = "last_publish_by", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
+          @Result(property = "ownerId", column = "owner_id", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
+          @Result(property = "owner", column = "owner", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+          @Result(property = "proxyUser", column = "proxy_user", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+          @Result(property = "userDefinedParams", column = "user_defined_params", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+          @Result(property = "extras", column = "extras", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+          @Result(property = "queue", column = "queue", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+          @Result(property = "flowsNodes", column = "id", javaType = List.class, many = @Many(select = "selectByFlowId")),
+  })
+  @SelectProvider(type = ProjectFlowMapperSqlProvider.class, method = "findByProject")
+  List<ProjectFlow> findByProject(@Param("projectId") Integer projectId);
+
+  /**
+   * 根据项目和名字删除一个工作流
+   * @param projectId
+   * @param name
+   * @return
+   */
+  @DeleteProvider(type = ProjectFlowMapperSqlProvider.class, method = "deleteByProjectAndName")
+  int deleteByProjectAndName(@Param("projectId") int projectId, @Param("name") String name);
+
+  /**
+   * 修改覆盖式
+   * @return
+   */
+  @UpdateProvider(type = ProjectFlowMapperSqlProvider.class, method = "updateByName")
+  int updateByName(@Param("flow") ProjectFlow projectFlow);
 
   @Results(value = {@Result(property = "id", column = "id", id = true, javaType = Integer.class, jdbcType = JdbcType.INTEGER),
           @Result(property = "name", column = "name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
