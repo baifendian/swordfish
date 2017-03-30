@@ -24,7 +24,7 @@ public enum FlowStatus {
   /**
    * 0(初始化) 1(调度依赖任务中) 2(调度依赖资源中) 3(正在运行) 4(运行成功) 5(kill掉) 6(运行失败)
    **/
-  INIT, WAITING_DEP, WAITING_RES, RUNNING, SUCCESS, KILL, FAILED;
+  INIT, WAITING_DEP, WAITING_RES, RUNNING, SUCCESS, KILL, FAILED, DEP_FAILED;
 
   @JsonValue
   public Integer getType() {
@@ -57,7 +57,7 @@ public enum FlowStatus {
   }
 
   public boolean typeIsFailure() {
-    return this == KILL || this == FAILED;
+    return this == KILL || this == FAILED || this == DEP_FAILED;
   }
 
   /**
@@ -66,6 +66,6 @@ public enum FlowStatus {
    * @return 是否终止状态
    */
   public boolean typeIsFinished() {
-    return this == SUCCESS || this == KILL || this == FAILED;
+    return this == SUCCESS || this == KILL || this == FAILED || this == DEP_FAILED;
   }
 }

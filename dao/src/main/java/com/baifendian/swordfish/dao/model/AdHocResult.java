@@ -18,6 +18,7 @@ package com.baifendian.swordfish.dao.model;
 import com.baifendian.swordfish.dao.enums.FlowStatus;
 
 import java.sql.Timestamp;
+import java.util.Date;
 
 public class AdHocResult {
   /**
@@ -46,6 +47,10 @@ public class AdHocResult {
    * 创建时间
    */
   private Timestamp createTime;
+
+  private Date startTime;
+
+  private Date endTime;
 
   public long getAdHocId() {
     return adHocId;
@@ -93,5 +98,21 @@ public class AdHocResult {
 
   public void setCreateTime(Timestamp createTime) {
     this.createTime = createTime;
+  }
+
+  public Date getStartTime() {
+    return startTime;
+  }
+
+  public void setStartTime(Date startTime) {
+    this.startTime = startTime;
+  }
+
+  public Date getEndTime() {
+    return endTime;
+  }
+
+  public void setEndTime(Date endTime) {
+    this.endTime = endTime;
   }
 }

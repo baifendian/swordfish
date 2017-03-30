@@ -16,7 +16,6 @@
 package com.baifendian.swordfish.dao.mapper;
 
 import com.baifendian.swordfish.dao.mapper.utils.EnumFieldUtil;
-import com.baifendian.swordfish.dao.enums.FlowErrorCode;
 import com.baifendian.swordfish.dao.enums.FlowRunType;
 import com.baifendian.swordfish.dao.enums.FlowStatus;
 import com.baifendian.swordfish.dao.enums.FlowType;
@@ -71,7 +70,6 @@ public class ExecutionFlowMapperProvider {
         VALUES("end_time", "#{executionFlow.endTime}");
         VALUES("workflow_data", "#{executionFlow.workflowData}");
         VALUES("type", EnumFieldUtil.genFieldStr("executionFlow.type", FlowRunType.class));
-        VALUES("error_code", EnumFieldUtil.genFieldStr("executionFlow.errorCode", FlowErrorCode.class));
         VALUES("max_try_times", "#{executionFlow.maxTryTimes}");
         VALUES("timeout", "#{executionFlow.timeout}");
       }
@@ -91,9 +89,6 @@ public class ExecutionFlowMapperProvider {
         }
         if (executionFlow.getEndTime() != null) {
           SET("end_time = #{executionFlow.endTime}");
-        }
-        if (executionFlow.getErrorCode() != null) {
-          SET("error_code = " + EnumFieldUtil.genFieldStr("executionFlow.errorCode", FlowErrorCode.class));
         }
         if (executionFlow.getWorker() != null) {
           SET("worker = #{executionFlow.worker}");

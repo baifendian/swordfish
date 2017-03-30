@@ -20,7 +20,7 @@ public class HBaseParam {
 
   private String zkZnodeParent;
 
-  private int zkPort;
+  private Integer zkPort;
 
   public String getZkQuorum() {
     return zkQuorum;
@@ -38,11 +38,11 @@ public class HBaseParam {
     this.zkZnodeParent = zkZnodeParent;
   }
 
-  public int getZkPort() {
+  public Integer getZkPort() {
     return zkPort;
   }
 
-  public void setZkPort(int zkPort) {
+  public void setZkPort(Integer zkPort) {
     this.zkPort = zkPort;
   }
 }

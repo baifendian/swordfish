@@ -15,10 +15,8 @@
  */
 package com.baifendian.swordfish.dao.model;
 
-import com.baifendian.swordfish.dao.enums.FlowErrorCode;
 import com.baifendian.swordfish.dao.enums.FlowRunType;
 import com.baifendian.swordfish.dao.enums.FlowStatus;
-import com.baifendian.swordfish.dao.enums.FlowType;
 
 import java.util.Date;
 
@@ -116,11 +114,6 @@ public class ExecutionFlow {
   private Integer maxTryTimes;
 
   private Integer timeout;
-
-  /**
-   * 执行的错误码
-   */
-  private FlowErrorCode errorCode;
 
   /**
    * 作业提交队列
@@ -277,14 +270,6 @@ public class ExecutionFlow {
    */
   public void setOrgName(String orgName) {
     this.orgName = orgName;
-  }
-
-  public FlowErrorCode getErrorCode() {
-    return errorCode;
-  }
-
-  public void setErrorCode(FlowErrorCode errorCode) {
-    this.errorCode = errorCode;
   }
 
   public String getQueue() {

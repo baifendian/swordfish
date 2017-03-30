@@ -293,7 +293,7 @@ public class FlowRunner implements Runnable {
     allParamMap.putAll(customParamMap);
     for (FlowNode node : nodes) {
       JobProps props = new JobProps();
-      props.setJobParams(node.getParam());
+      props.setJobParams(node.getParameter());
       props.setDefinedParams(allParamMap);
       String jobId = node.getType() + "_" + node.getId();
 
@@ -701,21 +701,6 @@ public class FlowRunner implements Runnable {
   private void updateExecutionFlow(FlowStatus status) {
     executionFlow.setEndTime(new Date());
     executionFlow.setStatus(status);
-    FlowErrorCode errorCode;
-    switch (status) {
-      case SUCCESS:
-        errorCode = FlowErrorCode.SUCCESS;
-        break;
-      case KILL:
-        errorCode = FlowErrorCode.KILL;
-        break;
-      case FAILED:
-        errorCode = FlowErrorCode.EXEC_FAILED;
-        break;
-      default:
-        errorCode = FlowErrorCode.EXEC_FAILED;
-    }
-    executionFlow.setErrorCode(errorCode);
     flowDao.updateExecutionFlow(executionFlow);
   }
 

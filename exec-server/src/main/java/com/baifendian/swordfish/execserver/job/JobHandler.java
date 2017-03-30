@@ -94,7 +94,7 @@ public class JobHandler {
 
     // 作业参数配置
     JobProps props = new JobProps();
-    props.setJobParams(node.getParam());
+    props.setJobParams(node.getParameter());
     props.setWorkDir(jobScriptPath);
     props.setProxyUser(executionFlow.getProxyUser());
     props.setDefinedParams(allParamMap);
