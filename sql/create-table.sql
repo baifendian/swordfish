@@ -145,3 +145,89 @@ CREATE TABLE `master_server` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `host_port` (`host`, `port`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- ad_hoc_result table
+DROP TABLE IF EXISTS `ad_hoc_results`;
+CREATE TABLE `ad_hoc_results` (
+  `ad_hoc_id` bigint(20) NOT NULL,
+  `index` int(11) NOT NULL,
+  `stm` text NOT NULL,
+  `result` text,
+  `status` tinyint(4) NOT NULL,
+  `create_time` datetime NOT NULL,
+  PRIMARY KEY (`ad_hoc_id`, `index`),
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `ad_hocs`;
+CREATE TABLE `ad_hocs` (
+  `id` bigint(11) NOT NULL AUTO_INCREMENT,
+  `project_id` int(11) NOT NULL,
+  `params` text NOT NULL,
+  `proxy_user` varchar(30) NOT NULL,
+  `queue` varchar(40) DEFAULT NULL,
+  `status` tinyint(4) DEFAULT NULL,
+  `create_time` datetime DEFAULT NULL,
+  `modify_time` datetime DEFAULT NULL,
+  `owner` int(11) DEFAULT NULL,
+  `last_modify_by` int(11) DEFAULT NULL,
+  `start_time` datetime DEFAULT NULL,
+  `end_time` datetime DEFAULT NULL,
+  `job_id` varchar(64) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `schedules`;
+CREATE TABLE `schedules` (
+  `flow_id` int(11) NOT NULL AUTO_INCREMENT,
+  `create_time` datetime NOT NULL,
+  `modify_time` datetime NOT NULL,
+  `last_modify_by` int(11) NOT NULL,
+  `schedule_status` tinyint(4) NOT NULL,
+  `start_date` datetime DEFAULT NULL,
+  `end_date` datetime DEFAULT NULL,
+  `schedule_type` tinyint(4) DEFAULT NULL,
+  `crontab_str` varchar(256) DEFAULT NULL,
+  `next_submit_time` datetime DEFAULT NULL,
+  `dep_workflows` varchar(2048) DEFAULT NULL,
+  `dep_policy` tinyint(4) DEFAULT NULL,
+  `failure_policy` tinyint(4) NOT NULL,
+  `max_try_times` tinyint(4) NOT NULL,
+  `notify_type` tinyint(4) NOT NULL,
+  `notify_mails` varchar(512) DEFAULT NULL,
+  `timeout` int(11) DEFAULT NULL,
+  PRIMARY KEY (`flow_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `execution_flows`;
+CREATE TABLE `execution_flows` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `flow_id` int(11) NOT NULL,
+  `worker` varchar(100) DEFAULT NULL,
+  `status` tinyint(4) NOT NULL,
+  `submit_user` int(11) NOT NULL,
+  `submit_time` datetime NOT NULL,
+  `proxy_user` varchar(64) NOT NULL,
+  `schedule_time` datetime DEFAULT NULL,
+  `start_time` datetime NOT NULL,
+  `end_time` datetime DEFAULT NULL,
+  `workflow_data` text NOT NULL,
+  `type` tinyint(4) NOT NULL,
+  `max_try_times` tinyint(4) DEFAULT NULL,
+  `timeout` int(4) DEFAULT NULL,
+  `error_code` tinyint(4) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `execution_nodes`;
+CREATE TABLE `execution_nodes` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `attempt` tinyint(4) NOT NULL,
+  `end_time` datetime DEFAULT NULL,
+  `exec_id` bigint(20) NOT NULL,
+  `flow_id` int(11) NOT NULL,
+  `job_id` varchar(64) NOT NULL,
+  `node_id` int(11) NOT NULL,
+  `start_time` datetime NOT NULL,
+  `status` tinyint(4) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;

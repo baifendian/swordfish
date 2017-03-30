@@ -33,6 +33,20 @@ public class MasterConfig {
    */
   public static int failRetryQueueSize;
 
+  public static int heartBeatCheckInterval;
+
+  public static int heartBeatTimeoutInterval;
+
+  public static int masterMinThreads;
+
+  public static int masterMaxThreads;
+
+  public static int masterPort;
+
+  private static final String MASTER_MIN_THREADS = "master.min.threads";
+  private static final String MASTER_MAX_THREADS = "master.max.threads";
+  private static final String MASTER_PORT = "master.port";
+
   static {
     Configuration conf = null;
     try {
@@ -42,5 +56,10 @@ public class MasterConfig {
     }
     failRetryCount = conf.getInt("masterToWorker.failRetry.count", 2);
     failRetryQueueSize = conf.getInt("masterToWorker.failRetry.queueSize", 10000);
+    heartBeatTimeoutInterval = conf.getInt("master.heartbeat.timeout.interval", 60) * 1000;
+    heartBeatCheckInterval = conf.getInt("master.heartbeat.check.interval", 30);
+    masterMinThreads = conf.getInt(MASTER_MIN_THREADS, 50);
+    masterMaxThreads = conf.getInt(MASTER_MAX_THREADS, 200);
+    masterPort = conf.getInt(MASTER_PORT, 9999);
   }
 }

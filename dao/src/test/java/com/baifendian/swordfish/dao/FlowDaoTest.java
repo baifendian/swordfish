@@ -15,6 +15,7 @@
  */
 package com.baifendian.swordfish.dao;
 
+import com.baifendian.swordfish.dao.enums.FlowRunType;
 import com.baifendian.swordfish.dao.model.ExecutionFlow;
 import com.baifendian.swordfish.dao.model.ExecutionNode;
 
@@ -22,6 +23,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -51,6 +53,12 @@ public class FlowDaoTest {
   @Test
   public void testQueryExecutionFlow() {
     ExecutionFlow executionFlow = flowDao.queryExecutionFlow(2549);
+    System.out.println(executionFlow);
+  }
+
+  @Test
+  public void testScheduleFlowToExecution() {
+    ExecutionFlow executionFlow = flowDao.scheduleFlowToExecution(1, 2, 1, new Date(), FlowRunType.DISPATCH, 3, 5000);
     System.out.println(executionFlow);
   }
 }

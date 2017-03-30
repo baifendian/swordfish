@@ -194,7 +194,7 @@ public class FlowDao extends BaseDao {
    * @return {@link ExecutionFlow}
    */
   public ExecutionFlow scheduleFlowToExecution(Integer projectId, Integer workflowId, int submitUser, Date scheduleTime, FlowRunType runType,
-                                               int maxTryTimes, int timeout) {
+                                               Integer maxTryTimes, Integer timeout) {
     List<FlowNodeRelation> flowNodeRelations = flowNodeRelationMapper.selectByFlowId(workflowId); // 边信息
     List<FlowNode> flowNodes = flowNodeMapper.selectByFlowId(workflowId); // 节点信息
     ProjectFlow projectFlow = projectFlowMapper.findById(workflowId);

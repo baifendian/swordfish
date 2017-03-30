@@ -61,7 +61,8 @@ public class ExecutionNodeMapperProvider {
     }.toString();
   }
 
-  public String update(ExecutionNode executionNode) {
+  public String update(Map<String, Object> parameter) {
+    ExecutionNode executionNode = (ExecutionNode) parameter.get("executionNode");
     return new SQL() {
       {
         UPDATE(TABLE_NAME);

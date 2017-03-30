@@ -78,7 +78,8 @@ public class ExecutionFlowMapperProvider {
     }.toString();
   }
 
-  public String update(ExecutionFlow executionFlow) {
+  public String update(Map<String, Object> parameter) {
+    ExecutionFlow executionFlow = (ExecutionFlow) parameter.get("executionFlow");
     return new SQL() {
       {
         UPDATE(TABLE_NAME);

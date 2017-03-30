@@ -188,7 +188,13 @@ public class FlowRunnerManager {
    */
   public void destroy() {
     for (FlowRunner flowRunner : runningFlows.values()) {
-      flowRunner.kill("execServer");
+      flowRunner.kill();
+    }
+
+    try {
+      Thread.sleep(5000);
+    } catch (InterruptedException e) {
+      e.printStackTrace();
     }
     if (!flowExecutorService.isShutdown()) {
       try {
