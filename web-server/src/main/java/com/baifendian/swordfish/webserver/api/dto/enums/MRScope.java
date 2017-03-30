@@ -22,11 +22,16 @@ public enum MRScope {
   }
 
   @JsonCreator
-  public static MRScope valueOfName(String name) throws IllegalArgumentException {
-    if (StringUtils.isEmpty(name)) {
+  public static NodeType valueOfType(Integer type) throws IllegalArgumentException {
+    if (type == null) {
       return null;
     }
-    return MRScope.valueOf(name);
+    for (NodeType nodeType : NodeType.values()) {
+      if (nodeType.getType().equals(type)) {
+        return nodeType;
+      }
+    }
+    throw new IllegalArgumentException("Cannot convert " + type + " to " + NodeType.class.getSimpleName() + " .");
   }
 
 }
