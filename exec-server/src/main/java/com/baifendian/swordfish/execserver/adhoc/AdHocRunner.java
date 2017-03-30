@@ -43,7 +43,7 @@ public class AdHocRunner implements Runnable {
   @Override
   public void run(){
     JobProps props = new JobProps();
-    props.setJobParams(adHoc.getParams());
+    props.setJobParams(adHoc.getParameter());
     props.setProxyUser(adHoc.getProxyUser());
     props.setQueue(adHoc.getQueue());
     props.setProjectId(adHoc.getProjectId());
