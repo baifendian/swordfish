@@ -48,7 +48,7 @@ public class FlowNodeMapperSqlProvider {
         INSERT_INTO(TABLE_NAME);
         VALUES("name", "#{flowNode.name}");
         VALUES("`desc`", "#{flowNode.desc}");
-        VALUES("type", EnumFieldUtil.genFieldStr("flowNode.type", NodeType.class));
+        VALUES("type", "#{flowNode.type}");
         VALUES("flow_id", "#{flowNode.flowId}");
         VALUES("parameter", "#{flowNode.parameter}");
         VALUES("extras", "#{flowNode.extras}");

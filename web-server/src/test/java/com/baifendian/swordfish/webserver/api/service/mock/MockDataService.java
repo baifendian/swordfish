@@ -189,7 +189,7 @@ public class MockDataService {
     flowNode.setExtras(getRandomString());
     flowNode.setFlowId(flowId);
     flowNode.setParameter(parameter);
-    flowNode.setType(NodeType.MR);
+    flowNode.setType("MR");
     flowNode.setDepList(Arrays.asList(depList));
     flowNode.setExtras(extras);
 

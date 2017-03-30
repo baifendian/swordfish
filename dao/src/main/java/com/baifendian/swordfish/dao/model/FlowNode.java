@@ -35,7 +35,7 @@ public class FlowNode {
 
   private String desc;
 
-  private NodeType type;
+  private String type;
 
   @JsonIgnore
   private int flowId;
@@ -75,11 +75,11 @@ public class FlowNode {
     this.desc = desc;
   }
 
-  public NodeType getType() {
+  public String getType() {
     return type;
   }
 
-  public void setType(NodeType type) {
+  public void setType(String type) {
     this.type = type;
   }
 
