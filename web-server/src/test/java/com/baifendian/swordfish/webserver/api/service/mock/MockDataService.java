@@ -16,16 +16,15 @@
 package com.baifendian.swordfish.webserver.api.service.mock;
 
 import com.baifendian.swordfish.dao.enums.DbType;
+import com.baifendian.swordfish.dao.enums.NodeType;
 import com.baifendian.swordfish.dao.enums.UserRoleType;
 import com.baifendian.swordfish.dao.mapper.DataSourceMapper;
 import com.baifendian.swordfish.dao.mapper.ProjectMapper;
 import com.baifendian.swordfish.dao.mapper.ProjectUserMapper;
 import com.baifendian.swordfish.dao.mapper.UserMapper;
-import com.baifendian.swordfish.dao.model.DataSource;
-import com.baifendian.swordfish.dao.model.Project;
-import com.baifendian.swordfish.dao.model.ProjectUser;
-import com.baifendian.swordfish.dao.model.User;
+import com.baifendian.swordfish.dao.model.*;
 import org.apache.commons.lang.RandomStringUtils;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -172,5 +171,22 @@ public class MockDataService {
     dataSourceMapper.insert(dataSource);
 
     return dataSource;
+  }
+
+  /**
+   * 虚拟一个mr节点
+   * @return
+   */
+  public FlowNode mocNode(int flowId){
+    String parameter = "{\"mainClass\":\"com.baifendian.mr.WordCount\",\"mainJar\":{\"scope\":\"project\",\"res\":\"wordcount-examples.jar\"},\"args\":\"/user/joe/wordcount/input /user/joe/wordcount/output\",\"properties\":[{\"prop\":\"wordcount.case.sensitive\",\"value\":\"true\"},{\"prop\":\"stopwords\",\"value\":\"the,who,a,then\"}],\"files\":[{\"res\":\"ABC.conf\",\"alias\":\"aa\"},{\"scope\":\"workflow\",\"res\":\"conf/HEL.conf\",\"alias\":\"hh\"}],\"archives\":[{\"res\":\"JOB.zip\",\"alias\":\"jj\"}],\"libJars\":[{\"scope\":\"workflow\",\"res\":\"lib/tokenizer-0.1.jar\"}]}"
+    FlowNode flowNode = new FlowNode();
+    flowNode.setName(getRandomString());
+    flowNode.setDesc(getRandomString());
+    flowNode.setExtras(getRandomString());
+    flowNode.setFlowId(flowId);
+    flowNode.setParameter(parameter);
+    flowNode.setType(NodeType.MR);
+    flowNode.setDep();
+    return null;
   }
 }

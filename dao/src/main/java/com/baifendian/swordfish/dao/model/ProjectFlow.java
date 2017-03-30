@@ -27,6 +27,8 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import org.apache.commons.lang3.StringUtils;
 
+import javax.xml.crypto.Data;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -39,10 +41,9 @@ public class ProjectFlow {
   @JsonIgnore
   private List<FlowNode> flowsNodes;
 
-  @JsonIgnore
-  private List<FlowNodeRelation> flowsNodesRelation;
-
   private String name;
+
+  private String desc;
 
   private Date createTime;
 
@@ -54,7 +55,7 @@ public class ProjectFlow {
 
   private int ownerId;
 
-  private String ownerName;
+  private String owner;
 
   private String proxyUser;
 
@@ -62,10 +63,17 @@ public class ProjectFlow {
 
   private String projectName;
 
+  @JsonIgnore
   private String extras;
+
+  private String queue;
+
+  private ProjectFlowData data = new ProjectFlowData();
+
 
   @JsonDeserialize(using = StringNodeJsonDeserializer.class)
   @JsonSerialize(using = StringNodeJsonSerializer.class)
+  @JsonIgnore
   private String userDefinedParams;
 
   @JsonIgnore
@@ -84,15 +92,8 @@ public class ProjectFlow {
   }
 
   public void setFlowsNodes(List<FlowNode> flowsNodes) {
+    this.data.setNodes(flowsNodes);
     this.flowsNodes = flowsNodes;
-  }
-
-  public List<FlowNodeRelation> getFlowsNodesRelation() {
-    return flowsNodesRelation;
-  }
-
-  public void setFlowsNodesRelation(List<FlowNodeRelation> flowsNodesRelation) {
-    this.flowsNodesRelation = flowsNodesRelation;
   }
 
   public String getName() {
@@ -103,8 +104,36 @@ public class ProjectFlow {
     this.name = name;
   }
 
+  public String getDesc() {
+    return desc;
+  }
+
+  public void setDesc(String desc) {
+    this.desc = desc;
+  }
+
+  public Date getCreateTime() {
+    return createTime;
+  }
+
+  public void setCreateTime(Date createTime) {
+    this.createTime = createTime;
+  }
+
+  public Date getModifyTime() {
+    return modifyTime;
+  }
+
+  public void setModifyTime(Date modifyTime) {
+    this.modifyTime = modifyTime;
+  }
+
   public int getLastModifyBy() {
     return lastModifyBy;
+  }
+
+  public void setLastModifyBy(int lastModifyBy) {
+    this.lastModifyBy = lastModifyBy;
   }
 
   public String getLastModifyByName() {
@@ -123,12 +152,12 @@ public class ProjectFlow {
     this.ownerId = ownerId;
   }
 
-  public String getOwnerName() {
-    return ownerName;
+  public String getOwner() {
+    return owner;
   }
 
-  public void setOwnerName(String ownerName) {
-    this.ownerName = ownerName;
+  public void setOwner(String owner) {
+    this.owner = owner;
   }
 
   public String getProxyUser() {
@@ -155,24 +184,29 @@ public class ProjectFlow {
     this.projectName = projectName;
   }
 
-  public Date getCreateTime() {
-    return createTime;
+  public String getExtras() {
+    return extras;
   }
 
-  public void setCreateTime(Date createTime) {
-    this.createTime = createTime;
+  public void setExtras(String extras) {
+    this.data.setExtras(extras);
+    this.extras = extras;
   }
 
-  public Date getModifyTime() {
-    return modifyTime;
+  public String getQueue() {
+    return queue;
   }
 
-  public void setModifyTime(Date modifyTime) {
-    this.modifyTime = modifyTime;
+  public void setQueue(String queue) {
+    this.queue = queue;
   }
 
-  public void setLastModifyBy(int lastModifyBy) {
-    this.lastModifyBy = lastModifyBy;
+  public ProjectFlowData getData() {
+    return data;
+  }
+
+  public void setData(ProjectFlowData data) {
+    this.data = data;
   }
 
   public String getUserDefinedParams() {
@@ -180,15 +214,8 @@ public class ProjectFlow {
   }
 
   public void setUserDefinedParams(String userDefinedParams) {
+    this.setUserDefinedParams(userDefinedParams);
     this.userDefinedParams = userDefinedParams;
-  }
-
-  public String getExtras() {
-    return extras;
-  }
-
-  public void setExtras(String extras) {
-    this.extras = extras;
   }
 
   public Map<String, String> getUserDefinedParamMap() {
@@ -202,5 +229,40 @@ public class ProjectFlow {
 
   public void setUserDefinedParamMap(Map<String, String> userDefinedParamMap) {
     this.userDefinedParamMap = userDefinedParamMap;
+  }
+
+  public class ProjectFlowData {
+    private List<FlowNode> nodes;
+
+    private String userDefParams;
+
+    private String extras;
+
+    public ProjectFlowData() {
+    }
+
+    public List<FlowNode> getNodes() {
+      return nodes;
+    }
+
+    public void setNodes(List<FlowNode> nodes) {
+      this.nodes = nodes;
+    }
+
+    public String getUserDefParams() {
+      return userDefParams;
+    }
+
+    public void setUserDefParams(String userDefParams) {
+      this.userDefParams = userDefParams;
+    }
+
+    public String getExtras() {
+      return extras;
+    }
+
+    public void setExtras(String extras) {
+      this.extras = extras;
+    }
   }
 }
