@@ -43,16 +43,31 @@ public class ProjectFlowMapperSqlProvider {
       {
         INSERT_INTO(TABLE_NAME);
         VALUES("name", "#{flow.name}");
+        VALUES("desc", "#{flow.desc}");
         VALUES("project_id", "#{flow.projectId}");
-        VALUES("owner_id", "#{flow.ownerId}");
         VALUES("modify_time", "#{flow.modifyTime}");
         VALUES("create_time", "#{flow.createTime}");
         VALUES("last_modify_by", "#{flow.lastModifyBy}");
-        VALUES("canvas", "#{flow.canvas}");
+        VALUES("owner", "#{flow.ownerId}");
+        VALUES("proxy_user", "#{flow.proxyUser}");
+        VALUES("user_defined_params", "#{flow.userDefinedParams}");
+        VALUES("extras", "#{flow.extras}");
+        VALUES("queue", "#{flow.queue}");
       }
     }.toString();
   }
 
+  public String queryByProjectAndName(Map<String, Object> parameter){
+    return new SQL() {
+      {
+        SELECT("p_f.*,p_f.owner as owner_id");
+        SELECT("u.name as owner_name,p.name as project_name");
+        FROM("project_flows p_f");
+        JOIN("user u on p_f.owner = u.id");
+        JOIN("project p on p_f.project_id = p.id");
+      }
+    }.toString();
+  }
   /**
    * 通过 id 更新(用于重命名) <p>
    *
@@ -97,10 +112,39 @@ public class ProjectFlowMapperSqlProvider {
   public String queryByName(Map<String, Object> parameter) {
     return new SQL() {
       {
+        SELECT("p_f.*,p_f.owner as owner_id");
+        SELECT("p.name as project_name");
+        SELECT("u.name as owner");
+        FROM("project_flow p_f");
+        JOIN("project p on p_f.project_id = p.id");
+        JOIN("user u on u.id = p.owner");
+        WHERE("project_id = #{projectId}");
+        WHERE("name = #{name}");
+      }
+    }.toString();
+  }
+
+  public String findByProjectNameAndName(Map<String, Object> parameter) {
+    return new SQL() {
+      {
+        SELECT("p_f.*,p_f.owner as owner_id");
+        SELECT("p.name as project_name");
+        SELECT("u.name as owner");
+        FROM("project_flow p_f");
+        JOIN("project p on p_f.project_id = p.id");
+        JOIN("user u on u.id = p.owner");
+        WHERE("project_name = #{projectName}");
+        WHERE("name = #{name}");
+      }
+    }.toString();
+  }
+
+  public String findByProject(Map<String, Object> parameter) {
+    return new SQL() {
+      {
         SELECT("*");
         FROM(TABLE_NAME);
         WHERE("project_id = #{projectId}");
-        WHERE("name = #{name}");
       }
     }.toString();
   }
@@ -212,6 +256,25 @@ public class ProjectFlowMapperSqlProvider {
         DELETE_FROM(TABLE_NAME);
         WHERE("project_id = #{projectId}");
         WHERE("type = " + EnumFieldUtil.genFieldStr("flowType", FlowType.class));
+      }
+    }.toString();
+  }
+
+  public String updateByName(Map<String, Object> parameter) {
+    return new SQL() {
+      {
+        UPDATE(TABLE_NAME);
+        SET("desc", "#{flow.desc}");
+        SET("modify_time", "#{flow.modifyTime}");
+        SET("create_time", "#{flow.createTime}");
+        SET("last_modify_by", "#{flow.lastModifyBy}");
+        SET("owner", "#{flow.owner}");
+        SET("proxy_user", "#{flow.proxyUser}");
+        SET("user_defined_params", "#{flow.userDefinedParams}");
+        SET("extras", "#{flow.extras}");
+        SET("queue", "#{flow.queue}");
+        WHERE("project_id = #{projectId}");
+        WHERE("name = #{name}");
       }
     }.toString();
   }

@@ -50,14 +50,9 @@ public class FlowNodeMapperSqlProvider {
         VALUES("`desc`", "#{flowNode.desc}");
         VALUES("type", EnumFieldUtil.genFieldStr("flowNode.type", NodeType.class));
         VALUES("flow_id", "#{flowNode.flowId}");
-        VALUES("pos_x", "#{flowNode.posX}");
-        VALUES("pos_y", "#{flowNode.posY}");
-        VALUES("param", "#{flowNode.param}");
-        VALUES("input_tables", "#{flowNode.inputTables}");
-        VALUES("output_tables", "#{flowNode.outputTables}");
-        VALUES("create_time", "#{flowNode.createTime}");
-        VALUES("modify_time", "#{flowNode.modifyTime}");
-        VALUES("last_modify_by", "#{flowNode.lastModifyBy}");
+        VALUES("parameter", "#{flowNode.parameter}");
+        VALUES("extras", "#{flowNode.extras}");
+        VALUES("dep", "#{flowNode.dep}");
       }
     }.toString();
   }
@@ -104,11 +99,6 @@ public class FlowNodeMapperSqlProvider {
         SET("modify_time = #{flowNode.modifyTime}");
         SET("last_modify_by = #{flowNode.lastModifyBy}");
 
-        if (flowNode.getId() == null) { // 即席查询使用 flowId直接更新
-          WHERE("flow_id = #{flowNode.flowId}");
-        } else {
-          WHERE("id = #{flowNode.id}");
-        }
       }
     }.toString();
   }
@@ -221,7 +211,7 @@ public class FlowNodeMapperSqlProvider {
         SELECT("id");
         FROM("project_flows");
         WHERE("project_id = #{projectId}");
-        WHERE("type = " + EnumFieldUtil.genFieldStr("flowType", FlowType.class));
+        WHERE("name = #{name}");
       }
     }.toString();
 

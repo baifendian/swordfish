@@ -16,6 +16,7 @@
 package com.baifendian.swordfish.dao.mapper;
 
 import com.baifendian.swordfish.dao.enums.FlowType;
+import com.baifendian.swordfish.dao.enums.NodeType;
 import com.baifendian.swordfish.dao.model.FlowNode;
 
 import org.apache.ibatis.annotations.*;
@@ -103,13 +104,13 @@ public interface FlowNodeMapper {
    */
   @Results(value = {@Result(property = "id", column = "id", id = true, javaType = int.class, jdbcType = JdbcType.INTEGER),
           @Result(property = "name", column = "name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-          @Result(property = "type", column = "type", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+          @Result(property = "type", column = "type", javaType = NodeType.class, jdbcType = JdbcType.INTEGER),
+          @Result(property = "desc", column = "desc", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+          @Result(property = "extras", column = "extras", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+          @Result(property = "dep", column = "dep", javaType = String.class, jdbcType = JdbcType.VARCHAR),
           @Result(property = "flowId", column = "flow_id", id = true, javaType = int.class, jdbcType = JdbcType.INTEGER),
-          @Result(property = "posX", column = "pos_x", javaType = double.class, jdbcType = JdbcType.DOUBLE),
-          @Result(property = "posY", column = "pos_y", javaType = double.class, jdbcType = JdbcType.DOUBLE),
-          @Result(property = "param", column = "param", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-          @Result(property = "inputTables", column = "input_tables", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-          @Result(property = "outputTables", column = "output_tables", javaType = String.class, jdbcType = JdbcType.VARCHAR),})
+          @Result(property = "parameter", column = "parameter", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+          })
   @SelectProvider(type = FlowNodeMapperSqlProvider.class, method = "selectByFlowId")
   List<FlowNode> selectByFlowId(@Param("flowId") int flowId);
 

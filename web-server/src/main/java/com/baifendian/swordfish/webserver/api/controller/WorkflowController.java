@@ -19,19 +19,29 @@ package com.baifendian.swordfish.webserver.api.controller;
  * 工作流管理的服务入口
  */
 
+import com.baifendian.swordfish.dao.model.ProjectFlow;
 import com.baifendian.swordfish.dao.model.User;
+import com.baifendian.swordfish.webserver.api.service.WorkflowService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
+import java.util.List;
 
 @RestController
 @RequestMapping("/projects/{projectName}/workflows")
 public class WorkflowController {
 
   private static Logger logger = LoggerFactory.getLogger(WorkflowController.class.getName());
+
+  @Autowired
+  private WorkflowService workflowService;
 
   /**
    * 创建工作流
@@ -47,20 +57,20 @@ public class WorkflowController {
    * @param response
    */
   @RequestMapping(value = "/{name}", method = {RequestMethod.POST})
-  public void createWorkflow(@RequestAttribute(value = "session.user") User operator,
-                             @PathVariable String projectName,
-                             @PathVariable String name,
-                             @RequestParam(value = "desc", required = false) String desc,
-                             @RequestParam(value = "proxyUser") String proxyUser,
-                             @RequestParam(value = "queue") String queue,
-                             @RequestParam(value = "data") String data,
-                             @RequestParam(value = "file") String file,
-                             HttpServletResponse response) {
-
-
+  public ProjectFlow createWorkflow(@RequestAttribute(value = "session.user") User operator,
+                                    @PathVariable String projectName,
+                                    @PathVariable String name,
+                                    @RequestParam(value = "desc", required = false) String desc,
+                                    @RequestParam(value = "proxyUser") String proxyUser,
+                                    @RequestParam(value = "queue") String queue,
+                                    @RequestParam(value = "data") String data,
+                                    @RequestParam("file") MultipartFile file,
+                                    HttpServletResponse response) {
+    return workflowService.createWorkflow(operator,projectName,name,desc,proxyUser,queue,data,file,response);
   }
 
   /**
+   * 修改或创建一个工作流
    * @param operator
    * @param projectName
    * @param name
@@ -72,7 +82,7 @@ public class WorkflowController {
    * @param response
    */
   @RequestMapping(value = "/{name}", method = {RequestMethod.PUT})
-  public void modifyWorkflow(@RequestAttribute(value = "session.user") User operator,
+  public ProjectFlow putWorkflow(@RequestAttribute(value = "session.user") User operator,
                              @PathVariable String projectName,
                              @PathVariable String name,
                              @RequestParam(value = "desc", required = false) String desc,
@@ -82,7 +92,33 @@ public class WorkflowController {
                              @RequestParam("file") MultipartFile file,
                              HttpServletResponse response) {
 
+    return workflowService.putWorkflow(operator,projectName,name,desc,proxyUser,queue,data,file,response);
+  }
 
+  /**
+   * 修改或创建一个工作流
+   * @param operator
+   * @param projectName
+   * @param name
+   * @param desc
+   * @param proxyUser
+   * @param queue
+   * @param data
+   * @param file
+   * @param response
+   */
+  @RequestMapping(value = "/{name}", method = {RequestMethod.PATCH})
+  public ProjectFlow patchWorkflow(@RequestAttribute(value = "session.user") User operator,
+                                 @PathVariable String projectName,
+                                 @PathVariable String name,
+                                 @RequestParam(value = "desc", required = false) String desc,
+                                 @RequestParam(value = "proxyUser") String proxyUser,
+                                 @RequestParam(value = "queue") String queue,
+                                 @RequestParam(value = "data") String data,
+                                 @RequestParam("file") MultipartFile file,
+                                 HttpServletResponse response) {
+
+    return workflowService.patchWorkflow(operator,projectName,name,desc,proxyUser,queue,data,file,response);
   }
 
   @RequestMapping(value = "/{name}", method = {RequestMethod.DELETE})
@@ -90,33 +126,40 @@ public class WorkflowController {
                              @PathVariable String projectName,
                              @PathVariable String name,
                              HttpServletResponse response) {
-
+    workflowService.deleteProjectFlow(operator,projectName,name,response);
 
   }
 
   @RequestMapping(value = "", method = {RequestMethod.GET})
-  public void queryWorkflow(@RequestAttribute(value = "session.user") User operator,
-                            @PathVariable String projectName,
-                            HttpServletResponse response) {
-
+  public List<ProjectFlow> queryWorkflow(@RequestAttribute(value = "session.user") User operator,
+                                         @PathVariable String projectName,
+                                         HttpServletResponse response) {
+    return workflowService.queryAllProjectFlow(operator,projectName,response);
 
   }
 
   @RequestMapping(value = "{name}", method = {RequestMethod.GET})
-  public void queryWorkflowDetail(@RequestAttribute(value = "session.user") User operator,
+  public ProjectFlow queryWorkflowDetail(@RequestAttribute(value = "session.user") User operator,
                                   @PathVariable String projectName,
                                   @PathVariable String name,
                                   HttpServletResponse response) {
-
-
+    return workflowService.queryProjectFlow(operator,projectName,name,response);
   }
 
   @RequestMapping(value = "{name}/file", method = {RequestMethod.GET})
-  public void downloadWorkflowDetail(@RequestAttribute(value = "session.user") User operator,
-                                  @PathVariable String projectName,
-                                  @PathVariable String name,
-                                  HttpServletResponse response) {
-
-
+  public ResponseEntity<Resource> downloadWorkflowDetail(@RequestAttribute(value = "session.user") User operator,
+                                                         @PathVariable String projectName,
+                                                         @PathVariable String name,
+                                                         HttpServletResponse response) {
+    org.springframework.core.io.Resource file = workflowService.queryProjectFlowFile(operator,projectName,name,response);
+    if(file == null) {
+      return ResponseEntity
+              .noContent().build();
+    }
+    return ResponseEntity
+            .ok()
+            .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getFilename() + "\"")
+            .body(file);
+  }
   }
 }

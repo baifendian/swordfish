@@ -15,36 +15,32 @@
  */
 package com.baifendian.swordfish.dao.model;
 
+import com.baifendian.swordfish.dao.enums.NodeType;
 import com.baifendian.swordfish.dao.utils.json.StringNodeJsonDeserializer;
 import com.baifendian.swordfish.dao.utils.json.StringNodeJsonSerializer;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
-import java.util.Date;
 import java.util.List;
 
 public class FlowNode {
 
-  private Integer id;
+  @JsonIgnore
+  private int id;
 
   private String name;
 
   private String desc;
 
-  private Date createTime;
+  private NodeType type;
 
-  private Date modifyTime;
-
-  private int lastModifyBy;
-
-  private String type;
-
+  @JsonIgnore
   private int flowId;
 
   @JsonDeserialize(using = StringNodeJsonDeserializer.class)
   @JsonSerialize(using = StringNodeJsonSerializer.class)
-  private String param;
+  private String parameter;
 
   private String dep;
 
@@ -53,11 +49,11 @@ public class FlowNode {
   @JsonIgnore
   private List<String> depList;
 
-  public Integer getId() {
+  public int getId() {
     return id;
   }
 
-  public void setId(Integer id) {
+  public void setId(int id) {
     this.id = id;
   }
 
@@ -77,35 +73,11 @@ public class FlowNode {
     this.desc = desc;
   }
 
-  public Date getCreateTime() {
-    return createTime;
-  }
-
-  public void setCreateTime(Date createTime) {
-    this.createTime = createTime;
-  }
-
-  public Date getModifyTime() {
-    return modifyTime;
-  }
-
-  public void setModifyTime(Date modifyTime) {
-    this.modifyTime = modifyTime;
-  }
-
-  public int getLastModifyBy() {
-    return lastModifyBy;
-  }
-
-  public void setLastModifyBy(int lastModifyBy) {
-    this.lastModifyBy = lastModifyBy;
-  }
-
-  public String getType() {
+  public NodeType getType() {
     return type;
   }
 
-  public void setType(String type) {
+  public void setType(NodeType type) {
     this.type = type;
   }
 
@@ -117,12 +89,12 @@ public class FlowNode {
     this.flowId = flowId;
   }
 
-  public String getParam() {
-    return param;
+  public String getParameter() {
+    return parameter;
   }
 
-  public void setParam(String param) {
-    this.param = param;
+  public void setParameter(String parameter) {
+    this.parameter = parameter;
   }
 
   public String getDep() {
@@ -133,19 +105,19 @@ public class FlowNode {
     this.dep = dep;
   }
 
-  public List<String> getDepList() {
-    return depList;
-  }
-
-  public void setDepList(List<String> depList) {
-    this.depList = depList;
-  }
-
   public String getExtras() {
     return extras;
   }
 
   public void setExtras(String extras) {
     this.extras = extras;
+  }
+
+  public List<String> getDepList() {
+    return depList;
+  }
+
+  public void setDepList(List<String> depList) {
+    this.depList = depList;
   }
 }
