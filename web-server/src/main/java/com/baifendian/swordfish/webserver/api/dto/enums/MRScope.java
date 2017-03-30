@@ -18,20 +18,21 @@ public enum MRScope {
 
   @JsonValue
   public String getScope() {
-    return scope;
+    return this.scope;
   }
 
+
   @JsonCreator
-  public static NodeType valueOfType(Integer type) throws IllegalArgumentException {
+  public static MRScope valueOfType(Integer type) throws IllegalArgumentException {
     if (type == null) {
       return null;
     }
-    for (NodeType nodeType : NodeType.values()) {
-      if (nodeType.getType().equals(type)) {
-        return nodeType;
+    for (MRScope mrScope : MRScope.values()) {
+      if (mrScope.getScope().equals(type)) {
+        return mrScope;
       }
     }
-    throw new IllegalArgumentException("Cannot convert " + type + " to " + NodeType.class.getSimpleName() + " .");
+    throw new IllegalArgumentException("Cannot convert " + type + " to " + MRScope.class.getSimpleName() + " .");
   }
 
 }
