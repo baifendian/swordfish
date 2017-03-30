@@ -18,16 +18,16 @@ package com.baifendian.swordfish.webserver.api.service.mock;
 import com.baifendian.swordfish.dao.enums.DbType;
 import com.baifendian.swordfish.dao.enums.NodeType;
 import com.baifendian.swordfish.dao.enums.UserRoleType;
-import com.baifendian.swordfish.dao.mapper.DataSourceMapper;
-import com.baifendian.swordfish.dao.mapper.ProjectMapper;
-import com.baifendian.swordfish.dao.mapper.ProjectUserMapper;
-import com.baifendian.swordfish.dao.mapper.UserMapper;
+import com.baifendian.swordfish.dao.mapper.*;
 import com.baifendian.swordfish.dao.model.*;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.apache.commons.lang.RandomStringUtils;
+import org.datanucleus.store.types.backed.ArrayList;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
 import java.util.Date;
 
 /**
@@ -47,6 +47,9 @@ public class MockDataService {
 
   @Autowired
   private DataSourceMapper dataSourceMapper;
+
+  @Autowired
+  private FlowNodeMapper flowNodeMapper;
 
   /**
    * 获取一个随机字符串
@@ -173,12 +176,13 @@ public class MockDataService {
     return dataSource;
   }
 
+  public String MR_PARAMETER = "{\"mainClass\":\"com.baifendian.mr.WordCount\",\"mainJar\":{\"scope\":\"project\",\"res\":\"wordcount-examples.jar\"},\"args\":\"/user/joe/wordcount/input /user/joe/wordcount/output\",\"properties\":[{\"prop\":\"wordcount.case.sensitive\",\"value\":\"true\"},{\"prop\":\"stopwords\",\"value\":\"the,who,a,then\"}],\"files\":[{\"res\":\"ABC.conf\",\"alias\":\"aa\"},{\"scope\":\"workflow\",\"res\":\"conf/HEL.conf\",\"alias\":\"hh\"}],\"archives\":[{\"res\":\"JOB.zip\",\"alias\":\"jj\"}],\"libJars\":[{\"scope\":\"workflow\",\"res\":\"lib/tokenizer-0.1.jar\"}]}";
+
   /**
    * 虚拟一个mr节点
    * @return
    */
-  public FlowNode mocNode(int flowId){
-    String parameter = "{\"mainClass\":\"com.baifendian.mr.WordCount\",\"mainJar\":{\"scope\":\"project\",\"res\":\"wordcount-examples.jar\"},\"args\":\"/user/joe/wordcount/input /user/joe/wordcount/output\",\"properties\":[{\"prop\":\"wordcount.case.sensitive\",\"value\":\"true\"},{\"prop\":\"stopwords\",\"value\":\"the,who,a,then\"}],\"files\":[{\"res\":\"ABC.conf\",\"alias\":\"aa\"},{\"scope\":\"workflow\",\"res\":\"conf/HEL.conf\",\"alias\":\"hh\"}],\"archives\":[{\"res\":\"JOB.zip\",\"alias\":\"jj\"}],\"libJars\":[{\"scope\":\"workflow\",\"res\":\"lib/tokenizer-0.1.jar\"}]}"
+  public FlowNode mocNode(String[] depList,int flowId,String parameter,String extras) throws JsonProcessingException {
     FlowNode flowNode = new FlowNode();
     flowNode.setName(getRandomString());
     flowNode.setDesc(getRandomString());
@@ -186,7 +190,18 @@ public class MockDataService {
     flowNode.setFlowId(flowId);
     flowNode.setParameter(parameter);
     flowNode.setType(NodeType.MR);
-    flowNode.setDep();
-    return null;
+    flowNode.setDepList(Arrays.asList(depList));
+    flowNode.setExtras(extras);
+
+    flowNodeMapper.insert(flowNode);
+    return flowNode;
+  }
+
+  /**
+   * 虚拟一个正常的MR节点
+   * @return
+   */
+  public FlowNode mocRmNode(String[] depList,int flowId) throws JsonProcessingException {
+    return mocNode(depList,flowId,MR_PARAMETER,MR_PARAMETER);
   }
 }

@@ -49,30 +49,6 @@ public interface FlowNodeMapper {
   int insert(@Param("flowNode") FlowNode flowNode);
 
   /**
-   * 更新记录 <p>
-   *
-   * @return 更新记录数
-   */
-  @UpdateProvider(type = FlowNodeMapperSqlProvider.class, method = "updateById")
-  int updateById(@Param("flowNode") FlowNode flowNode);
-
-  /**
-   * 更新多条记录(更新参数等详情信息) <p>
-   *
-   * @return 更新记录数
-   */
-  @UpdateProvider(type = FlowNodeMapperSqlProvider.class, method = "updateAllDetail")
-  int updateAllDetail(List<FlowNode> flowNodes);
-
-  /**
-   * 删除 workflow 节点 <p>
-   *
-   * @return 删除记录数
-   */
-  @DeleteProvider(type = FlowNodeMapperSqlProvider.class, method = "deleteByNodeId")
-  int deleteByNodeId(@Param("nodeId") int nodeId);
-
-  /**
    * 删除 workflow <p>
    *
    * @return 删除记录数
@@ -83,28 +59,11 @@ public interface FlowNodeMapper {
   /**
    * 查询记录 <p>
    *
-   * @return workflow 节点详情
-   */
-  @Results(value = {@Result(property = "id", column = "id", id = true, javaType = int.class, jdbcType = JdbcType.INTEGER),
-          @Result(property = "name", column = "name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-          @Result(property = "type", column = "type", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-          @Result(property = "flowId", column = "flow_id", id = true, javaType = int.class, jdbcType = JdbcType.INTEGER),
-          @Result(property = "posX", column = "pos_x", javaType = double.class, jdbcType = JdbcType.DOUBLE),
-          @Result(property = "posY", column = "pos_y", javaType = double.class, jdbcType = JdbcType.DOUBLE),
-          @Result(property = "param", column = "param", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-          @Result(property = "inputTables", column = "input_tables", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-          @Result(property = "outputTables", column = "output_tables", javaType = String.class, jdbcType = JdbcType.VARCHAR),})
-  @SelectProvider(type = FlowNodeMapperSqlProvider.class, method = "selectByNodeId")
-  FlowNode selectByNodeId(@Param("nodeId") int nodeId);
-
-  /**
-   * 查询记录 <p>
-   *
    * @return workflow 节点列表
    */
   @Results(value = {@Result(property = "id", column = "id", id = true, javaType = int.class, jdbcType = JdbcType.INTEGER),
           @Result(property = "name", column = "name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-          @Result(property = "type", column = "type", javaType = NodeType.class, jdbcType = JdbcType.INTEGER),
+          @Result(property = "type", column = "type", javaType = NodeType.class, jdbcType = JdbcType.VARCHAR),
           @Result(property = "desc", column = "desc", javaType = String.class, jdbcType = JdbcType.VARCHAR),
           @Result(property = "extras", column = "extras", javaType = String.class, jdbcType = JdbcType.VARCHAR),
           @Result(property = "dep", column = "dep", javaType = String.class, jdbcType = JdbcType.VARCHAR),
@@ -114,9 +73,5 @@ public interface FlowNodeMapper {
   @SelectProvider(type = FlowNodeMapperSqlProvider.class, method = "selectByFlowId")
   List<FlowNode> selectByFlowId(@Param("flowId") int flowId);
 
-  /**
-   * 删除项目的结点信息
-   */
-  @DeleteProvider(type = FlowNodeMapperSqlProvider.class, method = "deleteByProjectId")
-  int deleteByProjectId(@Param("projectId") int projectId, @Param("flowType") FlowType flowType);
+
 }

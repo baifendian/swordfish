@@ -1,9 +1,11 @@
 package com.baifendian.swordfish.webserver.api.service;
 
+import com.baifendian.swordfish.dao.enums.NodeType;
 import com.baifendian.swordfish.dao.model.User;
 import com.baifendian.swordfish.webserver.api.RestfulApiApplication;
 import com.baifendian.swordfish.webserver.api.service.mock.MockDataService;
 import org.junit.Before;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,6 +14,8 @@ import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.transaction.annotation.Transactional;
+
+import static junit.framework.TestCase.assertTrue;
 
 /**
  * Created by caojingwei on 2017/3/29.
@@ -39,6 +43,14 @@ public class WorkflowServiceTest {
   public void testCreateWorkflow(){
     {
 
+    }
+  }
+
+  @Test
+  public void testFlowNodeParamCheck(){
+    {
+      //检测是否能正常识别MR parameter
+      assertTrue(workflowService.flowNodeParamCheck(mockDataService.MR_PARAMETER, NodeType.MR));
     }
   }
 }

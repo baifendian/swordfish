@@ -161,5 +161,4 @@ public class WorkflowController {
             .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getFilename() + "\"")
             .body(file);
   }
-  }
 }

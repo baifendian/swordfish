@@ -188,6 +188,21 @@ public class ProjectFlowMapperSqlProvider {
     }.toString();
   }
 
+  /**
+   * 删除某个workflow <p>
+   *
+   * @return sql 语句
+   */
+  public String deleteByProjectAndName(Map<String, Object> parameter) {
+    return new SQL() {
+      {
+        DELETE_FROM(TABLE_NAME);
+        WHERE("project_id = #{projectId}");
+        WHERE("name = #{name}");
+      }
+    }.toString();
+  }
+
   public String queryFlowNum(int tenantId, List<FlowType> flowTypes) {
 
     StringBuilder sb = new StringBuilder();
