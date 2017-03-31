@@ -72,7 +72,7 @@ CREATE TABLE `resources` (
   `modify_time` datetime NOT NULL COMMENT 'resource last modify time',
   PRIMARY KEY (`id`),
   UNIQUE KEY `project_resname` (`project_id`, `name`),
-  FOREIGN KEY (`project_id`) REFERENCES `project`(`id`) ON DELETE CASCADE,
+  FOREIGN KEY (`project_id`) REFERENCES `project`(`id`),
   FOREIGN KEY (`owner`) REFERENCES `user`(`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -90,7 +90,7 @@ CREATE TABLE `datasource` (
   `modify_time` datetime NOT NULL COMMENT 'modify time of the datasource',
   PRIMARY KEY (`id`),
   UNIQUE KEY `project_dsname` (`project_id`, `name`),
-  FOREIGN KEY (`project_id`) REFERENCES `project`(`id`) ON DELETE CASCADE,
+  FOREIGN KEY (`project_id`) REFERENCES `project`(`id`),
   FOREIGN KEY (`owner`) REFERENCES `user`(`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -110,7 +110,7 @@ CREATE TABLE `project_flows` (
   `queue` varchar(64) DEFAULT NULL COMMENT 'queue of the project flows',
   PRIMARY KEY (`id`),
   UNIQUE KEY `project_flowname` (`project_id`, `name`),
-  FOREIGN KEY (`project_id`) REFERENCES `project`(`id`) ON DELETE CASCADE,
+  FOREIGN KEY (`project_id`) REFERENCES `project`(`id`),
   FOREIGN KEY (`owner`) REFERENCES `user`(`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 

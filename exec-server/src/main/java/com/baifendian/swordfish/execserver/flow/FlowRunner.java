@@ -15,26 +15,27 @@
  */
 package com.baifendian.swordfish.execserver.flow;
 
+import com.baifendian.swordfish.common.config.BaseConfig;
 import com.baifendian.swordfish.common.hadoop.HdfsClient;
 import com.baifendian.swordfish.common.hadoop.HdfsUtil;
-import com.baifendian.swordfish.dao.enums.FlowStatus;
 import com.baifendian.swordfish.common.job.Job;
 import com.baifendian.swordfish.common.job.JobProps;
-import com.baifendian.swordfish.common.config.BaseConfig;
 import com.baifendian.swordfish.common.mail.EmailManager;
 import com.baifendian.swordfish.common.utils.graph.DAGGraph;
 import com.baifendian.swordfish.common.utils.graph.Graph;
-import com.baifendian.swordfish.dao.utils.json.JsonUtil;
-import com.baifendian.swordfish.dao.*;
-import com.baifendian.swordfish.dao.exception.SqlException;
-import com.baifendian.swordfish.dao.enums.*;
+import com.baifendian.swordfish.dao.DaoFactory;
+import com.baifendian.swordfish.dao.FlowDao;
+import com.baifendian.swordfish.dao.enums.FailurePolicyType;
+import com.baifendian.swordfish.dao.enums.FlowErrorCode;
+import com.baifendian.swordfish.dao.enums.FlowRunType;
+import com.baifendian.swordfish.dao.enums.FlowStatus;
 import com.baifendian.swordfish.dao.model.*;
 import com.baifendian.swordfish.dao.model.flow.FlowDag;
+import com.baifendian.swordfish.dao.utils.json.JsonUtil;
 import com.baifendian.swordfish.execserver.exception.ExecTimeoutException;
 import com.baifendian.swordfish.execserver.job.JobTypeManager;
 import com.baifendian.swordfish.execserver.node.NodeRunner;
 import com.baifendian.swordfish.execserver.utils.LoggerUtil;
-
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -293,7 +294,7 @@ public class FlowRunner implements Runnable {
     allParamMap.putAll(customParamMap);
     for (FlowNode node : nodes) {
       JobProps props = new JobProps();
-      props.setJobParams(node.getParam());
+      props.setJobParams(node.getParameter());
       props.setDefinedParams(allParamMap);
       String jobId = node.getType() + "_" + node.getId();
 

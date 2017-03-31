@@ -21,54 +21,109 @@ import java.util.Map;
 
 public class ProjectUserSqlProvider {
 
+  private static final String TABLE_NAME = "project_user";
+
+  /**
+   * 查询项目的用户信息
+   *
+   * @param parameter
+   * @return
+   */
+  public String query(Map<String, Object> parameter) {
+    return new SQL() {{
+      SELECT("*");
+      SELECT("u.name as user_name, p.name as project_name");
+
+      FROM(TABLE_NAME + " p_u");
+
+      JOIN("user u on p_u.user_id = u.id");
+      JOIN("project p on p_u.project_id = p.id");
+
+      WHERE("`project_id` = #{projectId}");
+      WHERE("`user_id` = #{userId}");
+    }}.toString();
+  }
+
+  /**
+   * 插入新的记录
+   *
+   * @param parameter
+   * @return
+   */
   public String insert(Map<String, Object> parameter) {
     return new SQL() {{
-      INSERT_INTO("project_user");
-      VALUES("project_id", "#{projectUser.projectId}");
-      VALUES("user_id", "#{projectUser.userId}");
-      VALUES("perm", "#{projectUser.perm}");
+      INSERT_INTO(TABLE_NAME);
+
+      VALUES("`project_id`", "#{projectUser.projectId}");
+      VALUES("`user_id`", "#{projectUser.userId}");
+      VALUES("`perm`", "#{projectUser.perm}");
       VALUES("`create_time`", "#{projectUser.createTime}");
       VALUES("`modify_time`", "#{projectUser.modifyTime}");
     }}.toString();
   }
 
+  /**
+   * 查询一个项目下的所有用户
+   *
+   * @param parameter
+   * @return
+   */
   public String queryByProject(Map<String, Object> parameter) {
     return new SQL() {{
       SELECT("p_u.*");
-      SELECT("u.name as user_name,p.name as project_name");
-      FROM("project_user p_u");
+      SELECT("u.name as user_name, p.name as project_name");
+
+      FROM(TABLE_NAME + " p_u");
+
       JOIN("user u on p_u.user_id = u.id");
       JOIN("project p on p_u.project_id = p.id");
+
       WHERE("p_u.project_id = #{projectId}");
+    }}.toString();
+  }
+
+  /**
+   * 更新用户信息
+   *
+   * @param parameter
+   * @return
+   */
+  public String update(Map<String, Object> parameter) {
+    return new SQL() {{
+      UPDATE(TABLE_NAME);
+
+      SET("`perm`=#{projectUser.perm}");
+      SET("`modify_time`=#{projectUser.modifyTime}");
+
+      WHERE("`project_id` = #{projectId}");
+      WHERE("`user_id` = #{userId}");
+    }}.toString();
+  }
+
+  /**
+   * 删除一个项目下的用户
+   *
+   * @param parameter
+   * @return
+   */
+  public String delete(Map<String, Object> parameter) {
+    return new SQL() {{
+      DELETE_FROM(TABLE_NAME);
+
+      WHERE("`project_id` = #{projectId}");
+      WHERE("`user_id` = #{userId}");
     }}.toString();
   }
 
   public String queryForUser(Map<String, Object> parameter) {
     return new SQL() {{
       SELECT("u.*");
-      FROM("project_user p_u");
+
+      FROM(TABLE_NAME + " p_u");
+
       JOIN("user u on p_u.user_id = u.id");
+
       WHERE("p_u.project_id = #{projectId}");
-    }}.toString();
-  }
-
-  public String delete(Map<String, Object> parameter) {
-    return new SQL() {{
-      DELETE_FROM("project_user");
-      WHERE("user_id = #{userId}");
-      WHERE("project_id = #{projectId}");
-    }}.toString();
-  }
-
-  public String query(Map<String, Object> parameter) {
-    return new SQL() {{
-      SELECT("*");
-      SELECT("u.name as user_name,p.name as project_name");
-      FROM("project_user p_u");
-      JOIN("user u on p_u.user_id = u.id");
-      JOIN("project p on p_u.project_id = p.id");
-      WHERE("project_id = #{projectId}");
-      WHERE("user_id = #{userId}");
     }}.toString();
   }
 
