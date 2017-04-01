@@ -15,10 +15,7 @@
  */
 package com.baifendian.swordfish.dao.model;
 
-import com.baifendian.swordfish.dao.utils.json.JsonUtil;
 import com.baifendian.swordfish.dao.enums.DbType;
-
-import org.apache.commons.lang3.StringUtils;
 
 import java.util.Date;
 
@@ -31,7 +28,7 @@ public class DataSource {
   private String name;
   private String desc;
   private DbType type; // db 类型
-  private String params; // 参数信息
+  private String parameter; // 参数信息
   private DataSourceDbBase paramObj; // 参数信息, object 形式
   private Date createTime;
   private Date modifyTime;
@@ -103,12 +100,12 @@ public class DataSource {
     this.type = type;
   }
 
-  public String getParams() {
-    return params;
+  public String getParameter() {
+    return parameter;
   }
 
-  public void setParams(String params) {
-    this.params = params;
+  public void setParameter(String parameter) {
+    this.parameter = parameter;
   }
 
   public DataSourceDbBase getParamObj() {
@@ -145,7 +142,7 @@ public class DataSource {
             ", name='" + name + '\'' +
             ", desc='" + desc + '\'' +
             ", type=" + type +
-            ", params='" + params + '\'' +
+            ", parameter='" + parameter + '\'' +
             ", createTime=" + createTime +
             ", modifyTime=" + modifyTime +
             '}';

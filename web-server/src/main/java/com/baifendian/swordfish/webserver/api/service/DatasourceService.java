@@ -87,7 +87,7 @@ public class DatasourceService {
     dataSource.setType(type);
     dataSource.setProjectId(project.getId());
     dataSource.setProjectName(project.getName());
-    dataSource.setParams(parameter);
+    dataSource.setParameter(parameter);
     dataSource.setCreateTime(now);
     dataSource.setModifyTime(now);
 
@@ -165,7 +165,7 @@ public class DatasourceService {
     dataSource.setOwnerId(operator.getId());
     dataSource.setOwnerName(operator.getName());
     dataSource.setType(type);
-    dataSource.setParams(parameter);
+    dataSource.setParameter(parameter);
     dataSource.setProjectId(project.getId());
     dataSource.setProjectName(project.getName());
     dataSource.setModifyTime(now);

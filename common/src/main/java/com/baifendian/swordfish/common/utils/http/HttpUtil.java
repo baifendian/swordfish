@@ -314,15 +314,15 @@ public class HttpUtil {
 //
 //  public static byte[] get(String url, int timeout) {
 //    HttpClient hc = new HttpClient();
-//    hc.getHttpConnectionManager().getParams().setConnectionTimeout(timeout);
-//    hc.getHttpConnectionManager().getParams().setSoTimeout(timeout);
+//    hc.getHttpConnectionManager().getParameter().setConnectionTimeout(timeout);
+//    hc.getHttpConnectionManager().getParameter().setSoTimeout(timeout);
 //    GetMethod method = null;
 //    InputStream in = null;
 //    try {
 //      method = new GetMethod(url);
 //      method.setFollowRedirects(false);
-//      method.getParams().setParameter(HttpMethodParams.RETRY_HANDLER, new DefaultHttpMethodRetryHandler());
-//      method.getParams().setParameter(HttpMethodParams.HTTP_URI_CHARSET, "utf-8");
+//      method.getParameter().setParameter(HttpMethodParams.RETRY_HANDLER, new DefaultHttpMethodRetryHandler());
+//      method.getParameter().setParameter(HttpMethodParams.HTTP_URI_CHARSET, "utf-8");
 //      int code = hc.executeMethod(method);
 //      if (code == HttpStatus.SC_OK) {
 //        in = method.getResponseBodyAsStream();
@@ -346,8 +346,8 @@ public class HttpUtil {
 //
 //  public static byte[] post(String url, Map<String, String> params, int timeout) {
 //    HttpClient hc = new HttpClient();
-//    hc.getHttpConnectionManager().getParams().setConnectionTimeout(timeout);
-//    hc.getHttpConnectionManager().getParams().setSoTimeout(timeout);
+//    hc.getHttpConnectionManager().getParameter().setConnectionTimeout(timeout);
+//    hc.getHttpConnectionManager().getParameter().setSoTimeout(timeout);
 //    PostMethod method = null;
 //    InputStream in = null;
 //    try {
@@ -360,8 +360,8 @@ public class HttpUtil {
 //        }
 //      }
 //      method.setRequestBody(_params.toArray(new NameValuePair[]{}));
-//      method.getParams().setParameter(HttpMethodParams.RETRY_HANDLER, new DefaultHttpMethodRetryHandler());
-//      method.getParams().setParameter(HttpMethodParams.HTTP_URI_CHARSET, "utf-8");
+//      method.getParameter().setParameter(HttpMethodParams.RETRY_HANDLER, new DefaultHttpMethodRetryHandler());
+//      method.getParameter().setParameter(HttpMethodParams.HTTP_URI_CHARSET, "utf-8");
 //      int code = hc.executeMethod(method);
 //      if (code == HttpStatus.SC_OK) {
 //        in = method.getResponseBodyAsStream();

@@ -16,19 +16,14 @@
 package com.baifendian.swordfish.webserver.api.service.mock;
 
 import com.baifendian.swordfish.dao.enums.DbType;
-import com.baifendian.swordfish.dao.enums.NodeType;
 import com.baifendian.swordfish.dao.enums.UserRoleType;
 import com.baifendian.swordfish.dao.mapper.*;
 import com.baifendian.swordfish.dao.model.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import org.apache.commons.lang.RandomStringUtils;
 import org.codehaus.jackson.map.ObjectMapper;
-import org.datanucleus.store.types.backed.ArrayList;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.xml.soap.Node;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Date;
@@ -174,7 +169,7 @@ public class MockDataService {
     dataSource.setType(DbType.MYSQL);
     dataSource.setOwnerId(userId);
     dataSource.setProjectId(projectId);
-    dataSource.setParams(getRandomString());
+    dataSource.setParameter(getRandomString());
     dataSource.setCreateTime(now);
     dataSource.setModifyTime(now);
 
