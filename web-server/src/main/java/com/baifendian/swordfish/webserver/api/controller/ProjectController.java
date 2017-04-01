@@ -47,13 +47,13 @@ public class ProjectController {
    * @param response
    * @return
    */
-  @RequestMapping(value = "/{name}", method = {RequestMethod.POST})
+  @PostMapping(value = "/{name}")
   public Project createProject(@RequestAttribute(value = "session.user") User operator,
                                @PathVariable("name") String name,
                                @RequestParam(value = "desc", required = false) String desc,
                                HttpServletResponse response) {
     logger.info("Operator user id {}, create project, name: {}, desc: {}", operator.getId(), name, desc);
-    return projectService.createProject(operator,name,desc,response);
+    return projectService.createProject(operator, name, desc, response);
   }
 
   /**
@@ -64,12 +64,13 @@ public class ProjectController {
    * @param response
    * @return
    */
-  @RequestMapping(value = "/{name}", method = {RequestMethod.PUT})
+  @PutMapping(value = "/{name}")
   public Project modifyProject(@RequestAttribute(value = "session.user") User operator,
                                @PathVariable("name") String name,
                                @RequestParam(value = "desc", required = false) String desc,
                                HttpServletResponse response) {
-    return projectService.modifyProject(operator,name,desc,response);
+    logger.info("Operator user id {}, modify project, name: {}, desc: {}", operator.getId(), name, desc);
+    return projectService.modifyProject(operator, name, desc, response);
   }
 
   /**
@@ -79,11 +80,12 @@ public class ProjectController {
    * @param response
    * @return
    */
-  @RequestMapping(value = "/{name}", method = {RequestMethod.DELETE})
+  @DeleteMapping(value = "/{name}")
   public void deleteProject(@RequestAttribute(value = "session.user") User operator,
-                               @PathVariable("name") String name,
-                               HttpServletResponse response) {
-    projectService.deleteProject(operator,name,response);
+                            @PathVariable("name") String name,
+                            HttpServletResponse response) {
+    logger.info("Operator user id {}, delete project, name: {}, desc: {}", operator.getId(), name);
+    projectService.deleteProject(operator, name, response);
   }
 
   /**
@@ -92,14 +94,16 @@ public class ProjectController {
    * @param response
    * @return
    */
-  @RequestMapping(value = "", method = {RequestMethod.GET})
+  @GetMapping(value = "")
   public List<Project> queryProjects(@RequestAttribute(value = "session.user") User operator,
                                      HttpServletResponse response) {
-    return projectService.queryProject(operator,response);
+    logger.info("Operator user id {}, get project list", operator.getId());
+    return projectService.queryProject(operator, response);
   }
 
   /**
    * 项目增加一个用户
+   *
    * @param operator
    * @param name
    * @param userName
@@ -107,41 +111,65 @@ public class ProjectController {
    * @param response
    * @return
    */
-  @RequestMapping(value = "/{name}/users/{user-name}", method = {RequestMethod.PUT})
+  @RequestMapping(value = "/{name}/users/{userName}", method = {RequestMethod.PUT})
   public ProjectUser addProjectUser(@RequestAttribute(value = "session.user") User operator,
                                     @PathVariable("name") String name,
-                                    @PathVariable("user-name") String userName,
-                                    @RequestParam(value = "perm", required = false) int perm,
-                                    HttpServletResponse response ){
-    return projectService.addProjectUser(operator,name,userName,perm,response);
+                                    @PathVariable("userName") String userName,
+                                    @RequestParam(value = "perm") int perm,
+                                    HttpServletResponse response) {
+    logger.info("Operator user id {}, add user to project, project name: {}, user name: {}, perm: {}", operator.getId(), name, userName, perm);
+    return projectService.addProjectUser(operator, name, userName, perm, response);
   }
 
   /**
+   * 修改项目的用户权限信息
+   *
+   * @param operator
+   * @param name
+   * @param userName
+   * @param perm
+   * @param response
+   * @return
+   */
+  @PutMapping(value = "/{name}/users/{userName}")
+  public ProjectUser modifyProjectUser(@RequestAttribute(value = "session.user") User operator,
+                                    @PathVariable("name") String name,
+                                    @PathVariable("userName") String userName,
+                                    @RequestParam(value = "perm") int perm,
+                                    HttpServletResponse response) {
+    logger.info("Operator user id {}, modify user permission in the project, project name: {}, user name: {}, perm: {}", operator.getId(), name, userName, perm);
+    return projectService.modifyProjectUser(operator, name, userName, perm, response);
+  }
+  /**
    * 项目删除一个用户
+   *
    * @param operator
    * @param name
    * @param userName
    * @param response
    */
-  @RequestMapping(value = "/{name}/users/{user-name}", method = {RequestMethod.DELETE})
+  @DeleteMapping(value = "/{name}/users/{userName}")
   public void deleteProjectUser(@RequestAttribute(value = "session.user") User operator,
                                 @PathVariable("name") String name,
-                                @PathVariable("user-name") String userName,
-                                HttpServletResponse response ){
-    projectService.deleteProjectUser(operator,name,userName,response);
+                                @PathVariable("userName") String userName,
+                                HttpServletResponse response) {
+    logger.info("Operator user id {}, delete user from project, project name: {}, user name: {}, perm: {}", operator.getId(), name, userName);
+    projectService.deleteProjectUser(operator, name, userName, response);
   }
 
   /**
    * 查询一个项目下所有的用户
+   *
    * @param operator
    * @param name
    * @param response
    * @return
    */
-  @RequestMapping(value = "/{name}/users", method = {RequestMethod.GET})
+  @GetMapping(value = "/{name}/users")
   public List<ProjectUser> queryUser(@RequestAttribute(value = "session.user") User operator,
-                              @PathVariable("name") String name,
-                              HttpServletResponse response){
-    return projectService.queryUser(operator,name,response);
+                                     @PathVariable("name") String name,
+                                     HttpServletResponse response) {
+    logger.info("Operator user id {}, query users of project, project name: {}", operator.getId(), name);
+    return projectService.queryUser(operator, name, response);
   }
 }

@@ -72,7 +72,7 @@ CREATE TABLE `resources` (
   `modify_time` datetime NOT NULL COMMENT 'resource last modify time',
   PRIMARY KEY (`id`),
   UNIQUE KEY `project_resname` (`project_id`, `name`),
-  FOREIGN KEY (`project_id`) REFERENCES `project`(`id`) ON DELETE CASCADE,
+  FOREIGN KEY (`project_id`) REFERENCES `project`(`id`),
   FOREIGN KEY (`owner`) REFERENCES `user`(`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -90,7 +90,7 @@ CREATE TABLE `datasource` (
   `modify_time` datetime NOT NULL COMMENT 'modify time of the datasource',
   PRIMARY KEY (`id`),
   UNIQUE KEY `project_dsname` (`project_id`, `name`),
-  FOREIGN KEY (`project_id`) REFERENCES `project`(`id`) ON DELETE CASCADE,
+  FOREIGN KEY (`project_id`) REFERENCES `project`(`id`),
   FOREIGN KEY (`owner`) REFERENCES `user`(`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -111,7 +111,7 @@ CREATE TABLE `project_flows` (
   `queue` varchar(64) DEFAULT NULL COMMENT 'queue of the project flows',
   PRIMARY KEY (`id`),
   UNIQUE KEY `project_flowname` (`project_id`, `name`),
-  FOREIGN KEY (`project_id`) REFERENCES `project`(`id`) ON DELETE CASCADE,
+  FOREIGN KEY (`project_id`) REFERENCES `project`(`id`),
   FOREIGN KEY (`owner`) REFERENCES `user`(`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -128,13 +128,13 @@ CREATE TABLE `flows_nodes` (
   `dep` text DEFAULT NULL COMMENT 'dep of the flow nodes, is a json array, array element is a node name',
   PRIMARY KEY (`id`),
   UNIQUE KEY `flows_nodename` (`flow_id`, `name`),
-  FOREIGN KEY (`flow_id`) REFERENCES `project_flows`(`id`) ON DELETE CASCADE,
+  FOREIGN KEY (`flow_id`) REFERENCES `project_flows`(`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- `schedules` table
 DROP TABLE IF EXISTS `schedules`;
 CREATE TABLE `schedules` (
-  `flow_id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'flow id',
+  `flow_id` int(11) NOT NULL COMMENT 'flow id',
   `start_date` datetime NOT NULL COMMENT 'start date of the scheduler',
   `end_date` datetime NOT NULL COMMENT 'end date of the scheduler',
   `schedule_type` tinyint(4) NOT NULL COMMENT 'schedule type',
@@ -171,6 +171,7 @@ CREATE TABLE `execution_flows` (
   `start_time` datetime NOT NULL COMMENT 'real start time of this exec',
   `end_time` datetime DEFAULT NULL COMMENT 'end time of this exec',
   `workflow_data` text NOT NULL COMMENT 'short desc of the workflow, contain keys: edges, nodes; edges: [{"startNode": "xxx", "startNode": "xxx"}, ...], nodes: [{"name": "shelljob1", "desc":"shell", "type":"VIRTUAL", "param": {"script": "echo shelljob1"}, "extras": {...}}, ...]',
+  `user_defined_params` text DEFAULT NULL COMMENT 'user defined params of the flows.',
   `type` tinyint(4) NOT NULL COMMENT 'exec ways, schedule, add data or run ad-hoc.',
   `max_try_times` tinyint(4) DEFAULT NULL COMMENT 'max try times of the exec',
   `timeout` int(4) DEFAULT NULL COMMENT 'timeout, unit: seconds',
