@@ -65,7 +65,7 @@ public class ProjectController {
    * @param response
    * @return
    */
-  @PutMapping(value = "/{name}")
+  @PatchMapping(value = "/{name}")
   public Project modifyProject(@RequestAttribute(value = "session.user") User operator,
                                @PathVariable("name") String name,
                                @RequestParam(value = "desc", required = false) String desc,

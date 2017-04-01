@@ -112,7 +112,10 @@ public class ProjectService {
 
     Date now = new Date();
 
-    project.setDesc(desc);
+    if(desc != null) {
+      project.setDesc(desc);
+    }
+
     project.setModifyTime(now);
 
     int count = projectMapper.updateById(project);

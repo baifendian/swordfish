@@ -49,9 +49,11 @@ public class LoginController {
   private UserService userService;
 
   /**
-   * @param name:     用户名
-   * @param password: 登陆密码
-   * @param response
+   * @param name     用户名
+   * @param email    用户 email
+   * @param password 登陆密码
+   * @param request  请求信息
+   * @param response 返回信息
    * @return
    */
   @RequestMapping(value = "", method = {RequestMethod.POST, RequestMethod.GET})
