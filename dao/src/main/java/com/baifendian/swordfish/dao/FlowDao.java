@@ -23,11 +23,13 @@ import com.baifendian.swordfish.dao.mapper.*;
 import com.baifendian.swordfish.dao.model.*;
 import com.baifendian.swordfish.dao.model.flow.FlowDag;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -43,9 +45,6 @@ public class FlowDao extends BaseDao {
   private FlowNodeMapper flowNodeMapper;
 
   @Autowired
-  private FlowNodeRelationMapper flowNodeRelationMapper;
-
-  @Autowired
   private ScheduleMapper scheduleMapper;
 
   @Autowired
@@ -56,9 +55,13 @@ public class FlowDao extends BaseDao {
     executionFlowMapper = ConnectionFactory.getSqlSession().getMapper(ExecutionFlowMapper.class);
     projectFlowMapper = ConnectionFactory.getSqlSession().getMapper(ProjectFlowMapper.class);
     flowNodeMapper = ConnectionFactory.getSqlSession().getMapper(FlowNodeMapper.class);
-    flowNodeRelationMapper = ConnectionFactory.getSqlSession().getMapper(FlowNodeRelationMapper.class);
     scheduleMapper = ConnectionFactory.getSqlSession().getMapper(ScheduleMapper.class);
     executionNodeMapper = ConnectionFactory.getSqlSession().getMapper(ExecutionNodeMapper.class);
+  }
+
+  public FlowNode queryNodeInfo(Integer nodeId) {
+    FlowNode flowNode = flowNodeMapper.selectByNodeId(nodeId);
+    return flowNode;
   }
 
   /**
@@ -152,42 +155,23 @@ public class FlowDao extends BaseDao {
   }
 
   /**
-   * 执行 workflow 时，插入执行信息 <p>
-   *
-   * @return {@link ExecutionFlow}
-   */
-  public ExecutionFlow runFlowToExecution(Integer projectId, Integer workflowId) {
-    ProjectFlow projectFlow = projectFlowMapper.findById(workflowId);
-    List<FlowNodeRelation> flowNodeRelations = flowNodeRelationMapper.selectByFlowId(workflowId); // 边信息
-    List<FlowNode> flowNodes = flowNodeMapper.selectByFlowId(workflowId); // 节点信息
-    FlowDag flowDag = new FlowDag();
-    flowDag.setEdges(flowNodeRelations);
-    flowDag.setNodes(flowNodes);
-
-    ExecutionFlow executionFlow = new ExecutionFlow();
-    executionFlow.setProjectId(projectId);
-    executionFlow.setFlowId(workflowId);
-    executionFlow.setSubmitUser(projectFlow.getOwnerId());
-    executionFlow.setSubmitTime(new Date());
-    executionFlow.setStartTime(new Date());
-    executionFlow.setType(FlowRunType.DIRECT_RUN);
-    executionFlow.setStatus(FlowStatus.INIT);
-    executionFlow.setWorkflowData(JsonUtil.toJsonString(flowDag));
-
-    executionFlowMapper.insertAndGetId(executionFlow); // 插入执行信息
-
-    return executionFlow;
-  }
-
-  /**
    * 调度 workflow 时，插入执行信息（调度或者补数据） <p>
    *
    * @return {@link ExecutionFlow}
    */
   public ExecutionFlow scheduleFlowToExecution(Integer projectId, Integer workflowId, int submitUser, Date scheduleTime, FlowRunType runType,
                                                Integer maxTryTimes, Integer timeout) {
-    List<FlowNodeRelation> flowNodeRelations = flowNodeRelationMapper.selectByFlowId(workflowId); // 边信息
     List<FlowNode> flowNodes = flowNodeMapper.selectByFlowId(workflowId); // 节点信息
+    List<FlowNodeRelation> flowNodeRelations = new ArrayList<>();
+    for(FlowNode flowNode:flowNodes){
+      String dep = flowNode.getDep();
+      if(StringUtils.isNotEmpty(dep)){
+        List<String> depList = JsonUtil.parseObjectList(dep, String.class);
+        for(String depNode: depList){
+          flowNodeRelations.add(new FlowNodeRelation(workflowId, depNode, flowNode.getName()));
+        }
+      }
+    }
     ProjectFlow projectFlow = projectFlowMapper.findById(workflowId);
     FlowDag flowDag = new FlowDag();
     flowDag.setEdges(flowNodeRelations);
@@ -196,15 +180,18 @@ public class FlowDao extends BaseDao {
     ExecutionFlow executionFlow = new ExecutionFlow();
     executionFlow.setFlowId(workflowId);
     executionFlow.setSubmitUser(submitUser);
+    executionFlow.setSubmitTime(new Date());
+    executionFlow.setQueue(projectFlow.getQueue());
     executionFlow.setProxyUser(projectFlow.getProxyUser());
     executionFlow.setScheduleTime(scheduleTime);
-    executionFlow.setSubmitTime(new Date());
     executionFlow.setStartTime(new Date());
-    executionFlow.setType(runType);
-    executionFlow.setStatus(FlowStatus.INIT);
     executionFlow.setWorkflowData(JsonUtil.toJsonString(flowDag));
+    executionFlow.setUserDefinedParams(projectFlow.getUserDefinedParams());
+    executionFlow.setType(runType);
     executionFlow.setMaxTryTimes(maxTryTimes);
     executionFlow.setTimeout(timeout);
+    executionFlow.setStatus(FlowStatus.INIT);
+    executionFlow.setExtras(projectFlow.getExtras());
 
     executionFlowMapper.insertAndGetId(executionFlow); // 插入执行信息
 
@@ -323,17 +310,8 @@ public class FlowDao extends BaseDao {
     executionNodeMapper.update(executionNode);
   }
 
-  /**
-   * 获取 node 执行详情 <p>
-   *
-   * @return {@link ExecutionNode}
-   */
-  public ExecutionNode queryExecutionNode(long execId, Integer nodeId, Integer attempt) {
-    return executionNodeMapper.selectOneExecNode(execId, nodeId, attempt);
-  }
-
-  public ExecutionNode queryExecutionNodeLastAttempt(long execId, Integer nodeId) {
-    return executionNodeMapper.selectExecNodeLastAttempt(execId, nodeId);
+  public ExecutionNode queryExecutionNode(long execId, String nodeName) {
+    return executionNodeMapper.selectExecNode(execId, nodeName);
   }
 
   /**

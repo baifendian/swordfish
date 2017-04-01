@@ -40,7 +40,7 @@ public class FlowDaoTest {
 
   @Test
   public void testQueryExecutionNodeLastAttempt() {
-    ExecutionNode executionNode = flowDao.queryExecutionNodeLastAttempt(411, 6);
+    ExecutionNode executionNode = flowDao.queryExecutionNode(411, "test");
     System.out.println(executionNode.getStatus());
   }
 

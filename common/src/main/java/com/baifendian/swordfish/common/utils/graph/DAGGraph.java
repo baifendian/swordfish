@@ -24,7 +24,7 @@ import java.util.Queue;
 /**
  * 有向无环图, 增加边需要判断是否符合无环的约束, 否则增加失败
  */
-public class DAGGraph<VD, ED> extends Graph<VD, ED> {
+public class DAGGraph<VK, VD, ED> extends Graph<VK, VD, ED> {
   private static final Logger LOG = LoggerFactory.getLogger(DAGGraph.class);
 
   public DAGGraph() {
@@ -38,29 +38,30 @@ public class DAGGraph<VD, ED> extends Graph<VD, ED> {
    * @param endId        终点
    * @param createVertex 是否创建顶点
    * @return
+   * 判断增加 startKey -> endKey 会否导致环存在, 这个算法就是判断从 endKey 到 startKey 是不是可达的
    */
-  protected synchronized boolean validIfAdd(int startId, int endId, boolean createVertex) {
-    if (!super.validIfAdd(startId, endId, createVertex)) {
+  protected synchronized boolean validIfAdd(VK startKey, VK endKey, boolean createVertex) {
+    if (!super.validIfAdd(startKey, endKey, createVertex)) {
       return false;
     }
 
     // 具体算法是, 看 endId 到 startId 是否可达, 如果 endId 本来就不存在, 效率也是非常之高
     int times = getVertexNumber();
 
-    Queue<Integer> q = new LinkedList<>();
+    Queue<VK> q = new LinkedList<>();
 
-    q.add(endId);
+    q.add(endKey);
 
     // 循环最多 times - 1 次, 如果没有找到 startId, 表示是不可达的
     while (!q.isEmpty() && (--times > 0)) {
-      int id = q.poll();
+      VK key = q.poll();
 
-      for (Integer postId : getPostNode(id)) {
-        if (postId == startId) {
+      for (VK postKey : getPostNode(key)) {
+        if (postKey == startKey) {
           return false;
         }
 
-        q.add(postId);
+        q.add(postKey);
       }
     }
 

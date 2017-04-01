@@ -49,6 +49,9 @@ public class HBaseHandler implements DataSourceHandler {
       if(!StringUtils.isEmpty(param.getZkZnodeParent())){
         config.set("zookeeper.znode.parent", param.getZkZnodeParent());
       }
+      if(param.getZkPort() != null && param.getZkPort() != 0 ){
+        config.set("hbase.zookeeper.property.clientPort", param.getZkPort().toString());
+      }
       con = ConnectionFactory.createConnection(config);
     } finally {
       if (con != null) {

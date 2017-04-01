@@ -23,14 +23,12 @@ import java.util.Date;
 public class AdHoc {
   private long id;
   private int projectId;
-  private String params;
+  private String parameter;
   private String proxyUser;
   private String queue;
   private FlowStatus status;
   private Date createTime;
-  private Date modifyTime;
   private int owner;
-  private int lastModifyBy;
   private Date startTime;
   private Date endTime;
   private String jobId;
@@ -51,12 +49,12 @@ public class AdHoc {
     this.projectId = projectId;
   }
 
-  public String getParams() {
-    return params;
+  public String getParameter() {
+    return parameter;
   }
 
-  public void setParams(String params) {
-    this.params = params;
+  public void setParameter(String parameter) {
+    this.parameter = parameter;
   }
 
   public String getProxyUser() {
@@ -115,27 +113,11 @@ public class AdHoc {
     this.createTime = createTime;
   }
 
-  public Date getModifyTime() {
-    return modifyTime;
-  }
-
-  public void setModifyTime(Date modifyTime) {
-    this.modifyTime = modifyTime;
-  }
-
   public int getOwner() {
     return owner;
   }
 
   public void setOwner(int owner) {
     this.owner = owner;
-  }
-
-  public int getLastModifyBy() {
-    return lastModifyBy;
-  }
-
-  public void setLastModifyBy(int lastModifyBy) {
-    this.lastModifyBy = lastModifyBy;
   }
 }

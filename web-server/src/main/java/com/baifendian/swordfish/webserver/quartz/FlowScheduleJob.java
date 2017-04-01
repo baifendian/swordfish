@@ -150,9 +150,8 @@ public class FlowScheduleJob implements Job {
 
         // 如果自依赖的上一个调度周期失败，那么本次也失败
         if (!checkDepWorkflowStatus(flowId, previousFireTime, startTime, schedule.getTimeout())) {
-          executionFlow.setStatus(FlowStatus.FAILED);
+          executionFlow.setStatus(FlowStatus.DEP_FAILED);
           executionFlow.setEndTime(new Date());
-          executionFlow.setErrorCode(FlowErrorCode.DEP_PRE_FAILED);
           flowDao.updateExecutionFlow(executionFlow);
           LOGGER.error("自依赖的上一周期执行失败");
           // 发送邮件
@@ -175,9 +174,8 @@ public class FlowScheduleJob implements Job {
 
       // 依赖失败，则当前任务也失败
       if (!isSuccess) {
-        executionFlow.setStatus(FlowStatus.FAILED);
+        executionFlow.setStatus(FlowStatus.DEP_FAILED);
         executionFlow.setEndTime(new Date());
-        executionFlow.setErrorCode(FlowErrorCode.DEP_FAILED);
         flowDao.updateExecutionFlow(executionFlow);
         LOGGER.error("依赖的 workflow 执行失败");
         // 发送邮件
