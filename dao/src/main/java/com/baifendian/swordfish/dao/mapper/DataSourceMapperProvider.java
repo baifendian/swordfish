@@ -16,7 +16,6 @@
 package com.baifendian.swordfish.dao.mapper;
 
 import com.baifendian.swordfish.dao.model.DataSource;
-
 import org.apache.ibatis.jdbc.SQL;
 
 import java.util.Map;
@@ -24,63 +23,120 @@ import java.util.Map;
 public class DataSourceMapperProvider {
   public static final String DB_NAME = "`datasource`";
 
+  /**
+   * 插入数据源
+   *
+   * @param parameter
+   * @return
+   */
   public String insert(Map<String, Object> parameter) {
     DataSource dataSource = (DataSource) parameter.get("dataSource");
     int type = dataSource.getType().getType();
 
     return new SQL() {{
       INSERT_INTO(DB_NAME);
-      VALUES("owner", "#{dataSource.ownerId}");
-      VALUES("project_id", "#{dataSource.projectId}");
-      VALUES("name", "#{dataSource.name}");
+
+      VALUES("`name`", "#{dataSource.name}");
       VALUES("`desc`", "#{dataSource.desc}");
-      VALUES("type", "" + type);
-      //VALUES("db_id", "#{dataSource.dbId}");
-      VALUES("params", "#{dataSource.params}");
-      VALUES("create_time", "#{dataSource.createTime}");
-      VALUES("modify_time", "#{dataSource.modifyTime}");
+      VALUES("`type`", "" + type);
+      VALUES("`owner`", "#{dataSource.ownerId}");
+      VALUES("`project_id`", "#{dataSource.projectId}");
+      VALUES("`parameter`", "#{dataSource.parameter}");
+      VALUES("`create_time`", "#{dataSource.createTime}");
+      VALUES("`modify_time`", "#{dataSource.modifyTime}");
     }}.toString();
   }
 
-  public String deleteByProjectAndName(Map<String, Object> parameter){
-    return new SQL(){{
-      DELETE_FROM(DB_NAME);
-      WHERE("project_id = #{projectId} and name = #{name}");
-    }}.toString();
-  }
-
+  /**
+   * 更新数据源
+   *
+   * @param parameter
+   * @return
+   */
   public String update(Map<String, Object> parameter) {
     return new SQL() {{
       UPDATE(DB_NAME);
-      SET("owner = #{dataSource.ownerId}");
-      SET("project_id = #{dataSource.projectId}");
+
       SET("`desc` = #{dataSource.desc}");
-      SET("params = #{dataSource.params}");
-      SET("modify_time = #{dataSource.modifyTime}");
-      WHERE("name = #{dataSource.name}");
+      SET("`owner` = #{dataSource.ownerId}");
+      SET("`project_id` = #{dataSource.projectId}");
+      SET("`parameter` = #{dataSource.parameter}");
+      SET("`modify_time` = #{dataSource.modifyTime}");
+
+      WHERE("`name` = #{dataSource.name}");
     }}.toString();
   }
 
-  public String getByName(Map<String, Object> parameter) {
+  /**
+   * 删除数据源
+   *
+   * @param parameter
+   * @return
+   */
+  public String deleteByProjectAndName(Map<String, Object> parameter) {
     return new SQL() {{
-      SELECT("r.*,r.owner as owner_id");
-      SELECT("u.name as owner,p.name as project_name");
-      FROM("datasource r");
-      JOIN("user as u on u.id = r.owner");
-      JOIN("project p on r.project_id = p.id");
-      WHERE("r.project_id = #{projectId} and r.name = #{name}");
+      DELETE_FROM(DB_NAME);
+
+      WHERE("`project_id` = #{projectId} and name = #{name}");
     }}.toString();
   }
 
+  /**
+   * 得到某个项目下的所有数据源
+   *
+   * @param parameter
+   * @return
+   */
   public String getByProjectId(Map<String, Object> parameter) {
     return new SQL() {{
-      SELECT("r.*,r.owner as owner_id");
+      SELECT("r.*, r.owner as owner_id");
       SELECT("u.name as owner,p.name as project_name");
-      FROM("datasource r");
+
+      FROM(DB_NAME + " r");
+
       LEFT_OUTER_JOIN("user as u on u.id = r.owner");
       JOIN("project p on r.project_id = p.id");
+
       WHERE("r.project_id = #{projectId}");
     }}.toString();
   }
 
+  /**
+   * 得到某个数据源的信息
+   *
+   * @param parameter
+   * @return
+   */
+  public String getByName(Map<String, Object> parameter) {
+    return new SQL() {{
+      SELECT("r.*, r.owner as owner_id");
+      SELECT("u.name as owner, p.name as project_name");
+
+      FROM(DB_NAME + " r");
+
+      JOIN("user as u on u.id = r.owner");
+      JOIN("project p on r.project_id = p.id");
+
+      WHERE("r.project_id = #{projectId} and r.name = #{name}");
+    }}.toString();
+  }
+
+  /**
+   * 根据projectName 和 datasource name
+   * @param parameter
+   * @return
+   */
+  public String getByProjectNameAndName(Map<String, Object> parameter) {
+    return new SQL() {{
+      SELECT("r.*, r.owner as owner_id");
+      SELECT("u.name as owner, p.name as project_name");
+
+      FROM(DB_NAME + " r");
+
+      JOIN("user as u on u.id = r.owner");
+      JOIN("project p on r.project_id = p.id");
+
+      WHERE("p.name = #{projectName} and r.name = #{name}");
+    }}.toString();
+  }
 }

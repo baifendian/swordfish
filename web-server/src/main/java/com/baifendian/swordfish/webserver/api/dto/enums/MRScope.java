@@ -23,16 +23,16 @@ public enum MRScope {
 
 
   @JsonCreator
-  public static MRScope valueOfType(Integer type) throws IllegalArgumentException {
-    if (type == null) {
+  public static MRScope valueOfType(String scope) throws IllegalArgumentException {
+    if (scope == null) {
       return null;
     }
     for (MRScope mrScope : MRScope.values()) {
-      if (mrScope.getScope().equals(type)) {
+      if (mrScope.getScope().equals(scope)) {
         return mrScope;
       }
     }
-    throw new IllegalArgumentException("Cannot convert " + type + " to " + MRScope.class.getSimpleName() + " .");
+    throw new IllegalArgumentException("Cannot convert " + scope + " to " + MRScope.class.getSimpleName() + " .");
   }
 
 }

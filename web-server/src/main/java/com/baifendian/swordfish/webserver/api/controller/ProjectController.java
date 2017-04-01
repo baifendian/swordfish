@@ -53,6 +53,7 @@ public class ProjectController {
                                @RequestParam(value = "desc", required = false) String desc,
                                HttpServletResponse response) {
     logger.info("Operator user id {}, create project, name: {}, desc: {}", operator.getId(), name, desc);
+
     return projectService.createProject(operator, name, desc, response);
   }
 
@@ -64,12 +65,13 @@ public class ProjectController {
    * @param response
    * @return
    */
-  @PutMapping(value = "/{name}")
+  @PatchMapping(value = "/{name}")
   public Project modifyProject(@RequestAttribute(value = "session.user") User operator,
                                @PathVariable("name") String name,
                                @RequestParam(value = "desc", required = false) String desc,
                                HttpServletResponse response) {
     logger.info("Operator user id {}, modify project, name: {}, desc: {}", operator.getId(), name, desc);
+
     return projectService.modifyProject(operator, name, desc, response);
   }
 
@@ -85,6 +87,7 @@ public class ProjectController {
                             @PathVariable("name") String name,
                             HttpServletResponse response) {
     logger.info("Operator user id {}, delete project, name: {}, desc: {}", operator.getId(), name);
+
     projectService.deleteProject(operator, name, response);
   }
 
@@ -98,6 +101,7 @@ public class ProjectController {
   public List<Project> queryProjects(@RequestAttribute(value = "session.user") User operator,
                                      HttpServletResponse response) {
     logger.info("Operator user id {}, get project list", operator.getId());
+
     return projectService.queryProject(operator, response);
   }
 
@@ -111,13 +115,14 @@ public class ProjectController {
    * @param response
    * @return
    */
-  @RequestMapping(value = "/{name}/users/{userName}", method = {RequestMethod.PUT})
+  @PostMapping(value = "/{name}/users/{userName}")
   public ProjectUser addProjectUser(@RequestAttribute(value = "session.user") User operator,
                                     @PathVariable("name") String name,
                                     @PathVariable("userName") String userName,
                                     @RequestParam(value = "perm") int perm,
                                     HttpServletResponse response) {
     logger.info("Operator user id {}, add user to project, project name: {}, user name: {}, perm: {}", operator.getId(), name, userName, perm);
+
     return projectService.addProjectUser(operator, name, userName, perm, response);
   }
 
@@ -138,6 +143,7 @@ public class ProjectController {
                                     @RequestParam(value = "perm") int perm,
                                     HttpServletResponse response) {
     logger.info("Operator user id {}, modify user permission in the project, project name: {}, user name: {}, perm: {}", operator.getId(), name, userName, perm);
+
     return projectService.modifyProjectUser(operator, name, userName, perm, response);
   }
   /**
@@ -154,6 +160,7 @@ public class ProjectController {
                                 @PathVariable("userName") String userName,
                                 HttpServletResponse response) {
     logger.info("Operator user id {}, delete user from project, project name: {}, user name: {}, perm: {}", operator.getId(), name, userName);
+
     projectService.deleteProjectUser(operator, name, userName, response);
   }
 
@@ -170,6 +177,7 @@ public class ProjectController {
                                      @PathVariable("name") String name,
                                      HttpServletResponse response) {
     logger.info("Operator user id {}, query users of project, project name: {}", operator.getId(), name);
+
     return projectService.queryUser(operator, name, response);
   }
 }

@@ -230,7 +230,7 @@ public class ProjectFlow {
     this.userDefinedParamMap = userDefinedParamMap;
   }
 
-  public class ProjectFlowData {
+  public static class ProjectFlowData {
     private List<FlowNode> nodes;
 
     private String userDefParams;

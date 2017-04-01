@@ -26,7 +26,9 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.MessageFormat;
+import java.util.HashSet;
 import java.util.Properties;
+import java.util.Set;
 
 public class BaseConfig {
 
@@ -39,6 +41,8 @@ public class BaseConfig {
   private static String hdfsDataBasePath; // hdfs 目录, 用于存放 资源和工作流 的数据
 
   private static String localExecBasePath; // 本地目录, 用于执行工作流
+
+  private static Set<String> prohibitUserSet; // 禁用用户列表
 
   /**
    * 环境变量信息
@@ -61,9 +65,17 @@ public class BaseConfig {
       localExecBasePath = properties.getProperty("local.exec.base.path");
 
       systemEnvPath = properties.getProperty("sf.env.file");
+
       // 没有配置时使用部署用户的环境变量文件
-      if (StringUtils.isEmpty(systemEnvPath))
+      if (StringUtils.isEmpty(systemEnvPath)) {
         systemEnvPath = System.getProperty("user.home") + File.separator + ".bash_profile";
+      }
+
+      prohibitUserSet = new HashSet<>();
+      for (String user : properties.getProperty("prohibit.user.list").split(",")) {
+        LOGGER.info("prohibit user: {}", user);
+        prohibitUserSet.add(user);
+      }
     } catch (IOException e) {
       LOGGER.error(e.getMessage(), e);
     } finally {
@@ -195,5 +207,15 @@ public class BaseConfig {
    */
   public static String getSystemEnvPath() {
     return systemEnvPath;
+  }
+
+  /**
+   * 是否禁用用户
+   *
+   * @param user
+   * @return
+   */
+  public static boolean isProhibitUser(String user) {
+    return prohibitUserSet.contains(user);
   }
 }

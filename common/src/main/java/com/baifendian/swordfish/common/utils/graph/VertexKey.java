@@ -18,16 +18,16 @@ package com.baifendian.swordfish.common.utils.graph;
 public class VertexKey {
   private String key;
 
-  public VertexKey(String key){
+  public VertexKey(String key) {
     this.key = key;
   }
 
-  public String getKey(){
+  public String getKey() {
     return key;
   }
 
   @Override
-  public boolean equals(Object other){
+  public boolean equals(Object other) {
     if (this == other) {
       return true;
     }

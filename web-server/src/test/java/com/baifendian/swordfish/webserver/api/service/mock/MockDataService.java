@@ -16,19 +16,18 @@
 package com.baifendian.swordfish.webserver.api.service.mock;
 
 import com.baifendian.swordfish.dao.enums.DbType;
-import com.baifendian.swordfish.dao.enums.NodeType;
 import com.baifendian.swordfish.dao.enums.UserRoleType;
 import com.baifendian.swordfish.dao.mapper.*;
 import com.baifendian.swordfish.dao.model.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import org.apache.commons.lang.RandomStringUtils;
-import org.datanucleus.store.types.backed.ArrayList;
-import org.mockito.Mock;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 
 /**
  * 单元测试模拟数据工具
@@ -50,6 +49,9 @@ public class MockDataService {
 
   @Autowired
   private FlowNodeMapper flowNodeMapper;
+
+  @Autowired
+  private ProjectFlowMapper projectFlowMapper;
 
   /**
    * 获取一个随机字符串
@@ -167,7 +169,7 @@ public class MockDataService {
     dataSource.setType(DbType.MYSQL);
     dataSource.setOwnerId(userId);
     dataSource.setProjectId(projectId);
-    dataSource.setParams(getRandomString());
+    dataSource.setParameter(getRandomString());
     dataSource.setCreateTime(now);
     dataSource.setModifyTime(now);
 
@@ -177,6 +179,8 @@ public class MockDataService {
   }
 
   public String MR_PARAMETER = "{\"mainClass\":\"com.baifendian.mr.WordCount\",\"mainJar\":{\"scope\":\"project\",\"res\":\"wordcount-examples.jar\"},\"args\":\"/user/joe/wordcount/input /user/joe/wordcount/output\",\"properties\":[{\"prop\":\"wordcount.case.sensitive\",\"value\":\"true\"},{\"prop\":\"stopwords\",\"value\":\"the,who,a,then\"}],\"files\":[{\"res\":\"ABC.conf\",\"alias\":\"aa\"},{\"scope\":\"workflow\",\"res\":\"conf/HEL.conf\",\"alias\":\"hh\"}],\"archives\":[{\"res\":\"JOB.zip\",\"alias\":\"jj\"}],\"libJars\":[{\"scope\":\"workflow\",\"res\":\"lib/tokenizer-0.1.jar\"}]}";
+
+  public String USER_DEFINED_PARAMETER = "[{\"prop\":\"year\",\"value\":\"$[yyyy]\"}]";
 
   /**
    * 虚拟一个mr节点
@@ -203,5 +207,72 @@ public class MockDataService {
    */
   public FlowNode mocRmNode(String[] depList,int flowId) throws JsonProcessingException {
     return mocNode(depList,flowId,MR_PARAMETER,MR_PARAMETER);
+  }
+
+
+  /**
+   * 虚拟一个projectFlowData
+   * @return
+   */
+  public ProjectFlow.ProjectFlowData mocProjectFlowData(int flowId) throws JsonProcessingException {
+    FlowNode flowNode1 = mocRmNode(new String[]{},flowId);
+    FlowNode flowNode2 = mocRmNode(new String[]{flowNode1.getName()},flowId);
+    FlowNode flowNode3 = mocRmNode(new String[]{flowNode2.getName()},flowId);
+
+    List<FlowNode> flowNodeList = Arrays.asList(new FlowNode[]{flowNode1,flowNode2,flowNode3});
+
+    ProjectFlow.ProjectFlowData projectFlowData = new ProjectFlow.ProjectFlowData();
+    projectFlowData.setExtras(MR_PARAMETER);
+    projectFlowData.setUserDefParams(USER_DEFINED_PARAMETER);
+    projectFlowData.setNodes(flowNodeList);
+
+    return projectFlowData;
+  }
+
+  /**
+   * 虚拟一个projectFlowData 字符串
+   * @param flowId
+   * @return
+   */
+  public String mocProjectFlowDataJson(int flowId) throws IOException {
+    ObjectMapper mapper = new ObjectMapper();
+    ProjectFlow.ProjectFlowData projectFlowData = mocProjectFlowData(flowId);
+    return mapper.writeValueAsString(projectFlowData);
+  }
+
+  /**
+   * 虚拟一个 正常pojectFlow 工作流
+   * @return
+   */
+  public ProjectFlow mocProjectFlow(int projectId,int userId) throws JsonProcessingException {
+    ProjectFlow projectFlow = new ProjectFlow();
+    Date now = new Date();
+
+    projectFlow.setName(getRandomString());
+    projectFlow.setProjectId(projectId);
+    projectFlow.setDesc(getRandomString());
+    projectFlow.setCreateTime(now);
+    projectFlow.setModifyTime(now);
+    projectFlow.setProxyUser(getRandomString());
+    projectFlow.setQueue(getRandomString());
+    projectFlow.setOwnerId(userId);
+    projectFlow.setUserDefinedParams(USER_DEFINED_PARAMETER);
+    projectFlow.setExtras(MR_PARAMETER);
+
+    projectFlowMapper.insertAndGetId(projectFlow);
+
+    FlowNode flowNode1 = mocRmNode(new String[]{},projectFlow.getId());
+    FlowNode flowNode2 = mocRmNode(new String[]{flowNode1.getName()},projectFlow.getId());
+    FlowNode flowNode3 = mocRmNode(new String[]{flowNode2.getName()},projectFlow.getId());
+
+    List<FlowNode> flowNodeList = Arrays.asList(new FlowNode[]{flowNode1,flowNode2,flowNode3});
+
+    for (FlowNode flowNode:flowNodeList){
+      flowNodeMapper.insert(flowNode);
+    }
+
+    projectFlow.setFlowsNodes(flowNodeList);
+
+    return projectFlow;
   }
 }

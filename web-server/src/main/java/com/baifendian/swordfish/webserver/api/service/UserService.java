@@ -19,7 +19,9 @@ import com.baifendian.swordfish.common.utils.http.HttpUtil;
 import com.baifendian.swordfish.dao.enums.UserRoleType;
 import com.baifendian.swordfish.dao.mapper.ProjectMapper;
 import com.baifendian.swordfish.dao.mapper.UserMapper;
+import com.baifendian.swordfish.dao.model.Project;
 import com.baifendian.swordfish.dao.model.User;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -64,10 +66,14 @@ public class UserService {
                          String phone,
                          String proxyUsers,
                          HttpServletResponse response) {
+    // 如果不是管理员, 返回错误
     if (operator.getRole() != UserRoleType.ADMIN_USER) {
       response.setStatus(HttpStatus.SC_UNAUTHORIZED);
       return null;
     }
+
+    // 校验代理用户格式是否正确以及是否包含正常代理的内容
+    // TODO::
 
     User user = new User();
     Date now = new Date();
@@ -77,7 +83,7 @@ public class UserService {
     user.setDesc(desc);
     user.setPhone(phone);
     user.setPassword(HttpUtil.getMd5(password));
-    user.setRole(UserRoleType.GENERAL_USER); // 创建的用户都是普通用户
+    user.setRole(UserRoleType.GENERAL_USER); // 创建的用户都是普通用户, 管理员用户当前是内置的
     user.setProxyUsers(proxyUsers);
     user.setCreateTime(now);
     user.setModifyTime(now);
@@ -131,19 +137,40 @@ public class UserService {
       }
     }
 
-    User user = new User();
-    Date now = new Date();
+    User user = userMapper.queryByName(name);
 
-    user.setName(name);
-    user.setEmail(email);
-    user.setDesc(desc);
-    user.setPhone(phone);
-
-    if (StringUtils.isNotEmpty(password)) {
-      user.setPassword(HttpUtil.getMd5(password));
+    if (user == null) {
+      response.setStatus(HttpStatus.SC_NOT_MODIFIED);
+      return null;
     }
 
-    user.setProxyUsers(proxyUsers);
+    Date now = new Date();
+
+    if (email != null) {
+      user.setEmail(email);
+    }
+
+    if (desc != null) {
+      user.setDesc(desc);
+    }
+
+    if (phone != null) {
+      user.setPhone(phone);
+    }
+
+    if (password != null) {
+      if (StringUtils.isNotEmpty(password)) {
+        user.setPassword(HttpUtil.getMd5(password));
+      }
+    }
+
+    if (proxyUsers != null) {
+      // 校验代理用户格式是否正确以及是否包含正常代理的内容
+      // TODO::
+
+      user.setProxyUsers(proxyUsers);
+    }
+
     user.setModifyTime(now);
 
     int count = userMapper.update(user);
@@ -179,8 +206,14 @@ public class UserService {
       return;
     }
 
-    // 删除用户的时候, 必须保证 "项目/资源/工作流" 的信息不为空
-    // TODO::
+    // 删除用户的时候, 必须保证 "项目" 的信息不为空
+    List<Project> projects = projectMapper.queryProjectByUser(operator.getId());
+
+    if (CollectionUtils.isNotEmpty(projects)) {
+      logger.error("Can't delete a account which has projects");
+      response.setStatus(HttpStatus.SC_NOT_MODIFIED);
+      return;
+    }
 
     int count = userMapper.delete(name);
 

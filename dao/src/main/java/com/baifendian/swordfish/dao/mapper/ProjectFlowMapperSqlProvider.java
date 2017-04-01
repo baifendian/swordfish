@@ -43,7 +43,7 @@ public class ProjectFlowMapperSqlProvider {
       {
         INSERT_INTO(TABLE_NAME);
         VALUES("name", "#{flow.name}");
-        VALUES("desc", "#{flow.desc}");
+        VALUES("`desc`", "#{flow.desc}");
         VALUES("project_id", "#{flow.projectId}");
         VALUES("modify_time", "#{flow.modifyTime}");
         VALUES("create_time", "#{flow.createTime}");
@@ -115,11 +115,11 @@ public class ProjectFlowMapperSqlProvider {
         SELECT("p_f.*,p_f.owner as owner_id");
         SELECT("p.name as project_name");
         SELECT("u.name as owner");
-        FROM("project_flow p_f");
+        FROM("project_flows p_f");
         JOIN("project p on p_f.project_id = p.id");
         JOIN("user u on u.id = p.owner");
-        WHERE("project_id = #{projectId}");
-        WHERE("name = #{name}");
+        WHERE("p_f.project_id = #{projectId}");
+        WHERE("p_f.name = #{name}");
       }
     }.toString();
   }
@@ -130,7 +130,7 @@ public class ProjectFlowMapperSqlProvider {
         SELECT("p_f.*,p_f.owner as owner_id");
         SELECT("p.name as project_name");
         SELECT("u.name as owner");
-        FROM("project_flow p_f");
+        FROM("project_flows p_f");
         JOIN("project p on p_f.project_id = p.id");
         JOIN("user u on u.id = p.owner");
         WHERE("project_name = #{projectName}");
@@ -279,7 +279,7 @@ public class ProjectFlowMapperSqlProvider {
     return new SQL() {
       {
         UPDATE(TABLE_NAME);
-        SET("desc", "#{flow.desc}");
+        SET("`desc`", "#{flow.desc}");
         SET("modify_time", "#{flow.modifyTime}");
         SET("create_time", "#{flow.createTime}");
         SET("last_modify_by", "#{flow.lastModifyBy}");
