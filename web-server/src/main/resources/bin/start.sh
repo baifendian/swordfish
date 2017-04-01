@@ -26,7 +26,7 @@ STDOUT_FILE=$LOGS_DIR/stdout.log
 
 LIB_JARS=./lib/*
 #JAVA_OPTS=" -server -Xmx16g -Xms4g -XX:PermSize=512m -Xss256k -XX:+DisableExplicitGC -XX:+UseConcMarkSweepGC -XX:+CMSParallelRemarkEnabled -XX:+UseCMSCompactAtFullCollection -XX:LargePageSizeInBytes=128m -XX:+UseFastAccessorMethods -XX:+UseCMSInitiatingOccupancyOnly -XX:CMSInitiatingOccupancyFraction=70 "
-JAVA_OPTS=" -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005 -Xmx16g -Xms4g -XX:PermSize=512m -Xss256k -XX:+DisableExplicitGC -XX:+UseConcMarkSweepGC -XX:+CMSParallelRemarkEnabled -XX:+UseCMSCompactAtFullCollection -XX:LargePageSizeInBytes=128m -XX:+UseFastAccessorMethods -XX:+UseCMSInitiatingOccupancyOnly -XX:CMSInitiatingOccupancyFraction=70 "
+JAVA_OPTS=" -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5006 -Xmx16g -Xms4g -XX:PermSize=512m -Xss256k -XX:+DisableExplicitGC -XX:+UseConcMarkSweepGC -XX:+CMSParallelRemarkEnabled -XX:+UseCMSCompactAtFullCollection -XX:LargePageSizeInBytes=128m -XX:+UseFastAccessorMethods -XX:+UseCMSInitiatingOccupancyOnly -XX:CMSInitiatingOccupancyFraction=70 "
 
 echo -e "Starting the service ...\c"
 

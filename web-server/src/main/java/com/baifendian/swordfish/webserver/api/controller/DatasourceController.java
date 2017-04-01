@@ -58,25 +58,7 @@ public class DatasourceController {
     return datasourceService.createDataSource(operator,projectName,name,desc,type,parameter,response);
   }
 
-  /**
-   * 测试一个数据源
-   * @param operator
-   * @param projectName
-   * @param desc
-   * @param type
-   * @param parameter
-   * @param response
-   * @return
-   */
-  @GetMapping(value="/test")
-  public BaseResponse testDataSource(@RequestAttribute(value = "session.user") User operator,
-                                     @PathVariable("projectName") String projectName,
-                                     @RequestParam(value = "desc", required = false) String desc,
-                                     @RequestParam(value = "type", required = true) DbType type,
-                                     @RequestParam(value = "parameter", required = true) String parameter,
-                                     HttpServletResponse response){
-    return datasourceService.testDataSource(type,parameter,response);
-  }
+
 
   /**
    * 修改一个数据源
