@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #main函数所在类（类全称）
-MAIN_CLASS=com.bfd.dw.api.RestfulApiApplication
+MAIN_CLASS=com.baifendian.swordfish.webserver.api.RestfulApiApplication
 
 cd `dirname $0`
 BIN_DIR=`pwd`
