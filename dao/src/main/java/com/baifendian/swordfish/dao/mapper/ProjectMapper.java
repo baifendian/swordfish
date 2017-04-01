@@ -16,7 +16,6 @@
 package com.baifendian.swordfish.dao.mapper;
 
 import com.baifendian.swordfish.dao.model.Project;
-
 import org.apache.ibatis.annotations.*;
 import org.apache.ibatis.type.JdbcType;
 import org.mybatis.spring.annotation.MapperScan;
@@ -27,50 +26,82 @@ import java.util.List;
 @MapperScan
 public interface ProjectMapper {
 
+  /**
+   * 插入项目信息
+   *
+   * @param project
+   * @return
+   */
   @InsertProvider(type = ProjectSqlProvider.class, method = "insert")
   @SelectKey(statement = "SELECT LAST_INSERT_ID()", keyProperty = "newProject.id", before = false, resultType = int.class)
   int insert(@Param("newProject") Project project);
 
-  @Results(value = {@Result(property = "id", column = "id", id = true, javaType = int.class, jdbcType = JdbcType.INTEGER),
-          @Result(property = "name", column = "name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-          @Result(property = "desc", column = "desc", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-          @Result(property = "createTime", column = "create_time", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP),
-          @Result(property = "modifyTime", column = "modify_time", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP),
-          @Result(property = "ownerId", column = "owner_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
-          @Result(property = "owner", column = "owner", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-  })
-  @SelectProvider(type = ProjectSqlProvider.class, method = "queryProjectByUser")
-  List<Project> queryProjectByUser(@Param("userId") int userId);
+  /**
+   * 更新项目信息
+   *
+   * @param project
+   * @return
+   */
+  @UpdateProvider(type = ProjectSqlProvider.class, method = "updateById")
+  int updateById(@Param("project") Project project);
 
+  /**
+   * 删除项目
+   *
+   * @param id
+   * @return
+   */
+  @DeleteProvider(type = ProjectSqlProvider.class, method = "deleteById")
+  int deleteById(@Param("id") int id);
+
+  /**
+   * 查询所有的项目列表
+   *
+   * @return
+   */
   @Results(value = {@Result(property = "id", column = "id", id = true, javaType = int.class, jdbcType = JdbcType.INTEGER),
-          @Result(property = "name", column = "name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-          @Result(property = "desc", column = "desc", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-          @Result(property = "createTime", column = "create_time", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP),
-          @Result(property = "modifyTime", column = "modify_time", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP),
-          @Result(property = "ownerId", column = "owner_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
-          @Result(property = "owner", column = "owner", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+      @Result(property = "name", column = "name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+      @Result(property = "desc", column = "desc", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+      @Result(property = "createTime", column = "create_time", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP),
+      @Result(property = "modifyTime", column = "modify_time", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP),
+      @Result(property = "ownerId", column = "owner_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
+      @Result(property = "owner", column = "owner", javaType = String.class, jdbcType = JdbcType.VARCHAR),
   })
   @SelectProvider(type = ProjectSqlProvider.class, method = "queryAllProject")
   List<Project> queryAllProject();
 
-  @UpdateProvider(type = ProjectSqlProvider.class, method = "updateById")
-  int updateById(@Param("project") Project project);
+  /**
+   * 查询某个项目
+   *
+   * @param userId
+   * @return
+   */
+  @Results(value = {@Result(property = "id", column = "id", id = true, javaType = int.class, jdbcType = JdbcType.INTEGER),
+      @Result(property = "name", column = "name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+      @Result(property = "desc", column = "desc", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+      @Result(property = "createTime", column = "create_time", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP),
+      @Result(property = "modifyTime", column = "modify_time", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP),
+      @Result(property = "ownerId", column = "owner_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
+      @Result(property = "owner", column = "owner", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+  })
+  @SelectProvider(type = ProjectSqlProvider.class, method = "queryProjectByUser")
+  List<Project> queryProjectByUser(@Param("userId") int userId);
 
-  @DeleteProvider(type = ProjectSqlProvider.class, method = "deleteById")
-  int deleteById(@Param("id") int id);
-
+  /**
+   * 根据用户名称查询
+   *
+   * @param name
+   * @return
+   */
   @Results(value = {
-          @Result(property = "id", column = "id", id = true, javaType = int.class, jdbcType = JdbcType.INTEGER),
-          @Result(property = "name", column = "name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-          @Result(property = "desc", column = "desc", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-          @Result(property = "createTime", column = "create_time", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP),
-          @Result(property = "modifyTime", column = "modify_time", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP),
-          @Result(property = "ownerId", column = "owner_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
-          @Result(property = "owner", column = "owner", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+      @Result(property = "id", column = "id", id = true, javaType = int.class, jdbcType = JdbcType.INTEGER),
+      @Result(property = "name", column = "name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+      @Result(property = "desc", column = "desc", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+      @Result(property = "createTime", column = "create_time", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP),
+      @Result(property = "modifyTime", column = "modify_time", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP),
+      @Result(property = "ownerId", column = "owner_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
+      @Result(property = "owner", column = "owner", javaType = String.class, jdbcType = JdbcType.VARCHAR),
   })
   @SelectProvider(type = ProjectSqlProvider.class, method = "queryByName")
   Project queryByName(@Param("name") String name);
-
-
-
 }

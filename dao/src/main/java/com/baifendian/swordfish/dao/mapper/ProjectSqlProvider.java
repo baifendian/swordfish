@@ -15,8 +15,6 @@
  */
 package com.baifendian.swordfish.dao.mapper;
 
-import com.baifendian.swordfish.dao.model.Project;
-
 import org.apache.ibatis.jdbc.SQL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,70 +23,112 @@ import java.util.Map;
 
 public class ProjectSqlProvider {
 
-  private static Logger logger = LoggerFactory.getLogger(ProjectSqlProvider.class.getName());
+  private static final String TABLE_NAME = "project";
 
+  /**
+   * 插入项目信息
+   *
+   * @param parameter
+   * @return
+   */
   public String insert(Map<String, Object> parameter) {
-    Project project = (Project) parameter.get("newProject");
-    logger.debug(project.getName());
-    logger.debug(project.getDesc());
-    logger.debug(String.valueOf(project.getOwnerId()));
-    logger.debug(String.valueOf(project.getCreateTime()));
-    logger.debug(String.valueOf(project.getModifyTime()));
     return new SQL() {{
-      INSERT_INTO("project");
-      VALUES("`name`", "#{newProject.name,jdbcType=VARCHAR}");
-      VALUES("`desc`", "#{newProject.desc,jdbcType=VARCHAR}");
-      VALUES("create_time", "#{newProject.createTime}");
-      VALUES("modify_time", "#{newProject.modifyTime}");
-      VALUES("owner", "#{newProject.ownerId}");
+      INSERT_INTO(TABLE_NAME);
+
+      VALUES("`name`", "#{newProject.name}");
+      VALUES("`desc`", "#{newProject.desc}");
+      VALUES("`create_time`", "#{newProject.createTime}");
+      VALUES("`modify_time`", "#{newProject.modifyTime}");
+      VALUES("`owner`", "#{newProject.ownerId}");
     }}.toString();
   }
 
+  /**
+   * 更新项目信息
+   *
+   * @param parameter
+   * @return
+   */
   public String updateById(Map<String, Object> parameter) {
     return new SQL() {{
-      UPDATE("project");
+      UPDATE(TABLE_NAME);
+
       SET("`desc`=#{project.desc}");
-      SET("modify_time=#{project.modifyTime}");
-      WHERE("id = #{project.id}");
+      SET("`modify_time`=#{project.modifyTime}");
+
+      WHERE("`id` = #{project.id}");
     }}.toString();
   }
 
+  /**
+   * 删除项目信息
+   *
+   * @param parameter
+   * @return
+   */
   public String deleteById(Map<String, Object> parameter) {
     return new SQL() {{
-      DELETE_FROM("project");
-      WHERE("id = #{id}");
+      DELETE_FROM(TABLE_NAME);
+
+      WHERE("`id` = #{id}");
     }}.toString();
   }
 
-  public String queryByName(Map<String, Object> parameter) {
+  /**
+   * 查询所有的项目列表
+   *
+   * @param parameter
+   * @return
+   */
+  public String queryAllProject(Map<String, Object> parameter) {
     return new SQL() {{
-      SELECT("p.*,p.owner as owner_id");
+      SELECT("p.*, p.owner as owner_id");
       SELECT("u.name as owner");
-      FROM("project p");
-      JOIN("user u on p.owner = u.id");
-      WHERE("p.name = #{name}");
+
+      FROM(TABLE_NAME + " p");
+
+      LEFT_OUTER_JOIN("user u on p.owner = u.id");
     }}.toString();
   }
 
+  /**
+   * 根据用户 id 进行查询
+   *
+   * @param parameter
+   * @return
+   */
   public String queryProjectByUser(Map<String, Object> parameter) {
     return new SQL() {
       {
-        SELECT("p.*,p.owner as owner_id");
+        SELECT("p.*, p.owner as owner_id");
         SELECT("u.name as owner");
-        FROM("project p");
+
+        FROM(TABLE_NAME + " p");
+
         LEFT_OUTER_JOIN("project_user p_u on p.id = p_u.project_id");
         JOIN("user u on p.owner = u.id");
+
         WHERE("p_u.user_id = #{userId} or p.owner = #{userId}");
       }
     }.toString();
   }
 
-  public String queryAllProject(Map<String, Object> parameter){
+  /**
+   * 根据用户名称查询
+   *
+   * @param parameter
+   * @return
+   */
+  public String queryByName(Map<String, Object> parameter) {
     return new SQL() {{
-      SELECT("p.*,p.owner as owner_id");
+      SELECT("p.*, p.owner as owner_id");
       SELECT("u.name as owner");
-      FROM("project p");
-      LEFT_OUTER_JOIN("user u on p.owner = u.id");
+
+      FROM(TABLE_NAME + " p");
+
+      JOIN("user u on p.owner = u.id");
+
+      WHERE("p.name = #{name}");
     }}.toString();
   }
 }
