@@ -25,6 +25,8 @@ import java.util.Map;
 
 public class UserMapperProvider {
 
+  private static final String TABLE_NAME = "user";
+
   /**
    * @param parameter
    * @return
@@ -33,7 +35,9 @@ public class UserMapperProvider {
     return new SQL() {
       {
         SELECT("*");
-        FROM("user");
+
+        FROM(TABLE_NAME);
+
         WHERE("name = #{name}");
       }
     }.toString();
@@ -47,8 +51,10 @@ public class UserMapperProvider {
     return new SQL() {
       {
         SELECT("*");
-        FROM("user");
-        WHERE("email = #{email}");
+
+        FROM(TABLE_NAME);
+
+        WHERE("`email` = #{email}");
       }
     }.toString();
   }
@@ -63,14 +69,17 @@ public class UserMapperProvider {
     return new SQL() {
       {
         SELECT("*");
-        FROM("user");
+
+        FROM(TABLE_NAME);
+
         if (parameter.get("name") != null) {
-          WHERE("name = #{name}");
+          WHERE("`name` = #{name}");
         }
         if (parameter.get("email") != null) {
-          WHERE("email = #{email}");
+          WHERE("`email` = #{email}");
         }
-        WHERE("password = #{password}");
+
+        WHERE("`password` = #{password}");
       }
     }.toString();
   }
@@ -85,8 +94,10 @@ public class UserMapperProvider {
     return new SQL() {
       {
         SELECT("*");
-        FROM("user");
-        WHERE("id = #{userId}");
+
+        FROM(TABLE_NAME);
+
+        WHERE("`id` = #{userId}");
       }
     }.toString();
   }
@@ -100,7 +111,8 @@ public class UserMapperProvider {
   public String insert(Map<String, Object> parameter) {
     return new SQL() {
       {
-        INSERT_INTO("user");
+        INSERT_INTO(TABLE_NAME);
+
         VALUES("`name`", "#{user.name}");
         VALUES("`email`", "#{user.email}");
         VALUES("`desc`", "#{user.desc}");
@@ -123,7 +135,7 @@ public class UserMapperProvider {
   public String update(final User user) {
     return new SQL() {
       {
-        UPDATE("user");
+        UPDATE(TABLE_NAME);
 
         if (StringUtils.isNotEmpty(user.getEmail())) {
           SET("`email`=#{user.email}");
@@ -165,7 +177,7 @@ public class UserMapperProvider {
   public String delete(String name) {
     return new SQL() {
       {
-        DELETE_FROM("user");
+        DELETE_FROM(TABLE_NAME);
 
         WHERE("`name`=#{user.name}");
       }
@@ -181,7 +193,8 @@ public class UserMapperProvider {
     return new SQL() {
       {
         SELECT("*");
-        FROM("user");
+
+        FROM(TABLE_NAME);
       }
     }.toString();
   }

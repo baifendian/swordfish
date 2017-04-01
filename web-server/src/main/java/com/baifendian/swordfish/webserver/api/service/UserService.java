@@ -64,10 +64,13 @@ public class UserService {
                          String phone,
                          String proxyUsers,
                          HttpServletResponse response) {
+    // 如果不是管理员, 返回错误
     if (operator.getRole() != UserRoleType.ADMIN_USER) {
       response.setStatus(HttpStatus.SC_UNAUTHORIZED);
       return null;
     }
+
+    // 校验代理用户是否正确
 
     User user = new User();
     Date now = new Date();
@@ -77,7 +80,7 @@ public class UserService {
     user.setDesc(desc);
     user.setPhone(phone);
     user.setPassword(HttpUtil.getMd5(password));
-    user.setRole(UserRoleType.GENERAL_USER); // 创建的用户都是普通用户
+    user.setRole(UserRoleType.GENERAL_USER); // 创建的用户都是普通用户, 管理员用户当前是内置的
     user.setProxyUsers(proxyUsers);
     user.setCreateTime(now);
     user.setModifyTime(now);

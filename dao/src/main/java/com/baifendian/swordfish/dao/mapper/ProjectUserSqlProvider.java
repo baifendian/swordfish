@@ -115,6 +115,12 @@ public class ProjectUserSqlProvider {
     }}.toString();
   }
 
+  /**
+   * 查询项目下的所有用户
+   *
+   * @param parameter
+   * @return
+   */
   public String queryForUser(Map<String, Object> parameter) {
     return new SQL() {{
       SELECT("u.*");
@@ -126,5 +132,4 @@ public class ProjectUserSqlProvider {
       WHERE("p_u.project_id = #{projectId}");
     }}.toString();
   }
-
 }

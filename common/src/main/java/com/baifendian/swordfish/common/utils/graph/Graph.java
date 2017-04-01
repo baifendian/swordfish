@@ -51,6 +51,9 @@ public class Graph<VK, VD, ED> {
 
   /**
    * 增加顶点信息
+   *
+   * @param key    顶点的 id
+   * @param vertex 顶点的属性
    */
   public synchronized void addVertex(VK key, VD vertex) {
     vertices.put(key, vertex);
@@ -58,6 +61,9 @@ public class Graph<VK, VD, ED> {
 
   /**
    * 增加顶点, 不存在则插入
+   *
+   * @param key    顶点的 id
+   * @param vertex 顶点的属性
    */
   public synchronized void addVertexIfAbsent(VK key, VD vertex) {
     if (!containsVertex(key)) {
@@ -67,6 +73,8 @@ public class Graph<VK, VD, ED> {
 
   /**
    * 删除顶点, 需要将关联的边也进行删除
+   *
+   * @param key 顶点的 id
    */
   public synchronized void removeVertex(VK key) {
     List<Map.Entry<VK, VK>> pairs = new ArrayList<>();
@@ -91,13 +99,20 @@ public class Graph<VK, VD, ED> {
 
   /**
    * 属性没有值
+   *
+   * @param start 边的起点
+   * @param end   边的终点
+   * @return
    */
   public boolean addEdge(VK start, VK end) {
     return addEdge(start, end, false);
   }
 
   /**
-   * 属性没有值
+   * @param start        边的起点
+   * @param end          边的终点
+   * @param createVertex 顶点不存在是否创建
+   * @return
    */
   public boolean addEdge(VK start, VK end, boolean createVertex) {
     return addEdge(start, end, null, createVertex);
@@ -105,6 +120,11 @@ public class Graph<VK, VD, ED> {
 
   /**
    * 增加边, 注意, 边的起点和终点必须存在, 否则返回失败
+   *
+   * @param start 边的起点
+   * @param end   边的终点
+   * @param edge  边的属性
+   * @return
    */
   public boolean addEdge(VK start, VK end, ED edge) {
     return addEdge(start, end, edge, false);
@@ -113,7 +133,11 @@ public class Graph<VK, VD, ED> {
   /**
    * 增加边, 如果边的起始或终止结点不存在, 可以设置是否创建
    *
-   * @param createVertex, true 表示创建, 否则表示不创建
+   * @param start        边的起点
+   * @param end          边的终点
+   * @param edge         边的属性
+   * @param createVertex 顶点不存在是否创建
+   * @return
    */
   public synchronized boolean addEdge(VK start, VK end, ED edge, boolean createVertex) {
     // 需要是否可以加入 startId, endId (普通的 Graph 不需要判断, DAG 需要判断)
@@ -129,6 +153,10 @@ public class Graph<VK, VD, ED> {
 
   /**
    * 增加边, 不做顶点是否存在的检测, 以及不检测边是否是存在的
+   *
+   * @param start 边的起点
+   * @param end   边的终点
+   * @param edge  边的属性
    */
   private synchronized void addEdgeNoCheck(VK start, VK end, ED edge) {
     addVertexIfAbsent(start, null);
@@ -140,6 +168,11 @@ public class Graph<VK, VD, ED> {
 
   /**
    * 增加边到具体的数据结构中
+   *
+   * @param start 起点
+   * @param end   终点
+   * @param edge  边的属性
+   * @param edges 集合
    */
   private synchronized void addEdge(VK start, VK end, ED edge, Map<VK, Map<VK, ED>> edges) {
     edges.putIfAbsent(start, new HashMap<>());
@@ -149,6 +182,9 @@ public class Graph<VK, VD, ED> {
 
   /**
    * 删除边
+   *
+   * @param start 边的起点
+   * @param end   边的终点
    */
   public synchronized void removeEdge(VK start, VK end) {
     removeEdge(start, end, edges);
@@ -157,6 +193,10 @@ public class Graph<VK, VD, ED> {
 
   /**
    * 删除边
+   *
+   * @param start 边的起点
+   * @param end   边的终点
+   * @param edges 边的属性
    */
   private synchronized void removeEdge(VK start, VK end, Map<VK, Map<VK, ED>> edges) {
     Map<VK, ED> endEdges = edges.get(start);
@@ -196,6 +236,11 @@ public class Graph<VK, VD, ED> {
 
   /**
    * 一次性增加, 删除多条边, 顶点不存在则失败
+   *
+   * @param removeStartKeys 删除的起始顶点
+   * @param addStartKeys    增加的起始顶点
+   * @param endKey          终点
+   * @return
    */
   public boolean addRemoveMultiEdges(Collection<VK> removeStartKeys,
                                      Collection<VK> addStartKeys,
@@ -205,6 +250,12 @@ public class Graph<VK, VD, ED> {
 
   /**
    * 一次性增加, 删除多条边, 顶点不存在可以选择创建
+   *
+   * @param removeStartKeys 删除的起始顶点
+   * @param addStartKeys    增加的起始顶点
+   * @param endKey          终点
+   * @param createVertex    顶点不存在的时候, 是否创建
+   * @return
    */
   public synchronized boolean addRemoveMultiEdges(Collection<VK> removeStartKeys,
                                                   Collection<VK> addStartKeys,
@@ -249,6 +300,9 @@ public class Graph<VK, VD, ED> {
 
   /**
    * 是否包含顶点
+   *
+   * @param key 待检测顶点 id
+   * @return
    */
   public synchronized boolean containsVertex(VK key) {
     return vertices.containsKey(key);
@@ -256,6 +310,9 @@ public class Graph<VK, VD, ED> {
 
   /**
    * 获取顶点属性
+   *
+   * @param key 待查询顶点 id
+   * @return
    */
   public synchronized VD getVertex(VK key) {
     return vertices.get(key);
@@ -263,6 +320,8 @@ public class Graph<VK, VD, ED> {
 
   /**
    * 返回所有顶点
+   *
+   * @return
    */
   public Map<VK, VD> getVertices() {
     return vertices;
@@ -270,6 +329,10 @@ public class Graph<VK, VD, ED> {
 
   /**
    * 是否包含边
+   *
+   * @param startKey 起始顶点
+   * @param endKey   终止顶点
+   * @return
    */
   public synchronized boolean containsEdge(VK startKey, VK endKey) {
     Map<VK, ED> endEdges = edges.get(startKey);
@@ -282,6 +345,8 @@ public class Graph<VK, VD, ED> {
 
   /**
    * 返回所有边
+   *
+   * @return
    */
   public Map<VK, Map<VK, ED>> getEdges() {
     return edges;
@@ -289,6 +354,10 @@ public class Graph<VK, VD, ED> {
 
   /**
    * 获取边的属性
+   *
+   * @param startKey 起始顶点
+   * @param endKey   终止顶点
+   * @return
    */
   public synchronized ED getEdge(VK startKey, VK endKey) {
     Map<VK, ED> endEdges = edges.get(startKey);
@@ -302,6 +371,8 @@ public class Graph<VK, VD, ED> {
 
   /**
    * 获取边的个数
+   *
+   * @return
    */
   public synchronized int getEdgeNumber() {
     int c = 0;
@@ -315,6 +386,8 @@ public class Graph<VK, VD, ED> {
 
   /**
    * 获取顶点个数
+   *
+   * @return
    */
   public int getVertexNumber() {
     return vertices.size();
@@ -322,6 +395,8 @@ public class Graph<VK, VD, ED> {
 
   /**
    * 获取起始结点
+   *
+   * @return
    */
   public synchronized Collection<VK> getStartVertex() {
     return CollectionUtils.subtract(vertices.keySet(), reverseEdges.keySet());
@@ -329,6 +404,8 @@ public class Graph<VK, VD, ED> {
 
   /**
    * 获取终止结点
+   *
+   * @return
    */
   public synchronized Collection<VK> getEndVertex() {
     return CollectionUtils.subtract(vertices.keySet(), edges.keySet());
@@ -336,6 +413,9 @@ public class Graph<VK, VD, ED> {
 
   /**
    * 获取前置结点
+   *
+   * @param key 待计算顶点 id
+   * @return
    */
   public Set<VK> getPreNode(VK key) {
     return getNeighborNode(key, reverseEdges);
@@ -343,6 +423,9 @@ public class Graph<VK, VD, ED> {
 
   /**
    * 获取前续结点及其属性
+   *
+   * @param key 待计算顶点 id
+   * @return
    */
   public Map<VK, ED> getPreNodeAttr(VK key) {
     return getNeighborNodeAttr(key, reverseEdges);
@@ -350,6 +433,9 @@ public class Graph<VK, VD, ED> {
 
   /**
    * 获取后续结点
+   *
+   * @param key 待计算顶点 id
+   * @return
    */
   public Set<VK> getPostNode(VK key) {
     return getNeighborNode(key, edges);
@@ -357,6 +443,9 @@ public class Graph<VK, VD, ED> {
 
   /**
    * 获取后续结点及其属性
+   *
+   * @param key 待计算顶点 id
+   * @return
    */
   public Map<VK, ED> getPostNodeAttr(VK key) {
     return getNeighborNodeAttr(key, edges);
@@ -364,6 +453,10 @@ public class Graph<VK, VD, ED> {
 
   /**
    * 获取邻居结点
+   *
+   * @param key   待计算顶点 id
+   * @param edges 邻边信息
+   * @return
    */
   private Set<VK> getNeighborNode(VK key, final Map<VK, Map<VK, ED>> edges) {
     return getNeighborNodeAttr(key, edges).keySet();
@@ -371,6 +464,10 @@ public class Graph<VK, VD, ED> {
 
   /**
    * 获取邻居结点及其属性
+   *
+   * @param key   待计算的 id
+   * @param edges 连接的顶点
+   * @return
    */
   private synchronized Map<VK, ED> getNeighborNodeAttr(VK key, final Map<VK, Map<VK, ED>> edges) {
     final Map<VK, ED> neighborEdges = edges.get(key);
@@ -384,6 +481,9 @@ public class Graph<VK, VD, ED> {
 
   /**
    * 获取 id 的入度
+   *
+   * @param key 待计算的 id
+   * @return
    */
   public synchronized int getIndegree(VK key) {
     Collection<VK> getNeighborNode = getPreNode(key);
@@ -396,6 +496,9 @@ public class Graph<VK, VD, ED> {
 
   /**
    * 返回 id 的出度
+   *
+   * @param key 待计算的 id
+   * @return
    */
   public synchronized int getOutdegree(VK key) {
     Collection<VK> getNeighborNode = getPostNode(key);
@@ -407,7 +510,12 @@ public class Graph<VK, VD, ED> {
   }
 
   /**
-   * 判断增加 startId -> endId 是否合法
+   * 判断增加 startId -> endId 是否合法, 不会执行真正的添加操作
+   *
+   * @param startKey     起点
+   * @param endKey       终点
+   * @param createVertex 是否创建顶点
+   * @return
    */
   protected synchronized boolean validIfAdd(VK startKey, VK endKey, boolean createVertex) {
     // 不允许自己加到自己
@@ -434,6 +542,9 @@ public class Graph<VK, VD, ED> {
 
   /**
    * 广度优先遍历, 在无法遍历完成的时候, 是会抛出异常的
+   *
+   * @return
+   * @throws Exception
    */
   public List<VK> broadFirstSearch() throws Exception {
     List<VK> visit = new ArrayList<>();
@@ -472,6 +583,9 @@ public class Graph<VK, VD, ED> {
 
   /**
    * 深度优先遍历, 在无法遍历完成的时候, 是会抛出异常的
+   *
+   * @return
+   * @throws Exception
    */
   public List<VK> depthFirstSearch() throws Exception {
     List<VK> visit = new ArrayList<>();
@@ -493,6 +607,10 @@ public class Graph<VK, VD, ED> {
 
   /**
    * 深度优先遍历递归
+   *
+   * @param key        遍历的起始 id
+   * @param visit      访问列表
+   * @param hasVisited 已经访问的集合
    */
   private void depthFirstSearch(VK key, Collection<VK> visit, Set<VK> hasVisited) {
     visit.add(key);
@@ -507,6 +625,9 @@ public class Graph<VK, VD, ED> {
 
   /**
    * 返回 topological 排序, 如果有环, 会抛出异常
+   *
+   * @return
+   * @throws Exception
    */
   public List<VK> topologicalSort() throws Exception {
     Map.Entry<Boolean, List<VK>> entry = topologicalSortImpl();
@@ -519,7 +640,9 @@ public class Graph<VK, VD, ED> {
   }
 
   /**
-   * 返回 topological 排序 key 返回的是状态, 如果成功为 true, 失败(如有环)为 false, value 为 topology sort
+   * 返回 topological 排序
+   *
+   * @return key 返回的是状态, 如果成功为 true, 失败(如有环)为 false, value 为 topology sort
    */
   private Map.Entry<Boolean, List<VK>> topologicalSortImpl() {
     List<VK> sort = new ArrayList<>();
@@ -564,7 +687,11 @@ public class Graph<VK, VD, ED> {
   }
 
   /**
-   * 判断图是否是联通的, 判断连通是当做无向图来看待的, 算法描述如下: 1) 以一个点为起点, 采用广度优先遍历的方式对图进行遍历; 2) 如果遍历结束后, 能覆盖所有顶点, 则认为是联通的
+   * 判断图是否是联通的, 判断连通是当做无向图来看待的, 算法描述如下:
+   * 1) 以一个点为起点, 采用广度优先遍历的方式对图进行遍历
+   * 2) 如果遍历结束后, 能覆盖所有顶点, 则认为是联通的
+   *
+   * @return true 表示 连通, false 表示不连通
    */
   public synchronized boolean isConnected() {
     Queue<VK> q = new LinkedList<>();
@@ -589,7 +716,7 @@ public class Graph<VK, VD, ED> {
     while (!q.isEmpty()) {
       VK key = q.poll();
 
-      for (VK postKey: getPostNode(key)) {
+      for (VK postKey : getPostNode(key)) {
         if (!hasVisited.contains(postKey)) {
           q.add(postKey);
           hasVisited.add(postKey);
