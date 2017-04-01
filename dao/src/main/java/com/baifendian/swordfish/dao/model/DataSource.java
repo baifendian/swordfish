@@ -29,7 +29,6 @@ public class DataSource {
   private String desc;
   private DbType type; // db 类型
   private String parameter; // 参数信息
-  private DataSourceDbBase paramObj; // 参数信息, object 形式
   private Date createTime;
   private Date modifyTime;
 
@@ -106,14 +105,6 @@ public class DataSource {
 
   public void setParameter(String parameter) {
     this.parameter = parameter;
-  }
-
-  public DataSourceDbBase getParamObj() {
-    return paramObj;
-  }
-
-  public void setParamObj(DataSourceDbBase paramObj) {
-    this.paramObj = paramObj;
   }
 
   public Date getCreateTime() {
