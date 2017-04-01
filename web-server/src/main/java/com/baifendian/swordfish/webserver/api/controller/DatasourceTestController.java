@@ -20,8 +20,6 @@ public class DatasourceTestController {
   /**
    * 测试一个数据源
    * @param operator
-   * @param projectName
-   * @param desc
    * @param type
    * @param parameter
    * @param response
@@ -29,8 +27,6 @@ public class DatasourceTestController {
    */
   @GetMapping(value="/test")
   public BaseResponse testDataSource(@RequestAttribute(value = "session.user") User operator,
-                                     @PathVariable("projectName") String projectName,
-                                     @RequestParam(value = "desc", required = false) String desc,
                                      @RequestParam(value = "type", required = true) String type,
                                      @RequestParam(value = "parameter", required = true) String parameter,
                                      HttpServletResponse response){
