@@ -62,6 +62,8 @@ public class LoginController {
                                @RequestParam(value = "password") String password,
                                HttpServletRequest request,
                                HttpServletResponse response) {
+    logger.info("Login, user name: {}, email: {}, password: {}", name, email, "******");
+
     // 必须存在一个
     if (StringUtils.isEmpty(name) && StringUtils.isEmpty(email)) {
       response.setStatus(HttpStatus.SC_BAD_REQUEST);
