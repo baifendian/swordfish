@@ -17,14 +17,12 @@ package com.baifendian.swordfish.webserver.api.controller;
 
 import com.baifendian.swordfish.dao.model.User;
 import com.baifendian.swordfish.webserver.api.service.UserService;
-import org.apache.commons.httpclient.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.DELETE;
 import java.util.List;
 
 /**
@@ -123,11 +121,11 @@ public class UserController {
    */
   @GetMapping(value = "")
   public List<User> queryUsers(@RequestAttribute(value = "session.user") User operator,
-                               @RequestParam(value = "allUser", required = false) Boolean allUser,
+                               @RequestParam(value = "allUser", required = false, defaultValue = "false") boolean allUser,
                                HttpServletResponse response) {
     logger.info("Operator user id {}, query user, allUser: {}",
         operator.getId(), allUser);
 
-    return userService.queryUser(operator, (allUser == null) ? false : allUser, response);
+    return userService.queryUser(operator, allUser, response);
   }
 }
