@@ -63,7 +63,7 @@ public class ExecutorCheckThread implements Runnable {
           if (!CollectionUtils.isEmpty(executionFlows)) {
             logger.info("executor server {} fault, execIds size:{} ", executorServerInfo, executionFlows.size());
             for (ExecutionFlow execFlow : executionFlows) {
-              Long execId = execFlow.getId();
+              Integer execId = execFlow.getId();
               logger.info("reschedule workflow execId:{} ", execId);
               try {
                 ExecutionFlow executionFlow = flowDao.queryExecutionFlow(execId);

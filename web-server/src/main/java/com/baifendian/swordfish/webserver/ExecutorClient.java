@@ -15,7 +15,10 @@
  */
 package com.baifendian.swordfish.webserver;
 
+import com.baifendian.swordfish.common.job.exception.ExecException;
+import com.baifendian.swordfish.rpc.RetInfo;
 import com.baifendian.swordfish.rpc.WorkerService;
+import com.baifendian.swordfish.webserver.utils.ResultHelper;
 
 import org.apache.thrift.TException;
 import org.apache.thrift.protocol.TBinaryProtocol;
@@ -36,7 +39,7 @@ public class ExecutorClient {
 
   private int timeout = 3000;
 
-  private final int RPC_RETRIES = 3;
+  private static final int RPC_RETRIES = 3;
 
   private TTransport tTransport;
 
@@ -48,6 +51,10 @@ public class ExecutorClient {
     this.host = host;
     this.port = port;
     this.retries = retries;
+  }
+
+  public ExecutorClient(String host, int port) {
+    new ExecutorClient(host, port, ExecutorClient.RPC_RETRIES);
   }
 
   public ExecutorClient(ExecutorServerInfo executorServerInfo) {
@@ -73,7 +80,7 @@ public class ExecutorClient {
     }
   }
 
-  public boolean scheduleExecFlow(long execId, long scheduleDate) {
+  public boolean scheduleExecFlow(int execId, long scheduleDate) {
     connect();
     try {
       client.scheduleExecFlow(execId, scheduleDate);
@@ -86,7 +93,7 @@ public class ExecutorClient {
     return true;
   }
 
-  public void execAdHoc(long id) throws TException {
+  public void execAdHoc(int id) throws TException {
     connect();
     try {
       client.execAdHoc(id);
@@ -95,7 +102,7 @@ public class ExecutorClient {
     }
   }
 
-  public boolean execFlow(long execId) throws TException {
+  public boolean execFlow(int execId) throws TException {
     boolean result = false;
     for (int i = 0; i < retries; i++) {
       result = execFlowOne(execId);
@@ -110,10 +117,13 @@ public class ExecutorClient {
     return result;
   }
 
-  public boolean execFlowOne(long execId) throws TException {
+  public boolean execFlowOne(int execId) throws TException {
     connect();
     try {
-      client.execFlow(execId);
+      RetInfo retInfo = client.execFlow(execId);
+      if(retInfo.getStatus() != ResultHelper.SUCCESS.getStatus()){
+        throw new ExecException(retInfo.getMsg());
+      }
     } catch (TException e) {
       logger.error("exec flow error", e);
       throw e;
@@ -121,6 +131,15 @@ public class ExecutorClient {
       close();
     }
     return true;
+  }
+
+  public RetInfo cancelExecFlow(int execId) throws TException {
+    connect();
+    try {
+      return client.cancelExecFlow(execId);
+    } finally {
+      close();
+    }
   }
 
 }

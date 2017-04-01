@@ -53,7 +53,7 @@ public interface AdHocResultMapper {
    * @return 执行结果
    */
   @Results(value = {
-          @Result(property = "execId", column = "exec_id", javaType = long.class, jdbcType = JdbcType.BIGINT),
+          @Result(property = "adHocId", column = "exec_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
           @Result(property = "index", column = "index", javaType = int.class, jdbcType = JdbcType.INTEGER),
           @Result(property = "status", column = "status", typeHandler = EnumOrdinalTypeHandler.class, javaType = FlowStatus.class, jdbcType = JdbcType.TINYINT),
           @Result(property = "stm", column = "stm", javaType = String.class, jdbcType = JdbcType.VARCHAR),
@@ -62,7 +62,7 @@ public interface AdHocResultMapper {
   List<AdHocResult> selectByAdHocId(@Param("adHocId") long adHocId);
 
   @Results(value = {
-          @Result(property = "execId", column = "exec_id", javaType = long.class, jdbcType = JdbcType.BIGINT),
+          @Result(property = "adHocId", column = "exec_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
           @Result(property = "index", column = "index", javaType = int.class, jdbcType = JdbcType.INTEGER),
           @Result(property = "status", column = "status", typeHandler = EnumOrdinalTypeHandler.class, javaType = FlowStatus.class, jdbcType = JdbcType.TINYINT),
           @Result(property = "stm", column = "stm", javaType = String.class, jdbcType = JdbcType.VARCHAR),

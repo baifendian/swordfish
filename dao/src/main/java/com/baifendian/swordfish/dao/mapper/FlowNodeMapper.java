@@ -80,7 +80,7 @@ public interface FlowNodeMapper {
    */
   @Results(value = {@Result(property = "id", column = "id", id = true, javaType = int.class, jdbcType = JdbcType.INTEGER),
           @Result(property = "name", column = "name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-          @Result(property = "type", column = "type", javaType = NodeType.class, jdbcType = JdbcType.VARCHAR),
+          @Result(property = "type", column = "type", javaType = String.class, jdbcType = JdbcType.VARCHAR),
           @Result(property = "desc", column = "desc", javaType = String.class, jdbcType = JdbcType.VARCHAR),
           @Result(property = "extras", column = "extras", javaType = String.class, jdbcType = JdbcType.VARCHAR),
           @Result(property = "dep", column = "dep", javaType = String.class, jdbcType = JdbcType.VARCHAR),

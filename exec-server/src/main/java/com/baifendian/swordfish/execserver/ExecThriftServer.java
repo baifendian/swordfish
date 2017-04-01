@@ -134,9 +134,12 @@ public class ExecThriftServer {
     Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
       @Override
       public void run() {
-        executorService.shutdownNow();
-        workerService.destory();
-        server.stop();
+        if(executorService != null)
+          executorService.shutdownNow();
+        if(workerService != null)
+          workerService.destory();
+        if(server != null)
+          server.stop();
       }
     }));
 

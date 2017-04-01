@@ -18,6 +18,7 @@ package com.baifendian.swordfish.dao;
 import com.baifendian.swordfish.dao.enums.FlowRunType;
 import com.baifendian.swordfish.dao.model.ExecutionFlow;
 import com.baifendian.swordfish.dao.model.ExecutionNode;
+import com.baifendian.swordfish.dao.model.Schedule;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -60,5 +61,11 @@ public class FlowDaoTest {
   public void testScheduleFlowToExecution() {
     ExecutionFlow executionFlow = flowDao.scheduleFlowToExecution(1, 2, 1, new Date(), FlowRunType.DISPATCH, 3, 5000);
     System.out.println(executionFlow);
+  }
+
+  @Test
+  public void testQuerySchedule() {
+    Schedule schedule = flowDao.querySchedule(2);
+    System.out.println(schedule);
   }
 }

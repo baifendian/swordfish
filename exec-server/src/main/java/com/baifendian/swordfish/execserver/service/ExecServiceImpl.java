@@ -80,7 +80,7 @@ public class ExecServiceImpl implements Iface {
   }
 
   @Override
-  public RetInfo execFlow(long execId) throws TException {
+  public RetInfo execFlow(int execId) throws TException {
     try {
       // 查询 ExecutionFlow
       ExecutionFlow executionFlow = flowDao.queryExecutionFlow(execId);
@@ -102,7 +102,7 @@ public class ExecServiceImpl implements Iface {
   }
 
   @Override
-  public RetInfo scheduleExecFlow(long execId, long scheduleDate) throws TException {
+  public RetInfo scheduleExecFlow(int execId, long scheduleDate) throws TException {
     try {
       // 查询 ExecutionFlow
       ExecutionFlow executionFlow = flowDao.queryExecutionFlow(execId);
@@ -130,7 +130,7 @@ public class ExecServiceImpl implements Iface {
   }
 
   @Override
-  public RetInfo execAdHoc(long adHocId){
+  public RetInfo execAdHoc(int adHocId){
     AdHoc adHoc = adHocDao.getAdHoc(adHocId);
     if(adHoc == null){
       LOGGER.error("adhoc id {} not exists", adHocId);
@@ -148,7 +148,7 @@ public class ExecServiceImpl implements Iface {
     adHocRunnerManager.destory();
   }
 
-  public RetInfo cancelExecFlow(long execId)  throws TException {
+  public RetInfo cancelExecFlow(int execId)  throws TException {
     try {
       // 查询 ExecutionFlow
       ExecutionFlow executionFlow = flowDao.queryExecutionFlow(execId);

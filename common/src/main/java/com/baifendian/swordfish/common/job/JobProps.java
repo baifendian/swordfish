@@ -30,9 +30,9 @@ public class JobProps {
   private int workflowId;
 
   /**
-   * node id
+   * node Name
    **/
-  private int nodeId;
+  private String nodeName;
 
   /**
    * 执行id
@@ -129,12 +129,12 @@ public class JobProps {
     this.workflowId = workflowId;
   }
 
-  public int getNodeId() {
-    return nodeId;
+  public String getNodeName() {
+    return nodeName;
   }
 
-  public void setNodeId(int nodeId) {
-    this.nodeId = nodeId;
+  public void setNodeName(String nodeName) {
+    this.nodeName = nodeName;
   }
 
   public long getExecId() {

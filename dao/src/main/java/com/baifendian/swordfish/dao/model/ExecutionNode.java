@@ -18,14 +18,13 @@ package com.baifendian.swordfish.dao.model;
 import com.baifendian.swordfish.dao.enums.FlowStatus;
 
 import java.util.Date;
-import java.util.List;
 
 public class ExecutionNode {
 
   /**
    * 具体workflow执行的 id
    **/
-  private Long execId;
+  private Integer execId;
 
   /**
    * node 的名称
@@ -59,11 +58,11 @@ public class ExecutionNode {
 
   private String logLinks;
 
-  public Long getExecId() {
+  public Integer getExecId() {
     return execId;
   }
 
-  public void setExecId(Long execId) {
+  public void setExecId(Integer execId) {
     this.execId = execId;
   }
 

@@ -39,6 +39,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Flow 执行管理器 <p>
@@ -90,7 +91,7 @@ public class FlowRunnerManager {
    */
   private final FailurePolicyType defaultFailurePolicyType = FailurePolicyType.END;
 
-  private final Map<Long, FlowRunner> runningFlows = new ConcurrentHashMap<>();
+  private final Map<Integer, FlowRunner> runningFlows = new ConcurrentHashMap<>();
 
   private final Configuration conf;
 
@@ -148,7 +149,7 @@ public class FlowRunnerManager {
     flowExecutorService.submit(flowRunner);
   }
 
-  public void submitFlow(long execId) {
+  public void submitFlow(int execId) {
     ExecutionFlow executionFlow = flowDao.queryExecutionFlow(execId);
     submitFlow(executionFlow);
   }
@@ -187,17 +188,11 @@ public class FlowRunnerManager {
    * 销毁资源 <p>
    */
   public void destroy() {
-    for (FlowRunner flowRunner : runningFlows.values()) {
-      flowRunner.kill();
-    }
 
-    try {
-      Thread.sleep(5000);
-    } catch (InterruptedException e) {
-      e.printStackTrace();
-    }
     if (!flowExecutorService.isShutdown()) {
       try {
+        flowExecutorService.shutdown();
+        flowExecutorService.awaitTermination(3, TimeUnit.SECONDS);
         flowExecutorService.shutdownNow();
       } catch (Exception e) {
         LOGGER.error(e.getMessage(), e);
@@ -206,22 +201,37 @@ public class FlowRunnerManager {
 
     if (!nodeExecutorService.isShutdown()) {
       try {
+        nodeExecutorService.shutdown();
+        nodeExecutorService.awaitTermination(3, TimeUnit.SECONDS);
         nodeExecutorService.shutdownNow();
       } catch (Exception e) {
         LOGGER.error(e.getMessage(), e);
       }
     }
 
+    for (FlowRunner flowRunner : runningFlows.values()) {
+      flowRunner.kill();
+    }
+
     if (!jobExecutorService.isShutdown()) {
       try {
+        jobExecutorService.shutdown();
+        jobExecutorService.awaitTermination(3, TimeUnit.SECONDS);
         jobExecutorService.shutdownNow();
       } catch (Exception e) {
         LOGGER.error(e.getMessage(), e);
       }
     }
+
+    try {
+      Thread.sleep(5000);
+    } catch (InterruptedException e) {
+      e.printStackTrace();
+    }
+
   }
 
-  public void cancelFlow(long execId, String user) {
+  public void cancelFlow(int execId, String user) {
     FlowRunner flowRunner = runningFlows.get(execId);
 
     if (flowRunner == null) {
@@ -232,7 +242,7 @@ public class FlowRunnerManager {
     runningFlows.remove(execId);
   }
 
-  public void cancelFlow(long execId) {
+  public void cancelFlow(int execId) {
     FlowRunner flowRunner = runningFlows.get(execId);
 
     if (flowRunner == null) {

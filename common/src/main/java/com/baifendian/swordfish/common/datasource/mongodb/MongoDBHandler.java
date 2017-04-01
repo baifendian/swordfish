@@ -15,6 +15,7 @@
  */
 package com.baifendian.swordfish.common.datasource.mongodb;
 
+import com.baifendian.swordfish.common.datasource.DataSourceHandler;
 import com.baifendian.swordfish.dao.enums.DbType;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
 import com.mongodb.MongoClient;
@@ -26,7 +27,7 @@ import org.bson.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class MongoDBHandler {
+public class MongoDBHandler implements DataSourceHandler {
 
   private static final Logger logger = LoggerFactory.getLogger(MongoDBHandler.class);
 

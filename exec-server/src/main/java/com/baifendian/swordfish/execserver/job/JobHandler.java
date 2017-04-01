@@ -78,7 +78,7 @@ public class JobHandler {
     this.systemParamMap = systemParamMap;
     this.customParamMap = customParamMap;
     this.startTime = System.currentTimeMillis();
-    this.jobIdLog = String.format("%s_%d_%s", executionNode.getJobId(), BFDDateUtils.now(DATETIME_FORMAT));
+    this.jobIdLog = String.format("%s_%s", executionNode.getJobId(), BFDDateUtils.now(DATETIME_FORMAT));
     // custom参数会覆盖system参数
     allParamMap = new HashMap<>();
     allParamMap.putAll(systemParamMap);
@@ -100,6 +100,7 @@ public class JobHandler {
     props.setDefinedParams(allParamMap);
     props.setProjectId(executionFlow.getProjectId());
     props.setWorkflowId(executionFlow.getFlowId());
+    props.setNodeName(node.getName());
     props.setExecId(executionFlow.getId());
     props.setEnvFile(BaseConfig.getSystemEnvPath());
     props.setQueue(executionFlow.getQueue());

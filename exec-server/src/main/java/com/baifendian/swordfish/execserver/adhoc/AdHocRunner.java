@@ -20,7 +20,6 @@ import com.baifendian.swordfish.common.job.logger.JobLogger;
 import com.baifendian.swordfish.dao.AdHocDao;
 import com.baifendian.swordfish.dao.enums.FlowStatus;
 import com.baifendian.swordfish.dao.model.AdHoc;
-import com.baifendian.swordfish.execserver.job.hive.AdHocSqlJob;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,18 +55,10 @@ public class AdHocRunner implements Runnable {
       adHoc.setStatus(FlowStatus.RUNNING);
       adHocDao.updateAdHoc(adHoc);
       job = new AdHocSqlJob(adHoc.getJobId(), props, jobLogger);
-      job.before();
       job.process();
     } catch (Exception e) {
-      logger.debug("run adHoc job error", e);
+      logger.error("run adHoc job error", e);
       status = FlowStatus.FAILED;
-    } finally {
-      try {
-        if(job != null)
-          job.after();
-      } catch (Exception e) {
-        e.printStackTrace();
-      }
     }
 
     adHoc.setStatus(status);

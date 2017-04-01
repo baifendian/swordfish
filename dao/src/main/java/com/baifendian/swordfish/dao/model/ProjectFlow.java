@@ -214,7 +214,6 @@ public class ProjectFlow {
   }
 
   public void setUserDefinedParams(String userDefinedParams) {
-    this.setUserDefinedParams(userDefinedParams);
     this.userDefinedParams = userDefinedParams;
   }
 

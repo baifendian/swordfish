@@ -137,7 +137,7 @@ public class MasterClient {
     return true;
   }
 
-  public boolean execAdHoc(long id) {
+  public boolean execAdHoc(int id) {
     connect();
     try {
       RetInfo ret = client.execAdHoc(id);
@@ -154,10 +154,27 @@ public class MasterClient {
     return true;
   }
 
-  public boolean execFlow(long id) {
+  public boolean execFlow(int id) {
     connect();
     try {
       RetInfo ret = client.execFlow(id);
+      if (ret.getStatus() != 0) {
+        logger.error("exec flow error:{}", ret.getMsg());
+        return false;
+      }
+    } catch (TException e) {
+      logger.error("exec flow error", e);
+      return false;
+    } finally {
+      close();
+    }
+    return true;
+  }
+
+  public boolean cancelExecFlow(int id) {
+    connect();
+    try {
+      RetInfo ret = client.cancelExecFlow(id);
       if (ret.getStatus() != 0) {
         logger.error("exec flow error:{}", ret.getMsg());
         return false;

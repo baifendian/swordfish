@@ -15,36 +15,26 @@
  */
 package com.baifendian.swordfish.execserver.job.spark;
 
-import com.baifendian.swordfish.common.job.AbstractProcessJob;
 import com.baifendian.swordfish.common.job.BaseParam;
 import com.baifendian.swordfish.common.job.JobProps;
+import com.baifendian.swordfish.common.job.yarn.AbstractYarnJob;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
 import com.baifendian.swordfish.execserver.parameter.ParamHelper;
 
-import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Spark 作业 <p>
  */
-public class SparkJob extends AbstractProcessJob {
+public class SparkJob extends AbstractYarnJob {
 
   /**
    * 提交的参数
    */
   private SparkParam sparkParam;
-
-  /**
-   * app id
-   **/
-  private String appid;
 
   public SparkJob(String jobIdLog, JobProps props, Logger logger) throws IllegalAccessException, IOException {
     super(jobIdLog, props, logger);
@@ -75,53 +65,11 @@ public class SparkJob extends AbstractProcessJob {
     return processBuilder;
   }
 
-  @Override
-  protected void readProcessOutput() {
-    InputStream inputStream = process.getInputStream();
-    try {
-      BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
-      String line;
-      while ((line = reader.readLine()) != null) {
-        if (appid == null) {
-          appid = findAppid(line);
-        }
-        // jobContext.appendLog(line);
-        logger.info(line);
-      }
-    } catch (IOException e) {
-      logger.error(e.getMessage(), e);
-    } finally {
-      IOUtils.closeQuietly(inputStream);
-    }
-  }
-
-  /**
-   * 获取 appid <p>
-   *
-   * @return appid
-   */
-  private String findAppid(String line) {
-    if (line.contains("YarnClientImpl: Submitted application")) {
-      return line.substring(line.indexOf("application") + "application".length() + 1);
+  protected String findLogLinks(String line) {
+    if (line.contains("tracking URL:")) {
+      return line.substring(line.indexOf("URL:") + "URL:".length() + 1);
     }
     return null;
-  }
-
-  public void cancel() throws Exception {
-    super.cancel();
-
-    if (appid != null) {
-      String cmd = "yarn application -kill " + appid;
-
-      if (props.getProxyUser() != null) {
-        cmd = "sudo -u " + props.getProxyUser() + " " + cmd;
-      }
-      logger.info("run cmd:{}", cmd);
-      Runtime.getRuntime().exec(cmd);
-
-      completeLatch.await(KILL_TIME_MS, TimeUnit.MILLISECONDS);
-    }
-
   }
 
   @Override

@@ -69,7 +69,7 @@ public class FlowDao extends BaseDao {
    *
    * @return {@link ExecutionFlow}
    */
-  public ExecutionFlow queryExecutionFlow(long execId) {
+  public ExecutionFlow queryExecutionFlow(int execId) {
     return executionFlowMapper.selectByExecId(execId);
   }
 
@@ -110,7 +110,7 @@ public class FlowDao extends BaseDao {
    *
    * @return 是否成功
    */
-  public boolean updateExecutionFlowStatus(long execId, FlowStatus status) {
+  public boolean updateExecutionFlowStatus(int execId, FlowStatus status) {
     ExecutionFlow executionFlow = new ExecutionFlow();
     executionFlow.setId(execId);
     executionFlow.setStatus(status);
@@ -123,7 +123,7 @@ public class FlowDao extends BaseDao {
     return executionFlowMapper.update(executionFlow) > 0;
   }
 
-  public boolean updateExecutionFlowStatus(long execId, FlowStatus status, String worker) {
+  public boolean updateExecutionFlowStatus(int execId, FlowStatus status, String worker) {
     ExecutionFlow executionFlow = new ExecutionFlow();
     executionFlow.setId(execId);
     executionFlow.setStatus(status);

@@ -17,6 +17,8 @@ package com.baifendian.swordfish.execserver.job.hive;
 
 import com.baifendian.swordfish.common.job.ExecResult;
 
+import java.util.Date;
+
 /**
  * 执行结果回调处理 <p>
  */
@@ -25,5 +27,5 @@ public interface ResultCallback {
   /**
    * 处理执行结果 <p>
    */
-  void handleResult(ExecResult execResult);
+  void handleResult(ExecResult execResult, Date startTime, Date endTime);
 }

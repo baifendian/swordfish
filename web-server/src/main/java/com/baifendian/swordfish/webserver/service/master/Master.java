@@ -22,6 +22,7 @@ import com.baifendian.swordfish.dao.MasterDao;
 import com.baifendian.swordfish.dao.model.ExecutionFlow;
 import com.baifendian.swordfish.dao.model.ProjectFlow;
 import com.baifendian.swordfish.rpc.HeartBeatData;
+import com.baifendian.swordfish.rpc.RetInfo;
 import com.baifendian.swordfish.webserver.ExecutorClient;
 import com.baifendian.swordfish.webserver.ExecutorServerInfo;
 import com.baifendian.swordfish.webserver.ExecutorServerManager;
@@ -30,6 +31,7 @@ import com.baifendian.swordfish.webserver.exception.MasterException;
 import com.baifendian.swordfish.webserver.quartz.FlowScheduleJob;
 import com.baifendian.swordfish.webserver.utils.ResultHelper;
 
+import org.apache.derby.iapi.sql.execute.ExecutionContext;
 import org.apache.thrift.TException;
 import org.quartz.CronExpression;
 import org.slf4j.Logger;
@@ -149,11 +151,12 @@ public class Master {
     flowExecManager.submitAddData(flow, cron, startDateTime, endDateTime);
   }
 
-  public void execAdHoc(long id) throws TException {
+  public void execAdHoc(int id) throws TException {
     ExecutorServerInfo executorServerInfo = executorServerManager.getExecutorServer();
     if(executorServerInfo == null){
       throw new ExecException("can't found active executor server");
     }
+    logger.info("exec adhoc {} on server {}:{}", id, executorServerInfo.getHost(), executorServerInfo.getPort());
     ExecutorClient executorClient = new ExecutorClient(executorServerInfo);
     executorClient.execAdHoc(id);
   }
@@ -187,6 +190,24 @@ public class Master {
     executorServerInfo.setHeartBeatData(heartBeatData);
 
     executorServerManager.updateServer(key, executorServerInfo);
+  }
+
+  public RetInfo cancelExecFlow(int execId) throws TException {
+    ExecutionFlow executionFlow = flowDao.queryExecutionFlow(execId);
+    if(executionFlow == null) {
+      throw new MasterException("execId is not exists");
+    }
+    String worker = executionFlow.getWorker();
+    if(worker == null) {
+      throw new MasterException("worker is not exists");
+    }
+    String[] workerInfo = worker.split(":");
+    if(workerInfo.length < 2) {
+      throw new MasterException("worker is not validate format " + worker);
+    }
+    logger.info("cancel exec flow {} on worker {}", execId, worker);
+    ExecutorClient executionClient = new ExecutorClient(workerInfo[0], Integer.valueOf(workerInfo[1]));
+    return executionClient.cancelExecFlow(execId);
   }
 
 }

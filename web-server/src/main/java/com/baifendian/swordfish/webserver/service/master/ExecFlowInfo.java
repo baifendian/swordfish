@@ -16,20 +16,20 @@
 package com.baifendian.swordfish.webserver.service.master;
 
 public class ExecFlowInfo {
-  private long execId;
+  private int execId;
 
   public ExecFlowInfo(){
   }
 
-  public ExecFlowInfo(long execId){
+  public ExecFlowInfo(int execId){
     this.execId = execId;
   }
 
-  public long getExecId() {
+  public int getExecId() {
     return execId;
   }
 
-  public ExecFlowInfo setExecId(long execId) {
+  public ExecFlowInfo setExecId(int execId) {
     this.execId = execId;
     return this;
   }
