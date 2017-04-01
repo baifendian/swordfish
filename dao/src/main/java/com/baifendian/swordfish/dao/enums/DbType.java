@@ -15,6 +15,8 @@
  */
 package com.baifendian.swordfish.dao.enums;
 
+import org.apache.commons.lang.StringUtils;
+
 public enum DbType {
   /**
    * 0 mysql, 1 oracle, 2 sqlserver, 3 mongodb, 4 hbase094x, 5 hbase11x, 6 ftp
@@ -44,6 +46,24 @@ public enum DbType {
       throw new IllegalArgumentException("Cannot convert " + type + " to " + DbType.class.getSimpleName() + " .", ex);
     }
   }
+
+  /**
+   * 通过 type 获取枚举对象 <p>
+   *
+   * @return {@link DbType}
+   */
+  public static DbType valueOfType(String type) throws IllegalArgumentException {
+    if (StringUtils.isEmpty(type)) {
+      return null;
+    }
+
+    try {
+      return DbType.valueOf(type);
+    } catch (Exception ex) {
+      throw new IllegalArgumentException("Cannot convert " + type + " to " + DbType.class.getSimpleName() + " .", ex);
+    }
+  }
+
 
   /**
    * 判断一个类型是否属于Enum

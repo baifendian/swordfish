@@ -31,9 +31,9 @@ public class DatasourceTestController {
   public BaseResponse testDataSource(@RequestAttribute(value = "session.user") User operator,
                                      @PathVariable("projectName") String projectName,
                                      @RequestParam(value = "desc", required = false) String desc,
-                                     @RequestParam(value = "type", required = true) DbType type,
+                                     @RequestParam(value = "type", required = true) String type,
                                      @RequestParam(value = "parameter", required = true) String parameter,
                                      HttpServletResponse response){
-    return datasourceService.testDataSource(type,parameter,response);
+    return datasourceService.testDataSource(DbType.valueOf(type),parameter,response);
   }
 }

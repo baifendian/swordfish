@@ -82,13 +82,13 @@ public class DatasourceController {
                                            @PathVariable("projectName") String projectName,
                                            @PathVariable("name") String name,
                                            @RequestParam(value = "desc", required = false) String desc,
-                                           @RequestParam(value = "type") DbType type,
+                                           @RequestParam(value = "type") String type,
                                            @RequestParam(value = "parameter") String parameter,
                                            HttpServletResponse response) {
     logger.info("Operator user id {}, modify and put datasource, project name: {}, data source name: {}, desc: {}, type: {}, parameter: {}",
         operator.getId(), projectName, name, desc, type, parameter);
 
-    return datasourceService.modifyDataSource(operator, projectName, name, desc, type, parameter, response, true);
+    return datasourceService.modifyDataSource(operator, projectName, name, desc, DbType.valueOf(type), parameter, response, true);
   }
 
   /**
@@ -108,13 +108,13 @@ public class DatasourceController {
                                      @PathVariable("projectName") String projectName,
                                      @PathVariable("name") String name,
                                      @RequestParam(value = "desc", required = false) String desc,
-                                     @RequestParam(value = "type") DbType type,
+                                     @RequestParam(value = "type") String type,
                                      @RequestParam(value = "parameter") String parameter,
                                      HttpServletResponse response) {
     logger.info("Operator user id {}, modify datasource, project name: {}, data source name: {}, desc: {}, type: {}, parameter: {}",
         operator.getId(), projectName, name, desc, type, parameter);
 
-    return datasourceService.modifyDataSource(operator, projectName, name, desc, type, parameter, response, false);
+    return datasourceService.modifyDataSource(operator, projectName, name, desc, DbType.valueOf(type), parameter, response, false);
   }
 
   /**
