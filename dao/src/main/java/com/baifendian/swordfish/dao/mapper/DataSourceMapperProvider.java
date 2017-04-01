@@ -120,4 +120,23 @@ public class DataSourceMapperProvider {
       WHERE("r.project_id = #{projectId} and r.name = #{name}");
     }}.toString();
   }
+
+  /**
+   * 根据projectName 和 datasource name
+   * @param parameter
+   * @return
+   */
+  public String getByProjectNameAndName(Map<String, Object> parameter) {
+    return new SQL() {{
+      SELECT("r.*, r.owner as owner_id");
+      SELECT("u.name as owner, p.name as project_name");
+
+      FROM(DB_NAME + " r");
+
+      JOIN("user as u on u.id = r.owner");
+      JOIN("project p on r.project_id = p.id");
+
+      WHERE("p.name = #{projectName} and r.name = #{name}");
+    }}.toString();
+  }
 }
