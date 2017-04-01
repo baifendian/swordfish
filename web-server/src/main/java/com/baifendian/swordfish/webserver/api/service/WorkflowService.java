@@ -424,23 +424,20 @@ public class WorkflowService {
    * @return
    */
   public boolean graphCheck(List<FlowNode> flowNodeList){
-    Graph<Integer, String,String> graph = new Graph<>();
+    Graph<String, FlowNode,String> graph = new Graph<>();
 
     //缓存边关系
     Map<String,Integer> flowNodeIdMap = new HashMap<>();
 
     //填充顶点
-    int index = 0;
     for (FlowNode flowNode:flowNodeList){
-      graph.addVertex(index,flowNode.getName());
-      flowNodeIdMap.put(flowNode.getName(),index++);
+      graph.addVertex(flowNode.getName(),flowNode);
     }
 
     //填充边关系
-    index = 0;
     for (FlowNode flowNode:flowNodeList){
       for(String dep:flowNode.getDepList()){
-        graph.addEdge(flowNodeIdMap.get(dep),index);
+        graph.addEdge(dep,flowNode.getName());
       }
     }
 
