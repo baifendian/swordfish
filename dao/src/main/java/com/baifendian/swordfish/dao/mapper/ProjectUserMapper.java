@@ -88,6 +88,12 @@ public interface ProjectUserMapper {
   @SelectProvider(type = ProjectUserSqlProvider.class, method = "queryByProject")
   List<ProjectUser> queryByProject(@Param("projectId") int projectId);
 
+  /**
+   * 查询项目下的所有用户信息
+   *
+   * @param projectId
+   * @return
+   */
   @Results(value = {@Result(property = "id", column = "id", id = true, javaType = Integer.class, jdbcType = JdbcType.INTEGER),
       @Result(property = "name", column = "name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
       @Result(property = "email", column = "email", javaType = String.class, jdbcType = JdbcType.VARCHAR),

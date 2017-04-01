@@ -18,6 +18,9 @@ package com.baifendian.swordfish.common.utils;
 import ch.qos.logback.classic.pattern.ClassicConverter;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 
+/**
+ * 用于日志中的 "纳秒" 输出
+ */
 public class NanoSampleConverter extends ClassicConverter {
   @Override
   public String convert(ILoggingEvent event) {

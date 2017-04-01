@@ -33,6 +33,11 @@ public class DAGGraph<VD, ED> extends Graph<VD, ED> {
 
   /**
    * 判断增加 startId -> endId 会否导致环存在, 这个算法就是判断从 endId 到 startId 是不是可达的
+   *
+   * @param startId      起点
+   * @param endId        终点
+   * @param createVertex 是否创建顶点
+   * @return
    */
   protected synchronized boolean validIfAdd(int startId, int endId, boolean createVertex) {
     if (!super.validIfAdd(startId, endId, createVertex)) {
