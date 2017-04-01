@@ -11,7 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 
 
 @RestController
-@RequestMapping("/projects/datasources")
+@RequestMapping("/datasources")
 public class DatasourceTestController {
 
   @Autowired
