@@ -15,7 +15,6 @@
  */
 package com.baifendian.swordfish.dao.model;
 
-import com.baifendian.swordfish.dao.enums.NodeType;
 import com.baifendian.swordfish.dao.utils.json.StringNodeJsonDeserializer;
 import com.baifendian.swordfish.dao.utils.json.StringNodeJsonSerializer;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -24,6 +23,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
+import java.io.IOException;
 import java.util.List;
 
 public class FlowNode {
@@ -42,6 +42,7 @@ public class FlowNode {
 
   @JsonDeserialize(using = StringNodeJsonDeserializer.class)
   @JsonSerialize(using = StringNodeJsonSerializer.class)
+  //@JsonRawValue
   private String parameter;
 
   private String dep;
@@ -103,7 +104,9 @@ public class FlowNode {
     return dep;
   }
 
-  public void setDep(String dep) {
+  public void setDep(String dep) throws IOException {
+    ObjectMapper mapper = new ObjectMapper();
+    this.depList = mapper.readValue(dep,mapper.getTypeFactory().constructCollectionType(List.class,String.class));
     this.dep = dep;
   }
 

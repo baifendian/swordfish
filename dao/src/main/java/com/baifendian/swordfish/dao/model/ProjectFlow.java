@@ -214,7 +214,6 @@ public class ProjectFlow {
   }
 
   public void setUserDefinedParams(String userDefinedParams) {
-    this.setUserDefinedParams(userDefinedParams);
     this.userDefinedParams = userDefinedParams;
   }
 
@@ -231,7 +230,7 @@ public class ProjectFlow {
     this.userDefinedParamMap = userDefinedParamMap;
   }
 
-  public class ProjectFlowData {
+  public static class ProjectFlowData {
     private List<FlowNode> nodes;
 
     private String userDefParams;

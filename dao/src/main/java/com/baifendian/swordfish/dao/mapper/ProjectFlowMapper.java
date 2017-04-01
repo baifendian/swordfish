@@ -25,6 +25,7 @@ import org.apache.ibatis.type.EnumOrdinalTypeHandler;
 import org.apache.ibatis.type.JdbcType;
 import org.mybatis.spring.annotation.MapperScan;
 
+import javax.annotation.Resource;
 import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
@@ -162,7 +163,7 @@ public interface ProjectFlowMapper {
           @Result(property = "userDefinedParams", column = "user_defined_params", javaType = String.class, jdbcType = JdbcType.VARCHAR),
           @Result(property = "extras", column = "extras", javaType = String.class, jdbcType = JdbcType.VARCHAR),
           @Result(property = "queue", column = "queue", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-          @Result(property = "flowsNodes", column = "id", javaType = List.class, many = @Many(select = "selectByFlowId")),
+          @Result(property = "flowsNodes", column = "id", javaType = List.class, many = @Many(select = "com.baifendian.swordfish.dao.mapper.FlowNodeMapper.selectByFlowId")),
           })
   @SelectProvider(type = ProjectFlowMapperSqlProvider.class, method = "queryByName")
   ProjectFlow findByName(@Param("projectId") Integer projectId, @Param("name") String name);
@@ -182,7 +183,7 @@ public interface ProjectFlowMapper {
           @Result(property = "userDefinedParams", column = "user_defined_params", javaType = String.class, jdbcType = JdbcType.VARCHAR),
           @Result(property = "extras", column = "extras", javaType = String.class, jdbcType = JdbcType.VARCHAR),
           @Result(property = "queue", column = "queue", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-          @Result(property = "flowsNodes", column = "id", javaType = List.class, many = @Many(select = "selectByFlowId")),
+          @Result(property = "flowsNodes", column = "id", javaType = List.class, many = @Many(select = "com.baifendian.swordfish.dao.mapper.FlowNodeMapper.selectByFlowId")),
   })
   @SelectProvider(type = ProjectFlowMapperSqlProvider.class, method = "findByProjectNameAndName")
   ProjectFlow findByProjectNameAndName(@Param("projectName") String projectName, @Param("name") String name);
@@ -202,7 +203,7 @@ public interface ProjectFlowMapper {
           @Result(property = "userDefinedParams", column = "user_defined_params", javaType = String.class, jdbcType = JdbcType.VARCHAR),
           @Result(property = "extras", column = "extras", javaType = String.class, jdbcType = JdbcType.VARCHAR),
           @Result(property = "queue", column = "queue", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-          @Result(property = "flowsNodes", column = "id", javaType = List.class, many = @Many(select = "selectByFlowId")),
+          @Result(property = "flowsNodes", column = "id", javaType = List.class, many = @Many(select = "com.baifendian.swordfish.dao.mapper.FlowNodeMapper.selectByFlowId")),
   })
   @SelectProvider(type = ProjectFlowMapperSqlProvider.class, method = "findByProject")
   List<ProjectFlow> findByProject(@Param("projectId") Integer projectId);

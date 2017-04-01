@@ -16,11 +16,7 @@
 package com.baifendian.swordfish.webserver.api.dto;
 
 import com.baifendian.swordfish.webserver.api.dto.enums.MRScope;
-import org.json.JSONArray;
-import org.json.JSONObject;
-
 import java.util.List;
-import java.util.Map;
 
 /**
  * 类型检测dto
@@ -29,7 +25,7 @@ public class NodeParamMR {
   private String mainClass;
   private MainJar mainJar;
   private String args;
-  private Map<String,String> properties;
+  private List<Prop> properties;
   private List<File> files;
   private List<File> archives;
   private List<File> libJars;
@@ -58,11 +54,11 @@ public class NodeParamMR {
     this.args = args;
   }
 
-  public Map<String, String> getProperties() {
+  public List<Prop> getProperties() {
     return properties;
   }
 
-  public void setProperties(Map<String, String> properties) {
+  public void setProperties(List<Prop> properties) {
     this.properties = properties;
   }
 
@@ -93,19 +89,19 @@ public class NodeParamMR {
   public NodeParamMR() {
   }
 
-  public class MainJar{
-    private MRScope mrScope;
+  public static class MainJar{
+    private MRScope scope;
     private String res;
 
     public MainJar() {
     }
 
-    public MRScope getMrScope() {
-      return mrScope;
+    public MRScope getScope() {
+      return scope;
     }
 
-    public void setMrScope(MRScope mrScope) {
-      this.mrScope = mrScope;
+    public void setScope(MRScope scope) {
+      this.scope = scope;
     }
 
     public String getRes() {
@@ -117,17 +113,20 @@ public class NodeParamMR {
     }
   }
 
-  public class File{
-    private MRScope mrScope;
+  public static class File{
+    private MRScope scope;
     private String res;
     private String alias;
 
-    public MRScope getMrScope() {
-      return mrScope;
+    public File() {
     }
 
-    public void setMrScope(MRScope mrScope) {
-      this.mrScope = mrScope;
+    public MRScope getScope() {
+      return scope;
+    }
+
+    public void setScope(MRScope scope) {
+      this.scope = scope;
     }
 
     public String getRes() {
@@ -146,4 +145,31 @@ public class NodeParamMR {
       this.alias = alias;
     }
   }
+
+  public static class Prop{
+    private String prop;
+    private String value;
+
+    public Prop() {
+    }
+
+    public String getProp() {
+      return prop;
+    }
+
+    public void setProp(String prop) {
+      this.prop = prop;
+    }
+
+    public String getValue() {
+      return value;
+    }
+
+    public void setValue(String value) {
+      this.value = value;
+    }
+  }
+
 }
+
+

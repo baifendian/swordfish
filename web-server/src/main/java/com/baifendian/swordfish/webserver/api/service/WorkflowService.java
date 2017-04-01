@@ -16,7 +16,6 @@
 package com.baifendian.swordfish.webserver.api.service;
 
 import com.baifendian.swordfish.common.utils.graph.Graph;
-import com.baifendian.swordfish.dao.enums.NodeType;
 import com.baifendian.swordfish.dao.mapper.FlowNodeMapper;
 import com.baifendian.swordfish.dao.mapper.ProjectFlowMapper;
 import com.baifendian.swordfish.dao.mapper.ProjectMapper;
@@ -89,7 +88,7 @@ public class WorkflowService {
       return null;
     }
 
-    Project project = projectMapper.queryByName(name);
+    Project project = projectMapper.queryByName(projectName);
 
     if (project == null) {
       response.setStatus(HttpStatus.SC_NOT_MODIFIED);
@@ -102,6 +101,22 @@ public class WorkflowService {
     }
 
     List<FlowNode> flowNodes = projectFlowData.getNodes();
+
+    if (flowNodes!=null){
+      //闭环检测未通过
+      if (graphCheck(flowNodes)){
+        response.setStatus(HttpStatus.SC_BAD_REQUEST);
+        return null;
+      }
+      //parameter检测
+      for (FlowNode flowNode:flowNodes){
+        if(!flowNodeParamCheck(flowNode.getParameter(),flowNode.getType())){
+          response.setStatus(HttpStatus.SC_BAD_REQUEST);
+          return null;
+        }
+      }
+    }
+
 
     ProjectFlow projectFlow = new ProjectFlow();
     Date now = new Date();
@@ -130,12 +145,6 @@ public class WorkflowService {
 
 
     if (flowNodes != null) {
-      //闭环检测未通过
-      if (!graphCheck(flowNodes)){
-        response.setStatus(HttpStatus.SC_BAD_REQUEST);
-        return null;
-      }
-
       for (FlowNode flowNode : flowNodes) {
         flowNode.setFlowId(projectFlow.getId());
         flowNodeMapper.insert(flowNode);
@@ -184,7 +193,7 @@ public class WorkflowService {
   @Transactional
   public ProjectFlow patchWorkflow(User operator, String projectName, String name, String desc, String proxyUser, String queue, String data, MultipartFile file, HttpServletResponse response) {
 
-    Project project = projectMapper.queryByName(name);
+    Project project = projectMapper.queryByName(projectName);
 
     if (project == null) {
       response.setStatus(HttpStatus.SC_NOT_MODIFIED);
@@ -213,10 +222,25 @@ public class WorkflowService {
       if (!projectFlow.getUserDefinedParams().isEmpty()) {
         projectFlow.setUserDefinedParams(projectFlow.getUserDefinedParams());
       }
-      if (projectFlowData.getNodes() != null) {
+      List<FlowNode> flowNodeList = projectFlowData.getNodes();
+      if (flowNodeList != null) {
         projectFlow.setFlowsNodes(projectFlowData.getNodes());
         flowNodeMapper.deleteByFlowId(projectFlow.getId());
-        for (FlowNode flowNode : projectFlow.getFlowsNodes()) {
+
+        //闭环检测
+        if (!graphCheck(flowNodeList)){
+          response.setStatus(HttpStatus.SC_BAD_REQUEST);
+          return null;
+        }
+        //parameter检测
+        for (FlowNode flowNode:flowNodeList){
+          if(!flowNodeParamCheck(flowNode.getParameter(),flowNode.getType())){
+            response.setStatus(HttpStatus.SC_BAD_REQUEST);
+            return null;
+          }
+        }
+
+        for (FlowNode flowNode : flowNodeList) {
           flowNode.setFlowId(projectFlow.getId());
           flowNodeMapper.insert(flowNode);
         }
@@ -427,12 +451,13 @@ public class WorkflowService {
    * 检测flowNode parameter格式是否正常
    * @return
    */
-  public boolean flowNodeParamCheck(String parameter, NodeType nodeType){
+  public boolean flowNodeParamCheck(String parameter, String type){
     ObjectMapper mapper = new ObjectMapper();
 
     try {
-      switch (nodeType) {
-        case MR:
+      switch (type) {
+        case "MR":
+        case "mr":
           mapper.readValue(parameter, NodeParamMR.class);
           break;
         default:return false;
