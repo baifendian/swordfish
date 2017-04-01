@@ -100,7 +100,7 @@ public class EmailManager {
       String title = genTitle(executionFlow.getType(), executionNode.getStatus());
       String content = genContent(executionFlow.getType(), executionFlow.getProjectName(), executionFlow.getFlowName(),
               executionFlow.getScheduleTime(), executionNode.getStatus());
-      content += MessageFormat.format(CONTENT_NODE_FORMAT, executionNode.getNodeId());
+      content += MessageFormat.format(CONTENT_NODE_FORMAT, executionNode.getName());
       mailSendService.sendToFlowUserMails(executionFlow.getFlowId(), title, content);
     } catch (Exception e){
       logger.error("send mail error", e);

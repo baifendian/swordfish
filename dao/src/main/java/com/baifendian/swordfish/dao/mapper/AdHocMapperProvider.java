@@ -37,7 +37,7 @@ public class AdHocMapperProvider {
     return new SQL() {
       {
         INSERT_INTO(TABLE_NAME);
-        VALUES("params", "#{adHoc.params}");
+        VALUES("parameter", "#{adHoc.parameter}");
         VALUES("proxy_user", "#{adHoc.proxyUser}");
         VALUES("queue", "#{adHoc.queue}");
         VALUES("status", EnumFieldUtil.genFieldStr("adHoc.status", FlowStatus.class));
@@ -56,8 +56,6 @@ public class AdHocMapperProvider {
     return new SQL() {
       {
         UPDATE(TABLE_NAME);
-        SET("modify_time = #{adHoc.modifyTime}");
-        SET("last_modify_by = #{adHoc.lastModifyBy}");
         SET("start_time = #{adHoc.startTime}");
         SET("end_time = #{adHoc.endTime}");
         SET("job_id = #{adHoc.jobId}");

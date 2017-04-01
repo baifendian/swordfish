@@ -15,7 +15,6 @@
  */
 package com.baifendian.swordfish.dao.mapper;
 
-import com.baifendian.swordfish.dao.enums.FlowErrorCode;
 import com.baifendian.swordfish.dao.enums.FlowRunType;
 import com.baifendian.swordfish.dao.enums.FlowStatus;
 import com.baifendian.swordfish.dao.model.ExecutionFlow;
@@ -69,7 +68,6 @@ public interface ExecutionFlowMapper {
           @Result(property = "type", column = "type", typeHandler = EnumOrdinalTypeHandler.class, javaType = FlowRunType.class, jdbcType = JdbcType.TINYINT),
           @Result(property = "flowName", column = "flow_name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
           @Result(property = "submitUserName", column = "submit_user_name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-          @Result(property = "errorCode", column = "error_code", typeHandler = EnumOrdinalTypeHandler.class, jdbcType = JdbcType.TINYINT),
           @Result(property = "maxTryTimes", column = "max_try_times", javaType = int.class, jdbcType = JdbcType.INTEGER),
           @Result(property = "timeout", column = "timeout", javaType = int.class, jdbcType = JdbcType.INTEGER),
   })
@@ -91,8 +89,9 @@ public interface ExecutionFlowMapper {
           @Result(property = "workflowData", column = "workflow_data", javaType = String.class, jdbcType = JdbcType.VARCHAR),
           @Result(property = "type", column = "type", typeHandler = EnumOrdinalTypeHandler.class, javaType = FlowRunType.class, jdbcType = JdbcType.TINYINT),
           @Result(property = "flowName", column = "flow_name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-          @Result(property = "errorCode", column = "error_code", typeHandler = EnumOrdinalTypeHandler.class, javaType = FlowErrorCode.class, jdbcType = JdbcType.TINYINT),
           @Result(property = "queue", column = "queue", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+          @Result(property = "userDefinedParams", column = "user_defined_params", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+          @Result(property = "extras", column = "extras", javaType = String.class, jdbcType = JdbcType.VARCHAR),
           @Result(property = "maxTryTimes", column = "max_try_times", javaType = int.class, jdbcType = JdbcType.INTEGER),
           @Result(property = "timeout", column = "timeout", javaType = int.class, jdbcType = JdbcType.INTEGER),
   })

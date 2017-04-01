@@ -27,16 +27,17 @@ public class FlowNodeRelation {
 
   private int flowId;
 
-  private int startId;
+  private String startNode;
 
-  private int endId;
+  private String endNode;
 
-  @JsonDeserialize(using = StringNodeJsonDeserializer.class)
-  @JsonSerialize(using = StringNodeJsonSerializer.class)
-  private String attribute;
+  public FlowNodeRelation(){}
 
-  @JsonIgnore
-  private EdgeAttribute attributeObject;
+  public FlowNodeRelation(int flowId, String startNode, String endNode){
+    this.flowId = flowId;
+    this.startNode = startNode;
+    this.endNode = endNode;
+  }
 
   public int getFlowId() {
     return flowId;
@@ -46,40 +47,19 @@ public class FlowNodeRelation {
     this.flowId = flowId;
   }
 
-  public int getStartId() {
-    return startId;
+  public String getStartNode() {
+    return startNode;
   }
 
-  public void setStartId(int startId) {
-    this.startId = startId;
+  public void setStartNode(String startNode) {
+    this.startNode = startNode;
   }
 
-  public int getEndId() {
-    return endId;
+  public String getEndNode() {
+    return endNode;
   }
 
-  public void setEndId(int endId) {
-    this.endId = endId;
+  public void setEndNode(String endNode) {
+    this.endNode = endNode;
   }
-
-  public String getAttribute() {
-    return attribute;
-  }
-
-  public void setAttribute(String attribute) {
-    this.attribute = attribute;
-  }
-
-  /**
-   * 获取 EdgeAttribute 对象 <p>
-   *
-   * @return EdgeAttribute 对象
-   */
-  public EdgeAttribute getAttributeObject() {
-    if (attributeObject == null) {
-      attributeObject = JsonUtil.parseObject(attribute, EdgeAttribute.class);
-    }
-    return attributeObject;
-  }
-
 }

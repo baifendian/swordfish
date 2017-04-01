@@ -50,13 +50,13 @@ public class ExecutionNodeMapperProvider {
       {
         INSERT_INTO(TABLE_NAME);
         VALUES("exec_id", "#{executionNode.execId}");
-        VALUES("flow_id", "#{executionNode.flowId}");
-        VALUES("node_id", "#{executionNode.nodeId}");
-        VALUES("status", EnumFieldUtil.genFieldStr("executionNode.status", FlowStatus.class));
+        VALUES("name", "#{executionNode.name}");
         VALUES("start_time", "#{executionNode.startTime}");
         VALUES("end_time", "#{executionNode.endTime}");
         VALUES("attempt", "#{executionNode.attempt}");
+        VALUES("log_links", "#{executionNode.log_links}");
         VALUES("job_id", "#{executionNode.jobId}");
+        VALUES("status", EnumFieldUtil.genFieldStr("executionNode.status", FlowStatus.class));
       }
     }.toString();
   }
@@ -66,58 +66,32 @@ public class ExecutionNodeMapperProvider {
     return new SQL() {
       {
         UPDATE(TABLE_NAME);
+        if (executionNode.getAttempt() != null) {
+          SET("attempt = #{executionNode.attempt}");
+        }
         if (executionNode.getEndTime() != null) {
           SET("end_time = #{executionNode.endTime}");
         }
         if (executionNode.getStatus() != null) {
           SET("status = " + EnumFieldUtil.genFieldStr("executionNode.status", FlowStatus.class));
         }
-        WHERE("id = #{executionNode.id}");
+        if (executionNode.getLogLinks() != null) {
+          SET("log_links = #{executionNode.logLinks}");
+        }
+        WHERE("exec_id = #{executionNode.execId}");
+        WHERE("name = #{executionNode.name}");
       }
     }.toString();
   }
 
-  public String selectExecNodeLastAttempt(Map<String, Object> parameter) {
-    return new SQL() {
-      {
-        SELECT("a.*");
-        FROM(TABLE_NAME + " as a");
-        //INNER_JOIN("(SELECT exec_id, node_id, MAX(attempt) attempt FROM "+TABLE_NAME+" WHERE exec_id = #{execId} AND node_id=#{nodeId} group by exec_id, node_id) as b on a.exec_id = b.exec_id and a.node_id = b.node_id and a.attempt = b.attempt");
-        INNER_JOIN("(SELECT exec_id, node_id, MAX(id) id FROM " + TABLE_NAME + " WHERE exec_id = #{execId} AND node_id=#{nodeId} group by exec_id, node_id) as b on a.exec_id = b.exec_id and a.node_id = b.node_id and a.id = b.id");
-      }
-    }.toString();
-  }
 
-  public String selectByNodeId(Map<String, Object> parameter) {
+  public String selectExecNode(Map<String, Object> parameter) {
     return new SQL() {
       {
         SELECT("*");
         FROM(TABLE_NAME);
         WHERE("exec_id = #{execId}");
-        WHERE("node_id = #{nodeId}");
-      }
-    }.toString();
-  }
-
-  public String selectByNodeIdAndAttempt(Map<String, Object> parameter) {
-    return new SQL() {
-      {
-        SELECT("*");
-        FROM(TABLE_NAME);
-        WHERE("exec_id = #{execId}");
-        WHERE("node_id = #{nodeId}");
-        WHERE("attempt = #{attempt}");
-      }
-    }.toString();
-  }
-
-  public String selectByFlowId(Map<String, Object> parameter) {
-    return new SQL() {
-      {
-        SELECT("*");
-        FROM(TABLE_NAME);
-        WHERE("exec_id = #{execId}");
-        WHERE("flow_id = #{flowId}");
+        WHERE("name = #{name}");
       }
     }.toString();
   }

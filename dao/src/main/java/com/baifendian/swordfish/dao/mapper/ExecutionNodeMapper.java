@@ -49,57 +49,22 @@ public interface ExecutionNodeMapper {
   int update(@Param("executionNode") ExecutionNode executionNode);
 
   /**
-   * 查询单个Node记录(由于重试会获取多条记录) <p>
+   * 查询单个Node记录 <p>
    *
    * @param execId, nodeId
    */
-  @Results(value = {@Result(property = "id", column = "id", javaType = Long.class, jdbcType = JdbcType.BIGINT),
-          @Result(property = "execId", column = "exec_id", javaType = Long.class, jdbcType = JdbcType.BIGINT),
-          @Result(property = "flowId", column = "flow_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
-          @Result(property = "nodeId", column = "node_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
-          @Result(property = "appsId", column = "apps_id", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+  @Results(value = {
+          @Result(property = "execId", column = "exec_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
+          @Result(property = "nodeName", column = "name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
           @Result(property = "status", column = "status", typeHandler = EnumOrdinalTypeHandler.class, javaType = FlowStatus.class, jdbcType = JdbcType.TINYINT),
           @Result(property = "startTime", column = "start_time", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP),
           @Result(property = "endTime", column = "end_time", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP),
           @Result(property = "attempt", column = "attempt", javaType = int.class, jdbcType = JdbcType.TINYINT),
-          @Result(property = "jobId", column = "job_id", javaType = String.class, jdbcType = JdbcType.VARCHAR)})
-  @SelectProvider(type = ExecutionNodeMapperProvider.class, method = "selectByNodeIdAndAttempt")
-  ExecutionNode selectOneExecNode(@Param("execId") Long execId, @Param("nodeId") Integer nodeId, @Param("attempt") Integer attempt);
-
-  /**
-   *
-   * @param execId
-   * @param nodeId
-   * @return
-   */
-  @Results(value = {@Result(property = "id", column = "id", javaType = Long.class, jdbcType = JdbcType.BIGINT),
-          @Result(property = "execId", column = "exec_id", javaType = Long.class, jdbcType = JdbcType.BIGINT),
-          @Result(property = "flowId", column = "flow_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
-          @Result(property = "nodeId", column = "node_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
-          @Result(property = "appsId", column = "apps_id", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-          @Result(property = "status", column = "status", typeHandler = EnumOrdinalTypeHandler.class, javaType = FlowStatus.class, jdbcType = JdbcType.TINYINT),
-          @Result(property = "attempt", column = "attempt", javaType = int.class, jdbcType = JdbcType.TINYINT)
+          @Result(property = "logLinks", column = "log_links", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+          @Result(property = "jobId", column = "job_id", javaType = String.class, jdbcType = JdbcType.VARCHAR)
   })
-  @SelectProvider(type = ExecutionNodeMapperProvider.class, method = "selectExecNodeLastAttempt")
-  ExecutionNode selectExecNodeLastAttempt(@Param("execId") Long execId, @Param("nodeId") Integer nodeId);
-
-  /**
-   * 查询单个Node记录(由于重试会获取多条记录) <p>
-   *
-   * @param execId, nodeId
-   */
-  @Results(value = {@Result(property = "id", column = "id", javaType = Long.class, jdbcType = JdbcType.BIGINT),
-          @Result(property = "execId", column = "exec_id", javaType = Long.class, jdbcType = JdbcType.BIGINT),
-          @Result(property = "flowId", column = "flow_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
-          @Result(property = "nodeId", column = "node_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
-          @Result(property = "appsId", column = "apps_id", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-          @Result(property = "status", column = "status", typeHandler = EnumOrdinalTypeHandler.class, javaType = FlowStatus.class, jdbcType = JdbcType.TINYINT),
-          @Result(property = "startTime", column = "start_time", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP),
-          @Result(property = "endTime", column = "end_time", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP),
-          @Result(property = "attempt", column = "attempt", javaType = int.class, jdbcType = JdbcType.TINYINT),
-          @Result(property = "jobId", column = "job_id", javaType = String.class, jdbcType = JdbcType.VARCHAR)})
-  @SelectProvider(type = ExecutionNodeMapperProvider.class, method = "selectByNodeId")
-  List<ExecutionNode> selectExecNode(@Param("execId") Long execId, @Param("nodeId") Integer nodeId);
+  @SelectProvider(type = ExecutionNodeMapperProvider.class, method = "selectExecNode")
+  ExecutionNode selectExecNode(@Param("execId") Long execId, @Param("name") String name);
 
   /**
    * 查询flow 中所有节点执行的状态 <p>

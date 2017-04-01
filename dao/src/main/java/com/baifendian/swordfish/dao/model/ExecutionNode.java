@@ -23,29 +23,14 @@ import java.util.List;
 public class ExecutionNode {
 
   /**
-   * Node 执行id
-   **/
-  private Long id;
-
-  /**
    * 具体workflow执行的 id
    **/
   private Long execId;
 
   /**
-   * workflow的id
-   **/
-  private int flowId;
-
-  /**
-   * node 的 id
-   **/
-  private Integer nodeId;
-
-  /**
    * node 的名称
    **/
-  private String NodeName;
+  private String name;
 
   /**
    * 运行状态
@@ -65,20 +50,14 @@ public class ExecutionNode {
   /**
    * 尝试次数
    **/
-  private int attempt;
+  private Integer attempt;
 
   /**
    * 执行的job id
    **/
   private String jobId;
 
-  public Long getId() {
-    return id;
-  }
-
-  public void setId(Long id) {
-    this.id = id;
-  }
+  private String logLinks;
 
   public Long getExecId() {
     return execId;
@@ -86,30 +65,6 @@ public class ExecutionNode {
 
   public void setExecId(Long execId) {
     this.execId = execId;
-  }
-
-  public int getFlowId() {
-    return flowId;
-  }
-
-  public void setFlowId(int flowId) {
-    this.flowId = flowId;
-  }
-
-  public Integer getNodeId() {
-    return nodeId;
-  }
-
-  public void setNodeId(Integer nodeId) {
-    this.nodeId = nodeId;
-  }
-
-  public String getNodeName() {
-    return NodeName;
-  }
-
-  public void setNodeName(String nodeName) {
-    NodeName = nodeName;
   }
 
   public FlowStatus getStatus() {
@@ -136,11 +91,11 @@ public class ExecutionNode {
     this.endTime = endTime;
   }
 
-  public int getAttempt() {
+  public Integer getAttempt() {
     return attempt;
   }
 
-  public void setAttempt(int attempt) {
+  public void setAttempt(Integer attempt) {
     this.attempt = attempt;
   }
 
@@ -150,5 +105,21 @@ public class ExecutionNode {
 
   public void setJobId(String jobId) {
     this.jobId = jobId;
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public void setName(String name) {
+    this.name = name;
+  }
+
+  public String getLogLinks() {
+    return logLinks;
+  }
+
+  public void setLogLinks(String logLinks) {
+    this.logLinks = logLinks;
   }
 }

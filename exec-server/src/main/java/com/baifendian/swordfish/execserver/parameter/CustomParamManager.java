@@ -52,8 +52,6 @@ public class CustomParamManager {
    * @return 自定义参数
    */
   public static Map<String, String> buildCustomParam(ExecutionFlow executionFlow, String cycTimeStr) {
-    // 获取工作流的参数
-    ProjectFlow projectFlow = projectFlowMapper.findById(executionFlow.getFlowId());
     Map<String, String> valueMap = new HashMap<>();
     Date cycTime = executionFlow.getStartTime();
 
@@ -66,7 +64,7 @@ public class CustomParamManager {
     }
 
     // 遍历 flow 的参数
-    Map<String, String> userDefinedParamMap = projectFlow.getUserDefinedParamMap();
+    Map<String, String> userDefinedParamMap = executionFlow.getUserDefinedParamMap();
     if (userDefinedParamMap != null) {
       for (Map.Entry<String, String> entry : userDefinedParamMap.entrySet()) {
         String value = entry.getValue();

@@ -13,30 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.baifendian.swordfish.execserver.utils;
+package com.baifendian.swordfish.common.utils.graph;
 
-import com.baifendian.swordfish.dao.enums.FlowType;
+public class VertexKey {
+  private String key;
 
-/**
- * 日志记录工具类 <p>
- */
-public class LoggerUtil {
-
-  /**
-   * 分隔符
-   */
-  public static final String SEPARATOR = "_";
-
-  /**
-   * 生成 jobId <p>
-   *
-   * @return jobId
-   */
-  public static String genJobId(String prefix, long execId, String nodeName) {
-    if (nodeName == null) {
-      return prefix + SEPARATOR + execId;
-    }
-    return prefix + SEPARATOR + execId + SEPARATOR + nodeName;
+  public VertexKey(String key){
+    this.key = key;
   }
 
+  public String getKey(){
+    return key;
+  }
+
+  @Override
+  public boolean equals(Object other){
+    if (this == other) {
+      return true;
+    }
+    if (other instanceof VertexKey) {
+      VertexKey vertexKey = (VertexKey) other;
+      return key.equals(vertexKey.getKey());
+    }
+    return false;
+  }
 }
