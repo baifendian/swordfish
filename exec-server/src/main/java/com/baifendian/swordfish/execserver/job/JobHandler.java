@@ -78,7 +78,7 @@ public class JobHandler {
     this.systemParamMap = systemParamMap;
     this.customParamMap = customParamMap;
     this.startTime = System.currentTimeMillis();
-    this.jobIdLog = String.format("%s_%d_%s", executionNode.getJobId(), executionNode.getId(), BFDDateUtils.now(DATETIME_FORMAT));
+    this.jobIdLog = String.format("%s_%d_%s", executionNode.getJobId(), BFDDateUtils.now(DATETIME_FORMAT));
     // custom参数会覆盖system参数
     allParamMap = new HashMap<>();
     allParamMap.putAll(systemParamMap);

@@ -72,6 +72,9 @@ public class ExecutionFlowMapperProvider {
         VALUES("type", EnumFieldUtil.genFieldStr("executionFlow.type", FlowRunType.class));
         VALUES("max_try_times", "#{executionFlow.maxTryTimes}");
         VALUES("timeout", "#{executionFlow.timeout}");
+        VALUES("user_defined_params", "#{executionFlow.userDefinedParams}");
+        VALUES("queue", "#{executionFlow.queue}");
+        VALUES("extras", "#{executionFlow.extras}");
       }
     }.toString();
   }
@@ -229,7 +232,6 @@ public class ExecutionFlowMapperProvider {
         SELECT("a.*");
         SELECT("b.name as flow_name");
         SELECT("b.project_id as project_id");
-        SELECT("b.queue as queue");
         SELECT("c.name as project_name");
         FROM("execution_flows as a");
         INNER_JOIN("project_flows as b on a.flow_id = b.id");

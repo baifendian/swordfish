@@ -17,8 +17,16 @@ package com.baifendian.swordfish.dao.model;
 
 import com.baifendian.swordfish.dao.enums.FlowRunType;
 import com.baifendian.swordfish.dao.enums.FlowStatus;
+import com.baifendian.swordfish.dao.model.flow.params.Property;
+import com.baifendian.swordfish.dao.utils.json.JsonUtil;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import org.apache.commons.lang.StringUtils;
 
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public class ExecutionFlow {
   /**
@@ -97,16 +105,6 @@ public class ExecutionFlow {
   private String projectName;
 
   /**
-   * workflow 所在组织的id
-   */
-  private Integer orgId;
-
-  /**
-   * workflow 所在组织的名称
-   */
-  private String orgName;
-
-  /**
    * 调度时间
    **/
   private Date scheduleTime;
@@ -114,6 +112,13 @@ public class ExecutionFlow {
   private Integer maxTryTimes;
 
   private Integer timeout;
+
+  private String userDefinedParams;
+
+  private String extras;
+
+  @JsonIgnore
+  private Map<String, String> userDefinedParamMap;
 
   /**
    * 作业提交队列
@@ -244,34 +249,6 @@ public class ExecutionFlow {
     this.projectName = projectName;
   }
 
-  public Integer getOrgId() {
-    return orgId;
-  }
-
-  public void setOrgId(Integer orgId) {
-    this.orgId = orgId;
-  }
-
-  /**
-   * getter method
-   *
-   * @return the orgName
-   * @see ExecutionFlow#orgName
-   */
-  public String getOrgName() {
-    return orgName;
-  }
-
-  /**
-   * setter method
-   *
-   * @param orgName the orgName to set
-   * @see ExecutionFlow#orgName
-   */
-  public void setOrgName(String orgName) {
-    this.orgName = orgName;
-  }
-
   public String getQueue() {
     return queue;
   }
@@ -298,5 +275,30 @@ public class ExecutionFlow {
 
   public void setTimeout(Integer timeout) {
     this.timeout = timeout;
+  }
+
+  public String getUserDefinedParams() {
+    return userDefinedParams;
+  }
+
+  public void setUserDefinedParams(String userDefinedParams) {
+    this.userDefinedParams = userDefinedParams;
+  }
+
+  public String getExtras() {
+    return extras;
+  }
+
+  public void setExtras(String extras) {
+    this.extras = extras;
+  }
+
+  public Map<String, String> getUserDefinedParamMap() {
+    List<Property> propList;
+    if (userDefinedParamMap == null && StringUtils.isNotEmpty(userDefinedParams)) {
+      propList = JsonUtil.parseObjectList(userDefinedParams, Property.class);
+      userDefinedParamMap = propList.stream().collect(Collectors.toMap(Property::getProp, Property::getValue));
+    }
+    return userDefinedParamMap;
   }
 }

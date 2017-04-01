@@ -90,6 +90,8 @@ public interface ExecutionFlowMapper {
           @Result(property = "type", column = "type", typeHandler = EnumOrdinalTypeHandler.class, javaType = FlowRunType.class, jdbcType = JdbcType.TINYINT),
           @Result(property = "flowName", column = "flow_name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
           @Result(property = "queue", column = "queue", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+          @Result(property = "userDefinedParams", column = "user_defined_params", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+          @Result(property = "extras", column = "extras", javaType = String.class, jdbcType = JdbcType.VARCHAR),
           @Result(property = "maxTryTimes", column = "max_try_times", javaType = int.class, jdbcType = JdbcType.INTEGER),
           @Result(property = "timeout", column = "timeout", javaType = int.class, jdbcType = JdbcType.INTEGER),
   })

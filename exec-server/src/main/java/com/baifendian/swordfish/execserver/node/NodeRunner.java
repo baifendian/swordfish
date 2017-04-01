@@ -122,7 +122,7 @@ public class NodeRunner implements Runnable {
       // 具体执行
       status = jobHandler.handle();
 
-      LOGGER.info("run executor:{} finished, status:{}", executionNode.getId(), status);
+      LOGGER.info("run executor:{} finished, status:{}", executionNode.getName(), status);
 
       // 更新 executionNode 信息
       updateExecutionNode(status);
@@ -161,7 +161,7 @@ public class NodeRunner implements Runnable {
     if (executionNode.getStatus().typeIsFinished()) {
       return;
     }
-    LOGGER.info("kill has been called on node:{} node exec:{}", executionNode.getNodeId(), executionNode.getId());
+    LOGGER.info("kill has been called on node:{} ", executionNode.getName());
     killed = true;
 
     Job job = jobHandler.getJob();
