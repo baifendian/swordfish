@@ -13,9 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.baifendian.swordfish.execserver.job.hive;
+package com.baifendian.swordfish.execserver.adhoc;
 
 import com.baifendian.swordfish.common.job.BaseParam;
+import com.baifendian.swordfish.execserver.job.hive.UdfsInfo;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.hive.ql.parse.ParseDriver;
@@ -28,7 +29,7 @@ import java.util.stream.Collectors;
 /**
  * sql 节点参数 <p>
  */
-public class SqlParam extends BaseParam {
+public class AdHocParam {
 
   /**
    * LOGGER
@@ -38,38 +39,18 @@ public class SqlParam extends BaseParam {
   /**
    * 原始 sql 语句（多条，内部可能包含换行等符号，执行时需要处理）
    */
-  private String sql;
+  private String stmt;
 
   private List<UdfsInfo> udfs;
 
-  @Override
-  public boolean checkValid() {
-    if (StringUtils.isEmpty(sql)) {
-      return false;
-    }
-    try {
-      for (String sqlOne : sql.split(";")) {
-        sqlOne = sqlOne.replaceAll("\n", " ");
-        sqlOne = sqlOne.replaceAll("\r", "");
-        if (StringUtils.isNotBlank(sqlOne)) {
-          ParseDriver pd = new ParseDriver();
-          pd.parse(sqlOne);
-        }
-      }
-    } catch (Exception e) {
-      LOGGER.error(e.getMessage(), e);
-      return false;
-    }
+  private Integer limit;
 
-    return true;
+  public String getStmt() {
+    return stmt;
   }
 
-  public String getSql() {
-    return sql;
-  }
-
-  public void setSql(String sql) {
-    this.sql = sql;
+  public void setStmt(String stmt) {
+    this.stmt = stmt;
   }
 
   public List<UdfsInfo> getUdfs() {
@@ -80,13 +61,11 @@ public class SqlParam extends BaseParam {
     this.udfs = udfs;
   }
 
-  @Override
-  public List<String> getResourceFiles() {
-    if (udfs != null && !udfs.isEmpty()) {
-      return udfs.stream().filter(p -> p.getLibJar() != null && p.getLibJar().isProjectScope())
-              .map(p -> p.getLibJar().getRes()).collect(Collectors.toList());
-    } else {
-      return null;
-    }
+  public Integer getLimit() {
+    return limit;
+  }
+
+  public void setLimit(Integer limit) {
+    this.limit = limit;
   }
 }

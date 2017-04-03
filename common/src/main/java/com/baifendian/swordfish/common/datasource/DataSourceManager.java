@@ -18,6 +18,7 @@ package com.baifendian.swordfish.common.datasource;
 import com.baifendian.swordfish.common.datasource.ftp.FtpHandler;
 import com.baifendian.swordfish.common.datasource.hbase.HBaseHandler;
 import com.baifendian.swordfish.common.datasource.jdbc.JDBCHandler;
+import com.baifendian.swordfish.common.datasource.mongodb.MongoDBHandler;
 import com.baifendian.swordfish.common.job.exception.ExecException;
 import com.baifendian.swordfish.dao.enums.DbType;
 
@@ -28,18 +29,19 @@ import java.util.Map;
 
 public class DataSourceManager {
 
-  private static Map<String, Class<? extends DataSourceHandler>> dataSourceHandlerMap = new HashMap<>();
+  private static Map<DbType, Class<? extends DataSourceHandler>> dataSourceHandlerMap = new HashMap<>();
 
   static{
-    dataSourceHandlerMap.put("MYSQL", JDBCHandler.class);
-    dataSourceHandlerMap.put("ORACLE", JDBCHandler.class);
-    dataSourceHandlerMap.put("HBASE", HBaseHandler.class);
-    dataSourceHandlerMap.put("FTP", FtpHandler.class);
+    dataSourceHandlerMap.put(DbType.MYSQL, JDBCHandler.class);
+    dataSourceHandlerMap.put(DbType.ORACLE, JDBCHandler.class);
+    dataSourceHandlerMap.put(DbType.HBASE11X, HBaseHandler.class);
+    dataSourceHandlerMap.put(DbType.FTP, FtpHandler.class);
+    dataSourceHandlerMap.put(DbType.MONOGODB, MongoDBHandler.class);
   }
 
   public static DataSourceHandler getHandler(DbType dbType, String paramStr) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
     DataSourceHandler dataSourceHandler = null;
-    Class<? extends DataSourceHandler> dataSourceHandlerClass = dataSourceHandlerMap.get(dbType.name());
+    Class<? extends DataSourceHandler> dataSourceHandlerClass = dataSourceHandlerMap.get(dbType);
     if(dataSourceHandlerClass == null){
       throw new ExecException("unsupport datasource type " + dbType.name());
     }

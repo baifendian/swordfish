@@ -32,7 +32,7 @@ public class ExecutionFlow {
   /**
    * 具体执行的id
    **/
-  private Long id;
+  private Integer id;
 
   /**
    * workflow的id
@@ -125,11 +125,11 @@ public class ExecutionFlow {
    **/
   private String queue;
 
-  public Long getId() {
+  public Integer getId() {
     return id;
   }
 
-  public void setId(Long id) {
+  public void setId(Integer id) {
     this.id = id;
   }
 

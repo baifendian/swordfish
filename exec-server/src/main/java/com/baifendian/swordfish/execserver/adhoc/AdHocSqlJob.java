@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.baifendian.swordfish.execserver.job.hive;
+package com.baifendian.swordfish.execserver.adhoc;
 
 import com.baifendian.swordfish.common.config.BaseConfig;
 import com.baifendian.swordfish.common.job.ExecResult;
@@ -25,31 +25,44 @@ import com.baifendian.swordfish.dao.datasource.ConnectionFactory;
 import com.baifendian.swordfish.dao.mapper.AdHocResultMapper;
 import com.baifendian.swordfish.dao.model.AdHocJsonObject;
 import com.baifendian.swordfish.dao.model.AdHocResult;
+import com.baifendian.swordfish.execserver.job.hive.FunctionUtil;
+import com.baifendian.swordfish.execserver.job.hive.HiveSqlExec;
+import com.baifendian.swordfish.execserver.job.hive.ResultCallback;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 
 import java.io.IOException;
 import java.sql.Timestamp;
+import java.util.Date;
 import java.util.List;
 
 /**
  * 即席查询作业
  */
-public class AdHocSqlJob extends EtlSqlJob {
+public class AdHocSqlJob {
 
   private AdHocResultMapper adHocResultMapper;
 
+  private AdHocParam param;
+
+  private String jobIdLog;
+
+  private JobProps props;
+
+  private Logger logger;
+
   public AdHocSqlJob(String jobIdLog, JobProps props, Logger logger) throws IOException {
-    super(jobIdLog, props, logger);
+    this.jobIdLog = jobIdLog;
+    this.logger = logger;
+    this.props = props;
+    param = JsonUtil.parseObject(props.getJobParams(), AdHocParam.class);
     adHocResultMapper = ConnectionFactory.getSqlSession().getMapper(AdHocResultMapper.class);
   }
 
-  @Override
   public void process() throws Exception {
     logger.debug("{}", props.getJobParams());
-    logger.debug("is continue:{}", param.isBeContinue());
-    String sqls = param.getSql();
+    String sqls = param.getStmt();
     // 不支持参数替换
     //sqls = ParamHelper.resolvePlaceholders(sqls, definedParamMap);
     List<String> funcs = FunctionUtil.createFuncs(param.getUdfs(), jobIdLog, BaseConfig.getHdfsResourcesDir(props.getProjectId()) , true);
@@ -58,7 +71,7 @@ public class AdHocSqlJob extends EtlSqlJob {
     /** 查询结果写入数据库 */
     ResultCallback resultCallback = new ResultCallback() {
       @Override
-      public void handleResult(ExecResult execResult) {
+      public void handleResult(ExecResult execResult, Date startTime, Date endTime) {
         AdHocResult adHocResult = new AdHocResult();
         adHocResult.setAdHocId(props.getAdHocId());
         adHocResult.setStm(execResult.getStm());
@@ -68,14 +81,15 @@ public class AdHocSqlJob extends EtlSqlJob {
         adHocJsonObject.setTitles(execResult.getTitles());
         adHocJsonObject.setValues(execResult.getValues());
         adHocResult.setResult(JsonUtil.toJsonString(adHocJsonObject));
+        adHocResult.setStartTime(startTime);
+        adHocResult.setEndTime(endTime);
 
         adHocResultMapper.update(adHocResult); // 更新结果到数据库中
       }
     };
-    HiveSqlExec hiveSqlExec = new HiveSqlExec(funcs, execSqls, getProxyUser(), null, true, resultCallback, null, logger);
+    HiveSqlExec hiveSqlExec = new HiveSqlExec(funcs, execSqls, props.getProxyUser(), null, true, resultCallback, param.getLimit(), logger);
     initAdHocResult(execSqls);
     hiveSqlExec.run();
-    results = hiveSqlExec.getResults();
   }
 
   private void initAdHocResult(List<String> execSqls){

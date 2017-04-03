@@ -18,12 +18,10 @@ package com.baifendian.swordfish.execserver.job;
 import com.baifendian.swordfish.common.job.Job;
 import com.baifendian.swordfish.common.job.JobProps;
 import com.baifendian.swordfish.common.job.exception.ExecException;
-import com.baifendian.swordfish.execserver.exception.ConfigException;
 //import com.baifendian.swordfish.execserver.job.mr.MrJob;
-import com.baifendian.swordfish.execserver.job.hive.AdHocSqlJob;
+import com.baifendian.swordfish.execserver.adhoc.AdHocSqlJob;
 import com.baifendian.swordfish.execserver.job.hive.EtlSqlJob;
 import com.baifendian.swordfish.execserver.job.mr.MrJob;
-import com.baifendian.swordfish.execserver.job.process.DefaultProcessJob;
 import com.baifendian.swordfish.execserver.job.shell.ShellJob;
 import com.baifendian.swordfish.execserver.job.spark.SparkJob;
 
@@ -65,7 +63,6 @@ public class JobTypeManager {
     jobTypeMap.put("SPARK", new JobType(SparkJob.class, false));
     jobTypeMap.put("VIRTUAL", new JobType(NoopJob.class, false));
     jobTypeMap.put("HQL", new JobType(EtlSqlJob.class, false));
-    jobTypeMap.put("ADHOC_SQL", new JobType(AdHocSqlJob.class, false));
 
     jobTypeMap.put("SPARK-STREAMING", new JobType(SparkJob.class, true));
     addPluginJobs();

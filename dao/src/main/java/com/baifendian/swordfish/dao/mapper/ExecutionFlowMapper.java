@@ -42,7 +42,7 @@ public interface ExecutionFlowMapper {
    * @return 修改记录数
    */
   @InsertProvider(type = ExecutionFlowMapperProvider.class, method = "insert")
-  @SelectKey(statement = "SELECT LAST_INSERT_ID() AS id", keyProperty = "executionFlow.id", resultType = long.class, before = false)
+  @SelectKey(statement = "SELECT LAST_INSERT_ID() AS id", keyProperty = "executionFlow.id", resultType = int.class, before = false)
   int insertAndGetId(@Param("executionFlow") ExecutionFlow executionFlow);
 
   /**
@@ -56,7 +56,7 @@ public interface ExecutionFlowMapper {
   /**
    * 查询记录 <p>
    */
-  @Results(value = {@Result(property = "id", column = "id", id = true, javaType = Long.class, jdbcType = JdbcType.BIGINT),
+  @Results(value = {@Result(property = "id", column = "id", id = true, javaType = int.class, jdbcType = JdbcType.INTEGER),
           @Result(property = "flowId", column = "flow_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
           @Result(property = "workId", column = "work_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
           @Result(property = "status", column = "status", typeHandler = EnumOrdinalTypeHandler.class, javaType = FlowStatus.class, jdbcType = JdbcType.TINYINT),
@@ -74,7 +74,7 @@ public interface ExecutionFlowMapper {
   @SelectProvider(type = ExecutionFlowMapperProvider.class, method = "select")
   List<ExecutionFlow> select(@Param("maintainQuery") MaintainQuery maintainQuery);
 
-  @Results(value = {@Result(property = "id", column = "id", id = true, javaType = Long.class, jdbcType = JdbcType.BIGINT),
+  @Results(value = {@Result(property = "id", column = "id", id = true, javaType = int.class, jdbcType = JdbcType.INTEGER),
           @Result(property = "flowId", column = "flow_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
           @Result(property = "workId", column = "work_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
           @Result(property = "projectId", column = "project_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
@@ -96,9 +96,9 @@ public interface ExecutionFlowMapper {
           @Result(property = "timeout", column = "timeout", javaType = int.class, jdbcType = JdbcType.INTEGER),
   })
   @SelectProvider(type = ExecutionFlowMapperProvider.class, method = "selectByExecId")
-  ExecutionFlow selectByExecId(@Param("execId") Long execId);
+  ExecutionFlow selectByExecId(@Param("execId") Integer execId);
 
-  @Results(value = {@Result(property = "id", column = "id", id = true, javaType = Long.class, jdbcType = JdbcType.BIGINT),
+  @Results(value = {@Result(property = "id", column = "id", id = true, javaType = int.class, jdbcType = JdbcType.INTEGER),
           @Result(property = "flowId", column = "flow_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
           @Result(property = "worker", column = "worker", javaType = String.class, jdbcType = JdbcType.VARCHAR),
           @Result(property = "status", column = "status", typeHandler = EnumOrdinalTypeHandler.class, javaType = FlowStatus.class, jdbcType = JdbcType.TINYINT),
@@ -106,13 +106,13 @@ public interface ExecutionFlowMapper {
   @SelectProvider(type = ExecutionFlowMapperProvider.class, method = "selectAllNoFinishFlow")
   List<ExecutionFlow> selectAllNoFinishFlow();
 
-  @Results(value = {@Result(property = "id", column = "id", id = true, javaType = Long.class, jdbcType = JdbcType.BIGINT),
+  @Results(value = {@Result(property = "id", column = "id", id = true, javaType = int.class, jdbcType = JdbcType.INTEGER),
           @Result(property = "flowId", column = "flow_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
   })
   @SelectProvider(type = ExecutionFlowMapperProvider.class, method = "selectNoFinishFlow")
   List<ExecutionFlow> selectNoFinishFlow(@Param("worker") String worker);
 
-  @Results(value = {@Result(property = "id", column = "id", id = true, javaType = Long.class, jdbcType = JdbcType.BIGINT),
+  @Results(value = {@Result(property = "id", column = "id", id = true, javaType = int.class, jdbcType = JdbcType.INTEGER),
           @Result(property = "flowId", column = "flow_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
           @Result(property = "workId", column = "work_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
           @Result(property = "status", column = "status", typeHandler = EnumOrdinalTypeHandler.class, jdbcType = JdbcType.TINYINT),

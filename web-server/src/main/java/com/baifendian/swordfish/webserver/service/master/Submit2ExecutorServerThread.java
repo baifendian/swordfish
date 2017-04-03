@@ -83,7 +83,7 @@ public class Submit2ExecutorServerThread extends Thread {
         break; // 中断则退出
       }
 
-      long execId = execFlowInfo.getExecId();
+      int execId = execFlowInfo.getExecId();
       boolean isSucess = false; // 是否请求成功
       boolean isExecutorServerError = false;
       ExecutorServerInfo executorServerInfo = executorServerManager.getExecutorServer();
@@ -146,7 +146,7 @@ public class Submit2ExecutorServerThread extends Thread {
     if (!CollectionUtils.isEmpty(executionFlows)) {
       logger.info("executor server {} fault, execIds size:{} ", executorServerInfo, executionFlows.size());
       for (ExecutionFlow execFlow : executionFlows) {
-        Long execId = execFlow.getId();
+        Integer execId = execFlow.getId();
         logger.info("reschedule workflow execId:{} ", execId);
         ExecutionFlow executionFlow = flowDao.queryExecutionFlow(execId);
         if (executionFlow != null) {

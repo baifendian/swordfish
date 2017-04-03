@@ -82,7 +82,7 @@ public class MasterServiceImpl implements Iface {
   }
 
   @Override
-  public RetInfo execFlow(long execId) throws TException {
+  public RetInfo execFlow(int execId) throws TException {
     try {
       ExecutionFlow executionFlow = flowDao.queryExecutionFlow(execId);
       if (executionFlow == null) {
@@ -102,7 +102,7 @@ public class MasterServiceImpl implements Iface {
   }
 
   @Override
-  public RetInfo execAdHoc(long adHocId) {
+  public RetInfo execAdHoc(int adHocId) {
     try {
       LOGGER.debug("receive exec ad hoc request, id:{}", adHocId);
       AdHoc adHoc = adHocDao.getAdHoc(adHocId);
@@ -220,6 +220,7 @@ public class MasterServiceImpl implements Iface {
     return ResultHelper.SUCCESS;
   }
 
+  @Override
   public RetInfo registerExecutor(String host, int port, long registerTime) throws TException {
     try {
       master.registerExecutor(host, port, registerTime);
@@ -233,6 +234,7 @@ public class MasterServiceImpl implements Iface {
   /**
    * execServer汇报心跳 host : host地址 port : 端口号
    */
+  @Override
   public RetInfo executorReport(String host, int port, HeartBeatData heartBeatData) throws org.apache.thrift.TException {
     try {
       master.executorReport(host, port, heartBeatData);
@@ -241,6 +243,16 @@ public class MasterServiceImpl implements Iface {
       return ResultHelper.createErrorResult(e.getMessage());
     }
     return ResultHelper.SUCCESS;
+  }
+
+  @Override
+  public RetInfo cancelExecFlow(int execId) throws org.apache.thrift.TException {
+    try {
+      return master.cancelExecFlow(execId);
+    } catch (MasterException e) {
+      LOGGER.warn("executor report error", e);
+      return ResultHelper.createErrorResult(e.getMessage());
+    }
   }
 
 }

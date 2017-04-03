@@ -54,7 +54,7 @@ public class ExecutionNodeMapperProvider {
         VALUES("start_time", "#{executionNode.startTime}");
         VALUES("end_time", "#{executionNode.endTime}");
         VALUES("attempt", "#{executionNode.attempt}");
-        VALUES("log_links", "#{executionNode.log_links}");
+        VALUES("log_links", "#{executionNode.logLinks}");
         VALUES("job_id", "#{executionNode.jobId}");
         VALUES("status", EnumFieldUtil.genFieldStr("executionNode.status", FlowStatus.class));
       }

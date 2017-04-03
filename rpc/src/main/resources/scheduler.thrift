@@ -33,7 +33,7 @@ struct HeartBeatData {
     3: double memUsed,
 
     /** workflow execId list **/
-    4: list<i64> execIds,
+    4: list<i32> execIds,
 
 }
 	
@@ -44,7 +44,7 @@ service MasterService {
      * 执行某个 workflow 
      * execId : 执行 id
      */
-	RetInfo execFlow(1:i64 execId),
+	RetInfo execFlow(1:i32 execId),
 
 
 	/**
@@ -94,7 +94,13 @@ service MasterService {
      * 执行某个 adHoc SQL
      * adHocId : adHoc id
      */
-	RetInfo execAdHoc(1:i64 adHocId);
+	RetInfo execAdHoc(1:i32 adHocId);
+
+	/**
+     * 取消在执行的指定workflow
+     * execId : 执行 id
+     */
+	RetInfo cancelExecFlow(1:i32 execId),
 
 }
 
@@ -105,26 +111,26 @@ service WorkerService {
      * 执行某个 workflow 
      * execId : 执行 id
      */
-	RetInfo execFlow(1:i64 execId),
+	RetInfo execFlow(1:i32 execId),
 	
 	/**
      * 调度执行某个 workflow 
      * execId : 执行 id
      * scheduleDate : 调度时间（预期的）
      */
-	RetInfo scheduleExecFlow(1:i64 execId, 2:i64 scheduleDate),
+	RetInfo scheduleExecFlow(1:i32 execId, 2:i64 scheduleDate),
 
 	/**
      * 取消在执行的指定workflow
      * execId : 执行 id
      */
-	RetInfo cancelExecFlow(1:i64 execId),
+	RetInfo cancelExecFlow(1:i32 execId),
 
 	/**
      * 执行某个 adHoc SQL
      * adHocId : adHoc id
      */
-	RetInfo execAdHoc(1:i64 adHocId);
+	RetInfo execAdHoc(1:i32 adHocId);
 
 
 	

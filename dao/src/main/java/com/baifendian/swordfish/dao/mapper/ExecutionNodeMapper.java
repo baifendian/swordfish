@@ -37,7 +37,6 @@ public interface ExecutionNodeMapper {
    * @return 插入记录数
    */
   @InsertProvider(type = ExecutionNodeMapperProvider.class, method = "insert")
-  @SelectKey(statement = "SELECT LAST_INSERT_ID() AS id", keyProperty = "executionNode.id", resultType = Long.class, before = false)
   int insert(@Param("executionNode") ExecutionNode executionNode);
 
   /**
@@ -55,7 +54,7 @@ public interface ExecutionNodeMapper {
    */
   @Results(value = {
           @Result(property = "execId", column = "exec_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
-          @Result(property = "nodeName", column = "name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+          @Result(property = "name", column = "name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
           @Result(property = "status", column = "status", typeHandler = EnumOrdinalTypeHandler.class, javaType = FlowStatus.class, jdbcType = JdbcType.TINYINT),
           @Result(property = "startTime", column = "start_time", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP),
           @Result(property = "endTime", column = "end_time", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP),
@@ -65,18 +64,6 @@ public interface ExecutionNodeMapper {
   })
   @SelectProvider(type = ExecutionNodeMapperProvider.class, method = "selectExecNode")
   ExecutionNode selectExecNode(@Param("execId") Long execId, @Param("name") String name);
-
-  /**
-   * 查询flow 中所有节点执行的状态 <p>
-   *
-   * @param execId, flowId
-   */
-  @Results(value = {@Result(property = "flowId", column = "flow_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
-          @Result(property = "nodeId", column = "node_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
-          @Result(property = "status", column = "status", typeHandler = EnumOrdinalTypeHandler.class, javaType = FlowStatus.class, jdbcType = JdbcType.TINYINT),
-          @Result(property = "attempt", column = "attempt", javaType = int.class, jdbcType = JdbcType.TINYINT),})
-  @SelectProvider(type = ExecutionNodeMapperProvider.class, method = "selectStatusByFlowId")
-  List<ExecutionNode> selectExecNodesStatus(@Param("execId") Long execId, @Param("flowId") int flowId);
 
   @DeleteProvider(type = ExecutionNodeMapperProvider.class, method = "deleteByExecId")
   int deleteByExecId(@Param("execId") Long execId);

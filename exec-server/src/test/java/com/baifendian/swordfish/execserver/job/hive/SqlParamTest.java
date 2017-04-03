@@ -47,10 +47,7 @@ public class SqlParamTest {
 
   @Test
   public void testIsContinue() {
-    System.out.println(param.isBeContinue());
     System.out.println(JsonUtil.toJsonString(param));
-    param.setBeContinue(true);
     SqlParam param1 = JsonUtil.parseObject(JsonUtil.toJsonString(param), SqlParam.class);
-    System.out.println(param1.isBeContinue());
   }
 }

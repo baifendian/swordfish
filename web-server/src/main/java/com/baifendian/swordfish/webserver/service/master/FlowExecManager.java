@@ -134,7 +134,7 @@ public class FlowExecManager {
    *
    * @return 是否成功
    */
-  private boolean checkExecStatus(Long execId) {
+  private boolean checkExecStatus(int execId) {
     while (true) {
       try {
         Thread.sleep(checkInterval);

@@ -422,7 +422,12 @@ public class FlowRunner implements Runnable {
             executionNode.setStartTime(new Date());
             executionNode.setStatus(FlowStatus.INIT);
             executionNode.setJobId(LoggerUtil.genJobId(JOB_PREFIX, executionFlow.getId(), node.getName()));
-            flowDao.insertExecutionNode(executionNode);
+            // 如果是在恢复或者是长作业时，execution_nodes表中会存在记录，这里进行更新处理
+            if(executionNodeLog != null){
+              flowDao.updateExecutionNode(executionNode);
+            } else {
+              flowDao.insertExecutionNode(executionNode);
+            }
             // 插入执行队列
             executionNodes.add(executionNode);
 

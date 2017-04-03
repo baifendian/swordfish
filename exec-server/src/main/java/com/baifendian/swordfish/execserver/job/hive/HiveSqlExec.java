@@ -37,6 +37,7 @@ import java.sql.ResultSetMetaData;
 import java.sql.Statement;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -191,6 +192,7 @@ public class HiveSqlExec {
       // 执行 sql 语句
       int index = 0;
       for (String sql : sqls) {
+        Date startTime = new Date();
         LOGGER.info("hive execute sql : {}", sql);
         ExecResult execResult = new ExecResult();
         execResult.setIndex(index++);
@@ -259,7 +261,8 @@ public class HiveSqlExec {
 
           // 执行结果回调处理
           if (resultCallback != null) {
-            resultCallback.handleResult(execResult);
+            Date endTime = new Date();
+            resultCallback.handleResult(execResult, startTime, endTime);
           }
         }
       }

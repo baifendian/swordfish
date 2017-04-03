@@ -43,7 +43,7 @@ import java.util.Date;
 public class Init {
   public static void initFlow() {
     FlowDao flowDao = DaoFactory.getDaoInstance(FlowDao.class);
-    ExecutionFlow executionFlow = flowDao.scheduleFlowToExecution(1, 2, 1, new Date(), FlowRunType.DISPATCH, 3, 3*3600);
+    ExecutionFlow executionFlow = flowDao.scheduleFlowToExecution(1, 3, 1, new Date(), FlowRunType.DISPATCH, 3, 3*3600);
     System.out.println(executionFlow.getId());
   }
 
@@ -52,8 +52,8 @@ public class Init {
     ScheduleInfo scheduleInfo = new ScheduleInfo();
     scheduleInfo.setStartDate(System.currentTimeMillis() - 3600 * 24 * 1000);
     scheduleInfo.setEndDate(4101494400000l);
-    scheduleInfo.setCronExpression("30 * * * * ?");
-    masterClient.setSchedule(1, 2, scheduleInfo);
+    scheduleInfo.setCronExpression("1 40 * * * ?");
+    masterClient.setSchedule(1, 1, scheduleInfo);
   }
 
   public static void testJob() throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
@@ -68,9 +68,14 @@ public class Init {
     ExecServiceImpl impl = new ExecServiceImpl("127.0.0.1", 7777, conf);
     impl.scheduleExecFlow(3275, System.currentTimeMillis());
   }
-  public static void execFlow(long id) throws TException {
+  public static void execFlow(int id) throws TException {
     MasterClient masterClient = new MasterClient("172.18.1.22",9999, 3);
     masterClient.execFlow(id);
+  }
+
+  public static void cancelExecFlow(int id) throws TException {
+    MasterClient masterClient = new MasterClient("172.18.1.22",9999, 3);
+    masterClient.cancelExecFlow(id);
   }
 
   public static void runAdHoc() throws TException {
@@ -88,8 +93,9 @@ public class Init {
     //Init.testJob();
     //Init.initSchedule();
     //Init.runFlow();
-    //Init.runAdHoc();
-    Init.execFlow(15670);
+    Init.runAdHoc();
+    //Init.execFlow(77);
+    //Init.cancelExecFlow(77);
     System.out.println(BaseConfig.getSystemEnvPath());
     System.out.println(new Date(1488607000));
   }
