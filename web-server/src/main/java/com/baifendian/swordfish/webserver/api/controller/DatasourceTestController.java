@@ -27,8 +27,8 @@ public class DatasourceTestController {
    */
   @GetMapping(value="/test")
   public BaseResponse testDataSource(@RequestAttribute(value = "session.user") User operator,
-                                     @RequestParam(value = "type", required = true) String type,
-                                     @RequestParam(value = "parameter", required = true) String parameter,
+                                     @RequestParam(value = "type") String type,
+                                     @RequestParam(value = "parameter") String parameter,
                                      HttpServletResponse response){
     return datasourceService.testDataSource(DbType.valueOf(type),parameter,response);
   }

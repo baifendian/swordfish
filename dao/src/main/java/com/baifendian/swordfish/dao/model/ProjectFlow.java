@@ -79,6 +79,9 @@ public class ProjectFlow {
   @JsonIgnore
   private Map<String, String> userDefinedParamMap;
 
+  public ProjectFlow() {
+  }
+
   public int getId() {
     return id;
   }

@@ -127,4 +127,7 @@ public class FlowNode {
     this.dep = mapper.writeValueAsString(depList);
     this.depList = depList;
   }
+
+  public FlowNode() {
+  }
 }

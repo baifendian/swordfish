@@ -21,6 +21,7 @@ import com.baifendian.swordfish.dao.model.ProjectFlow;
 import com.baifendian.swordfish.dao.model.User;
 
 import org.apache.ibatis.annotations.*;
+import org.apache.ibatis.mapping.FetchType;
 import org.apache.ibatis.type.EnumOrdinalTypeHandler;
 import org.apache.ibatis.type.JdbcType;
 import org.mybatis.spring.annotation.MapperScan;
@@ -153,37 +154,35 @@ public interface ProjectFlowMapper {
           @Result(property = "createTime", column = "create_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE),
           @Result(property = "modifyTime", column = "modify_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE),
           @Result(property = "desc", column = "desc", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-          @Result(property = "projectId", column = "project_id", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
+          @Result(property = "projectId", column = "project_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
           @Result(property = "projectName", column = "project_name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-          @Result(property = "lastModifyBy", column = "last_modify_by", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
-          @Result(property = "lastPublishBy", column = "last_publish_by", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
-          @Result(property = "ownerId", column = "owner_id", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
+          @Result(property = "lastModifyBy", column = "last_modify_by", javaType = int.class, jdbcType = JdbcType.INTEGER),
+          @Result(property = "ownerId", column = "owner_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
           @Result(property = "owner", column = "owner", javaType = String.class, jdbcType = JdbcType.VARCHAR),
           @Result(property = "proxyUser", column = "proxy_user", javaType = String.class, jdbcType = JdbcType.VARCHAR),
           @Result(property = "userDefinedParams", column = "user_defined_params", javaType = String.class, jdbcType = JdbcType.VARCHAR),
           @Result(property = "extras", column = "extras", javaType = String.class, jdbcType = JdbcType.VARCHAR),
           @Result(property = "queue", column = "queue", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-          @Result(property = "flowsNodes", column = "id", javaType = List.class, many = @Many(select = "com.baifendian.swordfish.dao.mapper.FlowNodeMapper.selectByFlowId")),
+          @Result(property = "flowsNodes", column = "{flowId=id}", javaType = List.class, many = @Many(select = "com.baifendian.swordfish.dao.mapper.FlowNodeMapper.selectByFlowId",fetchType= FetchType.LAZY)),
           })
   @SelectProvider(type = ProjectFlowMapperSqlProvider.class, method = "queryByName")
-  ProjectFlow findByName(@Param("projectId") Integer projectId, @Param("name") String name);
+  ProjectFlow findByName(@Param("projectId") int projectId, @Param("name") String name);
 
   @Results(value = {@Result(property = "id", column = "id", id = true, javaType = int.class, jdbcType = JdbcType.INTEGER),
           @Result(property = "name", column = "name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
           @Result(property = "createTime", column = "create_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE),
           @Result(property = "modifyTime", column = "modify_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE),
           @Result(property = "desc", column = "desc", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-          @Result(property = "projectId", column = "project_id", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
+          @Result(property = "projectId", column = "project_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
           @Result(property = "projectName", column = "project_name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-          @Result(property = "lastModifyBy", column = "last_modify_by", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
-          @Result(property = "lastPublishBy", column = "last_publish_by", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
-          @Result(property = "ownerId", column = "owner_id", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
+          @Result(property = "lastModifyBy", column = "last_modify_by", javaType = int.class, jdbcType = JdbcType.INTEGER),
+          @Result(property = "ownerId", column = "owner_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
           @Result(property = "owner", column = "owner", javaType = String.class, jdbcType = JdbcType.VARCHAR),
           @Result(property = "proxyUser", column = "proxy_user", javaType = String.class, jdbcType = JdbcType.VARCHAR),
           @Result(property = "userDefinedParams", column = "user_defined_params", javaType = String.class, jdbcType = JdbcType.VARCHAR),
           @Result(property = "extras", column = "extras", javaType = String.class, jdbcType = JdbcType.VARCHAR),
           @Result(property = "queue", column = "queue", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-          @Result(property = "flowsNodes", column = "id", javaType = List.class, many = @Many(select = "com.baifendian.swordfish.dao.mapper.FlowNodeMapper.selectByFlowId")),
+          @Result(property = "flowsNodes", column = "{flowId=id}", javaType = List.class, many = @Many(select = "com.baifendian.swordfish.dao.mapper.FlowNodeMapper.selectByFlowId")),
   })
   @SelectProvider(type = ProjectFlowMapperSqlProvider.class, method = "findByProjectNameAndName")
   ProjectFlow findByProjectNameAndName(@Param("projectName") String projectName, @Param("name") String name);
@@ -193,17 +192,16 @@ public interface ProjectFlowMapper {
           @Result(property = "createTime", column = "create_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE),
           @Result(property = "modifyTime", column = "modify_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE),
           @Result(property = "desc", column = "desc", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-          @Result(property = "projectId", column = "project_id", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
+          @Result(property = "projectId", column = "project_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
           @Result(property = "projectName", column = "project_name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-          @Result(property = "lastModifyBy", column = "last_modify_by", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
-          @Result(property = "lastPublishBy", column = "last_publish_by", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
-          @Result(property = "ownerId", column = "owner_id", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
+          @Result(property = "lastModifyBy", column = "last_modify_by", javaType = int.class, jdbcType = JdbcType.INTEGER),
+          @Result(property = "ownerId", column = "owner_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
           @Result(property = "owner", column = "owner", javaType = String.class, jdbcType = JdbcType.VARCHAR),
           @Result(property = "proxyUser", column = "proxy_user", javaType = String.class, jdbcType = JdbcType.VARCHAR),
           @Result(property = "userDefinedParams", column = "user_defined_params", javaType = String.class, jdbcType = JdbcType.VARCHAR),
           @Result(property = "extras", column = "extras", javaType = String.class, jdbcType = JdbcType.VARCHAR),
           @Result(property = "queue", column = "queue", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-          @Result(property = "flowsNodes", column = "id", javaType = List.class, many = @Many(select = "com.baifendian.swordfish.dao.mapper.FlowNodeMapper.selectByFlowId")),
+          @Result(property = "flowsNodes", column = "{flowId=id}", javaType = List.class, many = @Many(select = "com.baifendian.swordfish.dao.mapper.FlowNodeMapper.selectByFlowId")),
   })
   @SelectProvider(type = ProjectFlowMapperSqlProvider.class, method = "findByProject")
   List<ProjectFlow> findByProject(@Param("projectId") Integer projectId);
