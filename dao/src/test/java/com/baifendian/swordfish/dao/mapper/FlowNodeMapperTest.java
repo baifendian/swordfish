@@ -6,6 +6,7 @@ import com.baifendian.swordfish.dao.model.FlowNode;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.Arrays;
 import java.util.List;
 
 import static junit.framework.TestCase.assertTrue;
@@ -25,6 +26,11 @@ public class FlowNodeMapperTest {
   public void testSelectByFlowId() {
     List<FlowNode> flowNodeList = flowNodeMapper.selectByFlowId(1);
     assertTrue(flowNodeList!=null);
+  }
+
+  @Test
+  public void testSelectByFlowIds() {
+    List<FlowNode> flowNodeList = flowNodeMapper.selectByFlowIds(Arrays.asList(new Integer[]{1,2,3}));
   }
 
 }

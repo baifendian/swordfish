@@ -19,6 +19,7 @@ import com.baifendian.swordfish.dao.enums.FlowType;
 import com.baifendian.swordfish.dao.enums.NodeType;
 import com.baifendian.swordfish.dao.model.FlowNode;
 
+import com.sun.tools.javac.comp.Flow;
 import org.apache.ibatis.annotations.*;
 import org.apache.ibatis.type.JdbcType;
 
@@ -90,5 +91,21 @@ public interface FlowNodeMapper {
   @SelectProvider(type = FlowNodeMapperSqlProvider.class, method = "selectByFlowId")
   List<FlowNode> selectByFlowId(@Param("flowId") int flowId);
 
+  /**
+   * 根据多个ID查看flowNode
+   * @param flowIds
+   * @return
+   */
+  @Results(value = {@Result(property = "id", column = "id", id = true, javaType = int.class, jdbcType = JdbcType.INTEGER),
+          @Result(property = "name", column = "name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+          @Result(property = "type", column = "type", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+          @Result(property = "desc", column = "desc", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+          @Result(property = "extras", column = "extras", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+          @Result(property = "dep", column = "dep", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+          @Result(property = "flowId", column = "flow_id", id = true, javaType = int.class, jdbcType = JdbcType.INTEGER),
+          @Result(property = "parameter", column = "parameter", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+  })
+  @SelectProvider(type = FlowNodeMapperSqlProvider.class, method = "selectByFlowIds")
+  List<FlowNode> selectByFlowIds(@Param("flowId") List<Integer> flowIds);
 
 }
