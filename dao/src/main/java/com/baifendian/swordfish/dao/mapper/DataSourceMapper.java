@@ -25,7 +25,6 @@ import org.mybatis.spring.annotation.MapperScan;
 import java.sql.Timestamp;
 import java.util.List;
 
-@MapperScan
 public interface DataSourceMapper {
   /**
    * 插入数据源

@@ -33,7 +33,7 @@ public class HBaseHandlerTest {
   @Test
   public void testIsConnectable() throws IOException {
     String paramStr = "{ \"zkQuorum\": \"bgsbtsp0006-dqf,bgsbtsp0007-dqf,bgsbtsp0008-dqf\", \"zkZnodeParent\": \"/hbase\", \"zkPort\":2181 }\n";
-    HBaseHandler handler = new HBaseHandler(DbType.HBASE11X, paramStr);
+    HBaseHandler handler = new HBaseHandler(DbType.HBASE, paramStr);
     handler.isConnectable();
   }
 }

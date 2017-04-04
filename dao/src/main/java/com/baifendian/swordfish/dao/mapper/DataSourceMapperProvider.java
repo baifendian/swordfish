@@ -64,7 +64,7 @@ public class DataSourceMapperProvider {
       SET("`parameter` = #{dataSource.parameter}");
       SET("`modify_time` = #{dataSource.modifyTime}");
 
-      WHERE("`name` = #{dataSource.name}");
+      WHERE("`id` = #{dataSource.id}");
     }}.toString();
   }
 

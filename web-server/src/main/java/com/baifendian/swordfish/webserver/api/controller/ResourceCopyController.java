@@ -51,7 +51,7 @@ public class ResourceCopyController {
                                @RequestParam(value = "destResName") String destResName,
                                @RequestParam(value = "desc", required = false) String desc,
                                HttpServletResponse response) {
-    logger.info("Operator user {}, delete resource, project name: {}, source resource name: {}, dest resource name: {}, desc: {}",
+    logger.info("Operator user {}, copy resource, project name: {}, source resource name: {}, dest resource name: {}, desc: {}",
         operator.getName(), projectName, srcResName, destResName, desc);
 
     return resourceService.copyResource(operator, projectName, srcResName, destResName, desc, response);

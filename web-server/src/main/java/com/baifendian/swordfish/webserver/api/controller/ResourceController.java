@@ -143,7 +143,7 @@ public class ResourceController {
     logger.info("Operator user {}, get resource list of project, project name: {}",
         operator.getName(), projectName);
 
-    return null;
+    return resourceService.getResources(operator, projectName, response);
   }
 
   /**
@@ -155,14 +155,14 @@ public class ResourceController {
    * @param response
    */
   @GetMapping(value = "/{name}")
-  public List<Resource> getResource(@RequestAttribute(value = "session.user") User operator,
-                                    @PathVariable String projectName,
-                                    @PathVariable String name,
-                                    HttpServletResponse response) {
+  public Resource getResource(@RequestAttribute(value = "session.user") User operator,
+                              @PathVariable String projectName,
+                              @PathVariable String name,
+                              HttpServletResponse response) {
     logger.info("Operator user {}, get resource detail, project name: {}, resource name: {}",
         operator.getName(), projectName, name);
 
-    return null;
+    return resourceService.getResource(operator, projectName, name, response);
   }
 
   /**
