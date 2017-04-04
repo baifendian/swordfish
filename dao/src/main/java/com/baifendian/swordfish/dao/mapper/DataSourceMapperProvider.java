@@ -21,6 +21,7 @@ import org.apache.ibatis.jdbc.SQL;
 import java.util.Map;
 
 public class DataSourceMapperProvider {
+
   public static final String DB_NAME = "`datasource`";
 
   /**
@@ -122,7 +123,8 @@ public class DataSourceMapperProvider {
   }
 
   /**
-   * 根据projectName 和 datasource name
+   * 根据 projectName 和 datasource name 查询
+   *
    * @param parameter
    * @return
    */

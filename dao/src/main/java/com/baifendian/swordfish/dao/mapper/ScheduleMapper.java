@@ -29,8 +29,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
-@MapperScan
 public interface ScheduleMapper {
+
   /**
    * 插入记录 <p>
    *

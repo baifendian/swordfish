@@ -20,16 +20,59 @@ import com.baifendian.swordfish.dao.enums.DbType;
 import java.util.Date;
 
 public class DataSource {
+  /**
+   * 数据源 id
+   */
   private int id;
+
+  /**
+   * owner id
+   */
   private int ownerId;
+
+  /**
+   * owner 名称
+   */
   private String ownerName;
+
+  /**
+   * 项目 id
+   */
   private int projectId;
+
+  /**
+   * 项目名称
+   */
   private String projectName;
+
+  /**
+   * 数据源名称
+   */
   private String name;
+
+  /**
+   * 数据源描述
+   */
   private String desc;
-  private DbType type; // db 类型
-  private String parameter; // 参数信息
+
+  /**
+   * 数据源类型
+   */
+  private DbType type;
+
+  /**
+   * 参数信息
+   */
+  private String parameter;
+
+  /**
+   * 创建时间
+   */
   private Date createTime;
+
+  /**
+   * 修改时间
+   */
   private Date modifyTime;
 
   public DataSource() {
@@ -126,16 +169,16 @@ public class DataSource {
   @Override
   public String toString() {
     return "DataSource{" +
-            "id=" + id +
-            ", ownerId=" + ownerId +
-            ", ownerName='" + ownerName + '\'' +
-            ", projectId=" + projectId +
-            ", name='" + name + '\'' +
-            ", desc='" + desc + '\'' +
-            ", type=" + type +
-            ", parameter='" + parameter + '\'' +
-            ", createTime=" + createTime +
-            ", modifyTime=" + modifyTime +
-            '}';
+        "id=" + id +
+        ", ownerId=" + ownerId +
+        ", ownerName='" + ownerName + '\'' +
+        ", projectId=" + projectId +
+        ", name='" + name + '\'' +
+        ", desc='" + desc + '\'' +
+        ", type=" + type +
+        ", parameter='" + parameter + '\'' +
+        ", createTime=" + createTime +
+        ", modifyTime=" + modifyTime +
+        '}';
   }
 }

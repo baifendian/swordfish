@@ -15,41 +15,26 @@
  */
 package com.baifendian.swordfish.webserver.api.dto;
 
+import java.util.List;
+
 /**
- * 基础返回结果
+ * 执行的 id 列表
  */
-public class BaseResponse {
+public class ExecutorIds {
   /**
-   * 状态为 0 表示成功, 否则失败
+   * 执行的 id 列表
    */
-  private int status;
+  private List<Integer> execIds;
 
-  /**
-   * 错误消息
-   */
-  private String message;
-
-  public BaseResponse() {
+  public ExecutorIds(List<Integer> execIds) {
+    this.execIds = execIds;
   }
 
-  public BaseResponse(int status, String message) {
-    this.status = status;
-    this.message = message;
+  public List<Integer> getExecIds() {
+    return execIds;
   }
 
-  public int getStatus() {
-    return status;
-  }
-
-  public void setStatus(int status) {
-    this.status = status;
-  }
-
-  public String getMessage() {
-    return message;
-  }
-
-  public void setMessage(String message) {
-    this.message = message;
+  public void setExecIds(List<Integer> execIds) {
+    this.execIds = execIds;
   }
 }

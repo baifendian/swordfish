@@ -82,8 +82,8 @@ public class ResourceController {
                                  @RequestParam(value = "desc", required = false) String desc,
                                  @RequestParam("file") MultipartFile file,
                                  HttpServletResponse response) {
-    logger.info("Operator user id {}, modify resource, project name: {}, resource name: {}, desc: {}",
-        operator.getId(), projectName, name, desc);
+    logger.info("Operator user {}, modify resource, project name: {}, resource name: {}, desc: {}",
+        operator.getName(), projectName, name, desc);
 
     return resourceService.modifyResource(operator, projectName, name, desc, file, response);
   }
@@ -101,8 +101,8 @@ public class ResourceController {
                              @PathVariable String projectName,
                              @PathVariable String name,
                              HttpServletResponse response) {
-    logger.info("Operator user id {}, delete resource, project name: {}, resource name: {}",
-        operator.getId(), projectName, name);
+    logger.info("Operator user {}, delete resource, project name: {}, resource name: {}",
+        operator.getName(), projectName, name);
 
     resourceService.deleteResource(operator, projectName, name, response);
   }
@@ -118,8 +118,8 @@ public class ResourceController {
   public List<Resource> getResources(@RequestAttribute(value = "session.user") User operator,
                                      @PathVariable String projectName,
                                      HttpServletResponse response) {
-    logger.info("Operator user id {}, retrieve resource of the project, project name: {}",
-        operator.getId(), projectName);
+    logger.info("Operator user {}, retrieve resource of the project, project name: {}",
+        operator.getName(), projectName);
 
     return null;
   }
@@ -137,8 +137,8 @@ public class ResourceController {
                                     @PathVariable String projectName,
                                     @PathVariable String name,
                                     HttpServletResponse response) {
-    logger.info("Operator user id {}, retrieve resource, project name: {}, resource name: {}",
-        operator.getId(), projectName, name);
+    logger.info("Operator user {}, retrieve resource, project name: {}, resource name: {}",
+        operator.getName(), projectName, name);
 
     return null;
   }
@@ -157,8 +157,8 @@ public class ResourceController {
                                                                                @PathVariable String projectName,
                                                                                @PathVariable String name,
                                                                                HttpServletResponse response) {
-    logger.info("Operator user id {}, download resource, project name: {}, resource name: {}",
-        operator.getId(), projectName, name);
+    logger.info("Operator user {}, download resource, project name: {}, resource name: {}",
+        operator.getName(), projectName, name);
 
     org.springframework.core.io.Resource file = resourceService.downloadResource(operator, projectName, name, response);
 

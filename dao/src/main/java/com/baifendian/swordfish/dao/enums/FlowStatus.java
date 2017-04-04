@@ -56,6 +56,11 @@ public enum FlowStatus {
     return this == SUCCESS;
   }
 
+  /**
+   * 判断是否失败状态
+   *
+   * @return 是否失败状态
+   */
   public boolean typeIsFailure() {
     return this == KILL || this == FAILED || this == DEP_FAILED;
   }
@@ -66,6 +71,6 @@ public enum FlowStatus {
    * @return 是否终止状态
    */
   public boolean typeIsFinished() {
-    return this == SUCCESS || this == KILL || this == FAILED || this == DEP_FAILED;
+    return typeIsSuccess() || typeIsFailure();
   }
 }

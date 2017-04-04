@@ -23,7 +23,6 @@ import org.mybatis.spring.annotation.MapperScan;
 import java.util.Date;
 import java.util.List;
 
-@MapperScan
 public interface ProjectMapper {
 
   /**

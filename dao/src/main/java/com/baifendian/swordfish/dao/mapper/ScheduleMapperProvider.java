@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.Set;
 
 public class ScheduleMapperProvider {
+
   public static final String DB_NAME = "schedules";
 
   public String insert(Map<String, Object> parameter) {
