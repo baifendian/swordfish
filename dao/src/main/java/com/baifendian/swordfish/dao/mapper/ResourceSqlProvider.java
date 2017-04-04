@@ -31,7 +31,7 @@ public class ResourceSqlProvider {
   public String insert(Map<String, Object> parameter) {
     return new SQL() {
       {
-        INSERT_INTO("resources");
+        INSERT_INTO(TABLE_NAME);
 
         VALUES("`name`", "#{resource.name}");
         VALUES("`suffix`", "#{resource.suffix}");
@@ -46,6 +46,26 @@ public class ResourceSqlProvider {
   }
 
   /**
+   * 更具项目和资源名称进行查询
+   *
+   * @param parameter
+   * @return
+   */
+  public String queryByProjectAndResName(Map<String, Object> parameter) {
+    return new SQL() {{
+      SELECT("r.*, r.owner as owner_id");
+      SELECT("u.name as owner, p.name as project_name");
+
+      FROM(TABLE_NAME + " r");
+
+      JOIN("user as u on u.id = r.owner");
+      JOIN("project p on r.project_id = p.id");
+
+      WHERE("p.name = #{projectName} and r.name = #{name}");
+    }}.toString();
+  }
+
+  /**
    * 查询资源详情
    *
    * @param parameter
@@ -55,9 +75,11 @@ public class ResourceSqlProvider {
     return new SQL() {
       {
         SELECT("*");
-        FROM("resources");
-        WHERE("project_id = #{projectId}");
-        WHERE("name = #{name}");
+
+        FROM(TABLE_NAME);
+
+        WHERE("`project_id` = #{projectId}");
+        WHERE("`name` = #{name}");
       }
     }.toString();
   }

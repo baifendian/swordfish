@@ -34,6 +34,28 @@ public interface ResourceMapper {
   int insert(@Param("resource") Resource resource);
 
   /**
+   * 根据项目和资源名称查询
+   *
+   * @param projectName
+   * @param name
+   * @return
+   */
+  @Results(value = {@Result(property = "id", column = "id", id = true, javaType = int.class, jdbcType = JdbcType.INTEGER),
+      @Result(property = "name", column = "name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+      @Result(property = "suffix", column = "suffix", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+      @Result(property = "originFilename", column = "origin_filename", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+      @Result(property = "desc", column = "desc", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+      @Result(property = "ownerId", column = "owner_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
+      @Result(property = "owner", column = "owner", javaType = int.class, jdbcType = JdbcType.INTEGER),
+      @Result(property = "projectId", column = "project_id", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
+      @Result(property = "projectName", column = "project_name", javaType = int.class, jdbcType = JdbcType.INTEGER),
+      @Result(property = "createTime", column = "create_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE),
+      @Result(property = "modifyTime", column = "modify_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE)
+  })
+  @SelectProvider(type = ResourceSqlProvider.class, method = "queryByProjectAndResName")
+  Resource queryByProjectAndResName(@Param("projectName") String projectName, @Param("name") String name);
+
+  /**
    * 查询资源, 根据名称查询
    *
    * @param name

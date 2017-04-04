@@ -142,6 +142,32 @@ public class ResourceService {
   }
 
   /**
+   * 修改资源, 不存在则创建
+   *
+   * @param operator
+   * @param projectName
+   * @param name
+   * @param desc
+   * @param file
+   * @param response
+   * @return
+   */
+  public Resource putResource(User operator,
+                              String projectName,
+                              String name,
+                              String desc,
+                              MultipartFile file,
+                              HttpServletResponse response) {
+    Resource resource = resourceMapper.queryByProjectAndResName(projectName, name);
+
+    if (resource == null) {
+      return createResource(operator, projectName, name, desc, file, response);
+    }
+
+    return modifyResource(operator, projectName, name, desc, file, response);
+  }
+
+  /**
    * 修改资源
    *
    * @param operator
@@ -186,6 +212,26 @@ public class ResourceService {
     }
 
     // 上传 & 插入数据
+    return null;
+  }
+
+  /**
+   * 拷贝资源
+   *
+   * @param operator
+   * @param projectName
+   * @param srcResName
+   * @param destResName
+   * @param desc
+   * @param response
+   * @return
+   */
+  public Resource copyResource(User operator,
+                               String projectName,
+                               String srcResName,
+                               String destResName,
+                               String desc,
+                               HttpServletResponse response) {
     return null;
   }
 

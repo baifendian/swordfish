@@ -18,7 +18,6 @@ package com.baifendian.swordfish.webserver.api.controller;
 import com.baifendian.swordfish.dao.model.Resource;
 import com.baifendian.swordfish.dao.model.User;
 import com.baifendian.swordfish.webserver.api.service.ResourceService;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -66,7 +65,30 @@ public class ResourceController {
   }
 
   /**
-   * 修改资源, 需要具备项目的 "w 权限"
+   * 修改资源, 如果不存在则会创建, 需要具备项目的 "w 权限"
+   *
+   * @param operator
+   * @param projectName
+   * @param name
+   * @param desc
+   * @param file
+   * @param response
+   * @return
+   */
+  public Resource putResource(@RequestAttribute(value = "session.user") User operator,
+                              @PathVariable String projectName,
+                              @PathVariable String name,
+                              @RequestParam(value = "desc", required = false) String desc,
+                              @RequestParam("file") MultipartFile file,
+                              HttpServletResponse response) {
+    logger.info("Operator user id {}, put resource, project name: {}, resource name: {}, desc: {}, file: [{},{}]",
+        operator.getId(), projectName, name, desc, file.getName(), file.getOriginalFilename());
+
+    return resourceService.putResource(operator, projectName, name, desc, file, response);
+  }
+
+  /**
+   * 部分修改资源, 需要具备项目的 "w 权限"
    *
    * @param operator
    * @param projectName
@@ -80,10 +102,10 @@ public class ResourceController {
                                  @PathVariable String projectName,
                                  @PathVariable String name,
                                  @RequestParam(value = "desc", required = false) String desc,
-                                 @RequestParam("file") MultipartFile file,
+                                 @RequestParam(value = "file", required = false) MultipartFile file,
                                  HttpServletResponse response) {
-    logger.info("Operator user {}, modify resource, project name: {}, resource name: {}, desc: {}",
-        operator.getName(), projectName, name, desc);
+    logger.info("Operator user id {}, modify resource, project name: {}, resource name: {}, desc: {}, file: [{},{}]",
+        operator.getId(), projectName, name, desc, (file == null) ? null : file.getName(), (file == null) ? null : file.getOriginalFilename());
 
     return resourceService.modifyResource(operator, projectName, name, desc, file, response);
   }
@@ -118,7 +140,7 @@ public class ResourceController {
   public List<Resource> getResources(@RequestAttribute(value = "session.user") User operator,
                                      @PathVariable String projectName,
                                      HttpServletResponse response) {
-    logger.info("Operator user {}, retrieve resource of the project, project name: {}",
+    logger.info("Operator user {}, get resource list of project, project name: {}",
         operator.getName(), projectName);
 
     return null;
@@ -137,7 +159,7 @@ public class ResourceController {
                                     @PathVariable String projectName,
                                     @PathVariable String name,
                                     HttpServletResponse response) {
-    logger.info("Operator user {}, retrieve resource, project name: {}, resource name: {}",
+    logger.info("Operator user {}, get resource detail, project name: {}, resource name: {}",
         operator.getName(), projectName, name);
 
     return null;
@@ -162,7 +184,7 @@ public class ResourceController {
 
     org.springframework.core.io.Resource file = resourceService.downloadResource(operator, projectName, name, response);
 
-    if(file == null) {
+    if (file == null) {
       return ResponseEntity
           .noContent().build();
     }

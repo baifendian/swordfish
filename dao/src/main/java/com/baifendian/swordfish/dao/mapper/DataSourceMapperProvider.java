@@ -22,7 +22,7 @@ import java.util.Map;
 
 public class DataSourceMapperProvider {
 
-  public static final String DB_NAME = "`datasource`";
+  public static final String TABLE_NAME = "`datasource`";
 
   /**
    * 插入数据源
@@ -35,7 +35,7 @@ public class DataSourceMapperProvider {
     int type = dataSource.getType().getType();
 
     return new SQL() {{
-      INSERT_INTO(DB_NAME);
+      INSERT_INTO(TABLE_NAME);
 
       VALUES("`name`", "#{dataSource.name}");
       VALUES("`desc`", "#{dataSource.desc}");
@@ -56,7 +56,7 @@ public class DataSourceMapperProvider {
    */
   public String update(Map<String, Object> parameter) {
     return new SQL() {{
-      UPDATE(DB_NAME);
+      UPDATE(TABLE_NAME);
 
       SET("`desc` = #{dataSource.desc}");
       SET("`owner` = #{dataSource.ownerId}");
@@ -76,7 +76,7 @@ public class DataSourceMapperProvider {
    */
   public String deleteByProjectAndName(Map<String, Object> parameter) {
     return new SQL() {{
-      DELETE_FROM(DB_NAME);
+      DELETE_FROM(TABLE_NAME);
 
       WHERE("`project_id` = #{projectId} and name = #{name}");
     }}.toString();
@@ -93,7 +93,7 @@ public class DataSourceMapperProvider {
       SELECT("r.*, r.owner as owner_id");
       SELECT("u.name as owner,p.name as project_name");
 
-      FROM(DB_NAME + " r");
+      FROM(TABLE_NAME + " r");
 
       LEFT_OUTER_JOIN("user as u on u.id = r.owner");
       JOIN("project p on r.project_id = p.id");
@@ -113,7 +113,7 @@ public class DataSourceMapperProvider {
       SELECT("r.*, r.owner as owner_id");
       SELECT("u.name as owner, p.name as project_name");
 
-      FROM(DB_NAME + " r");
+      FROM(TABLE_NAME + " r");
 
       JOIN("user as u on u.id = r.owner");
       JOIN("project p on r.project_id = p.id");
@@ -133,7 +133,7 @@ public class DataSourceMapperProvider {
       SELECT("r.*, r.owner as owner_id");
       SELECT("u.name as owner, p.name as project_name");
 
-      FROM(DB_NAME + " r");
+      FROM(TABLE_NAME + " r");
 
       JOIN("user as u on u.id = r.owner");
       JOIN("project p on r.project_id = p.id");

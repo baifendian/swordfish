@@ -99,9 +99,9 @@ public class ExecController {
                                          @RequestParam(value = "notifyMails", required = false) String notifyMails,
                                          @RequestParam(value = "timeout", required = false, defaultValue = "1800") int timeout,
                                          HttpServletResponse response) {
-    logger.info("Operator user {}, direct exec workflow, project name: {}, workflow name: {}, proxy user: {}, queue: {}, node dep: {}, file name: {}, notify type: {}," +
+    logger.info("Operator user {}, direct exec workflow, project name: {}, workflow name: {}, proxy user: {}, queue: {}, node dep: {}, file name: [{},{}], notify type: {}," +
             "notify mails: {}, timeout: {}",
-        operator.getName(), projectName, workflowName, proxyUser, queue, nodeDep, file.getOriginalFilename(), notifyType, notifyMails, timeout);
+        operator.getName(), projectName, workflowName, proxyUser, queue, nodeDep, file.getName(), file.getOriginalFilename(), notifyType, notifyMails, timeout);
 
     return null;
   }
