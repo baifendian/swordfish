@@ -163,7 +163,7 @@ public interface ProjectFlowMapper {
           @Result(property = "userDefinedParams", column = "user_defined_params", javaType = String.class, jdbcType = JdbcType.VARCHAR),
           @Result(property = "extras", column = "extras", javaType = String.class, jdbcType = JdbcType.VARCHAR),
           @Result(property = "queue", column = "queue", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-          @Result(property = "flowsNodes", column = "id", javaType = List.class, many = @Many(select = "com.baifendian.swordfish.dao.mapper.FlowNodeMapper.selectByFlowId")),
+          @Result(property = "flowsNodes", column = "{flowId=id}", javaType = List.class, many = @Many(select = "com.baifendian.swordfish.dao.mapper.FlowNodeMapper.selectByFlowId")),
           })
   @SelectProvider(type = ProjectFlowMapperSqlProvider.class, method = "queryByName")
   ProjectFlow findByName(@Param("projectId") int projectId, @Param("name") String name);
