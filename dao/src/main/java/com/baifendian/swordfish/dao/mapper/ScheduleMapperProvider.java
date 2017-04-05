@@ -51,13 +51,13 @@ public class ScheduleMapperProvider {
     }}.toString();
   }
 
-  public String update(Schedule schedule) {
+  public String update(Map<String, Object> parameter) {
     return new SQL() {
       {
         UPDATE(DB_NAME);
         SET("start_date = #{schedule.startDate}");
         SET("end_date = #{schedule.endDate}");
-        SET("cronta=#{schedule.crontab}");
+        SET("crontab=#{schedule.crontab}");
         SET("dep_workflows=#{schedule.depWorkflowsStr}");
         SET("dep_policy="+EnumFieldUtil.genFieldStr("schedule.depPolicy", DepPolicyType.class));
         SET("failure_policy="+EnumFieldUtil.genFieldStr("schedule.failurePolicy", FailurePolicyType.class));
@@ -81,8 +81,8 @@ public class ScheduleMapperProvider {
       SELECT("p.name as project_name");
       SELECT("u.name as owner_name");
       FROM(DB_NAME + " as s");
-      JOIN("project_flow as p_f on s.flow_id = p_f.id");
-      JOIN("project as p on p_f.projectId = p.id");
+      JOIN("project_flows as p_f on s.flow_id = p_f.id");
+      JOIN("project as p on p_f.project_id = p.id");
       JOIN("user as u on s.owner = u.id");
       WHERE("s.flow_id = #{flowId}");
     }}.toString();
@@ -95,8 +95,8 @@ public class ScheduleMapperProvider {
       SELECT("p.name as project_name");
       SELECT("u.name as owner_name");
       FROM(DB_NAME + " as s");
-      JOIN("project_flow as p_f on s.flow_id = p_f.id");
-      JOIN("project as p on p_f.projectId = p.id");
+      JOIN("project_flows as p_f on s.flow_id = p_f.id");
+      JOIN("project as p on p_f.project_id = p.id");
       JOIN("user as u on s.owner = u.id");
       WHERE("p.name = #{projectName}");
       WHERE("p_f.name = #{name}");
