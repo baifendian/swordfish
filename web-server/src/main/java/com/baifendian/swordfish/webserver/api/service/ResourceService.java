@@ -88,7 +88,7 @@ public class ResourceService {
     Project project = projectMapper.queryByName(projectName);
 
     if (project == null) {
-      logger.error("Project is not exist: {}", projectName);
+      logger.error("Project does not exist: {}", projectName);
       response.setStatus(HttpStatus.SC_BAD_REQUEST);
       return null;
     }
@@ -103,7 +103,7 @@ public class ResourceService {
     Resource resource = resourceMapper.queryResource(project.getId(), name);
 
     if (resource != null) {
-      logger.error("Resource {} is not empty", name);
+      logger.error("Resource {} does not empty", name);
       response.setStatus(HttpStatus.SC_CONFLICT);
       return null;
     }
@@ -285,7 +285,7 @@ public class ResourceService {
                                HttpServletResponse response) {
 
     // 源和目标不能是一样的名称
-    if (StringUtils.endsWithIgnoreCase(srcResName, destResName)) {
+    if (StringUtils.equalsIgnoreCase(srcResName, destResName)) {
       logger.error("Src resource mustn't the same to dest resource.");
       response.setStatus(HttpStatus.SC_NOT_MODIFIED);
       return null;
