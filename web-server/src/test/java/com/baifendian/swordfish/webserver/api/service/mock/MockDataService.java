@@ -55,9 +55,10 @@ public class MockDataService {
 
   /**
    * 获取一个随机字符串
+   *
    * @return
    */
-  public String getRandomString(){
+  public String getRandomString() {
     //return RandomStringUtils.random(10, new char[]{'a', 'b', 'c', 'd', 'e', 'f','g','h','i','j'});
     return getRandomString(5);
   }
@@ -75,9 +76,10 @@ public class MockDataService {
 
   /**
    * 创建一个的用户
+   *
    * @return
    */
-  public User createUser(UserRoleType userRoleType){
+  public User createUser(UserRoleType userRoleType) {
     User user = new User();
     Date now = new Date();
 
@@ -97,26 +99,29 @@ public class MockDataService {
 
   /**
    * 创建一个普通用户
+   *
    * @return
    */
-  public User createGeneralUser(){
+  public User createGeneralUser() {
     return createUser(UserRoleType.GENERAL_USER);
   }
 
   /**
    * 创建一个管理员用户
+   *
    * @return
    */
-  public User createAdminUser(){
+  public User createAdminUser() {
     return createUser(UserRoleType.ADMIN_USER);
   }
 
   /**
    * 创建一个项目
+   *
    * @param user
    * @return
    */
-  public Project createProject(User user){
+  public Project createProject(User user) {
     Project project = new Project();
     Date now = new Date();
 
@@ -133,12 +138,13 @@ public class MockDataService {
 
   /**
    * 创建一个用户项目关系
+   *
    * @param projectId
    * @param userId
    * @param perm
    * @return
    */
-  public ProjectUser createProjectUser(int projectId, int userId, int perm){
+  public ProjectUser createProjectUser(int projectId, int userId, int perm) {
     ProjectUser projectUser = new ProjectUser();
     Date now = new Date();
 
@@ -156,11 +162,12 @@ public class MockDataService {
 
   /**
    * 创建一个数据源
+   *
    * @param projectId
    * @param userId
    * @return
    */
-  public DataSource createDataSource(int projectId,int userId){
+  public DataSource createDataSource(int projectId, int userId) {
     DataSource dataSource = new DataSource();
     Date now = new Date();
 
@@ -184,9 +191,10 @@ public class MockDataService {
 
   /**
    * 虚拟一个mr节点
+   *
    * @return
    */
-  public FlowNode mocNode(String[] depList,int flowId,String parameter,String extras) throws JsonProcessingException {
+  public FlowNode mocNode(String[] depList, int flowId, String parameter, String extras) throws JsonProcessingException {
     FlowNode flowNode = new FlowNode();
     flowNode.setName(getRandomString());
     flowNode.setDesc(getRandomString());
@@ -203,23 +211,24 @@ public class MockDataService {
 
   /**
    * 虚拟一个正常的MR节点
+   *
    * @return
    */
-  public FlowNode mocRmNode(String[] depList,int flowId) throws JsonProcessingException {
-    return mocNode(depList,flowId,MR_PARAMETER,MR_PARAMETER);
+  public FlowNode mocRmNode(String[] depList, int flowId) throws JsonProcessingException {
+    return mocNode(depList, flowId, MR_PARAMETER, MR_PARAMETER);
   }
-
 
   /**
    * 虚拟一个projectFlowData
+   *
    * @return
    */
   public ProjectFlow.ProjectFlowData mocProjectFlowData(int flowId) throws JsonProcessingException {
-    FlowNode flowNode1 = mocRmNode(new String[]{},flowId);
-    FlowNode flowNode2 = mocRmNode(new String[]{flowNode1.getName()},flowId);
-    FlowNode flowNode3 = mocRmNode(new String[]{flowNode2.getName()},flowId);
+    FlowNode flowNode1 = mocRmNode(new String[]{}, flowId);
+    FlowNode flowNode2 = mocRmNode(new String[]{flowNode1.getName()}, flowId);
+    FlowNode flowNode3 = mocRmNode(new String[]{flowNode2.getName()}, flowId);
 
-    List<FlowNode> flowNodeList = Arrays.asList(new FlowNode[]{flowNode1,flowNode2,flowNode3});
+    List<FlowNode> flowNodeList = Arrays.asList(new FlowNode[]{flowNode1, flowNode2, flowNode3});
 
     ProjectFlow.ProjectFlowData projectFlowData = new ProjectFlow.ProjectFlowData();
     projectFlowData.setExtras(MR_PARAMETER);
@@ -231,6 +240,7 @@ public class MockDataService {
 
   /**
    * 虚拟一个projectFlowData 字符串
+   *
    * @param flowId
    * @return
    */
@@ -242,9 +252,10 @@ public class MockDataService {
 
   /**
    * 虚拟一个 正常pojectFlow 工作流
+   *
    * @return
    */
-  public ProjectFlow mocProjectFlow(int projectId,int userId) throws JsonProcessingException {
+  public ProjectFlow mocProjectFlow(int projectId, int userId) throws JsonProcessingException {
     ProjectFlow projectFlow = new ProjectFlow();
     Date now = new Date();
 
@@ -261,13 +272,13 @@ public class MockDataService {
 
     projectFlowMapper.insertAndGetId(projectFlow);
 
-    FlowNode flowNode1 = mocRmNode(new String[]{},projectFlow.getId());
-    FlowNode flowNode2 = mocRmNode(new String[]{flowNode1.getName()},projectFlow.getId());
-    FlowNode flowNode3 = mocRmNode(new String[]{flowNode2.getName()},projectFlow.getId());
+    FlowNode flowNode1 = mocRmNode(new String[]{}, projectFlow.getId());
+    FlowNode flowNode2 = mocRmNode(new String[]{flowNode1.getName()}, projectFlow.getId());
+    FlowNode flowNode3 = mocRmNode(new String[]{flowNode2.getName()}, projectFlow.getId());
 
-    List<FlowNode> flowNodeList = Arrays.asList(new FlowNode[]{flowNode1,flowNode2,flowNode3});
+    List<FlowNode> flowNodeList = Arrays.asList(new FlowNode[]{flowNode1, flowNode2, flowNode3});
 
-    for (FlowNode flowNode:flowNodeList){
+    for (FlowNode flowNode : flowNodeList) {
       flowNodeMapper.insert(flowNode);
     }
 

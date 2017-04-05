@@ -84,9 +84,6 @@ public class ProjectFlowMapperSqlProvider {
         if (projectFlow.getOwnerId() != 0) {
           SET("owner_id = #{flow.ownerId}");
         }
-        if (projectFlow.getLastModifyBy() != 0) {
-          SET("last_modify_by = #{flow.lastModifyBy}");
-        }
         WHERE("id = #{flow.id}");
       }
     }.toString();

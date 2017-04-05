@@ -52,6 +52,8 @@ import java.util.Map;
 @Service
 public class WorkflowService {
 
+  private static Logger logger = LoggerFactory.getLogger(WorkflowService.class.getName());
+
   @Autowired
   private ProjectFlowMapper projectFlowMapper;
 
@@ -67,10 +69,8 @@ public class WorkflowService {
   @Autowired
   private FlowDao flowDao;
 
-  private static Logger logger = LoggerFactory.getLogger(WorkflowService.class.getName());
-
   /**
-   * 创建一个工作流
+   * 创建一个工作流, 需要具备项目的 'w' 权限
    *
    * @param operator
    * @param projectName
@@ -83,16 +83,10 @@ public class WorkflowService {
    * @param response
    * @return
    */
-  @Transactional
+  @Transactional(value = "TransactionManager")
   public ProjectFlow createWorkflow(User operator, String projectName, String name, String desc, String proxyUser, String queue, String data, MultipartFile file, HttpServletResponse response) {
 
-    ProjectFlow.ProjectFlowData projectFlowData = ProjectFlowDataDes11n(data, file);
-
-    if (projectFlowData == null) {
-      response.setStatus(HttpStatus.SC_BAD_REQUEST);
-      return null;
-    }
-
+    // 查看是否对项目具备相应的权限
     Project project = projectMapper.queryByName(projectName);
 
     if (project == null) {
@@ -105,23 +99,35 @@ public class WorkflowService {
       return null;
     }
 
+    // 反序列化
+    ProjectFlow.ProjectFlowData projectFlowData = projectFlowDataDes(data, file);
+
+    if (projectFlowData == null) {
+      response.setStatus(HttpStatus.SC_BAD_REQUEST);
+      return null;
+    }
+
+    // 得到结点列表
     List<FlowNode> flowNodes = projectFlowData.getNodes();
 
-    if (flowNodes!=null){
-      //闭环检测未通过
-      if (graphCheck(flowNodes)){
+    if (flowNodes == null) {
+      response.setStatus(HttpStatus.SC_BAD_REQUEST);
+      return null;
+    }
+
+      // 闭环检测未通过
+      if (graphCheck(flowNodes)) {
         response.setStatus(HttpStatus.SC_BAD_REQUEST);
         return null;
       }
+
       //parameter检测
-      for (FlowNode flowNode:flowNodes){
-        if(!flowNodeParamCheck(flowNode.getParameter(),flowNode.getType())){
+      for (FlowNode flowNode : flowNodes) {
+        if (!flowNodeParamCheck(flowNode.getParameter(), flowNode.getType())) {
           response.setStatus(HttpStatus.SC_BAD_REQUEST);
           return null;
-        }
       }
     }
-
 
     ProjectFlow projectFlow = new ProjectFlow();
     Date now = new Date();
@@ -137,7 +143,7 @@ public class WorkflowService {
     projectFlow.setQueue(queue);
     projectFlow.setOwnerId(operator.getId());
     projectFlow.setOwner(operator.getName());
-    projectFlow.setUserDefinedParams(projectFlowData.getUserDefParams());
+//    projectFlow.setUserDefinedParams(projectFlowData.getUserDefParams());
     projectFlow.setExtras(projectFlowData.getExtras());
 
     try {
@@ -161,6 +167,7 @@ public class WorkflowService {
 
   /**
    * 修改工作流，如果不存在就创建。
+   *
    * @param operator
    * @param projectName
    * @param name
@@ -172,12 +179,13 @@ public class WorkflowService {
    * @param response
    * @return
    */
-  public ProjectFlow putWorkflow(User operator, String projectName, String name, String desc, String proxyUser, String queue, String data, MultipartFile file, HttpServletResponse response){
+  @Transactional(value = "TransactionManager")
+  public ProjectFlow putWorkflow(User operator, String projectName, String name, String desc, String proxyUser, String queue, String data, MultipartFile file, HttpServletResponse response) {
     ProjectFlow projectFlow = flowDao.projectFlowFindByPorjectNameAndName(projectName, name);
-    if (projectFlow == null){
-      return createWorkflow(operator,projectName,name,desc,proxyUser,queue,data,file,response);
+    if (projectFlow == null) {
+      return createWorkflow(operator, projectName, name, desc, proxyUser, queue, data, file, response);
     } else {
-      return patchWorkflow(operator,projectName,name,desc,proxyUser,queue,data,file,response);
+      return patchWorkflow(operator, projectName, name, desc, proxyUser, queue, data, file, response);
     }
   }
 
@@ -195,7 +203,7 @@ public class WorkflowService {
    * @param response
    * @return
    */
-  @Transactional
+  @Transactional(value = "TransactionManager")
   public ProjectFlow patchWorkflow(User operator, String projectName, String name, String desc, String proxyUser, String queue, String data, MultipartFile file, HttpServletResponse response) {
 
     Project project = projectMapper.queryByName(projectName);
@@ -218,7 +226,7 @@ public class WorkflowService {
       return null;
     }
 
-    ProjectFlow.ProjectFlowData projectFlowData = ProjectFlowDataDes11n(data, file);
+    ProjectFlow.ProjectFlowData projectFlowData = projectFlowDataDes(data, file);
 
     if (projectFlowData != null) {
       if (!projectFlow.getExtras().isEmpty()) {
@@ -233,13 +241,13 @@ public class WorkflowService {
 
 
         //闭环检测
-        if (graphCheck(flowNodeList)){
+        if (graphCheck(flowNodeList)) {
           response.setStatus(HttpStatus.SC_BAD_REQUEST);
           return null;
         }
         //parameter检测
-        for (FlowNode flowNode:flowNodeList){
-          if(!flowNodeParamCheck(flowNode.getParameter(),flowNode.getType())){
+        for (FlowNode flowNode : flowNodeList) {
+          if (!flowNodeParamCheck(flowNode.getParameter(), flowNode.getType())) {
             response.setStatus(HttpStatus.SC_BAD_REQUEST);
             return null;
           }
@@ -282,7 +290,7 @@ public class WorkflowService {
    * @param name
    * @param response
    */
-  @Transactional
+  @Transactional(value = "TransactionManager")
   public void deleteProjectFlow(User operator, String projectName, String name, HttpServletResponse response) {
 
     Project project = projectMapper.queryByName(projectName);
@@ -312,12 +320,13 @@ public class WorkflowService {
 
   /**
    * 修改一个项目下所有工作流的配置
+   *
    * @param operator
    * @param projectName
    * @param queue
    * @param proxyUser
    */
-  public void modifyWorkflowConf(User operator,String projectName, String queue,String proxyUser, HttpServletResponse response){
+  public void modifyWorkflowConf(User operator, String projectName, String queue, String proxyUser, HttpServletResponse response) {
     Project project = projectMapper.queryByName(projectName);
 
     if (project == null) {
@@ -330,13 +339,16 @@ public class WorkflowService {
       return;
     }
 
-    projectFlowMapper.updateProjectConf(project.getId(), queue,proxyUser);
+    projectFlowMapper.updateProjectConf(project.getId(), queue, proxyUser);
   }
 
   /**
    * 查询一个项目下所有工作流
    *
    * @param operator
+   * @param projectName
+   * @param response
+   * @return
    */
   public List<ProjectFlow> queryAllProjectFlow(User operator, String projectName, HttpServletResponse response) {
 
@@ -357,7 +369,7 @@ public class WorkflowService {
   }
 
   /**
-   * 查询某一个具体工作流
+   * 查询某一个具体工作流的详情
    *
    * @param operator
    * @param projectName
@@ -380,10 +392,16 @@ public class WorkflowService {
     }
 
     return flowDao.projectFlowfindByName(project.getId(), name);
-
   }
 
-  public Resource queryProjectFlowFile(User operator, String projectName, String name, HttpServletResponse response){
+  /**
+   * @param operator
+   * @param projectName
+   * @param name
+   * @param response
+   * @return
+   */
+  public Resource downloadProjectFlowFile(User operator, String projectName, String name, HttpServletResponse response) {
     Project project = projectMapper.queryByName(projectName);
 
     if (project == null) {
@@ -426,47 +444,53 @@ public class WorkflowService {
    * @param file
    * @return
    */
-  public ProjectFlow.ProjectFlowData ProjectFlowDataDes11n(String data, MultipartFile file) {
+  private ProjectFlow.ProjectFlowData projectFlowDataDes(String data, MultipartFile file) {
     ProjectFlow.ProjectFlowData projectFlowData = null;
     ObjectMapper mapper = new ObjectMapper();
-    try {
-      projectFlowData = mapper.readValue(data, ProjectFlow.ProjectFlowData.class);
-    } catch (Exception e) {
-      logger.error(e.toString());
-    }
 
     if (file != null && !file.isEmpty()) {
       try {
+        // 先将文件存放到本地
+
+        // 解压
+
+        // 读取 workflow.json 文件
+
         ByteArrayInputStream stream = new ByteArrayInputStream(file.getBytes());
         String jsonString = IOUtils.toString(stream, "UTF-8");
         projectFlowData = mapper.readValue(jsonString, ProjectFlow.ProjectFlowData.class);
       } catch (Exception e) {
         logger.error(e.toString());
       }
+    } else {
+      try {
+        projectFlowData = mapper.readValue(data, ProjectFlow.ProjectFlowData.class);
+      } catch (Exception e) {
+        logger.error(e.toString());
+      }
     }
+
     return projectFlowData;
   }
 
   /**
    * 闭环检测
+   *
    * @param flowNodeList
    * @return
    */
-  public boolean graphCheck(List<FlowNode> flowNodeList){
-    Graph<String, FlowNode,String> graph = new Graph<>();
-
-    //缓存边关系
-    Map<String,Integer> flowNodeIdMap = new HashMap<>();
+  private boolean graphCheck(List<FlowNode> flowNodeList) {
+    Graph<String, FlowNode, String> graph = new Graph<>();
 
     //填充顶点
-    for (FlowNode flowNode:flowNodeList){
-      graph.addVertex(flowNode.getName(),flowNode);
+    for (FlowNode flowNode : flowNodeList) {
+      graph.addVertex(flowNode.getName(), flowNode);
     }
 
     //填充边关系
-    for (FlowNode flowNode:flowNodeList){
-      for(String dep:flowNode.getDepList()){
-        graph.addEdge(dep,flowNode.getName());
+    for (FlowNode flowNode : flowNodeList) {
+      for (String dep : flowNode.getDepList()) {
+        graph.addEdge(dep, flowNode.getName());
       }
     }
 
@@ -474,10 +498,13 @@ public class WorkflowService {
   }
 
   /**
-   * 检测flowNode parameter格式是否正常
+   * 检测 flowNode parameter 格式是否正常
+   *
+   * @param parameter
+   * @param type
    * @return
    */
-  public boolean flowNodeParamCheck(String parameter, String type){
+  private boolean flowNodeParamCheck(String parameter, String type) {
     ObjectMapper mapper = new ObjectMapper();
 
     try {
@@ -486,9 +513,10 @@ public class WorkflowService {
         case "mr":
           mapper.readValue(parameter, NodeParamMR.class);
           break;
-        default:return false;
+        default:
+          return false;
       }
-    }catch (Exception e){
+    } catch (Exception e) {
       logger.error(e.toString());
       return false;
     }

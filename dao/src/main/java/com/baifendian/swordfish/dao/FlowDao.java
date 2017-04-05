@@ -210,7 +210,6 @@ public class FlowDao extends BaseDao {
     projectFlow.setCreateTime(new Date());
     projectFlow.setModifyTime(new Date());
     projectFlow.setOwnerId(userId);
-    projectFlow.setLastModifyBy(userId);
     projectFlow.setProjectId(projectId);
 
     int count = projectFlowMapper.insertAndGetId(projectFlow); // 插入函数记录

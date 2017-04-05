@@ -58,8 +58,8 @@ public class ResourceController {
                                  @RequestParam(value = "desc", required = false) String desc,
                                  @RequestParam("file") MultipartFile file,
                                  HttpServletResponse response) {
-    logger.info("Operator user id {}, create resource, project name: {}, resource name: {}, desc: {}, file: [{},{}]",
-        operator.getId(), projectName, name, desc, file.getName(), file.getOriginalFilename());
+    logger.info("Operator user {}, create resource, project name: {}, resource name: {}, desc: {}, file: [{},{}]",
+        operator.getName(), projectName, name, desc, file.getName(), file.getOriginalFilename());
 
     return resourceService.createResource(operator, projectName, name, desc, file, response);
   }
@@ -81,8 +81,8 @@ public class ResourceController {
                               @RequestParam(value = "desc", required = false) String desc,
                               @RequestParam("file") MultipartFile file,
                               HttpServletResponse response) {
-    logger.info("Operator user id {}, put resource, project name: {}, resource name: {}, desc: {}, file: [{},{}]",
-        operator.getId(), projectName, name, desc, file.getName(), file.getOriginalFilename());
+    logger.info("Operator user {}, put resource, project name: {}, resource name: {}, desc: {}, file: [{},{}]",
+        operator.getName(), projectName, name, desc, file.getName(), file.getOriginalFilename());
 
     return resourceService.putResource(operator, projectName, name, desc, file, response);
   }
@@ -104,8 +104,8 @@ public class ResourceController {
                                  @RequestParam(value = "desc", required = false) String desc,
                                  @RequestParam(value = "file", required = false) MultipartFile file,
                                  HttpServletResponse response) {
-    logger.info("Operator user id {}, modify resource, project name: {}, resource name: {}, desc: {}, file: [{},{}]",
-        operator.getId(), projectName, name, desc, (file == null) ? null : file.getName(), (file == null) ? null : file.getOriginalFilename());
+    logger.info("Operator user {}, modify resource, project name: {}, resource name: {}, desc: {}, file: [{},{}]",
+        operator.getName(), projectName, name, desc, (file == null) ? null : file.getName(), (file == null) ? null : file.getOriginalFilename());
 
     return resourceService.modifyResource(operator, projectName, name, desc, file, response);
   }

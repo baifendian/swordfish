@@ -29,6 +29,7 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -126,10 +127,11 @@ public class ResourceService {
     resource.setCreateTime(now);
     resource.setModifyTime(now);
 
-    int count = resourceMapper.insert(resource);
-
-    if (count <= 0) {
-      response.setStatus(HttpStatus.SC_NOT_MODIFIED);
+    try {
+      resourceMapper.insert(resource);
+    } catch (DuplicateKeyException e) {
+      logger.error("Resource has exist, can't create again.", e);
+      response.setStatus(HttpStatus.SC_CONFLICT);
       return null;
     }
 
