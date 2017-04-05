@@ -44,7 +44,7 @@ public class ResourceCopyController {
    * @param desc
    * @param response
    */
-  @DeleteMapping(value = "")
+  @PostMapping(value = "")
   public Resource copyResource(@RequestAttribute(value = "session.user") User operator,
                                @PathVariable String projectName,
                                @RequestParam(value = "srcResName") String srcResName,
