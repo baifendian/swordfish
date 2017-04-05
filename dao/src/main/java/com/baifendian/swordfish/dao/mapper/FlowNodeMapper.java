@@ -105,7 +105,7 @@ public interface FlowNodeMapper {
           @Result(property = "flowId", column = "flow_id", id = true, javaType = int.class, jdbcType = JdbcType.INTEGER),
           @Result(property = "parameter", column = "parameter", javaType = String.class, jdbcType = JdbcType.VARCHAR),
   })
-  @SelectProvider(type = FlowNodeMapperSqlProvider.class, method = "selectByFlowIds")
-  List<FlowNode> selectByFlowIds(@Param("flowId") List<Integer> flowIds);
+  @Select("<script> select * from flows_nodes where flow_id in  <foreach item=\"flowId\" index=\"index\" collection=\"flowIds\" open=\"(\" separator=\",\" close=\")\"> #{flowId} </foreach> </script>")
+  List<FlowNode> selectByFlowIds(@Param("flowIds") List<Integer> flowIds);
 
 }

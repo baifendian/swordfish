@@ -323,4 +323,58 @@ public class FlowDao extends BaseDao {
     // 插入执行节点信息
     return scheduleMapper.selectByFlowId(flowId);
   }
+
+  /**
+   * 根据name获取一个工作流的信息
+   * @param projectId
+   * @param name
+   * @return
+   */
+  public ProjectFlow projectFlowfindByName(int projectId,String name){
+    ProjectFlow projectFlow = projectFlowMapper.findByName(projectId,name);
+    if (projectFlow !=null ){
+      List<FlowNode> flowNodeList = flowNodeMapper.selectByFlowId(projectFlow.getId());
+      projectFlow.setFlowsNodes(flowNodeList);
+    }
+    return projectFlow;
+  }
+
+  /**
+   * 根据项目名和工作流名称查询
+   * @param projectName
+   * @param name
+   * @return
+   */
+  public ProjectFlow projectFlowFindByPorjectNameAndName(String projectName,String name){
+    ProjectFlow projectFlow = projectFlowMapper.findByProjectNameAndName(projectName,name);
+    if (projectFlow!=null){
+      List<FlowNode> flowNodeList = flowNodeMapper.selectByFlowId(projectFlow.getId());
+      projectFlow.setFlowsNodes(flowNodeList);
+    }
+    return projectFlow;
+  }
+
+  /**
+   * 获取一个项目下所有的工作流
+   * @param projectId
+   * @return
+   */
+  public List<ProjectFlow> projectFlowFindByProject(int projectId){
+    List<ProjectFlow> projectFlowList = projectFlowMapper.findByProject(projectId);
+    List<Integer> flowIds = new ArrayList<>();
+    for (ProjectFlow projectFlow:projectFlowList){
+      flowIds.add(projectFlow.getId());
+    }
+    List<FlowNode> flowNodeList = flowNodeMapper.selectByFlowIds(flowIds);
+    for(ProjectFlow projectFlow:projectFlowList){
+      List<FlowNode> flowNodes = new ArrayList<>();
+      for (FlowNode flowNode:flowNodeList){
+        if (flowNode.getFlowId() == projectFlow.getId()){
+          flowNodes.add(flowNode);
+        }
+      }
+      projectFlow.setFlowsNodes(flowNodes);
+    }
+    return projectFlowList;
+  }
 }

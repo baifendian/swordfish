@@ -35,7 +35,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
 @RestController
-@RequestMapping("/projects/{projectName}/workflows")
+@RequestMapping("/projects/{projectName}")
 public class WorkflowController {
 
   private static Logger logger = LoggerFactory.getLogger(WorkflowController.class.getName());
@@ -56,7 +56,7 @@ public class WorkflowController {
    * @param file
    * @param response
    */
-  @RequestMapping(value = "/{name}", method = {RequestMethod.POST})
+  @RequestMapping(value = "/workflows/{name}", method = {RequestMethod.POST})
   public ProjectFlow createWorkflow(@RequestAttribute(value = "session.user") User operator,
                                     @PathVariable String projectName,
                                     @PathVariable String name,
@@ -81,7 +81,7 @@ public class WorkflowController {
    * @param file
    * @param response
    */
-  @RequestMapping(value = "/{name}", method = {RequestMethod.PUT})
+  @RequestMapping(value = "/workflows/{name}", method = {RequestMethod.PUT})
   public ProjectFlow putWorkflow(@RequestAttribute(value = "session.user") User operator,
                              @PathVariable String projectName,
                              @PathVariable String name,
@@ -107,7 +107,7 @@ public class WorkflowController {
    * @param file
    * @param response
    */
-  @RequestMapping(value = "/{name}", method = {RequestMethod.PATCH})
+  @RequestMapping(value = "/workflows/{name}", method = {RequestMethod.PATCH})
   public ProjectFlow patchWorkflow(@RequestAttribute(value = "session.user") User operator,
                                  @PathVariable String projectName,
                                  @PathVariable String name,
@@ -121,7 +121,14 @@ public class WorkflowController {
     return workflowService.patchWorkflow(operator,projectName,name,desc,proxyUser,queue,data,file,response);
   }
 
-  @RequestMapping(value = "/{name}", method = {RequestMethod.DELETE})
+  /**
+   * 删除一个工作流
+   * @param operator
+   * @param projectName
+   * @param name
+   * @param response
+   */
+  @RequestMapping(value = "/workflows/{name}", method = {RequestMethod.DELETE})
   public void modifyWorkflow(@RequestAttribute(value = "session.user") User operator,
                              @PathVariable String projectName,
                              @PathVariable String name,
@@ -130,6 +137,23 @@ public class WorkflowController {
 
   }
 
+  @RequestMapping(value = "/workflows-conf", method = {RequestMethod.DELETE})
+  public void modifyWorkflowConf(@RequestAttribute(value = "session.user") User operator,
+                                 @PathVariable String projectName,
+                                 @PathVariable String name,
+                                 @RequestParam(value = "queue", required = false) String queue,
+                                 @RequestParam(value = "proxyUser", required = false) String proxyUser,
+                                 HttpServletResponse response){
+    workflowService.modifyWorkflowConf(operator,projectName,queue,proxyUser,response);
+  }
+
+  /**
+   * 查询一个项目下所有的工作流
+   * @param operator
+   * @param projectName
+   * @param response
+   * @return
+   */
   @RequestMapping(value = "", method = {RequestMethod.GET})
   public List<ProjectFlow> queryWorkflow(@RequestAttribute(value = "session.user") User operator,
                                          @PathVariable String projectName,
@@ -138,7 +162,15 @@ public class WorkflowController {
 
   }
 
-  @RequestMapping(value = "{name}", method = {RequestMethod.GET})
+  /**
+   * 查询一个具体的工作流
+   * @param operator
+   * @param projectName
+   * @param name
+   * @param response
+   * @return
+   */
+  @RequestMapping(value = "/workflows/{name}", method = {RequestMethod.GET})
   public ProjectFlow queryWorkflowDetail(@RequestAttribute(value = "session.user") User operator,
                                   @PathVariable String projectName,
                                   @PathVariable String name,
@@ -146,7 +178,15 @@ public class WorkflowController {
     return workflowService.queryProjectFlow(operator,projectName,name,response);
   }
 
-  @RequestMapping(value = "{name}/file", method = {RequestMethod.GET})
+  /**
+   * 下载指定文件
+   * @param operator
+   * @param projectName
+   * @param name
+   * @param response
+   * @return
+   */
+  @RequestMapping(value = "/workflows/{name}/file", method = {RequestMethod.GET})
   public ResponseEntity<Resource> downloadWorkflowDetail(@RequestAttribute(value = "session.user") User operator,
                                                          @PathVariable String projectName,
                                                          @PathVariable String name,
