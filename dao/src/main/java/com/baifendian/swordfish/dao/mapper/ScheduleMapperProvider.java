@@ -35,7 +35,7 @@ public class ScheduleMapperProvider {
       VALUES("flow_id", "#{schedule.flowId}");
       VALUES("start_date", "#{schedule.startDate}");
       VALUES("end_date", "#{schedule.endDate}");
-      VALUES("crontab_str", "#{schedule.crontabStr}");
+      VALUES("crontab", "#{schedule.crontab}");
       VALUES("dep_workflows", "#{schedule.depWorkflowsStr}");
       VALUES("dep_policy", EnumFieldUtil.genFieldStr("schedule.depPolicy", DepPolicyType.class));
       VALUES("failure_policy", EnumFieldUtil.genFieldStr("schedule.failurePolicy", FailurePolicyType.class));
@@ -56,8 +56,21 @@ public class ScheduleMapperProvider {
     return new SQL() {
       {
         UPDATE(DB_NAME);
-        SET("modify_time = #{schedule.modifyTime}");
-        SET("last_modify_by = #{schedule.lastModifyBy}");
+        SET("start_date = #{schedule.startDate}");
+        SET("end_date = #{schedule.endDate}");
+        SET("cronta=#{schedule.crontab}");
+        SET("dep_workflows=#{schedule.depWorkflowsStr}");
+        SET("dep_policy="+EnumFieldUtil.genFieldStr("schedule.depPolicy", DepPolicyType.class));
+        SET("failure_policy="+EnumFieldUtil.genFieldStr("schedule.failurePolicy", FailurePolicyType.class));
+        SET("max_try_times=#{schedule.maxTryTimes}");
+        SET("notify_type="+EnumFieldUtil.genFieldStr("schedule.notifyType", NotifyType.class));
+        SET("notify_mails=#{schedule.notifyMailsStr}");
+        SET("timeout=#{schedule.timeout}");
+        SET("create_time=#{schedule.createTime}");
+        SET("modify_time", "#{schedule.modifyTime}");
+        SET("owner", "#{schedule.ownerId}");
+        SET("last_modify_by", "#{schedule.lastModifyById}");
+        SET("schedule_status", EnumFieldUtil.genFieldStr("schedule.scheduleStatus", ScheduleStatus.class));
         if (schedule.getScheduleStatus() != null) {
           SET("schedule_status = " + EnumFieldUtil.genFieldStr("schedule.scheduleStatus", ScheduleStatus.class));
         }

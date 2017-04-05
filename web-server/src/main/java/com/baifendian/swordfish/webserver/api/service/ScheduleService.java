@@ -102,7 +102,7 @@ public class ScheduleService {
       Schedule.ScheduleParam scheduleParam = mapper.readValue(schedule,Schedule.ScheduleParam.class);
       scheduleObj.setStartDate(scheduleParam.getStatDate());
       scheduleObj.setEndDate(scheduleParam.getEndDate());
-      scheduleObj.setCrontabStr(scheduleParam.getCrontab());
+      scheduleObj.setCrontab(scheduleParam.getCrontab());
       scheduleObj.setSchedule(scheduleParam);
       scheduleObj.setNotifyType(notifyType);
       scheduleObj.setNotifyMailsStr(notifyMails);

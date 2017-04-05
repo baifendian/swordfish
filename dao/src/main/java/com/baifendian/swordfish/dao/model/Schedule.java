@@ -32,7 +32,7 @@ import java.util.List;
  */
 public class Schedule {
 
-  private ScheduleParam schedule;
+  private ScheduleParam schedule = new ScheduleParam();
 
   @JsonIgnore
   private String scheduleStr;
@@ -51,7 +51,7 @@ public class Schedule {
   private Date endDate;
 
   @JsonIgnore
-  private String crontabStr;
+  private String crontab;
 
   @JsonIgnore
   private String depWorkflowsStr;
@@ -138,10 +138,12 @@ public class Schedule {
   }
 
   public Date getStartDate() {
+
     return startDate;
   }
 
   public void setStartDate(Date startDate) {
+    this.schedule.setStatDate(startDate);
     this.startDate = startDate;
   }
 
@@ -150,15 +152,17 @@ public class Schedule {
   }
 
   public void setEndDate(Date endDate) {
+    this.schedule.setEndDate(endDate);
     this.endDate = endDate;
   }
 
-  public String getCrontabStr() {
-    return crontabStr;
+  public String getCrontab() {
+    return crontab;
   }
 
-  public void setCrontabStr(String crontabStr) {
-    this.crontabStr = crontabStr;
+  public void setCrontab(String crontab) {
+    this.schedule.setCrontab(crontab);
+    this.crontab = crontab;
   }
 
   public String getDepWorkflowsStr() {
