@@ -15,8 +15,7 @@
  */
 package com.baifendian.swordfish.webserver.api.service.mock;
 
-import com.baifendian.swordfish.dao.enums.DbType;
-import com.baifendian.swordfish.dao.enums.UserRoleType;
+import com.baifendian.swordfish.dao.enums.*;
 import com.baifendian.swordfish.dao.mapper.*;
 import com.baifendian.swordfish.dao.model.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -52,6 +51,11 @@ public class MockDataService {
 
   @Autowired
   private ProjectFlowMapper projectFlowMapper;
+
+  private ObjectMapper objectMapper = new ObjectMapper();
+
+  @Autowired
+  private ScheduleMapper scheduleMapper;
 
   /**
    * 获取一个随机字符串
@@ -274,5 +278,31 @@ public class MockDataService {
     projectFlow.setFlowsNodes(flowNodeList);
 
     return projectFlow;
+  }
+
+  /**
+   * 虚拟一个Schedule
+   * @return
+   */
+  public Schedule mockSchedule(String projectName,int flowId,int userId) throws IOException {
+    Schedule schedule = new Schedule();
+    Date now = new Date();
+    schedule.setFlowId(flowId);
+    schedule.setStartDate(now);
+    schedule.setEndDate(now);
+    schedule.setCrontab("0 8 * * * * ?");
+    schedule.setNotifyType(NotifyType.FAILURE);
+    schedule.setNotifyMailsStr(objectMapper.writeValueAsString(Arrays.asList(new String[]{"ABC@baifendian.com"})));
+    schedule.setMaxTryTimes(2);
+    schedule.setFailurePolicy(FailurePolicyType.END);
+    schedule.setDepWorkflowsStr(objectMapper.writeValueAsString(Arrays.asList(new Schedule.DepWorkflow[]{new Schedule.DepWorkflow(projectName,getRandomString())})));
+    schedule.setDepPolicy(DepPolicyType.NO_DEP_PRE);
+    schedule.setTimeout(3600);
+    schedule.setOwnerId(userId);
+    schedule.setCreateTime(now);
+    schedule.setModifyTime(now);
+    schedule.setScheduleStatus(ScheduleStatus.OFFLINE);
+    scheduleMapper.insert(schedule);
+    return schedule;
   }
 }
