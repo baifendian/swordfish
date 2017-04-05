@@ -15,9 +15,9 @@
  */
 package com.baifendian.swordfish.execserver.adhoc;
 
+import com.baifendian.swordfish.common.utils.DateUtils;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
-import com.baifendian.swordfish.common.utils.BFDDateUtils;
 import com.baifendian.swordfish.dao.AdHocDao;
 import com.baifendian.swordfish.dao.DaoFactory;
 import com.baifendian.swordfish.dao.enums.FlowStatus;
@@ -50,7 +50,7 @@ public class AdHocRunnerManager {
   }
 
   public void submitAdHoc(AdHoc adHoc){
-    String jobId = "ADHOC_" + adHoc.getId() + "_" + BFDDateUtils.now(Constants.DATETIME_FORMAT);
+    String jobId = "ADHOC_" + adHoc.getId() + "_" + DateUtils.now(Constants.DATETIME_FORMAT);
     adHoc.setStartTime(new Date());
     adHoc.setStatus(FlowStatus.INIT);
     adHoc.setJobId(jobId);

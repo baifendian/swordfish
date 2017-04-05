@@ -15,16 +15,14 @@
  */
 package com.baifendian.swordfish.common.mail;
 
-import com.baifendian.swordfish.dao.model.ExecutionNode;
-import com.baifendian.swordfish.dao.model.Schedule;
-import com.baifendian.swordfish.common.utils.BFDDateUtils;
+import com.baifendian.swordfish.common.utils.DateUtils;
 import com.baifendian.swordfish.dao.DaoFactory;
 import com.baifendian.swordfish.dao.enums.FlowRunType;
 import com.baifendian.swordfish.dao.enums.FlowStatus;
-import com.baifendian.swordfish.dao.enums.FlowType;
 import com.baifendian.swordfish.dao.model.ExecutionFlow;
+import com.baifendian.swordfish.dao.model.ExecutionNode;
 import com.baifendian.swordfish.dao.model.ProjectFlow;
-
+import com.baifendian.swordfish.dao.model.Schedule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,6 +37,7 @@ import java.util.Map;
 public class EmailManager {
 
   private static final Logger logger = LoggerFactory.getLogger(EmailManager.class);
+
   /**
    * {@link MailSendService}
    */
@@ -51,202 +50,184 @@ public class EmailManager {
   /**
    * 邮件标题格式
    */
-  private static final String TITLE_FORMAT = "【调度系统】【{0}】【{1}】";
+  private static final String TITLE_FORMAT = "[Schedule system] [{0} [{1}]";
 
   /**
    * 获取邮件任务
    */
-  private static final String CONTENT_FORMAT = "<b>{0}</b><hr/>项目：{1}<br/>工作流名称：{2}<br/>调度时间：{3}<br/>执行结果：{4}<br/><br/><I>备注：详细执行情况见【运维中心】-【调度日志】</I>";
+  private static final String CONTENT_FORMAT = "<b>{0}</b><hr/>Project：{1}<br/>workflow name：{2}<br/>schedule time：{3}<br/>execution time：{4}<br/><br/><I>Note：execution detail see [maintain center] - [schedule logs]</I>";
 
 
   private static final String CONTENT_NODE_FORMAT = "<br>Long job Node:{0} RUN ERROR";
 
   /**
-   * 邮件内容的结尾
-   */
-  private static final String TAIL_FORMAT = "<br/><br/><I>备注：详细执行情况见【运维中心】-【调度日志】</I>";
-
-  /**
    * 补数据内容头部
    */
-  private static final String ADD_DATA_HEAD_FORMAT = "<b>{0}</b><hr/>项目：{1}<br/>工作流名称：{2}<br/>工作流类型：{3}<br/><br/><b>补数据详情</b>";
+  private static final String ADD_DATA_HEAD_FORMAT = "<b>{0}</b><hr/>Project：{1}<br/>workflow name：{2}<br/><br/><b>Add data detail</b>";
 
   /**
    * 补数据的每个元素内容
    */
-  private static final String ADD_DATA_ITEM_FORMAT = "<hr style=\"border:1px dotted #036\" />调度时间：{0}<br/>执行结果：{1}";
+  private static final String ADD_DATA_ITEM_FORMAT = "<hr style=\"border:1px dotted #036\" />Schedule time：{0}<br/>Execution result：{1}";
 
   /**
    * 补数据的结尾
    */
-  private static final String ADD_DATA_TAIL_FORMAT = "<br/><br/><I>备注：详细执行情况见【运维中心】-【调度日志】</I>";
+  private static final String ADD_DATA_TAIL_FORMAT = "<br/><br/><I>Note：execution detail see [Maintain center】- [Schedule log]</I>";
 
   /**
-   * 发送 EMAIL（调度） <p>
+   * 发送 EMAIL(调度)
+   *
+   * @param executionFlow
+   * @param schedule
    */
   public static void sendEmail(ExecutionFlow executionFlow, Schedule schedule) {
     String title = genTitle(executionFlow.getType(), executionFlow.getStatus());
     String content = genContent(executionFlow.getType(), executionFlow.getProjectName(), executionFlow.getFlowName(),
-            executionFlow.getScheduleTime(), executionFlow.getStatus());
+        executionFlow.getScheduleTime(), executionFlow.getStatus());
+
     mailSendService.sendToFlowMails(executionFlow.getFlowId(), title, content, true, schedule);
   }
 
   /**
-   * 长任务，如果node报错，就发邮件通知
+   * 长任务，如果 node 报错，就发邮件通知
+   *
+   * @param executionFlow
    * @param executionNode
    */
   public static void sendEmail(ExecutionFlow executionFlow, ExecutionNode executionNode) {
     try {
       String title = genTitle(executionFlow.getType(), executionNode.getStatus());
       String content = genContent(executionFlow.getType(), executionFlow.getProjectName(), executionFlow.getFlowName(),
-              executionFlow.getScheduleTime(), executionNode.getStatus());
+          executionFlow.getScheduleTime(), executionNode.getStatus());
+
       content += MessageFormat.format(CONTENT_NODE_FORMAT, executionNode.getName());
       mailSendService.sendToFlowUserMails(executionFlow.getFlowId(), title, content);
-    } catch (Exception e){
+    } catch (Exception e) {
       logger.error("send mail error", e);
     }
   }
 
   /**
-   * 发送 EMAIL(补数据) <p>
+   * 发送 EMAIL(补数据)
+   *
+   * @param projectFlow
+   * @param isSuccess
+   * @param resultList
    */
   public static void sendAddDataEmail(ProjectFlow projectFlow, boolean isSuccess, List<Map.Entry<Date, Boolean>> resultList) {
-    String title = MessageFormat.format(TITLE_FORMAT, "补数据", isSuccess ? "成功" : "失败");
+    String title = MessageFormat.format(TITLE_FORMAT, "Add data", isSuccess ? "Success" : "Failed");
     StringBuilder builder = new StringBuilder();
-    String head = MessageFormat.format(ADD_DATA_HEAD_FORMAT, "补数据", projectFlow.getProjectName(), projectFlow.getName());
+    String head = MessageFormat.format(ADD_DATA_HEAD_FORMAT, "Add data", projectFlow.getProjectName(), projectFlow.getName());
     builder.append(head);
+
     for (Map.Entry<Date, Boolean> entry : resultList) {
-      String item = MessageFormat.format(ADD_DATA_ITEM_FORMAT, BFDDateUtils.defaultFormat(entry.getKey()), getResultStatus(entry.getValue()));
+      String item = MessageFormat.format(ADD_DATA_ITEM_FORMAT, DateUtils.defaultFormat(entry.getKey()), getResultStatus(entry.getValue()));
       builder.append(item);
     }
+
     builder.append(ADD_DATA_TAIL_FORMAT);
     mailSendService.sendToFlowMails(projectFlow.getProjectId(), title, builder.toString(), true, null);
   }
 
   /**
-   * 获取结果状态字符串 <p>
+   * 获取结果状态字符串
    *
-   * @return 结果状态
+   * @param isSuccess
+   * @return
    */
   private static String getResultStatus(Boolean isSuccess) {
     if (isSuccess == null) {
-      return "未开始";
+      return "Not started";
     }
-    return isSuccess ? "<font color=\"green\">成功</font>" : "<font color=\"red\">失败</font>";
+
+    return isSuccess ? "<font color=\"green\">Success</font>" : "<font color=\"red\">Failed</font>";
   }
 
   /**
-   * 获取邮件标题 <p>
+   * 获取邮件标题
    *
-   * @return 标题
+   * @param runType
+   * @param flowStatus
+   * @return
    */
-
   public static String genTitle(FlowRunType runType, FlowStatus flowStatus) {
     return MessageFormat.format(TITLE_FORMAT, getRunTypeCnName(runType), getFlowStatusCnName(flowStatus));
   }
 
   /**
-   * 生成邮件内容 <p>
+   * 生成邮件内容
    *
-   * @return 内容
+   * @param runType
+   * @param projectName
+   * @param flowName
+   * @param scheduleDate
+   * @param flowStatus
+   * @return
    */
   public static String genContent(FlowRunType runType, String projectName, String flowName, Date scheduleDate, FlowStatus flowStatus) {
     return MessageFormat.format(CONTENT_FORMAT, getRunTypeCnName(runType), projectName, flowName,
-            BFDDateUtils.defaultFormat(scheduleDate), getFlowStatusCnNameH5(flowStatus));
+        DateUtils.defaultFormat(scheduleDate), getFlowStatusCnNameH5(flowStatus));
   }
 
   /**
-   * 获取执行类型的中文名 <p>
+   * 获取执行类型的描述 <p>
    *
-   * @return 中文名
+   * @param runType
+   * @return
    */
   private static String getRunTypeCnName(FlowRunType runType) {
     String cnName;
+
     switch (runType) {
       case ADD_DATA:
-        cnName = "补数据";
+        cnName = "Add data";
         break;
 
       case DIRECT_RUN:
-        cnName = "直接运行";
+        cnName = "Direct run";
         break;
 
       case DISPATCH:
-        cnName = "调度";
+        cnName = "Schedule";
         break;
 
       case STREAMING:
-        cnName = "流任务";
+        cnName = "Streaming task";
         break;
 
       default:
-        cnName = "未知";
+        cnName = "Unknown";
     }
+
     return cnName;
   }
 
   /**
-   * 获取执行状态的中文名 <p>
+   * 获取执行状态的描述 <p>
    *
-   * @return 中文名
+   * @param status
+   * @return
    */
   private static String getFlowStatusCnName(FlowStatus status) {
-    String cnName;
-    // 仅当失败或者被 kill 的时候认为任务失败，否则认为成功
-    switch (status) {
-      case KILL:
-      case FAILED:
-        cnName = "失败";
-        break;
-
-      default:
-        cnName = "成功";
+    if (status.typeIsFailure()) {
+      return "Failed";
     }
-    return cnName;
+
+    return "Success";
   }
 
   /**
-   * 获取执行状态的中文名 <p>
+   * 获取执行状态的描述 <p>
    *
-   * @return 中文名
+   * @param status
+   * @return
    */
   private static String getFlowStatusCnNameH5(FlowStatus status) {
-    String cnName;
-    // 仅当失败或者被 kill 的时候认为任务失败，否则认为成功
-    switch (status) {
-      case KILL:
-      case FAILED:
-        cnName = "<font color=\"red\">失败</font>";
-        break;
-
-      default:
-        cnName = "<font color=\"green\">成功</font>";
+    if (status.typeIsFailure()) {
+      return "<font color=\"red\">Failed</font>";
     }
-    return cnName;
+
+    return "<font color=\"green\">Success</font>";
   }
-
-  /**
-   * 获取工作流类型的中文名 <p>
-   *
-   * @return 中文名
-   */
-  private static String getFlowTypeCnName(FlowType type) {
-    String cnName;
-    switch (type) {
-      case SHORT:
-        cnName = "普通ETL";
-        break;
-      case LONG:
-        cnName = "流任务";
-        break;
-      case ETL:
-        cnName = "图形化ETL";
-        break;
-
-      default:
-        cnName = "其他";
-    }
-    return cnName;
-  }
-
 }
