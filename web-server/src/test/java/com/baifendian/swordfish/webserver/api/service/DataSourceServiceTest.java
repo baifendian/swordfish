@@ -114,7 +114,7 @@ public class DataSourceServiceTest {
       String desc = mockDataService.getRandomString();
       String paramter = mockDataService.getRandomString();
       MockHttpServletResponse mockHttpServletResponse = new MockHttpServletResponse();
-      DataSource res = datasourceService.modifyDataSource(user, project.getName(), dataSource.getName(), desc, DbType.MYSQL, paramter, mockHttpServletResponse);
+      DataSource res = datasourceService.modifyDataSource(user, project.getName(), dataSource.getName(), desc, paramter, mockHttpServletResponse);
       assertEquals(mockHttpServletResponse.getStatus(), HttpStatus.SC_OK);
       assertTrue(res != null);
     }
@@ -125,7 +125,7 @@ public class DataSourceServiceTest {
       String desc = mockDataService.getRandomString();
       String paramter = mockDataService.getRandomString();
       MockHttpServletResponse mockHttpServletResponse = new MockHttpServletResponse();
-      DataSource res = datasourceService.modifyDataSource(user1, project.getName(), dataSource.getName(), desc, DbType.MYSQL, paramter, mockHttpServletResponse);
+      DataSource res = datasourceService.modifyDataSource(user1, project.getName(), dataSource.getName(), desc, paramter, mockHttpServletResponse);
       assertEquals(mockHttpServletResponse.getStatus(), HttpStatus.SC_UNAUTHORIZED);
       assertTrue(res == null);
     }
@@ -135,7 +135,7 @@ public class DataSourceServiceTest {
       String desc = mockDataService.getRandomString();
       String paramter = mockDataService.getRandomString();
       MockHttpServletResponse mockHttpServletResponse = new MockHttpServletResponse();
-      DataSource res = datasourceService.modifyDataSource(user, project.getName(), name, desc, DbType.MYSQL, paramter, mockHttpServletResponse);
+      DataSource res = datasourceService.modifyDataSource(user, project.getName(), name, desc, paramter, mockHttpServletResponse);
       assertEquals(mockHttpServletResponse.getStatus(), HttpStatus.SC_NOT_MODIFIED);
       assertTrue(res == null);
     }
