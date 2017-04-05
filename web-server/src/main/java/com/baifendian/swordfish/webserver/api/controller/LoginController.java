@@ -40,6 +40,7 @@ import javax.servlet.http.HttpServletResponse;
 @RestController
 @RequestMapping("/login")
 public class LoginController {
+
   private static Logger logger = LoggerFactory.getLogger(LoginController.class.getName());
 
   @Autowired

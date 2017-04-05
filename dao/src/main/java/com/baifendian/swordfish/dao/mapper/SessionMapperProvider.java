@@ -21,6 +21,8 @@ import java.util.Map;
 
 public class SessionMapperProvider {
 
+  private static final String TABLE_NAME = "session";
+
   /**
    * @param parameter
    * @return
@@ -28,8 +30,10 @@ public class SessionMapperProvider {
   public String queryById(Map<String, Object> parameter) {
     return new SQL() {{
       SELECT("*");
-      FROM("session");
-      WHERE("id = #{sessionId}");
+
+      FROM(TABLE_NAME);
+
+      WHERE("`id` = #{sessionId}");
     }}.toString();
   }
 
@@ -40,9 +44,11 @@ public class SessionMapperProvider {
   public String queryByIdAndIp(Map<String, Object> parameter) {
     return new SQL() {{
       SELECT("*");
-      FROM("session");
-      WHERE("id = #{sessionId}");
-      WHERE("ip = #{ip}");
+
+      FROM(TABLE_NAME);
+
+      WHERE("`id` = #{sessionId}");
+      WHERE("`ip` = #{ip}");
     }}.toString();
   }
 
@@ -53,9 +59,11 @@ public class SessionMapperProvider {
   public String queryByUserIdAndIp(Map<String, Object> parameter) {
     return new SQL() {{
       SELECT("*");
-      FROM("session");
-      WHERE("user_id = #{userId}");
-      WHERE("ip = #{ip}");
+
+      FROM(TABLE_NAME);
+
+      WHERE("`user_id` = #{userId}");
+      WHERE("`ip` = #{ip}");
     }}.toString();
   }
 
@@ -65,11 +73,12 @@ public class SessionMapperProvider {
    */
   public String insert(Map<String, Object> parameter) {
     return new SQL() {{
-      INSERT_INTO("session");
-      VALUES("id", "#{session.id}");
-      VALUES("user_id", "#{session.userId}");
-      VALUES("ip", "#{session.ip}");
-      VALUES("last_login_time", "#{session.lastLoginTime}");
+      INSERT_INTO(TABLE_NAME);
+
+      VALUES("`id`", "#{session.id}");
+      VALUES("`user_id`", "#{session.userId}");
+      VALUES("`ip`", "#{session.ip}");
+      VALUES("`last_login_time`", "#{session.lastLoginTime}");
     }}.toString();
   }
 
@@ -79,8 +88,9 @@ public class SessionMapperProvider {
    */
   public String deleteById(Map<String, Object> parameter) {
     return new SQL() {{
-      DELETE_FROM("session");
-      WHERE("id = #{sessionId}");
+      DELETE_FROM(TABLE_NAME);
+
+      WHERE("`id` = #{sessionId}");
     }}.toString();
   }
 
@@ -90,8 +100,9 @@ public class SessionMapperProvider {
    */
   public String deleteByExpireTime(Map<String, Object> parameter) {
     return new SQL() {{
-      DELETE_FROM("session");
-      WHERE("last_login_time <= #{expireTime}");
+      DELETE_FROM(TABLE_NAME);
+
+      WHERE("`last_login_time` <= #{expireTime}");
     }}.toString();
   }
 
@@ -102,9 +113,11 @@ public class SessionMapperProvider {
   public String update(Map<String, Object> parameter) {
     return new SQL() {
       {
-        UPDATE("session");
-        SET("last_login_time=#{loginTime}");
-        WHERE("id = #{sessionId}");
+        UPDATE(TABLE_NAME);
+
+        SET("`last_login_time`=#{loginTime}");
+
+        WHERE("`id` = #{sessionId}");
       }
     }.toString();
   }

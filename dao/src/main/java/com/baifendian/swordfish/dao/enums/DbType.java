@@ -19,12 +19,11 @@ import org.apache.commons.lang.StringUtils;
 
 public enum DbType {
   /**
-   * 0 mysql, 1 oracle, 2 sqlserver, 3 mongodb, 4 hbase094x, 5 hbase11x, 6 ftp
+   * 0 mysql, 1 oracle, 2 mongodb, 3 hbase, 4 ftp
    */
-  MYSQL, ORACLE, SQLSERVER, MONOGODB, HBASE094X, HBASE11X, FTP;
+  MYSQL, ORACLE, MONOGODB, HBASE, FTP;
 
   /**
-   *
    * @return
    */
   public Integer getType() {
@@ -58,23 +57,9 @@ public enum DbType {
     }
 
     try {
-      return DbType.valueOf(type);
+      return DbType.valueOf(type.toUpperCase());
     } catch (Exception ex) {
       throw new IllegalArgumentException("Cannot convert " + type + " to " + DbType.class.getSimpleName() + " .", ex);
     }
-  }
-
-
-  /**
-   * 判断一个类型是否属于Enum
-   */
-  public static boolean isInEnum(String type) {
-    for (DbType dbType : values()) {
-      if (dbType.name().equals(type)) {
-        return true;
-      }
-    }
-
-    return false;
   }
 }

@@ -34,7 +34,7 @@ public class DataSourceManager {
   static{
     dataSourceHandlerMap.put(DbType.MYSQL, JDBCHandler.class);
     dataSourceHandlerMap.put(DbType.ORACLE, JDBCHandler.class);
-    dataSourceHandlerMap.put(DbType.HBASE11X, HBaseHandler.class);
+    dataSourceHandlerMap.put(DbType.HBASE, HBaseHandler.class);
     dataSourceHandlerMap.put(DbType.FTP, FtpHandler.class);
     dataSourceHandlerMap.put(DbType.MONOGODB, MongoDBHandler.class);
   }

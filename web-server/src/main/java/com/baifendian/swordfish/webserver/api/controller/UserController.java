@@ -59,8 +59,8 @@ public class UserController {
                          @RequestParam(value = "phone", required = false) String phone,
                          @RequestParam(value = "proxyUsers") String proxyUsers,
                          HttpServletResponse response) {
-    logger.info("Operator user id {}, create user, name: {}, email: {}, desc: {}, password: {}, phone: {}, proxyUsers: {}",
-        operator.getId(), name, email, desc, "******", phone, proxyUsers);
+    logger.info("Operator user {}, create user, name: {}, email: {}, desc: {}, password: {}, phone: {}, proxyUsers: {}",
+        operator.getName(), name, email, desc, "******", phone, proxyUsers);
 
     return userService.createUser(operator, name, email, desc, password, phone, proxyUsers, response);
   }
@@ -87,8 +87,8 @@ public class UserController {
                          @RequestParam(value = "phone", required = false) String phone,
                          @RequestParam(value = "proxyUsers", required = false) String proxyUsers,
                          HttpServletResponse response) {
-    logger.info("Operator user id {}, modify user, name: {}, email: {}, desc: {}, password: {}, phone: {}, proxyUsers: {}",
-        operator.getId(), name, email, desc, "******", phone, proxyUsers);
+    logger.info("Operator user {}, modify user, name: {}, email: {}, desc: {}, password: {}, phone: {}, proxyUsers: {}",
+        operator.getName(), name, email, desc, "******", phone, proxyUsers);
 
     return userService.modifyUser(operator, name, email, desc, password, phone, proxyUsers, response);
   }
@@ -105,8 +105,8 @@ public class UserController {
   public void deleteUser(@RequestAttribute(value = "session.user") User operator,
                          @PathVariable String name,
                          HttpServletResponse response) {
-    logger.info("Operator user id {}, delete user, name: {}",
-        operator.getId(), name);
+    logger.info("Operator user {}, delete user, name: {}",
+        operator.getName(), name);
 
     userService.deleteUser(operator, name, response);
   }
@@ -123,8 +123,8 @@ public class UserController {
   public List<User> queryUsers(@RequestAttribute(value = "session.user") User operator,
                                @RequestParam(value = "allUser", required = false, defaultValue = "false") boolean allUser,
                                HttpServletResponse response) {
-    logger.info("Operator user id {}, query user, allUser: {}",
-        operator.getId(), allUser);
+    logger.info("Operator user {}, query user, allUser: {}",
+        operator.getName(), allUser);
 
     return userService.queryUser(operator, allUser, response);
   }

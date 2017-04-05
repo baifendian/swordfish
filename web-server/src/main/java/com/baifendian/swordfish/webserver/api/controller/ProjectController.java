@@ -52,7 +52,7 @@ public class ProjectController {
                                @PathVariable("name") String name,
                                @RequestParam(value = "desc", required = false) String desc,
                                HttpServletResponse response) {
-    logger.info("Operator user id {}, create project, name: {}, desc: {}", operator.getId(), name, desc);
+    logger.info("Operator user {}, create project, name: {}, desc: {}", operator.getName(), name, desc);
 
     return projectService.createProject(operator, name, desc, response);
   }
@@ -70,7 +70,7 @@ public class ProjectController {
                                @PathVariable("name") String name,
                                @RequestParam(value = "desc", required = false) String desc,
                                HttpServletResponse response) {
-    logger.info("Operator user id {}, modify project, name: {}, desc: {}", operator.getId(), name, desc);
+    logger.info("Operator user {}, modify project, name: {}, desc: {}", operator.getName(), name, desc);
 
     return projectService.modifyProject(operator, name, desc, response);
   }
@@ -86,7 +86,7 @@ public class ProjectController {
   public void deleteProject(@RequestAttribute(value = "session.user") User operator,
                             @PathVariable("name") String name,
                             HttpServletResponse response) {
-    logger.info("Operator user id {}, delete project, name: {}, desc: {}", operator.getId(), name);
+    logger.info("Operator user {}, delete project, name: {}, desc: {}", operator.getName(), name);
 
     projectService.deleteProject(operator, name, response);
   }
@@ -100,7 +100,7 @@ public class ProjectController {
   @GetMapping(value = "")
   public List<Project> queryProjects(@RequestAttribute(value = "session.user") User operator,
                                      HttpServletResponse response) {
-    logger.info("Operator user id {}, get project list", operator.getId());
+    logger.info("Operator user {}, get project list", operator.getName());
 
     return projectService.queryProject(operator, response);
   }
@@ -121,7 +121,7 @@ public class ProjectController {
                                     @PathVariable("userName") String userName,
                                     @RequestParam(value = "perm") int perm,
                                     HttpServletResponse response) {
-    logger.info("Operator user id {}, add user to project, project name: {}, user name: {}, perm: {}", operator.getId(), name, userName, perm);
+    logger.info("Operator user {}, add user to project, project name: {}, user name: {}, perm: {}", operator.getName(), name, userName, perm);
 
     return projectService.addProjectUser(operator, name, userName, perm, response);
   }
@@ -142,7 +142,7 @@ public class ProjectController {
                                     @PathVariable("userName") String userName,
                                     @RequestParam(value = "perm") int perm,
                                     HttpServletResponse response) {
-    logger.info("Operator user id {}, modify user permission in the project, project name: {}, user name: {}, perm: {}", operator.getId(), name, userName, perm);
+    logger.info("Operator user {}, modify user permission in the project, project name: {}, user name: {}, perm: {}", operator.getName(), name, userName, perm);
 
     return projectService.modifyProjectUser(operator, name, userName, perm, response);
   }
@@ -159,7 +159,7 @@ public class ProjectController {
                                 @PathVariable("name") String name,
                                 @PathVariable("userName") String userName,
                                 HttpServletResponse response) {
-    logger.info("Operator user id {}, delete user from project, project name: {}, user name: {}, perm: {}", operator.getId(), name, userName);
+    logger.info("Operator user {}, delete user from project, project name: {}, user name: {}, perm: {}", operator.getName(), name, userName);
 
     projectService.deleteProjectUser(operator, name, userName, response);
   }
@@ -176,7 +176,7 @@ public class ProjectController {
   public List<ProjectUser> queryUser(@RequestAttribute(value = "session.user") User operator,
                                      @PathVariable("name") String name,
                                      HttpServletResponse response) {
-    logger.info("Operator user id {}, query users of project, project name: {}", operator.getId(), name);
+    logger.info("Operator user {}, query users of project, project name: {}", operator.getName(), name);
 
     return projectService.queryUser(operator, name, response);
   }

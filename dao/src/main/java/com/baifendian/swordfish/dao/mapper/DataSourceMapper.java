@@ -25,7 +25,6 @@ import org.mybatis.spring.annotation.MapperScan;
 import java.sql.Timestamp;
 import java.util.List;
 
-@MapperScan
 public interface DataSourceMapper {
   /**
    * 插入数据源
@@ -107,18 +106,18 @@ public interface DataSourceMapper {
    * @return
    */
   @Results(value = {
-          @Result(property = "id", column = "id", id = true, javaType = Integer.class, jdbcType = JdbcType.INTEGER),
-          @Result(property = "name", column = "name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-          @Result(property = "desc", column = "desc", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-          @Result(property = "type", column = "type", typeHandler = EnumOrdinalTypeHandler.class, javaType = DbType.class, jdbcType = JdbcType.INTEGER),
-          @Result(property = "ownerName", column = "owner", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-          @Result(property = "ownerId", column = "owner_id", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
-          @Result(property = "projectId", column = "project_id", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
-          @Result(property = "projectName", column = "project_name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-          @Result(property = "parameter", column = "parameter", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-          @Result(property = "createTime", column = "create_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE),
-          @Result(property = "modifyTime", column = "modify_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE)
+      @Result(property = "id", column = "id", id = true, javaType = Integer.class, jdbcType = JdbcType.INTEGER),
+      @Result(property = "name", column = "name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+      @Result(property = "desc", column = "desc", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+      @Result(property = "type", column = "type", typeHandler = EnumOrdinalTypeHandler.class, javaType = DbType.class, jdbcType = JdbcType.INTEGER),
+      @Result(property = "ownerName", column = "owner", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+      @Result(property = "ownerId", column = "owner_id", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
+      @Result(property = "projectId", column = "project_id", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
+      @Result(property = "projectName", column = "project_name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+      @Result(property = "parameter", column = "parameter", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+      @Result(property = "createTime", column = "create_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE),
+      @Result(property = "modifyTime", column = "modify_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE)
   })
   @SelectProvider(type = DataSourceMapperProvider.class, method = "getByProjectNameAndName")
-  DataSource getByProjectNameAndName(@Param("projectName") String projectName,@Param("name") String name);
+  DataSource getByProjectNameAndName(@Param("projectName") String projectName, @Param("name") String name);
 }

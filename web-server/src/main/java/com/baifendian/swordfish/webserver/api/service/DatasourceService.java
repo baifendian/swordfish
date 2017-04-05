@@ -125,6 +125,28 @@ public class DatasourceService {
   }
 
   /**
+   * put 数据源, 不存在则创建
+   *
+   * @param operator
+   * @param projectName
+   * @param name
+   * @param desc
+   * @param type
+   * @param parameter
+   * @param response
+   * @return
+   */
+  public DataSource putDataSource(User operator, String projectName, String name, String desc, DbType type, String parameter, HttpServletResponse response) {
+    DataSource dataSource = dataSourceMapper.getByProjectNameAndName(projectName, name);
+
+    if (dataSource == null) {
+      return createDataSource(operator, projectName, name, desc, type, parameter, response);
+    }
+
+    return modifyDataSource(operator, projectName, name, desc, type, parameter, response);
+  }
+
+  /**
    * 修改一个数据源
    *
    * @param operator
@@ -134,19 +156,14 @@ public class DatasourceService {
    * @param type
    * @param parameter
    * @param response
-   * @param create      true 表示不存在则创建, false 表示不存在则报错
    * @return
    */
-  public DataSource modifyDataSource(User operator, String projectName, String name, String desc, DbType type, String parameter, HttpServletResponse response, boolean create) {
+  public DataSource modifyDataSource(User operator, String projectName, String name, String desc, DbType type, String parameter, HttpServletResponse response) {
     // 查询项目
     Project project = projectMapper.queryByName(projectName);
 
     // 不存在的项目名
     if (project == null) {
-      if (create) { // 需要创建
-        return createDataSource(operator, projectName, name, desc, type, parameter, response);
-      }
-
       response.setStatus(HttpStatus.SC_NOT_MODIFIED);
       return null;
     }

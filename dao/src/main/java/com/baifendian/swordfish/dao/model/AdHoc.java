@@ -16,28 +16,75 @@
 package com.baifendian.swordfish.dao.model;
 
 import com.baifendian.swordfish.dao.enums.FlowStatus;
-import com.baifendian.swordfish.dao.enums.FlowStatus;
 
 import java.util.Date;
 
 public class AdHoc {
-  private long id;
+  /**
+   * exec id
+   */
+  private int id;
+
+  /**
+   * 项目 id
+   */
   private int projectId;
-  private String parameter;
-  private String proxyUser;
-  private String queue;
-  private FlowStatus status;
-  private Date createTime;
+
+  /**
+   * owner
+   */
   private int owner;
-  private Date startTime;
-  private Date endTime;
+
+  /**
+   * 参数信息
+   */
+  private String parameter;
+
+  /**
+   * 代理用户
+   */
+  private String proxyUser;
+
+  /**
+   * 队列
+   */
+  private String queue;
+
+  /**
+   * 状态
+   */
+  private FlowStatus status;
+
+  /**
+   * job id
+   */
   private String jobId;
 
-  public long getId() {
+  /**
+   * timeout for the ad-hoc
+   */
+  private int timeout;
+
+  /**
+   * 创建时间
+   */
+  private Date createTime;
+
+  /**
+   * 执行的起始时间
+   */
+  private Date startTime;
+
+  /**
+   * 执行的结束时间
+   */
+  private Date endTime;
+
+  public int getId() {
     return id;
   }
 
-  public void setId(long id) {
+  public void setId(int id) {
     this.id = id;
   }
 
@@ -47,6 +94,14 @@ public class AdHoc {
 
   public void setProjectId(int projectId) {
     this.projectId = projectId;
+  }
+
+  public int getOwner() {
+    return owner;
+  }
+
+  public void setOwner(int owner) {
+    this.owner = owner;
   }
 
   public String getParameter() {
@@ -81,6 +136,30 @@ public class AdHoc {
     this.status = status;
   }
 
+  public String getJobId() {
+    return jobId;
+  }
+
+  public void setJobId(String jobId) {
+    this.jobId = jobId;
+  }
+
+  public int getTimeout() {
+    return timeout;
+  }
+
+  public void setTimeout(int timeout) {
+    this.timeout = timeout;
+  }
+
+  public Date getCreateTime() {
+    return createTime;
+  }
+
+  public void setCreateTime(Date createTime) {
+    this.createTime = createTime;
+  }
+
   public Date getStartTime() {
     return startTime;
   }
@@ -95,29 +174,5 @@ public class AdHoc {
 
   public void setEndTime(Date endTime) {
     this.endTime = endTime;
-  }
-
-  public String getJobId() {
-    return jobId;
-  }
-
-  public void setJobId(String jobId) {
-    this.jobId = jobId;
-  }
-
-  public Date getCreateTime() {
-    return createTime;
-  }
-
-  public void setCreateTime(Date createTime) {
-    this.createTime = createTime;
-  }
-
-  public int getOwner() {
-    return owner;
-  }
-
-  public void setOwner(int owner) {
-    this.owner = owner;
   }
 }

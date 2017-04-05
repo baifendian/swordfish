@@ -20,6 +20,7 @@ import org.apache.ibatis.annotations.*;
 import org.apache.ibatis.type.JdbcType;
 
 import java.sql.Timestamp;
+import java.util.List;
 
 public interface ResourceMapper {
 
@@ -32,6 +33,28 @@ public interface ResourceMapper {
   @InsertProvider(type = ResourceSqlProvider.class, method = "insert")
   @SelectKey(statement = "SELECT LAST_INSERT_ID() AS id", keyProperty = "resource.id", resultType = int.class, before = false)
   int insert(@Param("resource") Resource resource);
+
+  /**
+   * 根据项目和资源名称查询
+   *
+   * @param projectName
+   * @param name
+   * @return
+   */
+  @Results(value = {@Result(property = "id", column = "id", id = true, javaType = int.class, jdbcType = JdbcType.INTEGER),
+      @Result(property = "name", column = "name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+      @Result(property = "suffix", column = "suffix", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+      @Result(property = "originFilename", column = "origin_filename", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+      @Result(property = "desc", column = "desc", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+      @Result(property = "ownerId", column = "owner_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
+      @Result(property = "owner", column = "owner", javaType = int.class, jdbcType = JdbcType.INTEGER),
+      @Result(property = "projectId", column = "project_id", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
+      @Result(property = "projectName", column = "project_name", javaType = int.class, jdbcType = JdbcType.INTEGER),
+      @Result(property = "createTime", column = "create_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE),
+      @Result(property = "modifyTime", column = "modify_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE)
+  })
+  @SelectProvider(type = ResourceSqlProvider.class, method = "queryByProjectAndResName")
+  Resource queryByProjectAndResName(@Param("projectName") String projectName, @Param("name") String name);
 
   /**
    * 查询资源, 根据名称查询
@@ -51,47 +74,74 @@ public interface ResourceMapper {
   })
   @SelectProvider(type = ResourceSqlProvider.class, method = "queryResource")
   Resource queryResource(@Param("projectId") int projectId, @Param("name") String name);
-//
-//  /**
-//   * 删除资源
-//   *
-//   * @param name
-//   * @return
-//   */
-//  @DeleteProvider(type = ResourceSqlProvider.class, method = "delete")
-//  int delete(@Param("name") String name);
-//
-//  /**
-//   * 查询详情 <p>
-//   *
-//   * @return {@link Resources}
-//   */
-//  @Results(value = {@Result(property = "id", column = "id", id = true, javaType = int.class, jdbcType = JdbcType.INTEGER),
-//      @Result(property = "type", column = "type", typeHandler = EnumOrdinalTypeHandler.class, javaType = ResourceType.class, jdbcType = JdbcType.INTEGER),
-//      @Result(property = "name", column = "name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-//      @Result(property = "parentId", column = "parent_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
-//      @Result(property = "ownerId", column = "owner_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
-//      @Result(property = "ownerName", column = "owner_name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-//      @Result(property = "createTime", column = "create_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE),
-//      @Result(property = "modifyTime", column = "modify_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE),
-//      @Result(property = "publishTime", column = "publish_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE),
-//      @Result(property = "desc", column = "desc", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-//      @Result(property = "projectId", column = "project_id", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
-//      @Result(property = "projectName", column = "project_name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-//      @Result(property = "orgId", column = "org_id", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
-//      @Result(property = "orgName", column = "org_name", javaType = String.class, jdbcType = JdbcType.VARCHAR),})
-//  @SelectProvider(type = ResourceSqlProvider.class, method = "queryDetails")
-//  List<Resources> queryDetails(@Param("resourceIds") Set<Integer> resourceIds);
-//
-//  /**
-//   * 删除项目的资源信息
-//   */
-//  @DeleteProvider(type = ResourceSqlProvider.class, method = "deleteByProjectId")
-//  int deleteByProjectId(@Param("projectId") Integer projectId);
-//
-//  @SelectProvider(type = ResourceSqlProvider.class, method = "queryIdByNames")
-//  List<Integer> queryIdByNames(@Param("projectId") Integer projectId, @Param("resourceNames") List<String> resourceNames);
-//
-//  @SelectProvider(type = ResourceSqlProvider.class, method = "countByProject")
-//  Integer countByProject(@Param("projectId") Integer projectId);
+
+  /**
+   * 更新资源
+   *
+   * @param resource
+   */
+  @UpdateProvider(type = ResourceSqlProvider.class, method = "update")
+  int update(@Param("resource") Resource resource);
+
+  /**
+   * 删除资源
+   *
+   * @param resourceId
+   * @return
+   */
+  @DeleteProvider(type = ResourceSqlProvider.class, method = "delete")
+  int delete(@Param("resourceId") int resourceId);
+
+  /**
+   * 删除资源
+   *
+   * @param projectId
+   * @param name
+   * @return
+   */
+  @DeleteProvider(type = ResourceSqlProvider.class, method = "deleteResource")
+  int deleteResource(@Param("projectId") int projectId, @Param("name") String name);
+
+  /**
+   * 查询资源的详情
+   *
+   * @param projectId
+   * @param name
+   * @return
+   */
+  @Results(value = {@Result(property = "id", column = "id", id = true, javaType = int.class, jdbcType = JdbcType.INTEGER),
+      @Result(property = "name", column = "name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+      @Result(property = "suffix", column = "suffix", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+      @Result(property = "originFilename", column = "origin_filename", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+      @Result(property = "desc", column = "desc", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+      @Result(property = "ownerId", column = "owner", javaType = int.class, jdbcType = JdbcType.INTEGER),
+      @Result(property = "owner", column = "owner_name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+      @Result(property = "projectId", column = "project_id", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
+      @Result(property = "projectName", column = "project_name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+      @Result(property = "createTime", column = "create_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE),
+      @Result(property = "modifyTime", column = "modify_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE)
+  })
+  @SelectProvider(type = ResourceSqlProvider.class, method = "queryResourceDetail")
+  Resource queryResourceDetail(@Param("projectId") int projectId, @Param("name") String name);
+
+  /**
+   * 查询项目下的资源列表
+   *
+   * @param projectId
+   * @return
+   */
+  @Results(value = {@Result(property = "id", column = "id", id = true, javaType = int.class, jdbcType = JdbcType.INTEGER),
+      @Result(property = "name", column = "name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+      @Result(property = "suffix", column = "suffix", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+      @Result(property = "originFilename", column = "origin_filename", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+      @Result(property = "desc", column = "desc", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+      @Result(property = "ownerId", column = "owner", javaType = int.class, jdbcType = JdbcType.INTEGER),
+      @Result(property = "owner", column = "owner_name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+      @Result(property = "projectId", column = "project_id", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
+      @Result(property = "projectName", column = "project_name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+      @Result(property = "createTime", column = "create_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE),
+      @Result(property = "modifyTime", column = "modify_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE)
+  })
+  @SelectProvider(type = ResourceSqlProvider.class, method = "queryResourceDetails")
+  List<Resource> queryResourceDetails(@Param("projectId") int projectId);
 }

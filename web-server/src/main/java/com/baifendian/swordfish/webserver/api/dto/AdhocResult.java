@@ -13,12 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.baifendian.swordfish.dao.model;
+package com.baifendian.swordfish.webserver.api.dto;
 
-import java.util.ArrayList;
 import java.util.List;
 
-public class AdHocJsonObject {
+public class AdhocResult {
+  /**
+   * 具体的语句
+   */
+  private String stm;
+
   /**
    * 返回的表头
    */
@@ -27,44 +31,28 @@ public class AdHocJsonObject {
   /**
    * 返回的数据
    */
-  private List<List<String>> values = new ArrayList<>();
+  private List<List<String>> values;
 
-  /**
-   * getter method
-   *
-   * @return the titles
-   * @see AdHocJsonObject#titles
-   */
+  public String getStm() {
+    return stm;
+  }
+
+  public void setStm(String stm) {
+    this.stm = stm;
+  }
+
   public List<String> getTitles() {
     return titles;
   }
 
-  /**
-   * setter method
-   *
-   * @param titles the titles to set
-   * @see AdHocJsonObject#titles
-   */
   public void setTitles(List<String> titles) {
     this.titles = titles;
   }
 
-  /**
-   * getter method
-   *
-   * @return the values
-   * @see AdHocJsonObject#values
-   */
   public List<List<String>> getValues() {
     return values;
   }
 
-  /**
-   * setter method
-   *
-   * @param values the values to set
-   * @see AdHocJsonObject#values
-   */
   public void setValues(List<List<String>> values) {
     this.values = values;
   }

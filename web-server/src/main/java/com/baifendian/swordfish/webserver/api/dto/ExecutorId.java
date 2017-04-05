@@ -16,40 +16,23 @@
 package com.baifendian.swordfish.webserver.api.dto;
 
 /**
- * 基础返回结果
+ * 获取执行的 id 信息
  */
-public class BaseResponse {
+public class ExecutorId {
   /**
-   * 状态为 0 表示成功, 否则失败
+   * 执行 id
    */
-  private int status;
+  private int execId;
 
-  /**
-   * 错误消息
-   */
-  private String message;
-
-  public BaseResponse() {
+  public ExecutorId(int execId) {
+    this.execId = execId;
   }
 
-  public BaseResponse(int status, String message) {
-    this.status = status;
-    this.message = message;
+  public int getExecId() {
+    return execId;
   }
 
-  public int getStatus() {
-    return status;
-  }
-
-  public void setStatus(int status) {
-    this.status = status;
-  }
-
-  public String getMessage() {
-    return message;
-  }
-
-  public void setMessage(String message) {
-    this.message = message;
+  public void setExecId(int execId) {
+    this.execId = execId;
   }
 }

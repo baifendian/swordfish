@@ -18,7 +18,6 @@ package com.baifendian.swordfish.dao.mapper;
 import com.baifendian.swordfish.dao.enums.FlowType;
 import com.baifendian.swordfish.dao.enums.ScheduleStatus;
 import com.baifendian.swordfish.dao.model.Schedule;
-import com.baifendian.swordfish.dao.model.statistics.DisField;
 
 import org.apache.ibatis.annotations.*;
 import org.apache.ibatis.type.EnumOrdinalTypeHandler;
@@ -29,8 +28,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
-@MapperScan
 public interface ScheduleMapper {
+
   /**
    * 插入记录 <p>
    *
@@ -111,15 +110,15 @@ public interface ScheduleMapper {
 
   @DeleteProvider(type = ScheduleMapperProvider.class, method = "deleteByFlowId")
   int deleteByFlowId(@Param("flowId") int flowId);
-
-  /**
-   * 工作流类型分布 <p>
-   */
-  @Results(value = {@Result(property = "flowType", column = "flow_type", typeHandler = EnumOrdinalTypeHandler.class, jdbcType = JdbcType.TINYINT),
-          @Result(property = "value", column = "num", javaType = int.class, jdbcType = JdbcType.INTEGER),
-  })
-  @SelectProvider(type = ScheduleMapperProvider.class, method = "queryFlowTypeDis")
-  List<DisField> queryFlowTypeDis(@Param("projectId") int projectId);
+//
+//  /**
+//   * 工作流类型分布 <p>
+//   */
+//  @Results(value = {@Result(property = "flowType", column = "flow_type", typeHandler = EnumOrdinalTypeHandler.class, jdbcType = JdbcType.TINYINT),
+//          @Result(property = "value", column = "num", javaType = int.class, jdbcType = JdbcType.INTEGER),
+//  })
+//  @SelectProvider(type = ScheduleMapperProvider.class, method = "queryFlowTypeDis")
+//  List<DisField> queryFlowTypeDis(@Param("projectId") int projectId);
 
   /**
    * 查询一个项目中图形化ETL上线的的数目 <p>
@@ -129,15 +128,15 @@ public interface ScheduleMapper {
   @SelectProvider(type = ScheduleMapperProvider.class, method = "queryFlowEtlNum")
   int queryFlowEtlNum(@Param("projectId") int projectId);
 
-
-  /**
-   * 工作流调度类型分布 <p>
-   */
-  @Results(value = {@Result(property = "scheduleType", column = "schedule_type", typeHandler = EnumOrdinalTypeHandler.class, jdbcType = JdbcType.TINYINT),
-          @Result(property = "value", column = "num", javaType = int.class, jdbcType = JdbcType.INTEGER),
-  })
-  @SelectProvider(type = ScheduleMapperProvider.class, method = "selectScheduleTypeDis")
-  List<DisField> selectScheduleTypeDis(@Param("projectId") int projectId);
+//
+//  /**
+//   * 工作流调度类型分布 <p>
+//   */
+//  @Results(value = {@Result(property = "scheduleType", column = "schedule_type", typeHandler = EnumOrdinalTypeHandler.class, jdbcType = JdbcType.TINYINT),
+//          @Result(property = "value", column = "num", javaType = int.class, jdbcType = JdbcType.INTEGER),
+//  })
+//  @SelectProvider(type = ScheduleMapperProvider.class, method = "selectScheduleTypeDis")
+//  List<DisField> selectScheduleTypeDis(@Param("projectId") int projectId);
 
   @SelectProvider(type = ScheduleMapperProvider.class, method = "selectScheduleTypeNull")
   int selectScheduleTypeNull(@Param("projectId") int projectId);
