@@ -267,7 +267,7 @@ public class FlowScheduleJob implements Job {
       Schedule depSchedule = flowDao.querySchedule(depFlowId);
       if (depSchedule != null) {
         Map.Entry<Date, Date> cycleDate;
-        if (depSchedule.getScheduleType().ordinal() > schedule.getScheduleType().ordinal()) {
+        /*if (depSchedule.getScheduleType().ordinal() > schedule.getScheduleType().ordinal()) {
           cycleDate = calcCycleDate(scheduledFireTime, depSchedule.getScheduleType());
         } else {
           cycleDate = calcCycleDate(scheduledFireTime, schedule.getScheduleType());
@@ -276,7 +276,7 @@ public class FlowScheduleJob implements Job {
         // 检测依赖的最新状态
         if (!checkDepWorkflowStatus(scheduledFireTime, depFlowId, cycleDate, startTime, timeout)) {
           return false;
-        }
+        }*/
       }
     }
     return true;
