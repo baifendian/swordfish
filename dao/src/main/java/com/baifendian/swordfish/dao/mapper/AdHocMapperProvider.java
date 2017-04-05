@@ -95,7 +95,7 @@ public class AdHocMapperProvider {
         SELECT("*");
 
         FROM(TABLE_NAME );
-        WHERE("id = #{execId}");
+        WHERE("id = #{id}");
       }
     }.toString();
   }

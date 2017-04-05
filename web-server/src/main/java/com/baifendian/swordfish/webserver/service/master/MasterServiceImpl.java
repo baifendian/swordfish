@@ -111,7 +111,7 @@ public class MasterServiceImpl implements Iface {
         return ResultHelper.createErrorResult("adhoc id not exists");
       }
       master.execAdHoc(adHocId);
-    } catch (TException | ExecException e) {
+    } catch (Exception e) {
       LOGGER.error(e.getMessage(), e);
       return ResultHelper.createErrorResult(e.getMessage());
     }
@@ -126,13 +126,13 @@ public class MasterServiceImpl implements Iface {
     LOGGER.info("set schedule {} {}", projectId, flowId);
 
     if (scheduleInfo == null || StringUtils.isEmpty(scheduleInfo.getCronExpression())) {
-      return ResultHelper.createErrorResult("scheduleInfo 参数内容不能为空");
+      return ResultHelper.createErrorResult("scheduleInfo param is null");
     }
 
     try {
       Schedule schedule = flowDao.querySchedule(flowId);
       if (schedule == null) {
-        return ResultHelper.createErrorResult("schedule 元数据为空");
+        return ResultHelper.createErrorResult("flow schedule info not exists");
       }
 
       // 解析参数
@@ -190,13 +190,14 @@ public class MasterServiceImpl implements Iface {
    */
   @Override
   public RetInfo appendWorkFlow(int projectId, int flowId, String scheduleMeta) throws TException {
+    LOGGER.debug("append workflow projectId:{}, flowId:{},scheduleMeta:{}", projectId, flowId, scheduleMeta);
     ScheduleMeta meta = null;
     try {
       ProjectFlow flow = flowDao.queryFlow(flowId);
       // 若 workflow 被删除
       if (flow == null) {
-        LOGGER.error("projectId:{},flowId:{} 的工作流不存在", projectId, flowId);
-        return ResultHelper.createErrorResult("当前workflow 不存在");
+        LOGGER.error("projectId:{},flowId:{} workflow not exists", projectId, flowId);
+        return ResultHelper.createErrorResult("current workflow not exists");
       }
 
       meta = JsonUtil.parseObject(scheduleMeta, ScheduleMeta.class);
@@ -214,7 +215,7 @@ public class MasterServiceImpl implements Iface {
     }
 
     if (meta == null) {
-      return ResultHelper.createErrorResult("scheduleMeta 信息不正确");
+      return ResultHelper.createErrorResult("scheduleMeta is null");
     }
 
     return ResultHelper.SUCCESS;
@@ -224,7 +225,7 @@ public class MasterServiceImpl implements Iface {
   public RetInfo registerExecutor(String host, int port, long registerTime) throws TException {
     try {
       master.registerExecutor(host, port, registerTime);
-    } catch (MasterException e) {
+    } catch (Exception e) {
       LOGGER.warn("executor register error", e);
       return ResultHelper.createErrorResult(e.getMessage());
     }
@@ -238,7 +239,7 @@ public class MasterServiceImpl implements Iface {
   public RetInfo executorReport(String host, int port, HeartBeatData heartBeatData) throws org.apache.thrift.TException {
     try {
       master.executorReport(host, port, heartBeatData);
-    } catch (MasterException e) {
+    } catch (Exception e) {
       LOGGER.warn("executor report error", e);
       return ResultHelper.createErrorResult(e.getMessage());
     }
@@ -249,7 +250,7 @@ public class MasterServiceImpl implements Iface {
   public RetInfo cancelExecFlow(int execId) throws org.apache.thrift.TException {
     try {
       return master.cancelExecFlow(execId);
-    } catch (MasterException e) {
+    } catch (Exception e) {
       LOGGER.warn("executor report error", e);
       return ResultHelper.createErrorResult(e.getMessage());
     }

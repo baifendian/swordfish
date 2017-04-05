@@ -16,18 +16,30 @@
 package com.baifendian.swordfish.dao;
 
 import com.baifendian.swordfish.dao.datasource.ConnectionFactory;
+import com.baifendian.swordfish.dao.enums.FlowStatus;
 import com.baifendian.swordfish.dao.mapper.AdHocMapper;
+import com.baifendian.swordfish.dao.mapper.AdHocResultMapper;
 import com.baifendian.swordfish.dao.model.AdHoc;
+import com.baifendian.swordfish.dao.model.AdHocResult;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.sql.Timestamp;
+import java.util.List;
 
 public class AdHocDao extends BaseDao {
   @Autowired
   private AdHocMapper adHocMapper;
 
+  @Autowired
+  private AdHocResultMapper adHocResultMapper;
+
   @Override
   protected void init() {
     adHocMapper = ConnectionFactory.getSqlSession().getMapper(AdHocMapper.class);
+    adHocResultMapper = ConnectionFactory.getSqlSession().getMapper(AdHocResultMapper.class);
   }
 
   public boolean updateAdHoc(AdHoc adHoc) {
@@ -38,7 +50,28 @@ public class AdHocDao extends BaseDao {
     return adHocMapper.insert(adHoc);
   }
 
-  public AdHoc getAdHoc(long id){
+  public AdHoc getAdHoc(int id){
     return adHocMapper.selectById(id);
+  }
+
+  public boolean updateAdHocResult(AdHocResult adHocResult) {
+    return adHocResultMapper.update(adHocResult) > 0;
+  }
+
+  @Transactional(value = "TransactionManager")
+  public void initAdHocResult(int execId, List<String> execSqls){
+    if(CollectionUtils.isNotEmpty(execSqls)){
+      adHocResultMapper.delete(execId);
+      int index=0;
+      for(String stm: execSqls){
+        AdHocResult adHocResult = new AdHocResult();
+        adHocResult.setExecId(execId);
+        adHocResult.setStm(stm);
+        adHocResult.setIndex(index++);
+        adHocResult.setStatus(FlowStatus.INIT);
+        adHocResult.setCreateTime(new Timestamp(System.currentTimeMillis()));
+        adHocResultMapper.insert(adHocResult);
+      }
+    }
   }
 }

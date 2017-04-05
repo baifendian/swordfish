@@ -158,8 +158,9 @@ public class FlowRunnerManager {
    * 提交调度的 workflow 执行 <p>
    */
   public void submitFlow(ExecutionFlow executionFlow, Schedule schedule, Date scheduleDate) {
-    int maxTryTimes = schedule.getMaxTryTimes() != null ? schedule.getMaxTryTimes() : defaultMaxTryTimes;
-    int timeout = schedule.getTimeout() != null ? schedule.getTimeout() : defaultMaxTimeout;
+    //int maxTryTimes = schedule.getMaxTryTimes() != null ? schedule.getMaxTryTimes() : defaultMaxTryTimes;
+    int maxTryTimes = schedule.getMaxTryTimes();
+    int timeout = schedule.getTimeout() != 0 ? schedule.getTimeout() : defaultMaxTimeout;
     FailurePolicyType failurePolicy = schedule.getFailurePolicy() != null ? schedule.getFailurePolicy() : defaultFailurePolicyType;
 
     // 系统参数

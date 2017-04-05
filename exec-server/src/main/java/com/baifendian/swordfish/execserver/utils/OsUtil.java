@@ -15,6 +15,7 @@
  */
 package com.baifendian.swordfish.execserver.utils;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -174,5 +175,68 @@ public class OsUtil {
     return map;
   }
 
+  public static List<String> getUserList() {
+    List<String> userList = new ArrayList<>();
+    InputStreamReader inputs = null;
+    BufferedReader buffer = null;
+    try {
+      inputs = new InputStreamReader(new FileInputStream("/etc/passwd"));
+      buffer = new BufferedReader(inputs);
+      String line = "";
+      while (true) {
+        line = buffer.readLine();
+        if (line == null)
+          break;
+
+        if (line.contains(":")) {
+          String[] userInfo = line.split(":");
+          userList.add(userInfo[0]);
+        }
+      }
+    } catch (Exception e){
+      logger.error("get memory usage error", e);
+    } finally {
+      try {
+        buffer.close();
+        inputs.close();
+      } catch (IOException e) {
+        logger.error("close stream", e);
+      }
+    }
+    return userList;
+  }
+
+  public static String getGroup() throws IOException {
+    String cmd = "groups";
+    String result = exeCmd(cmd);
+    if(StringUtils.isNotEmpty(result)){
+      String[] groupInfo = StringUtils.split(result);
+      return groupInfo[0];
+    }
+    return null;
+  }
+
+  public static String exeCmd(String commandStr) throws IOException {
+    BufferedReader br = null;
+    try {
+      Process p = Runtime.getRuntime().exec(commandStr);
+      br = new BufferedReader(new InputStreamReader(p.getInputStream()));
+      String line = null;
+      StringBuilder sb = new StringBuilder();
+      while ((line = br.readLine()) != null) {
+        sb.append(line + "\n");
+      }
+      return sb.toString();
+    } finally {
+      if (br != null)
+      {
+        try {
+          br.close();
+        } catch (Exception e) {
+          e.printStackTrace();
+        }
+      }
+    }
+  }
 
 }

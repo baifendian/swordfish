@@ -15,6 +15,7 @@
  */
 package com.baifendian.swordfish.execserver;
 
+import com.baifendian.swordfish.dao.model.flow.ScheduleMeta;
 import com.baifendian.swordfish.rpc.HeartBeatData;
 import com.baifendian.swordfish.rpc.MasterService;
 import com.baifendian.swordfish.rpc.RetInfo;
@@ -175,6 +176,23 @@ public class MasterClient {
     connect();
     try {
       RetInfo ret = client.cancelExecFlow(id);
+      if (ret.getStatus() != 0) {
+        logger.error("exec flow error:{}", ret.getMsg());
+        return false;
+      }
+    } catch (TException e) {
+      logger.error("exec flow error", e);
+      return false;
+    } finally {
+      close();
+    }
+    return true;
+  }
+
+  public boolean appendWorkFlow(int projectId, int workflowId, String scheduleMeta) {
+    connect();
+    try {
+      RetInfo ret = client.appendWorkFlow(projectId, workflowId, scheduleMeta);
       if (ret.getStatus() != 0) {
         logger.error("exec flow error:{}", ret.getMsg());
         return false;
