@@ -73,7 +73,7 @@ public class AdHocResultMapperProvider {
     return new SQL() {
       {
         DELETE_FROM(TABLE_NAME);
-        WHERE("exec_id = #{adHocId}");
+        WHERE("exec_id = #{execId}");
       }
     }.toString();
   }

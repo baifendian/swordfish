@@ -46,23 +46,23 @@ public class ShellJob extends AbstractProcessJob {
   public ShellJob(String jobIdLog, JobProps props, Logger logger) throws IOException {
     super(jobIdLog, props, logger);
 
-    if (!shellParam.checkValid()) {
-      throw new ExecException("ShellJob script param can't be null");
-    }
     this.currentPath = getWorkingDirectory();
-
   }
 
   @Override
   public void initJobParams() {
+    logger.debug("job params {}", props.getJobParams());
     shellParam = JsonUtil.parseObject(props.getJobParams(), ShellParam.class);
-    String script = shellParam.getScript();
-    script = ParamHelper.resolvePlaceholders(script, props.getDefinedParams());
-    shellParam.setScript(script);
+    if (!shellParam.checkValid()) {
+      throw new ExecException("ShellJob script param can't be null");
+    }
   }
 
   @Override
   public ProcessBuilder createProcessBuilder() throws IOException {
+    String script = shellParam.getScript();
+    script = ParamHelper.resolvePlaceholders(script, props.getDefinedParams());
+    shellParam.setScript(script);
     logger.info("script:\n{}", shellParam.getScript());
     logger.info("currentPath: {}", currentPath);
     String fileName = currentPath + "/" + jobIdLog + "_" + UUID.randomUUID().toString().substring(0, 8) + ".sh";

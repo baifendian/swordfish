@@ -295,7 +295,7 @@ public class FlowRunner implements Runnable {
       JobProps props = new JobProps();
       props.setJobParams(node.getParameter());
       props.setDefinedParams(allParamMap);
-      String jobId = node.getType() + "_" + node.getId();
+      String jobId = node.getType() + "_" + node.getName();
 
       Job job = JobTypeManager.newJob(jobId, node.getType(), props, LOGGER);
       if (job.getParam() != null && job.getParam().getResourceFiles() != null) {

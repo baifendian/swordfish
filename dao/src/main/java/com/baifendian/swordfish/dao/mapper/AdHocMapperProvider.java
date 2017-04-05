@@ -92,6 +92,17 @@ public class AdHocMapperProvider {
   public String selectById(Map<String, Object> parameter) {
     return new SQL() {
       {
+        SELECT("*");
+
+        FROM(TABLE_NAME );
+        WHERE("id = #{execId}");
+      }
+    }.toString();
+  }
+
+  public String selectByUserAndId(Map<String, Object> parameter) {
+    return new SQL() {
+      {
         SELECT("p.*");
 
         FROM(TABLE_NAME + " as a");
