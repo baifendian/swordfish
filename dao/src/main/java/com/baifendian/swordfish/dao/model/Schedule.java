@@ -60,14 +60,14 @@ public class Schedule {
 
   private FailurePolicyType failurePolicy;
 
-  private int maxTryTimes;
+  private Integer maxTryTimes;
 
   private NotifyType notifyType;
 
   @JsonIgnore
   private String notifyMailsStr;
 
-  private int timeout;
+  private Integer timeout;
 
   private Date createTime;
 
@@ -201,11 +201,11 @@ public class Schedule {
     this.failurePolicy = failurePolicy;
   }
 
-  public int getMaxTryTimes() {
+  public Integer getMaxTryTimes() {
     return maxTryTimes;
   }
 
-  public void setMaxTryTimes(int maxTryTimes) {
+  public void setMaxTryTimes(Integer maxTryTimes) {
     this.maxTryTimes = maxTryTimes;
   }
 
@@ -237,11 +237,11 @@ public class Schedule {
     this.notifyMails = notifyMails;
   }
 
-  public int getTimeout() {
+  public Integer getTimeout() {
     return timeout;
   }
 
-  public void setTimeout(int timeout) {
+  public void setTimeout(Integer timeout) {
     this.timeout = timeout;
   }
 
