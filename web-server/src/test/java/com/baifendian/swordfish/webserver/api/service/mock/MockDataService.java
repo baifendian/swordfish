@@ -18,6 +18,7 @@ package com.baifendian.swordfish.webserver.api.service.mock;
 import com.baifendian.swordfish.dao.enums.*;
 import com.baifendian.swordfish.dao.mapper.*;
 import com.baifendian.swordfish.dao.model.*;
+import com.baifendian.swordfish.dao.model.flow.params.Property;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -227,7 +228,7 @@ public class MockDataService {
    *
    * @return
    */
-  public ProjectFlow.ProjectFlowData mocProjectFlowData(int flowId) throws JsonProcessingException {
+  public ProjectFlow.ProjectFlowData mocProjectFlowData(int flowId) throws IOException {
     FlowNode flowNode1 = mocRmNode(new String[]{}, flowId);
     FlowNode flowNode2 = mocRmNode(new String[]{flowNode1.getName()}, flowId);
     FlowNode flowNode3 = mocRmNode(new String[]{flowNode2.getName()}, flowId);
@@ -236,7 +237,7 @@ public class MockDataService {
 
     ProjectFlow.ProjectFlowData projectFlowData = new ProjectFlow.ProjectFlowData();
     projectFlowData.setExtras(MR_PARAMETER);
-    projectFlowData.setUserDefParams(USER_DEFINED_PARAMETER);
+    projectFlowData.setUserDefParams(Arrays.asList(new Property[]{new Property("year","$[yyyy]")}));
     projectFlowData.setNodes(flowNodeList);
 
     return projectFlowData;
