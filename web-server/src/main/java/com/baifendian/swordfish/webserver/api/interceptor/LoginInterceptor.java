@@ -19,6 +19,7 @@ import com.baifendian.swordfish.dao.mapper.UserMapper;
 import com.baifendian.swordfish.dao.model.Session;
 import com.baifendian.swordfish.dao.model.User;
 import com.baifendian.swordfish.webserver.api.service.SessionService;
+import org.apache.commons.httpclient.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,6 +48,7 @@ public class LoginInterceptor implements HandlerInterceptor {
 
     // session 如果没有获取到, 返回 false
     if (session == null) {
+      httpServletResponse.setStatus(HttpStatus.SC_UNAUTHORIZED);
       return false;
     }
 
@@ -56,6 +58,7 @@ public class LoginInterceptor implements HandlerInterceptor {
     User user = userMapper.queryById(session.getUserId());
 
     if (user == null) {
+      httpServletResponse.setStatus(HttpStatus.SC_UNAUTHORIZED);
       return false;
     }
 
