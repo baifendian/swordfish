@@ -138,7 +138,7 @@ public class Schedule {
   }
 
   public void setStartDate(Date startDate) {
-    this.schedule.setStatDate(startDate);
+    this.schedule.setStartDate(startDate);
     this.startDate = startDate;
   }
 
@@ -281,19 +281,19 @@ public class Schedule {
   }
 
   public static class ScheduleParam{
-    private Date statDate;
+    private Date startDate;
     private Date endDate;
     private String crontab;
 
     public ScheduleParam() {
     }
 
-    public Date getStatDate() {
-      return statDate;
+    public Date getStartDate() {
+      return startDate;
     }
 
-    public void setStatDate(Date statDate) {
-      this.statDate = statDate;
+    public void setStartDate(Date startDate) {
+      this.startDate = startDate;
     }
 
     public Date getEndDate() {
@@ -318,6 +318,11 @@ public class Schedule {
     private String workflowName;
 
     public DepWorkflow() {
+    }
+
+    public DepWorkflow(String projectName, String workflowName) {
+      this.projectName = projectName;
+      this.workflowName = workflowName;
     }
 
     public String getProjectName() {
