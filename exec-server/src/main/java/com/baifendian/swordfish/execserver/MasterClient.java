@@ -177,11 +177,11 @@ public class MasterClient {
     try {
       RetInfo ret = client.cancelExecFlow(id);
       if (ret.getStatus() != 0) {
-        logger.error("exec flow error:{}", ret.getMsg());
+        logger.error("cancel exec flow error:{}", ret.getMsg());
         return false;
       }
     } catch (TException e) {
-      logger.error("exec flow error", e);
+      logger.error("cancel flow error", e);
       return false;
     } finally {
       close();

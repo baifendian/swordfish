@@ -508,7 +508,10 @@ public class FlowRunner implements Runnable {
    * 提交 NodeRunner 执行 <p>
    */
   private void submitNodeRunner(FlowNode flowNode, ExecutionNode executionNode) {
-    int nowTimeout = calcNodeTimeout(); // 重新计算超时时间
+    int nowTimeout = -1;
+    if(!JobTypeManager.isLongJob(flowNode.getType())) {
+      nowTimeout = calcNodeTimeout(); // 重新计算超时时间
+    }
     NodeRunner nodeRunner = new NodeRunner(executionFlow, executionNode, flowNode, jobExecutorService, synObject, nowTimeout, systemParamMap, customParamMap);
     Future<?> future = executorService.submit(nodeRunner);
     activeNodeRunners.add(nodeRunner);
@@ -524,7 +527,7 @@ public class FlowRunner implements Runnable {
 
     int usedTime = (int) ((System.currentTimeMillis() - startTime) / 1000);
     if (timeout <= usedTime) {
-      throw new ExecTimeoutException("当前 workflow 已经执行超时");
+      throw new ExecTimeoutException(" workflow execution fetch time out");
     }
     return timeout - usedTime;
   }
@@ -547,6 +550,7 @@ public class FlowRunner implements Runnable {
         if(JobTypeManager.isLongJob(node.getType())){
           // 长任务处理
           // 报错发送邮件，避免出现程序问题，一直重复调度
+          LOGGER.debug("exec id:{}, node:{} retry", executionNode.getExecId(), executionNode.getName());
           EmailManager.sendEmail(executionFlow, executionNode);
           executionNodes.remove(executionNode);
           reSubmitNodeRunner(node, executionNode);

@@ -149,18 +149,19 @@ public class ExecServiceImpl implements Iface {
   }
 
   public RetInfo cancelExecFlow(int execId)  throws TException {
+    LOGGER.debug("cancel exec flow {}", execId);
     try {
       // 查询 ExecutionFlow
       ExecutionFlow executionFlow = flowDao.queryExecutionFlow(execId);
       if (executionFlow == null) {
-        return ResultHelper.createErrorResult("execId 对应的记录不存在");
+        return ResultHelper.createErrorResult("execId not exists");
       }
 
       if (executionFlow.getStatus().typeIsFinished()) {
         return ResultHelper.createErrorResult("execId run finished");
       }
 
-      flowRunnerManager.cancelFlow(execId);
+      flowRunnerManager.cancelFlow(execId, "master");
     } catch (Exception e) {
       LOGGER.error(e.getMessage(), e);
       return ResultHelper.createErrorResult(e.getMessage());

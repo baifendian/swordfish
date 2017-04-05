@@ -113,7 +113,7 @@ public class Init {
     //Init.runAdHoc();
     //Init.appendWorkFlow();
     //Init.execFlow(817);
-    //Init.cancelExecFlow(77);
+    Init.cancelExecFlow(817);
     CronExpression cron = new CronExpression("10 * * * * ?");
     Date now = new Date();
     Date date = cron.getTimeAfter(now);
