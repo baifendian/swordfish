@@ -66,7 +66,7 @@ public class Init {
   public static void runFlow() throws TException {
     Configuration conf = new PropertiesConfiguration();
     ExecServiceImpl impl = new ExecServiceImpl("127.0.0.1", 7777, conf);
-    impl.scheduleExecFlow(3275, System.currentTimeMillis());
+    impl.execFlow(779);
   }
   public static void execFlow(int id) throws TException {
     MasterClient masterClient = new MasterClient("172.18.1.22",9999, 3);
@@ -92,9 +92,9 @@ public class Init {
     //Init.initFlow();
     //Init.testJob();
     //Init.initSchedule();
-    //Init.runFlow();
-    Init.runAdHoc();
-    //Init.execFlow(77);
+    Init.runFlow();
+    //Init.runAdHoc();
+    //Init.execFlow(779);
     //Init.cancelExecFlow(77);
     System.out.println(BaseConfig.getSystemEnvPath());
     System.out.println(new Date(1488607000));

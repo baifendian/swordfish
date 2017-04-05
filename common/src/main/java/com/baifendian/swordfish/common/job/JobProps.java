@@ -42,7 +42,7 @@ public class JobProps {
   /**
    * 即席查询时的adHocId
    */
-  private long adHocId;
+  private int adHocId;
   /**
    * 作业执行用户
    **/
@@ -153,11 +153,11 @@ public class JobProps {
     this.queue = queue;
   }
 
-  public long getAdHocId() {
+  public int getAdHocId() {
     return adHocId;
   }
 
-  public void setAdHocId(long adHocId) {
+  public void setAdHocId(int adHocId) {
     this.adHocId = adHocId;
   }
 }

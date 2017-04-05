@@ -73,7 +73,7 @@ public class AdHocSqlJob {
       @Override
       public void handleResult(ExecResult execResult, Date startTime, Date endTime) {
         AdHocResult adHocResult = new AdHocResult();
-        adHocResult.setAdHocId(props.getAdHocId());
+        adHocResult.setExecId(props.getAdHocId());
         adHocResult.setStm(execResult.getStm());
         adHocResult.setIndex(execResult.getIndex());
         adHocResult.setStatus(execResult.getStatus());
@@ -98,7 +98,7 @@ public class AdHocSqlJob {
       int index=0;
       for(String stm: execSqls){
         AdHocResult adHocResult = new AdHocResult();
-        adHocResult.setAdHocId(props.getAdHocId());
+        adHocResult.setExecId(props.getAdHocId());
         adHocResult.setStm(stm);
         adHocResult.setIndex(index++);
         adHocResult.setStatus(FlowStatus.INIT);
