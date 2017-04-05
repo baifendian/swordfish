@@ -19,6 +19,8 @@ import com.baifendian.swordfish.common.config.BaseConfig;
 import com.baifendian.swordfish.common.job.ExecResult;
 import com.baifendian.swordfish.common.job.JobProps;
 import com.baifendian.swordfish.common.utils.CommonUtil;
+import com.baifendian.swordfish.dao.AdHocDao;
+import com.baifendian.swordfish.dao.DaoFactory;
 import com.baifendian.swordfish.dao.enums.FlowStatus;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
 import com.baifendian.swordfish.dao.datasource.ConnectionFactory;
@@ -42,7 +44,7 @@ import java.util.List;
  */
 public class AdHocSqlJob {
 
-  private AdHocResultMapper adHocResultMapper;
+  private AdHocDao adHocDao;
 
   private AdHocParam param;
 
@@ -56,8 +58,8 @@ public class AdHocSqlJob {
     this.jobIdLog = jobIdLog;
     this.logger = logger;
     this.props = props;
+    this.adHocDao = DaoFactory.getDaoInstance(AdHocDao.class);
     param = JsonUtil.parseObject(props.getJobParams(), AdHocParam.class);
-    adHocResultMapper = ConnectionFactory.getSqlSession().getMapper(AdHocResultMapper.class);
   }
 
   public void process() throws Exception {
@@ -84,28 +86,12 @@ public class AdHocSqlJob {
         adHocResult.setStartTime(startTime);
         adHocResult.setEndTime(endTime);
 
-        adHocResultMapper.update(adHocResult); // 更新结果到数据库中
+        adHocDao.updateAdHocResult(adHocResult); // 更新结果到数据库中
       }
     };
     HiveSqlExec hiveSqlExec = new HiveSqlExec(funcs, execSqls, props.getProxyUser(), null, true, resultCallback, param.getLimit(), logger);
-    initAdHocResult(execSqls);
+    adHocDao.initAdHocResult(props.getAdHocId(), execSqls);
     hiveSqlExec.run();
-  }
-
-  private void initAdHocResult(List<String> execSqls){
-    if(CollectionUtils.isNotEmpty(execSqls)){
-      adHocResultMapper.delete(props.getAdHocId());
-      int index=0;
-      for(String stm: execSqls){
-        AdHocResult adHocResult = new AdHocResult();
-        adHocResult.setExecId(props.getAdHocId());
-        adHocResult.setStm(stm);
-        adHocResult.setIndex(index++);
-        adHocResult.setStatus(FlowStatus.INIT);
-        adHocResult.setCreateTime(new Timestamp(System.currentTimeMillis()));
-        adHocResultMapper.insert(adHocResult);
-      }
-    }
   }
 
 }

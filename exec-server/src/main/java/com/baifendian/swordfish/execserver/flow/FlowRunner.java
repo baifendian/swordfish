@@ -35,10 +35,13 @@ import com.baifendian.swordfish.execserver.exception.ExecTimeoutException;
 import com.baifendian.swordfish.execserver.job.JobTypeManager;
 import com.baifendian.swordfish.execserver.node.NodeRunner;
 import com.baifendian.swordfish.execserver.utils.LoggerUtil;
+import com.baifendian.swordfish.execserver.utils.OsUtil;
+
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ObjectUtils;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -192,13 +195,26 @@ public class FlowRunner implements Runnable {
     try {
       String execLocalPath = BaseConfig.getFlowExecDir(executionFlow.getProjectId(), executionFlow.getFlowId(),
               executionFlow.getId());
-      LOGGER.info("当前执行的目录是：{}", execLocalPath);
+      LOGGER.info("exec id:{} current execution dir：{}", executionFlow.getId(), execLocalPath);
       File execLocalPathFile = new File(execLocalPath);
       if (execLocalPathFile.exists()) {
         FileUtils.forceDelete(execLocalPathFile);
         //throw new ExecTimeoutException(String.format("path %s exists", execLocalPath));
       }
       FileUtils.forceMkdir(execLocalPathFile);
+
+      // proxyUser用户处理，如果系统不存在该用户，这里自动创建用户
+      String proxyUser = executionFlow.getProxyUser();
+      List<String> osUserList = OsUtil.getUserList();
+      if(!osUserList.contains(proxyUser)){
+        String userGroup = OsUtil.getGroup();
+        if(StringUtils.isNotEmpty(userGroup)) {
+          LOGGER.info("create os user:{}", proxyUser);
+          String cmd = String.format("sudo useradd -g %s %s", userGroup, proxyUser);
+          LOGGER.info("exec cmd {} ", cmd);
+          OsUtil.exeCmd(cmd);
+        }
+      }
 
       FlowDag flowDag = JsonUtil.parseObject(executionFlow.getWorkflowData(), FlowDag.class);
 

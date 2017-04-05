@@ -40,9 +40,6 @@ public class FlowNode {
   @JsonIgnore
   private int flowId;
 
-  @JsonDeserialize(using = StringNodeJsonDeserializer.class)
-  @JsonSerialize(using = StringNodeJsonSerializer.class)
-  //@JsonRawValue
   private String parameter;
 
   private String dep;

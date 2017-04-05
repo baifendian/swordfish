@@ -40,7 +40,7 @@ public class AdHocResultMapperProvider {
     return new SQL() {
       {
         INSERT_INTO(TABLE_NAME);
-        VALUES("exec_id", "#{adHocResult.adHocId}");
+        VALUES("exec_id", "#{adHocResult.execId}");
         VALUES("`index`", "#{adHocResult.index}");
         VALUES("stm", "#{adHocResult.stm}");
         VALUES("result", "#{adHocResult.result}");
@@ -63,7 +63,7 @@ public class AdHocResultMapperProvider {
         SET("start_time = #{adHocResult.startTime}");
         SET("end_time = #{adHocResult.endTime}");
         SET("status = " + EnumFieldUtil.genFieldStr("adHocResult.status", FlowStatus.class));
-        WHERE("exec_id = #{adHocResult.adHocId}");
+        WHERE("exec_id = #{adHocResult.execId}");
         WHERE("`index` = #{adHocResult.index}");
       }
     }.toString();
@@ -88,7 +88,7 @@ public class AdHocResultMapperProvider {
       {
         SELECT("*");
         FROM(TABLE_NAME);
-        WHERE("exec_id = #{adHocId}");
+        WHERE("exec_id = #{execId}");
         ORDER_BY("create_time DESC ");
       }
     }.toString();
@@ -99,7 +99,7 @@ public class AdHocResultMapperProvider {
       {
         SELECT("*");
         FROM(TABLE_NAME);
-        WHERE("exec_id = #{adHocId}");
+        WHERE("exec_id = #{execId}");
         WHERE("`index` = #{index}");
         ORDER_BY("create_time DESC limit 1");
       }

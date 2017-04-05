@@ -17,12 +17,15 @@ package com.baifendian.swordfish.execserver;
 
 import com.baifendian.swordfish.common.job.Job;
 import com.baifendian.swordfish.common.job.JobProps;
+import com.baifendian.swordfish.common.utils.BFDDateUtils;
 import com.baifendian.swordfish.dao.DaoFactory;
 import com.baifendian.swordfish.dao.FlowDao;
 import com.baifendian.swordfish.common.config.BaseConfig;
 import com.baifendian.swordfish.dao.enums.FlowRunType;
 import com.baifendian.swordfish.dao.enums.FlowType;
 import com.baifendian.swordfish.dao.model.ExecutionFlow;
+import com.baifendian.swordfish.dao.model.flow.ScheduleMeta;
+import com.baifendian.swordfish.dao.utils.json.JsonUtil;
 import com.baifendian.swordfish.execserver.job.JobTypeManager;
 import com.baifendian.swordfish.execserver.service.ExecServiceImpl;
 import com.baifendian.swordfish.rpc.ScheduleInfo;
@@ -35,6 +38,9 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Date;
 
 /**
@@ -78,6 +84,15 @@ public class Init {
     masterClient.cancelExecFlow(id);
   }
 
+  public static void appendWorkFlow() throws TException {
+    MasterClient masterClient = new MasterClient("172.18.1.22",9999, 3);
+    ScheduleMeta scheduleMeta = new ScheduleMeta();
+    scheduleMeta.setStartDate(new Date());
+    scheduleMeta.setEndDate(BFDDateUtils.parse("2017-04-05 16:00:00"));
+    scheduleMeta.setCrontab("10 */10 * * * ?");
+    masterClient.appendWorkFlow(1, 2, JsonUtil.toJsonString(scheduleMeta));
+  }
+
   public static void runAdHoc() throws TException {
     Configuration conf = new PropertiesConfiguration();
     /*
@@ -92,9 +107,10 @@ public class Init {
     //Init.initFlow();
     //Init.testJob();
     //Init.initSchedule();
-    Init.runFlow();
+    //Init.runFlow();
     //Init.runAdHoc();
-    //Init.execFlow(779);
+    //Init.appendWorkFlow();
+    Init.execFlow(817);
     //Init.cancelExecFlow(77);
     System.out.println(BaseConfig.getSystemEnvPath());
     System.out.println(new Date(1488607000));
