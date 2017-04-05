@@ -42,7 +42,7 @@ import java.io.IOException;
 /**
  * 字符串节点的自定义反序列化 <p>
  */
-public class StringNodeJsonDeserializer extends JsonDeserializer<String> {
+public class JsonObjectDeserializer extends JsonDeserializer<String> {
 
   @Override
   public String deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException, JsonProcessingException {

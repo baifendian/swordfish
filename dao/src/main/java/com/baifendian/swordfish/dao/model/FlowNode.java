@@ -15,11 +15,11 @@
  */
 package com.baifendian.swordfish.dao.model;
 
-import com.baifendian.swordfish.dao.utils.json.StringNodeJsonDeserializer;
-import com.baifendian.swordfish.dao.utils.json.StringNodeJsonSerializer;
+import com.baifendian.swordfish.dao.utils.json.JsonObjectDeserializer;
+import com.baifendian.swordfish.dao.utils.json.JsonObjectSerializer;
+import com.baifendian.swordfish.dao.utils.json.JsonUtil;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
@@ -28,25 +28,49 @@ import java.util.List;
 
 public class FlowNode {
 
+  /**
+   * 结点 id
+   */
   @JsonIgnore
   private int id;
 
+  /**
+   * 结点名称
+   */
   private String name;
 
+  /**
+   * 结点描述
+   */
   private String desc;
 
+  /**
+   * 结点类型
+   */
   private String type;
 
+  /**
+   * 所属工作流
+   */
   @JsonIgnore
   private int flowId;
 
-  @JsonDeserialize(using = StringNodeJsonDeserializer.class)
-  @JsonSerialize(using = StringNodeJsonSerializer.class)
-  //@JsonRawValue
+  /**
+   * 参数信息
+   */
+  @JsonDeserialize(using = JsonObjectDeserializer.class)
+  @JsonSerialize(using = JsonObjectSerializer.class)
   private String parameter;
 
+  /**
+   * 依赖信息
+   */
+  @JsonDeserialize(using = JsonObjectDeserializer.class)
+  @JsonSerialize(using = JsonObjectSerializer.class)
   private String dep;
 
+  @JsonDeserialize(using = JsonObjectDeserializer.class)
+  @JsonSerialize(using = JsonObjectSerializer.class)
   private String extras;
 
   @JsonIgnore
@@ -105,9 +129,8 @@ public class FlowNode {
   }
 
   public void setDep(String dep) throws IOException {
-    ObjectMapper mapper = new ObjectMapper();
-    this.depList = mapper.readValue(dep,mapper.getTypeFactory().constructCollectionType(List.class,String.class));
     this.dep = dep;
+    this.depList = JsonUtil.parseObjectList(dep, String.class);
   }
 
   public String getExtras() {
@@ -123,11 +146,7 @@ public class FlowNode {
   }
 
   public void setDepList(List<String> depList) throws JsonProcessingException {
-    ObjectMapper mapper = new ObjectMapper();
-    this.dep = mapper.writeValueAsString(depList);
     this.depList = depList;
-  }
-
-  public FlowNode() {
+    this.dep = JsonUtil.toJsonString(depList);
   }
 }
