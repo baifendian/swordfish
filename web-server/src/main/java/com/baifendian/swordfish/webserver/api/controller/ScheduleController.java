@@ -15,10 +15,7 @@
  */
 package com.baifendian.swordfish.webserver.api.controller;
 
-import com.baifendian.swordfish.dao.enums.DepPolicyType;
-import com.baifendian.swordfish.dao.enums.FailurePolicyType;
-import com.baifendian.swordfish.dao.enums.NodeType;
-import com.baifendian.swordfish.dao.enums.ScheduleStatus;
+import com.baifendian.swordfish.dao.enums.*;
 import com.baifendian.swordfish.dao.model.Schedule;
 import com.baifendian.swordfish.dao.model.User;
 import com.baifendian.swordfish.webserver.api.service.ScheduleService;
@@ -62,7 +59,7 @@ public class ScheduleController {
                                  @PathVariable String projectName,
                                  @PathVariable String workflowName,
                                  @RequestParam(value = "schedule") String schedule,
-                                 @RequestParam(value = "notifyType") NodeType notifyType,
+                                 @RequestParam(value = "notifyType") NotifyType notifyType,
                                  @RequestParam(value = "notifyMails",required=false) String notifyMails,
                                  @RequestParam(value = "maxTryTimes") int maxTryTimes,
                                  @RequestParam(value = "failurePolicy") FailurePolicyType failurePolicy,
@@ -93,7 +90,7 @@ public class ScheduleController {
                                  @PathVariable String projectName,
                                  @PathVariable String workflowName,
                                  @RequestParam(value = "schedule") String schedule,
-                                 @RequestParam(value = "notifyType") NodeType notifyType,
+                                 @RequestParam(value = "notifyType") NotifyType notifyType,
                                  @RequestParam(value = "notifyMails",required=false) String notifyMails,
                                  @RequestParam(value = "maxTryTimes") int maxTryTimes,
                                  @RequestParam(value = "failurePolicy") FailurePolicyType failurePolicy,
@@ -124,7 +121,7 @@ public class ScheduleController {
                                  @PathVariable String projectName,
                                  @PathVariable String workflowName,
                                  @RequestParam(value = "schedule") String schedule,
-                                 @RequestParam(value = "notifyType") NodeType notifyType,
+                                 @RequestParam(value = "notifyType") NotifyType notifyType,
                                  @RequestParam(value = "notifyMails",required=false) String notifyMails,
                                  @RequestParam(value = "maxTryTimes") int maxTryTimes,
                                  @RequestParam(value = "failurePolicy") FailurePolicyType failurePolicy,

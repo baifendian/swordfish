@@ -67,23 +67,10 @@ public class ScheduleMapperProvider {
         SET("notify_mails=#{schedule.notifyMailsStr}");
         SET("timeout=#{schedule.timeout}");
         SET("create_time=#{schedule.createTime}");
-        SET("modify_time", "#{schedule.modifyTime}");
-        SET("owner", "#{schedule.ownerId}");
-        SET("last_modify_by", "#{schedule.lastModifyById}");
-        SET("schedule_status", EnumFieldUtil.genFieldStr("schedule.scheduleStatus", ScheduleStatus.class));
-        if (schedule.getScheduleStatus() != null) {
-          SET("schedule_status = " + EnumFieldUtil.genFieldStr("schedule.scheduleStatus", ScheduleStatus.class));
-        }
-        if (schedule.getStartDate() != null) {
-          SET("start_date = #{schedule.startDate}");
-          SET("end_date = #{schedule.endDate}");
-          SET("schedule_type = " + EnumFieldUtil.genFieldStr("schedule.scheduleType", ScheduleType.class));
-          SET("crontab_str = #{schedule.crontabStr}");
-        }
-        if (schedule.getNotifyType() != null) {
-          SET("notify_type = " + EnumFieldUtil.genFieldStr("schedule.notifyType", NotifyType.class));
-        }
-
+        SET("modify_time=#{schedule.modifyTime}");
+        SET("owner=#{schedule.ownerId}");
+        SET("last_modify_by=#{schedule.lastModifyById}");
+        SET("schedule_status="+EnumFieldUtil.genFieldStr("schedule.scheduleStatus", ScheduleStatus.class));
         WHERE("flow_id = #{schedule.flowId}");
       }
     }.toString();
@@ -94,10 +81,27 @@ public class ScheduleMapperProvider {
       SELECT("*");
       SELECT("p_f.name as project_flow_name");
       SELECT("p.name as project_name");
+      SELECT("u.name as owner_name");
       FROM(DB_NAME + " as s");
       JOIN("project_flow as p_f on s.flow_id = p_f.id");
       JOIN("project as p on p_f.projectId = p.id");
-      WHERE("flow_id = #{flowId}");
+      JOIN("user as u on s.owner = u.id");
+      WHERE("s.flow_id = #{flowId}");
+    }}.toString();
+  }
+
+  public String selectByFlowName(Map<String, Object> parameter) {
+    return new SQL() {{
+      SELECT("*");
+      SELECT("p_f.name as project_flow_name");
+      SELECT("p.name as project_name");
+      SELECT("u.name as owner_name");
+      FROM(DB_NAME + " as s");
+      JOIN("project_flow as p_f on s.flow_id = p_f.id");
+      JOIN("project as p on p_f.projectId = p.id");
+      JOIN("user as u on s.owner = u.id");
+      WHERE("p.name = #{projectName}");
+      WHERE("p_f.name = #{name}");
     }}.toString();
   }
 

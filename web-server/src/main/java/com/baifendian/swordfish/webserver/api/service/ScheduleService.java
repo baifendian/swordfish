@@ -27,6 +27,7 @@ import com.baifendian.swordfish.dao.model.ProjectFlow;
 import com.baifendian.swordfish.dao.model.Schedule;
 import com.baifendian.swordfish.dao.model.User;
 import org.apache.commons.httpclient.HttpStatus;
+import org.apache.commons.lang3.StringUtils;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -69,7 +70,7 @@ public class ScheduleService {
    * @param response
    * @return
    */
-  public Schedule createSchedule(User operator, String projectName, String workflowName, String schedule, String, NotifyType notifyType, String notifyMails, int maxTryTimes, FailurePolicyType failurePolicy, String  depWorkflows, DepPolicyType depPolicyType, int timeout, HttpServletResponse response){
+  public Schedule createSchedule(User operator, String projectName, String workflowName, String schedule, NotifyType notifyType, String notifyMails, int maxTryTimes, FailurePolicyType failurePolicy, String  depWorkflows, DepPolicyType depPolicyType, int timeout, HttpServletResponse response){
     Project project = projectMapper.queryByName(projectName);
 
     if (project == null) {
@@ -150,7 +151,7 @@ public class ScheduleService {
    * @param response
    * @return
    */
-  public Schedule modifySchedule(User operator, String projectName, String workflowName, String schedule, String, NotifyType notifyType, String notifyMails, int maxTryTimes, FailurePolicyType failurePolicy, String  depWorkflows, DepPolicyType depPolicyType, int timeout, HttpServletResponse response){
+  public Schedule patchSchedule(User operator, String projectName, String workflowName, String schedule, NotifyType notifyType, String notifyMails, Integer maxTryTimes, FailurePolicyType failurePolicy, String  depWorkflows, DepPolicyType depPolicyType, Integer timeout, HttpServletResponse response){
     Project project = projectMapper.queryByName(projectName);
 
     if (project == null) {
@@ -171,7 +172,105 @@ public class ScheduleService {
       return null;
     }
 
+    //检查调度是否存在
 
+    Schedule scheduleObj = scheduleMapper.selectByFlowId(projectFlow.getId());
+    Date now = new Date();
+
+    if (scheduleObj == null){
+      response.setStatus(HttpStatus.SC_NOT_MODIFIED);
+      return null;
+    }
+
+    //封装检查更新参数
+    try {
+      ObjectMapper mapper = new ObjectMapper();
+      if (!StringUtils.isEmpty(schedule)){
+        Schedule.ScheduleParam scheduleParam = mapper.readValue(schedule,Schedule.ScheduleParam.class);
+        scheduleObj.setStartDate(scheduleParam.getStatDate());
+        scheduleObj.setEndDate(scheduleParam.getEndDate());
+        scheduleObj.setCrontab(scheduleParam.getCrontab());
+        scheduleObj.setSchedule(scheduleParam);
+      }
+      if (notifyType!=null){
+        scheduleObj.setNotifyType(notifyType);
+      }
+      if (!StringUtils.isEmpty(notifyMails)){
+        scheduleObj.setNotifyMailsStr(notifyMails);
+      }
+
+      if (maxTryTimes!=null){
+        scheduleObj.setMaxTryTimes(maxTryTimes);
+      }
+
+      if (failurePolicy!=null){
+        scheduleObj.setFailurePolicy(failurePolicy);
+      }
+
+      if (!StringUtils.isEmpty(depWorkflows)){
+        scheduleObj.setDepWorkflowsStr(depWorkflows);
+      }
+
+      if (depPolicyType!=null){
+        scheduleObj.setDepPolicy(depPolicyType);
+      }
+
+      if (timeout!=null){
+        scheduleObj.setTimeout(timeout);
+      }
+      scheduleObj.setModifyTime(now);
+    }catch (Exception e){
+      logger.error(e.toString());
+      response.setStatus(HttpStatus.SC_BAD_REQUEST);
+      return null;
+    }
+
+    scheduleMapper.update(scheduleObj);
+
+    return scheduleObj;
+  }
+
+  /**
+   * 创建并修改一个工作流
+   * @return
+   */
+  public Schedule putSchedule(User operator, String projectName, String workflowName, String schedule, NotifyType notifyType, String notifyMails, Integer maxTryTimes, FailurePolicyType failurePolicy, String  depWorkflows, DepPolicyType depPolicyType, Integer timeout, HttpServletResponse response){
+    Schedule scheduleObj = scheduleMapper.selectByFlowName(projectName,workflowName);
+    if (scheduleObj == null){
+      return createSchedule(operator,projectName,workflowName,schedule,notifyType,notifyMails,maxTryTimes,failurePolicy,depWorkflows,depPolicyType,timeout,response);
+    }else{
+      return patchSchedule(operator,projectName,workflowName,schedule,notifyType,notifyMails,maxTryTimes,failurePolicy,depWorkflows,depPolicyType,timeout,response);
+    }
+  }
+
+  /**
+   * 查询一个工作流的调度
+   * @param operator
+   * @param projectName
+   * @param workflowName
+   * @param response
+   * @return
+   */
+  public Schedule querySchedule(User operator, String projectName, String workflowName,HttpServletResponse response){
+    Project project = projectMapper.queryByName(projectName);
+
+    if (project == null) {
+      return null;
+    }
+
+    if (!projectService.hasReadPerm(operator.getId(), project)) {
+      response.setStatus(HttpStatus.SC_UNAUTHORIZED);
+      return null;
+    }
+
+    //检查是否存在工作流
+    ProjectFlow projectFlow = flowDao.projectFlowfindByName(project.getId(),workflowName);
+
+    if (projectFlow == null){
+      return null;
+    }
+
+    return scheduleMapper.selectByFlowId(projectFlow.getId());
   }
 
 }
