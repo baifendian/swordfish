@@ -15,7 +15,6 @@
  */
 package com.baifendian.swordfish.common.utils;
 
-import org.apache.commons.lang.time.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.PropertyPlaceholderHelper;
@@ -190,12 +189,12 @@ public class TimePlaceholderUtil {
       if (expr.startsWith(TIMESTAMP)) {
         String timeExpr = expr.substring(TIMESTAMP.length() + 1, expr.length() - 1);
         Map.Entry<Date, String> entry = calcTimeExpr(timeExpr, date);
-        String dateStr = BFDDateUtils.format(entry.getKey(), entry.getValue());
-        Date timestamp = BFDDateUtils.parse(dateStr, entry.getValue());
+        String dateStr = DateUtils.format(entry.getKey(), entry.getValue());
+        Date timestamp = DateUtils.parse(dateStr, entry.getValue());
         value = String.valueOf(timestamp.getTime() / 1000); // 获取时间戳（精确到s）
       } else {
         Map.Entry<Date, String> entry = calcTimeExpr(expr, date);
-        value = BFDDateUtils.format(entry.getKey(), entry.getValue());
+        value = DateUtils.format(entry.getKey(), entry.getValue());
       }
     } catch (Exception e) {
       LOGGER.error(e.getMessage(), e);
@@ -240,7 +239,7 @@ public class TimePlaceholderUtil {
       String dayExpr = params[1];
       Integer day = CalculateUtil.calc(dayExpr);
       Date targetDate = getFirstDayOfMonth(cycTime);
-      targetDate = DateUtils.addDays(targetDate, day);
+      targetDate = org.apache.commons.lang.time.DateUtils.addDays(targetDate, day);
       return new AbstractMap.SimpleImmutableEntry<Date, String>(targetDate, dateFormat);
     }
     throw new RuntimeException("表达式不正确");
@@ -259,7 +258,7 @@ public class TimePlaceholderUtil {
       String dayExpr = params[1];
       Integer day = CalculateUtil.calc(dayExpr);
       Date targetDate = getLastDayOfMonth(cycTime);
-      targetDate = DateUtils.addDays(targetDate, day);
+      targetDate = org.apache.commons.lang.time.DateUtils.addDays(targetDate, day);
       return new AbstractMap.SimpleImmutableEntry<Date, String>(targetDate, dateFormat);
     }
     throw new RuntimeException("表达式不正确");
@@ -278,7 +277,7 @@ public class TimePlaceholderUtil {
       String dayExpr = params[1];
       Integer day = CalculateUtil.calc(dayExpr);
       Date targetDate = getMonday(cycTime);
-      targetDate = DateUtils.addDays(targetDate, day);
+      targetDate = org.apache.commons.lang.time.DateUtils.addDays(targetDate, day);
       return new AbstractMap.SimpleImmutableEntry<Date, String>(targetDate, dateFormat);
     }
     throw new RuntimeException("表达式不正确");
@@ -297,7 +296,7 @@ public class TimePlaceholderUtil {
       String dayExpr = params[1];
       Integer day = CalculateUtil.calc(dayExpr);
       Date targetDate = getSunday(cycTime);
-      targetDate = DateUtils.addDays(targetDate, day);
+      targetDate = org.apache.commons.lang.time.DateUtils.addDays(targetDate, day);
       return new AbstractMap.SimpleImmutableEntry<Date, String>(targetDate, dateFormat);
     }
     throw new RuntimeException("表达式不正确");
@@ -315,7 +314,7 @@ public class TimePlaceholderUtil {
       String dateFormat = params[0];
       String monthExpr = params[1];
       Integer addMonth = CalculateUtil.calc(monthExpr);
-      Date targetDate = DateUtils.addMonths(cycTime, addMonth);
+      Date targetDate = org.apache.commons.lang.time.DateUtils.addMonths(cycTime, addMonth);
       return new AbstractMap.SimpleImmutableEntry<Date, String>(targetDate, dateFormat);
     }
     throw new RuntimeException("表达式不正确");
@@ -332,7 +331,7 @@ public class TimePlaceholderUtil {
       // $[HHmmss+N/24/60]
       if (Character.isDigit(expr.charAt(index + 1))) {
         String addMinuteExpr = expr.substring(index + 1);
-        Date targetDate = DateUtils.addMinutes(cycTime, calcAddMinute(addMinuteExpr));
+        Date targetDate = org.apache.commons.lang.time.DateUtils.addMinutes(cycTime, calcAddMinute(addMinuteExpr));
         String dateFormat = expr.substring(0, index);
         return new AbstractMap.SimpleImmutableEntry<Date, String>(targetDate, dateFormat);
       }
@@ -341,7 +340,7 @@ public class TimePlaceholderUtil {
       // $[HHmmss-N/24/60]
       if (Character.isDigit(expr.charAt(index + 1))) {
         String addMinuteExpr = expr.substring(index + 1);
-        Date targetDate = DateUtils.addMinutes(cycTime, 0 - calcAddMinute(addMinuteExpr));
+        Date targetDate = org.apache.commons.lang.time.DateUtils.addMinutes(cycTime, 0 - calcAddMinute(addMinuteExpr));
         String dateFormat = expr.substring(0, index);
         return new AbstractMap.SimpleImmutableEntry<Date, String>(targetDate, dateFormat);
       } else { // $[yyyy-MM-dd/HH:mm:ss]

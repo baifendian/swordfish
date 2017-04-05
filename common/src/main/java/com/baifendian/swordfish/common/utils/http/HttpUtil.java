@@ -185,7 +185,7 @@ public class HttpUtil {
 //    if (!StringUtils.isNotEmpty(rst)) {
 //      return null;
 //    } else {
-//      return BFDDateUtils.parse(rst);
+//      return DateUtils.parse(rst);
 //    }
 //  }
 //
@@ -194,7 +194,7 @@ public class HttpUtil {
 //    if (!StringUtils.isNotEmpty(rst)) {
 //      return null;
 //    } else {
-//      return BFDDateUtils.parse(rst, dateFormat);
+//      return DateUtils.parse(rst, dateFormat);
 //    }
 //  }
 //
