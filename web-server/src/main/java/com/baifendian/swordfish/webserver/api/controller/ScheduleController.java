@@ -15,8 +15,155 @@
  */
 package com.baifendian.swordfish.webserver.api.controller;
 
+import com.baifendian.swordfish.dao.enums.DepPolicyType;
+import com.baifendian.swordfish.dao.enums.FailurePolicyType;
+import com.baifendian.swordfish.dao.enums.NodeType;
+import com.baifendian.swordfish.dao.enums.ScheduleStatus;
+import com.baifendian.swordfish.dao.model.Schedule;
+import com.baifendian.swordfish.dao.model.User;
+import com.baifendian.swordfish.webserver.api.service.ScheduleService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import javax.servlet.http.HttpServletResponse;
+
 /**
  * 调度设置和管理入口
  */
+@RestController
+@RequestMapping(" /projects/{projectName}/workflows")
 public class ScheduleController {
+
+  @Autowired
+  private ScheduleService scheduleService;
+
+  private static Logger logger = LoggerFactory.getLogger(ScheduleController.class.getName());
+
+  /**
+   * 创建一个调度
+   * @param operator
+   * @param projectName
+   * @param workflowName
+   * @param schedule
+   * @param notifyType
+   * @param maxTryTimes
+   * @param failurePolicy
+   * @param depWorkflows
+   * @param depPolicyType
+   * @param timeout
+   * @param response
+   * @return
+   */
+  @PostMapping("/{workflowName}/schedules")
+  public Schedule createSchedule(@RequestAttribute(value = "session.user") User operator,
+                                 @PathVariable String projectName,
+                                 @PathVariable String workflowName,
+                                 @RequestParam(value = "schedule") String schedule,
+                                 @RequestParam(value = "notifyType") NodeType notifyType,
+                                 @RequestParam(value = "notifyMails",required=false) String notifyMails,
+                                 @RequestParam(value = "maxTryTimes") int maxTryTimes,
+                                 @RequestParam(value = "failurePolicy") FailurePolicyType failurePolicy,
+                                 @RequestParam(value = "depWorkflows") String  depWorkflows,
+                                 @RequestParam(value = "depPolicy") DepPolicyType depPolicyType,
+                                 @RequestParam(value = "timeout") int timeout,
+                                 HttpServletResponse response){
+    return scheduleService.createSchedule(operator,projectName,workflowName,schedule,notifyType,notifyMails,maxTryTimes,failurePolicy,depWorkflows,depPolicyType,timeout,response);
+  }
+
+  /**
+   * 新增或修改一个调度
+   * @param operator
+   * @param projectName
+   * @param workflowName
+   * @param schedule
+   * @param notifyType
+   * @param maxTryTimes
+   * @param failurePolicy
+   * @param depWorkflows
+   * @param depPolicyType
+   * @param timeout
+   * @param response
+   * @return
+   */
+  @PutMapping("/{workflowName}/schedules")
+  public Schedule createAndModifySchedule(@RequestAttribute(value = "session.user") User operator,
+                                 @PathVariable String projectName,
+                                 @PathVariable String workflowName,
+                                 @RequestParam(value = "schedule") String schedule,
+                                 @RequestParam(value = "notifyType") NodeType notifyType,
+                                 @RequestParam(value = "notifyMails",required=false) String notifyMails,
+                                 @RequestParam(value = "maxTryTimes") int maxTryTimes,
+                                 @RequestParam(value = "failurePolicy") FailurePolicyType failurePolicy,
+                                 @RequestParam(value = "depWorkflows") String  depWorkflows,
+                                 @RequestParam(value = "depPolicy") DepPolicyType depPolicyType,
+                                 @RequestParam(value = "timeout") int timeout,
+                                 HttpServletResponse response){
+    return null;
+  }
+
+  /**
+   * 修改一个调度
+   * @param operator
+   * @param projectName
+   * @param workflowName
+   * @param schedule
+   * @param notifyType
+   * @param maxTryTimes
+   * @param failurePolicy
+   * @param depWorkflows
+   * @param depPolicyType
+   * @param timeout
+   * @param response
+   * @return
+   */
+  @PatchMapping("/{workflowName}/schedules")
+  public Schedule modifySchedule(@RequestAttribute(value = "session.user") User operator,
+                                 @PathVariable String projectName,
+                                 @PathVariable String workflowName,
+                                 @RequestParam(value = "schedule") String schedule,
+                                 @RequestParam(value = "notifyType") NodeType notifyType,
+                                 @RequestParam(value = "notifyMails",required=false) String notifyMails,
+                                 @RequestParam(value = "maxTryTimes") int maxTryTimes,
+                                 @RequestParam(value = "failurePolicy") FailurePolicyType failurePolicy,
+                                 @RequestParam(value = "depWorkflows") String  depWorkflows,
+                                 @RequestParam(value = "depPolicy") DepPolicyType depPolicyType,
+                                 @RequestParam(value = "timeout") int timeout,
+                                 HttpServletResponse response){
+    return null;
+  }
+
+  /**
+   * 设置一个调度的状态
+   * @param operator
+   * @param projectName
+   * @param workflowName
+   * @param response
+   */
+  @PostMapping("/{workflowName}/schedules/{scheduleStatus}")
+  public void modifyScheduleStatus(@RequestAttribute(value = "session.user") User operator,
+                                   @PathVariable String projectName,
+                                   @PathVariable String workflowName,
+                                   @PathVariable ScheduleStatus scheduleStatus,
+                                   HttpServletResponse response){
+
+  }
+
+  /**
+   * 查询一个工作流的调度
+   * @param operator
+   * @param projectName
+   * @param workflowName
+   * @param response
+   * @return
+   */
+  @GetMapping("/{workflowName}/schedules")
+  public Schedule querySchedule(@RequestAttribute(value = "session.user") User operator,
+                                @PathVariable String projectName,
+                                @PathVariable String workflowName,
+                                HttpServletResponse response){
+    return null;
+  }
 }

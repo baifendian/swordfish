@@ -203,16 +203,6 @@ public class FlowNodeMapperSqlProvider {
     }.toString();
   }
 
-  public String selectByFlowIds(Map<String, Object> parameter) {
-    return new SQL() {
-      {
-        SELECT("*");
-        FROM(TABLE_NAME);
-        WHERE("flow_id in <foreach item=\"flowId\" index=\"index\" collection=\"flowIds\" open=\"(\" separator=\",\" close=\")\"> #{flowId} </foreach>");
-      }
-    }.toString();
-  }
-
   /**
    * 删除项目信息
    */

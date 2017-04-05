@@ -16,6 +16,7 @@
 package com.baifendian.swordfish.webserver.api.service;
 
 import com.baifendian.swordfish.common.utils.graph.Graph;
+import com.baifendian.swordfish.dao.FlowDao;
 import com.baifendian.swordfish.dao.mapper.FlowNodeMapper;
 import com.baifendian.swordfish.dao.mapper.ProjectFlowMapper;
 import com.baifendian.swordfish.dao.mapper.ProjectMapper;
@@ -28,6 +29,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,6 +63,9 @@ public class WorkflowService {
 
   @Autowired
   private ProjectService projectService;
+
+  @Autowired
+  private FlowDao flowDao;
 
   private static Logger logger = LoggerFactory.getLogger(WorkflowService.class.getName());
 
@@ -168,7 +173,7 @@ public class WorkflowService {
    * @return
    */
   public ProjectFlow putWorkflow(User operator, String projectName, String name, String desc, String proxyUser, String queue, String data, MultipartFile file, HttpServletResponse response){
-    ProjectFlow projectFlow = projectFlowMapper.findByProjectNameAndName(projectName, name);
+    ProjectFlow projectFlow = flowDao.projectFlowFindByPorjectNameAndName(projectName, name);
     if (projectFlow == null){
       return createWorkflow(operator,projectName,name,desc,proxyUser,queue,data,file,response);
     } else {
@@ -205,7 +210,7 @@ public class WorkflowService {
       return null;
     }
 
-    ProjectFlow projectFlow = projectFlowMapper.findByName(project.getId(), name);
+    ProjectFlow projectFlow = flowDao.projectFlowfindByName(project.getId(), name);
     Date now = new Date();
 
     if (projectFlow == null) {
@@ -225,10 +230,10 @@ public class WorkflowService {
       List<FlowNode> flowNodeList = projectFlowData.getNodes();
       if (flowNodeList != null) {
         projectFlow.setFlowsNodes(projectFlowData.getNodes());
-        flowNodeMapper.deleteByFlowId(projectFlow.getId());
+
 
         //闭环检测
-        if (!graphCheck(flowNodeList)){
+        if (graphCheck(flowNodeList)){
           response.setStatus(HttpStatus.SC_BAD_REQUEST);
           return null;
         }
@@ -240,6 +245,7 @@ public class WorkflowService {
           }
         }
 
+        flowNodeMapper.deleteByFlowId(projectFlow.getId());
         for (FlowNode flowNode : flowNodeList) {
           flowNode.setFlowId(projectFlow.getId());
           flowNodeMapper.insert(flowNode);
@@ -248,17 +254,17 @@ public class WorkflowService {
 
     }
 
-    if (!name.isEmpty()) {
+    if (!StringUtils.isEmpty(name)) {
       projectFlow.setName(name);
     }
-    if (!desc.isEmpty()) {
+    if (!StringUtils.isEmpty(desc)) {
       projectFlow.setDesc(desc);
     }
     projectFlow.setModifyTime(now);
-    if (!proxyUser.isEmpty()) {
+    if (!StringUtils.isEmpty(proxyUser)) {
       projectFlow.setProxyUser(proxyUser);
     }
-    if (!queue.isEmpty()) {
+    if (!StringUtils.isEmpty(queue)) {
       projectFlow.setQueue(queue);
     }
 
@@ -291,7 +297,7 @@ public class WorkflowService {
       return;
     }
 
-    ProjectFlow projectFlow = projectFlowMapper.findByName(project.getId(), name);
+    ProjectFlow projectFlow = flowDao.projectFlowfindByName(project.getId(), name);
 
     if (projectFlow == null) {
       response.setStatus(HttpStatus.SC_NOT_MODIFIED);
@@ -302,6 +308,29 @@ public class WorkflowService {
     flowNodeMapper.deleteByFlowId(projectFlow.getId());
 
     return;
+  }
+
+  /**
+   * 修改一个项目下所有工作流的配置
+   * @param operator
+   * @param projectName
+   * @param queue
+   * @param proxyUser
+   */
+  public void modifyWorkflowConf(User operator,String projectName, String queue,String proxyUser, HttpServletResponse response){
+    Project project = projectMapper.queryByName(projectName);
+
+    if (project == null) {
+      response.setStatus(HttpStatus.SC_NOT_MODIFIED);
+      return;
+    }
+
+    if (!projectService.hasWritePerm(operator.getId(), project)) {
+      response.setStatus(HttpStatus.SC_UNAUTHORIZED);
+      return;
+    }
+
+    projectFlowMapper.updateProjectConf(project.getId(), queue,proxyUser);
   }
 
   /**
@@ -323,7 +352,7 @@ public class WorkflowService {
       return null;
     }
 
-    return projectFlowMapper.findByProject(project.getId());
+    return flowDao.projectFlowFindByProject(project.getId());
 
   }
 
@@ -350,7 +379,7 @@ public class WorkflowService {
       return null;
     }
 
-    return projectFlowMapper.findByName(project.getId(), name);
+    return flowDao.projectFlowfindByName(project.getId(), name);
 
   }
 
@@ -367,7 +396,7 @@ public class WorkflowService {
       return null;
     }
 
-    ProjectFlow projectFlow = projectFlowMapper.findByName(project.getId(), name);
+    ProjectFlow projectFlow = flowDao.projectFlowfindByName(project.getId(), name);
 
     ObjectMapper mapper = new ObjectMapper();
 
