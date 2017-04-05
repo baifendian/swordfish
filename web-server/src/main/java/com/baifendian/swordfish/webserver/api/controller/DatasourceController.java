@@ -98,7 +98,6 @@ public class DatasourceController {
    * @param name
    * @param projectName
    * @param desc
-   * @param type
    * @param parameter
    * @param response
    * @return
@@ -108,13 +107,12 @@ public class DatasourceController {
                                      @PathVariable("projectName") String projectName,
                                      @PathVariable("name") String name,
                                      @RequestParam(value = "desc", required = false) String desc,
-                                     @RequestParam(value = "type") String type,
                                      @RequestParam(value = "parameter") String parameter,
                                      HttpServletResponse response) {
     logger.info("Operator user {}, modify datasource, project name: {}, data source name: {}, desc: {}, type: {}, parameter: {}",
-        operator.getName(), projectName, name, desc, type, parameter);
+        operator.getName(), projectName, name, desc, parameter);
 
-    return datasourceService.modifyDataSource(operator, projectName, name, desc, DbType.valueOf(type), parameter, response);
+    return datasourceService.modifyDataSource(operator, projectName, name, desc, parameter, response);
   }
 
   /**

@@ -64,7 +64,6 @@ public interface ScheduleMapper {
           @Result(property = "modifyTime", column = "modifyTime", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP),
           @Result(property = "ownerId", column = "owner", javaType = int.class, jdbcType = JdbcType.INTEGER),
           @Result(property = "owner", column = "owner_name", javaType = int.class, jdbcType = JdbcType.INTEGER),
-          @Result(property = "last_modify_by", column = "lastModifyById", javaType = int.class, jdbcType = JdbcType.INTEGER),
           @Result(property = "schedule_status", column = "scheduleStatus", javaType = ScheduleStatus.class, jdbcType = JdbcType.TINYINT),
   })
   @SelectProvider(type = ScheduleMapperProvider.class, method = "selectByFlowId")
@@ -89,7 +88,6 @@ public interface ScheduleMapper {
           @Result(property = "modifyTime", column = "modifyTime", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP),
           @Result(property = "ownerId", column = "owner", javaType = int.class, jdbcType = JdbcType.INTEGER),
           @Result(property = "owner", column = "owner_name", javaType = int.class, jdbcType = JdbcType.INTEGER),
-          @Result(property = "last_modify_by", column = "lastModifyById", javaType = int.class, jdbcType = JdbcType.INTEGER),
           @Result(property = "schedule_status", column = "scheduleStatus", javaType = ScheduleStatus.class, jdbcType = JdbcType.TINYINT),
   })
   @SelectProvider(type = ScheduleMapperProvider.class, method = "selectByFlowName")

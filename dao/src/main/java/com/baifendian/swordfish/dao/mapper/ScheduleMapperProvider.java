@@ -46,7 +46,6 @@ public class ScheduleMapperProvider {
       VALUES("create_time", "#{schedule.createTime}");
       VALUES("modify_time", "#{schedule.modifyTime}");
       VALUES("owner", "#{schedule.ownerId}");
-      VALUES("last_modify_by", "#{schedule.lastModifyById}");
       VALUES("schedule_status", EnumFieldUtil.genFieldStr("schedule.scheduleStatus", ScheduleStatus.class));
 
     }}.toString();
@@ -69,7 +68,6 @@ public class ScheduleMapperProvider {
         SET("create_time=#{schedule.createTime}");
         SET("modify_time=#{schedule.modifyTime}");
         SET("owner=#{schedule.ownerId}");
-        SET("last_modify_by=#{schedule.lastModifyById}");
         SET("schedule_status="+EnumFieldUtil.genFieldStr("schedule.scheduleStatus", ScheduleStatus.class));
         WHERE("flow_id = #{schedule.flowId}");
       }

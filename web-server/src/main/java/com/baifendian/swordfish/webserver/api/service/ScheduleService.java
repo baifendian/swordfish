@@ -116,8 +116,6 @@ public class ScheduleService {
       scheduleObj.setModifyTime(now);
       scheduleObj.setOwnerId(operator.getId());
       scheduleObj.setOwner(operator.getName());
-      scheduleObj.setLastModifyById(operator.getId());
-      scheduleObj.setLastModifyBy(operator.getName());
     }catch (Exception e){
       logger.error(e.toString());
       response.setStatus(HttpStatus.SC_BAD_REQUEST);

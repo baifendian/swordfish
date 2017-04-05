@@ -79,11 +79,6 @@ public class Schedule {
   private String owner;
 
   @JsonIgnore
-  private int lastModifyById;
-
-  private String lastModifyBy;
-
-  @JsonIgnore
   private ScheduleStatus scheduleStatus;
 
   private List<String> notifyMails = new ArrayList<>();
@@ -275,22 +270,6 @@ public class Schedule {
 
   public void setOwner(String owner) {
     this.owner = owner;
-  }
-
-  public int getLastModifyById() {
-    return lastModifyById;
-  }
-
-  public void setLastModifyById(int lastModifyById) {
-    this.lastModifyById = lastModifyById;
-  }
-
-  public String getLastModifyBy() {
-    return lastModifyBy;
-  }
-
-  public void setLastModifyBy(String lastModifyBy) {
-    this.lastModifyBy = lastModifyBy;
   }
 
   public ScheduleStatus getScheduleStatus() {

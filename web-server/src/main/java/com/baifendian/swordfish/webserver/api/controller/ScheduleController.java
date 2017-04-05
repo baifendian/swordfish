@@ -98,7 +98,7 @@ public class ScheduleController {
                                  @RequestParam(value = "depPolicy") DepPolicyType depPolicyType,
                                  @RequestParam(value = "timeout") int timeout,
                                  HttpServletResponse response){
-    return null;
+    return scheduleService.patchSchedule(operator,projectName,workflowName,schedule,notifyType,notifyMails,maxTryTimes,failurePolicy,depWorkflows,depPolicyType,timeout,response);
   }
 
   /**
