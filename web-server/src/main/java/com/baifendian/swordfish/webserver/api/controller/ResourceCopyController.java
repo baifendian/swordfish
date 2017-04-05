@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletResponse;
 
 @RestController
-@RequestMapping("/projects/{projectName}/resources-copy")
+@RequestMapping("/projects/{projectName}/resource-copy")
 public class ResourceCopyController {
 
   private static Logger logger = LoggerFactory.getLogger(ResourceCopyController.class.getName());
