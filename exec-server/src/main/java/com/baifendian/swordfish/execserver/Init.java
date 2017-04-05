@@ -33,11 +33,13 @@ import com.baifendian.swordfish.rpc.ScheduleInfo;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.thrift.TException;
+import org.quartz.CronExpression;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.text.ParseException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
@@ -103,16 +105,20 @@ public class Init {
     masterClient.execAdHoc(1);
   }
 
-  public static void main(String[] args) throws NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException, IOException, TException {
+  public static void main(String[] args) throws NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException, IOException, TException, ParseException {
     //Init.initFlow();
     //Init.testJob();
     //Init.initSchedule();
     //Init.runFlow();
     //Init.runAdHoc();
     //Init.appendWorkFlow();
-    Init.execFlow(817);
+    //Init.execFlow(817);
     //Init.cancelExecFlow(77);
-    System.out.println(BaseConfig.getSystemEnvPath());
-    System.out.println(new Date(1488607000));
+    CronExpression cron = new CronExpression("10 * * * * ?");
+    Date now = new Date();
+    Date date = cron.getTimeAfter(now);
+    Date nextInvalidTime = cron.getNextInvalidTimeAfter(now);
+    System.out.printf("now %s \nafter %s \ninvalid %s\n", now, date, nextInvalidTime);
+
   }
 }

@@ -80,7 +80,7 @@ public class MailSendService extends BaseDao {
    * @param sendToUserIfMailsEmpty 标志位，若项目无邮件组发送邮件给项目成员
    */
   public boolean sendToFlowMails(int flowId, String title, String content, boolean sendToUserIfMailsEmpty, Schedule schedule) {
-    String mailsStr = schedule.getNotifyEmails();
+    String mailsStr = schedule.getNotifyMailsStr();
     if (mailsStr == null || mailsStr == "") {
       System.out.println(sendToUserIfMailsEmpty);
       if (sendToUserIfMailsEmpty) {

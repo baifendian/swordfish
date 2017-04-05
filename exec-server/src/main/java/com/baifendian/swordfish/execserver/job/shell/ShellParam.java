@@ -62,7 +62,8 @@ public class ShellParam extends BaseParam {
   @Override
   public List<String> getResourceFiles() {
     if (resources != null) {
-      return resources.stream().map(p -> p.getRes()).collect(Collectors.toList());
+      return resources.stream().filter(p->p.isProjectScope())
+              .map(p -> p.getRes()).collect(Collectors.toList());
     } else {
       return null;
     }

@@ -163,7 +163,7 @@ public class FlowScheduleJob implements Job {
       }
     }
 
-    List<DepWorkflow> deps = JsonUtil.parseObjectList(schedule.getDepWorkflows(), DepWorkflow.class);
+    List<DepWorkflow> deps = JsonUtil.parseObjectList(schedule.getDepWorkflowsStr(), DepWorkflow.class);
     if (deps != null) {
       if (isNotUpdateWaitingDep) { // 需要更新状态为 WAITING_DEP
         updateWaitingDepFlowStatus(executionFlow);
