@@ -137,7 +137,7 @@ public class AdhocService {
     // 连接
     MasterClient masterClient = new MasterClient(masterServer.getHost(), masterServer.getPort());
     try {
-      logger.info("Call master client, exec id: {}", adhoc.getId());
+      logger.info("Call master client, exec id: {}, host: {}, port: {}", adhoc.getId(), masterServer.getHost(), masterServer.getPort());
 
       RetInfo retInfo = masterClient.execAdHoc(adhoc.getId());
 
@@ -183,6 +183,7 @@ public class AdhocService {
     }
 
     // TODO:: 返回日志信息
+
 
     return new AdhocLogData();
   }

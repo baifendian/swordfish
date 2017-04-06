@@ -42,8 +42,8 @@ public class AdHocMapperProvider {
         VALUES("`proxy_user`", "#{adHoc.proxyUser}");
         VALUES("`queue`", "#{adHoc.queue}");
         VALUES("`status`", EnumFieldUtil.genFieldStr("adHoc.status", FlowStatus.class));
-        VALUES("`job_id`", "adHoc.jobId");
-        VALUES("`timeout`", "adHoc.timeout");
+        VALUES("`job_id`", "#{adHoc.jobId}");
+        VALUES("`timeout`", "#{adHoc.timeout}");
         VALUES("`create_time`", "#{adHoc.createTime}");
         VALUES("`start_time`", "#{adHoc.startTime}");
         VALUES("`end_time`", "#{adHoc.endTime}");
