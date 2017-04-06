@@ -113,6 +113,23 @@ public class FlowRunnerManager {
 
     ThreadFactory jobThreadFactory = new ThreadFactoryBuilder().setNameFormat("Exec-Worker-Job").build();
     jobExecutorService = Executors.newCachedThreadPool(jobThreadFactory);
+
+    Thread cleanThread = new Thread(new Runnable() {
+      @Override
+      public void run() {
+        while(true) {
+          try {
+            cleanFinishedFlows();
+            Thread.sleep(5000);
+          } catch (Exception e){
+            LOGGER.error("clean thread error ", e);
+          }
+        }
+      }
+    });
+    cleanThread.setDaemon(true);
+    cleanThread.setName("finishedFlowClean");
+    cleanThread.start();
   }
 
   /**
@@ -183,6 +200,15 @@ public class FlowRunnerManager {
 
     runningFlows.put(executionFlow.getId(), flowRunner);
     flowExecutorService.submit(flowRunner);
+  }
+
+  private void cleanFinishedFlows(){
+    for(Map.Entry<Integer, FlowRunner> entry: runningFlows.entrySet()){
+      ExecutionFlow executionFlow = flowDao.queryExecutionFlow(entry.getKey());
+      if(executionFlow.getStatus().typeIsFinished()){
+        runningFlows.remove(entry.getKey());
+      }
+    }
   }
 
   /**

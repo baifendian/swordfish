@@ -17,10 +17,14 @@ package com.baifendian.swordfish.webserver.api.service;
 
 import com.baifendian.swordfish.dao.enums.FlowStatus;
 import com.baifendian.swordfish.dao.mapper.AdHocMapper;
+import com.baifendian.swordfish.dao.mapper.MasterServerMapper;
 import com.baifendian.swordfish.dao.mapper.ProjectMapper;
 import com.baifendian.swordfish.dao.model.AdHoc;
+import com.baifendian.swordfish.dao.model.MasterServer;
 import com.baifendian.swordfish.dao.model.Project;
 import com.baifendian.swordfish.dao.model.User;
+import com.baifendian.swordfish.rpc.RetInfo;
+import com.baifendian.swordfish.rpc.client.MasterClient;
 import com.baifendian.swordfish.webserver.api.dto.AdhocLogData;
 import com.baifendian.swordfish.webserver.api.dto.AdhocResult;
 import com.baifendian.swordfish.webserver.api.dto.ExecutorId;
@@ -47,6 +51,9 @@ public class AdhocService {
 
   @Autowired
   private AdHocMapper adHocMapper;
+
+  @Autowired
+  private MasterServerMapper masterServerMapper;
 
   /**
    * 执行即席查询
@@ -95,6 +102,20 @@ public class AdhocService {
     adhoc.setCreateTime(now);
 
     adHocMapper.insert(adhoc);
+
+    MasterServer masterServer = masterServerMapper.query();
+    if(masterServer == null){
+      // TODO:: 这个要返回什么代码待确认。
+      response.setStatus(HttpStatus.SC_NOT_MODIFIED);
+      return null;
+    }
+
+    MasterClient masterClient = new MasterClient(masterServer.getHost(), masterServer.getPort());
+    try {
+      RetInfo retInfo = masterClient.execAdHoc(adhoc.getId());
+    } catch (Exception e){
+
+    }
 
     // TODO:: 写 ad_hoc_results db
 

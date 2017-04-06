@@ -27,7 +27,7 @@ public class FlowDagTest {
   @Test
   public void testFlowDag(){
     FlowDao flowDao = DaoFactory.getDaoInstance(FlowDao.class);
-    ExecutionFlow executionFlow = flowDao.queryExecutionFlow(784);
+    ExecutionFlow executionFlow = flowDao.queryExecutionFlow(861);
     FlowDag flowDag = JsonUtil.parseObject(executionFlow.getWorkflowData(), FlowDag.class);
     System.out.println(flowDag);
   }

@@ -21,6 +21,8 @@ import com.baifendian.swordfish.dao.mapper.ProjectFlowMapper;
 import com.baifendian.swordfish.dao.mapper.ProjectUserMapper;
 import com.baifendian.swordfish.dao.model.Schedule;
 import com.baifendian.swordfish.dao.model.User;
+
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -81,18 +83,15 @@ public class MailSendService extends BaseDao {
    * @param sendToUserIfMailsEmpty 标志位，若项目无邮件组发送邮件给项目成员
    */
   public boolean sendToFlowMails(int flowId, String title, String content, boolean sendToUserIfMailsEmpty, Schedule schedule) {
-    String mailsStr = schedule.getNotifyMailsStr();
+    List<String> mails = schedule.getNotifyMails();
 
-    if (StringUtils.isEmpty(mailsStr)) {
+    if (CollectionUtils.isEmpty(mails)) {
       if (sendToUserIfMailsEmpty) {
         return sendToProjectUsers(flowId, title, content);
       } else {
         return false;
       }
     }
-
-    String[] mailsArr = mailsStr.split(";");
-    Collection<String> mails = Arrays.asList(mailsArr);
 
     return MailSendUtil.sendMails(mails, title, content);
   }

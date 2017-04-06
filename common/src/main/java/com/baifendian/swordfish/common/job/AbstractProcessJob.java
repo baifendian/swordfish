@@ -236,11 +236,11 @@ public abstract class AbstractProcessJob extends AbstractJob {
     }, threadLoggerInfoName);
 
     try {
+      loggerInfoThread.setDaemon(true);
       loggerInfoThread.start();
-      loggerInfoThread.join();
       // loggerErrorThread.start();
       // loggerErrorThread.join();
-    } catch (InterruptedException e) {
+    } catch (Exception e) {
       logger.error(e.getMessage(), e);
     }
   }

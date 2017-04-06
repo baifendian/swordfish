@@ -27,6 +27,7 @@ import com.baifendian.swordfish.dao.utils.json.JsonUtil;
 import com.baifendian.swordfish.execserver.job.JobTypeManager;
 import com.baifendian.swordfish.execserver.service.ExecServiceImpl;
 import com.baifendian.swordfish.rpc.ScheduleInfo;
+import com.baifendian.swordfish.rpc.client.MasterClient;
 
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.PropertiesConfiguration;
@@ -46,7 +47,7 @@ import java.util.Date;
 public class Init {
   public static void initFlow() {
     FlowDao flowDao = DaoFactory.getDaoInstance(FlowDao.class);
-    ExecutionFlow executionFlow = flowDao.scheduleFlowToExecution(1, 3, 1, new Date(), FlowRunType.DISPATCH, 3, 3*3600);
+    ExecutionFlow executionFlow = flowDao.scheduleFlowToExecution(1, 2, 1, new Date(), FlowRunType.DISPATCH, 3, 3*3600);
     System.out.println(executionFlow.getId());
   }
 
@@ -101,14 +102,14 @@ public class Init {
   }
 
   public static void main(String[] args) throws NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException, IOException, TException, ParseException {
-    //Init.initFlow();
+    Init.initFlow();
     //Init.testJob();
     //Init.initSchedule();
     //Init.runFlow();
     //Init.runAdHoc();
     //Init.appendWorkFlow();
     //Init.execFlow(817);
-    Init.cancelExecFlow(817);
+    //Init.cancelExecFlow(817);
     CronExpression cron = new CronExpression("10 * * * * ?");
     Date now = new Date();
     Date date = cron.getTimeAfter(now);

@@ -13,9 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/*
+ * Copyright (C) 2017 Baifendian Corporation
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *          http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.baifendian.swordfish.rpc.client;
 
-import com.baifendian.swordfish.dao.model.flow.ScheduleMeta;
 import com.baifendian.swordfish.rpc.HeartBeatData;
 import com.baifendian.swordfish.rpc.MasterService;
 import com.baifendian.swordfish.rpc.RetInfo;
@@ -53,6 +68,10 @@ public class MasterClient {
     this.host = host;
     this.port = port;
     this.retries = retries;
+  }
+
+  public MasterClient(String host, int port) {
+    new MasterClient(host, port, 3);
   }
 
   private void connect() {
@@ -138,21 +157,17 @@ public class MasterClient {
     return true;
   }
 
-  public boolean execAdHoc(int id) {
+  public RetInfo execAdHoc(int id) throws TException {
     connect();
     try {
       RetInfo ret = client.execAdHoc(id);
-      if (ret.getStatus() != 0) {
-        logger.error("exec ad hoc error:{}", ret.getMsg());
-        return false;
-      }
+      return ret;
     } catch (TException e) {
       logger.error("exec ad hoc error", e);
-      return false;
+      throw e;
     } finally {
       close();
     }
-    return true;
   }
 
   public boolean execFlow(int id) {
