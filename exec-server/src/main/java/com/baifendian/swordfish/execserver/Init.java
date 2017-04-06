@@ -93,8 +93,8 @@ public class Init {
     //Init.testJob();
     //Init.initSchedule();
     //Init.runFlow();
-    Init.runAdHoc();
-    //Init.execFlow(77);
+    //Init.runAdHoc();
+    Init.execFlow(415);
     //Init.cancelExecFlow(77);
     System.out.println(BaseConfig.getSystemEnvPath());
     System.out.println(new Date(1488607000));
