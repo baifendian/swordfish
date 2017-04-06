@@ -81,7 +81,7 @@ public class ProjectFlowMapperSqlProvider {
           SET("name = #{flow.name}");
         }
         if (projectFlow.getOwnerId() != 0) {
-          SET("owner_id = #{flow.ownerId}");
+          SET("owner = #{flow.ownerId}");
         }
         WHERE("id = #{flow.id}");
       }

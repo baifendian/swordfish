@@ -19,6 +19,7 @@ import com.baifendian.swordfish.dao.enums.*;
 import com.baifendian.swordfish.dao.mapper.*;
 import com.baifendian.swordfish.dao.model.*;
 import com.baifendian.swordfish.dao.model.flow.params.Property;
+import com.baifendian.swordfish.dao.utils.json.JsonUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -254,7 +255,7 @@ public class MockDataService {
   public String mocProjectFlowDataJson(int flowId) throws IOException {
     ObjectMapper mapper = new ObjectMapper();
     ProjectFlow.ProjectFlowData projectFlowData = mocProjectFlowData(flowId);
-    return mapper.writeValueAsString(projectFlowData);
+    return JsonUtil.toJsonString(projectFlowData);
   }
 
   /**
