@@ -63,31 +63,36 @@ public class AdHocSqlJob {
     String sqls = param.getStms();
     // 不支持参数替换
     //sqls = ParamHelper.resolvePlaceholders(sqls, definedParamMap);
-    List<String> funcs = FunctionUtil.createFuncs(param.getUdfs(), jobIdLog, BaseConfig.getHdfsResourcesDir(props.getProjectId()) , true);
-    List<String> execSqls = CommonUtil.sqlSplit(sqls);
-    logger.info("exec sql:{}, funcs:{}", sqls, funcs);
-    /** 查询结果写入数据库 */
-    ResultCallback resultCallback = new ResultCallback() {
-      @Override
-      public void handleResult(ExecResult execResult, Date startTime, Date endTime) {
-        AdHocResult adHocResult = new AdHocResult();
-        adHocResult.setExecId(props.getAdHocId());
-        adHocResult.setStm(execResult.getStm());
-        adHocResult.setIndex(execResult.getIndex());
-        adHocResult.setStatus(execResult.getStatus());
-        AdHocJsonObject adHocJsonObject = new AdHocJsonObject();
-        adHocJsonObject.setTitles(execResult.getTitles());
-        adHocJsonObject.setValues(execResult.getValues());
-        adHocResult.setResult(JsonUtil.toJsonString(adHocJsonObject));
-        adHocResult.setStartTime(startTime);
-        adHocResult.setEndTime(endTime);
+    try {
+      List<String> funcs = FunctionUtil.createFuncs(param.getUdfs(), jobIdLog, BaseConfig.getHdfsResourcesDir(props.getProjectId()), true);
+      List<String> execSqls = CommonUtil.sqlSplit(sqls);
+      logger.info("exec sql:{}, funcs:{}", sqls, funcs);
+      /** 查询结果写入数据库 */
+      ResultCallback resultCallback = new ResultCallback() {
+        @Override
+        public void handleResult(ExecResult execResult, Date startTime, Date endTime) {
+          AdHocResult adHocResult = new AdHocResult();
+          adHocResult.setExecId(props.getAdHocId());
+          adHocResult.setStm(execResult.getStm());
+          adHocResult.setIndex(execResult.getIndex());
+          adHocResult.setStatus(execResult.getStatus());
+          AdHocJsonObject adHocJsonObject = new AdHocJsonObject();
+          adHocJsonObject.setTitles(execResult.getTitles());
+          adHocJsonObject.setValues(execResult.getValues());
+          adHocResult.setResult(JsonUtil.toJsonString(adHocJsonObject));
+          adHocResult.setStartTime(startTime);
+          adHocResult.setEndTime(endTime);
 
-        adHocDao.updateAdHocResult(adHocResult); // 更新结果到数据库中
-      }
-    };
-    HiveSqlExec hiveSqlExec = new HiveSqlExec(funcs, execSqls, props.getProxyUser(), null, true, resultCallback, param.getLimit(), logger);
-    adHocDao.initAdHocResult(props.getAdHocId(), execSqls);
-    hiveSqlExec.run();
+          adHocDao.updateAdHocResult(adHocResult); // 更新结果到数据库中
+        }
+      };
+      HiveSqlExec hiveSqlExec = new HiveSqlExec(funcs, execSqls, props.getProxyUser(), null, true, resultCallback, param.getLimit(), logger);
+      adHocDao.initAdHocResult(props.getAdHocId(), execSqls);
+      hiveSqlExec.run();
+    } catch (Exception e){
+      logger.error("ad hoc job run error", e);
+      throw e;
+    }
   }
 
 }
