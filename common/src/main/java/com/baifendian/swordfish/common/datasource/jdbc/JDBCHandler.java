@@ -40,7 +40,6 @@ public class JDBCHandler implements DataSourceHandler {
   static{
     dbDriverMap.put(DbType.MYSQL, "com.mysql.jdbc.Driver");
     dbDriverMap.put(DbType.ORACLE, "oracle.jdbc.driver.OracleDriver");
-    dbDriverMap.put(DbType.SQLSERVER, "com.microsoft.jdbc.sqlserver.SQLServerDriver");
   }
 
   public JDBCHandler(DbType dbType, String paramStr){

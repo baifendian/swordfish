@@ -15,25 +15,27 @@
  */
 package com.baifendian.swordfish.dao.model;
 
-import com.baifendian.swordfish.dao.utils.json.JsonUtil;
-import com.baifendian.swordfish.dao.utils.json.StringNodeJsonDeserializer;
-import com.baifendian.swordfish.dao.utils.json.StringNodeJsonSerializer;
-import com.baifendian.swordfish.dao.model.flow.EdgeAttribute;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-
 public class FlowNodeRelation {
 
+  /**
+   * 所属的 flow
+   */
   private int flowId;
 
+  /**
+   * 起点名称
+   */
   private String startNode;
 
+  /**
+   * 终点名称
+   */
   private String endNode;
 
-  public FlowNodeRelation(){}
+  public FlowNodeRelation() {
+  }
 
-  public FlowNodeRelation(int flowId, String startNode, String endNode){
+  public FlowNodeRelation(int flowId, String startNode, String endNode) {
     this.flowId = flowId;
     this.startNode = startNode;
     this.endNode = endNode;

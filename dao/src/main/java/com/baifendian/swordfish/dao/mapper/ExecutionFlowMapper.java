@@ -58,7 +58,7 @@ public interface ExecutionFlowMapper {
    */
   @Results(value = {@Result(property = "id", column = "id", id = true, javaType = int.class, jdbcType = JdbcType.INTEGER),
           @Result(property = "flowId", column = "flow_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
-          @Result(property = "workId", column = "work_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
+          @Result(property = "worker", column = "worker", javaType = String.class, jdbcType = JdbcType.VARCHAR),
           @Result(property = "status", column = "status", typeHandler = EnumOrdinalTypeHandler.class, javaType = FlowStatus.class, jdbcType = JdbcType.TINYINT),
           @Result(property = "submitUser", column = "submit_user", javaType = int.class, jdbcType = JdbcType.INTEGER),
           @Result(property = "submitTime", column = "submit_time", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP),
@@ -76,7 +76,7 @@ public interface ExecutionFlowMapper {
 
   @Results(value = {@Result(property = "id", column = "id", id = true, javaType = int.class, jdbcType = JdbcType.INTEGER),
           @Result(property = "flowId", column = "flow_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
-          @Result(property = "workId", column = "work_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
+          @Result(property = "worker", column = "worker", javaType = String.class, jdbcType = JdbcType.VARCHAR),
           @Result(property = "projectId", column = "project_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
           @Result(property = "projectName", column = "project_name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
           @Result(property = "status", column = "status", typeHandler = EnumOrdinalTypeHandler.class, javaType = FlowStatus.class, jdbcType = JdbcType.TINYINT),
@@ -112,32 +112,35 @@ public interface ExecutionFlowMapper {
   @SelectProvider(type = ExecutionFlowMapperProvider.class, method = "selectNoFinishFlow")
   List<ExecutionFlow> selectNoFinishFlow(@Param("worker") String worker);
 
-  @Results(value = {@Result(property = "id", column = "id", id = true, javaType = int.class, jdbcType = JdbcType.INTEGER),
+  @Results(value = {
+          @Result(property = "id", column = "id", id = true, javaType = int.class, jdbcType = JdbcType.INTEGER),
           @Result(property = "flowId", column = "flow_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
-          @Result(property = "workId", column = "work_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
+          @Result(property = "worker", column = "worker", javaType = String.class, jdbcType = JdbcType.VARCHAR),
           @Result(property = "status", column = "status", typeHandler = EnumOrdinalTypeHandler.class, jdbcType = JdbcType.TINYINT),
           @Result(property = "scheduleTime", column = "schedule_time", javaType = int.class, jdbcType = JdbcType.INTEGER),
           @Result(property = "type", column = "type", typeHandler = EnumOrdinalTypeHandler.class, jdbcType = JdbcType.TINYINT),})
   @SelectProvider(type = ExecutionFlowMapperProvider.class, method = "selectByFlowIdAndTimes")
   List<ExecutionFlow> selectByFlowIdAndTimes(@Param("flowId") Integer flowId, @Param("startDate") Date startDate, @Param("endDate") Date endDate);
 
-  @Results(value = {@Result(property = "id", column = "id", id = true, javaType = Long.class, jdbcType = JdbcType.BIGINT),
+  @Results(value = {
+          @Result(property = "id", column = "id", id = true, javaType = int.class, jdbcType = JdbcType.INTEGER),
           @Result(property = "flowId", column = "flow_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
-          @Result(property = "workId", column = "work_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
+          @Result(property = "worker", column = "worker", javaType = String.class, jdbcType = JdbcType.VARCHAR),
           @Result(property = "status", column = "status", typeHandler = EnumOrdinalTypeHandler.class, jdbcType = JdbcType.TINYINT),
           @Result(property = "scheduleTime", column = "schedule_time", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP),
           @Result(property = "type", column = "type", typeHandler = EnumOrdinalTypeHandler.class, jdbcType = JdbcType.TINYINT),})
   @SelectProvider(type = ExecutionFlowMapperProvider.class, method = "selectByFlowIdAndTime")
   List<ExecutionFlow> selectByFlowIdAndTime(@Param("flowId") Integer flowId, @Param("scheduleTime") Date scheduleTime);
 
-  @Results(value = {@Result(property = "id", column = "id", id = true, javaType = Long.class, jdbcType = JdbcType.BIGINT),
+  @Results(value = {
+          @Result(property = "id", column = "id", id = true, javaType = int.class, jdbcType = JdbcType.INTEGER),
           @Result(property = "flowId", column = "flow_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
-          @Result(property = "workId", column = "work_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
+          @Result(property = "worker", column = "worker", javaType = String.class, jdbcType = JdbcType.VARCHAR),
           @Result(property = "status", column = "status", typeHandler = EnumOrdinalTypeHandler.class, jdbcType = JdbcType.TINYINT),})
   @SelectProvider(type = ExecutionFlowMapperProvider.class, method = "selectNewestExeFlow")
   List<ExecutionFlow> selectNewestExeFlow(@Param("flowIds") Set<Integer> flowIds);
 
   @DeleteProvider(type = ExecutionFlowMapperProvider.class, method = "deleteByExecId")
-  int deleteByExecId(@Param("execId") Long execId);
+  int deleteByExecId(@Param("execId") int execId);
 
 }

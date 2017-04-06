@@ -41,7 +41,7 @@ import java.io.IOException;
 /**
  * 字符串节点的自定义序列化 <p>
  */
-public class StringNodeJsonSerializer extends JsonSerializer<String> {
+public class JsonObjectSerializer extends JsonSerializer<String> {
 
   @Override
   public void serialize(String value, JsonGenerator jgen, SerializerProvider provider) throws IOException, JsonProcessingException {

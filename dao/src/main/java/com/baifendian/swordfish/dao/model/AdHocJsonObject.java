@@ -27,7 +27,7 @@ public class AdHocJsonObject {
   /**
    * 返回的数据
    */
-  private List<List<String>> values = new ArrayList<List<String>>();
+  private List<List<String>> values = new ArrayList<>();
 
   /**
    * getter method
@@ -68,5 +68,4 @@ public class AdHocJsonObject {
   public void setValues(List<List<String>> values) {
     this.values = values;
   }
-
 }

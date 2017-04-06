@@ -18,6 +18,7 @@ package com.baifendian.swordfish.dao;
 import com.baifendian.swordfish.dao.enums.FlowRunType;
 import com.baifendian.swordfish.dao.model.ExecutionFlow;
 import com.baifendian.swordfish.dao.model.ExecutionNode;
+import com.baifendian.swordfish.dao.model.ProjectFlow;
 import com.baifendian.swordfish.dao.model.Schedule;
 
 import org.junit.Before;
@@ -68,4 +69,11 @@ public class FlowDaoTest {
     Schedule schedule = flowDao.querySchedule(2);
     System.out.println(schedule);
   }
+
+  @Test
+  public void testProjectFlowfindByName() {
+    ProjectFlow projectFlow = flowDao.projectFlowfindByName(1,"bdi_base");
+    System.out.print(projectFlow);
+  }
+
 }

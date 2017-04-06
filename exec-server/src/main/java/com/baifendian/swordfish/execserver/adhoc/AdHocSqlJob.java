@@ -15,25 +15,23 @@
  */
 package com.baifendian.swordfish.execserver.adhoc;
 
+import com.baifendian.swordfish.common.adhoc.AdHocParam;
 import com.baifendian.swordfish.common.config.BaseConfig;
 import com.baifendian.swordfish.common.job.ExecResult;
 import com.baifendian.swordfish.common.job.JobProps;
 import com.baifendian.swordfish.common.utils.CommonUtil;
-import com.baifendian.swordfish.dao.enums.FlowStatus;
+import com.baifendian.swordfish.dao.AdHocDao;
+import com.baifendian.swordfish.dao.DaoFactory;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
-import com.baifendian.swordfish.dao.datasource.ConnectionFactory;
-import com.baifendian.swordfish.dao.mapper.AdHocResultMapper;
 import com.baifendian.swordfish.dao.model.AdHocJsonObject;
 import com.baifendian.swordfish.dao.model.AdHocResult;
 import com.baifendian.swordfish.execserver.job.hive.FunctionUtil;
 import com.baifendian.swordfish.execserver.job.hive.HiveSqlExec;
 import com.baifendian.swordfish.execserver.job.hive.ResultCallback;
 
-import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 
 import java.io.IOException;
-import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
 
@@ -42,7 +40,7 @@ import java.util.List;
  */
 public class AdHocSqlJob {
 
-  private AdHocResultMapper adHocResultMapper;
+  private AdHocDao adHocDao;
 
   private AdHocParam param;
 
@@ -56,13 +54,13 @@ public class AdHocSqlJob {
     this.jobIdLog = jobIdLog;
     this.logger = logger;
     this.props = props;
+    this.adHocDao = DaoFactory.getDaoInstance(AdHocDao.class);
     param = JsonUtil.parseObject(props.getJobParams(), AdHocParam.class);
-    adHocResultMapper = ConnectionFactory.getSqlSession().getMapper(AdHocResultMapper.class);
   }
 
   public void process() throws Exception {
     logger.debug("{}", props.getJobParams());
-    String sqls = param.getStmt();
+    String sqls = param.getStms();
     // 不支持参数替换
     //sqls = ParamHelper.resolvePlaceholders(sqls, definedParamMap);
     List<String> funcs = FunctionUtil.createFuncs(param.getUdfs(), jobIdLog, BaseConfig.getHdfsResourcesDir(props.getProjectId()) , true);
@@ -73,7 +71,7 @@ public class AdHocSqlJob {
       @Override
       public void handleResult(ExecResult execResult, Date startTime, Date endTime) {
         AdHocResult adHocResult = new AdHocResult();
-        adHocResult.setAdHocId(props.getAdHocId());
+        adHocResult.setExecId(props.getAdHocId());
         adHocResult.setStm(execResult.getStm());
         adHocResult.setIndex(execResult.getIndex());
         adHocResult.setStatus(execResult.getStatus());
@@ -84,28 +82,12 @@ public class AdHocSqlJob {
         adHocResult.setStartTime(startTime);
         adHocResult.setEndTime(endTime);
 
-        adHocResultMapper.update(adHocResult); // 更新结果到数据库中
+        adHocDao.updateAdHocResult(adHocResult); // 更新结果到数据库中
       }
     };
     HiveSqlExec hiveSqlExec = new HiveSqlExec(funcs, execSqls, props.getProxyUser(), null, true, resultCallback, param.getLimit(), logger);
-    initAdHocResult(execSqls);
+    adHocDao.initAdHocResult(props.getAdHocId(), execSqls);
     hiveSqlExec.run();
-  }
-
-  private void initAdHocResult(List<String> execSqls){
-    if(CollectionUtils.isNotEmpty(execSqls)){
-      adHocResultMapper.delete(props.getAdHocId());
-      int index=0;
-      for(String stm: execSqls){
-        AdHocResult adHocResult = new AdHocResult();
-        adHocResult.setAdHocId(props.getAdHocId());
-        adHocResult.setStm(stm);
-        adHocResult.setIndex(index++);
-        adHocResult.setStatus(FlowStatus.INIT);
-        adHocResult.setCreateTime(new Timestamp(System.currentTimeMillis()));
-        adHocResultMapper.insert(adHocResult);
-      }
-    }
   }
 
 }

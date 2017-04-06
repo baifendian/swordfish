@@ -113,6 +113,23 @@ public class FlowRunnerManager {
 
     ThreadFactory jobThreadFactory = new ThreadFactoryBuilder().setNameFormat("Exec-Worker-Job").build();
     jobExecutorService = Executors.newCachedThreadPool(jobThreadFactory);
+
+    Thread cleanThread = new Thread(new Runnable() {
+      @Override
+      public void run() {
+        while(true) {
+          try {
+            cleanFinishedFlows();
+            Thread.sleep(5000);
+          } catch (Exception e){
+            LOGGER.error("clean thread error ", e);
+          }
+        }
+      }
+    });
+    cleanThread.setDaemon(true);
+    cleanThread.setName("finishedFlowClean");
+    cleanThread.start();
   }
 
   /**
@@ -158,8 +175,9 @@ public class FlowRunnerManager {
    * 提交调度的 workflow 执行 <p>
    */
   public void submitFlow(ExecutionFlow executionFlow, Schedule schedule, Date scheduleDate) {
-    int maxTryTimes = schedule.getMaxTryTimes() != null ? schedule.getMaxTryTimes() : defaultMaxTryTimes;
-    int timeout = schedule.getTimeout() != null ? schedule.getTimeout() : defaultMaxTimeout;
+    //int maxTryTimes = schedule.getMaxTryTimes() != null ? schedule.getMaxTryTimes() : defaultMaxTryTimes;
+    int maxTryTimes = schedule.getMaxTryTimes();
+    int timeout = schedule.getTimeout() != 0 ? schedule.getTimeout() : defaultMaxTimeout;
     FailurePolicyType failurePolicy = schedule.getFailurePolicy() != null ? schedule.getFailurePolicy() : defaultFailurePolicyType;
 
     // 系统参数
@@ -182,6 +200,15 @@ public class FlowRunnerManager {
 
     runningFlows.put(executionFlow.getId(), flowRunner);
     flowExecutorService.submit(flowRunner);
+  }
+
+  private void cleanFinishedFlows(){
+    for(Map.Entry<Integer, FlowRunner> entry: runningFlows.entrySet()){
+      ExecutionFlow executionFlow = flowDao.queryExecutionFlow(entry.getKey());
+      if(executionFlow.getStatus().typeIsFinished()){
+        runningFlows.remove(entry.getKey());
+      }
+    }
   }
 
   /**

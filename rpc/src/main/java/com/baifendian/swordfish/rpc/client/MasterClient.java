@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.baifendian.swordfish.execserver;
+package com.baifendian.swordfish.rpc.client;
 
 import com.baifendian.swordfish.rpc.HeartBeatData;
 import com.baifendian.swordfish.rpc.MasterService;
@@ -52,6 +52,10 @@ public class MasterClient {
     this.host = host;
     this.port = port;
     this.retries = retries;
+  }
+
+  public MasterClient(String host, int port) {
+    this(host, port, 3);
   }
 
   private void connect() {
@@ -137,21 +141,17 @@ public class MasterClient {
     return true;
   }
 
-  public boolean execAdHoc(int id) {
+  public RetInfo execAdHoc(int id) throws TException {
     connect();
     try {
       RetInfo ret = client.execAdHoc(id);
-      if (ret.getStatus() != 0) {
-        logger.error("exec ad hoc error:{}", ret.getMsg());
-        return false;
-      }
+      return ret;
     } catch (TException e) {
       logger.error("exec ad hoc error", e);
-      return false;
+      throw e;
     } finally {
       close();
     }
-    return true;
   }
 
   public boolean execFlow(int id) {
@@ -175,6 +175,23 @@ public class MasterClient {
     connect();
     try {
       RetInfo ret = client.cancelExecFlow(id);
+      if (ret.getStatus() != 0) {
+        logger.error("cancel exec flow error:{}", ret.getMsg());
+        return false;
+      }
+    } catch (TException e) {
+      logger.error("cancel flow error", e);
+      return false;
+    } finally {
+      close();
+    }
+    return true;
+  }
+
+  public boolean appendWorkFlow(int projectId, int workflowId, String scheduleMeta) {
+    connect();
+    try {
+      RetInfo ret = client.appendWorkFlow(projectId, workflowId, scheduleMeta);
       if (ret.getStatus() != 0) {
         logger.error("exec flow error:{}", ret.getMsg());
         return false;

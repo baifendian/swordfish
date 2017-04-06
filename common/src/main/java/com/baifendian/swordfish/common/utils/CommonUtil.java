@@ -18,24 +18,14 @@ package com.baifendian.swordfish.common.utils;
 import com.google.common.collect.Sets;
 import org.apache.commons.lang.StringUtils;
 
-import java.security.MessageDigest;
 import java.util.*;
-
-import static com.baifendian.swordfish.common.utils.CommonUtil.TokenType.BRACKET;
 
 public class CommonUtil {
   /**
    * 状态机描述
    */
   private enum Status {
-    START, LETTER, BLANK, END, QUOTE, SINGLE_QUOTE, BACKSLASH_FOR_QUOTE, BACKSLASH_FOR_SINGLE_QUOTE, COMMENT
-  }
-
-  /**
-   * token 的类型描述
-   */
-  public enum TokenType {
-    WORD, BRACKET, BRACKET2, BLANK, OTHERS
+    START, BLANK, END, QUOTE, SINGLE_QUOTE, BACKSLASH_FOR_QUOTE, BACKSLASH_FOR_SINGLE_QUOTE, COMMENT
   }
 
   /**
@@ -43,16 +33,6 @@ public class CommonUtil {
    */
   private final static Set<String> keywords = Sets.newHashSet("SELECT", "ALL", "DISTINCT", "FROM", "WHERE", "BY",
       "WITH", "LIMIT", "JOIN", "UNION", "OVER", "IN", "IF", "AND", "OR", "PARTITION");
-
-  private static MessageDigest md = null;
-
-  static {
-    try {
-      md = MessageDigest.getInstance("MD5");
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
-  }
 
   /**
    * 识别文件后缀名称
@@ -74,26 +54,10 @@ public class CommonUtil {
   }
 
   /**
-   * 增加日期中某类型的某数值。如增加日期
+   * sql 字符串解析, 将一个语句进行正常切割为多个, 语句的切割符号为 ";"
    *
-   * @param date     日期
-   * @param dateType 类型
-   * @param amount   数值
-   * @return 计算后日期
-   */
-  private static Date addInteger(Date date, int dateType, int amount) {
-    Date resDate = null;
-    if (date != null) {
-      Calendar calendar = Calendar.getInstance();
-      calendar.setTime(date);
-      calendar.add(dateType, amount);
-      resDate = calendar.getTime();
-    }
-    return resDate;
-  }
-
-  /**
-   * sql 字符串解析, 将一个语句进行正常切割, 为多个. 能处理 ', ", 回车换行问题.
+   * @param sql
+   * @return
    */
   public static List<String> sqlSplit(String sql) {
     if (StringUtils.isEmpty(sql)) {
@@ -227,250 +191,11 @@ public class CommonUtil {
     return r;
   }
 
-  /**
-   * 返回 token 以及类型, 对于单词, 采用 value, 其它的则没有
-   */
-  public static List<Map.Entry<TokenType, String>> getToken(String sql) {
-    if (StringUtils.isEmpty(sql)) {
-      return Collections.EMPTY_LIST;
-    }
-
-    StringBuffer buffer = new StringBuffer();
-
-    List<Map.Entry<TokenType, String>> list = new ArrayList<>();
-    Status status = Status.START;
-
-    for (int i = 0; i < sql.length(); ++i) {
-      char c = sql.charAt(i);
-      char nextChar = ((i + 1) < sql.length()) ? sql.charAt(i + 1) : ' '; // add at 2017/1/6
-
-      boolean singleChar = false;
-
-      switch (status) {
-        case START: {
-          if (c == '_' || Character.isLetter(c)) {
-            status = Status.LETTER;
-            // 如果是单词, 就记录之
-            buffer.append(c);
-          } else if (c == '\'') {
-            status = Status.SINGLE_QUOTE;
-          } else if (c == '"') {
-            status = Status.QUOTE;
-          } else if (c == '-' && nextChar == '-') { // add at 2017/1/6)
-            status = Status.COMMENT;
-            ++i;
-            continue;
-          } else {
-            singleChar = true;
-          }
-        }
-        break;
-        case COMMENT: {
-          if (c != '\r' && c != '\n') {
-            status = Status.COMMENT;
-            continue;
-          } else {
-            status = Status.START;
-            singleChar = true;
-          }
-        }
-        case LETTER: {
-          if (c == '_' || Character.isLetter(c) || Character.isDigit(c)) {
-            status = Status.LETTER;
-            // 如果是单词, 就记录之
-            buffer.append(c);
-          } else if (c == '"') {
-            status = Status.QUOTE;
-          } else if (c == '\'') {
-            status = Status.SINGLE_QUOTE;
-          } else if (c == '-' && nextChar == '-') { // add at 2017/1/6)
-            status = Status.COMMENT;
-            ++i;
-            continue;
-          } else {
-            list.add(new AbstractMap.SimpleEntry(TokenType.WORD, buffer.toString()));
-            buffer = new StringBuffer();
-            // 是一个终结符号
-            status = Status.START;
-            singleChar = true;
-          }
-        }
-        break;
-        case QUOTE: {
-          if (c == '"') {
-            // 结束了
-            list.add(new AbstractMap.SimpleEntry(TokenType.OTHERS, null));
-            status = Status.START;
-          } else if (c == '\\') {
-            status = Status.BACKSLASH_FOR_QUOTE;
-          }
-        }
-        break;
-        case SINGLE_QUOTE: {
-          if (c == '\'') {
-            // 结束了
-            list.add(new AbstractMap.SimpleEntry(TokenType.OTHERS, null));
-            status = Status.START;
-          } else if (c == '\\') {
-            status = Status.BACKSLASH_FOR_SINGLE_QUOTE;
-          }
-        }
-        break;
-        case BACKSLASH_FOR_QUOTE: {
-          status = Status.QUOTE;
-        }
-        break;
-        case BACKSLASH_FOR_SINGLE_QUOTE: {
-          status = Status.SINGLE_QUOTE;
-        }
-        break;
-      }
-
-      // 这里起点即是终点
-      if (singleChar) {            // 是一个终结符号
-        if (c == '(') {
-          list.add(new AbstractMap.SimpleEntry(BRACKET, null));
-        } else if (c == ')') {
-          list.add(new AbstractMap.SimpleEntry(TokenType.BRACKET2, null));
-        } else if (Character.isWhitespace(c)) {
-          list.add(new AbstractMap.SimpleEntry(TokenType.BLANK, null));
-        } else {
-          list.add(new AbstractMap.SimpleEntry(TokenType.OTHERS, null));
-        }
-      }
-    }
-
-    switch (status) {
-      case QUOTE:
-      case BACKSLASH_FOR_QUOTE:
-      case BACKSLASH_FOR_SINGLE_QUOTE:
-      case SINGLE_QUOTE: {
-        list.add(new AbstractMap.SimpleEntry(TokenType.OTHERS, null));
-      }
-      break;
-      case LETTER: {
-        list.add(new AbstractMap.SimpleEntry(TokenType.WORD, buffer.toString()));
-      }
-      break;
-      default:
-        break;
-    }
-
-    return list;
-  }
-
-  /**
-   * 识别一个 sql 中的自定义 function, 这个算法是采用栈的方式来实现:
-   * <p>
-   * 1) 首先将 sql 处理, 去除掉 ""
-   * 2) 然后获取一个个的 Token, 对于 Token 有2种情况, 单词, 非单词(都是一个个字符)
-   * 3) 单词就符合单词的规则, 以 _ 或者字母开头, 后面都是数字
-   * 4) 如果是 单词, 后面接上了 (, 考虑将 单词 作为 function name, 否则抛弃
-   * <p>
-   * 注意: 有可能多找关键词, 比如某些 hive 关键词后面跟上了 (), 会误认为是关键词, 不过这个不影响我们的正常处理
-   *
-   * @param sql
-   * @return
-   */
-  public static Set<String> sqlFunction(String sql) {
-    Collection<Map.Entry<TokenType, String>> tokens = getToken(sql);
-    if (tokens.isEmpty()) {
-      return Collections.EMPTY_SET;
-    }
-
-    Stack<Map.Entry<TokenType, String>> stack = new Stack<>();
-
-    Set<String> funcs = new HashSet<>();
-
-    // 遍历 token
-    for (Map.Entry<TokenType, String> token : tokens) {
-      // 1) 如果是遇到了 BLANK, 则忽略;
-      // 2) 栈顶如果是 WORD, 如果遇到了 WORD, 弹出并压入新的 WORD, 遇到了 BRACKET, 则压入, 遇到了 BRACKET2, 一直弹出遇到了 BRACKET;
-      // 3) 栈顶如果是 BRACKET, 遇到了 WORD 则压入, 遇到了 OTHERS 则丢弃, 如果遇到了 BRACKET2 则栈弹出, 一直到弹出了 WORD, 记为 function;
-      // 4) 栈顶如果是空的, 遇到了 WORD 则压入, 其它都丢弃;
-      TokenType type = token.getKey();
-
-      // 如果遇到了 BLANK, 则丢弃
-      if (type == TokenType.BLANK) {
-        continue;
-      }
-
-      // 查看栈顶
-      if (stack.isEmpty()) { // 空的
-        if (type == TokenType.WORD) {
-          stack.push(token);
-        }
-        continue;
-      }
-
-      // 非空的
-      Map.Entry<TokenType, String> top = stack.peek();
-
-      switch (top.getKey()) {
-        case WORD: {
-          switch (token.getKey()) {
-            case BRACKET: { // 遇到了 (
-              stack.push(token);
-            }
-            break;
-            case BRACKET2: { // 遇到了 )
-              while (!stack.isEmpty()) {
-                TokenType pop = stack.pop().getKey();
-                // 如果遇到了 (
-                if (pop == TokenType.BRACKET) {
-                  Map.Entry<TokenType, String> word = stack.pop();
-                  if (!keywords.contains(word.getValue().toUpperCase())) {
-                    funcs.add(word.getValue());
-                  }
-                  break;
-                }
-              }
-            }
-            break;
-            case WORD: { // 遇到了 WORD
-              stack.pop();
-              stack.push(token);
-            }
-            break;
-            default: {
-              stack.pop();
-            }
-            break;
-          }
-        }
-        break;
-        case BRACKET: {
-          switch (token.getKey()) {
-            case WORD: { // 遇到了 WORD
-              stack.push(token);
-            }
-            break;
-            case BRACKET2: { // 遇到了 )
-              stack.pop();
-              Map.Entry<TokenType, String> word = stack.pop();
-              if (!keywords.contains(word.getValue().toUpperCase())) {
-                funcs.add(word.getValue());
-              }
-            }
-            break;
-            default:
-              break;
-          }
-        }
-        break;
-        default:
-          break;
-      }
-    }
-
-    return funcs;
-  }
-
   public static void main(String[] args) {
     System.out.println("abc'\\t'def");
 
     System.out.println("split complex clause...");
-    Collection<String> r = CommonUtil.sqlSplit("by '\\t' by '\\n' e;LOAD DATA INPATH 'hdfs:///tmp/dw//testtxt_1479882703178_4322' INTO TABLE testtxt_1479882703178_4322;INSERT INTO TABLE baifendian_e_commerce.fact_daily_order PARTITION(l_date='aa') SELECT col_0,null,null,null,null from testtxt_1479882703178_4322;DROP TABLE IF EXISTS testtxt_1479882703178_4322;");
+    Collection<String> r = sqlSplit("by '\\t' by '\\n' e;LOAD DATA INPATH 'hdfs:///tmp/dw//testtxt_1479882703178_4322' INTO TABLE testtxt_1479882703178_4322;INSERT INTO TABLE baifendian_e_commerce.fact_daily_order PARTITION(l_date='aa') SELECT col_0,null,null,null,null from testtxt_1479882703178_4322;DROP TABLE IF EXISTS testtxt_1479882703178_4322;");
     for (String sr : r) {
       System.out.println(sr);
     }

@@ -21,7 +21,6 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import org.springframework.util.StringUtils;
 
 import java.io.IOException;
@@ -59,21 +58,24 @@ public class JsonUtil {
    */
   public static String toJsonString(Object object) {
     try {
-      // JSON_MAPPER.setDateFormat(new
-      // SimpleDateFormat(Constants.BASE_DATETIME_FORMAT));
       return JSON_MAPPER.writeValueAsString(object);
     } catch (JsonProcessingException e) {
-      throw new RuntimeException("Json序列化异常", e);
+      throw new RuntimeException("Json serialization exception.", e);
     }
   }
 
   /**
-   * 将string 转化为 map @param <V> @param <T> @param <T> @param object @return @throws
+   * string 转化为 map
+   *
+   * @param json
+   * @param classT
+   * @param classV
+   * @param <T>
+   * @param <V>
+   * @return
    */
   public static <T, V> Map<T, V> stringToMap(String json, Class<T> classT, Class<V> classV) {
     try {
-      // JSON_MAPPER.setDateFormat(new
-      // SimpleDateFormat(Constants.BASE_DATETIME_FORMAT));
       return JSON_MAPPER.readValue(json, new TypeReference<Map<T, V>>() {
       });
     } catch (Exception e) {
@@ -82,22 +84,32 @@ public class JsonUtil {
   }
 
   /**
-   * 反序列化一个json字符串 <p>
+   * 反序列化一个 json 字符串
    *
-   * @return instance of T
+   * @param json
+   * @param clazz
+   * @param <T>
+   * @return
    */
   public static <T> T parseObject(String json, Class<T> clazz) {
     if (StringUtils.isEmpty(json)) {
       return null;
     }
+
     try {
       return JSON_MAPPER.readValue(json, clazz);
     } catch (IOException e) {
       System.out.println(e);
-      throw new RuntimeException("Json反序列化异常", e);
+      throw new RuntimeException("Json deserialization exception.", e);
     }
   }
 
+  /**
+   * json 转对象
+   *
+   * @param json
+   * @return
+   */
   public static Map<String, String> parseObjectMap(String json) {
     if (StringUtils.isEmpty(json)) {
       return null;
@@ -107,14 +119,17 @@ public class JsonUtil {
       });
     } catch (IOException e) {
       System.out.println(e);
-      throw new RuntimeException("Json反序列化异常", e);
+      throw new RuntimeException("Json deserialization exception.", e);
     }
   }
 
   /**
-   * 反序列化一个json字符串 <p>
+   * 反序列化一个 json 字符串
    *
-   * @return instance of List<T>
+   * @param json
+   * @param clazz
+   * @param <T>
+   * @return
    */
   public static <T> List<T> parseObjectList(String json, Class<T> clazz) {
     if (StringUtils.isEmpty(json)) {
@@ -124,28 +139,31 @@ public class JsonUtil {
       JavaType javaType = JSON_MAPPER.getTypeFactory().constructParametricType(List.class, clazz);
       return JSON_MAPPER.readValue(json, javaType);
     } catch (IOException e) {
-      throw new RuntimeException("Json反序列化异常", e);
+      throw new RuntimeException("Json deserialization exception.", e);
     }
   }
 
   /**
-   * 获取 Json 树 <p>
+   * 获取 Json 树
    *
-   * @return {@link JsonNode}
+   * @param json
+   * @return
    */
   public static JsonNode readTree(String json) {
     if (StringUtils.isEmpty(json)) {
       return null;
     }
+
     try {
       return JSON_MAPPER.readTree(json);
     } catch (IOException e) {
-      throw new RuntimeException("Json解析异常", e);
+      throw new RuntimeException("Json parse exception.", e);
     }
   }
 
   /**
-   * 获取字段的值（支持深度搜索）<br/> 多个相同字段的情况下，获取节点顺序的第一个 <p>
+   * 获取字段的值（支持深度搜索）<br/>
+   * 多个相同字段的情况下，获取节点顺序的第一个 <p>
    *
    * @param jsonNode json tree
    * @param field    字段名
@@ -153,10 +171,11 @@ public class JsonUtil {
    */
   public static String findNodeByField(JsonNode jsonNode, String field) {
     JsonNode node = jsonNode.findValue(field);
+
     if (node == null) {
       return null;
     }
+
     return node.toString();
   }
-
 }

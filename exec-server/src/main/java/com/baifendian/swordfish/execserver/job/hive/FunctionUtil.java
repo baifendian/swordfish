@@ -16,6 +16,8 @@
 package com.baifendian.swordfish.execserver.job.hive;
 
 import com.baifendian.swordfish.common.hadoop.HdfsClient;
+import com.baifendian.swordfish.common.job.ResourceInfo;
+import com.baifendian.swordfish.common.job.UdfsInfo;
 import com.baifendian.swordfish.common.job.exception.ExecException;
 
 import org.apache.commons.collections.CollectionUtils;
@@ -24,7 +26,6 @@ import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.hadoop.fs.Path;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,7 +36,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 public class FunctionUtil {
 
@@ -91,8 +91,9 @@ public class FunctionUtil {
   private static Set<String> getFuncResouces(List<UdfsInfo> udfsInfos) {
     Set<String> resources = new HashSet<>();
     for (UdfsInfo udfsInfo : udfsInfos) {
-      if (udfsInfo.getLibJar() != null) {
-        resources.add(udfsInfo.getLibJar().getRes());
+      if (CollectionUtils.isNotEmpty(udfsInfo.getLibJars())) {
+        for(ResourceInfo resourceInfo: udfsInfo.getLibJars())
+        resources.add(resourceInfo.getRes());
       }
     }
     return resources;

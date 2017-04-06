@@ -17,8 +17,14 @@ package com.baifendian.swordfish.dao.model;
 
 
 import com.baifendian.swordfish.dao.enums.*;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * 调度的设置基础数据 <p>
@@ -26,31 +32,29 @@ import java.util.Date;
  */
 public class Schedule {
 
+  private ScheduleParam schedule = new ScheduleParam();
+
+  @JsonIgnore
+  private String scheduleStr;
+
+  @JsonIgnore
   private int flowId;
 
   private String flowName;
 
-  private FlowType flowType;
+  private String projectName;
 
-  private Date createTime;
-
-  private Date modifyTime;
-
-  private int lastModifyBy;
-
-  private ScheduleStatus scheduleStatus;
-
+  @JsonIgnore
   private Date startDate;
 
+  @JsonIgnore
   private Date endDate;
 
-  private ScheduleType scheduleType;
+  @JsonIgnore
+  private String crontab;
 
-  private String crontabStr;
-
-  private Date nextSubmitTime;
-
-  private String depWorkflows;
+  @JsonIgnore
+  private String depWorkflowsStr;
 
   private DepPolicyType depPolicy;
 
@@ -60,13 +64,57 @@ public class Schedule {
 
   private NotifyType notifyType;
 
-  private String notifyEmails;
+  @JsonIgnore
+  private String notifyMailsStr;
 
   private Integer timeout;
 
+  private Date createTime;
+
+  private Date modifyTime;
+
+  @JsonIgnore
   private int ownerId;
 
-  private String ownerName;
+  private String owner;
+
+  @JsonIgnore
+  private ScheduleStatus scheduleStatus;
+
+  private List<String> notifyMails = new ArrayList<>();
+
+  private List<DepWorkflow> depWorkflows = new ArrayList<>();
+
+  public Schedule() {
+  }
+
+  public String getProjectName() {
+    return projectName;
+  }
+
+  public void setProjectName(String projectName) {
+    this.projectName = projectName;
+  }
+
+  public ScheduleParam getSchedule() {
+    return schedule;
+  }
+
+  public void setSchedule(ScheduleParam schedule) throws JsonProcessingException {
+    ObjectMapper mapper = new ObjectMapper();
+    this.scheduleStr = mapper.writeValueAsString(schedule);
+    this.schedule = schedule;
+  }
+
+  public String getScheduleStr() {
+    return scheduleStr;
+  }
+
+  public void setScheduleStr(String scheduleStr) throws IOException {
+    ObjectMapper mapper = new ObjectMapper();
+    this.schedule = mapper.readValue(scheduleStr,ScheduleParam.class);
+    this.scheduleStr = scheduleStr;
+  }
 
   public int getFlowId() {
     return flowId;
@@ -84,51 +132,13 @@ public class Schedule {
     this.flowName = flowName;
   }
 
-  public FlowType getFlowType() {
-    return flowType;
-  }
-
-  public void setFlowType(FlowType flowType) {
-    this.flowType = flowType;
-  }
-
-  public Date getCreateTime() {
-    return createTime;
-  }
-
-  public void setCreateTime(Date createTime) {
-    this.createTime = createTime;
-  }
-
-  public Date getModifyTime() {
-    return modifyTime;
-  }
-
-  public void setModifyTime(Date modifyTime) {
-    this.modifyTime = modifyTime;
-  }
-
-  public int getLastModifyBy() {
-    return lastModifyBy;
-  }
-
-  public void setLastModifyBy(int lastModifyBy) {
-    this.lastModifyBy = lastModifyBy;
-  }
-
-  public ScheduleStatus getScheduleStatus() {
-    return scheduleStatus;
-  }
-
-  public void setScheduleStatus(ScheduleStatus scheduleStatus) {
-    this.scheduleStatus = scheduleStatus;
-  }
-
   public Date getStartDate() {
+
     return startDate;
   }
 
   public void setStartDate(Date startDate) {
+    this.schedule.setStartDate(startDate);
     this.startDate = startDate;
   }
 
@@ -137,38 +147,36 @@ public class Schedule {
   }
 
   public void setEndDate(Date endDate) {
+    this.schedule.setEndDate(endDate);
     this.endDate = endDate;
   }
 
-  public ScheduleType getScheduleType() {
-    return scheduleType;
+  public String getCrontab() {
+    return crontab;
   }
 
-  public void setScheduleType(ScheduleType scheduleType) {
-    this.scheduleType = scheduleType;
+  public void setCrontab(String crontab) {
+    this.schedule.setCrontab(crontab);
+    this.crontab = crontab;
   }
 
-  public String getCrontabStr() {
-    return crontabStr;
+  public String getDepWorkflowsStr() {
+    return depWorkflowsStr;
   }
 
-  public void setCrontabStr(String crontabStr) {
-    this.crontabStr = crontabStr;
+  public void setDepWorkflowsStr(String depWorkflowsStr) throws IOException {
+    ObjectMapper mapper = new ObjectMapper();
+    this.depWorkflows = mapper.readValue(depWorkflowsStr,mapper.getTypeFactory().constructCollectionType(List.class,DepWorkflow.class));
+    this.depWorkflowsStr = depWorkflowsStr;
   }
 
-  public Date getNextSubmitTime() {
-    return nextSubmitTime;
-  }
-
-  public void setNextSubmitTime(Date nextSubmitTime) {
-    this.nextSubmitTime = nextSubmitTime;
-  }
-
-  public String getDepWorkflows() {
+  public List<DepWorkflow> getDepWorkflows() {
     return depWorkflows;
   }
 
-  public void setDepWorkflows(String depWorkflows) {
+  public void setDepWorkflows(List<DepWorkflow> depWorkflows) throws JsonProcessingException {
+    ObjectMapper mapper = new ObjectMapper();
+    this.depWorkflowsStr = mapper.writeValueAsString(depWorkflows);
     this.depWorkflows = depWorkflows;
   }
 
@@ -204,12 +212,24 @@ public class Schedule {
     this.notifyType = notifyType;
   }
 
-  public String getNotifyEmails() {
-    return notifyEmails;
+  public String getNotifyMailsStr() {
+    return notifyMailsStr;
   }
 
-  public void setNotifyEmails(String notifyEmails) {
-    this.notifyEmails = notifyEmails;
+  public void setNotifyMailsStr(String notifyMailsStr) throws IOException {
+    ObjectMapper mapper = new ObjectMapper();
+    this.notifyMails = mapper.readValue(notifyMailsStr,mapper.getTypeFactory().constructCollectionType(List.class,String.class));
+    this.notifyMailsStr = notifyMailsStr;
+  }
+
+  public List<String> getNotifyMails() {
+    return notifyMails;
+  }
+
+  public void setNotifyMails(List<String> notifyMails) throws JsonProcessingException {
+    ObjectMapper mapper = new ObjectMapper();
+    this.notifyMailsStr = mapper.writeValueAsString(notifyMails);
+    this.notifyMails = notifyMails;
   }
 
   public Integer getTimeout() {
@@ -220,6 +240,22 @@ public class Schedule {
     this.timeout = timeout;
   }
 
+  public Date getCreateTime() {
+    return createTime;
+  }
+
+  public void setCreateTime(Date createTime) {
+    this.createTime = createTime;
+  }
+
+  public Date getModifyTime() {
+    return modifyTime;
+  }
+
+  public void setModifyTime(Date modifyTime) {
+    this.modifyTime = modifyTime;
+  }
+
   public int getOwnerId() {
     return ownerId;
   }
@@ -228,11 +264,81 @@ public class Schedule {
     this.ownerId = ownerId;
   }
 
-  public String getOwnerName() {
-    return ownerName;
+  public String getOwner() {
+    return owner;
   }
 
-  public void setOwnerName(String ownerName) {
-    this.ownerName = ownerName;
+  public void setOwner(String owner) {
+    this.owner = owner;
+  }
+
+  public ScheduleStatus getScheduleStatus() {
+    return scheduleStatus;
+  }
+
+  public void setScheduleStatus(ScheduleStatus scheduleStatus) {
+    this.scheduleStatus = scheduleStatus;
+  }
+
+  public static class ScheduleParam{
+    private Date startDate;
+    private Date endDate;
+    private String crontab;
+
+    public ScheduleParam() {
+    }
+
+    public Date getStartDate() {
+      return startDate;
+    }
+
+    public void setStartDate(Date startDate) {
+      this.startDate = startDate;
+    }
+
+    public Date getEndDate() {
+      return endDate;
+    }
+
+    public void setEndDate(Date endDate) {
+      this.endDate = endDate;
+    }
+
+    public String getCrontab() {
+      return crontab;
+    }
+
+    public void setCrontab(String crontab) {
+      this.crontab = crontab;
+    }
+  }
+
+  public static class DepWorkflow{
+    private String projectName;
+    private String workflowName;
+
+    public DepWorkflow() {
+    }
+
+    public DepWorkflow(String projectName, String workflowName) {
+      this.projectName = projectName;
+      this.workflowName = workflowName;
+    }
+
+    public String getProjectName() {
+      return projectName;
+    }
+
+    public void setProjectName(String projectName) {
+      this.projectName = projectName;
+    }
+
+    public String getWorkflowName() {
+      return workflowName;
+    }
+
+    public void setWorkflowName(String workflowName) {
+      this.workflowName = workflowName;
+    }
   }
 }

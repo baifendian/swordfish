@@ -13,38 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.baifendian.swordfish.execserver.job.hive;
+package com.baifendian.swordfish.dao.model.flow;
 
-import com.baifendian.swordfish.common.job.ResourceInfo;
+import com.baifendian.swordfish.dao.DaoFactory;
+import com.baifendian.swordfish.dao.FlowDao;
+import com.baifendian.swordfish.dao.model.ExecutionFlow;
+import com.baifendian.swordfish.dao.utils.json.JsonUtil;
 
-public class UdfsInfo {
-  private String func;
+import org.junit.Test;
 
-  private String className;
+public class FlowDagTest {
 
-  private ResourceInfo libJar;
-
-  public String getFunc() {
-    return func;
-  }
-
-  public void setFunc(String func) {
-    this.func = func;
-  }
-
-  public String getClassName() {
-    return className;
-  }
-
-  public void setClassName(String className) {
-    this.className = className;
-  }
-
-  public ResourceInfo getLibJar() {
-    return libJar;
-  }
-
-  public void setLibJar(ResourceInfo libJar) {
-    this.libJar = libJar;
+  @Test
+  public void testFlowDag(){
+    FlowDao flowDao = DaoFactory.getDaoInstance(FlowDao.class);
+    ExecutionFlow executionFlow = flowDao.queryExecutionFlow(861);
+    FlowDag flowDag = JsonUtil.parseObject(executionFlow.getWorkflowData(), FlowDag.class);
+    System.out.println(flowDag);
   }
 }

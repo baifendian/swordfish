@@ -19,13 +19,38 @@ import java.util.Date;
 
 public class MasterServer {
 
+  /**
+   * 服务 id
+   */
+  private int id;
+
+  /**
+   * 服务 ip 信息
+   */
   private String host;
 
+  /**
+   * 服务端口
+   */
   private int port;
 
+  /**
+   * 创建时间
+   */
   private Date createTime;
 
+  /**
+   * 修改时间
+   */
   private Date modifyTime;
+
+  public int getId() {
+    return id;
+  }
+
+  public void setId(int id) {
+    this.id = id;
+  }
 
   public String getHost() {
     return host;

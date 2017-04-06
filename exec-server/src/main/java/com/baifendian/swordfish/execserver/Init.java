@@ -17,24 +17,30 @@ package com.baifendian.swordfish.execserver;
 
 import com.baifendian.swordfish.common.job.Job;
 import com.baifendian.swordfish.common.job.JobProps;
+import com.baifendian.swordfish.common.utils.DateUtils;
 import com.baifendian.swordfish.dao.DaoFactory;
 import com.baifendian.swordfish.dao.FlowDao;
-import com.baifendian.swordfish.common.config.BaseConfig;
+import com.baifendian.swordfish.dao.MasterDao;
 import com.baifendian.swordfish.dao.enums.FlowRunType;
-import com.baifendian.swordfish.dao.enums.FlowType;
 import com.baifendian.swordfish.dao.model.ExecutionFlow;
+import com.baifendian.swordfish.dao.model.MasterServer;
+import com.baifendian.swordfish.dao.model.flow.ScheduleMeta;
+import com.baifendian.swordfish.dao.utils.json.JsonUtil;
 import com.baifendian.swordfish.execserver.job.JobTypeManager;
 import com.baifendian.swordfish.execserver.service.ExecServiceImpl;
 import com.baifendian.swordfish.rpc.ScheduleInfo;
+import com.baifendian.swordfish.rpc.client.MasterClient;
 
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.thrift.TException;
+import org.quartz.CronExpression;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.text.ParseException;
 import java.util.Date;
 
 /**
@@ -43,7 +49,7 @@ import java.util.Date;
 public class Init {
   public static void initFlow() {
     FlowDao flowDao = DaoFactory.getDaoInstance(FlowDao.class);
-    ExecutionFlow executionFlow = flowDao.scheduleFlowToExecution(1, 3, 1, new Date(), FlowRunType.DISPATCH, 3, 3*3600);
+    ExecutionFlow executionFlow = flowDao.scheduleFlowToExecution(1, 2, 1, new Date(), FlowRunType.DISPATCH, 3, 3*3600);
     System.out.println(executionFlow.getId());
   }
 
@@ -52,8 +58,8 @@ public class Init {
     ScheduleInfo scheduleInfo = new ScheduleInfo();
     scheduleInfo.setStartDate(System.currentTimeMillis() - 3600 * 24 * 1000);
     scheduleInfo.setEndDate(4101494400000l);
-    scheduleInfo.setCronExpression("1 40 * * * ?");
-    masterClient.setSchedule(1, 1, scheduleInfo);
+    scheduleInfo.setCronExpression("*/10 * * * * ?");
+    masterClient.setSchedule(1, 2, scheduleInfo);
   }
 
   public static void testJob() throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
@@ -66,7 +72,7 @@ public class Init {
   public static void runFlow() throws TException {
     Configuration conf = new PropertiesConfiguration();
     ExecServiceImpl impl = new ExecServiceImpl("127.0.0.1", 7777, conf);
-    impl.scheduleExecFlow(3275, System.currentTimeMillis());
+    impl.execFlow(779);
   }
   public static void execFlow(int id) throws TException {
     MasterClient masterClient = new MasterClient("172.18.1.22",9999, 3);
@@ -78,25 +84,42 @@ public class Init {
     masterClient.cancelExecFlow(id);
   }
 
+  public static void appendWorkFlow() throws TException {
+    MasterClient masterClient = new MasterClient("172.18.1.22",9999, 3);
+    ScheduleMeta scheduleMeta = new ScheduleMeta();
+    scheduleMeta.setStartDate(new Date());
+    scheduleMeta.setEndDate(DateUtils.parse("2017-04-05 16:00:00"));
+    scheduleMeta.setCrontab("10 */10 * * * ?");
+    masterClient.appendWorkFlow(1, 2, JsonUtil.toJsonString(scheduleMeta));
+  }
+
   public static void runAdHoc() throws TException {
     Configuration conf = new PropertiesConfiguration();
     /*
     ExecServiceImpl impl = new ExecServiceImpl("127.0.0.1", 7777, conf);
     impl.execAdHoc(1);
     */
-    MasterClient masterClient = new MasterClient("172.18.1.22",9999, 3);
-    masterClient.execAdHoc(1);
+    //MasterClient masterClient = new MasterClient("172.18.1.22",9999, 3);
+    MasterDao masterDao = DaoFactory.getDaoInstance(MasterDao.class);
+    MasterServer  masterServer = masterDao.getMasterServer();
+    MasterClient masterClient = new MasterClient(masterServer.getHost(), masterServer.getPort());
+    masterClient.execAdHoc(7);
   }
 
-  public static void main(String[] args) throws NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException, IOException, TException {
+  public static void main(String[] args) throws NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException, IOException, TException, ParseException {
     //Init.initFlow();
     //Init.testJob();
     //Init.initSchedule();
     //Init.runFlow();
-    //Init.runAdHoc();
-    Init.execFlow(415);
-    //Init.cancelExecFlow(77);
-    System.out.println(BaseConfig.getSystemEnvPath());
-    System.out.println(new Date(1488607000));
+    Init.runAdHoc();
+    //Init.appendWorkFlow();
+    //Init.execFlow(817);
+    //Init.cancelExecFlow(817);
+    CronExpression cron = new CronExpression("10 * * * * ?");
+    Date now = new Date();
+    Date date = cron.getTimeAfter(now);
+    Date nextInvalidTime = cron.getNextInvalidTimeAfter(now);
+    System.out.printf("now %s \nafter %s \ninvalid %s\n", now, date, nextInvalidTime);
+
   }
 }

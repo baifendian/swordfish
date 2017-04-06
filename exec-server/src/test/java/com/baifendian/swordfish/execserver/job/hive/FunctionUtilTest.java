@@ -15,6 +15,7 @@
  */
 package com.baifendian.swordfish.execserver.job.hive;
 
+import com.baifendian.swordfish.common.job.UdfsInfo;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
 
 import org.junit.Before;

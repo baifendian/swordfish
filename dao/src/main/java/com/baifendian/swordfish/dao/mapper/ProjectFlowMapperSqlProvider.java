@@ -47,7 +47,6 @@ public class ProjectFlowMapperSqlProvider {
         VALUES("project_id", "#{flow.projectId}");
         VALUES("modify_time", "#{flow.modifyTime}");
         VALUES("create_time", "#{flow.createTime}");
-        VALUES("last_modify_by", "#{flow.lastModifyBy}");
         VALUES("owner", "#{flow.ownerId}");
         VALUES("proxy_user", "#{flow.proxyUser}");
         VALUES("user_defined_params", "#{flow.userDefinedParams}");
@@ -84,9 +83,6 @@ public class ProjectFlowMapperSqlProvider {
         if (projectFlow.getOwnerId() != 0) {
           SET("owner_id = #{flow.ownerId}");
         }
-        if (projectFlow.getLastModifyBy() != 0) {
-          SET("last_modify_by = #{flow.lastModifyBy}");
-        }
         WHERE("id = #{flow.id}");
       }
     }.toString();
@@ -117,7 +113,7 @@ public class ProjectFlowMapperSqlProvider {
         SELECT("u.name as owner");
         FROM("project_flows p_f");
         JOIN("project p on p_f.project_id = p.id");
-        JOIN("user u on u.id = p.owner");
+        JOIN("user u on p_f.owner = u.id");
         WHERE("p_f.project_id = #{projectId}");
         WHERE("p_f.name = #{name}");
       }
@@ -132,9 +128,9 @@ public class ProjectFlowMapperSqlProvider {
         SELECT("u.name as owner");
         FROM("project_flows p_f");
         JOIN("project p on p_f.project_id = p.id");
-        JOIN("user u on u.id = p.owner");
-        WHERE("project_name = #{projectName}");
-        WHERE("name = #{name}");
+        JOIN("user u on p_f.owner = u.id");
+        WHERE("p.name = #{projectName}");
+        WHERE("p_f.name = #{name}");
       }
     }.toString();
   }
@@ -279,17 +275,16 @@ public class ProjectFlowMapperSqlProvider {
     return new SQL() {
       {
         UPDATE(TABLE_NAME);
-        SET("`desc`", "#{flow.desc}");
-        SET("modify_time", "#{flow.modifyTime}");
-        SET("create_time", "#{flow.createTime}");
-        SET("last_modify_by", "#{flow.lastModifyBy}");
-        SET("owner", "#{flow.owner}");
-        SET("proxy_user", "#{flow.proxyUser}");
-        SET("user_defined_params", "#{flow.userDefinedParams}");
-        SET("extras", "#{flow.extras}");
-        SET("queue", "#{flow.queue}");
-        WHERE("project_id = #{projectId}");
-        WHERE("name = #{name}");
+        SET("`desc`=#{flow.desc}");
+        SET("modify_time=#{flow.modifyTime}");
+        SET("create_time=#{flow.createTime}");
+        SET("owner=#{flow.ownerId}");
+        SET("proxy_user=#{flow.proxyUser}");
+        SET("user_defined_params=#{flow.userDefinedParams}");
+        SET("extras=#{flow.extras}");
+        SET("queue=#{flow.queue}");
+        WHERE("project_id = #{flow.projectId}");
+        WHERE("name = #{flow.name}");
       }
     }.toString();
   }
@@ -301,6 +296,23 @@ public class ProjectFlowMapperSqlProvider {
         FROM(TABLE_NAME + " as f");
         INNER_JOIN("user as u on u.id = f.owner");
         WHERE("f.id = #{id}");
+      }
+    }.toString();
+  }
+
+  public String updateProjectConf(Map<String, Object> parameter) {
+    String queue = parameter.get("queue").toString();
+    String desc = parameter.get("proxyUser").toString();
+    return new SQL() {
+      {
+        UPDATE(TABLE_NAME);
+        if (!StringUtils.isEmpty(queue)){
+          SET("`queue`=#{queue}");
+        }
+        if (!StringUtils.isEmpty(desc)){
+          SET("proxy_user=#{proxyUser}");
+        }
+        WHERE("project_id = #{projectId}");
       }
     }.toString();
   }

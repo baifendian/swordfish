@@ -35,10 +35,13 @@ import com.baifendian.swordfish.execserver.exception.ExecTimeoutException;
 import com.baifendian.swordfish.execserver.job.JobTypeManager;
 import com.baifendian.swordfish.execserver.node.NodeRunner;
 import com.baifendian.swordfish.execserver.utils.LoggerUtil;
+import com.baifendian.swordfish.execserver.utils.OsUtil;
+
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ObjectUtils;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -192,13 +195,26 @@ public class FlowRunner implements Runnable {
     try {
       String execLocalPath = BaseConfig.getFlowExecDir(executionFlow.getProjectId(), executionFlow.getFlowId(),
               executionFlow.getId());
-      LOGGER.info("当前执行的目录是：{}", execLocalPath);
+      LOGGER.info("exec id:{} current execution dir：{}", executionFlow.getId(), execLocalPath);
       File execLocalPathFile = new File(execLocalPath);
       if (execLocalPathFile.exists()) {
         FileUtils.forceDelete(execLocalPathFile);
         //throw new ExecTimeoutException(String.format("path %s exists", execLocalPath));
       }
       FileUtils.forceMkdir(execLocalPathFile);
+
+      // proxyUser用户处理，如果系统不存在该用户，这里自动创建用户
+      String proxyUser = executionFlow.getProxyUser();
+      List<String> osUserList = OsUtil.getUserList();
+      if(!osUserList.contains(proxyUser)){
+        String userGroup = OsUtil.getGroup();
+        if(StringUtils.isNotEmpty(userGroup)) {
+          LOGGER.info("create os user:{}", proxyUser);
+          String cmd = String.format("sudo useradd -g %s %s", userGroup, proxyUser);
+          LOGGER.info("exec cmd {} ", cmd);
+          OsUtil.exeCmd(cmd);
+        }
+      }
 
       FlowDag flowDag = JsonUtil.parseObject(executionFlow.getWorkflowData(), FlowDag.class);
 
@@ -295,7 +311,7 @@ public class FlowRunner implements Runnable {
       JobProps props = new JobProps();
       props.setJobParams(node.getParameter());
       props.setDefinedParams(allParamMap);
-      String jobId = node.getType() + "_" + node.getId();
+      String jobId = node.getType() + "_" + node.getName();
 
       Job job = JobTypeManager.newJob(jobId, node.getType(), props, LOGGER);
       if (job.getParam() != null && job.getParam().getResourceFiles() != null) {
@@ -492,7 +508,10 @@ public class FlowRunner implements Runnable {
    * 提交 NodeRunner 执行 <p>
    */
   private void submitNodeRunner(FlowNode flowNode, ExecutionNode executionNode) {
-    int nowTimeout = calcNodeTimeout(); // 重新计算超时时间
+    int nowTimeout = -1;
+    if(!JobTypeManager.isLongJob(flowNode.getType())) {
+      nowTimeout = calcNodeTimeout(); // 重新计算超时时间
+    }
     NodeRunner nodeRunner = new NodeRunner(executionFlow, executionNode, flowNode, jobExecutorService, synObject, nowTimeout, systemParamMap, customParamMap);
     Future<?> future = executorService.submit(nodeRunner);
     activeNodeRunners.add(nodeRunner);
@@ -508,7 +527,7 @@ public class FlowRunner implements Runnable {
 
     int usedTime = (int) ((System.currentTimeMillis() - startTime) / 1000);
     if (timeout <= usedTime) {
-      throw new ExecTimeoutException("当前 workflow 已经执行超时");
+      throw new ExecTimeoutException(" workflow execution fetch time out");
     }
     return timeout - usedTime;
   }
@@ -531,6 +550,7 @@ public class FlowRunner implements Runnable {
         if(JobTypeManager.isLongJob(node.getType())){
           // 长任务处理
           // 报错发送邮件，避免出现程序问题，一直重复调度
+          LOGGER.debug("exec id:{}, node:{} retry", executionNode.getExecId(), executionNode.getName());
           EmailManager.sendEmail(executionFlow, executionNode);
           executionNodes.remove(executionNode);
           reSubmitNodeRunner(node, executionNode);

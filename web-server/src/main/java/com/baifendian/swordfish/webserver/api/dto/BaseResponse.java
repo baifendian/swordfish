@@ -15,7 +15,9 @@
  */
 package com.baifendian.swordfish.webserver.api.dto;
 
-
+/**
+ * 基础返回结果
+ */
 public class BaseResponse {
   /**
    * 状态为 0 表示成功, 否则失败

@@ -24,6 +24,7 @@ import com.baifendian.swordfish.dao.model.Project;
 import com.baifendian.swordfish.dao.model.User;
 import com.baifendian.swordfish.webserver.api.dto.BaseResponse;
 import org.apache.commons.httpclient.HttpStatus;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -125,7 +126,7 @@ public class DatasourceService {
   }
 
   /**
-   * 修改一个数据源
+   * put 数据源, 不存在则创建
    *
    * @param operator
    * @param projectName
@@ -134,19 +135,35 @@ public class DatasourceService {
    * @param type
    * @param parameter
    * @param response
-   * @param create      true 表示不存在则创建, false 表示不存在则报错
    * @return
    */
-  public DataSource modifyDataSource(User operator, String projectName, String name, String desc, DbType type, String parameter, HttpServletResponse response, boolean create) {
+  public DataSource putDataSource(User operator, String projectName, String name, String desc, DbType type, String parameter, HttpServletResponse response) {
+    DataSource dataSource = dataSourceMapper.getByProjectNameAndName(projectName, name);
+
+    if (dataSource == null) {
+      return createDataSource(operator, projectName, name, desc, type, parameter, response);
+    }
+
+    return modifyDataSource(operator, projectName, name, desc, parameter, response);
+  }
+
+  /**
+   * 修改一个数据源
+   *
+   * @param operator
+   * @param projectName
+   * @param name
+   * @param desc
+   * @param parameter
+   * @param response
+   * @return
+   */
+  public DataSource modifyDataSource(User operator, String projectName, String name, String desc, String parameter, HttpServletResponse response) {
     // 查询项目
     Project project = projectMapper.queryByName(projectName);
 
     // 不存在的项目名
     if (project == null) {
-      if (create) { // 需要创建
-        return createDataSource(operator, projectName, name, desc, type, parameter, response);
-      }
-
       response.setStatus(HttpStatus.SC_NOT_MODIFIED);
       return null;
     }
@@ -157,24 +174,29 @@ public class DatasourceService {
       return null;
     }
 
-    DataSource dataSource = new DataSource();
+    // 查找指定数据源
+
+    DataSource dataSource = dataSourceMapper.getByName(project.getId(),name);
     Date now = new Date();
 
-    dataSource.setName(name);
-    dataSource.setDesc(desc);
-    dataSource.setOwnerId(operator.getId());
-    dataSource.setOwnerName(operator.getName());
-    dataSource.setType(type);
-    dataSource.setParameter(parameter);
-    dataSource.setProjectId(project.getId());
-    dataSource.setProjectName(project.getName());
-    dataSource.setModifyTime(now);
-
-    int count = dataSourceMapper.update(dataSource);
-    if (count <= 0) {
+    if (dataSource == null){
       response.setStatus(HttpStatus.SC_NOT_MODIFIED);
       return null;
     }
+
+    if (!StringUtils.isEmpty(desc)){
+      dataSource.setDesc(desc);
+    }
+
+    if (!StringUtils.isEmpty(parameter)){
+      dataSource.setParameter(parameter);
+    }
+
+    dataSource.setModifyTime(now);
+    dataSource.setOwnerId(operator.getId());
+    dataSource.setOwnerName(operator.getName());
+
+    dataSourceMapper.update(dataSource);
 
     return dataSource;
   }

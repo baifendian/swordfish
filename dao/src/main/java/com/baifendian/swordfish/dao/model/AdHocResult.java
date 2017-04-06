@@ -22,16 +22,14 @@ import java.util.Date;
 
 public class AdHocResult {
   /**
-   * ad hoc id
+   * exec id
    */
-  private long adHocId;
+  private int execId;
 
   /**
    * 执行语句在查询语句数组中的索引
    */
   private int index;
-
-  private FlowStatus status;
 
   /**
    * 执行语句
@@ -44,20 +42,31 @@ public class AdHocResult {
   private String result;
 
   /**
+   * 执行状态
+   */
+  private FlowStatus status;
+
+  /**
    * 创建时间
    */
   private Timestamp createTime;
 
+  /**
+   * 开始执行时间
+   */
   private Date startTime;
 
+  /**
+   * 结束时间
+   */
   private Date endTime;
 
-  public long getAdHocId() {
-    return adHocId;
+  public int getExecId() {
+    return execId;
   }
 
-  public void setAdHocId(long adHocId) {
-    this.adHocId = adHocId;
+  public void setExecId(int execId) {
+    this.execId = execId;
   }
 
   public int getIndex() {
@@ -66,14 +75,6 @@ public class AdHocResult {
 
   public void setIndex(int index) {
     this.index = index;
-  }
-
-  public FlowStatus getStatus() {
-    return status;
-  }
-
-  public void setStatus(FlowStatus status) {
-    this.status = status;
   }
 
   public String getStm() {
@@ -90,6 +91,14 @@ public class AdHocResult {
 
   public void setResult(String result) {
     this.result = result;
+  }
+
+  public FlowStatus getStatus() {
+    return status;
+  }
+
+  public void setStatus(FlowStatus status) {
+    this.status = status;
   }
 
   public Timestamp getCreateTime() {

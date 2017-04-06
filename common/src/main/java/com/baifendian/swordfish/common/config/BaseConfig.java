@@ -29,6 +29,7 @@ import java.text.MessageFormat;
 import java.util.HashSet;
 import java.util.Properties;
 import java.util.Set;
+import java.util.UUID;
 
 public class BaseConfig {
 
@@ -84,6 +85,17 @@ public class BaseConfig {
   }
 
   /**
+   * 得到下载到本地的文件名称
+   *
+   * @param projectId
+   * @param filename
+   * @return
+   */
+  public static String getLocalDownloadFilename(int projectId, String filename) {
+    return MessageFormat.format("{0}/{1}/{3}", localDownloadBasePath, UUID.randomUUID().toString(), filename);
+  }
+
+  /**
    * 本地的资源数据缓存文件目录
    *
    * @param projectId
@@ -94,35 +106,14 @@ public class BaseConfig {
   }
 
   /**
-   * 得到下载到本地的资源文件目录
-   *
-   * @param projectId
-   * @return
-   */
-  public static String getLocalDownloadResourceDir(int projectId) {
-    return MessageFormat.format("{0}/{1}/resources", localDownloadBasePath, projectId);
-  }
-
-  /**
    * 本地的资源数据缓存文件名称
    *
    * @param projectId
-   * @param resName
+   * @param filename
    * @return
    */
-  public static String getLocalResourceFilename(int projectId, String resName) {
-    return MessageFormat.format("{0}/{1}/resources/{2}", localDataBasePath, projectId, resName);
-  }
-
-  /**
-   * 得到下载到本地的资源文件名称
-   *
-   * @param projectId
-   * @param resName
-   * @return
-   */
-  public static String getLocalDownloadResourceFilename(int projectId, String resName) {
-    return MessageFormat.format("{0}/{1}/resources/{2}", localDownloadBasePath, projectId, resName);
+  public static String getLocalResourceFilename(int projectId, String filename) {
+    return MessageFormat.format("{0}/{1}", getLocalResourceDir(projectId), filename);
   }
 
   /**
@@ -139,11 +130,11 @@ public class BaseConfig {
    * 本地的工作流数据缓存文件名称
    *
    * @param projectId
-   * @param workflowName
+   * @param filename
    * @return
    */
-  public static String getLocalWorkflowFilename(int projectId, String workflowName) {
-    return MessageFormat.format("{0}/{1}/workflows/{2}.{3}", localDataBasePath, projectId, workflowName, ".zip");
+  public static String getLocalWorkflowFilename(int projectId, String filename) {
+    return MessageFormat.format("{0}/{1}.{2}", getLocalWorkflowDir(projectId), filename, ".zip");
   }
 
   /**
@@ -160,11 +151,11 @@ public class BaseConfig {
    * hdfs 上资源的文件名称
    *
    * @param projectId
-   * @param resName
+   * @param filename
    * @return
    */
-  public static String getHdfsResourcesFilename(int projectId, String resName) {
-    return MessageFormat.format("{0}/{1}/resources/{2}", hdfsDataBasePath, projectId, resName);
+  public static String getHdfsResourcesFilename(int projectId, String filename) {
+    return MessageFormat.format("{0}/{1}", getHdfsResourcesDir(projectId), filename);
   }
 
   /**
@@ -181,11 +172,11 @@ public class BaseConfig {
    * hdfs 上工作流数据的文件名称
    *
    * @param projectId
-   * @param workflowName
+   * @param filename
    * @return
    */
-  public static String getHdfsWorkflowFilename(int projectId, String workflowName) {
-    return MessageFormat.format("{0}/{1}/workflows/{2}.{3}", hdfsDataBasePath, projectId, workflowName, "zip");
+  public static String getHdfsWorkflowFilename(int projectId, String filename) {
+    return MessageFormat.format("{0}/{1}.{2}", getHdfsWorkflowDir(projectId), filename, "zip");
   }
 
   /**

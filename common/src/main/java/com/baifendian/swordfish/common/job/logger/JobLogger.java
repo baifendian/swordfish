@@ -15,6 +15,8 @@
  */
 package com.baifendian.swordfish.common.job.logger;
 
+import com.baifendian.swordfish.common.utils.StructuredArguments;
+
 import org.slf4j.Logger;
 import org.slf4j.Marker;
 
@@ -29,7 +31,7 @@ public class JobLogger implements Logger {
   }
 
   private String addJobId(String msg) {
-    return String.format("%s %s", jobIdLog, msg);
+    return String.format("%s %s", StructuredArguments.jobValue(jobIdLog), msg);
   }
 
   @Override

@@ -17,19 +17,17 @@ package com.baifendian.swordfish.dao.mapper;
 
 import com.baifendian.swordfish.dao.enums.FlowStatus;
 import com.baifendian.swordfish.dao.mapper.utils.EnumFieldUtil;
-
 import org.apache.ibatis.jdbc.SQL;
 
 import java.util.Map;
 
 public class AdHocMapperProvider {
-  /**
-   * table name
-   */
+
   private static final String TABLE_NAME = "ad_hocs";
+  private static final String RESULT_TABLE_NAME = "ad_hoc_results";
 
   /**
-   * 生成插入语句 <p>
+   * 生成插入语句
    *
    * @return sql语句
    */
@@ -37,12 +35,38 @@ public class AdHocMapperProvider {
     return new SQL() {
       {
         INSERT_INTO(TABLE_NAME);
-        VALUES("parameter", "#{adHoc.parameter}");
-        VALUES("proxy_user", "#{adHoc.proxyUser}");
-        VALUES("queue", "#{adHoc.queue}");
-        VALUES("status", EnumFieldUtil.genFieldStr("adHoc.status", FlowStatus.class));
-        VALUES("create_time", "#{adHoc.createTime}");
-        VALUES("owner", "#{adHoc.owner}");
+
+        VALUES("`project_id`", "#{adHoc.projectId}");
+        VALUES("`owner`", "#{adHoc.owner}");
+        VALUES("`parameter`", "#{adHoc.parameter}");
+        VALUES("`proxy_user`", "#{adHoc.proxyUser}");
+        VALUES("`queue`", "#{adHoc.queue}");
+        VALUES("`status`", EnumFieldUtil.genFieldStr("adHoc.status", FlowStatus.class));
+        VALUES("`job_id`", "#{adHoc.jobId}");
+        VALUES("`timeout`", "#{adHoc.timeout}");
+        VALUES("`create_time`", "#{adHoc.createTime}");
+        VALUES("`start_time`", "#{adHoc.startTime}");
+        VALUES("`end_time`", "#{adHoc.endTime}");
+      }
+    }.toString();
+  }
+
+  /**
+   * 生成查询项目的语句
+   *
+   * @param parameter
+   * @return
+   */
+  public String selectProjectByExecId(Map<String, Object> parameter) {
+    return new SQL() {
+      {
+        SELECT("p.*");
+
+        FROM(TABLE_NAME + " as a");
+
+        JOIN("project p on a.project_id = p.id");
+
+        WHERE("a.id = #{execId}");
       }
     }.toString();
   }
@@ -69,8 +93,24 @@ public class AdHocMapperProvider {
     return new SQL() {
       {
         SELECT("*");
-        FROM(TABLE_NAME);
-        WHERE("id=#{id}");
+
+        FROM(TABLE_NAME );
+        WHERE("id = #{id}");
+      }
+    }.toString();
+  }
+
+  public String selectByUserAndId(Map<String, Object> parameter) {
+    return new SQL() {
+      {
+        SELECT("p.*");
+
+        FROM(TABLE_NAME + " as a");
+
+        JOIN("project p on p.id = a.project_id");
+
+        WHERE("p_u.user_id = #{userId} or p.owner = #{userId}");
+        WHERE("a.id = #{execId}");
       }
     }.toString();
   }

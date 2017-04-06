@@ -15,20 +15,15 @@
  */
 package com.baifendian.swordfish.dao.model;
 
-import com.baifendian.swordfish.dao.utils.json.JsonUtil;
-import com.baifendian.swordfish.dao.utils.json.StringNodeJsonDeserializer;
-import com.baifendian.swordfish.dao.utils.json.StringNodeJsonSerializer;
 import com.baifendian.swordfish.dao.model.flow.params.Property;
-import com.baifendian.swordfish.dao.enums.FlowType;
-import com.baifendian.swordfish.dao.enums.ScheduleStatus;
+import com.baifendian.swordfish.dao.utils.json.JsonObjectDeserializer;
+import com.baifendian.swordfish.dao.utils.json.JsonObjectSerializer;
+import com.baifendian.swordfish.dao.utils.json.JsonUtil;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-
 import org.apache.commons.lang3.StringUtils;
 
-import javax.xml.crypto.Data;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -36,48 +31,99 @@ import java.util.stream.Collectors;
 
 public class ProjectFlow {
 
+  /**
+   * 工作流 id
+   */
+  @JsonIgnore
   private int id;
 
-  @JsonIgnore
-  private List<FlowNode> flowsNodes;
-
+  /**
+   * 工作流名称
+   */
   private String name;
 
-  private String desc;
-
-  private Date createTime;
-
-  private Date modifyTime;
-
-  private int lastModifyBy;
-
-  private String lastModifyByName;
-
-  private int ownerId;
-
-  private String owner;
-
-  private String proxyUser;
-
+  /**
+   * 项目 id
+   */
+  @JsonIgnore
   private int projectId;
 
+  /**
+   * 项目名称
+   */
   private String projectName;
 
+  /**
+   * 工作流描述
+   */
+  private String desc;
+
+  /**
+   * 创建时间
+   */
+  private Date createTime;
+
+  /**
+   * 修改时间
+   */
+  private Date modifyTime;
+
+  /**
+   * owner id
+   */
   @JsonIgnore
-  private String extras;
+  private int ownerId;
 
-  private String queue;
+  /**
+   * owner 名称
+   */
+  private String owner;
 
-  private ProjectFlowData data = new ProjectFlowData();
+  /**
+   * 代理用户
+   */
+  private String proxyUser;
 
-
-  @JsonDeserialize(using = StringNodeJsonDeserializer.class)
-  @JsonSerialize(using = StringNodeJsonSerializer.class)
+  /**
+   * 用户定义参数
+   */
+  @JsonDeserialize(using = JsonObjectDeserializer.class)
+  @JsonSerialize(using = JsonObjectSerializer.class)
   @JsonIgnore
   private String userDefinedParams;
 
+  /**
+   * 用户定义参数的 map 结构,
+   */
   @JsonIgnore
   private Map<String, String> userDefinedParamMap;
+
+  /**
+   * 额外字段
+   */
+  @JsonDeserialize(using = JsonObjectDeserializer.class)
+  @JsonSerialize(using = JsonObjectSerializer.class)
+  @JsonIgnore
+  private String extras;
+
+  /**
+   * 队列信息
+   */
+  private String queue;
+
+  /**
+   * 结点信息, 数据库中数据解析出来的
+   */
+  @JsonIgnore
+  private List<FlowNode> flowsNodes;
+
+  /**
+   * 该数据结构其实是 db 中没有的, 用于构建的, 需要返回的
+   */
+  private ProjectFlowData data = new ProjectFlowData();
+
+  public ProjectFlow() {
+  }
 
   public int getId() {
     return id;
@@ -126,22 +172,6 @@ public class ProjectFlow {
 
   public void setModifyTime(Date modifyTime) {
     this.modifyTime = modifyTime;
-  }
-
-  public int getLastModifyBy() {
-    return lastModifyBy;
-  }
-
-  public void setLastModifyBy(int lastModifyBy) {
-    this.lastModifyBy = lastModifyBy;
-  }
-
-  public String getLastModifyByName() {
-    return lastModifyByName;
-  }
-
-  public void setLastModifyByName(String lastModifyByName) {
-    this.lastModifyByName = lastModifyByName;
   }
 
   public int getOwnerId() {
@@ -219,10 +249,12 @@ public class ProjectFlow {
 
   public Map<String, String> getUserDefinedParamMap() {
     List<Property> propList;
+
     if (userDefinedParamMap == null && StringUtils.isNotEmpty(userDefinedParams)) {
       propList = JsonUtil.parseObjectList(userDefinedParams, Property.class);
       userDefinedParamMap = propList.stream().collect(Collectors.toMap(Property::getProp, Property::getValue));
     }
+
     return userDefinedParamMap;
   }
 
@@ -231,14 +263,22 @@ public class ProjectFlow {
   }
 
   public static class ProjectFlowData {
+    /**
+     * 结点信息
+     */
     private List<FlowNode> nodes;
 
-    private String userDefParams;
+    /**
+     * 用户自定义参数
+     */
+    private List<Property> userDefParams;
 
+    /**
+     * 额外信息
+     */
+    @JsonDeserialize(using = JsonObjectDeserializer.class)
+    @JsonSerialize(using = JsonObjectSerializer.class)
     private String extras;
-
-    public ProjectFlowData() {
-    }
 
     public List<FlowNode> getNodes() {
       return nodes;
@@ -248,11 +288,11 @@ public class ProjectFlow {
       this.nodes = nodes;
     }
 
-    public String getUserDefParams() {
+    public List<Property> getUserDefParams() {
       return userDefParams;
     }
 
-    public void setUserDefParams(String userDefParams) {
+    public void setUserDefParams(List<Property> userDefParams) {
       this.userDefParams = userDefParams;
     }
 

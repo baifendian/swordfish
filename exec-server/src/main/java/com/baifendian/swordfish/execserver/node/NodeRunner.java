@@ -157,11 +157,11 @@ public class NodeRunner implements Runnable {
   }
 
   public void kill() {
-    // 存在线程竞争问题
+    LOGGER.info("kill has been called on node:{} ", executionNode.getName());
     if (executionNode.getStatus().typeIsFinished()) {
+      LOGGER.debug("node:{} status is {} ignore", executionNode.getName(), executionNode.getStatus().name());
       return;
     }
-    LOGGER.info("kill has been called on node:{} ", executionNode.getName());
     killed = true;
 
     Job job = jobHandler.getJob();

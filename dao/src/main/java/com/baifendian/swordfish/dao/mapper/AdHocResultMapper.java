@@ -45,7 +45,7 @@ public interface AdHocResultMapper {
   int update(@Param("adHocResult") AdHocResult adHocResult);
 
   @DeleteProvider(type = AdHocResultMapperProvider.class, method = "delete")
-  int delete(@Param("adHocId") Long adHocId);
+  int delete(@Param("execId") int execId);
 
   /**
    * 查询即席查询的执行结果(通过 adHocId ) <p>

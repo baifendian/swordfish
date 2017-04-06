@@ -28,63 +28,37 @@ public class ProjectUser {
    */
   @JsonIgnore
   private int projectId;
+
   /**
    * 项目名
    */
   private String projectName;
+
   /**
    * 用户ID
    */
   @JsonIgnore
   private int userId;
+
   /**
    * 用户名
    */
   private String userName;
+
   /**
    * 创建时间
    */
   private Date createTime;
+
   /**
    * 创建时间
    */
   private Date modifyTime;
+
   /**
-   * 用户在project中的权限
+   * 用户在 project 中的权限
    */
   private int perm;
-
-  public ProjectUser() {
-  }
-
-  public ProjectUser(int projectId, String projectName, int userId, String userName, Date createTime, Date modifyTime, int perm) {
-    this.projectId = projectId;
-    this.projectName = projectName;
-    this.userId = userId;
-    this.userName = userName;
-    this.createTime = createTime;
-    this.modifyTime = modifyTime;
-    this.perm = perm;
-  }
-
-  public ProjectUser(int projectId, int userId, Date createTime, int perm) {
-    this.projectId = projectId;
-    this.userId = userId;
-    this.createTime = createTime;
-    this.perm = perm;
-  }
-
-  public ProjectUser(int projectId, int userId, Date createTime) {
-    this.projectId = projectId;
-    this.userId = userId;
-    this.createTime = createTime;
-  }
-
-  public ProjectUser(int projectId, int userId) {
-    this.projectId = projectId;
-    this.userId = userId;
-    this.createTime = new Date();
-  }
 
   public String getProjectName() {
     return projectName;
