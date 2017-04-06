@@ -232,7 +232,7 @@ public class MockDataService {
 
     ProjectFlow.ProjectFlowData projectFlowData = new ProjectFlow.ProjectFlowData();
     projectFlowData.setExtras(MR_PARAMETER);
-    projectFlowData.setUserDefParams(USER_DEFINED_PARAMETER);
+    //projectFlowData.setUserDefParams(USER_DEFINED_PARAMETER);
     projectFlowData.setNodes(flowNodeList);
 
     return projectFlowData;
