@@ -45,7 +45,8 @@ public class JsonObjectSerializer extends JsonSerializer<String> {
 
   @Override
   public void serialize(String value, JsonGenerator jgen, SerializerProvider provider) throws IOException, JsonProcessingException {
-    jgen.writeRawValue(value);
+    String v = value;
+    jgen.writeRawValue(v);
   }
 
 }

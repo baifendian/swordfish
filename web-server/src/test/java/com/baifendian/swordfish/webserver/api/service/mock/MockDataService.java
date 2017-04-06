@@ -20,6 +20,7 @@ import com.baifendian.swordfish.dao.mapper.*;
 import com.baifendian.swordfish.dao.model.*;
 import com.baifendian.swordfish.dao.model.flow.params.Property;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -200,6 +201,7 @@ public class MockDataService {
    * @return
    */
   public FlowNode mocNode(String[] depList, int flowId, String parameter, String extras) throws JsonProcessingException {
+    ObjectMapper mapper = new ObjectMapper();
     FlowNode flowNode = new FlowNode();
     flowNode.setName(getRandomString());
     flowNode.setDesc(getRandomString());
