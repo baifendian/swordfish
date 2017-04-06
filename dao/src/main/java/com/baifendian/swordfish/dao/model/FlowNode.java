@@ -19,9 +19,12 @@ import com.baifendian.swordfish.dao.utils.json.JsonObjectDeserializer;
 import com.baifendian.swordfish.dao.utils.json.JsonObjectSerializer;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonRawValue;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.util.JSONPObject;
 
 import java.io.IOException;
 import java.util.List;
@@ -58,9 +61,11 @@ public class FlowNode {
   /**
    * 参数信息
    */
+  //@JsonRawValue
   @JsonDeserialize(using = JsonObjectDeserializer.class)
   @JsonSerialize(using = JsonObjectSerializer.class)
   private String parameter;
+
 
   /**
    * 依赖信息
@@ -72,6 +77,7 @@ public class FlowNode {
   @JsonDeserialize(using = JsonObjectDeserializer.class)
   @JsonSerialize(using = JsonObjectSerializer.class)
   private String extras;
+
 
   @JsonIgnore
   private List<String> depList;
@@ -149,4 +155,5 @@ public class FlowNode {
     this.depList = depList;
     this.dep = JsonUtil.toJsonString(depList);
   }
+
 }

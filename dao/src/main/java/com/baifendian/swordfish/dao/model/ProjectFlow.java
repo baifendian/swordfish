@@ -20,6 +20,8 @@ import com.baifendian.swordfish.dao.utils.json.JsonObjectDeserializer;
 import com.baifendian.swordfish.dao.utils.json.JsonObjectSerializer;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.apache.commons.lang3.StringUtils;
@@ -266,6 +268,8 @@ public class ProjectFlow {
     /**
      * 结点信息
      */
+    @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
+    @JsonSubTypes({ @JsonSubTypes.Type(value = FlowNode.class, name = "FlowNode")})
     private List<FlowNode> nodes;
 
     /**

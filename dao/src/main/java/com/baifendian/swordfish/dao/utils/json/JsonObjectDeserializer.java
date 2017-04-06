@@ -46,8 +46,8 @@ public class JsonObjectDeserializer extends JsonDeserializer<String> {
 
   @Override
   public String deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException, JsonProcessingException {
-    String node = jp.getText();
-    return node;
+    JsonNode node = jp.getCodec().readTree(jp);
+    return node.toString();
   }
 
 }
