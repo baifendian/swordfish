@@ -81,7 +81,7 @@ public class WorkflowService {
    * @param response
    * @return
    */
-  @Transactional(value = "TransactionManager")
+  //@Transactional(value = "TransactionManager")
   public ProjectFlow createWorkflow(User operator, String projectName, String name, String desc, String proxyUser, String queue, String data, MultipartFile file, HttpServletResponse response) {
 
     // 查看是否对项目具备相应的权限
@@ -181,7 +181,7 @@ public class WorkflowService {
    * @param response
    * @return
    */
-  @Transactional(value = "TransactionManager")
+  //@Transactional(value = "TransactionManager")
   public ProjectFlow putWorkflow(User operator, String projectName, String name, String desc, String proxyUser, String queue, String data, MultipartFile file, HttpServletResponse response) {
     ProjectFlow projectFlow = flowDao.projectFlowFindByPorjectNameAndName(projectName, name);
 
@@ -308,7 +308,7 @@ public class WorkflowService {
    * @param name
    * @param response
    */
-  @Transactional(value = "TransactionManager")
+  //@Transactional(value = "TransactionManager")
   public void deleteProjectFlow(User operator, String projectName, String name, HttpServletResponse response) {
 
     // 查询项目是否存在以及是否具备相应权限
