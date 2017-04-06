@@ -16,13 +16,16 @@
 package com.baifendian.swordfish.execserver.job.hive;
 
 import com.baifendian.swordfish.common.job.BaseParam;
+import com.baifendian.swordfish.common.job.ResourceInfo;
 import com.baifendian.swordfish.common.job.UdfsInfo;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.hive.ql.parse.ParseDriver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -84,8 +87,17 @@ public class SqlParam extends BaseParam {
   @Override
   public List<String> getResourceFiles() {
     if (udfs != null && !udfs.isEmpty()) {
-      return udfs.stream().filter(p -> p.getLibJar() != null && p.getLibJar().isProjectScope())
-              .map(p -> p.getLibJar().getRes()).collect(Collectors.toList());
+      List<String> resFiles = new ArrayList<>();
+      for(UdfsInfo udfsInfo:udfs){
+        if(CollectionUtils.isNotEmpty(udfsInfo.getLibJars())) {
+          for (ResourceInfo resourceInfo : udfsInfo.getLibJars()) {
+            if(resourceInfo.isProjectScope()) {
+              resFiles.add(resourceInfo.getRes());
+            }
+          }
+        }
+      }
+      return resFiles;
     } else {
       return null;
     }
