@@ -58,8 +58,8 @@ public class Init {
     ScheduleInfo scheduleInfo = new ScheduleInfo();
     scheduleInfo.setStartDate(System.currentTimeMillis() - 3600 * 24 * 1000);
     scheduleInfo.setEndDate(4101494400000l);
-    scheduleInfo.setCronExpression("1 40 * * * ?");
-    masterClient.setSchedule(1, 1, scheduleInfo);
+    scheduleInfo.setCronExpression("*/10 * * * * ?");
+    masterClient.setSchedule(1, 2, scheduleInfo);
   }
 
   public static void testJob() throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
@@ -102,8 +102,8 @@ public class Init {
     //MasterClient masterClient = new MasterClient("172.18.1.22",9999, 3);
     MasterDao masterDao = DaoFactory.getDaoInstance(MasterDao.class);
     MasterServer  masterServer = masterDao.getMasterServer();
-    MasterClient masterClient = new MasterClient(masterServer.getHost(), masterServer.getPort(), 3);
-    masterClient.execAdHoc(1);
+    MasterClient masterClient = new MasterClient(masterServer.getHost(), masterServer.getPort());
+    masterClient.execAdHoc(7);
   }
 
   public static void main(String[] args) throws NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException, IOException, TException, ParseException {

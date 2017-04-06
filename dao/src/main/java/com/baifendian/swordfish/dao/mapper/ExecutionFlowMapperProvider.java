@@ -244,7 +244,7 @@ public class ExecutionFlowMapperProvider {
   public String selectByFlowIdAndTimes(Map<String, Object> parameter) {
     StringBuilder sb = new StringBuilder();
     String inExpr = "(" + FlowRunType.DISPATCH.ordinal() + "," + FlowRunType.ADD_DATA.ordinal() + ")";
-    sb.append("SELECT id, flow_id, work_id, type, status, schedule_time FROM execution_flows WHERE flow_id = #{flowId} AND type IN " + inExpr + " AND ");
+    sb.append("SELECT id, flow_id, worker, type, status, schedule_time FROM execution_flows WHERE flow_id = #{flowId} AND type IN " + inExpr + " AND ");
     sb.append("schedule_time = (SELECT MIN(schedule_time) FROM execution_flows WHERE flow_id = #{flowId} AND type IN" + inExpr
             + " AND schedule_time >= #{startDate} AND schedule_time < #{endDate})");
 
@@ -254,7 +254,7 @@ public class ExecutionFlowMapperProvider {
   public String selectByFlowIdAndTime(Map<String, Object> parameter) {
     StringBuilder sb = new StringBuilder();
     String inExpr = "(" + FlowRunType.DISPATCH.ordinal() + "," + FlowRunType.ADD_DATA.ordinal() + ")";
-    sb.append("SELECT id, flow_id, work_id, type, status, schedule_time FROM execution_flows WHERE flow_id = #{flowId} AND type IN " + inExpr + " AND ");
+    sb.append("SELECT id, flow_id, worker, type, status, schedule_time FROM execution_flows WHERE flow_id = #{flowId} AND type IN " + inExpr + " AND ");
     sb.append("schedule_time = #{scheduleTime}");
 
     return sb.toString();
@@ -262,7 +262,7 @@ public class ExecutionFlowMapperProvider {
 
   public String selectNewestExeFlow(Set<Integer> flowIds) {
     StringBuilder sb = new StringBuilder();
-    sb.append("select a.id, a.flow_id, a.work_id, a.status from execution_flows as a,");
+    sb.append("select a.id, a.flow_id, a.worker, a.status from execution_flows as a,");
 
     sb.append("(select max(id) as id from execution_flows ");
     sb.append("where flow_id in (0");
