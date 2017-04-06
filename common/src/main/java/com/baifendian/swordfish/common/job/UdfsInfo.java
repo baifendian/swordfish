@@ -13,9 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.baifendian.swordfish.execserver.job.hive;
-
-import com.baifendian.swordfish.common.job.ResourceInfo;
+package com.baifendian.swordfish.common.job;
 
 public class UdfsInfo {
   private String func;
