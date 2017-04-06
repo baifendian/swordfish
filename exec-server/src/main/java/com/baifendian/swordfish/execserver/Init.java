@@ -102,11 +102,11 @@ public class Init {
   }
 
   public static void main(String[] args) throws NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException, IOException, TException, ParseException {
-    Init.initFlow();
+    //Init.initFlow();
     //Init.testJob();
     //Init.initSchedule();
     //Init.runFlow();
-    //Init.runAdHoc();
+    Init.runAdHoc();
     //Init.appendWorkFlow();
     //Init.execFlow(817);
     //Init.cancelExecFlow(817);

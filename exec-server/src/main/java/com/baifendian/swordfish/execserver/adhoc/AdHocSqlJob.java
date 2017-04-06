@@ -15,27 +15,23 @@
  */
 package com.baifendian.swordfish.execserver.adhoc;
 
+import com.baifendian.swordfish.common.adhoc.AdHocParam;
 import com.baifendian.swordfish.common.config.BaseConfig;
 import com.baifendian.swordfish.common.job.ExecResult;
 import com.baifendian.swordfish.common.job.JobProps;
 import com.baifendian.swordfish.common.utils.CommonUtil;
 import com.baifendian.swordfish.dao.AdHocDao;
 import com.baifendian.swordfish.dao.DaoFactory;
-import com.baifendian.swordfish.dao.enums.FlowStatus;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
-import com.baifendian.swordfish.dao.datasource.ConnectionFactory;
-import com.baifendian.swordfish.dao.mapper.AdHocResultMapper;
 import com.baifendian.swordfish.dao.model.AdHocJsonObject;
 import com.baifendian.swordfish.dao.model.AdHocResult;
 import com.baifendian.swordfish.execserver.job.hive.FunctionUtil;
 import com.baifendian.swordfish.execserver.job.hive.HiveSqlExec;
 import com.baifendian.swordfish.execserver.job.hive.ResultCallback;
 
-import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 
 import java.io.IOException;
-import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
 
@@ -64,7 +60,7 @@ public class AdHocSqlJob {
 
   public void process() throws Exception {
     logger.debug("{}", props.getJobParams());
-    String sqls = param.getStmt();
+    String sqls = param.getStms();
     // 不支持参数替换
     //sqls = ParamHelper.resolvePlaceholders(sqls, definedParamMap);
     List<String> funcs = FunctionUtil.createFuncs(param.getUdfs(), jobIdLog, BaseConfig.getHdfsResourcesDir(props.getProjectId()) , true);
