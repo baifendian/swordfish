@@ -15,11 +15,9 @@
  */
 package com.baifendian.swordfish.execserver.parameter;
 
-import com.baifendian.swordfish.common.utils.BFDDateUtils;
+import com.baifendian.swordfish.common.utils.DateUtils;
 import com.baifendian.swordfish.dao.enums.FlowRunType;
 import com.baifendian.swordfish.dao.model.ExecutionFlow;
-
-import org.apache.commons.lang.time.DateUtils;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -81,11 +79,11 @@ public class SystemParamManager {
     Date execStartTime = executionFlow.getStartTime();
     switch (runType) {
       case DIRECT_RUN:
-        bizDate = DateUtils.addDays(execStartTime, -1); // 运行日期的前一天
+        bizDate = org.apache.commons.lang.time.DateUtils.addDays(execStartTime, -1); // 运行日期的前一天
         break;
 
       case DISPATCH:
-        bizDate = DateUtils.addDays(scheduleDate, -1); // 调度日期的前一天
+        bizDate = org.apache.commons.lang.time.DateUtils.addDays(scheduleDate, -1); // 调度日期的前一天
         break;
 
       case ADD_DATA:
@@ -93,10 +91,10 @@ public class SystemParamManager {
         break;
 
       default:
-        bizDate = DateUtils.addDays(execStartTime, -1); // 运行日期的前一天
+        bizDate = org.apache.commons.lang.time.DateUtils.addDays(execStartTime, -1); // 运行日期的前一天
     }
 
-    Date bizCurDate = DateUtils.addDays(bizDate, 1); // bizDate + 1 天
+    Date bizCurDate = org.apache.commons.lang.time.DateUtils.addDays(bizDate, 1); // bizDate + 1 天
     Date runTime = execStartTime;
 
     Map<String, String> valueMap = new HashMap<>();
@@ -116,7 +114,7 @@ public class SystemParamManager {
    * @return 日期字符串
    */
   private static String formatDate(Date date) {
-    return BFDDateUtils.format(date, DATE_FORMAT);
+    return DateUtils.format(date, DATE_FORMAT);
   }
 
   /**
@@ -125,6 +123,6 @@ public class SystemParamManager {
    * @return 时间字符串
    */
   private static String formatTime(Date date) {
-    return BFDDateUtils.format(date, TIME_FORMAT);
+    return DateUtils.format(date, TIME_FORMAT);
   }
 }

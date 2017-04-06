@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.baifendian.swordfish.execserver;
+package com.baifendian.swordfish.rpc.client;
 
 import com.baifendian.swordfish.dao.model.flow.ScheduleMeta;
 import com.baifendian.swordfish.rpc.HeartBeatData;

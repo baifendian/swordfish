@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.PUT;
 
 /**
  * 调度设置和管理入口
@@ -98,7 +99,7 @@ public class ScheduleController {
                                  @RequestParam(value = "depPolicy") DepPolicyType depPolicyType,
                                  @RequestParam(value = "timeout") int timeout,
                                  HttpServletResponse response){
-    return scheduleService.patchSchedule(operator,projectName,workflowName,schedule,notifyType,notifyMails,maxTryTimes,failurePolicy,depWorkflows,depPolicyType,timeout,response);
+    return scheduleService.putSchedule(operator,projectName,workflowName,schedule,notifyType,notifyMails,maxTryTimes,failurePolicy,depWorkflows,depPolicyType,timeout,response);
   }
 
   /**
@@ -117,7 +118,7 @@ public class ScheduleController {
    * @return
    */
   @PatchMapping("/{workflowName}/schedules")
-  public Schedule modifySchedule(@RequestAttribute(value = "session.user") User operator,
+  public Schedule patchSchedule(@RequestAttribute(value = "session.user") User operator,
                                  @PathVariable String projectName,
                                  @PathVariable String workflowName,
                                  @RequestParam(value = "schedule") String schedule,
@@ -129,7 +130,7 @@ public class ScheduleController {
                                  @RequestParam(value = "depPolicy") DepPolicyType depPolicyType,
                                  @RequestParam(value = "timeout") int timeout,
                                  HttpServletResponse response){
-    return null;
+    return scheduleService.patchSchedule(operator,projectName,workflowName,schedule,notifyType,notifyMails,maxTryTimes,failurePolicy,depWorkflows,depPolicyType,timeout,null,response);
   }
 
   /**
@@ -140,12 +141,12 @@ public class ScheduleController {
    * @param response
    */
   @PostMapping("/{workflowName}/schedules/{scheduleStatus}")
-  public void modifyScheduleStatus(@RequestAttribute(value = "session.user") User operator,
+  public void postScheduleStatus(@RequestAttribute(value = "session.user") User operator,
                                    @PathVariable String projectName,
                                    @PathVariable String workflowName,
                                    @PathVariable ScheduleStatus scheduleStatus,
                                    HttpServletResponse response){
-
+    scheduleService.patchSchedule(operator,projectName,workflowName,null,null,null,null,null,null,null,null,scheduleStatus,response);
   }
 
   /**
@@ -161,6 +162,6 @@ public class ScheduleController {
                                 @PathVariable String projectName,
                                 @PathVariable String workflowName,
                                 HttpServletResponse response){
-    return null;
+    return scheduleService.querySchedule(operator,projectName,workflowName,response);
   }
 }

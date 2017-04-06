@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletResponse;
 
 @RestController
-@RequestMapping("/projects/{projectName}/resources-copy")
+@RequestMapping("/projects/{projectName}/resource-copy")
 public class ResourceCopyController {
 
   private static Logger logger = LoggerFactory.getLogger(ResourceCopyController.class.getName());
@@ -44,7 +44,7 @@ public class ResourceCopyController {
    * @param desc
    * @param response
    */
-  @DeleteMapping(value = "")
+  @PostMapping(value = "")
   public Resource copyResource(@RequestAttribute(value = "session.user") User operator,
                                @PathVariable String projectName,
                                @RequestParam(value = "srcResName") String srcResName,

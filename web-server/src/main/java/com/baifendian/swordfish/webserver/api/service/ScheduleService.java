@@ -16,10 +16,7 @@
 package com.baifendian.swordfish.webserver.api.service;
 
 import com.baifendian.swordfish.dao.FlowDao;
-import com.baifendian.swordfish.dao.enums.DepPolicyType;
-import com.baifendian.swordfish.dao.enums.FailurePolicyType;
-import com.baifendian.swordfish.dao.enums.NodeType;
-import com.baifendian.swordfish.dao.enums.NotifyType;
+import com.baifendian.swordfish.dao.enums.*;
 import com.baifendian.swordfish.dao.mapper.ProjectMapper;
 import com.baifendian.swordfish.dao.mapper.ScheduleMapper;
 import com.baifendian.swordfish.dao.model.Project;
@@ -101,7 +98,7 @@ public class ScheduleService {
     try {
       ObjectMapper mapper = new ObjectMapper();
       Schedule.ScheduleParam scheduleParam = mapper.readValue(schedule,Schedule.ScheduleParam.class);
-      scheduleObj.setStartDate(scheduleParam.getStatDate());
+      scheduleObj.setStartDate(scheduleParam.getStartDate());
       scheduleObj.setEndDate(scheduleParam.getEndDate());
       scheduleObj.setCrontab(scheduleParam.getCrontab());
       scheduleObj.setSchedule(scheduleParam);
@@ -116,6 +113,7 @@ public class ScheduleService {
       scheduleObj.setModifyTime(now);
       scheduleObj.setOwnerId(operator.getId());
       scheduleObj.setOwner(operator.getName());
+      scheduleObj.setScheduleStatus(ScheduleStatus.OFFLINE);
     }catch (Exception e){
       logger.error(e.toString());
       response.setStatus(HttpStatus.SC_BAD_REQUEST);
@@ -149,7 +147,7 @@ public class ScheduleService {
    * @param response
    * @return
    */
-  public Schedule patchSchedule(User operator, String projectName, String workflowName, String schedule, NotifyType notifyType, String notifyMails, Integer maxTryTimes, FailurePolicyType failurePolicy, String  depWorkflows, DepPolicyType depPolicyType, Integer timeout, HttpServletResponse response){
+  public Schedule patchSchedule(User operator, String projectName, String workflowName, String schedule, NotifyType notifyType, String notifyMails, Integer maxTryTimes, FailurePolicyType failurePolicy, String  depWorkflows, DepPolicyType depPolicyType, Integer timeout, ScheduleStatus scheduleStatus, HttpServletResponse response){
     Project project = projectMapper.queryByName(projectName);
 
     if (project == null) {
@@ -185,7 +183,7 @@ public class ScheduleService {
       ObjectMapper mapper = new ObjectMapper();
       if (!StringUtils.isEmpty(schedule)){
         Schedule.ScheduleParam scheduleParam = mapper.readValue(schedule,Schedule.ScheduleParam.class);
-        scheduleObj.setStartDate(scheduleParam.getStatDate());
+        scheduleObj.setStartDate(scheduleParam.getStartDate());
         scheduleObj.setEndDate(scheduleParam.getEndDate());
         scheduleObj.setCrontab(scheduleParam.getCrontab());
         scheduleObj.setSchedule(scheduleParam);
@@ -216,6 +214,10 @@ public class ScheduleService {
       if (timeout!=null){
         scheduleObj.setTimeout(timeout);
       }
+
+      if (scheduleStatus!=null){
+        scheduleObj.setScheduleStatus(scheduleStatus);
+      }
       scheduleObj.setModifyTime(now);
     }catch (Exception e){
       logger.error(e.toString());
@@ -237,7 +239,7 @@ public class ScheduleService {
     if (scheduleObj == null){
       return createSchedule(operator,projectName,workflowName,schedule,notifyType,notifyMails,maxTryTimes,failurePolicy,depWorkflows,depPolicyType,timeout,response);
     }else{
-      return patchSchedule(operator,projectName,workflowName,schedule,notifyType,notifyMails,maxTryTimes,failurePolicy,depWorkflows,depPolicyType,timeout,response);
+      return patchSchedule(operator,projectName,workflowName,schedule,notifyType,notifyMails,maxTryTimes,failurePolicy,depWorkflows,depPolicyType,timeout,null,response);
     }
   }
 

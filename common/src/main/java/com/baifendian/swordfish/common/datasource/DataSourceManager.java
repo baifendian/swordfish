@@ -36,7 +36,7 @@ public class DataSourceManager {
     dataSourceHandlerMap.put(DbType.ORACLE, JDBCHandler.class);
     dataSourceHandlerMap.put(DbType.HBASE, HBaseHandler.class);
     dataSourceHandlerMap.put(DbType.FTP, FtpHandler.class);
-    dataSourceHandlerMap.put(DbType.MONOGODB, MongoDBHandler.class);
+    dataSourceHandlerMap.put(DbType.MONGODB, MongoDBHandler.class);
   }
 
   public static DataSourceHandler getHandler(DbType dbType, String paramStr) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {

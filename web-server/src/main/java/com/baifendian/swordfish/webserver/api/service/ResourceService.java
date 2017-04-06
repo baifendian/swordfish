@@ -59,7 +59,7 @@ public class ResourceService {
   /**
    * 创建资源:<br>
    * 1) 先下载资源到本地, 为了避免并发问题, 随机生成一个文件名称<br>
-   * 2) 拷贝到 hdfs 中, 给予合适的文件名称(包含后缀)<br>
+   * 2) 拷贝到 hdfs 中, 给予合适的文件名称(包含后缀)<p>
    *
    * @param operator
    * @param projectName
@@ -79,6 +79,7 @@ public class ResourceService {
 
     // 文件为空
     if (file.isEmpty()) {
+      logger.error("File is empty: {}", file.getOriginalFilename());
       response.setStatus(HttpStatus.SC_BAD_REQUEST);
       return null;
     }
@@ -87,11 +88,13 @@ public class ResourceService {
     Project project = projectMapper.queryByName(projectName);
 
     if (project == null) {
+      logger.error("Project does not exist: {}", projectName);
       response.setStatus(HttpStatus.SC_BAD_REQUEST);
       return null;
     }
 
     if (!projectService.hasWritePerm(operator.getId(), project)) {
+      logger.error("User {} has no right permission for the project {}", operator.getName(), projectName);
       response.setStatus(HttpStatus.SC_UNAUTHORIZED);
       return null;
     }
@@ -100,6 +103,7 @@ public class ResourceService {
     Resource resource = resourceMapper.queryResource(project.getId(), name);
 
     if (resource != null) {
+      logger.error("Resource {} does not empty", name);
       response.setStatus(HttpStatus.SC_CONFLICT);
       return null;
     }
@@ -185,6 +189,7 @@ public class ResourceService {
                                  HttpServletResponse response) {
     // 文件为空
     if (file != null && file.isEmpty()) {
+      logger.error("File does not null but empty: {}", file.getOriginalFilename());
       response.setStatus(HttpStatus.SC_BAD_REQUEST);
       return null;
     }
@@ -193,11 +198,13 @@ public class ResourceService {
     Project project = projectMapper.queryByName(projectName);
 
     if (project == null) {
+      logger.error("Project does not exist: {}", projectName);
       response.setStatus(HttpStatus.SC_BAD_REQUEST);
       return null;
     }
 
     if (!projectService.hasWritePerm(operator.getId(), project)) {
+      logger.error("User {} has no right permission for the project {}", operator.getName(), projectName);
       response.setStatus(HttpStatus.SC_UNAUTHORIZED);
       return null;
     }
@@ -206,6 +213,7 @@ public class ResourceService {
     Resource resource = resourceMapper.queryResource(project.getId(), name);
 
     if (resource == null) {
+      logger.error("Resource {} does not exist", name);
       response.setStatus(HttpStatus.SC_NOT_MODIFIED);
       return null;
     }
@@ -228,6 +236,7 @@ public class ResourceService {
     int count = resourceMapper.update(resource);
 
     if (count <= 0) {
+      logger.error("Resource {} upload failed", name);
       response.setStatus(HttpStatus.SC_NOT_MODIFIED);
       return null;
     }
@@ -276,7 +285,7 @@ public class ResourceService {
                                HttpServletResponse response) {
 
     // 源和目标不能是一样的名称
-    if (StringUtils.endsWithIgnoreCase(srcResName, destResName)) {
+    if (StringUtils.equalsIgnoreCase(srcResName, destResName)) {
       logger.error("Src resource mustn't the same to dest resource.");
       response.setStatus(HttpStatus.SC_NOT_MODIFIED);
       return null;
@@ -286,11 +295,13 @@ public class ResourceService {
     Project project = projectMapper.queryByName(projectName);
 
     if (project == null) {
+      logger.error("Project does not exist: {}", projectName);
       response.setStatus(HttpStatus.SC_BAD_REQUEST);
       return null;
     }
 
     if (!projectService.hasWritePerm(operator.getId(), project)) {
+      logger.error("User {} has no right permission for the project {}", operator.getName(), projectName);
       response.setStatus(HttpStatus.SC_UNAUTHORIZED);
       return null;
     }
@@ -299,6 +310,7 @@ public class ResourceService {
     Resource srcResource = resourceMapper.queryResource(project.getId(), srcResName);
 
     if (srcResource == null) {
+      logger.error("Resource {} does not exist", srcResName);
       response.setStatus(HttpStatus.SC_NOT_MODIFIED);
       return null;
     }
@@ -324,10 +336,11 @@ public class ResourceService {
       destResource.setCreateTime(now);
       destResource.setModifyTime(now);
 
-      int count = resourceMapper.insert(destResource);
-
-      if (count <= 0) {
-        response.setStatus(HttpStatus.SC_NOT_MODIFIED);
+      try {
+        resourceMapper.insert(destResource);
+      } catch (DuplicateKeyException e) {
+        logger.error("Resource has exist, can't create again.", e);
+        response.setStatus(HttpStatus.SC_CONFLICT);
         return null;
       }
     } else { // 存在
@@ -378,11 +391,13 @@ public class ResourceService {
     Project project = projectMapper.queryByName(projectName);
 
     if (project == null) {
+      logger.error("Project does not exist: {}", projectName);
       response.setStatus(HttpStatus.SC_BAD_REQUEST);
       return;
     }
 
     if (!projectService.hasWritePerm(operator.getId(), project)) {
+      logger.error("User {} has no right permission for the project {}", operator.getName(), projectName);
       response.setStatus(HttpStatus.SC_UNAUTHORIZED);
       return;
     }
@@ -402,8 +417,6 @@ public class ResourceService {
     String hdfsFilename = BaseConfig.getHdfsResourcesFilename(project.getId(), filename);
 
     HdfsClient.getInstance().delete(hdfsFilename, false);
-
-    return;
   }
 
   /**
@@ -420,11 +433,13 @@ public class ResourceService {
     Project project = projectMapper.queryByName(projectName);
 
     if (project == null) {
+      logger.error("Project does not exist: {}", projectName);
       response.setStatus(HttpStatus.SC_BAD_REQUEST);
       return null;
     }
 
     if (!projectService.hasReadPerm(operator.getId(), project)) {
+      logger.error("User {} has no right permission for the project {}", operator.getName(), projectName);
       response.setStatus(HttpStatus.SC_UNAUTHORIZED);
       return null;
     }
@@ -450,11 +465,13 @@ public class ResourceService {
     Project project = projectMapper.queryByName(projectName);
 
     if (project == null) {
+      logger.error("Project does not exist: {}", projectName);
       response.setStatus(HttpStatus.SC_BAD_REQUEST);
       return null;
     }
 
     if (!projectService.hasReadPerm(operator.getId(), project)) {
+      logger.error("User {} has no right permission for the project {}", operator.getName(), projectName);
       response.setStatus(HttpStatus.SC_UNAUTHORIZED);
       return null;
     }
@@ -463,6 +480,7 @@ public class ResourceService {
     Resource resource = resourceMapper.queryResourceDetail(project.getId(), name);
 
     if (resource == null) {
+      logger.error("Resource {} does not exist", name);
       response.setStatus(HttpStatus.SC_NOT_FOUND);
       return null;
     }
@@ -487,11 +505,13 @@ public class ResourceService {
     Project project = projectMapper.queryByName(projectName);
 
     if (project == null) {
+      logger.error("Project does not exist: {}", projectName);
       response.setStatus(HttpStatus.SC_BAD_REQUEST);
       return null;
     }
 
     if (!projectService.hasReadPerm(operator.getId(), project)) {
+      logger.error("User {} has no right permission for the project {}", operator.getName(), projectName);
       response.setStatus(HttpStatus.SC_UNAUTHORIZED);
       return null;
     }

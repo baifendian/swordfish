@@ -249,10 +249,12 @@ public class ProjectFlow {
 
   public Map<String, String> getUserDefinedParamMap() {
     List<Property> propList;
+
     if (userDefinedParamMap == null && StringUtils.isNotEmpty(userDefinedParams)) {
       propList = JsonUtil.parseObjectList(userDefinedParams, Property.class);
       userDefinedParamMap = propList.stream().collect(Collectors.toMap(Property::getProp, Property::getValue));
     }
+
     return userDefinedParamMap;
   }
 

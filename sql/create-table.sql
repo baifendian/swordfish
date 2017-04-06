@@ -63,7 +63,7 @@ DROP TABLE If Exists `resources`;
 CREATE TABLE `resources` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'resource id',
   `name` varchar(64) NOT NULL COMMENT 'resources name',
-  `suffix` varchar(20) NOT NULL COMMENT 'suffix of the file',
+  `suffix` varchar(20) DEFAULT NULL COMMENT 'suffix of the file',
   `origin_filename` varchar(64) NOT NULL COMMENT 'file name of the orgin file',
   `desc` varchar(256) DEFAULT NULL COMMENT 'resources description',
   `owner` int(11) NOT NULL COMMENT 'owner id of the resource',

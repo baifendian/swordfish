@@ -18,7 +18,7 @@ package com.baifendian.swordfish.execserver.job;
 import com.baifendian.swordfish.common.job.Job;
 import com.baifendian.swordfish.common.job.JobProps;
 import com.baifendian.swordfish.common.job.exception.ExecException;
-import com.baifendian.swordfish.common.utils.BFDDateUtils;
+import com.baifendian.swordfish.common.utils.DateUtils;
 import com.baifendian.swordfish.dao.FlowDao;
 import com.baifendian.swordfish.common.config.BaseConfig;
 import com.baifendian.swordfish.dao.enums.FlowStatus;
@@ -32,7 +32,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
-import java.sql.Time;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.*;
@@ -78,7 +77,7 @@ public class JobHandler {
     this.systemParamMap = systemParamMap;
     this.customParamMap = customParamMap;
     this.startTime = System.currentTimeMillis();
-    this.jobIdLog = String.format("%s_%s", executionNode.getJobId(), BFDDateUtils.now(DATETIME_FORMAT));
+    this.jobIdLog = String.format("%s_%s", executionNode.getJobId(), DateUtils.now(DATETIME_FORMAT));
     // custom参数会覆盖system参数
     allParamMap = new HashMap<>();
     allParamMap.putAll(systemParamMap);

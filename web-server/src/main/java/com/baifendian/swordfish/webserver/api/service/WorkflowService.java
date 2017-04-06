@@ -24,9 +24,11 @@ import com.baifendian.swordfish.dao.model.FlowNode;
 import com.baifendian.swordfish.dao.model.Project;
 import com.baifendian.swordfish.dao.model.ProjectFlow;
 import com.baifendian.swordfish.dao.model.User;
+import com.baifendian.swordfish.dao.utils.json.JsonUtil;
 import com.baifendian.swordfish.webserver.api.dto.NodeParamMR;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
@@ -45,9 +47,7 @@ import java.io.ByteArrayInputStream;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Service
 public class WorkflowService {
@@ -90,11 +90,13 @@ public class WorkflowService {
     Project project = projectMapper.queryByName(projectName);
 
     if (project == null) {
+      logger.error("Project is not exist: {}", projectName);
       response.setStatus(HttpStatus.SC_NOT_MODIFIED);
       return null;
     }
 
     if (!projectService.hasWritePerm(operator.getId(), project)) {
+      logger.error("User {} has no right permission for the project {}", operator.getName(), projectName);
       response.setStatus(HttpStatus.SC_UNAUTHORIZED);
       return null;
     }
@@ -103,6 +105,7 @@ public class WorkflowService {
     ProjectFlow.ProjectFlowData projectFlowData = projectFlowDataDes(data, file);
 
     if (projectFlowData == null) {
+      logger.error("Project data or file not valid");
       response.setStatus(HttpStatus.SC_BAD_REQUEST);
       return null;
     }
@@ -110,25 +113,29 @@ public class WorkflowService {
     // 得到结点列表
     List<FlowNode> flowNodes = projectFlowData.getNodes();
 
-    if (flowNodes == null) {
+    if (CollectionUtils.isEmpty(flowNodes)) {
+      logger.error("Project node information is empty");
       response.setStatus(HttpStatus.SC_BAD_REQUEST);
       return null;
     }
 
-      // 闭环检测未通过
-      if (graphCheck(flowNodes)) {
+    // 闭环检测未通过
+    if (graphHasCycle(flowNodes)) {
+      logger.error("Graph has cycle");
+      response.setStatus(HttpStatus.SC_BAD_REQUEST);
+      return null;
+    }
+
+    // parameter 检测
+    for (FlowNode flowNode : flowNodes) {
+      // TODO:: 这个检测不是很合理, 需要修改, 不太完备
+      if (!flowNodeParamCheck(flowNode.getParameter(), flowNode.getType())) {
         response.setStatus(HttpStatus.SC_BAD_REQUEST);
         return null;
       }
-
-      //parameter检测
-      for (FlowNode flowNode : flowNodes) {
-        if (!flowNodeParamCheck(flowNode.getParameter(), flowNode.getType())) {
-          response.setStatus(HttpStatus.SC_BAD_REQUEST);
-          return null;
-      }
     }
 
+    // 项目信息
     ProjectFlow projectFlow = new ProjectFlow();
     Date now = new Date();
 
@@ -143,7 +150,7 @@ public class WorkflowService {
     projectFlow.setQueue(queue);
     projectFlow.setOwnerId(operator.getId());
     projectFlow.setOwner(operator.getName());
-//    projectFlow.setUserDefinedParams(projectFlowData.getUserDefParams());
+    projectFlow.setUserDefinedParams(JsonUtil.toJsonString(projectFlowData.getUserDefParams()));
     projectFlow.setExtras(projectFlowData.getExtras());
 
     try {
@@ -154,19 +161,16 @@ public class WorkflowService {
       return null;
     }
 
-
-    if (flowNodes != null) {
-      for (FlowNode flowNode : flowNodes) {
-        flowNode.setFlowId(projectFlow.getId());
-        flowNodeMapper.insert(flowNode);
-      }
+    for (FlowNode flowNode : flowNodes) {
+      flowNode.setFlowId(projectFlow.getId());
+      flowNodeMapper.insert(flowNode);
     }
 
     return projectFlow;
   }
 
   /**
-   * 修改工作流，如果不存在就创建。
+   * 修改工作流，如果不存在就创建
    *
    * @param operator
    * @param projectName
@@ -182,11 +186,12 @@ public class WorkflowService {
   @Transactional(value = "TransactionManager")
   public ProjectFlow putWorkflow(User operator, String projectName, String name, String desc, String proxyUser, String queue, String data, MultipartFile file, HttpServletResponse response) {
     ProjectFlow projectFlow = flowDao.projectFlowFindByPorjectNameAndName(projectName, name);
+
     if (projectFlow == null) {
       return createWorkflow(operator, projectName, name, desc, proxyUser, queue, data, file, response);
-    } else {
-      return patchWorkflow(operator, projectName, name, desc, proxyUser, queue, data, file, response);
     }
+
+    return patchWorkflow(operator, projectName, name, desc, proxyUser, queue, data, file, response);
   }
 
   /**
@@ -240,12 +245,13 @@ public class WorkflowService {
         projectFlow.setFlowsNodes(projectFlowData.getNodes());
 
 
-        //闭环检测
-        if (graphCheck(flowNodeList)) {
+        // 闭环检测
+        if (graphHasCycle(flowNodeList)) {
           response.setStatus(HttpStatus.SC_BAD_REQUEST);
           return null;
         }
-        //parameter检测
+
+        // parameter检测
         for (FlowNode flowNode : flowNodeList) {
           if (!flowNodeParamCheck(flowNode.getParameter(), flowNode.getType())) {
             response.setStatus(HttpStatus.SC_BAD_REQUEST);
@@ -479,15 +485,15 @@ public class WorkflowService {
    * @param flowNodeList
    * @return
    */
-  private boolean graphCheck(List<FlowNode> flowNodeList) {
+  private boolean graphHasCycle(List<FlowNode> flowNodeList) {
     Graph<String, FlowNode, String> graph = new Graph<>();
 
-    //填充顶点
+    // 填充顶点
     for (FlowNode flowNode : flowNodeList) {
       graph.addVertex(flowNode.getName(), flowNode);
     }
 
-    //填充边关系
+    // 填充边关系
     for (FlowNode flowNode : flowNodeList) {
       for (String dep : flowNode.getDepList()) {
         graph.addEdge(dep, flowNode.getName());

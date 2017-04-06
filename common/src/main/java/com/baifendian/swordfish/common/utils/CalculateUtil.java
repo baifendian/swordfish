@@ -28,19 +28,24 @@ public class CalculateUtil {
 
   /**
    * 计算整数表达式的值
+   *
+   * @param expression
+   * @return
    */
   public static Integer calc(String expression) {
     expression = StringUtils.trim(expression);
     expression = transform(expression);
     List<String> result = getStringList(expression); // String转换为List
     result = getPostOrder(result); // 中缀变后缀
+
     return calculate(result); // 计算
   }
 
   /**
-   * 将表达式中正负号改为P（正） S（负）
+   * 将表达式中正负号改为 P（正） S（负）
    *
-   * @param expression 例如-2+-1*(+3)-(-1) 被转为 S2+S1*(P3)-(S1)
+   * @param expression 例如 "-2+-1*(+3)-(-1) 被转为 S2+S1*(P3)-(S1)"
+   * @return
    */
   private static String transform(String expression) {
     char[] arr = expression.toCharArray();
@@ -69,8 +74,9 @@ public class CalculateUtil {
   }
 
   /**
-   * 将字符串转化成List
+   * 将字符串转化成 List
    *
+   * @param expression
    * @return list
    */
   private static List<String> getStringList(String expression) {
@@ -96,6 +102,7 @@ public class CalculateUtil {
   /**
    * 将中缀表达式转化为后缀表达式
    *
+   * @param inOrderList
    * @return 后缀表达式
    */
   private static List<String> getPostOrder(List<String> inOrderList) {
@@ -124,15 +131,18 @@ public class CalculateUtil {
         }
       }
     }
+
     while (!stack.isEmpty()) {
       result.add(stack.pop());
     }
+
     return result;
   }
 
   /**
    * 计算后缀表达式
    *
+   * @param postOrder
    * @return 整数
    */
   private static Integer calculate(List<String> postOrder) {
@@ -178,6 +188,8 @@ public class CalculateUtil {
   /**
    * 比较运算符等级
    *
+   * @param peek
+   * @param cur
    * @return true or false
    */
   private static boolean compare(String peek, String cur) {
@@ -190,6 +202,7 @@ public class CalculateUtil {
     } else if ("-".equals(peek) && ("+".equals(cur) || "-".equals(cur))) {
       return true;
     }
+
     return false;
   }
 
@@ -197,5 +210,4 @@ public class CalculateUtil {
     String s = "24*60*(-12/24/60)";
     System.out.println(calc(s));
   }
-
 }

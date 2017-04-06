@@ -21,6 +21,7 @@ import com.baifendian.swordfish.dao.mapper.ProjectFlowMapper;
 import com.baifendian.swordfish.dao.mapper.ProjectUserMapper;
 import com.baifendian.swordfish.dao.model.Schedule;
 import com.baifendian.swordfish.dao.model.User;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -72,7 +73,7 @@ public class MailSendService extends BaseDao {
   }
 
   /**
-   * 若workflow无邮件组，且指定sendToUserIfMailsEmpty为true时，则发送邮件给项目组成员
+   * 若 workflow 无邮件组，且指定 sendToUserIfMailsEmpty 为 true 时，则发送邮件给项目组成员
    *
    * @param flowId                 flowid
    * @param title                  邮件主题
@@ -81,20 +82,29 @@ public class MailSendService extends BaseDao {
    */
   public boolean sendToFlowMails(int flowId, String title, String content, boolean sendToUserIfMailsEmpty, Schedule schedule) {
     String mailsStr = schedule.getNotifyMailsStr();
-    if (mailsStr == null || mailsStr == "") {
-      System.out.println(sendToUserIfMailsEmpty);
+
+    if (StringUtils.isEmpty(mailsStr)) {
       if (sendToUserIfMailsEmpty) {
         return sendToProjectUsers(flowId, title, content);
       } else {
         return false;
       }
     }
+
     String[] mailsArr = mailsStr.split(";");
     Collection<String> mails = Arrays.asList(mailsArr);
 
     return MailSendUtil.sendMails(mails, title, content);
   }
 
+  /**
+   * 发送邮件 flow 的 owner
+   *
+   * @param flowId
+   * @param title
+   * @param content
+   * @return
+   */
   public boolean sendToFlowUserMails(int flowId, String title, String content) {
     User user = projectFlowMapper.queryFlowOwner(flowId);
 

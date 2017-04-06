@@ -47,7 +47,6 @@ public class ProjectFlowMapperSqlProvider {
         VALUES("project_id", "#{flow.projectId}");
         VALUES("modify_time", "#{flow.modifyTime}");
         VALUES("create_time", "#{flow.createTime}");
-        VALUES("last_modify_by", "#{flow.lastModifyBy}");
         VALUES("owner", "#{flow.ownerId}");
         VALUES("proxy_user", "#{flow.proxyUser}");
         VALUES("user_defined_params", "#{flow.userDefinedParams}");
@@ -279,7 +278,6 @@ public class ProjectFlowMapperSqlProvider {
         SET("`desc`=#{flow.desc}");
         SET("modify_time=#{flow.modifyTime}");
         SET("create_time=#{flow.createTime}");
-        SET("last_modify_by=#{flow.lastModifyBy}");
         SET("owner=#{flow.ownerId}");
         SET("proxy_user=#{flow.proxyUser}");
         SET("user_defined_params=#{flow.userDefinedParams}");

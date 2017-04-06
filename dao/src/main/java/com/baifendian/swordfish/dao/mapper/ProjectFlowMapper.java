@@ -62,7 +62,6 @@ public interface ProjectFlowMapper {
           @Result(property = "mailGroups", column = "mail_groups", javaType = String.class, jdbcType = JdbcType.VARCHAR),
           @Result(property = "projectId", column = "project_id", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
           @Result(property = "projectName", column = "project_name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-          @Result(property = "lastModifyBy", column = "last_modify_by", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
           @Result(property = "ownerId", column = "owner_id", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
           @Result(property = "inputTables", column = "input_tables", javaType = String.class, jdbcType = JdbcType.VARCHAR),
           @Result(property = "outputTables", column = "output_tables", javaType = String.class, jdbcType = JdbcType.VARCHAR),
