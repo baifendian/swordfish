@@ -23,6 +23,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.junit.Assert.assertEquals;
+
 public class FlowNodeTest {
   @Test
   public void testSetDep() throws IOException {
@@ -56,6 +58,7 @@ public class FlowNodeTest {
     String flowNodeStr = JsonUtil.toJsonString(flowNode);
     System.out.println(flowNodeStr);
     FlowNode flowNode1 = JsonUtil.parseObject(flowNodeStr, FlowNode.class);
-    System.out.println(flowNode1.getParameter());
+    assertEquals(flowNode.getName(), flowNode1.getName());
+    assertEquals(flowNode.getParameter(), flowNode1.getParameter());
   }
 }
