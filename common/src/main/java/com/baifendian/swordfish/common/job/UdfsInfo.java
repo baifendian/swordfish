@@ -15,12 +15,15 @@
  */
 package com.baifendian.swordfish.common.job;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class UdfsInfo {
   private String func;
 
   private String className;
 
-  private ResourceInfo libJar;
+  private List<ResourceInfo> libJars = new ArrayList<>();
 
   public String getFunc() {
     return func;
@@ -38,11 +41,11 @@ public class UdfsInfo {
     this.className = className;
   }
 
-  public ResourceInfo getLibJar() {
-    return libJar;
+  public List<ResourceInfo> getLibJars() {
+    return libJars;
   }
 
-  public void setLibJar(ResourceInfo libJar) {
-    this.libJar = libJar;
+  public void setLibJars(List<ResourceInfo> libJars) {
+    this.libJars = libJars;
   }
 }

@@ -16,6 +16,7 @@
 package com.baifendian.swordfish.execserver.job.hive;
 
 import com.baifendian.swordfish.common.hadoop.HdfsClient;
+import com.baifendian.swordfish.common.job.ResourceInfo;
 import com.baifendian.swordfish.common.job.UdfsInfo;
 import com.baifendian.swordfish.common.job.exception.ExecException;
 
@@ -90,8 +91,9 @@ public class FunctionUtil {
   private static Set<String> getFuncResouces(List<UdfsInfo> udfsInfos) {
     Set<String> resources = new HashSet<>();
     for (UdfsInfo udfsInfo : udfsInfos) {
-      if (udfsInfo.getLibJar() != null) {
-        resources.add(udfsInfo.getLibJar().getRes());
+      if (CollectionUtils.isNotEmpty(udfsInfo.getLibJars())) {
+        for(ResourceInfo resourceInfo: udfsInfo.getLibJars())
+        resources.add(resourceInfo.getRes());
       }
     }
     return resources;
