@@ -30,7 +30,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.httpclient.HttpStatus;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,7 +42,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
-import java.io.ByteArrayInputStream;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.Date;
@@ -90,7 +88,7 @@ public class WorkflowService {
     Project project = projectMapper.queryByName(projectName);
 
     if (project == null) {
-      logger.error("Project is not exist: {}", projectName);
+      logger.error("Project does not exist: {}", projectName);
       response.setStatus(HttpStatus.SC_NOT_MODIFIED);
       return null;
     }
@@ -211,48 +209,57 @@ public class WorkflowService {
   @Transactional(value = "TransactionManager")
   public ProjectFlow patchWorkflow(User operator, String projectName, String name, String desc, String proxyUser, String queue, String data, MultipartFile file, HttpServletResponse response) {
 
+    // 查询项目是否存在以及是否具备相应权限
     Project project = projectMapper.queryByName(projectName);
 
     if (project == null) {
+      logger.error("Project does not exist: {}", projectName);
       response.setStatus(HttpStatus.SC_NOT_MODIFIED);
       return null;
     }
 
     if (!projectService.hasWritePerm(operator.getId(), project)) {
+      logger.error("User {} has no right permission for the project {}", operator.getName(), projectName);
       response.setStatus(HttpStatus.SC_UNAUTHORIZED);
       return null;
     }
 
+    // 查询工作流信息
     ProjectFlow projectFlow = flowDao.projectFlowfindByName(project.getId(), name);
     Date now = new Date();
 
     if (projectFlow == null) {
+      logger.error("Workflow does not exist: {}", name);
       response.setStatus(HttpStatus.SC_NOT_MODIFIED);
       return null;
     }
 
+    // 解析
     ProjectFlow.ProjectFlowData projectFlowData = projectFlowDataDes(data, file);
 
     if (projectFlowData != null) {
-      if (!projectFlow.getExtras().isEmpty()) {
-        projectFlow.setExtras(projectFlow.getExtras());
+      if (!StringUtils.isEmpty(projectFlowData.getExtras())) {
+        projectFlow.setExtras(projectFlowData.getExtras());
       }
-      if (!projectFlow.getUserDefinedParams().isEmpty()) {
-        projectFlow.setUserDefinedParams(projectFlow.getUserDefinedParams());
+
+      if (!CollectionUtils.isEmpty(projectFlowData.getUserDefParams())) {
+        projectFlow.setUserDefinedParams(JsonUtil.toJsonString(projectFlowData.getUserDefParams()));
       }
+
       List<FlowNode> flowNodeList = projectFlowData.getNodes();
       if (flowNodeList != null) {
         projectFlow.setFlowsNodes(projectFlowData.getNodes());
 
-
         // 闭环检测
         if (graphHasCycle(flowNodeList)) {
+          logger.error("Graph has cycle");
           response.setStatus(HttpStatus.SC_BAD_REQUEST);
           return null;
         }
 
-        // parameter检测
+        // parameter 检测
         for (FlowNode flowNode : flowNodeList) {
+          // TODO::参数检测存在问题
           if (!flowNodeParamCheck(flowNode.getParameter(), flowNode.getType())) {
             response.setStatus(HttpStatus.SC_BAD_REQUEST);
             return null;
@@ -265,27 +272,32 @@ public class WorkflowService {
           flowNodeMapper.insert(flowNode);
         }
       }
-
     }
 
-    if (!StringUtils.isEmpty(name)) {
+    if (StringUtils.isNotEmpty(name)) {
       projectFlow.setName(name);
     }
-    if (!StringUtils.isEmpty(desc)) {
+
+    if (StringUtils.isNotEmpty(desc)) {
       projectFlow.setDesc(desc);
     }
+
     projectFlow.setModifyTime(now);
-    if (!StringUtils.isEmpty(proxyUser)) {
+
+    if (StringUtils.isNotEmpty(proxyUser)) {
       projectFlow.setProxyUser(proxyUser);
     }
-    if (!StringUtils.isEmpty(queue)) {
+
+    if (StringUtils.isNotEmpty(queue)) {
       projectFlow.setQueue(queue);
     }
 
-    projectFlowMapper.updateByName(projectFlow);
+    projectFlow.setOwnerId(operator.getId());
+    projectFlow.setOwner(operator.getName());
+
+    projectFlowMapper.updateById(projectFlow);
 
     return projectFlow;
-
   }
 
   /**
@@ -299,6 +311,7 @@ public class WorkflowService {
   @Transactional(value = "TransactionManager")
   public void deleteProjectFlow(User operator, String projectName, String name, HttpServletResponse response) {
 
+    // 查询项目是否存在以及是否具备相应权限
     Project project = projectMapper.queryByName(projectName);
 
     if (project == null) {
@@ -452,28 +465,21 @@ public class WorkflowService {
    */
   private ProjectFlow.ProjectFlowData projectFlowDataDes(String data, MultipartFile file) {
     ProjectFlow.ProjectFlowData projectFlowData = null;
-    ObjectMapper mapper = new ObjectMapper();
 
     if (file != null && !file.isEmpty()) {
-      try {
-        // 先将文件存放到本地
+      // TODO::
+      // 先将文件存放到本地
 
-        // 解压
+      // 解压
 
-        // 读取 workflow.json 文件
-
-        ByteArrayInputStream stream = new ByteArrayInputStream(file.getBytes());
-        String jsonString = IOUtils.toString(stream, "UTF-8");
-        projectFlowData = mapper.readValue(jsonString, ProjectFlow.ProjectFlowData.class);
-      } catch (Exception e) {
-        logger.error(e.toString());
-      }
-    } else {
-      try {
-        projectFlowData = mapper.readValue(data, ProjectFlow.ProjectFlowData.class);
-      } catch (Exception e) {
-        logger.error(e.toString());
-      }
+      // 读取 workflow.json 文件
+//
+//        ByteArrayInputStream stream = new ByteArrayInputStream(file.getBytes());
+//        String jsonString = IOUtils.toString(stream, "UTF-8");
+      String jsonString = "";
+      projectFlowData = JsonUtil.parseObject(jsonString, ProjectFlow.ProjectFlowData.class);
+    } else if (data != null) {
+      projectFlowData = JsonUtil.parseObject(data, ProjectFlow.ProjectFlowData.class);
     }
 
     return projectFlowData;
