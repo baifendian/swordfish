@@ -501,8 +501,10 @@ public class WorkflowService {
 
     // 填充边关系
     for (FlowNode flowNode : flowNodeList) {
-      for (String dep : flowNode.getDepList()) {
-        graph.addEdge(dep, flowNode.getName());
+      if (CollectionUtils.isNotEmpty(flowNode.getDepList())){
+        for (String dep : flowNode.getDepList()) {
+          graph.addEdge(dep, flowNode.getName());
+        }
       }
     }
 
@@ -517,7 +519,7 @@ public class WorkflowService {
    * @return
    */
   private boolean flowNodeParamCheck(String parameter, String type) {
-    ObjectMapper mapper = new ObjectMapper();
+    /*ObjectMapper mapper = new ObjectMapper();
 
     try {
       switch (type) {
@@ -531,7 +533,7 @@ public class WorkflowService {
     } catch (Exception e) {
       logger.error(e.toString());
       return false;
-    }
+    }*/
     return true;
   }
 }
