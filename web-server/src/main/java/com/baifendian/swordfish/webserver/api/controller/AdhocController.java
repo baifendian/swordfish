@@ -18,8 +18,8 @@ package com.baifendian.swordfish.webserver.api.controller;
 import com.baifendian.swordfish.common.job.UdfsInfo;
 import com.baifendian.swordfish.dao.model.User;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
-import com.baifendian.swordfish.webserver.api.dto.AdhocLogData;
-import com.baifendian.swordfish.webserver.api.dto.AdhocResult;
+import com.baifendian.swordfish.webserver.api.dto.AdHocLogData;
+import com.baifendian.swordfish.webserver.api.dto.AdHocResultData;
 import com.baifendian.swordfish.webserver.api.dto.ExecutorId;
 import com.baifendian.swordfish.webserver.api.service.AdhocService;
 import org.apache.commons.httpclient.HttpStatus;
@@ -107,7 +107,7 @@ public class AdhocController {
    * @return
    */
   @GetMapping(value = "/adHoc/{execId}/logs")
-  public AdhocLogData queryLogs(@RequestAttribute(value = "session.user") User operator,
+  public AdHocLogData queryLogs(@RequestAttribute(value = "session.user") User operator,
                                 @PathVariable int execId,
                                 @RequestParam(value = "index") int index,
                                 @RequestParam(value = "from", required = false, defaultValue = "0") int from,
@@ -141,10 +141,10 @@ public class AdhocController {
    * @return
    */
   @GetMapping(value = "/adHoc/{execId}/result")
-  public AdhocResult queryResult(@RequestAttribute(value = "session.user") User operator,
-                                 @PathVariable int execId,
-                                 @RequestParam(value = "index") int index,
-                                 HttpServletResponse response) {
+  public AdHocResultData queryResult(@RequestAttribute(value = "session.user") User operator,
+                                     @PathVariable int execId,
+                                     @RequestParam(value = "index") int index,
+                                     HttpServletResponse response) {
     logger.info("Operator user {}, get adhoc result, exec id: {}, index: {}",
         operator.getName(), execId, index);
 

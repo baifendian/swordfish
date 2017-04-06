@@ -80,39 +80,69 @@ public class AdHocMapperProvider {
     return new SQL() {
       {
         UPDATE(TABLE_NAME);
-        SET("start_time = #{adHoc.startTime}");
-        SET("end_time = #{adHoc.endTime}");
-        SET("job_id = #{adHoc.jobId}");
-        SET("status = " + EnumFieldUtil.genFieldStr("adHoc.status", FlowStatus.class));
-        WHERE("id = #{adHoc.id}");
+
+        SET("`start_time` = #{adHoc.startTime}");
+        SET("`end_time` = #{adHoc.endTime}");
+        SET("`job_id` = #{adHoc.jobId}");
+        SET("`status` = " + EnumFieldUtil.genFieldStr("adHoc.status", FlowStatus.class));
+
+        WHERE("`id` = #{adHoc.id}");
       }
     }.toString();
   }
 
+  /**
+   * 查询, 根据 id 查询
+   *
+   * @param parameter
+   * @return
+   */
   public String selectById(Map<String, Object> parameter) {
     return new SQL() {
       {
         SELECT("*");
 
-        FROM(TABLE_NAME );
-        WHERE("id = #{id}");
+        FROM(TABLE_NAME);
+
+        WHERE("`id` = #{id}");
       }
     }.toString();
   }
 
-  public String selectByUserAndId(Map<String, Object> parameter) {
+  /**
+   * 查询结果的 sql
+   *
+   * @param parameter
+   * @return
+   */
+  public String selectResultById(Map<String, Object> parameter) {
     return new SQL() {
       {
-        SELECT("p.*");
+        SELECT("*");
 
-        FROM(TABLE_NAME + " as a");
+        FROM(RESULT_TABLE_NAME);
 
-        JOIN("project p on p.id = a.project_id");
-
-        WHERE("p_u.user_id = #{userId} or p.owner = #{userId}");
-        WHERE("a.id = #{execId}");
+        WHERE("`exec_id` = #{execId}");
       }
     }.toString();
   }
 
+  /**
+   * query result by exec id and index
+   *
+   * @param parameter
+   * @return
+   */
+  public String selectResultByIdAndIndex(Map<String, Object> parameter) {
+    return new SQL() {
+      {
+        SELECT("*");
+
+        FROM(RESULT_TABLE_NAME);
+
+        WHERE("`exec_id` = #{execId}");
+        WHERE("`index` = #{index}");
+      }
+    }.toString();
+  }
 }

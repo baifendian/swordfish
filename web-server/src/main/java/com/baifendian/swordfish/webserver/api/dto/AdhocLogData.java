@@ -17,7 +17,7 @@ package com.baifendian.swordfish.webserver.api.dto;
 
 import com.baifendian.swordfish.dao.enums.FlowStatus;
 
-public class AdhocLogData {
+public class AdHocLogData {
   /**
    * 工作量的状态
    */

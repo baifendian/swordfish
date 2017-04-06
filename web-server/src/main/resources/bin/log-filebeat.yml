@@ -1,0 +1,13 @@
+filebeat.prospectors:
+- input_type: log
+  multiline.timeout: 1s
+  paths:
+    - /home/swordfish/liujin/swordfish-exec-server-1.0-SNAPSHOT/logs/exec-server*.log
+  multiline:
+    pattern: '^\['
+    negate: true
+    match: after
+#  exclude_lines: ["^\\[DEBUG\\]"]
+
+output.logstash:
+  hosts: ["172.18.1.22:5044"]
