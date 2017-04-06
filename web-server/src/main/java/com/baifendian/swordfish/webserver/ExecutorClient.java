@@ -54,7 +54,7 @@ public class ExecutorClient {
   }
 
   public ExecutorClient(String host, int port) {
-    new ExecutorClient(host, port, ExecutorClient.RPC_RETRIES);
+    this(host, port, ExecutorClient.RPC_RETRIES);
   }
 
   public ExecutorClient(ExecutorServerInfo executorServerInfo) {
