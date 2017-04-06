@@ -16,6 +16,7 @@
 package com.baifendian.swordfish.dao.model;
 
 import com.baifendian.swordfish.dao.model.flow.params.Property;
+import com.baifendian.swordfish.dao.utils.json.FlowNodeListS11N;
 import com.baifendian.swordfish.dao.utils.json.JsonObjectDeserializer;
 import com.baifendian.swordfish.dao.utils.json.JsonObjectSerializer;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
@@ -268,8 +269,6 @@ public class ProjectFlow {
     /**
      * 结点信息
      */
-    @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
-    @JsonSubTypes({ @JsonSubTypes.Type(value = FlowNode.class, name = "FlowNode")})
     private List<FlowNode> nodes;
 
     /**
