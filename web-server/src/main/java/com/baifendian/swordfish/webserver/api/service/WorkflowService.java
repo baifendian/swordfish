@@ -206,7 +206,7 @@ public class WorkflowService {
    * @param response
    * @return
    */
-  @Transactional(value = "TransactionManager")
+  //@Transactional(value = "TransactionManager")
   public ProjectFlow patchWorkflow(User operator, String projectName, String name, String desc, String proxyUser, String queue, String data, MultipartFile file, HttpServletResponse response) {
 
     // 查询项目是否存在以及是否具备相应权限
