@@ -15,7 +15,9 @@
  */
 package com.baifendian.swordfish.webserver.api.controller;
 
+import com.baifendian.swordfish.common.job.UdfsInfo;
 import com.baifendian.swordfish.dao.model.User;
+import com.baifendian.swordfish.dao.utils.json.JsonUtil;
 import com.baifendian.swordfish.webserver.api.dto.AdhocLogData;
 import com.baifendian.swordfish.webserver.api.dto.AdhocResult;
 import com.baifendian.swordfish.webserver.api.dto.ExecutorId;
@@ -27,6 +29,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
+import java.util.List;
 
 /**
  * 即席查询的服务入口
@@ -78,9 +81,18 @@ public class AdhocController {
       throw new IllegalArgumentException("Argument is not valid, timeout must be between (0, 14400]");
     }
 
-    // TODO:: 检验 udfs, 生成对象
+    // 检验 udfs, 生成对象
+    List<UdfsInfo> udfsInfos;
 
-    return adhocService.execAdhoc(operator, projectName, stms, limit, proxyUser, queue, udfs, timeout, response);
+    try {
+      udfsInfos = JsonUtil.parseObjectList(udfs, UdfsInfo.class);
+    } catch (Exception e) {
+      logger.error("Parse json exception.", e);
+      response.setStatus(HttpStatus.SC_BAD_REQUEST);
+      throw new IllegalArgumentException("Argument is not valid, udfs format not a valid.");
+    }
+
+    return adhocService.execAdhoc(operator, projectName, stms, limit, proxyUser, queue, udfsInfos, timeout, response);
   }
 
   /**
