@@ -178,7 +178,7 @@ public class AdhocService {
     }
 
     if (!projectService.hasExecPerm(operator.getId(), project)) {
-      logger.error("User {} has no right permission for the project {}", operator.getName(), project.getName());
+      logger.error("User [{},{}] has no right permission for the project [{}], execId: {}", operator.getId(), operator.getName(), project.getName(), execId);
       response.setStatus(HttpStatus.SC_UNAUTHORIZED);
       return null;
     }

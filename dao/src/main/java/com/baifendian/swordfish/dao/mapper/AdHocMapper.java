@@ -43,6 +43,13 @@ public interface AdHocMapper {
    * @param execId
    * @return
    */
+  @Results(value = {@Result(property = "id", column = "id", id = true, javaType = int.class, jdbcType = JdbcType.INTEGER),
+      @Result(property = "name", column = "name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+      @Result(property = "desc", column = "desc", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+      @Result(property = "createTime", column = "create_time", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP),
+      @Result(property = "modifyTime", column = "modify_time", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP),
+      @Result(property = "ownerId", column = "owner", javaType = int.class, jdbcType = JdbcType.INTEGER),
+  })
   @SelectProvider(type = AdHocMapperProvider.class, method = "selectProjectByExecId")
   Project queryProjectByExecId(@Param("execId") int execId);
 
@@ -83,14 +90,14 @@ public interface AdHocMapper {
    * @return
    */
   @Results(value = {
-      @Result(property = "id", column = "exec_id", id = true, javaType = int.class, jdbcType = JdbcType.INTEGER),
-      @Result(property = "projectId", column = "index", id = true, javaType = int.class, jdbcType = JdbcType.INTEGER),
-      @Result(property = "proxyUser", column = "stm", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-      @Result(property = "queue", column = "result", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+      @Result(property = "execId", column = "exec_id", id = true, javaType = int.class, jdbcType = JdbcType.INTEGER),
+      @Result(property = "index", column = "index", id = true, javaType = int.class, jdbcType = JdbcType.INTEGER),
+      @Result(property = "stm", column = "stm", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+      @Result(property = "result", column = "result", javaType = String.class, jdbcType = JdbcType.VARCHAR),
       @Result(property = "status", column = "status", typeHandler = EnumOrdinalTypeHandler.class, jdbcType = JdbcType.TINYINT),
-      @Result(property = "owner", column = "create_time", javaType = int.class, jdbcType = JdbcType.INTEGER),
-      @Result(property = "parameter", column = "start_time", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-      @Result(property = "parameter", column = "end_time", javaType = String.class, jdbcType = JdbcType.VARCHAR)
+      @Result(property = "createTime", column = "create_time", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP),
+      @Result(property = "startTime", column = "start_time", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP),
+      @Result(property = "endTime", column = "end_time", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP)
   })
   @SelectProvider(type = AdHocMapperProvider.class, method = "selectResultById")
   List<AdHocResult> selectResultById(@Param("execId") int execId);
@@ -103,14 +110,14 @@ public interface AdHocMapper {
    * @return
    */
   @Results(value = {
-      @Result(property = "id", column = "exec_id", id = true, javaType = int.class, jdbcType = JdbcType.INTEGER),
-      @Result(property = "projectId", column = "index", id = true, javaType = int.class, jdbcType = JdbcType.INTEGER),
-      @Result(property = "proxyUser", column = "stm", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-      @Result(property = "queue", column = "result", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+      @Result(property = "execId", column = "exec_id", id = true, javaType = int.class, jdbcType = JdbcType.INTEGER),
+      @Result(property = "index", column = "index", id = true, javaType = int.class, jdbcType = JdbcType.INTEGER),
+      @Result(property = "stm", column = "stm", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+      @Result(property = "result", column = "result", javaType = String.class, jdbcType = JdbcType.VARCHAR),
       @Result(property = "status", column = "status", typeHandler = EnumOrdinalTypeHandler.class, jdbcType = JdbcType.TINYINT),
-      @Result(property = "owner", column = "create_time", javaType = int.class, jdbcType = JdbcType.INTEGER),
-      @Result(property = "parameter", column = "start_time", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-      @Result(property = "parameter", column = "end_time", javaType = String.class, jdbcType = JdbcType.VARCHAR)
+      @Result(property = "createTime", column = "create_time", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP),
+      @Result(property = "startTime", column = "start_time", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP),
+      @Result(property = "endTime", column = "end_time", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP)
   })
   @SelectProvider(type = AdHocMapperProvider.class, method = "selectResultByIdAndIndex")
   AdHocResult selectResultByIdAndIndex(@Param("execId") int execId, @Param("index") int index);

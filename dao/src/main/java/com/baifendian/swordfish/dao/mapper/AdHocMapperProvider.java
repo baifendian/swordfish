@@ -18,10 +18,14 @@ package com.baifendian.swordfish.dao.mapper;
 import com.baifendian.swordfish.dao.enums.FlowStatus;
 import com.baifendian.swordfish.dao.mapper.utils.EnumFieldUtil;
 import org.apache.ibatis.jdbc.SQL;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 
 public class AdHocMapperProvider {
+
+  private static Logger logger = LoggerFactory.getLogger(AdHocMapperProvider.class.getName());
 
   private static final String TABLE_NAME = "ad_hocs";
   private static final String RESULT_TABLE_NAME = "ad_hoc_results";
@@ -58,7 +62,7 @@ public class AdHocMapperProvider {
    * @return
    */
   public String selectProjectByExecId(Map<String, Object> parameter) {
-    return new SQL() {
+    String sql = new SQL() {
       {
         SELECT("p.*");
 
@@ -69,6 +73,8 @@ public class AdHocMapperProvider {
         WHERE("a.id = #{execId}");
       }
     }.toString();
+
+    return sql;
   }
 
   /**

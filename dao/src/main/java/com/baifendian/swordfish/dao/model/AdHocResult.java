@@ -49,7 +49,7 @@ public class AdHocResult {
   /**
    * 创建时间
    */
-  private Timestamp createTime;
+  private Date createTime;
 
   /**
    * 开始执行时间
@@ -101,11 +101,11 @@ public class AdHocResult {
     this.status = status;
   }
 
-  public Timestamp getCreateTime() {
+  public Date getCreateTime() {
     return createTime;
   }
 
-  public void setCreateTime(Timestamp createTime) {
+  public void setCreateTime(Date createTime) {
     this.createTime = createTime;
   }
 
