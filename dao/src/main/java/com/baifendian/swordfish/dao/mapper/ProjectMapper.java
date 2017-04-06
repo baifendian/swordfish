@@ -64,7 +64,7 @@ public interface ProjectMapper {
       @Result(property = "createTime", column = "create_time", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP),
       @Result(property = "modifyTime", column = "modify_time", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP),
       @Result(property = "ownerId", column = "owner_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
-      @Result(property = "owner", column = "owner", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+      @Result(property = "owner", column = "owner", javaType = String.class, jdbcType = JdbcType.VARCHAR)
   })
   @SelectProvider(type = ProjectSqlProvider.class, method = "queryAllProject")
   List<Project> queryAllProject();
@@ -81,7 +81,7 @@ public interface ProjectMapper {
       @Result(property = "createTime", column = "create_time", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP),
       @Result(property = "modifyTime", column = "modify_time", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP),
       @Result(property = "ownerId", column = "owner_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
-      @Result(property = "owner", column = "owner", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+      @Result(property = "owner", column = "owner", javaType = String.class, jdbcType = JdbcType.VARCHAR)
   })
   @SelectProvider(type = ProjectSqlProvider.class, method = "queryProjectByUser")
   List<Project> queryProjectByUser(@Param("userId") int userId);
@@ -99,7 +99,7 @@ public interface ProjectMapper {
       @Result(property = "createTime", column = "create_time", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP),
       @Result(property = "modifyTime", column = "modify_time", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP),
       @Result(property = "ownerId", column = "owner_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
-      @Result(property = "owner", column = "owner", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+      @Result(property = "owner", column = "owner", javaType = String.class, jdbcType = JdbcType.VARCHAR)
   })
   @SelectProvider(type = ProjectSqlProvider.class, method = "queryByName")
   Project queryByName(@Param("name") String name);
