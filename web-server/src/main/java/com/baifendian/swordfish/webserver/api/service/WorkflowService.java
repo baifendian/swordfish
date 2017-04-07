@@ -27,7 +27,6 @@ import com.baifendian.swordfish.dao.model.User;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
 import com.baifendian.swordfish.webserver.api.dto.NodeParamMR;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.lang.StringUtils;
@@ -38,6 +37,7 @@ import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -81,7 +81,7 @@ public class WorkflowService {
    * @param response
    * @return
    */
-  //@Transactional(value = "TransactionManager")
+  @Transactional(value = "TransactionManager")
   public ProjectFlow createWorkflow(User operator, String projectName, String name, String desc, String proxyUser, String queue, String data, MultipartFile file, HttpServletResponse response) {
 
     // 查看是否对项目具备相应的权限
@@ -181,7 +181,7 @@ public class WorkflowService {
    * @param response
    * @return
    */
-  //@Transactional(value = "TransactionManager")
+  @Transactional(value = "TransactionManager")
   public ProjectFlow putWorkflow(User operator, String projectName, String name, String desc, String proxyUser, String queue, String data, MultipartFile file, HttpServletResponse response) {
     ProjectFlow projectFlow = flowDao.projectFlowFindByPorjectNameAndName(projectName, name);
 
@@ -206,7 +206,7 @@ public class WorkflowService {
    * @param response
    * @return
    */
-  //@Transactional(value = "TransactionManager")
+  @Transactional(value = "TransactionManager")
   public ProjectFlow patchWorkflow(User operator, String projectName, String name, String desc, String proxyUser, String queue, String data, MultipartFile file, HttpServletResponse response) {
 
     // 查询项目是否存在以及是否具备相应权限
@@ -308,7 +308,7 @@ public class WorkflowService {
    * @param name
    * @param response
    */
-  //@Transactional(value = "TransactionManager")
+  @Transactional(value = "TransactionManager")
   public void deleteProjectFlow(User operator, String projectName, String name, HttpServletResponse response) {
 
     // 查询项目是否存在以及是否具备相应权限
@@ -435,13 +435,11 @@ public class WorkflowService {
 
     ProjectFlow projectFlow = flowDao.projectFlowfindByName(project.getId(), name);
 
-    ObjectMapper mapper = new ObjectMapper();
-
     String json = "";
 
     try {
-      json = mapper.writeValueAsString(projectFlow.getData());
-    } catch (JsonProcessingException e) {
+      json = JsonUtil.toJsonString(projectFlow.getData());
+    } catch (RuntimeException e) {
       e.printStackTrace();
       return null;
     }

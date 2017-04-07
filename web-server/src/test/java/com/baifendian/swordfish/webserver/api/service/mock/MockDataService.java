@@ -22,6 +22,7 @@ import com.baifendian.swordfish.dao.model.flow.params.Property;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import org.apache.avro.data.Json;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -54,8 +55,6 @@ public class MockDataService {
 
   @Autowired
   private ProjectFlowMapper projectFlowMapper;
-
-  private ObjectMapper objectMapper = new ObjectMapper();
 
   @Autowired
   private ScheduleMapper scheduleMapper;
@@ -201,8 +200,7 @@ public class MockDataService {
    *
    * @return
    */
-  public FlowNode mocNode(String[] depList, int flowId, String parameter, String extras) throws JsonProcessingException {
-    ObjectMapper mapper = new ObjectMapper();
+  public FlowNode mocNode(String[] depList, int flowId, String parameter, String extras,boolean write) throws JsonProcessingException {
     FlowNode flowNode = new FlowNode();
     flowNode.setName(getRandomString());
     flowNode.setDesc(getRandomString());
@@ -213,18 +211,33 @@ public class MockDataService {
     flowNode.setDepList(Arrays.asList(depList));
     flowNode.setExtras(extras);
 
-    flowNodeMapper.insert(flowNode);
+    if(write){
+      flowNodeMapper.insert(flowNode);
+    }
     return flowNode;
   }
 
   /**
-   * 虚拟一个正常的MR节点
+   * 虚拟一个正常的MR节点 并写入数据库
    *
    * @return
    */
   public FlowNode mocRmNode(String[] depList, int flowId) throws JsonProcessingException {
-    return mocNode(depList, flowId, MR_PARAMETER, MR_PARAMETER);
+    return mocNode(depList, flowId, MR_PARAMETER, MR_PARAMETER,true);
   }
+
+  /**
+   * 虚拟一个RM节点，但是不写入数据库
+   * @param depList
+   * @param flowId
+   * @return
+   * @throws JsonProcessingException
+   */
+  public FlowNode mocRmNodeJson(String[] depList, int flowId) throws JsonProcessingException {
+    return mocNode(depList, flowId, MR_PARAMETER, MR_PARAMETER,false);
+  }
+
+
 
   /**
    * 虚拟一个projectFlowData
@@ -232,9 +245,9 @@ public class MockDataService {
    * @return
    */
   public ProjectFlow.ProjectFlowData mocProjectFlowData(int flowId) throws IOException {
-    FlowNode flowNode1 = mocRmNode(new String[]{}, flowId);
-    FlowNode flowNode2 = mocRmNode(new String[]{flowNode1.getName()}, flowId);
-    FlowNode flowNode3 = mocRmNode(new String[]{flowNode2.getName()}, flowId);
+    FlowNode flowNode1 = mocRmNodeJson(new String[]{}, flowId);
+    FlowNode flowNode2 = mocRmNodeJson(new String[]{flowNode1.getName()}, flowId);
+    FlowNode flowNode3 = mocRmNodeJson(new String[]{flowNode2.getName()}, flowId);
 
     List<FlowNode> flowNodeList = Arrays.asList(new FlowNode[]{flowNode1, flowNode2, flowNode3});
 
@@ -253,7 +266,6 @@ public class MockDataService {
    * @return
    */
   public String mocProjectFlowDataJson(int flowId) throws IOException {
-    ObjectMapper mapper = new ObjectMapper();
     ProjectFlow.ProjectFlowData projectFlowData = mocProjectFlowData(flowId);
     return JsonUtil.toJsonString(projectFlowData);
   }
@@ -286,10 +298,6 @@ public class MockDataService {
 
     List<FlowNode> flowNodeList = Arrays.asList(new FlowNode[]{flowNode1, flowNode2, flowNode3});
 
-    for (FlowNode flowNode : flowNodeList) {
-      flowNodeMapper.insert(flowNode);
-    }
-
     projectFlow.setFlowsNodes(flowNodeList);
 
     return projectFlow;
@@ -307,10 +315,10 @@ public class MockDataService {
     schedule.setEndDate(now);
     schedule.setCrontab("0 8 * * * * ?");
     schedule.setNotifyType(NotifyType.FAILURE);
-    schedule.setNotifyMailsStr(objectMapper.writeValueAsString(Arrays.asList(new String[]{"ABC@baifendian.com"})));
+    schedule.setNotifyMailsStr(JsonUtil.toJsonString(Arrays.asList(new String[]{"ABC@baifendian.com"})));
     schedule.setMaxTryTimes(2);
     schedule.setFailurePolicy(FailurePolicyType.END);
-    schedule.setDepWorkflowsStr(objectMapper.writeValueAsString(Arrays.asList(new Schedule.DepWorkflow[]{new Schedule.DepWorkflow(projectName,getRandomString())})));
+    schedule.setDepWorkflowsStr(JsonUtil.toJsonString(Arrays.asList(new Schedule.DepWorkflow[]{new Schedule.DepWorkflow(projectName,getRandomString())})));
     schedule.setDepPolicy(DepPolicyType.NO_DEP_PRE);
     schedule.setTimeout(3600);
     schedule.setOwnerId(userId);

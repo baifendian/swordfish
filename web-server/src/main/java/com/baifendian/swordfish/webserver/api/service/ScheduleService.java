@@ -23,9 +23,9 @@ import com.baifendian.swordfish.dao.model.Project;
 import com.baifendian.swordfish.dao.model.ProjectFlow;
 import com.baifendian.swordfish.dao.model.Schedule;
 import com.baifendian.swordfish.dao.model.User;
+import com.baifendian.swordfish.dao.utils.json.JsonUtil;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.lang3.StringUtils;
-import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -96,8 +96,7 @@ public class ScheduleService {
     scheduleObj.setFlowName(projectFlow.getName());
 
     try {
-      ObjectMapper mapper = new ObjectMapper();
-      Schedule.ScheduleParam scheduleParam = mapper.readValue(schedule,Schedule.ScheduleParam.class);
+      Schedule.ScheduleParam scheduleParam = JsonUtil.parseObject(schedule,Schedule.ScheduleParam.class);
       scheduleObj.setStartDate(scheduleParam.getStartDate());
       scheduleObj.setEndDate(scheduleParam.getEndDate());
       scheduleObj.setCrontab(scheduleParam.getCrontab());
@@ -180,9 +179,8 @@ public class ScheduleService {
 
     //封装检查更新参数
     try {
-      ObjectMapper mapper = new ObjectMapper();
       if (!StringUtils.isEmpty(schedule)){
-        Schedule.ScheduleParam scheduleParam = mapper.readValue(schedule,Schedule.ScheduleParam.class);
+        Schedule.ScheduleParam scheduleParam = JsonUtil.parseObject(schedule,Schedule.ScheduleParam.class);
         scheduleObj.setStartDate(scheduleParam.getStartDate());
         scheduleObj.setEndDate(scheduleParam.getEndDate());
         scheduleObj.setCrontab(scheduleParam.getCrontab());

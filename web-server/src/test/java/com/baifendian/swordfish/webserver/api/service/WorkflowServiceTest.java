@@ -21,11 +21,11 @@ import com.baifendian.swordfish.dao.enums.UserRoleType;
 import com.baifendian.swordfish.dao.model.Project;
 import com.baifendian.swordfish.dao.model.ProjectFlow;
 import com.baifendian.swordfish.dao.model.User;
+import com.baifendian.swordfish.dao.utils.json.JsonUtil;
 import com.baifendian.swordfish.webserver.api.RestfulApiApplication;
 import com.baifendian.swordfish.webserver.api.service.mock.MockDataService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.apache.http.HttpStatus;
-import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -73,10 +73,8 @@ public class WorkflowServiceTest {
 
   @Test
   public void testCreateWorkflow() throws IOException {
-    ObjectMapper objectMapper = new ObjectMapper();
     {
       //正常创建一个 workflow
-      //String data1 = mockDataService.mocProjectFlowDataJson2(0);
       String name = mockDataService.getRandomString();
       String desc = mockDataService.getRandomString();
       String proxyUser = mockDataService.getRandomString();
@@ -86,7 +84,7 @@ public class WorkflowServiceTest {
       ProjectFlow projectFlow = workflowService.createWorkflow(user,project.getName(),name,desc,proxyUser,queue,data,null,mockHttpServletResponse);
       assertEquals(mockHttpServletResponse.getStatus(), HttpStatus.SC_OK);
       assertTrue(projectFlow!=null);
-      logger.info(objectMapper.writeValueAsString(projectFlow));
+      logger.info(JsonUtil.toJsonString(projectFlow));
     }
     {
       //重复创建一个 workflow

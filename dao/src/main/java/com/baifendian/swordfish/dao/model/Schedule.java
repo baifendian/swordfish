@@ -17,9 +17,9 @@ package com.baifendian.swordfish.dao.model;
 
 
 import com.baifendian.swordfish.dao.enums.*;
+import com.baifendian.swordfish.dao.utils.json.JsonUtil;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -101,8 +101,7 @@ public class Schedule {
   }
 
   public void setSchedule(ScheduleParam schedule) throws JsonProcessingException {
-    ObjectMapper mapper = new ObjectMapper();
-    this.scheduleStr = mapper.writeValueAsString(schedule);
+    this.scheduleStr = JsonUtil.toJsonString(schedule);
     this.schedule = schedule;
   }
 
@@ -111,8 +110,7 @@ public class Schedule {
   }
 
   public void setScheduleStr(String scheduleStr) throws IOException {
-    ObjectMapper mapper = new ObjectMapper();
-    this.schedule = mapper.readValue(scheduleStr,ScheduleParam.class);
+    this.schedule = JsonUtil.parseObject(scheduleStr,ScheduleParam.class);
     this.scheduleStr = scheduleStr;
   }
 
@@ -165,8 +163,7 @@ public class Schedule {
   }
 
   public void setDepWorkflowsStr(String depWorkflowsStr) throws IOException {
-    ObjectMapper mapper = new ObjectMapper();
-    this.depWorkflows = mapper.readValue(depWorkflowsStr,mapper.getTypeFactory().constructCollectionType(List.class,DepWorkflow.class));
+    this.depWorkflows = JsonUtil.parseObjectList(depWorkflowsStr,DepWorkflow.class);
     this.depWorkflowsStr = depWorkflowsStr;
   }
 
@@ -175,8 +172,7 @@ public class Schedule {
   }
 
   public void setDepWorkflows(List<DepWorkflow> depWorkflows) throws JsonProcessingException {
-    ObjectMapper mapper = new ObjectMapper();
-    this.depWorkflowsStr = mapper.writeValueAsString(depWorkflows);
+    this.depWorkflowsStr = JsonUtil.toJsonString(depWorkflows);
     this.depWorkflows = depWorkflows;
   }
 
@@ -217,8 +213,7 @@ public class Schedule {
   }
 
   public void setNotifyMailsStr(String notifyMailsStr) throws IOException {
-    ObjectMapper mapper = new ObjectMapper();
-    this.notifyMails = mapper.readValue(notifyMailsStr,mapper.getTypeFactory().constructCollectionType(List.class,String.class));
+    this.notifyMails = JsonUtil.parseObjectList(notifyMailsStr,String.class);
     this.notifyMailsStr = notifyMailsStr;
   }
 
@@ -227,8 +222,7 @@ public class Schedule {
   }
 
   public void setNotifyMails(List<String> notifyMails) throws JsonProcessingException {
-    ObjectMapper mapper = new ObjectMapper();
-    this.notifyMailsStr = mapper.writeValueAsString(notifyMails);
+    this.notifyMailsStr = JsonUtil.toJsonString(notifyMails);
     this.notifyMails = notifyMails;
   }
 
