@@ -136,6 +136,8 @@ public class FlowScheduleJob implements Job {
     ExecutionFlow executionFlow = flowDao.scheduleFlowToExecution(projectId, flowId, flow.getOwnerId(), scheduledFireTime,
             FlowRunType.DISPATCH, schedule.getMaxTryTimes(), schedule.getTimeout());
     executionFlow.setProjectId(projectId);
+    executionFlow.setProjectName(flow.getProjectName());
+    executionFlow.setFlowName(flow.getName());
 
     // 自动依赖上一调度周期才能结束
     boolean isNotUpdateWaitingDep = true;
