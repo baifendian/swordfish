@@ -13,29 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.baifendian.swordfish.webserver.service.master;
+package com.baifendian.swordfish.masterserver.exception;
 
-public class ExecFlowInfo {
-  private int execId;
+public class MasterException extends RuntimeException {
 
-  public ExecFlowInfo(){
-  }
-
-  public ExecFlowInfo(int execId){
-    this.execId = execId;
-  }
-
-  public int getExecId() {
-    return execId;
-  }
-
-  public ExecFlowInfo setExecId(int execId) {
-    this.execId = execId;
-    return this;
-  }
-
-  @Override
-  public String toString(){
-    return String.format("execId:%d", execId);
+  public MasterException(String msg) {
+    super(msg);
   }
 }

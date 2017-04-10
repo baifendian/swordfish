@@ -13,40 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.baifendian.swordfish.webserver.service.master;
+package com.baifendian.swordfish.masterserver.master;
 
 import com.baifendian.swordfish.common.job.exception.ExecException;
-import com.baifendian.swordfish.dao.DaoFactory;
 import com.baifendian.swordfish.dao.FlowDao;
-import com.baifendian.swordfish.dao.MasterDao;
 import com.baifendian.swordfish.dao.model.ExecutionFlow;
 import com.baifendian.swordfish.dao.model.ProjectFlow;
 import com.baifendian.swordfish.rpc.HeartBeatData;
 import com.baifendian.swordfish.rpc.RetInfo;
-import com.baifendian.swordfish.webserver.ExecutorClient;
-import com.baifendian.swordfish.webserver.ExecutorServerInfo;
-import com.baifendian.swordfish.webserver.ExecutorServerManager;
-import com.baifendian.swordfish.webserver.config.MasterConfig;
-import com.baifendian.swordfish.webserver.exception.MasterException;
-import com.baifendian.swordfish.webserver.quartz.FlowScheduleJob;
-import com.baifendian.swordfish.webserver.utils.ResultHelper;
-
-import org.apache.derby.iapi.sql.execute.ExecutionContext;
+import com.baifendian.swordfish.masterserver.ExecutorClient;
+import com.baifendian.swordfish.masterserver.ExecutorServerInfo;
+import com.baifendian.swordfish.masterserver.ExecutorServerManager;
+import com.baifendian.swordfish.masterserver.config.MasterConfig;
+import com.baifendian.swordfish.masterserver.exception.MasterException;
+import com.baifendian.swordfish.masterserver.quartz.FlowScheduleJob;
 import org.apache.thrift.TException;
 import org.quartz.CronExpression;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.Executors;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
+import java.util.*;
+import java.util.concurrent.*;
 
 public class Master {
 

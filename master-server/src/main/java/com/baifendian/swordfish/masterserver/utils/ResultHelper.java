@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.baifendian.swordfish.webserver.utils;
+package com.baifendian.swordfish.masterserver.utils;
 
 import com.baifendian.swordfish.rpc.RetInfo;
 

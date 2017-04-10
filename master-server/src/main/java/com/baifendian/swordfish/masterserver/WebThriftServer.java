@@ -13,28 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.baifendian.swordfish.webserver;
+package com.baifendian.swordfish.masterserver;
 
 import com.baifendian.swordfish.common.utils.ThriftUtil;
 import com.baifendian.swordfish.dao.DaoFactory;
 import com.baifendian.swordfish.dao.FlowDao;
 import com.baifendian.swordfish.dao.MasterDao;
-import com.baifendian.swordfish.dao.model.ExecutionFlow;
 import com.baifendian.swordfish.dao.model.MasterServer;
-import com.baifendian.swordfish.rpc.HeartBeatData;
 import com.baifendian.swordfish.rpc.MasterService;
-import com.baifendian.swordfish.webserver.config.MasterConfig;
-import com.baifendian.swordfish.webserver.exception.MasterException;
-import com.baifendian.swordfish.webserver.quartz.QuartzManager;
-import com.baifendian.swordfish.webserver.service.master.ExecFlowInfo;
-import com.baifendian.swordfish.webserver.service.master.ExecutorCheckThread;
-import com.baifendian.swordfish.webserver.service.master.Master;
-import com.baifendian.swordfish.webserver.service.master.MasterServiceImpl;
-import com.baifendian.swordfish.webserver.service.master.Submit2ExecutorServerThread;
-
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.configuration.ConfigurationException;
-import org.apache.commons.configuration.PropertiesConfiguration;
+import com.baifendian.swordfish.masterserver.config.MasterConfig;
+import com.baifendian.swordfish.masterserver.exception.MasterException;
+import com.baifendian.swordfish.masterserver.quartz.QuartzManager;
+import com.baifendian.swordfish.masterserver.master.Master;
+import com.baifendian.swordfish.masterserver.master.MasterServiceImpl;
 import org.apache.thrift.TProcessor;
 import org.apache.thrift.protocol.TBinaryProtocol;
 import org.apache.thrift.protocol.TProtocolFactory;
@@ -48,15 +39,6 @@ import org.slf4j.LoggerFactory;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.Executors;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 public class WebThriftServer {
 

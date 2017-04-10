@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.baifendian.swordfish.webserver.config;
+package com.baifendian.swordfish.masterserver.config;
 
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
@@ -49,11 +49,13 @@ public class MasterConfig {
 
   static {
     Configuration conf = null;
+
     try {
       conf = new PropertiesConfiguration("master.properties");
     } catch (ConfigurationException e) {
       e.printStackTrace();
     }
+
     failRetryCount = conf.getInt("masterToWorker.failRetry.count", 2);
     failRetryQueueSize = conf.getInt("masterToWorker.failRetry.queueSize", 10000);
     heartBeatTimeoutInterval = conf.getInt("master.heartbeat.timeout.interval", 60) * 1000;

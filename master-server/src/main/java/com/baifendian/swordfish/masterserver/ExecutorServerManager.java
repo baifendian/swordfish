@@ -13,14 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.baifendian.swordfish.webserver;
+package com.baifendian.swordfish.masterserver;
 
-import com.baifendian.swordfish.webserver.exception.MasterException;
-
+import com.baifendian.swordfish.masterserver.exception.MasterException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class ExecutorServerManager {

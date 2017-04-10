@@ -13,39 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.baifendian.swordfish.webserver;
+package com.baifendian.swordfish.masterserver.master;
 
-import com.baifendian.swordfish.rpc.HeartBeatData;
+public class ExecFlowInfo {
+  private int execId;
 
-public class ExecutorServerInfo {
-
-  private String host;
-
-  private int port;
-
-  private HeartBeatData heartBeatData;
-
-  public String getHost() {
-    return host;
+  public ExecFlowInfo(){
   }
 
-  public void setHost(String host) {
-    this.host = host;
+  public ExecFlowInfo(int execId){
+    this.execId = execId;
   }
 
-  public int getPort() {
-    return port;
+  public int getExecId() {
+    return execId;
   }
 
-  public void setPort(int port) {
-    this.port = port;
+  public ExecFlowInfo setExecId(int execId) {
+    this.execId = execId;
+    return this;
   }
 
-  public HeartBeatData getHeartBeatData() {
-    return heartBeatData;
-  }
-
-  public void setHeartBeatData(HeartBeatData heartBeatData) {
-    this.heartBeatData = heartBeatData;
+  @Override
+  public String toString(){
+    return String.format("execId:%d", execId);
   }
 }

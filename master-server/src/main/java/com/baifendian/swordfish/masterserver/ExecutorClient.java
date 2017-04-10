@@ -13,13 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.baifendian.swordfish.webserver;
+package com.baifendian.swordfish.masterserver;
 
 import com.baifendian.swordfish.common.job.exception.ExecException;
 import com.baifendian.swordfish.rpc.RetInfo;
 import com.baifendian.swordfish.rpc.WorkerService;
-import com.baifendian.swordfish.webserver.utils.ResultHelper;
-
+import com.baifendian.swordfish.masterserver.utils.ResultHelper;
 import org.apache.thrift.TException;
 import org.apache.thrift.protocol.TBinaryProtocol;
 import org.apache.thrift.protocol.TProtocol;

@@ -13,13 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.baifendian.swordfish.webserver.service.master;
+package com.baifendian.swordfish.masterserver.master;
 
 import com.baifendian.swordfish.dao.AdHocDao;
-import com.baifendian.swordfish.dao.enums.ExecType;
-import com.baifendian.swordfish.dao.model.AdHoc;
 import com.baifendian.swordfish.dao.DaoFactory;
 import com.baifendian.swordfish.dao.FlowDao;
+import com.baifendian.swordfish.dao.enums.ExecType;
+import com.baifendian.swordfish.dao.model.AdHoc;
 import com.baifendian.swordfish.dao.model.ExecutionFlow;
 import com.baifendian.swordfish.dao.model.ProjectFlow;
 import com.baifendian.swordfish.dao.model.Schedule;
@@ -28,16 +28,17 @@ import com.baifendian.swordfish.rpc.MasterService.Iface;
 import com.baifendian.swordfish.rpc.RetInfo;
 import com.baifendian.swordfish.rpc.RetResultInfo;
 import com.baifendian.swordfish.rpc.ScheduleInfo;
-import com.baifendian.swordfish.webserver.quartz.FlowScheduleJob;
-import com.baifendian.swordfish.webserver.quartz.QuartzManager;
-import com.baifendian.swordfish.webserver.utils.ResultHelper;
-
+import com.baifendian.swordfish.masterserver.quartz.FlowScheduleJob;
+import com.baifendian.swordfish.masterserver.quartz.QuartzManager;
+import com.baifendian.swordfish.masterserver.utils.ResultHelper;
 import org.apache.thrift.TException;
 import org.quartz.CronExpression;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.Map;
 
 /**
  * MasterService 实现 <p>
@@ -216,7 +217,7 @@ public class MasterServiceImpl implements Iface {
    * execServer汇报心跳 host : host地址 port : 端口号
    */
   @Override
-  public RetInfo executorReport(String host, int port, HeartBeatData heartBeatData) throws org.apache.thrift.TException {
+  public RetInfo executorReport(String host, int port, HeartBeatData heartBeatData) throws TException {
     try {
       master.executorReport(host, port, heartBeatData);
     } catch (Exception e) {
@@ -227,7 +228,7 @@ public class MasterServiceImpl implements Iface {
   }
 
   @Override
-  public RetInfo cancelExecFlow(int execId) throws org.apache.thrift.TException {
+  public RetInfo cancelExecFlow(int execId) throws TException {
     try {
       return master.cancelExecFlow(execId);
     } catch (Exception e) {

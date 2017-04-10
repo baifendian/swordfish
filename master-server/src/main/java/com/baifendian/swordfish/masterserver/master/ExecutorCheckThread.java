@@ -13,13 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.baifendian.swordfish.webserver.service.master;
+package com.baifendian.swordfish.masterserver.master;
 
 import com.baifendian.swordfish.dao.FlowDao;
 import com.baifendian.swordfish.dao.model.ExecutionFlow;
-import com.baifendian.swordfish.webserver.ExecutorServerInfo;
-import com.baifendian.swordfish.webserver.ExecutorServerManager;
-
+import com.baifendian.swordfish.masterserver.ExecutorServerInfo;
+import com.baifendian.swordfish.masterserver.ExecutorServerManager;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

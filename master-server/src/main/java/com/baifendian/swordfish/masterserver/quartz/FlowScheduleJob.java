@@ -13,19 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.baifendian.swordfish.webserver.quartz;
+package com.baifendian.swordfish.masterserver.quartz;
 
-import com.baifendian.swordfish.dao.enums.FlowStatus;
-import com.baifendian.swordfish.dao.utils.json.JsonUtil;
+import com.baifendian.swordfish.common.mail.EmailManager;
 import com.baifendian.swordfish.dao.FlowDao;
-import com.baifendian.swordfish.dao.enums.*;
+import com.baifendian.swordfish.dao.enums.DepPolicyType;
+import com.baifendian.swordfish.dao.enums.ExecType;
+import com.baifendian.swordfish.dao.enums.FlowStatus;
+import com.baifendian.swordfish.dao.enums.ScheduleType;
 import com.baifendian.swordfish.dao.model.ExecutionFlow;
 import com.baifendian.swordfish.dao.model.ProjectFlow;
 import com.baifendian.swordfish.dao.model.Schedule;
 import com.baifendian.swordfish.dao.model.flow.DepWorkflow;
-import com.baifendian.swordfish.common.mail.EmailManager;
-import com.baifendian.swordfish.webserver.service.master.ExecFlowInfo;
-
+import com.baifendian.swordfish.dao.utils.json.JsonUtil;
+import com.baifendian.swordfish.masterserver.master.ExecFlowInfo;
 import org.apache.commons.collections.CollectionUtils;
 import org.quartz.Job;
 import org.quartz.JobDataMap;

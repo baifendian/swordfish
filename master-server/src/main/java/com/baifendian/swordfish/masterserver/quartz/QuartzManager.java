@@ -13,10 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.baifendian.swordfish.webserver.quartz;
+package com.baifendian.swordfish.masterserver.quartz;
 
-import com.baifendian.swordfish.webserver.exception.QuartzException;
-
+import com.baifendian.swordfish.masterserver.exception.QuartzException;
 import org.quartz.*;
 import org.quartz.impl.StdSchedulerFactory;
 import org.quartz.impl.matchers.GroupMatcher;

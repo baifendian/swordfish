@@ -13,26 +13,39 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.baifendian.swordfish.webserver.exception;
+package com.baifendian.swordfish.masterserver;
 
-public class QuartzException extends RuntimeException {
-  /**
-   * Serial version UID
-   */
-  private static final long serialVersionUID = 1L;
+import com.baifendian.swordfish.rpc.HeartBeatData;
 
-  /**
-   * @param msg
-   */
-  public QuartzException(String msg) {
-    super(msg);
+public class ExecutorServerInfo {
+
+  private String host;
+
+  private int port;
+
+  private HeartBeatData heartBeatData;
+
+  public String getHost() {
+    return host;
   }
 
-  /**
-   * @param msg
-   * @param cause
-   */
-  public QuartzException(String msg, Throwable cause) {
-    super(msg, cause);
+  public void setHost(String host) {
+    this.host = host;
+  }
+
+  public int getPort() {
+    return port;
+  }
+
+  public void setPort(int port) {
+    this.port = port;
+  }
+
+  public HeartBeatData getHeartBeatData() {
+    return heartBeatData;
+  }
+
+  public void setHeartBeatData(HeartBeatData heartBeatData) {
+    this.heartBeatData = heartBeatData;
   }
 }
