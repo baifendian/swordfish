@@ -69,6 +69,27 @@ public interface ScheduleMapper {
   @SelectProvider(type = ScheduleMapperProvider.class, method = "selectByFlowId")
   Schedule selectByFlowId(@Param("flowId") int flowId);
 
+  @Results(value = {
+          @Result(property = "flowId", column = "flow_id", id = true, javaType = int.class, jdbcType = JdbcType.INTEGER),
+          @Result(property = "startDate", column = "start_date", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP),
+          @Result(property = "endDate", column = "end_date", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP),
+          @Result(property = "crontab", column = "crontab", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+          @Result(property = "depWorkflowsStr", column = "dep_workflows", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+          @Result(property = "depPolicy", column = "dep_policy", typeHandler = EnumOrdinalTypeHandler.class, javaType = DepPolicyType.class, jdbcType = JdbcType.TINYINT),
+          @Result(property = "failurePolicy", column = "failure_policy",typeHandler = EnumOrdinalTypeHandler.class, javaType = FailurePolicyType.class, jdbcType = JdbcType.TINYINT),
+          @Result(property = "maxTryTimes", column = "max_try_times", javaType = int.class, jdbcType = JdbcType.INTEGER),
+          @Result(property = "notifyType", column = "notify_type",typeHandler = EnumOrdinalTypeHandler.class, javaType = NotifyType.class, jdbcType = JdbcType.TINYINT),
+          @Result(property = "notifyMailsStr", column = "notify_mails", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+          @Result(property = "timeout", column = "timeout", javaType = int.class, jdbcType = JdbcType.INTEGER),
+          @Result(property = "createTime", column = "create_time", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP),
+          @Result(property = "modifyTime", column = "modify_time", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP),
+          @Result(property = "ownerId", column = "owner", javaType = int.class, jdbcType = JdbcType.INTEGER),
+          @Result(property = "owner", column = "owner_name", javaType = String.class, jdbcType = JdbcType.INTEGER),
+          @Result(property = "scheduleStatus", column = "schedule_status",typeHandler = EnumOrdinalTypeHandler.class, javaType = ScheduleStatus.class, jdbcType = JdbcType.TINYINT),
+  })
+  @SelectProvider(type = ScheduleMapperProvider.class, method = "selectByProject")
+  List<Schedule> selectByProject(@Param("projectName") String projectName);
+
   /**
    * workflow 发布任务的调度查询(单个任务) <p>
    */
