@@ -15,10 +15,7 @@
  */
 package com.baifendian.swordfish.rpc.client;
 
-import com.baifendian.swordfish.rpc.HeartBeatData;
-import com.baifendian.swordfish.rpc.MasterService;
-import com.baifendian.swordfish.rpc.RetInfo;
-import com.baifendian.swordfish.rpc.ScheduleInfo;
+import com.baifendian.swordfish.rpc.*;
 
 import org.apache.thrift.TException;
 import org.apache.thrift.protocol.TBinaryProtocol;
@@ -127,7 +124,7 @@ public class MasterClient {
   public boolean setSchedule(int projectId, int flowId, ScheduleInfo scheduleInfo) {
     connect();
     try {
-      RetInfo ret = client.setSchedule(projectId, flowId, scheduleInfo);
+      RetInfo ret = client.setSchedule(projectId, flowId);
       if (ret.getStatus() != 0) {
         logger.error("set schedule error:{}", ret.getMsg());
         return false;
@@ -154,12 +151,12 @@ public class MasterClient {
     }
   }
 
-  public boolean execFlow(int id) {
+  public boolean execFlow(int projectId, int flowId, long scheduleDate) {
     connect();
     try {
-      RetInfo ret = client.execFlow(id);
-      if (ret.getStatus() != 0) {
-        logger.error("exec flow error:{}", ret.getMsg());
+      RetResultInfo ret = client.execFlow(projectId, flowId, scheduleDate);
+      if (ret.getRetInfo().getStatus() != 0) {
+        logger.error("exec flow error:{}", ret.getRetInfo().getMsg());
         return false;
       }
     } catch (TException e) {
@@ -188,10 +185,10 @@ public class MasterClient {
     return true;
   }
 
-  public boolean appendWorkFlow(int projectId, int workflowId, String scheduleMeta) {
+  public boolean appendWorkFlow(int projectId, int workflowId, ScheduleInfo scheduleInfo) {
     connect();
     try {
-      RetInfo ret = client.appendWorkFlow(projectId, workflowId, scheduleMeta);
+      RetInfo ret = client.appendWorkFlow(projectId, workflowId, scheduleInfo);
       if (ret.getStatus() != 0) {
         logger.error("exec flow error:{}", ret.getMsg());
         return false;

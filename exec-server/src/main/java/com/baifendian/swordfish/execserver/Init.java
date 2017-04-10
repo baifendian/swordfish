@@ -74,9 +74,9 @@ public class Init {
     ExecServiceImpl impl = new ExecServiceImpl("127.0.0.1", 7777, conf);
     impl.execFlow(779);
   }
-  public static void execFlow(int id) throws TException {
+  public static void execFlow(int projectId, int flowId) throws TException {
     MasterClient masterClient = new MasterClient("172.18.1.22",9999, 3);
-    masterClient.execFlow(id);
+    masterClient.execFlow(projectId, flowId, System.currentTimeMillis());
   }
 
   public static void cancelExecFlow(int id) throws TException {
@@ -86,11 +86,11 @@ public class Init {
 
   public static void appendWorkFlow() throws TException {
     MasterClient masterClient = new MasterClient("172.18.1.22",9999, 3);
-    ScheduleMeta scheduleMeta = new ScheduleMeta();
-    scheduleMeta.setStartDate(new Date());
-    scheduleMeta.setEndDate(DateUtils.parse("2017-04-05 16:00:00"));
-    scheduleMeta.setCrontab("10 */10 * * * ?");
-    masterClient.appendWorkFlow(1, 2, JsonUtil.toJsonString(scheduleMeta));
+    ScheduleInfo scheduleInfo = new ScheduleInfo();
+    scheduleInfo.setStartDate(System.currentTimeMillis());
+    scheduleInfo.setEndDate(System.currentTimeMillis() + 10*24*3600*1000);
+    scheduleInfo.setCronExpression("10 */10 * * * ?");
+    masterClient.appendWorkFlow(1, 2, scheduleInfo);
   }
 
   public static void runAdHoc() throws TException {

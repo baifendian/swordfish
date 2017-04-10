@@ -31,6 +31,7 @@ import com.baifendian.swordfish.dao.model.flow.ScheduleMeta;
 import com.baifendian.swordfish.rpc.HeartBeatData;
 import com.baifendian.swordfish.rpc.MasterService.Iface;
 import com.baifendian.swordfish.rpc.RetInfo;
+import com.baifendian.swordfish.rpc.RetResultInfo;
 import com.baifendian.swordfish.rpc.ScheduleInfo;
 import com.baifendian.swordfish.webserver.ExecutorClient;
 import com.baifendian.swordfish.webserver.ExecutorServerInfo;
@@ -82,23 +83,25 @@ public class MasterServiceImpl implements Iface {
   }
 
   @Override
-  public RetInfo execFlow(int execId) throws TException {
+  public RetResultInfo execFlow(int projectId, int flowId, long scheduleDate) throws TException {
+    ExecutionFlow executionFlow;
     try {
-      ExecutionFlow executionFlow = flowDao.queryExecutionFlow(execId);
-      if (executionFlow == null) {
-        LOGGER.error("execId is not exists");
-        return ResultHelper.createErrorResult("execId is not exists");
+      ProjectFlow flow = flowDao.projectFlowfindById(flowId);
+      if (flow == null) {
+        LOGGER.error("flowId is not exists");
+        return new RetResultInfo(ResultHelper.createErrorResult("flowId is not exists"), null);
       }
-      flowDao.updateExecutionFlowStatus(execId, FlowStatus.INIT);
+      executionFlow = flowDao.scheduleFlowToExecution(projectId, flowId, flow.getOwnerId(), new Date(scheduleDate),
+              FlowRunType.DIRECT_RUN, 3, 10 * 3600);
       ExecFlowInfo execFlowInfo = new ExecFlowInfo();
       execFlowInfo.setExecId(executionFlow.getId());
 
       master.addExecFlow(execFlowInfo);
     } catch (Exception e){
       LOGGER.error(e.getMessage(), e);
-      return ResultHelper.createErrorResult(e.getMessage());
+      return new RetResultInfo(ResultHelper.createErrorResult(e.getMessage()), null);
     }
-    return ResultHelper.SUCCESS;
+    return new RetResultInfo(ResultHelper.SUCCESS, Arrays.asList(executionFlow.getId()));
   }
 
   @Override
@@ -122,12 +125,8 @@ public class MasterServiceImpl implements Iface {
    * 设置调度信息, 最终设置的是 Crontab 表达式(其实是按照 Quartz 的语法)
    */
   @Override
-  public RetInfo setSchedule(int projectId, int flowId, ScheduleInfo scheduleInfo) throws TException {
+  public RetInfo setSchedule(int projectId, int flowId) throws TException {
     LOGGER.info("set schedule {} {}", projectId, flowId);
-
-    if (scheduleInfo == null || StringUtils.isEmpty(scheduleInfo.getCronExpression())) {
-      return ResultHelper.createErrorResult("scheduleInfo param is null");
-    }
 
     try {
       Schedule schedule = flowDao.querySchedule(flowId);
@@ -136,13 +135,13 @@ public class MasterServiceImpl implements Iface {
       }
 
       // 解析参数
-      Date startDate = new Date(scheduleInfo.getStartDate());
-      Date endDate = new Date(scheduleInfo.getEndDate());
+      Date startDate = schedule.getStartDate();
+      Date endDate = schedule.getEndDate();
 
       String jobName = FlowScheduleJob.genJobName(flowId);
       String jobGroupName = FlowScheduleJob.genJobGroupName(projectId);
       Map<String, Object> dataMap = FlowScheduleJob.genDataMap(projectId, flowId, schedule);
-      QuartzManager.addJobAndTrigger(jobName, jobGroupName, FlowScheduleJob.class, startDate, endDate, scheduleInfo.getCronExpression(), dataMap);
+      QuartzManager.addJobAndTrigger(jobName, jobGroupName, FlowScheduleJob.class, startDate, endDate, schedule.getCrontab(), dataMap);
     } catch (Exception e) {
       LOGGER.error(e.getMessage(), e);
       return ResultHelper.createErrorResult(e.getMessage());
@@ -189,9 +188,8 @@ public class MasterServiceImpl implements Iface {
    * 补数据
    */
   @Override
-  public RetInfo appendWorkFlow(int projectId, int flowId, String scheduleMeta) throws TException {
-    LOGGER.debug("append workflow projectId:{}, flowId:{},scheduleMeta:{}", projectId, flowId, scheduleMeta);
-    ScheduleMeta meta = null;
+  public RetInfo appendWorkFlow(int projectId, int flowId, ScheduleInfo scheduleInfo) throws TException {
+    LOGGER.debug("append workflow projectId:{}, flowId:{},scheduleMeta:{}", projectId, flowId, scheduleInfo);
     try {
       ProjectFlow flow = flowDao.projectFlowfindById(flowId);
       // 若 workflow 被删除
@@ -200,22 +198,17 @@ public class MasterServiceImpl implements Iface {
         return ResultHelper.createErrorResult("current workflow not exists");
       }
 
-      meta = JsonUtil.parseObject(scheduleMeta, ScheduleMeta.class);
-      String crontabStr = meta.getCrontab();
+      String crontabStr = scheduleInfo.getCronExpression();
       CronExpression cron = new CronExpression(crontabStr);
 
-      Date startDateTime = meta.getStartDate();
-      Date endDateTime = meta.getEndDate();
+      Date startDateTime = new Date(scheduleInfo.getStartDate());
+      Date endDateTime = new Date(scheduleInfo.getEndDate());
 
       // 提交补数据任务
       master.submitAddData(flow, cron, startDateTime, endDateTime);
     } catch (Exception e) {
       LOGGER.error(e.getMessage(), e);
       return ResultHelper.createErrorResult(e.getMessage());
-    }
-
-    if (meta == null) {
-      return ResultHelper.createErrorResult("scheduleMeta is null");
     }
 
     return ResultHelper.SUCCESS;
