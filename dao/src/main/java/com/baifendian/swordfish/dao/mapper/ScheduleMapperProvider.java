@@ -88,6 +88,20 @@ public class ScheduleMapperProvider {
     }}.toString();
   }
 
+  public String selectByProject(Map<String, Object> parameter) {
+    return new SQL() {{
+      SELECT("*");
+      SELECT("p_f.name as project_flow_name");
+      SELECT("p.name as project_name");
+      SELECT("u.name as owner_name");
+      FROM(DB_NAME + " as s");
+      JOIN("project_flows as p_f on s.flow_id = p_f.id");
+      JOIN("project as p on p_f.project_id = p.id");
+      JOIN("user as u on s.owner = u.id");
+      WHERE("p.name = #{projectName}");
+    }}.toString();
+  }
+
   public String selectByFlowName(Map<String, Object> parameter) {
     return new SQL() {{
       SELECT("*");
@@ -201,5 +215,6 @@ public class ScheduleMapperProvider {
     }
     return sb.toString();
   }
+
 
 }
