@@ -116,7 +116,7 @@ public class FlowScheduleJob implements Job {
     // 起始时间 (ms)
     long startTime = System.currentTimeMillis();
 
-    ProjectFlow flow = flowDao.queryFlow(flowId);
+    ProjectFlow flow = flowDao.projectFlowfindById(flowId);
     // 若 workflow 被删除，那么直接删除当前 job
     if (flow == null) {
       deleteJob(projectId, flowId);

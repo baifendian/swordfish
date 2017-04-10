@@ -15,6 +15,8 @@
  */
 package com.baifendian.swordfish.dao.model.flow.params;
 
+import java.util.Objects;
+
 public class Property {
   /**
    * 配置名
@@ -74,4 +76,17 @@ public class Property {
     this.value = value;
   }
 
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    Property property = (Property) o;
+    return Objects.equals(prop, property.prop) &&
+            Objects.equals(value, property.value);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(prop, value);
+  }
 }

@@ -25,9 +25,13 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.util.JSONPObject;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 
 public class FlowNode {
 
@@ -156,4 +160,23 @@ public class FlowNode {
     this.dep = JsonUtil.toJsonString(depList);
   }
 
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    FlowNode flowNode = (FlowNode) o;
+    return flowId == flowNode.flowId &&
+            Objects.equals(name, flowNode.name) &&
+            Objects.equals(desc, flowNode.desc) &&
+            Objects.equals(type, flowNode.type) &&
+            Objects.equals(parameter, flowNode.parameter) &&
+            Objects.equals(dep, flowNode.dep) &&
+            Objects.equals(extras, flowNode.extras) &&
+            CollectionUtils.isEqualCollection(depList, flowNode.depList);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(name, desc, type, flowId, parameter, dep, extras, depList);
+  }
 }

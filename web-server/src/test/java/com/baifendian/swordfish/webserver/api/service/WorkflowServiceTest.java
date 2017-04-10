@@ -16,6 +16,7 @@
 package com.baifendian.swordfish.webserver.api.service;
 
 import com.baifendian.swordfish.common.consts.Constants;
+import com.baifendian.swordfish.dao.FlowDao;
 import com.baifendian.swordfish.dao.enums.NodeType;
 import com.baifendian.swordfish.dao.enums.UserRoleType;
 import com.baifendian.swordfish.dao.model.Project;
@@ -45,7 +46,7 @@ import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertTrue;
 
 /**
- * Created by caojingwei on 2017/3/29.
+ * workflowService unit test
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = RestfulApiApplication.class)
@@ -71,6 +72,9 @@ public class WorkflowServiceTest {
     project = mockDataService.createProject(user);
   }
 
+  @Autowired
+  private FlowDao flowDao;
+
   @Test
   public void testCreateWorkflow() throws IOException {
     {
@@ -82,13 +86,15 @@ public class WorkflowServiceTest {
       String data = mockDataService.mocProjectFlowDataJson(0);
       MockHttpServletResponse mockHttpServletResponse = new MockHttpServletResponse();
       ProjectFlow projectFlow = workflowService.createWorkflow(user,project.getName(),name,desc,proxyUser,queue,data,null,mockHttpServletResponse);
+      ProjectFlow projectFlow1 = flowDao.projectFlowFindByPorjectNameAndName(project.getName(),projectFlow.getName());
       assertEquals(mockHttpServletResponse.getStatus(), HttpStatus.SC_OK);
       assertTrue(projectFlow!=null);
+      assertTrue(projectFlow.equals(projectFlow1));
       logger.info(JsonUtil.toJsonString(projectFlow));
     }
     {
       //重复创建一个 workflow
-      ProjectFlow projectFlow = mockDataService.mocProjectFlow(project.getId(),user.getId());
+      ProjectFlow projectFlow = mockDataService.mocProjectFlow(project,user);
       String desc = mockDataService.getRandomString();
       String proxyUser = mockDataService.getRandomString();
       String queue = mockDataService.getRandomString();
@@ -119,21 +125,27 @@ public class WorkflowServiceTest {
   public void testPatchWorkflow() throws IOException {
     {
       //正常修改一个工作流的描述
-      ProjectFlow projectFlow = mockDataService.mocProjectFlow(project.getId(),user.getId());
+      ProjectFlow projectFlow = mockDataService.mocProjectFlow(project,user);
       String desc = mockDataService.getRandomString();
+      projectFlow.setDesc(desc);
       MockHttpServletResponse mockHttpServletResponse = new MockHttpServletResponse();
-      projectFlow = workflowService.patchWorkflow(user,project.getName(),projectFlow.getName(),desc,null,null,null,null,mockHttpServletResponse);
+      ProjectFlow projectFlow1 = workflowService.patchWorkflow(user,project.getName(),projectFlow.getName(),desc,null,null,null,null,mockHttpServletResponse);
+      ProjectFlow projectFlow2 = flowDao.projectFlowFindByPorjectNameAndName(project.getName(),projectFlow.getName());
       assertEquals(mockHttpServletResponse.getStatus(), HttpStatus.SC_OK);
-      assertTrue(projectFlow!=null);
+      assertTrue(projectFlow.equals(projectFlow1));
+      assertTrue(projectFlow.equals(projectFlow2));
     }
     {
       //正常修改一个工作流的data
-      ProjectFlow projectFlow = mockDataService.mocProjectFlow(project.getId(),user.getId());
-      String data = mockDataService.mocProjectFlowDataJson(projectFlow.getId());
+      ProjectFlow projectFlow = mockDataService.mocProjectFlow(project,user);
+      ProjectFlow.ProjectFlowData data = mockDataService.mocProjectFlowData(projectFlow.getId());
+      projectFlow.setData(data);
       MockHttpServletResponse mockHttpServletResponse = new MockHttpServletResponse();
-      projectFlow = workflowService.patchWorkflow(user,project.getName(),projectFlow.getName(),null,null,null,data,null,mockHttpServletResponse);
+      ProjectFlow projectFlow1 = workflowService.patchWorkflow(user,project.getName(),projectFlow.getName(),null,null,null,JsonUtil.toJsonString(data),null,mockHttpServletResponse);
+      ProjectFlow projectFlow2 = flowDao.projectFlowFindByPorjectNameAndName(project.getName(),projectFlow.getName());
       assertEquals(mockHttpServletResponse.getStatus(), HttpStatus.SC_OK);
-      assertTrue(projectFlow!=null);
+      assertTrue(projectFlow.equals(projectFlow1));
+      assertTrue(projectFlow.equals(projectFlow2));
     }
     {
       //修改一个不存在的工作流
@@ -162,7 +174,7 @@ public class WorkflowServiceTest {
     }
     {
       //修改一个存在工作流
-      ProjectFlow projectFlow1 = mockDataService.mocProjectFlow(project.getId(),user.getId());
+      ProjectFlow projectFlow1 = mockDataService.mocProjectFlow(project,user);
       String desc = mockDataService.getRandomString();
       MockHttpServletResponse mockHttpServletResponse = new MockHttpServletResponse();
       ProjectFlow projectFlow = workflowService.putWorkflow(user,project.getName(),projectFlow1.getName(),desc,null,null,null,null,mockHttpServletResponse);
@@ -175,7 +187,7 @@ public class WorkflowServiceTest {
   public void testDeleteProjectFlow() throws JsonProcessingException {
     {
       //正常删除一个工作流
-      ProjectFlow projectFlow = mockDataService.mocProjectFlow(project.getId(),user.getId());
+      ProjectFlow projectFlow = mockDataService.mocProjectFlow(project,user);
       MockHttpServletResponse mockHttpServletResponse = new MockHttpServletResponse();
       workflowService.deleteProjectFlow(user,project.getName(),projectFlow.getName(),mockHttpServletResponse);
       assertEquals(mockHttpServletResponse.getStatus(), HttpStatus.SC_OK);
@@ -191,7 +203,7 @@ public class WorkflowServiceTest {
       //无权限删除一个工作流
       User user1 = mockDataService.createGeneralUser();
       mockDataService.createProjectUser(project.getId(),user1.getId(), Constants.PROJECT_USER_PERM_READ);
-      ProjectFlow projectFlow = mockDataService.mocProjectFlow(project.getId(),user.getId());
+      ProjectFlow projectFlow = mockDataService.mocProjectFlow(project,user);
       MockHttpServletResponse mockHttpServletResponse = new MockHttpServletResponse();
       workflowService.deleteProjectFlow(user1,project.getName(),projectFlow.getName(),mockHttpServletResponse);
       assertEquals(mockHttpServletResponse.getStatus(), HttpStatus.SC_UNAUTHORIZED);
@@ -202,7 +214,7 @@ public class WorkflowServiceTest {
   public void testQueryProjectFlow() throws JsonProcessingException {
     {
       //查询一个工作流
-      ProjectFlow projectFlow = mockDataService.mocProjectFlow(project.getId(),user.getId());
+      ProjectFlow projectFlow = mockDataService.mocProjectFlow(project,user);
       MockHttpServletResponse mockHttpServletResponse = new MockHttpServletResponse();
       ProjectFlow projectFlow1 = workflowService.queryProjectFlow(user,project.getName(),projectFlow.getName(),mockHttpServletResponse);
       assertEquals(mockHttpServletResponse.getStatus(), HttpStatus.SC_OK);
@@ -214,7 +226,7 @@ public class WorkflowServiceTest {
   public void testQueryAllProjectFlow() throws JsonProcessingException {
     {
       //查询一个项目下的工作流
-      ProjectFlow projectFlow = mockDataService.mocProjectFlow(project.getId(),user.getId());
+      ProjectFlow projectFlow = mockDataService.mocProjectFlow(project,user);
       MockHttpServletResponse mockHttpServletResponse = new MockHttpServletResponse();
       List<ProjectFlow> projectFlowList = workflowService.queryAllProjectFlow(user,project.getName(),mockHttpServletResponse);
       assertEquals(mockHttpServletResponse.getStatus(), HttpStatus.SC_OK);
@@ -227,7 +239,7 @@ public class WorkflowServiceTest {
   public void testmModifyWorkflowConf() throws JsonProcessingException {
     {
       //修改一个项目下的工作流配置
-      ProjectFlow projectFlow = mockDataService.mocProjectFlow(project.getId(),user.getId());
+      ProjectFlow projectFlow = mockDataService.mocProjectFlow(project,user);
       String queue = mockDataService.getRandomString();
       String proxyUser = mockDataService.getRandomString();
       MockHttpServletResponse mockHttpServletResponse = new MockHttpServletResponse();
@@ -238,7 +250,7 @@ public class WorkflowServiceTest {
       //无权限操作一个工作流
       User user1 = mockDataService.createGeneralUser();
       mockDataService.createProjectUser(project.getId(),user1.getId(), Constants.PROJECT_USER_PERM_READ);
-      ProjectFlow projectFlow = mockDataService.mocProjectFlow(project.getId(),user.getId());
+      ProjectFlow projectFlow = mockDataService.mocProjectFlow(project,user);
       String queue = mockDataService.getRandomString();
       String proxyUser = mockDataService.getRandomString();
       MockHttpServletResponse mockHttpServletResponse = new MockHttpServletResponse();
@@ -254,4 +266,5 @@ public class WorkflowServiceTest {
 //      assertTrue(workflowService.flowNodeParamCheck(mockDataService.MR_PARAMETER.toString(), "MR"));
     }
   }
+
 }

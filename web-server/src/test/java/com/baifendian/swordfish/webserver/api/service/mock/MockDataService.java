@@ -21,9 +21,6 @@ import com.baifendian.swordfish.dao.model.*;
 import com.baifendian.swordfish.dao.model.flow.params.Property;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import org.apache.avro.data.Json;
-import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -275,18 +272,20 @@ public class MockDataService {
    *
    * @return
    */
-  public ProjectFlow mocProjectFlow(int projectId, int userId) throws JsonProcessingException {
+  public ProjectFlow mocProjectFlow(Project project, User user) throws JsonProcessingException {
     ProjectFlow projectFlow = new ProjectFlow();
     Date now = new Date();
 
     projectFlow.setName(getRandomString());
-    projectFlow.setProjectId(projectId);
+    projectFlow.setProjectId(project.getId());
+    projectFlow.setProjectName(project.getName());
     projectFlow.setDesc(getRandomString());
     projectFlow.setCreateTime(now);
     projectFlow.setModifyTime(now);
     projectFlow.setProxyUser(getRandomString());
     projectFlow.setQueue(getRandomString());
-    projectFlow.setOwnerId(userId);
+    projectFlow.setOwnerId(user.getId());
+    projectFlow.setOwner(user.getName());
     projectFlow.setUserDefinedParams(USER_DEFINED_PARAMETER);
     projectFlow.setExtras(MR_PARAMETER);
 

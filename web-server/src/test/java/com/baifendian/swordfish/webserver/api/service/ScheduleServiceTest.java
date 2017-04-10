@@ -80,7 +80,7 @@ public class ScheduleServiceTest {
   public void testCreateSchedule() throws IOException {
     {
       //正常创建一个调度
-      ProjectFlow projectFlow = mockDataService.mocProjectFlow(project.getId(),user.getId());
+      ProjectFlow projectFlow = mockDataService.mocProjectFlow(project,user);
       Date now = new Date();
       Schedule.ScheduleParam scheduleParam = new Schedule.ScheduleParam();
       scheduleParam.setStartDate(now);
@@ -122,7 +122,7 @@ public class ScheduleServiceTest {
     }
     {
       //创建一个已经存在的调度
-      ProjectFlow projectFlow = mockDataService.mocProjectFlow(project.getId(),user.getId());
+      ProjectFlow projectFlow = mockDataService.mocProjectFlow(project,user);
       mockDataService.mockSchedule(project.getName(),projectFlow.getId(),user.getId());
       Date now = new Date();
       Schedule.ScheduleParam scheduleParam = new Schedule.ScheduleParam();
@@ -146,7 +146,7 @@ public class ScheduleServiceTest {
       //无权限创建一个调度
       User user1 = mockDataService.createGeneralUser();
       mockDataService.createProjectUser(project.getId(),user1.getId(), Constants.PROJECT_USER_PERM_READ);
-      ProjectFlow projectFlow = mockDataService.mocProjectFlow(project.getId(),user.getId());
+      ProjectFlow projectFlow = mockDataService.mocProjectFlow(project,user);
       Date now = new Date();
       Schedule.ScheduleParam scheduleParam = new Schedule.ScheduleParam();
       scheduleParam.setStartDate(now);
@@ -171,7 +171,7 @@ public class ScheduleServiceTest {
   public void testPatchSchedule() throws IOException {
     {
       //正常修改一个调度
-      ProjectFlow projectFlow = mockDataService.mocProjectFlow(project.getId(),user.getId());
+      ProjectFlow projectFlow = mockDataService.mocProjectFlow(project,user);
       mockDataService.mockSchedule(project.getName(),projectFlow.getId(),user.getId());
       Date now = new Date();
       Schedule.ScheduleParam scheduleParam = new Schedule.ScheduleParam();
@@ -215,7 +215,7 @@ public class ScheduleServiceTest {
     }
     {
       //无权限修改
-      ProjectFlow projectFlow = mockDataService.mocProjectFlow(project.getId(),user.getId());
+      ProjectFlow projectFlow = mockDataService.mocProjectFlow(project,user);
       mockDataService.mockSchedule(project.getName(),projectFlow.getId(),user.getId());
       User user1 = mockDataService.createGeneralUser();
       mockDataService.createProjectUser(project.getId(),user1.getId(), Constants.PROJECT_USER_PERM_READ);
@@ -244,7 +244,7 @@ public class ScheduleServiceTest {
   public void testPutSchedule() throws IOException {
     {
       //修改一个已经存在的调度
-      ProjectFlow projectFlow = mockDataService.mocProjectFlow(project.getId(),user.getId());
+      ProjectFlow projectFlow = mockDataService.mocProjectFlow(project,user);
       mockDataService.mockSchedule(project.getName(),projectFlow.getId(),user.getId());
       Date now = new Date();
       Schedule.ScheduleParam scheduleParam = new Schedule.ScheduleParam();
@@ -266,7 +266,7 @@ public class ScheduleServiceTest {
     }
     {
       //修改一个不存在的调度
-      ProjectFlow projectFlow = mockDataService.mocProjectFlow(project.getId(),user.getId());
+      ProjectFlow projectFlow = mockDataService.mocProjectFlow(project,user);
       Date now = new Date();
       Schedule.ScheduleParam scheduleParam = new Schedule.ScheduleParam();
       scheduleParam.setStartDate(now);
@@ -291,7 +291,7 @@ public class ScheduleServiceTest {
   public void testQuerySchedule() throws IOException {
     {
       //查询一个调度信息
-      ProjectFlow projectFlow = mockDataService.mocProjectFlow(project.getId(),user.getId());
+      ProjectFlow projectFlow = mockDataService.mocProjectFlow(project,user);
       mockDataService.mockSchedule(project.getName(),projectFlow.getId(),user.getId());
       MockHttpServletResponse mockHttpServletRespon = new MockHttpServletResponse();
       Schedule schedule = scheduleService.querySchedule(user,project.getName(),projectFlow.getName(),mockHttpServletRespon);
