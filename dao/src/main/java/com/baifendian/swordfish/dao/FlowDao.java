@@ -365,6 +365,8 @@ public class FlowDao extends BaseDao {
   public void modifyProjectFlow(ProjectFlow projectFlow){
     flowNodeMapper.deleteByFlowId(projectFlow.getId());
     for (FlowNode flowNode:projectFlow.getFlowsNodes()){
+      //重新设置id保证唯一性
+      flowNode.setFlowId(projectFlow.getId());
       flowNodeMapper.insert(flowNode);
     }
     projectFlowMapper.updateById(projectFlow);

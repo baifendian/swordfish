@@ -98,9 +98,9 @@ public class ProjectFlow {
    * 用户定义参数
    * 数据库映射字段
    */
+  @JsonIgnore
   @JsonDeserialize(using = JsonObjectDeserializer.class)
   @JsonSerialize(using = JsonObjectSerializer.class)
-  @JsonIgnore
   private String userDefinedParams;
 
   /**
@@ -113,9 +113,9 @@ public class ProjectFlow {
    * 额外字段
    * 数据库映射字段
    */
+  @JsonIgnore
   @JsonDeserialize(using = JsonObjectDeserializer.class)
   @JsonSerialize(using = JsonObjectSerializer.class)
-  @JsonIgnore
   private String extras;
 
   /**

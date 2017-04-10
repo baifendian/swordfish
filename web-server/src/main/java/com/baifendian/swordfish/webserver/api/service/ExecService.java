@@ -15,13 +15,47 @@
  */
 package com.baifendian.swordfish.webserver.api.service;
 
+import com.baifendian.swordfish.dao.enums.NotifyType;
+import com.baifendian.swordfish.dao.mapper.ProjectMapper;
+import com.baifendian.swordfish.dao.model.Project;
+import com.baifendian.swordfish.dao.model.User;
+import com.baifendian.swordfish.webserver.api.dto.ExecResponse;
+import org.apache.commons.httpclient.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import javax.servlet.http.HttpServletResponse;
 
 @Service
 public class ExecService {
 
   private static Logger logger = LoggerFactory.getLogger(ExecService.class.getName());
 
+  @Autowired
+  private ProjectMapper projectMapper;
+
+  @Autowired
+  private ProjectService projectService;
+
+  public ExecResponse execExistWorkflow(User operator, String projectName, String workflowName, String schedule, String nodeName, String nodeDep, NotifyType notifyType,String notifyMails,int timeout, HttpServletResponse response){
+
+    // 查看是否对项目具备相应的权限
+    Project project = projectMapper.queryByName(projectName);
+
+    if (project == null) {
+      logger.error("Project does not exist: {}", projectName);
+      response.setStatus(HttpStatus.SC_NOT_MODIFIED);
+      return null;
+    }
+
+    if (!projectService.hasWritePerm(operator.getId(), project)) {
+      logger.error("User {} has no right permission for the project {} to create project flow", operator.getName(), projectName);
+      response.setStatus(HttpStatus.SC_UNAUTHORIZED);
+      return null;
+    }
+
+    return null;
+  }
 }
