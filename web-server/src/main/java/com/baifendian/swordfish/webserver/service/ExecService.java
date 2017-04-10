@@ -15,11 +15,17 @@
  */
 package com.baifendian.swordfish.webserver.service;
 
+import com.baifendian.swordfish.dao.FlowDao;
+import com.baifendian.swordfish.dao.enums.ExecType;
 import com.baifendian.swordfish.dao.enums.NotifyType;
+import com.baifendian.swordfish.dao.mapper.MasterServerMapper;
 import com.baifendian.swordfish.dao.mapper.ProjectMapper;
+import com.baifendian.swordfish.dao.model.MasterServer;
 import com.baifendian.swordfish.dao.model.Project;
+import com.baifendian.swordfish.dao.model.ProjectFlow;
 import com.baifendian.swordfish.dao.model.User;
-import com.baifendian.swordfish.webserver.dto.ExecResponse;
+import com.baifendian.swordfish.rpc.client.MasterClient;
+import com.baifendian.swordfish.webserver.dto.ExecutorIds;
 import org.apache.commons.httpclient.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,6 +33,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletResponse;
+import java.util.Date;
 
 @Service
 public class ExecService {
@@ -39,7 +46,13 @@ public class ExecService {
   @Autowired
   private ProjectService projectService;
 
-  public ExecResponse execExistWorkflow(User operator, String projectName, String workflowName, String schedule, String nodeName, String nodeDep, NotifyType notifyType, String notifyMails, int timeout, HttpServletResponse response){
+  @Autowired
+  private MasterServerMapper masterServerMapper;
+
+  @Autowired
+  private FlowDao flowDao;
+
+  public ExecutorIds execExistWorkflow(User operator, String projectName, String workflowName, String schedule, ExecType execType, String nodeName, String nodeDep, NotifyType notifyType, String notifyMails, int timeout, HttpServletResponse response) throws Exception {
 
     // 查看是否对项目具备相应的权限
     Project project = projectMapper.queryByName(projectName);
@@ -55,6 +68,39 @@ public class ExecService {
       response.setStatus(HttpStatus.SC_UNAUTHORIZED);
       return null;
     }
+
+    ProjectFlow projectFlow = flowDao.projectFlowfindByName(project.getId(), workflowName);
+
+    if (projectFlow == null) {
+      response.setStatus(HttpStatus.SC_NOT_MODIFIED);
+      logger.error("User {} has no exist workflow {} for the project {} to exec workflow", operator.getName(), workflowName, project.getName());
+      return null;
+    }
+
+    // 查看 master 是否存在
+    MasterServer masterServer = masterServerMapper.query();
+    if (masterServer == null) {
+      logger.error("Master server does not exist.");
+      response.setStatus(HttpStatus.SC_NOT_MODIFIED);
+      return null;
+    }
+
+    //链接execServer
+    MasterClient masterClient = new MasterClient(masterServer.getHost(), masterServer.getPort());
+
+    try {
+      logger.info("Call master client set schedule , project id: {}, flow id: {},host: {}, port: {}", project.getId(), projectFlow.getId(), masterServer.getHost(), masterServer.getPort());
+      if (!masterClient.execFlow(project.getId(), projectFlow.getId(), new Date().getTime())) {
+        response.setStatus(HttpStatus.SC_SERVICE_UNAVAILABLE);
+        logger.error("Call master client set schedule false , project id: {}, flow id: {},host: {}, port: {}", project.getId(), projectFlow.getId(), masterServer.getHost(), masterServer.getPort());
+        throw new Exception("Call master client set schedule false");
+      }
+    } catch (Exception e) {
+      response.setStatus(HttpStatus.SC_SERVICE_UNAVAILABLE);
+      logger.error("Call master client set schedule error", e);
+      throw e;
+    }
+
 
     return null;
   }

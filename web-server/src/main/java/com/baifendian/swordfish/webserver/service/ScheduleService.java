@@ -30,9 +30,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletResponse;
 import java.util.Date;
+import java.util.List;
+
+import static com.baifendian.swordfish.dao.enums.ScheduleStatus.*;
 
 @Service
 public class ScheduleService {
@@ -56,6 +60,7 @@ public class ScheduleService {
 
   /**
    * 创建一个调度
+   *
    * @param operator
    * @param projectName
    * @param workflowName
@@ -69,7 +74,8 @@ public class ScheduleService {
    * @param response
    * @return
    */
-  public Schedule createSchedule(User operator, String projectName, String workflowName, String schedule, NotifyType notifyType, String notifyMails, int maxTryTimes, FailurePolicyType failurePolicy, String  depWorkflows, DepPolicyType depPolicyType, int timeout, HttpServletResponse response){
+  @Transactional(value = "TransactionManager", rollbackFor = Exception.class)
+  public Schedule createSchedule(User operator, String projectName, String workflowName, String schedule, NotifyType notifyType, String notifyMails, int maxTryTimes, FailurePolicyType failurePolicy, String depWorkflows, DepPolicyType depPolicyType, int timeout, HttpServletResponse response){
     Project project = projectMapper.queryByName(projectName);
 
     if (project == null) {
@@ -79,22 +85,16 @@ public class ScheduleService {
 
     if (!projectService.hasReadPerm(operator.getId(), project)) {
       response.setStatus(HttpStatus.SC_UNAUTHORIZED);
-      return null;
-    }
-
-    // 查看 master 是否存在
-    MasterServer masterServer = masterServerMapper.query();
-    if (masterServer == null) {
-      logger.error("Master server does not exist.");
-      response.setStatus(HttpStatus.SC_NOT_MODIFIED);
+      logger.error("User {} has no right permission for the project {} to post schedule",operator.getName(),project.getName());
       return null;
     }
 
     //检查是否存在工作流
-    ProjectFlow projectFlow = flowDao.projectFlowfindByName(project.getId(),workflowName);
+    ProjectFlow projectFlow = flowDao.projectFlowfindByName(project.getId(), workflowName);
 
-    if (projectFlow == null){
+    if (projectFlow == null) {
       response.setStatus(HttpStatus.SC_NOT_MODIFIED);
+      logger.error("User {} has no exist workflow {} for the project {} to post schedule",operator.getName(),workflowName,project.getName());
       return null;
     }
 
@@ -106,7 +106,7 @@ public class ScheduleService {
     scheduleObj.setFlowName(projectFlow.getName());
 
     try {
-      Schedule.ScheduleParam scheduleParam = JsonUtil.parseObject(schedule,Schedule.ScheduleParam.class);
+      Schedule.ScheduleParam scheduleParam = JsonUtil.parseObject(schedule, Schedule.ScheduleParam.class);
       scheduleObj.setStartDate(scheduleParam.getStartDate());
       scheduleObj.setEndDate(scheduleParam.getEndDate());
       scheduleObj.setCrontab(scheduleParam.getCrontab());
@@ -122,8 +122,8 @@ public class ScheduleService {
       scheduleObj.setModifyTime(now);
       scheduleObj.setOwnerId(operator.getId());
       scheduleObj.setOwner(operator.getName());
-      scheduleObj.setScheduleStatus(ScheduleStatus.OFFLINE);
-    }catch (Exception e){
+      scheduleObj.setScheduleStatus(OFFLINE);
+    } catch (Exception e) {
       logger.error(e.toString());
       response.setStatus(HttpStatus.SC_BAD_REQUEST);
       return null;
@@ -137,19 +137,12 @@ public class ScheduleService {
       return null;
     }
 
-    //
-    MasterClient masterClient = new MasterClient(masterServer.getHost(), masterServer.getPort());
-    try{
-      //RetInfo retInfo = masterClient.setSchedule(project.getId(),projectFlow.getId());
-    }catch (Exception e){
-
-    }
-
     return scheduleObj;
   }
 
   /**
    * 修改一个调度
+   *
    * @param operator
    * @param projectName
    * @param workflowName
@@ -164,7 +157,8 @@ public class ScheduleService {
    * @param response
    * @return
    */
-  public Schedule patchSchedule(User operator, String projectName, String workflowName, String schedule, NotifyType notifyType, String notifyMails, Integer maxTryTimes, FailurePolicyType failurePolicy, String  depWorkflows, DepPolicyType depPolicyType, Integer timeout, ScheduleStatus scheduleStatus, HttpServletResponse response){
+  @Transactional(value = "TransactionManager", rollbackFor = Exception.class)
+  public Schedule patchSchedule(User operator, String projectName, String workflowName, String schedule, NotifyType notifyType, String notifyMails, Integer maxTryTimes, FailurePolicyType failurePolicy, String depWorkflows, DepPolicyType depPolicyType, Integer timeout, ScheduleStatus scheduleStatus, HttpServletResponse response) {
     Project project = projectMapper.queryByName(projectName);
 
     if (project == null) {
@@ -174,14 +168,16 @@ public class ScheduleService {
 
     if (!projectService.hasReadPerm(operator.getId(), project)) {
       response.setStatus(HttpStatus.SC_UNAUTHORIZED);
+      logger.error("User {} has no right permission for the project {} to patch schedule",operator.getName(),project.getName());
       return null;
     }
 
     //检查是否存在工作流
-    ProjectFlow projectFlow = flowDao.projectFlowfindByName(project.getId(),workflowName);
+    ProjectFlow projectFlow = flowDao.projectFlowfindByName(project.getId(), workflowName);
 
-    if (projectFlow == null){
+    if (projectFlow == null) {
       response.setStatus(HttpStatus.SC_NOT_MODIFIED);
+      logger.error("User {} has no exist workflow {} for the project {} to patch schedule",operator.getName(),workflowName,project.getName());
       return null;
     }
 
@@ -190,52 +186,52 @@ public class ScheduleService {
     Schedule scheduleObj = scheduleMapper.selectByFlowId(projectFlow.getId());
     Date now = new Date();
 
-    if (scheduleObj == null){
+    if (scheduleObj == null) {
       response.setStatus(HttpStatus.SC_NOT_MODIFIED);
       return null;
     }
 
     //封装检查更新参数
     try {
-      if (!StringUtils.isEmpty(schedule)){
-        Schedule.ScheduleParam scheduleParam = JsonUtil.parseObject(schedule,Schedule.ScheduleParam.class);
+      if (!StringUtils.isEmpty(schedule)) {
+        Schedule.ScheduleParam scheduleParam = JsonUtil.parseObject(schedule, Schedule.ScheduleParam.class);
         scheduleObj.setStartDate(scheduleParam.getStartDate());
         scheduleObj.setEndDate(scheduleParam.getEndDate());
         scheduleObj.setCrontab(scheduleParam.getCrontab());
         scheduleObj.setSchedule(scheduleParam);
       }
-      if (notifyType!=null){
+      if (notifyType != null) {
         scheduleObj.setNotifyType(notifyType);
       }
-      if (!StringUtils.isEmpty(notifyMails)){
+      if (!StringUtils.isEmpty(notifyMails)) {
         scheduleObj.setNotifyMailsStr(notifyMails);
       }
 
-      if (maxTryTimes!=null){
+      if (maxTryTimes != null) {
         scheduleObj.setMaxTryTimes(maxTryTimes);
       }
 
-      if (failurePolicy!=null){
+      if (failurePolicy != null) {
         scheduleObj.setFailurePolicy(failurePolicy);
       }
 
-      if (!StringUtils.isEmpty(depWorkflows)){
+      if (!StringUtils.isEmpty(depWorkflows)) {
         scheduleObj.setDepWorkflowsStr(depWorkflows);
       }
 
-      if (depPolicyType!=null){
+      if (depPolicyType != null) {
         scheduleObj.setDepPolicy(depPolicyType);
       }
 
-      if (timeout!=null){
+      if (timeout != null) {
         scheduleObj.setTimeout(timeout);
       }
 
-      if (scheduleStatus!=null){
+      if (scheduleStatus != null) {
         scheduleObj.setScheduleStatus(scheduleStatus);
       }
       scheduleObj.setModifyTime(now);
-    }catch (Exception e){
+    } catch (Exception e) {
       logger.error(e.toString());
       response.setStatus(HttpStatus.SC_BAD_REQUEST);
       return null;
@@ -248,26 +244,116 @@ public class ScheduleService {
 
   /**
    * 创建并修改一个工作流
+   *
    * @return
    */
-  public Schedule putSchedule(User operator, String projectName, String workflowName, String schedule, NotifyType notifyType, String notifyMails, Integer maxTryTimes, FailurePolicyType failurePolicy, String  depWorkflows, DepPolicyType depPolicyType, Integer timeout, HttpServletResponse response){
-    Schedule scheduleObj = scheduleMapper.selectByFlowName(projectName,workflowName);
-    if (scheduleObj == null){
-      return createSchedule(operator,projectName,workflowName,schedule,notifyType,notifyMails,maxTryTimes,failurePolicy,depWorkflows,depPolicyType,timeout,response);
-    }else{
-      return patchSchedule(operator,projectName,workflowName,schedule,notifyType,notifyMails,maxTryTimes,failurePolicy,depWorkflows,depPolicyType,timeout,null,response);
+  public Schedule putSchedule(User operator, String projectName, String workflowName, String schedule, NotifyType notifyType, String notifyMails, Integer maxTryTimes, FailurePolicyType failurePolicy, String depWorkflows, DepPolicyType depPolicyType, Integer timeout, HttpServletResponse response){
+    Schedule scheduleObj = scheduleMapper.selectByFlowName(projectName, workflowName);
+    if (scheduleObj == null) {
+      return createSchedule(operator, projectName, workflowName, schedule, notifyType, notifyMails, maxTryTimes, failurePolicy, depWorkflows, depPolicyType, timeout, response);
+    } else {
+      return patchSchedule(operator, projectName, workflowName, schedule, notifyType, notifyMails, maxTryTimes, failurePolicy, depWorkflows, depPolicyType, timeout, null, response);
     }
   }
 
   /**
+   * 设置一个调度的上下线
+   */
+  public void postScheduleStatus(User operator,String projectName,String workflowName,ScheduleStatus scheduleStatus,HttpServletResponse response) throws Exception{
+    Project project = projectMapper.queryByName(projectName);
+
+    if (project == null) {
+      response.setStatus(HttpStatus.SC_NOT_MODIFIED);
+      return;
+    }
+
+    if (!projectService.hasReadPerm(operator.getId(), project)) {
+      response.setStatus(HttpStatus.SC_UNAUTHORIZED);
+      logger.error("User {} has no right permission for the project {} to post schedule status",operator.getName(),project.getName());
+      return;
+    }
+
+    //检查是否存在工作流
+    ProjectFlow projectFlow = flowDao.projectFlowfindByName(project.getId(), workflowName);
+
+    if (projectFlow == null) {
+      response.setStatus(HttpStatus.SC_NOT_MODIFIED);
+      logger.error("User {} has no exist workflow {} for the project {} to post schedule status",operator.getName(),workflowName,project.getName());
+      return;
+    }
+
+    // 查看 master 是否存在
+    MasterServer masterServer = masterServerMapper.query();
+    if (masterServer == null) {
+      logger.error("Master server does not exist.");
+      response.setStatus(HttpStatus.SC_NOT_MODIFIED);
+      return;
+    }
+
+    //检查调度是否存在
+
+    Schedule scheduleObj = scheduleMapper.selectByFlowId(projectFlow.getId());
+    Date now = new Date();
+
+    if (scheduleObj == null) {
+      response.setStatus(HttpStatus.SC_NOT_MODIFIED);
+      return;
+    }
+
+    scheduleObj.setScheduleStatus(scheduleStatus);
+
+    scheduleMapper.update(scheduleObj);
+
+    //链接execServer
+    MasterClient masterClient = new MasterClient(masterServer.getHost(), masterServer.getPort());
+
+    try {
+
+      switch (scheduleStatus){
+        case ONLINE:{
+          logger.info("Call master client set schedule online , project id: {}, flow id: {},host: {}, port: {}", project.getId(), projectFlow.getId(), masterServer.getHost(), masterServer.getPort());
+          if (!masterClient.setSchedule(project.getId(), projectFlow.getId())) {
+            response.setStatus(HttpStatus.SC_SERVICE_UNAVAILABLE);
+            logger.error("Call master client set schedule online false , project id: {}, flow id: {},host: {}, port: {}", project.getId(), projectFlow.getId(), masterServer.getHost(), masterServer.getPort());
+            throw new Exception("Call master client set schedule offline false");
+          }
+          break;
+        }
+        case OFFLINE:{
+          logger.info("Call master client set schedule offline , project id: {}, flow id: {},host: {}, port: {}", project.getId(), projectFlow.getId(), masterServer.getHost(), masterServer.getPort());
+          if (!masterClient.setSchedule(project.getId(), projectFlow.getId())) {
+            response.setStatus(HttpStatus.SC_SERVICE_UNAVAILABLE);
+            logger.error("Call master client set schedule offline false , project id: {}, flow id: {},host: {}, port: {}", project.getId(), projectFlow.getId(), masterServer.getHost(), masterServer.getPort());
+            throw new Exception("Call master client set schedule offline false");
+          }
+          break;
+        }
+        default:{
+          response.setStatus(HttpStatus.SC_BAD_REQUEST);
+          logger.error("unknown schedule status {}",scheduleStatus.toString());
+        }
+      }
+
+    } catch (Exception e) {
+      response.setStatus(HttpStatus.SC_SERVICE_UNAVAILABLE);
+      logger.error("Call master client set schedule error", e);
+      throw e;
+    }
+
+    return;
+
+  }
+
+  /**
    * 查询一个工作流的调度
+   *
    * @param operator
    * @param projectName
    * @param workflowName
    * @param response
    * @return
    */
-  public Schedule querySchedule(User operator, String projectName, String workflowName,HttpServletResponse response){
+  public Schedule querySchedule(User operator, String projectName, String workflowName, HttpServletResponse response) {
     Project project = projectMapper.queryByName(projectName);
 
     if (project == null) {
@@ -276,17 +362,40 @@ public class ScheduleService {
 
     if (!projectService.hasReadPerm(operator.getId(), project)) {
       response.setStatus(HttpStatus.SC_UNAUTHORIZED);
+      logger.error("User {} has no right permission for the project {} to get schedule",operator.getName(),project.getName());
       return null;
     }
 
     //检查是否存在工作流
-    ProjectFlow projectFlow = flowDao.projectFlowfindByName(project.getId(),workflowName);
+    ProjectFlow projectFlow = flowDao.projectFlowfindByName(project.getId(), workflowName);
 
-    if (projectFlow == null){
+    if (projectFlow == null) {
       return null;
     }
 
     return scheduleMapper.selectByFlowId(projectFlow.getId());
   }
 
+  /**
+   * 根据项目查询调度
+   * @param operator
+   * @param projectName
+   * @param response
+   * @return
+   */
+  public List<Schedule> queryAllSchedule(User operator, String projectName, HttpServletResponse response) {
+    Project project = projectMapper.queryByName(projectName);
+
+    if (project == null) {
+      return null;
+    }
+
+    if (!projectService.hasReadPerm(operator.getId(), project)) {
+      response.setStatus(HttpStatus.SC_UNAUTHORIZED);
+      logger.error("User {} has no right permission for the project {} to get all schedule",operator.getName(),project.getName());
+      return null;
+    }
+
+    return scheduleMapper.selectByProject(projectName);
+  }
 }

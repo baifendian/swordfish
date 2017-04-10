@@ -25,6 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
+import java.util.List;
 
 /**
  * 调度设置和管理入口
@@ -86,17 +87,17 @@ public class ScheduleController {
    */
   @PutMapping("/{workflowName}/schedules")
   public Schedule createAndModifySchedule(@RequestAttribute(value = "session.user") User operator,
-                                 @PathVariable String projectName,
-                                 @PathVariable String workflowName,
-                                 @RequestParam(value = "schedule") String schedule,
-                                 @RequestParam(value = "notifyType") NotifyType notifyType,
-                                 @RequestParam(value = "notifyMails",required=false) String notifyMails,
-                                 @RequestParam(value = "maxTryTimes") int maxTryTimes,
-                                 @RequestParam(value = "failurePolicy") FailurePolicyType failurePolicy,
-                                 @RequestParam(value = "depWorkflows") String  depWorkflows,
-                                 @RequestParam(value = "depPolicy") DepPolicyType depPolicyType,
-                                 @RequestParam(value = "timeout") int timeout,
-                                 HttpServletResponse response){
+                                          @PathVariable String projectName,
+                                          @PathVariable String workflowName,
+                                          @RequestParam(value = "schedule") String schedule,
+                                          @RequestParam(value = "notifyType") NotifyType notifyType,
+                                          @RequestParam(value = "notifyMails",required=false) String notifyMails,
+                                          @RequestParam(value = "maxTryTimes") int maxTryTimes,
+                                          @RequestParam(value = "failurePolicy") FailurePolicyType failurePolicy,
+                                          @RequestParam(value = "depWorkflows") String  depWorkflows,
+                                          @RequestParam(value = "depPolicy") DepPolicyType depPolicyType,
+                                          @RequestParam(value = "timeout") int timeout,
+                                          HttpServletResponse response){
     return scheduleService.putSchedule(operator,projectName,workflowName,schedule,notifyType,notifyMails,maxTryTimes,failurePolicy,depWorkflows,depPolicyType,timeout,response);
   }
 
@@ -117,17 +118,17 @@ public class ScheduleController {
    */
   @PatchMapping("/{workflowName}/schedules")
   public Schedule patchSchedule(@RequestAttribute(value = "session.user") User operator,
-                                 @PathVariable String projectName,
-                                 @PathVariable String workflowName,
-                                 @RequestParam(value = "schedule") String schedule,
-                                 @RequestParam(value = "notifyType") NotifyType notifyType,
-                                 @RequestParam(value = "notifyMails",required=false) String notifyMails,
-                                 @RequestParam(value = "maxTryTimes") int maxTryTimes,
-                                 @RequestParam(value = "failurePolicy") FailurePolicyType failurePolicy,
-                                 @RequestParam(value = "depWorkflows") String  depWorkflows,
-                                 @RequestParam(value = "depPolicy") DepPolicyType depPolicyType,
-                                 @RequestParam(value = "timeout") int timeout,
-                                 HttpServletResponse response){
+                                @PathVariable String projectName,
+                                @PathVariable String workflowName,
+                                @RequestParam(value = "schedule") String schedule,
+                                @RequestParam(value = "notifyType") NotifyType notifyType,
+                                @RequestParam(value = "notifyMails",required=false) String notifyMails,
+                                @RequestParam(value = "maxTryTimes") int maxTryTimes,
+                                @RequestParam(value = "failurePolicy") FailurePolicyType failurePolicy,
+                                @RequestParam(value = "depWorkflows") String  depWorkflows,
+                                @RequestParam(value = "depPolicy") DepPolicyType depPolicyType,
+                                @RequestParam(value = "timeout") int timeout,
+                                HttpServletResponse response){
     return scheduleService.patchSchedule(operator,projectName,workflowName,schedule,notifyType,notifyMails,maxTryTimes,failurePolicy,depWorkflows,depPolicyType,timeout,null,response);
   }
 
@@ -140,11 +141,15 @@ public class ScheduleController {
    */
   @PostMapping("/{workflowName}/schedules/{scheduleStatus}")
   public void postScheduleStatus(@RequestAttribute(value = "session.user") User operator,
-                                   @PathVariable String projectName,
-                                   @PathVariable String workflowName,
-                                   @PathVariable ScheduleStatus scheduleStatus,
-                                   HttpServletResponse response){
-    scheduleService.patchSchedule(operator,projectName,workflowName,null,null,null,null,null,null,null,null,scheduleStatus,response);
+                                 @PathVariable String projectName,
+                                 @PathVariable String workflowName,
+                                 @PathVariable ScheduleStatus scheduleStatus,
+                                 HttpServletResponse response){
+    try {
+      scheduleService.postScheduleStatus(operator, projectName, workflowName, scheduleStatus, response);
+    }catch (Exception e){
+      logger.error("Post schedule status error",e);
+    }
   }
 
   /**
@@ -161,5 +166,19 @@ public class ScheduleController {
                                 @PathVariable String workflowName,
                                 HttpServletResponse response){
     return scheduleService.querySchedule(operator,projectName,workflowName,response);
+  }
+
+  /**
+   * 查询一个项目下所有调度
+   * @param operator
+   * @param projectName
+   * @param response
+   * @return
+   */
+  @GetMapping("/schedules")
+  public List<Schedule> queryAllSchedule(@RequestAttribute(value = "session.user") User operator,
+                                         @PathVariable String projectName,
+                                         HttpServletResponse response){
+    return scheduleService.queryAllSchedule(operator,projectName,response);
   }
 }
