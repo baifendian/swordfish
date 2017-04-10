@@ -28,7 +28,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -150,7 +149,7 @@ public class FlowDao extends BaseDao {
    *
    * @return {@link ExecutionFlow}
    */
-  public ExecutionFlow scheduleFlowToExecution(Integer projectId, Integer workflowId, int submitUser, Date scheduleTime, FlowRunType runType,
+  public ExecutionFlow scheduleFlowToExecution(Integer projectId, Integer workflowId, int submitUser, Date scheduleTime, ExecType runType,
                                                Integer maxTryTimes, Integer timeout) {
     List<FlowNode> flowNodes = flowNodeMapper.selectByFlowId(workflowId); // 节点信息
     List<FlowNodeRelation> flowNodeRelations = new ArrayList<>();

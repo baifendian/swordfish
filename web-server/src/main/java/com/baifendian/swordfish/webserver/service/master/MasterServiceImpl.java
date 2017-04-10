@@ -15,42 +15,29 @@
  */
 package com.baifendian.swordfish.webserver.service.master;
 
-import com.baifendian.swordfish.common.job.exception.ExecException;
 import com.baifendian.swordfish.dao.AdHocDao;
-import com.baifendian.swordfish.dao.enums.FlowRunType;
+import com.baifendian.swordfish.dao.enums.ExecType;
 import com.baifendian.swordfish.dao.model.AdHoc;
-import com.baifendian.swordfish.dao.utils.json.JsonUtil;
 import com.baifendian.swordfish.dao.DaoFactory;
 import com.baifendian.swordfish.dao.FlowDao;
-import com.baifendian.swordfish.dao.enums.FlowStatus;
-import com.baifendian.swordfish.dao.enums.FlowType;
 import com.baifendian.swordfish.dao.model.ExecutionFlow;
 import com.baifendian.swordfish.dao.model.ProjectFlow;
 import com.baifendian.swordfish.dao.model.Schedule;
-import com.baifendian.swordfish.dao.model.flow.ScheduleMeta;
 import com.baifendian.swordfish.rpc.HeartBeatData;
 import com.baifendian.swordfish.rpc.MasterService.Iface;
 import com.baifendian.swordfish.rpc.RetInfo;
 import com.baifendian.swordfish.rpc.RetResultInfo;
 import com.baifendian.swordfish.rpc.ScheduleInfo;
-import com.baifendian.swordfish.webserver.ExecutorClient;
-import com.baifendian.swordfish.webserver.ExecutorServerInfo;
-import com.baifendian.swordfish.webserver.ExecutorServerManager;
-import com.baifendian.swordfish.webserver.config.MasterConfig;
-import com.baifendian.swordfish.webserver.exception.MasterException;
 import com.baifendian.swordfish.webserver.quartz.FlowScheduleJob;
 import com.baifendian.swordfish.webserver.quartz.QuartzManager;
 import com.baifendian.swordfish.webserver.utils.ResultHelper;
 
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.lang.StringUtils;
 import org.apache.thrift.TException;
 import org.quartz.CronExpression;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
-import java.util.concurrent.*;
 
 /**
  * MasterService 实现 <p>
@@ -92,7 +79,7 @@ public class MasterServiceImpl implements Iface {
         return new RetResultInfo(ResultHelper.createErrorResult("flowId is not exists"), null);
       }
       executionFlow = flowDao.scheduleFlowToExecution(projectId, flowId, flow.getOwnerId(), new Date(scheduleDate),
-              FlowRunType.DIRECT_RUN, 3, 10 * 3600);
+              ExecType.DIRECT_RUN, 3, 10 * 3600);
       ExecFlowInfo execFlowInfo = new ExecFlowInfo();
       execFlowInfo.setExecId(executionFlow.getId());
 

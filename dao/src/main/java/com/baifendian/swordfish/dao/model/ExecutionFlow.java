@@ -15,7 +15,7 @@
  */
 package com.baifendian.swordfish.dao.model;
 
-import com.baifendian.swordfish.dao.enums.FlowRunType;
+import com.baifendian.swordfish.dao.enums.ExecType;
 import com.baifendian.swordfish.dao.enums.FlowStatus;
 import com.baifendian.swordfish.dao.model.flow.params.Property;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
@@ -92,7 +92,7 @@ public class ExecutionFlow {
   /**
    * workflow 等运行的类型
    **/
-  private FlowRunType type;
+  private ExecType type;
 
   /**
    * workflow 所在项目的id
@@ -217,11 +217,11 @@ public class ExecutionFlow {
     this.workflowData = workflowData;
   }
 
-  public FlowRunType getType() {
+  public ExecType getType() {
     return type;
   }
 
-  public void setType(FlowRunType type) {
+  public void setType(ExecType type) {
     this.type = type;
   }
 

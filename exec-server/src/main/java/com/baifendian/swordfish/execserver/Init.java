@@ -17,15 +17,12 @@ package com.baifendian.swordfish.execserver;
 
 import com.baifendian.swordfish.common.job.Job;
 import com.baifendian.swordfish.common.job.JobProps;
-import com.baifendian.swordfish.common.utils.DateUtils;
 import com.baifendian.swordfish.dao.DaoFactory;
 import com.baifendian.swordfish.dao.FlowDao;
 import com.baifendian.swordfish.dao.MasterDao;
-import com.baifendian.swordfish.dao.enums.FlowRunType;
+import com.baifendian.swordfish.dao.enums.ExecType;
 import com.baifendian.swordfish.dao.model.ExecutionFlow;
 import com.baifendian.swordfish.dao.model.MasterServer;
-import com.baifendian.swordfish.dao.model.flow.ScheduleMeta;
-import com.baifendian.swordfish.dao.utils.json.JsonUtil;
 import com.baifendian.swordfish.execserver.job.JobTypeManager;
 import com.baifendian.swordfish.execserver.service.ExecServiceImpl;
 import com.baifendian.swordfish.rpc.ScheduleInfo;
@@ -49,7 +46,7 @@ import java.util.Date;
 public class Init {
   public static void initFlow() {
     FlowDao flowDao = DaoFactory.getDaoInstance(FlowDao.class);
-    ExecutionFlow executionFlow = flowDao.scheduleFlowToExecution(1, 2, 1, new Date(), FlowRunType.DISPATCH, 3, 3*3600);
+    ExecutionFlow executionFlow = flowDao.scheduleFlowToExecution(1, 2, 1, new Date(), ExecType.DISPATCH, 3, 3*3600);
     System.out.println(executionFlow.getId());
   }
 

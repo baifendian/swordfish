@@ -18,7 +18,7 @@ package com.baifendian.swordfish.dao.enums;
 /**
  * workflow 等运行的类型 <p>
  */
-public enum FlowRunType {
+public enum ExecType {
 
   /**
    * 0(开发测试) 1(调度的任务) 2(补数据的任务) 3(流式)
@@ -34,14 +34,14 @@ public enum FlowRunType {
    *
    * @return {@link FlowStatus}
    */
-  public static FlowRunType valueOfType(Integer type) throws IllegalArgumentException {
+  public static ExecType valueOfType(Integer type) throws IllegalArgumentException {
     if (type == null) {
       return null;
     }
     try {
-      return FlowRunType.values()[type];
+      return ExecType.values()[type];
     } catch (Exception ex) {
-      throw new IllegalArgumentException("Cannot convert " + type + " to " + FlowRunType.class.getSimpleName() + " .", ex);
+      throw new IllegalArgumentException("Cannot convert " + type + " to " + ExecType.class.getSimpleName() + " .", ex);
     }
   }
 }

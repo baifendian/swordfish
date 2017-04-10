@@ -15,7 +15,7 @@
  */
 package com.baifendian.swordfish.dao.mapper;
 
-import com.baifendian.swordfish.dao.enums.FlowRunType;
+import com.baifendian.swordfish.dao.enums.ExecType;
 import com.baifendian.swordfish.dao.enums.FlowStatus;
 import com.baifendian.swordfish.dao.model.ExecutionFlow;
 import com.baifendian.swordfish.dao.model.MaintainQuery;
@@ -65,7 +65,7 @@ public interface ExecutionFlowMapper {
           @Result(property = "startTime", column = "start_time", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP),
           @Result(property = "endTime", column = "end_time", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP),
           @Result(property = "workflowData", column = "workflow_data", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-          @Result(property = "type", column = "type", typeHandler = EnumOrdinalTypeHandler.class, javaType = FlowRunType.class, jdbcType = JdbcType.TINYINT),
+          @Result(property = "type", column = "type", typeHandler = EnumOrdinalTypeHandler.class, javaType = ExecType.class, jdbcType = JdbcType.TINYINT),
           @Result(property = "flowName", column = "flow_name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
           @Result(property = "submitUserName", column = "submit_user_name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
           @Result(property = "maxTryTimes", column = "max_try_times", javaType = int.class, jdbcType = JdbcType.INTEGER),
@@ -87,7 +87,7 @@ public interface ExecutionFlowMapper {
           @Result(property = "scheduleTime", column = "schedule_time", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP),
           @Result(property = "endTime", column = "end_time", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP),
           @Result(property = "workflowData", column = "workflow_data", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-          @Result(property = "type", column = "type", typeHandler = EnumOrdinalTypeHandler.class, javaType = FlowRunType.class, jdbcType = JdbcType.TINYINT),
+          @Result(property = "type", column = "type", typeHandler = EnumOrdinalTypeHandler.class, javaType = ExecType.class, jdbcType = JdbcType.TINYINT),
           @Result(property = "flowName", column = "flow_name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
           @Result(property = "queue", column = "queue", javaType = String.class, jdbcType = JdbcType.VARCHAR),
           @Result(property = "userDefinedParams", column = "user_defined_params", javaType = String.class, jdbcType = JdbcType.VARCHAR),

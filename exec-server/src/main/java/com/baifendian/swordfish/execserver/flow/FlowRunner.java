@@ -26,7 +26,7 @@ import com.baifendian.swordfish.common.utils.graph.Graph;
 import com.baifendian.swordfish.dao.DaoFactory;
 import com.baifendian.swordfish.dao.FlowDao;
 import com.baifendian.swordfish.dao.enums.FailurePolicyType;
-import com.baifendian.swordfish.dao.enums.FlowRunType;
+import com.baifendian.swordfish.dao.enums.ExecType;
 import com.baifendian.swordfish.dao.enums.FlowStatus;
 import com.baifendian.swordfish.dao.model.*;
 import com.baifendian.swordfish.dao.model.flow.FlowDag;
@@ -743,9 +743,9 @@ public class FlowRunner implements Runnable {
    * flow执行完的后置处理 <p>
    */
   private void after() {
-    FlowRunType flowRunType = executionFlow.getType();
+    ExecType flowRunType = executionFlow.getType();
     // 调度任务的发邮件处理
-    if (flowRunType == FlowRunType.DISPATCH) {
+    if (flowRunType == ExecType.DISPATCH) {
       // 发送邮件
       try {
         sendEmail();

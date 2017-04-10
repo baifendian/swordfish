@@ -16,7 +16,7 @@
 package com.baifendian.swordfish.execserver.parameter;
 
 import com.baifendian.swordfish.common.utils.DateUtils;
-import com.baifendian.swordfish.dao.enums.FlowRunType;
+import com.baifendian.swordfish.dao.enums.ExecType;
 import com.baifendian.swordfish.dao.model.ExecutionFlow;
 
 import java.util.Date;
@@ -74,7 +74,7 @@ public class SystemParamManager {
    * @return 系统参数
    */
   public static Map<String, String> buildSystemParam(ExecutionFlow executionFlow, Date scheduleDate, Date addDate) {
-    FlowRunType runType = executionFlow.getType();
+    ExecType runType = executionFlow.getType();
     Date bizDate;
     Date execStartTime = executionFlow.getStartTime();
     switch (runType) {

@@ -16,7 +16,7 @@
 package com.baifendian.swordfish.dao.mapper;
 
 import com.baifendian.swordfish.dao.mapper.utils.EnumFieldUtil;
-import com.baifendian.swordfish.dao.enums.FlowRunType;
+import com.baifendian.swordfish.dao.enums.ExecType;
 import com.baifendian.swordfish.dao.enums.FlowStatus;
 import com.baifendian.swordfish.dao.enums.FlowType;
 import com.baifendian.swordfish.dao.model.ExecutionFlow;
@@ -69,7 +69,7 @@ public class ExecutionFlowMapperProvider {
         VALUES("start_time", "#{executionFlow.startTime}");
         VALUES("end_time", "#{executionFlow.endTime}");
         VALUES("workflow_data", "#{executionFlow.workflowData}");
-        VALUES("type", EnumFieldUtil.genFieldStr("executionFlow.type", FlowRunType.class));
+        VALUES("type", EnumFieldUtil.genFieldStr("executionFlow.type", ExecType.class));
         VALUES("max_try_times", "#{executionFlow.maxTryTimes}");
         VALUES("timeout", "#{executionFlow.timeout}");
         VALUES("user_defined_params", "#{executionFlow.userDefinedParams}");
@@ -243,7 +243,7 @@ public class ExecutionFlowMapperProvider {
 
   public String selectByFlowIdAndTimes(Map<String, Object> parameter) {
     StringBuilder sb = new StringBuilder();
-    String inExpr = "(" + FlowRunType.DISPATCH.ordinal() + "," + FlowRunType.ADD_DATA.ordinal() + ")";
+    String inExpr = "(" + ExecType.DISPATCH.ordinal() + "," + ExecType.ADD_DATA.ordinal() + ")";
     sb.append("SELECT id, flow_id, worker, type, status, schedule_time FROM execution_flows WHERE flow_id = #{flowId} AND type IN " + inExpr + " AND ");
     sb.append("schedule_time = (SELECT MIN(schedule_time) FROM execution_flows WHERE flow_id = #{flowId} AND type IN" + inExpr
             + " AND schedule_time >= #{startDate} AND schedule_time < #{endDate})");
@@ -253,7 +253,7 @@ public class ExecutionFlowMapperProvider {
 
   public String selectByFlowIdAndTime(Map<String, Object> parameter) {
     StringBuilder sb = new StringBuilder();
-    String inExpr = "(" + FlowRunType.DISPATCH.ordinal() + "," + FlowRunType.ADD_DATA.ordinal() + ")";
+    String inExpr = "(" + ExecType.DISPATCH.ordinal() + "," + ExecType.ADD_DATA.ordinal() + ")";
     sb.append("SELECT id, flow_id, worker, type, status, schedule_time FROM execution_flows WHERE flow_id = #{flowId} AND type IN " + inExpr + " AND ");
     sb.append("schedule_time = #{scheduleTime}");
 

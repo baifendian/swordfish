@@ -18,13 +18,11 @@ package com.baifendian.swordfish.webserver.service.master;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
 import com.baifendian.swordfish.dao.FlowDao;
-import com.baifendian.swordfish.dao.enums.FlowRunType;
+import com.baifendian.swordfish.dao.enums.ExecType;
 import com.baifendian.swordfish.dao.model.ExecutionFlow;
 import com.baifendian.swordfish.dao.model.ProjectFlow;
 import com.baifendian.swordfish.common.mail.EmailManager;
 import com.baifendian.swordfish.dao.model.Schedule;
-import com.baifendian.swordfish.rpc.HeartBeatData;
-import com.baifendian.swordfish.webserver.ExecutorServerInfo;
 
 import org.apache.commons.lang.time.DateUtils;
 import org.quartz.CronExpression;
@@ -32,7 +30,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
-import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
@@ -102,7 +99,7 @@ public class FlowExecManager {
                 timeout = schedule.getTimeout();
               }
               ExecutionFlow executionFlow = flowDao.scheduleFlowToExecution(flow.getProjectId(), flow.getId(),
-                      flow.getOwnerId(), scheduleDate, FlowRunType.ADD_DATA, maxTryTimes, timeout);
+                      flow.getOwnerId(), scheduleDate, ExecType.ADD_DATA, maxTryTimes, timeout);
               executionFlow.setProjectId(flow.getProjectId());
               ExecFlowInfo execFlowInfo = new ExecFlowInfo();
               execFlowInfo.setExecId(executionFlow.getId());

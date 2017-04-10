@@ -17,7 +17,7 @@ package com.baifendian.swordfish.common.mail;
 
 import com.baifendian.swordfish.common.utils.DateUtils;
 import com.baifendian.swordfish.dao.DaoFactory;
-import com.baifendian.swordfish.dao.enums.FlowRunType;
+import com.baifendian.swordfish.dao.enums.ExecType;
 import com.baifendian.swordfish.dao.enums.FlowStatus;
 import com.baifendian.swordfish.dao.model.ExecutionFlow;
 import com.baifendian.swordfish.dao.model.ExecutionNode;
@@ -151,7 +151,7 @@ public class EmailManager {
    * @param flowStatus
    * @return
    */
-  public static String genTitle(FlowRunType runType, FlowStatus flowStatus) {
+  public static String genTitle(ExecType runType, FlowStatus flowStatus) {
     return MessageFormat.format(TITLE_FORMAT, getRunTypeCnName(runType), getFlowStatusCnName(flowStatus));
   }
 
@@ -165,7 +165,7 @@ public class EmailManager {
    * @param flowStatus
    * @return
    */
-  public static String genContent(FlowRunType runType, String projectName, String flowName, Date scheduleDate, FlowStatus flowStatus) {
+  public static String genContent(ExecType runType, String projectName, String flowName, Date scheduleDate, FlowStatus flowStatus) {
     return MessageFormat.format(CONTENT_FORMAT, getRunTypeCnName(runType), projectName, flowName,
         DateUtils.defaultFormat(scheduleDate), getFlowStatusCnNameH5(flowStatus));
   }
@@ -176,7 +176,7 @@ public class EmailManager {
    * @param runType
    * @return
    */
-  private static String getRunTypeCnName(FlowRunType runType) {
+  private static String getRunTypeCnName(ExecType runType) {
     String cnName;
 
     switch (runType) {

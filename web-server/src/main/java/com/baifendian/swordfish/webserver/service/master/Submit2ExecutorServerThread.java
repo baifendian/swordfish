@@ -16,7 +16,6 @@
 package com.baifendian.swordfish.webserver.service.master;
 
 import com.baifendian.swordfish.dao.FlowDao;
-import com.baifendian.swordfish.dao.enums.FlowRunType;
 import com.baifendian.swordfish.dao.enums.FlowStatus;
 import com.baifendian.swordfish.dao.model.ExecutionFlow;
 import com.baifendian.swordfish.webserver.ExecutorClient;
@@ -26,7 +25,6 @@ import com.baifendian.swordfish.webserver.config.MasterConfig;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.thrift.TException;
-import org.apache.tools.ant.taskdefs.Exec;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

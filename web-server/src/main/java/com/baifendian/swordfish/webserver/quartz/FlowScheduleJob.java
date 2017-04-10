@@ -27,7 +27,6 @@ import com.baifendian.swordfish.common.mail.EmailManager;
 import com.baifendian.swordfish.webserver.service.master.ExecFlowInfo;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.BooleanUtils;
 import org.quartz.Job;
 import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
@@ -134,7 +133,7 @@ public class FlowScheduleJob implements Job {
 
     // 插入 ExecutionFlow
     ExecutionFlow executionFlow = flowDao.scheduleFlowToExecution(projectId, flowId, flow.getOwnerId(), scheduledFireTime,
-            FlowRunType.DISPATCH, schedule.getMaxTryTimes(), schedule.getTimeout());
+            ExecType.DISPATCH, schedule.getMaxTryTimes(), schedule.getTimeout());
     executionFlow.setProjectId(projectId);
     executionFlow.setProjectName(flow.getProjectName());
     executionFlow.setFlowName(flow.getName());
