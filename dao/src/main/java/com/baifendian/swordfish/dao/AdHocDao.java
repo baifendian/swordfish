@@ -27,6 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
+import java.util.Date;
 import java.util.List;
 
 public class AdHocDao extends BaseDao {
@@ -69,7 +70,7 @@ public class AdHocDao extends BaseDao {
         adHocResult.setStm(stm);
         adHocResult.setIndex(index++);
         adHocResult.setStatus(FlowStatus.INIT);
-        adHocResult.setCreateTime(new Timestamp(System.currentTimeMillis()));
+        adHocResult.setCreateTime(new Date());
         adHocResultMapper.insert(adHocResult);
       }
     }

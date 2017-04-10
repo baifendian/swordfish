@@ -257,7 +257,7 @@ public class HiveSqlExec {
           }
         } finally {
           execResult.setStatus(status);
-          logResult(execResult);
+          //logResult(execResult);
 
           // 执行结果回调处理
           if (resultCallback != null) {

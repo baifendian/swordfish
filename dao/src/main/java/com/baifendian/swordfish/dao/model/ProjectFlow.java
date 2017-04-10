@@ -22,54 +22,63 @@ import com.baifendian.swordfish.dao.utils.json.JsonUtil;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class ProjectFlow {
 
   /**
    * 工作流 id
-   */
+   * 数据库映射字段
+   **/
   @JsonIgnore
   private int id;
 
   /**
    * 工作流名称
+   * 数据库映射字段
    */
   private String name;
 
   /**
    * 项目 id
+   * 数据库映射字段
    */
   @JsonIgnore
   private int projectId;
 
   /**
    * 项目名称
+   * API返回字段
    */
   private String projectName;
 
   /**
    * 工作流描述
+   * 数据库映射字段
    */
   private String desc;
 
   /**
    * 创建时间
+   * 数据库映射字段
    */
   private Date createTime;
 
   /**
    * 修改时间
+   * 数据库映射字段
    */
   private Date modifyTime;
 
   /**
    * owner id
+   * 数据库映射字段
    */
   @JsonIgnore
   private int ownerId;
@@ -81,11 +90,13 @@ public class ProjectFlow {
 
   /**
    * 代理用户
+   * 数据库映射字段
    */
   private String proxyUser;
 
   /**
    * 用户定义参数
+   * 数据库映射字段
    */
   @JsonDeserialize(using = JsonObjectDeserializer.class)
   @JsonSerialize(using = JsonObjectSerializer.class)
@@ -100,6 +111,7 @@ public class ProjectFlow {
 
   /**
    * 额外字段
+   * 数据库映射字段
    */
   @JsonDeserialize(using = JsonObjectDeserializer.class)
   @JsonSerialize(using = JsonObjectSerializer.class)
@@ -108,6 +120,7 @@ public class ProjectFlow {
 
   /**
    * 队列信息
+   * 数据库映射字段
    */
   private String queue;
 
@@ -236,6 +249,9 @@ public class ProjectFlow {
   }
 
   public void setData(ProjectFlowData data) {
+    this.flowsNodes = data.getNodes();
+    this.extras = data.getExtras();
+    this.userDefinedParams = JsonUtil.toJsonString(data.getUserDefParams());
     this.data = data;
   }
 
@@ -244,6 +260,7 @@ public class ProjectFlow {
   }
 
   public void setUserDefinedParams(String userDefinedParams) {
+    this.data.setUserDefParams(JsonUtil.parseObjectList(userDefinedParams,Property.class));
     this.userDefinedParams = userDefinedParams;
   }
 
@@ -262,6 +279,30 @@ public class ProjectFlow {
     this.userDefinedParamMap = userDefinedParamMap;
   }
 
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    ProjectFlow that = (ProjectFlow) o;
+    return id == that.id &&
+            projectId == that.projectId &&
+            ownerId == that.ownerId &&
+            Objects.equals(name, that.name) &&
+            Objects.equals(projectName, that.projectName) &&
+            Objects.equals(desc, that.desc) &&
+            //Objects.equals(createTime, that.createTime) &&
+            //Objects.equals(modifyTime, that.modifyTime) &&
+            Objects.equals(owner, that.owner) &&
+            Objects.equals(proxyUser, that.proxyUser) &&
+            Objects.equals(userDefinedParams, that.userDefinedParams) &&
+            Objects.equals(extras, that.extras) &&
+            Objects.equals(queue, that.queue) &&
+            CollectionUtils.isEqualCollection(flowsNodes, that.flowsNodes) &&
+            Objects.equals(data, that.data);
+  }
+
+
+
   public static class ProjectFlowData {
     /**
      * 结点信息
@@ -272,6 +313,16 @@ public class ProjectFlow {
      * 用户自定义参数
      */
     private List<Property> userDefParams;
+
+    @Override
+    public boolean equals(Object o) {
+      if (this == o) return true;
+      if (o == null || getClass() != o.getClass()) return false;
+      ProjectFlowData that = (ProjectFlowData) o;
+      return CollectionUtils.isEqualCollection(nodes, that.nodes) &&
+              CollectionUtils.isEqualCollection(userDefParams, that.userDefParams) &&
+              Objects.equals(extras, that.extras);
+    }
 
     /**
      * 额外信息

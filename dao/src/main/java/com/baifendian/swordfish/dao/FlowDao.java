@@ -146,15 +146,6 @@ public class FlowDao extends BaseDao {
   }
 
   /**
-   * 获取 workflow 详情 <p>
-   *
-   * @return {@link ProjectFlow}
-   */
-  public ProjectFlow queryFlow(Integer workflowId) {
-    return projectFlowMapper.findById(workflowId);
-  }
-
-  /**
    * 调度 workflow 时，插入执行信息（调度或者补数据） <p>
    *
    * @return {@link ExecutionFlow}
@@ -172,7 +163,7 @@ public class FlowDao extends BaseDao {
         }
       }
     }
-    ProjectFlow projectFlow = projectFlowMapper.findById(workflowId);
+    ProjectFlow projectFlow = new ProjectFlow();
     FlowDag flowDag = new FlowDag();
     flowDag.setEdges(flowNodeRelations);
     flowDag.setNodes(flowNodes);
@@ -336,6 +327,47 @@ public class FlowDao extends BaseDao {
       projectFlow.setFlowsNodes(flowNodeList);
     }
     return projectFlow;
+  }
+
+  /**
+   * 根据Id获取一个workflow
+   * @param id
+   * @return
+   */
+  public ProjectFlow projectFlowfindById(int id){
+    ProjectFlow projectFlow = projectFlowMapper.findById(id);
+    if (projectFlow !=null ){
+      List<FlowNode> flowNodeList = flowNodeMapper.selectByFlowId(projectFlow.getId());
+      projectFlow.setFlowsNodes(flowNodeList);
+    }
+    return projectFlow;
+  }
+
+  /**
+   * 创建一个projectFlow
+   * @return
+   */
+  @Transactional(value = "TransactionManager",rollbackFor = Exception.class)
+  public void createProjectFlow(ProjectFlow projectFlow){
+    projectFlowMapper.insertAndGetId(projectFlow);
+    for (FlowNode flowNode:projectFlow.getFlowsNodes()){
+      flowNode.setFlowId(projectFlow.getId());
+      flowNodeMapper.insert(flowNode);
+    }
+    projectFlow.getData().setNodes(projectFlow.getFlowsNodes());
+  }
+
+  /**
+   * 修改一个工作流
+   * @param projectFlow
+   */
+  @Transactional(value = "TransactionManager",rollbackFor = Exception.class)
+  public void modifyProjectFlow(ProjectFlow projectFlow){
+    flowNodeMapper.deleteByFlowId(projectFlow.getId());
+    for (FlowNode flowNode:projectFlow.getFlowsNodes()){
+      flowNodeMapper.insert(flowNode);
+    }
+    projectFlowMapper.updateById(projectFlow);
   }
 
   /**

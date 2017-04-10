@@ -193,7 +193,7 @@ public class MasterServiceImpl implements Iface {
     LOGGER.debug("append workflow projectId:{}, flowId:{},scheduleMeta:{}", projectId, flowId, scheduleMeta);
     ScheduleMeta meta = null;
     try {
-      ProjectFlow flow = flowDao.queryFlow(flowId);
+      ProjectFlow flow = flowDao.projectFlowfindById(flowId);
       // 若 workflow 被删除
       if (flow == null) {
         LOGGER.error("projectId:{},flowId:{} workflow not exists", projectId, flowId);

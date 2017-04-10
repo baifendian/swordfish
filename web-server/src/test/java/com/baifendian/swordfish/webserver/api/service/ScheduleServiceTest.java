@@ -24,10 +24,12 @@ import com.baifendian.swordfish.dao.model.Project;
 import com.baifendian.swordfish.dao.model.ProjectFlow;
 import com.baifendian.swordfish.dao.model.Schedule;
 import com.baifendian.swordfish.dao.model.User;
+import com.baifendian.swordfish.dao.utils.json.JsonUtil;
 import com.baifendian.swordfish.webserver.api.RestfulApiApplication;
 import com.baifendian.swordfish.webserver.api.service.mock.MockDataService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.avro.data.Json;
 import org.apache.http.HttpStatus;
 import org.junit.Before;
 import org.junit.Test;
@@ -74,31 +76,29 @@ public class ScheduleServiceTest {
     project = mockDataService.createProject(user);
   }
 
-  private ObjectMapper objectMapper = new ObjectMapper();
-
   @Test
   public void testCreateSchedule() throws IOException {
     {
       //正常创建一个调度
-      ProjectFlow projectFlow = mockDataService.mocProjectFlow(project.getId(),user.getId());
+      ProjectFlow projectFlow = mockDataService.mocProjectFlow(project,user);
       Date now = new Date();
       Schedule.ScheduleParam scheduleParam = new Schedule.ScheduleParam();
       scheduleParam.setStartDate(now);
       scheduleParam.setEndDate(now);
       scheduleParam.setCrontab("0 8 * * * * ?");
-      String schedule = objectMapper.writeValueAsString(scheduleParam);
+      String schedule = JsonUtil.toJsonString(scheduleParam);
       NotifyType notifyType = NotifyType.FAILURE;
-      String notifyMails = objectMapper.writeValueAsString(Arrays.asList(new String[]{"ABC@baifendian.com"}));
+      String notifyMails = JsonUtil.toJsonString(Arrays.asList(new String[]{"ABC@baifendian.com"}));
       Integer maxTryTimes = 2;
       FailurePolicyType failurePolicyType = FailurePolicyType.END;
-      String depWorkflows = objectMapper.writeValueAsString(Arrays.asList(new Schedule.DepWorkflow[]{new Schedule.DepWorkflow(project.getName(),mockDataService.getRandomString())}));
+      String depWorkflows = JsonUtil.toJsonString(Arrays.asList(new Schedule.DepWorkflow[]{new Schedule.DepWorkflow(project.getName(),mockDataService.getRandomString())}));
       DepPolicyType depPolicyType = DepPolicyType.NO_DEP_PRE;
       Integer timeout = 3600;
       MockHttpServletResponse mockHttpServletRespon = new MockHttpServletResponse();
       Schedule scheduleObj = scheduleService.createSchedule(user,project.getName(),projectFlow.getName(),schedule,notifyType,notifyMails,maxTryTimes,failurePolicyType,depWorkflows,depPolicyType,timeout,mockHttpServletRespon);
       assertEquals(mockHttpServletRespon.getStatus(), HttpStatus.SC_OK);
       assertTrue(scheduleObj!=null);
-      logger.info(objectMapper.writeValueAsString(scheduleObj));
+      logger.info(JsonUtil.toJsonString(scheduleObj));
     }
     {
       //创建一个不存在的projectFlow的调度
@@ -107,12 +107,12 @@ public class ScheduleServiceTest {
       scheduleParam.setStartDate(now);
       scheduleParam.setEndDate(now);
       scheduleParam.setCrontab("0 8 * * * * ?");
-      String schedule = objectMapper.writeValueAsString(scheduleParam);
+      String schedule = JsonUtil.toJsonString(scheduleParam);
       NotifyType notifyType = NotifyType.FAILURE;
-      String notifyMails = objectMapper.writeValueAsString(Arrays.asList(new String[]{"ABC@baifendian.com"}));
+      String notifyMails = JsonUtil.toJsonString(Arrays.asList(new String[]{"ABC@baifendian.com"}));
       Integer maxTryTimes = 2;
       FailurePolicyType failurePolicyType = FailurePolicyType.END;
-      String depWorkflows = objectMapper.writeValueAsString(Arrays.asList(new Schedule.DepWorkflow[]{new Schedule.DepWorkflow(project.getName(),mockDataService.getRandomString())}));
+      String depWorkflows = JsonUtil.toJsonString(Arrays.asList(new Schedule.DepWorkflow[]{new Schedule.DepWorkflow(project.getName(),mockDataService.getRandomString())}));
       DepPolicyType depPolicyType = DepPolicyType.NO_DEP_PRE;
       Integer timeout = 3600;
       MockHttpServletResponse mockHttpServletRespon = new MockHttpServletResponse();
@@ -122,19 +122,19 @@ public class ScheduleServiceTest {
     }
     {
       //创建一个已经存在的调度
-      ProjectFlow projectFlow = mockDataService.mocProjectFlow(project.getId(),user.getId());
+      ProjectFlow projectFlow = mockDataService.mocProjectFlow(project,user);
       mockDataService.mockSchedule(project.getName(),projectFlow.getId(),user.getId());
       Date now = new Date();
       Schedule.ScheduleParam scheduleParam = new Schedule.ScheduleParam();
       scheduleParam.setStartDate(now);
       scheduleParam.setEndDate(now);
       scheduleParam.setCrontab("0 8 * * * * ?");
-      String schedule = objectMapper.writeValueAsString(scheduleParam);
+      String schedule = JsonUtil.toJsonString(scheduleParam);
       NotifyType notifyType = NotifyType.FAILURE;
-      String notifyMails = objectMapper.writeValueAsString(Arrays.asList(new String[]{"ABC@baifendian.com"}));
+      String notifyMails = JsonUtil.toJsonString(Arrays.asList(new String[]{"ABC@baifendian.com"}));
       Integer maxTryTimes = 2;
       FailurePolicyType failurePolicyType = FailurePolicyType.END;
-      String depWorkflows = objectMapper.writeValueAsString(Arrays.asList(new Schedule.DepWorkflow[]{new Schedule.DepWorkflow(project.getName(),mockDataService.getRandomString())}));
+      String depWorkflows = JsonUtil.toJsonString(Arrays.asList(new Schedule.DepWorkflow[]{new Schedule.DepWorkflow(project.getName(),mockDataService.getRandomString())}));
       DepPolicyType depPolicyType = DepPolicyType.NO_DEP_PRE;
       Integer timeout = 3600;
       MockHttpServletResponse mockHttpServletRespon = new MockHttpServletResponse();
@@ -146,18 +146,18 @@ public class ScheduleServiceTest {
       //无权限创建一个调度
       User user1 = mockDataService.createGeneralUser();
       mockDataService.createProjectUser(project.getId(),user1.getId(), Constants.PROJECT_USER_PERM_READ);
-      ProjectFlow projectFlow = mockDataService.mocProjectFlow(project.getId(),user.getId());
+      ProjectFlow projectFlow = mockDataService.mocProjectFlow(project,user);
       Date now = new Date();
       Schedule.ScheduleParam scheduleParam = new Schedule.ScheduleParam();
       scheduleParam.setStartDate(now);
       scheduleParam.setEndDate(now);
       scheduleParam.setCrontab("0 8 * * * * ?");
-      String schedule = objectMapper.writeValueAsString(scheduleParam);
+      String schedule = JsonUtil.toJsonString(scheduleParam);
       NotifyType notifyType = NotifyType.FAILURE;
-      String notifyMails = objectMapper.writeValueAsString(Arrays.asList(new String[]{"ABC@baifendian.com"}));
+      String notifyMails = JsonUtil.toJsonString(Arrays.asList(new String[]{"ABC@baifendian.com"}));
       Integer maxTryTimes = 2;
       FailurePolicyType failurePolicyType = FailurePolicyType.END;
-      String depWorkflows = objectMapper.writeValueAsString(Arrays.asList(new Schedule.DepWorkflow[]{new Schedule.DepWorkflow(project.getName(),mockDataService.getRandomString())}));
+      String depWorkflows = JsonUtil.toJsonString(Arrays.asList(new Schedule.DepWorkflow[]{new Schedule.DepWorkflow(project.getName(),mockDataService.getRandomString())}));
       DepPolicyType depPolicyType = DepPolicyType.NO_DEP_PRE;
       Integer timeout = 3600;
       MockHttpServletResponse mockHttpServletRespon = new MockHttpServletResponse();
@@ -171,19 +171,19 @@ public class ScheduleServiceTest {
   public void testPatchSchedule() throws IOException {
     {
       //正常修改一个调度
-      ProjectFlow projectFlow = mockDataService.mocProjectFlow(project.getId(),user.getId());
+      ProjectFlow projectFlow = mockDataService.mocProjectFlow(project,user);
       mockDataService.mockSchedule(project.getName(),projectFlow.getId(),user.getId());
       Date now = new Date();
       Schedule.ScheduleParam scheduleParam = new Schedule.ScheduleParam();
       scheduleParam.setStartDate(now);
       scheduleParam.setEndDate(now);
       scheduleParam.setCrontab("0 8 * * * * ?");
-      String schedule = objectMapper.writeValueAsString(scheduleParam);
+      String schedule = JsonUtil.toJsonString(scheduleParam);
       NotifyType notifyType = NotifyType.FAILURE;
-      String notifyMails = objectMapper.writeValueAsString(Arrays.asList(new String[]{"ABC@baifendian.com"}));
+      String notifyMails = JsonUtil.toJsonString(Arrays.asList(new String[]{"ABC@baifendian.com"}));
       Integer maxTryTimes = 2;
       FailurePolicyType failurePolicyType = FailurePolicyType.END;
-      String depWorkflows = objectMapper.writeValueAsString(Arrays.asList(new Schedule.DepWorkflow[]{new Schedule.DepWorkflow(project.getName(),mockDataService.getRandomString())}));
+      String depWorkflows = JsonUtil.toJsonString(Arrays.asList(new Schedule.DepWorkflow[]{new Schedule.DepWorkflow(project.getName(),mockDataService.getRandomString())}));
       DepPolicyType depPolicyType = DepPolicyType.NO_DEP_PRE;
       ScheduleStatus scheduleStatus = ScheduleStatus.ONLINE;
       Integer timeout = 3600;
@@ -199,12 +199,12 @@ public class ScheduleServiceTest {
       scheduleParam.setStartDate(now);
       scheduleParam.setEndDate(now);
       scheduleParam.setCrontab("0 8 * * * * ?");
-      String schedule = objectMapper.writeValueAsString(scheduleParam);
+      String schedule = JsonUtil.toJsonString(scheduleParam);
       NotifyType notifyType = NotifyType.FAILURE;
-      String notifyMails = objectMapper.writeValueAsString(Arrays.asList(new String[]{"ABC@baifendian.com"}));
+      String notifyMails = JsonUtil.toJsonString(Arrays.asList(new String[]{"ABC@baifendian.com"}));
       Integer maxTryTimes = 2;
       FailurePolicyType failurePolicyType = FailurePolicyType.END;
-      String depWorkflows = objectMapper.writeValueAsString(Arrays.asList(new Schedule.DepWorkflow[]{new Schedule.DepWorkflow(project.getName(),mockDataService.getRandomString())}));
+      String depWorkflows = JsonUtil.toJsonString(Arrays.asList(new Schedule.DepWorkflow[]{new Schedule.DepWorkflow(project.getName(),mockDataService.getRandomString())}));
       DepPolicyType depPolicyType = DepPolicyType.NO_DEP_PRE;
       ScheduleStatus scheduleStatus = ScheduleStatus.ONLINE;
       Integer timeout = 3600;
@@ -215,7 +215,7 @@ public class ScheduleServiceTest {
     }
     {
       //无权限修改
-      ProjectFlow projectFlow = mockDataService.mocProjectFlow(project.getId(),user.getId());
+      ProjectFlow projectFlow = mockDataService.mocProjectFlow(project,user);
       mockDataService.mockSchedule(project.getName(),projectFlow.getId(),user.getId());
       User user1 = mockDataService.createGeneralUser();
       mockDataService.createProjectUser(project.getId(),user1.getId(), Constants.PROJECT_USER_PERM_READ);
@@ -224,12 +224,12 @@ public class ScheduleServiceTest {
       scheduleParam.setStartDate(now);
       scheduleParam.setEndDate(now);
       scheduleParam.setCrontab("0 8 * * * * ?");
-      String schedule = objectMapper.writeValueAsString(scheduleParam);
+      String schedule = JsonUtil.toJsonString(scheduleParam);
       NotifyType notifyType = NotifyType.FAILURE;
-      String notifyMails = objectMapper.writeValueAsString(Arrays.asList(new String[]{"ABC@baifendian.com"}));
+      String notifyMails = JsonUtil.toJsonString(Arrays.asList(new String[]{"ABC@baifendian.com"}));
       Integer maxTryTimes = 2;
       FailurePolicyType failurePolicyType = FailurePolicyType.END;
-      String depWorkflows = objectMapper.writeValueAsString(Arrays.asList(new Schedule.DepWorkflow[]{new Schedule.DepWorkflow(project.getName(),mockDataService.getRandomString())}));
+      String depWorkflows = JsonUtil.toJsonString(Arrays.asList(new Schedule.DepWorkflow[]{new Schedule.DepWorkflow(project.getName(),mockDataService.getRandomString())}));
       DepPolicyType depPolicyType = DepPolicyType.NO_DEP_PRE;
       ScheduleStatus scheduleStatus = ScheduleStatus.ONLINE;
       Integer timeout = 3600;
@@ -244,19 +244,19 @@ public class ScheduleServiceTest {
   public void testPutSchedule() throws IOException {
     {
       //修改一个已经存在的调度
-      ProjectFlow projectFlow = mockDataService.mocProjectFlow(project.getId(),user.getId());
+      ProjectFlow projectFlow = mockDataService.mocProjectFlow(project,user);
       mockDataService.mockSchedule(project.getName(),projectFlow.getId(),user.getId());
       Date now = new Date();
       Schedule.ScheduleParam scheduleParam = new Schedule.ScheduleParam();
       scheduleParam.setStartDate(now);
       scheduleParam.setEndDate(now);
       scheduleParam.setCrontab("0 8 * * * * ?");
-      String schedule = objectMapper.writeValueAsString(scheduleParam);
+      String schedule = JsonUtil.toJsonString(scheduleParam);
       NotifyType notifyType = NotifyType.FAILURE;
-      String notifyMails = objectMapper.writeValueAsString(Arrays.asList(new String[]{"ABC@baifendian.com"}));
+      String notifyMails = JsonUtil.toJsonString(Arrays.asList(new String[]{"ABC@baifendian.com"}));
       Integer maxTryTimes = 2;
       FailurePolicyType failurePolicyType = FailurePolicyType.END;
-      String depWorkflows = objectMapper.writeValueAsString(Arrays.asList(new Schedule.DepWorkflow[]{new Schedule.DepWorkflow(project.getName(),mockDataService.getRandomString())}));
+      String depWorkflows = JsonUtil.toJsonString(Arrays.asList(new Schedule.DepWorkflow[]{new Schedule.DepWorkflow(project.getName(),mockDataService.getRandomString())}));
       DepPolicyType depPolicyType = DepPolicyType.NO_DEP_PRE;
       Integer timeout = 3600;
       MockHttpServletResponse mockHttpServletRespon = new MockHttpServletResponse();
@@ -266,18 +266,18 @@ public class ScheduleServiceTest {
     }
     {
       //修改一个不存在的调度
-      ProjectFlow projectFlow = mockDataService.mocProjectFlow(project.getId(),user.getId());
+      ProjectFlow projectFlow = mockDataService.mocProjectFlow(project,user);
       Date now = new Date();
       Schedule.ScheduleParam scheduleParam = new Schedule.ScheduleParam();
       scheduleParam.setStartDate(now);
       scheduleParam.setEndDate(now);
       scheduleParam.setCrontab("0 8 * * * * ?");
-      String schedule = objectMapper.writeValueAsString(scheduleParam);
+      String schedule = JsonUtil.toJsonString(scheduleParam);
       NotifyType notifyType = NotifyType.FAILURE;
-      String notifyMails = objectMapper.writeValueAsString(Arrays.asList(new String[]{"ABC@baifendian.com"}));
+      String notifyMails = JsonUtil.toJsonString(Arrays.asList(new String[]{"ABC@baifendian.com"}));
       Integer maxTryTimes = 2;
       FailurePolicyType failurePolicyType = FailurePolicyType.END;
-      String depWorkflows = objectMapper.writeValueAsString(Arrays.asList(new Schedule.DepWorkflow[]{new Schedule.DepWorkflow(project.getName(),mockDataService.getRandomString())}));
+      String depWorkflows = JsonUtil.toJsonString(Arrays.asList(new Schedule.DepWorkflow[]{new Schedule.DepWorkflow(project.getName(),mockDataService.getRandomString())}));
       DepPolicyType depPolicyType = DepPolicyType.NO_DEP_PRE;
       Integer timeout = 3600;
       MockHttpServletResponse mockHttpServletRespon = new MockHttpServletResponse();
@@ -291,7 +291,7 @@ public class ScheduleServiceTest {
   public void testQuerySchedule() throws IOException {
     {
       //查询一个调度信息
-      ProjectFlow projectFlow = mockDataService.mocProjectFlow(project.getId(),user.getId());
+      ProjectFlow projectFlow = mockDataService.mocProjectFlow(project,user);
       mockDataService.mockSchedule(project.getName(),projectFlow.getId(),user.getId());
       MockHttpServletResponse mockHttpServletRespon = new MockHttpServletResponse();
       Schedule schedule = scheduleService.querySchedule(user,project.getName(),projectFlow.getName(),mockHttpServletRespon);

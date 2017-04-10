@@ -73,16 +73,17 @@ public class ProjectFlowMapperSqlProvider {
    * @return sql 语句
    */
   public String updateById(Map<String, Object> parameter) {
-    ProjectFlow projectFlow = (ProjectFlow) parameter.get("flow");
     return new SQL() {
       {
         UPDATE(TABLE_NAME);
-        if (StringUtils.isNotEmpty(projectFlow.getName())) {
-          SET("name = #{flow.name}");
-        }
-        if (projectFlow.getOwnerId() != 0) {
-          SET("owner = #{flow.ownerId}");
-        }
+        SET("`desc`=#{flow.desc}");
+        SET("modify_time=#{flow.modifyTime}");
+        SET("create_time=#{flow.createTime}");
+        SET("owner=#{flow.ownerId}");
+        SET("proxy_user=#{flow.proxyUser}");
+        SET("user_defined_params=#{flow.userDefinedParams}");
+        SET("extras=#{flow.extras}");
+        SET("queue=#{flow.queue}");
         WHERE("id = #{flow.id}");
       }
     }.toString();
@@ -110,7 +111,7 @@ public class ProjectFlowMapperSqlProvider {
       {
         SELECT("p_f.*,p_f.owner as owner_id");
         SELECT("p.name as project_name");
-        SELECT("u.name as owner");
+        SELECT("u.name as owner_name");
         FROM("project_flows p_f");
         JOIN("project p on p_f.project_id = p.id");
         JOIN("user u on p_f.owner = u.id");
@@ -120,12 +121,26 @@ public class ProjectFlowMapperSqlProvider {
     }.toString();
   }
 
+  public String queryById(Map<String, Object> parameter) {
+    return new SQL() {
+      {
+        SELECT("p_f.*,p_f.owner as owner_id");
+        SELECT("p.name as project_name");
+        SELECT("u.name as owner_name");
+        FROM("project_flows p_f");
+        JOIN("project p on p_f.project_id = p.id");
+        JOIN("user u on p_f.owner = u.id");
+        WHERE("p_f.id = #{id}");
+      }
+    }.toString();
+  }
+
   public String findByProjectNameAndName(Map<String, Object> parameter) {
     return new SQL() {
       {
         SELECT("p_f.*,p_f.owner as owner_id");
         SELECT("p.name as project_name");
-        SELECT("u.name as owner");
+        SELECT("u.name as owner_name");
         FROM("project_flows p_f");
         JOIN("project p on p_f.project_id = p.id");
         JOIN("user u on p_f.owner = u.id");

@@ -116,7 +116,7 @@ public class FlowScheduleJob implements Job {
     // 起始时间 (ms)
     long startTime = System.currentTimeMillis();
 
-    ProjectFlow flow = flowDao.queryFlow(flowId);
+    ProjectFlow flow = flowDao.projectFlowfindById(flowId);
     // 若 workflow 被删除，那么直接删除当前 job
     if (flow == null) {
       deleteJob(projectId, flowId);
@@ -136,6 +136,8 @@ public class FlowScheduleJob implements Job {
     ExecutionFlow executionFlow = flowDao.scheduleFlowToExecution(projectId, flowId, flow.getOwnerId(), scheduledFireTime,
             FlowRunType.DISPATCH, schedule.getMaxTryTimes(), schedule.getTimeout());
     executionFlow.setProjectId(projectId);
+    executionFlow.setProjectName(flow.getProjectName());
+    executionFlow.setFlowName(flow.getName());
 
     // 自动依赖上一调度周期才能结束
     boolean isNotUpdateWaitingDep = true;

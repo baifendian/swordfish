@@ -60,9 +60,9 @@ public class HiveConnectionClient {
   private int timeBetweenEvictionRunsMillis = 180000;
 
   /**
-   * 空闲时是否进行连接有效性验证，如果验证失败则移除，默认为false
+   * 空闲时是否进行连接有效性验证，如果验证失败则移除，默认为true
    */
-  private boolean testWhileIdle = false;
+  private boolean testWhileIdle = true;
 
   private static HiveConnectionClient hiveConnectionClient;
 
