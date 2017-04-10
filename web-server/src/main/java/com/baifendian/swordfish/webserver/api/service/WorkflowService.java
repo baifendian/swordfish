@@ -300,6 +300,8 @@ public class WorkflowService {
       flowDao.modifyProjectFlow(projectFlow);
     } catch (Exception e) {
       logger.error("Workflow modify has error", e);
+      response.setStatus(HttpStatus.SC_NOT_MODIFIED);
+      return null;
     }
 
     return projectFlow;
@@ -336,6 +338,8 @@ public class WorkflowService {
     }
 
     projectFlowMapper.deleteByProjectAndName(project.getId(), name);
+
+    // TODO 删除调度，删除日志等
 
     return;
   }

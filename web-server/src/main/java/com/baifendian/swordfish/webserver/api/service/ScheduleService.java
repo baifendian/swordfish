@@ -17,13 +17,13 @@ package com.baifendian.swordfish.webserver.api.service;
 
 import com.baifendian.swordfish.dao.FlowDao;
 import com.baifendian.swordfish.dao.enums.*;
+import com.baifendian.swordfish.dao.mapper.MasterServerMapper;
 import com.baifendian.swordfish.dao.mapper.ProjectMapper;
 import com.baifendian.swordfish.dao.mapper.ScheduleMapper;
-import com.baifendian.swordfish.dao.model.Project;
-import com.baifendian.swordfish.dao.model.ProjectFlow;
-import com.baifendian.swordfish.dao.model.Schedule;
-import com.baifendian.swordfish.dao.model.User;
+import com.baifendian.swordfish.dao.model.*;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
+import com.baifendian.swordfish.rpc.RetInfo;
+import com.baifendian.swordfish.rpc.client.MasterClient;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -52,6 +52,9 @@ public class ScheduleService {
   @Autowired
   private FlowDao flowDao;
 
+  @Autowired
+  private MasterServerMapper masterServerMapper;
+
   /**
    * 创建一个调度
    * @param operator
@@ -77,6 +80,14 @@ public class ScheduleService {
 
     if (!projectService.hasReadPerm(operator.getId(), project)) {
       response.setStatus(HttpStatus.SC_UNAUTHORIZED);
+      return null;
+    }
+
+    // 查看 master 是否存在
+    MasterServer masterServer = masterServerMapper.query();
+    if (masterServer == null) {
+      logger.error("Master server does not exist.");
+      response.setStatus(HttpStatus.SC_NOT_MODIFIED);
       return null;
     }
 
@@ -125,6 +136,14 @@ public class ScheduleService {
       logger.error("schedule has exist, can't create again.", e);
       response.setStatus(HttpStatus.SC_CONFLICT);
       return null;
+    }
+
+    //
+    MasterClient masterClient = new MasterClient(masterServer.getHost(), masterServer.getPort());
+    try{
+      //RetInfo retInfo = masterClient.setSchedule(project.getId(),projectFlow.getId());
+    }catch (Exception e){
+
     }
 
     return scheduleObj;

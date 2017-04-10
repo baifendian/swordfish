@@ -58,6 +58,7 @@
             <excludes>
                 <exclude>javax.servlet:servlet-api</exclude>
                 <exclude>org.eclipse.jetty.aggregate:jetty-all</exclude>
+                <exclude>org.slf4j:slf4j-log4j12</exclude>
             </excludes>
         </dependencySet>
     </dependencySets>
