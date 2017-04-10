@@ -15,6 +15,7 @@
  */
 package com.baifendian.swordfish.webserver.api.controller;
 
+import com.baifendian.swordfish.dao.enums.NotifyType;
 import com.baifendian.swordfish.dao.model.User;
 import com.baifendian.swordfish.webserver.api.dto.UserSessionData;
 import com.baifendian.swordfish.webserver.api.service.ExecService;
@@ -60,7 +61,7 @@ public class ExecController {
                                            @RequestParam(value = "schedule", required = false) String schedule,
                                            @RequestParam(value = "nodeName", required = false) String nodeName,
                                            @RequestParam(value = "nodeDep", required = false) String nodeDep,
-                                           @RequestParam(value = "notifyType", required = false) String notifyType,
+                                           @RequestParam(value = "notifyType", required = false) NotifyType notifyType,
                                            @RequestParam(value = "notifyMails", required = false) String notifyMails,
                                            @RequestParam(value = "timeout", required = false, defaultValue = "1800") int timeout,
                                            HttpServletResponse response) {
