@@ -92,12 +92,12 @@ public class FlowExecManager {
               Schedule schedule = flowDao.querySchedule(flow.getId());
               Integer maxTryTimes = 3;
               Integer timeout = 10 * 3600;
-              if(schedule != null){
+              if (schedule != null) {
                 maxTryTimes = schedule.getMaxTryTimes();
                 timeout = schedule.getTimeout();
               }
               ExecutionFlow executionFlow = flowDao.scheduleFlowToExecution(flow.getProjectId(), flow.getId(),
-                      flow.getOwnerId(), scheduleDate, ExecType.ADD_DATA, maxTryTimes, timeout);
+                  flow.getOwnerId(), scheduleDate, ExecType.ADD_DATA, maxTryTimes, null, null, schedule.getNotifyType(), schedule.getNotifyMails(), timeout);
               executionFlow.setProjectId(flow.getProjectId());
               ExecFlowInfo execFlowInfo = new ExecFlowInfo();
               execFlowInfo.setExecId(executionFlow.getId());
