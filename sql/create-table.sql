@@ -150,8 +150,7 @@ CREATE TABLE `schedules` (
   `schedule_status` tinyint(4) NOT NULL COMMENT 'status, offline/online 0 means offline, 1 means online',
   PRIMARY KEY (`flow_id`),
   FOREIGN KEY (`flow_id`) REFERENCES `project_flows`(`id`) ON DELETE CASCADE,
-  FOREIGN KEY (`owner`) REFERENCES `user`(`id`),
-  FOREIGN KEY (`last_modify_by`) REFERENCES `user`(`id`)
+  FOREIGN KEY (`owner`) REFERENCES `user`(`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- `execution_flows` table

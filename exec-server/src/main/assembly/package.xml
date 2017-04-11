@@ -25,14 +25,6 @@
     <includeBaseDirectory>false</includeBaseDirectory>
     <fileSets>
         <fileSet>
-            <directory>src/main/resources/bin</directory>
-            <includes>
-                <include>*.*</include>
-            </includes>
-            <directoryMode>755</directoryMode>
-            <outputDirectory>bin</outputDirectory>
-        </fileSet>
-        <fileSet>
             <directory>src/main/resources</directory>
             <includes>
                 <include>**/*.properties</include>
@@ -56,6 +48,14 @@
                 <include>**/*.json</include>
             </includes>
             <outputDirectory>conf</outputDirectory>
+        </fileSet>
+        <fileSet>
+            <directory>${project.parent.basedir}/common/src/main/resources/bin</directory>
+            <includes>
+                <include>*.*</include>
+            </includes>
+            <directoryMode>755</directoryMode>
+            <outputDirectory>bin</outputDirectory>
         </fileSet>
         <fileSet>
             <directory>${project.parent.basedir}/dao/src/main/resources</directory>

@@ -15,8 +15,10 @@
  */
 package com.baifendian.swordfish.webserver.controller;
 
+import com.baifendian.swordfish.dao.enums.ExecType;
 import com.baifendian.swordfish.dao.enums.NotifyType;
 import com.baifendian.swordfish.dao.model.User;
+import com.baifendian.swordfish.webserver.dto.ExecutorIds;
 import com.baifendian.swordfish.webserver.dto.UserSessionData;
 import com.baifendian.swordfish.webserver.service.ExecService;
 import org.slf4j.Logger;
@@ -55,16 +57,17 @@ public class ExecController {
    * @return
    */
   @PostMapping(value = "")
-  public UserSessionData execExistWorkflow(@RequestAttribute(value = "session.user") User operator,
-                                           @RequestParam(value = "projectName") String projectName,
-                                           @RequestParam(value = "workflowName") String workflowName,
-                                           @RequestParam(value = "schedule", required = false) String schedule,
-                                           @RequestParam(value = "nodeName", required = false) String nodeName,
-                                           @RequestParam(value = "nodeDep", required = false) String nodeDep,
-                                           @RequestParam(value = "notifyType", required = false) NotifyType notifyType,
-                                           @RequestParam(value = "notifyMails", required = false) String notifyMails,
-                                           @RequestParam(value = "timeout", required = false, defaultValue = "1800") int timeout,
-                                           HttpServletResponse response) {
+  public ExecutorIds execExistWorkflow(@RequestAttribute(value = "session.user") User operator,
+                                       @RequestParam(value = "projectName") String projectName,
+                                       @RequestParam(value = "workflowName") String workflowName,
+                                       @RequestParam(value = "schedule", required = false) String schedule,
+                                       @RequestParam(value = "execType", required = false) ExecType execType,
+                                       @RequestParam(value = "nodeName", required = false) String nodeName,
+                                       @RequestParam(value = "nodeDep", required = false) String nodeDep,
+                                       @RequestParam(value = "notifyType", required = false) NotifyType notifyType,
+                                       @RequestParam(value = "notifyMails", required = false) String notifyMails,
+                                       @RequestParam(value = "timeout", required = false, defaultValue = "1800") int timeout,
+                                       HttpServletResponse response) {
     logger.info("Operator user {}, exec workflow, project name: {}, workflow name: {}, schedule: {}, node name: {}, node dep: {}, notify type: {}," +
             "notify mails: {}, timeout: {}",
         operator.getName(), projectName, workflowName, schedule, nodeName, nodeDep, notifyType, notifyMails, timeout);

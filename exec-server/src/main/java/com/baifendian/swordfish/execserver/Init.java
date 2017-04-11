@@ -56,7 +56,7 @@ public class Init {
     scheduleInfo.setStartDate(System.currentTimeMillis() - 3600 * 24 * 1000);
     scheduleInfo.setEndDate(4101494400000l);
     scheduleInfo.setCronExpression("*/10 * * * * ?");
-    masterClient.setSchedule(1, 2, scheduleInfo);
+    masterClient.setSchedule(1, 2);
   }
 
   public static void testJob() throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {

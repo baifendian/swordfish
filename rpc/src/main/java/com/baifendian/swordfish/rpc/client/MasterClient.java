@@ -121,7 +121,7 @@ public class MasterClient {
     return true;
   }
 
-  public boolean setSchedule(int projectId, int flowId, ScheduleInfo scheduleInfo) {
+  public boolean setSchedule(int projectId, int flowId) {
     connect();
     try {
       RetInfo ret = client.setSchedule(projectId, flowId);
@@ -131,6 +131,23 @@ public class MasterClient {
       }
     } catch (TException e) {
       logger.error("set schedule error", e);
+      return false;
+    } finally {
+      close();
+    }
+    return true;
+  }
+
+  public boolean deleteSchedule(int projectId, int flowId) {
+    connect();
+    try {
+      RetInfo ret = client.deleteSchedule(projectId, flowId);
+      if (ret.getStatus() != 0) {
+        logger.error("delete schedule error:{}", ret.getMsg());
+        return false;
+      }
+    } catch (TException e) {
+      logger.error("delete schedule error", e);
       return false;
     } finally {
       close();
