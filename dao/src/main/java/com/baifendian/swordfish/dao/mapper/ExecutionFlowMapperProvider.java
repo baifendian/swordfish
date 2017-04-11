@@ -245,7 +245,7 @@ public class ExecutionFlowMapperProvider {
 
   public String selectByFlowIdAndTimes(Map<String, Object> parameter) {
     StringBuilder sb = new StringBuilder();
-    String inExpr = "(" + ExecType.DISPATCH.ordinal() + "," + ExecType.ADD_DATA.ordinal() + ")";
+    String inExpr = "(" + ExecType.DIRECT.ordinal() + "," + ExecType.COMPLEMENT_DATA.ordinal() + ")";
     sb.append("SELECT id, flow_id, worker, type, status, schedule_time FROM execution_flows WHERE flow_id = #{flowId} AND type IN " + inExpr + " AND ");
     sb.append("schedule_time = (SELECT MIN(schedule_time) FROM execution_flows WHERE flow_id = #{flowId} AND type IN" + inExpr
             + " AND schedule_time >= #{startDate} AND schedule_time < #{endDate})");
@@ -293,7 +293,7 @@ public class ExecutionFlowMapperProvider {
 
   public String selectByFlowIdAndTime(Map<String, Object> parameter) {
     StringBuilder sb = new StringBuilder();
-    String inExpr = "(" + ExecType.DISPATCH.ordinal() + "," + ExecType.ADD_DATA.ordinal() + ")";
+    String inExpr = "(" + ExecType.DIRECT.ordinal() + "," + ExecType.COMPLEMENT_DATA.ordinal() + ")";
     sb.append("SELECT id, flow_id, worker, type, status, schedule_time FROM execution_flows WHERE flow_id = #{flowId} AND type IN " + inExpr + " AND ");
     sb.append("schedule_time = #{scheduleTime}");
 

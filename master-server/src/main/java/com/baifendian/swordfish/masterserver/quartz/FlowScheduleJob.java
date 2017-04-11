@@ -133,7 +133,7 @@ public class FlowScheduleJob implements Job {
 
     // 插入 ExecutionFlow
     ExecutionFlow executionFlow = flowDao.scheduleFlowToExecution(projectId, flowId, flow.getOwnerId(), scheduledFireTime,
-        ExecType.DISPATCH, schedule.getMaxTryTimes(), null, null, schedule.getNotifyType(), schedule.getNotifyMails(), schedule.getTimeout());
+        ExecType.SCHEDULER, schedule.getMaxTryTimes(), null, null, schedule.getNotifyType(), schedule.getNotifyMails(), schedule.getTimeout());
     executionFlow.setProjectId(projectId);
     executionFlow.setProjectName(flow.getProjectName());
     executionFlow.setFlowName(flow.getName());

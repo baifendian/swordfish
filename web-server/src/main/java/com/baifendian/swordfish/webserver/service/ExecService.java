@@ -151,6 +151,8 @@ public class ExecService {
         }
         default:{
           logger.error("exec workflow no support exec type {}",execType.getType());
+          response.setStatus(HttpStatus.SC_BAD_REQUEST);
+          return null;
         }
       }
 
