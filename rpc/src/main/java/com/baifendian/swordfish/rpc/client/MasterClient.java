@@ -16,7 +16,6 @@
 package com.baifendian.swordfish.rpc.client;
 
 import com.baifendian.swordfish.rpc.*;
-
 import org.apache.thrift.TException;
 import org.apache.thrift.protocol.TBinaryProtocol;
 import org.apache.thrift.protocol.TProtocol;
@@ -74,9 +73,9 @@ public class MasterClient {
 
   public boolean executorReport(String clientHost, int clientPort, HeartBeatData heartBeatData) {
     boolean result = false;
-    for(int i=0; i<retries; i++){
+    for (int i = 0; i < retries; i++) {
       result = executorReportOne(clientHost, clientPort, heartBeatData);
-      if(result)
+      if (result)
         break;
       try {
         Thread.sleep(1000);
@@ -168,21 +167,18 @@ public class MasterClient {
     }
   }
 
-  public boolean execFlow(int projectId, int flowId, long scheduleDate) {
+  public RetResultInfo execFlow(int projectId, int flowId, long scheduleDate, ExecInfo execInfo) {
     connect();
     try {
-      RetResultInfo ret = client.execFlow(projectId, flowId, scheduleDate);
-      if (ret.getRetInfo().getStatus() != 0) {
-        logger.error("exec flow error:{}", ret.getRetInfo().getMsg());
-        return false;
-      }
+      RetResultInfo ret = client.execFlow(projectId, flowId, scheduleDate, execInfo);
+
+      return ret;
     } catch (TException e) {
       logger.error("exec flow error", e);
-      return false;
+      return null;
     } finally {
       close();
     }
-    return true;
   }
 
   public boolean cancelExecFlow(int id) {
@@ -202,21 +198,18 @@ public class MasterClient {
     return true;
   }
 
-  public boolean appendWorkFlow(int projectId, int workflowId, ScheduleInfo scheduleInfo) {
+  public RetResultInfo appendWorkFlow(int projectId, int workflowId, ScheduleInfo scheduleInfo) {
     connect();
     try {
-      RetInfo ret = client.appendWorkFlow(projectId, workflowId, scheduleInfo);
-      if (ret.getStatus() != 0) {
-        logger.error("exec flow error:{}", ret.getMsg());
-        return false;
-      }
+      RetResultInfo ret = client.appendWorkFlow(projectId, workflowId, scheduleInfo);
+
+      return ret;
     } catch (TException e) {
       logger.error("exec flow error", e);
-      return false;
+      return null;
     } finally {
       close();
     }
-    return true;
   }
 
 }

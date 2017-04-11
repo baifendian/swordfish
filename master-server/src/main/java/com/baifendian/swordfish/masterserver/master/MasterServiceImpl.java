@@ -19,24 +19,25 @@ import com.baifendian.swordfish.dao.AdHocDao;
 import com.baifendian.swordfish.dao.DaoFactory;
 import com.baifendian.swordfish.dao.FlowDao;
 import com.baifendian.swordfish.dao.enums.ExecType;
+import com.baifendian.swordfish.dao.enums.NodeDepType;
+import com.baifendian.swordfish.dao.enums.NotifyType;
 import com.baifendian.swordfish.dao.model.AdHoc;
 import com.baifendian.swordfish.dao.model.ExecutionFlow;
 import com.baifendian.swordfish.dao.model.ProjectFlow;
 import com.baifendian.swordfish.dao.model.Schedule;
-import com.baifendian.swordfish.rpc.HeartBeatData;
-import com.baifendian.swordfish.rpc.MasterService.Iface;
-import com.baifendian.swordfish.rpc.RetInfo;
-import com.baifendian.swordfish.rpc.RetResultInfo;
-import com.baifendian.swordfish.rpc.ScheduleInfo;
 import com.baifendian.swordfish.masterserver.quartz.FlowScheduleJob;
 import com.baifendian.swordfish.masterserver.quartz.QuartzManager;
+import com.baifendian.swordfish.masterserver.utils.ResultDetailHelper;
 import com.baifendian.swordfish.masterserver.utils.ResultHelper;
+import com.baifendian.swordfish.rpc.*;
+import com.baifendian.swordfish.rpc.MasterService.Iface;
 import org.apache.thrift.TException;
 import org.quartz.CronExpression;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Map;
 
@@ -68,45 +69,6 @@ public class MasterServiceImpl implements Iface {
     this.adHocDao = DaoFactory.getDaoInstance(AdHocDao.class);
     this.master = master;
 
-  }
-
-  @Override
-  public RetResultInfo execFlow(int projectId, int flowId, long scheduleDate) throws TException {
-    ExecutionFlow executionFlow;
-    try {
-      ProjectFlow flow = flowDao.projectFlowfindById(flowId);
-      if (flow == null) {
-        LOGGER.error("flowId is not exists");
-        return new RetResultInfo(ResultHelper.createErrorResult("flowId is not exists"), null);
-      }
-      executionFlow = flowDao.scheduleFlowToExecution(projectId, flowId, flow.getOwnerId(), new Date(scheduleDate),
-              ExecType.DIRECT_RUN, 3, 10 * 3600);
-      ExecFlowInfo execFlowInfo = new ExecFlowInfo();
-      execFlowInfo.setExecId(executionFlow.getId());
-
-      master.addExecFlow(execFlowInfo);
-    } catch (Exception e){
-      LOGGER.error(e.getMessage(), e);
-      return new RetResultInfo(ResultHelper.createErrorResult(e.getMessage()), null);
-    }
-    return new RetResultInfo(ResultHelper.SUCCESS, Arrays.asList(executionFlow.getId()));
-  }
-
-  @Override
-  public RetInfo execAdHoc(int adHocId) {
-    try {
-      LOGGER.debug("receive exec ad hoc request, id:{}", adHocId);
-      AdHoc adHoc = adHocDao.getAdHoc(adHocId);
-      if (adHoc == null) {
-        LOGGER.error("adhoc id {} not exists", adHocId);
-        return ResultHelper.createErrorResult("adhoc id not exists");
-      }
-      master.execAdHoc(adHocId);
-    } catch (Exception e) {
-      LOGGER.error(e.getMessage(), e);
-      return ResultHelper.createErrorResult(e.getMessage());
-    }
-    return ResultHelper.SUCCESS;
   }
 
   /**
@@ -172,18 +134,68 @@ public class MasterServiceImpl implements Iface {
     return ResultHelper.SUCCESS;
   }
 
+  @Override
+  public RetResultInfo execFlow(int projectId, int flowId, long scheduleDate, ExecInfo execInfo) throws TException {
+    ExecutionFlow executionFlow;
+    try {
+      ProjectFlow flow = flowDao.projectFlowfindById(flowId);
+      if (flow == null) {
+        LOGGER.error("flowId is not exists");
+        return new RetResultInfo(ResultHelper.createErrorResult("flowId is not exists"), null);
+      }
+
+      executionFlow = flowDao.scheduleFlowToExecution(projectId,
+          flowId,
+          flow.getOwnerId(),
+          new Date(scheduleDate),
+          ExecType.DIRECT_RUN,
+          1, // 仅仅执行 1 次
+          execInfo.getNodeName(),
+          NodeDepType.valueOfType(execInfo.getNodeDep()),
+          NotifyType.valueOfType(execInfo.getNotifyType()),
+          execInfo.getNotifyMails(),
+          execInfo.timeout);
+
+      ExecFlowInfo execFlowInfo = new ExecFlowInfo();
+      execFlowInfo.setExecId(executionFlow.getId());
+
+      master.addExecFlow(execFlowInfo);
+    } catch (Exception e) {
+      LOGGER.error(e.getMessage(), e);
+      return new RetResultInfo(ResultHelper.createErrorResult(e.getMessage()), null);
+    }
+    return new RetResultInfo(ResultHelper.SUCCESS, Arrays.asList(executionFlow.getId()));
+  }
+
+  @Override
+  public RetInfo execAdHoc(int adHocId) {
+    try {
+      LOGGER.debug("receive exec ad hoc request, id:{}", adHocId);
+      AdHoc adHoc = adHocDao.getAdHoc(adHocId);
+      if (adHoc == null) {
+        LOGGER.error("adhoc id {} not exists", adHocId);
+        return ResultHelper.createErrorResult("adhoc id not exists");
+      }
+      master.execAdHoc(adHocId);
+    } catch (Exception e) {
+      LOGGER.error(e.getMessage(), e);
+      return ResultHelper.createErrorResult(e.getMessage());
+    }
+    return ResultHelper.SUCCESS;
+  }
+
   /**
    * 补数据
    */
   @Override
-  public RetInfo appendWorkFlow(int projectId, int flowId, ScheduleInfo scheduleInfo) throws TException {
+  public RetResultInfo appendWorkFlow(int projectId, int flowId, ScheduleInfo scheduleInfo) throws TException {
     LOGGER.debug("append workflow projectId:{}, flowId:{},scheduleMeta:{}", projectId, flowId, scheduleInfo);
     try {
       ProjectFlow flow = flowDao.projectFlowfindById(flowId);
       // 若 workflow 被删除
       if (flow == null) {
         LOGGER.error("projectId:{},flowId:{} workflow not exists", projectId, flowId);
-        return ResultHelper.createErrorResult("current workflow not exists");
+        return ResultDetailHelper.createErrorResult("current workflow not exists");
       }
 
       String crontabStr = scheduleInfo.getCronExpression();
@@ -196,10 +208,10 @@ public class MasterServiceImpl implements Iface {
       master.submitAddData(flow, cron, startDateTime, endDateTime);
     } catch (Exception e) {
       LOGGER.error(e.getMessage(), e);
-      return ResultHelper.createErrorResult(e.getMessage());
+      return ResultDetailHelper.createErrorResult(e.getMessage());
     }
 
-    return ResultHelper.SUCCESS;
+    return ResultDetailHelper.createSuccessResult(Collections.emptyList());
   }
 
   @Override
@@ -236,5 +248,4 @@ public class MasterServiceImpl implements Iface {
       return ResultHelper.createErrorResult(e.getMessage());
     }
   }
-
 }

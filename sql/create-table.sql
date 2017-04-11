@@ -170,6 +170,8 @@ CREATE TABLE `execution_flows` (
   `user_defined_params` text DEFAULT NULL COMMENT 'user defined parameter of the flows.',
   `type` tinyint(4) NOT NULL COMMENT 'exec ways, schedule, add data or run ad-hoc.',
   `max_try_times` tinyint(4) DEFAULT NULL COMMENT 'max try times of the exec',
+  `notify_type` tinyint(4) NOT NULL COMMENT 'notify type',
+  `notify_mails` text DEFAULT NULL COMMENT 'notify emails',
   `timeout` int(11) NOT NULL COMMENT 'timeout, unit: seconds',
   `status` tinyint(4) NOT NULL COMMENT 'exec status',
   `extras` text DEFAULT NULL COMMENT 'extra information of the flows',

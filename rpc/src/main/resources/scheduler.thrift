@@ -23,7 +23,7 @@ struct RetResultInfo {
   /**
    * 返回状态
    */
-  1: RetInfo retInfo
+  1: RetInfo retInfo,
 
   /**
    * 返回flow exec Id
@@ -46,6 +46,36 @@ struct ScheduleInfo {
    	
   /** cron 表达式 */
   3: string cronExpression
+}
+
+/**
+ * 执行的一些信息
+ */
+struct ExecInfo {
+  /**
+   * 表示执行的节点名称, 传 空或 null 表示执行工作流
+   */
+  1: string nodeName,
+
+  /**
+   * 节点依赖类型, 默认仅执行节点
+   */
+  2: i32 nodeDep = 0,
+
+  /**
+   * 报警类型, 默认不报警
+   */
+  3: i32 notifyType = 0,
+
+  /**
+   * 报警邮箱列表
+   */
+  4: list<string> notifyMails,
+
+  /**
+   * 超时时间, 单位: 秒
+   */
+  5: i32 timeout = 1800
 }
 
 /**
@@ -77,14 +107,6 @@ struct HeartBeatData {
  * Master 服务接口
  */
 service MasterService {
-  /**
-   * 执行某个 workflow
-   *
-   * projectId : project id
-   * flowId : workflow id
-   * scheduleDate : 调度时间（预期的）
-   */
-   RetResultInfo execFlow(1:i32 projectId, 2:i32 flowId, 3:i64 scheduleDate),
 
   /**
    * 设置某个 workflow 的调度信息
@@ -110,13 +132,23 @@ service MasterService {
   RetInfo deleteSchedules(1:i32 projectId),
 
   /**
+   * 执行某个 workflow
+   *
+   * projectId : project id
+   * flowId : workflow id
+   * scheduleDate : 调度时间（预期的）
+   * execInfo : 执行信息
+   */
+  RetResultInfo execFlow(1:i32 projectId, 2:i32 flowId, 3:i64 scheduleDate, 4:ExecInfo execInfo),
+
+  /**
    * 给一个 workflow 补数据
    *
    * projectId : 项目 ID
    * flowId : 工作流 ID
    * scheduleInfo: 补数据相关信息(此处不通过调度去执行)
    */
-  RetInfo appendWorkFlow(1:i32 projectId, 2:i32 flowId, 3:ScheduleInfo scheduleInfo),
+  RetResultInfo appendWorkFlow(1:i32 projectId, 2:i32 flowId, 3:ScheduleInfo scheduleInfo),
 
   /**
    * 注册 execServer

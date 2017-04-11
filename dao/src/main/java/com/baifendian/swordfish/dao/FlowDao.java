@@ -15,14 +15,12 @@
  */
 package com.baifendian.swordfish.dao;
 
-import com.baifendian.swordfish.dao.enums.FlowStatus;
-import com.baifendian.swordfish.dao.utils.json.JsonUtil;
 import com.baifendian.swordfish.dao.datasource.ConnectionFactory;
 import com.baifendian.swordfish.dao.enums.*;
 import com.baifendian.swordfish.dao.mapper.*;
 import com.baifendian.swordfish.dao.model.*;
 import com.baifendian.swordfish.dao.model.flow.FlowDag;
-
+import com.baifendian.swordfish.dao.utils.json.JsonUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -150,24 +148,28 @@ public class FlowDao extends BaseDao {
    * @return {@link ExecutionFlow}
    */
   public ExecutionFlow scheduleFlowToExecution(Integer projectId, Integer workflowId, int submitUser, Date scheduleTime, ExecType runType,
-                                               Integer maxTryTimes, Integer timeout) {
+                                               Integer maxTryTimes, String nodeName, NodeDepType nodeDep, NotifyType notifyType, List<String> mails, int timeout) {
     List<FlowNode> flowNodes = flowNodeMapper.selectByFlowId(workflowId); // 节点信息
     List<FlowNodeRelation> flowNodeRelations = new ArrayList<>();
-    for(FlowNode flowNode:flowNodes){
+
+    for (FlowNode flowNode : flowNodes) {
       String dep = flowNode.getDep();
-      if(StringUtils.isNotEmpty(dep)){
+      if (StringUtils.isNotEmpty(dep)) {
         List<String> depList = JsonUtil.parseObjectList(dep, String.class);
-        for(String depNode: depList){
+        for (String depNode : depList) {
           flowNodeRelations.add(new FlowNodeRelation(workflowId, depNode, flowNode.getName()));
         }
       }
     }
+
     ProjectFlow projectFlow = projectFlowMapper.findById(projectId);
     FlowDag flowDag = new FlowDag();
     flowDag.setEdges(flowNodeRelations);
     flowDag.setNodes(flowNodes);
 
+    // TODO:: 处理邮件的字段信息, 以及工作流节点的信息
     ExecutionFlow executionFlow = new ExecutionFlow();
+
     executionFlow.setFlowId(workflowId);
     executionFlow.setSubmitUser(submitUser);
     executionFlow.setSubmitTime(new Date());
@@ -315,13 +317,14 @@ public class FlowDao extends BaseDao {
 
   /**
    * 根据name获取一个工作流的信息
+   *
    * @param projectId
    * @param name
    * @return
    */
-  public ProjectFlow projectFlowfindByName(int projectId,String name){
-    ProjectFlow projectFlow = projectFlowMapper.findByName(projectId,name);
-    if (projectFlow !=null ){
+  public ProjectFlow projectFlowfindByName(int projectId, String name) {
+    ProjectFlow projectFlow = projectFlowMapper.findByName(projectId, name);
+    if (projectFlow != null) {
       List<FlowNode> flowNodeList = flowNodeMapper.selectByFlowId(projectFlow.getId());
       projectFlow.setFlowsNodes(flowNodeList);
     }
@@ -330,12 +333,13 @@ public class FlowDao extends BaseDao {
 
   /**
    * 根据Id获取一个workflow
+   *
    * @param id
    * @return
    */
-  public ProjectFlow projectFlowfindById(int id){
+  public ProjectFlow projectFlowfindById(int id) {
     ProjectFlow projectFlow = projectFlowMapper.findById(id);
-    if (projectFlow !=null ){
+    if (projectFlow != null) {
       List<FlowNode> flowNodeList = flowNodeMapper.selectByFlowId(projectFlow.getId());
       projectFlow.setFlowsNodes(flowNodeList);
     }
@@ -344,12 +348,13 @@ public class FlowDao extends BaseDao {
 
   /**
    * 创建一个projectFlow
+   *
    * @return
    */
-  @Transactional(value = "TransactionManager",rollbackFor = Exception.class)
-  public void createProjectFlow(ProjectFlow projectFlow){
+  @Transactional(value = "TransactionManager", rollbackFor = Exception.class)
+  public void createProjectFlow(ProjectFlow projectFlow) {
     projectFlowMapper.insertAndGetId(projectFlow);
-    for (FlowNode flowNode:projectFlow.getFlowsNodes()){
+    for (FlowNode flowNode : projectFlow.getFlowsNodes()) {
       flowNode.setFlowId(projectFlow.getId());
       flowNodeMapper.insert(flowNode);
     }
@@ -358,12 +363,13 @@ public class FlowDao extends BaseDao {
 
   /**
    * 修改一个工作流
+   *
    * @param projectFlow
    */
-  @Transactional(value = "TransactionManager",rollbackFor = Exception.class)
-  public void modifyProjectFlow(ProjectFlow projectFlow){
+  @Transactional(value = "TransactionManager", rollbackFor = Exception.class)
+  public void modifyProjectFlow(ProjectFlow projectFlow) {
     flowNodeMapper.deleteByFlowId(projectFlow.getId());
-    for (FlowNode flowNode:projectFlow.getFlowsNodes()){
+    for (FlowNode flowNode : projectFlow.getFlowsNodes()) {
       //重新设置id保证唯一性
       flowNode.setFlowId(projectFlow.getId());
       flowNodeMapper.insert(flowNode);
@@ -373,13 +379,14 @@ public class FlowDao extends BaseDao {
 
   /**
    * 根据项目名和工作流名称查询
+   *
    * @param projectName
    * @param name
    * @return
    */
-  public ProjectFlow projectFlowFindByPorjectNameAndName(String projectName,String name){
-    ProjectFlow projectFlow = projectFlowMapper.findByProjectNameAndName(projectName,name);
-    if (projectFlow!=null){
+  public ProjectFlow projectFlowFindByPorjectNameAndName(String projectName, String name) {
+    ProjectFlow projectFlow = projectFlowMapper.findByProjectNameAndName(projectName, name);
+    if (projectFlow != null) {
       List<FlowNode> flowNodeList = flowNodeMapper.selectByFlowId(projectFlow.getId());
       projectFlow.setFlowsNodes(flowNodeList);
     }
@@ -388,20 +395,21 @@ public class FlowDao extends BaseDao {
 
   /**
    * 获取一个项目下所有的工作流
+   *
    * @param projectId
    * @return
    */
-  public List<ProjectFlow> projectFlowFindByProject(int projectId){
+  public List<ProjectFlow> projectFlowFindByProject(int projectId) {
     List<ProjectFlow> projectFlowList = projectFlowMapper.findByProject(projectId);
     List<Integer> flowIds = new ArrayList<>();
-    for (ProjectFlow projectFlow:projectFlowList){
+    for (ProjectFlow projectFlow : projectFlowList) {
       flowIds.add(projectFlow.getId());
     }
     List<FlowNode> flowNodeList = flowNodeMapper.selectByFlowIds(flowIds);
-    for(ProjectFlow projectFlow:projectFlowList){
+    for (ProjectFlow projectFlow : projectFlowList) {
       List<FlowNode> flowNodes = new ArrayList<>();
-      for (FlowNode flowNode:flowNodeList){
-        if (flowNode.getFlowId() == projectFlow.getId()){
+      for (FlowNode flowNode : flowNodeList) {
+        if (flowNode.getFlowId() == projectFlow.getId()) {
           flowNodes.add(flowNode);
         }
       }
