@@ -37,6 +37,7 @@ public class ExecutionFlow {
   /**
    * workflow的id
    **/
+  @JsonIgnore
   private int flowId;
 
   /**
@@ -57,12 +58,12 @@ public class ExecutionFlow {
   /**
    * 提交用户id
    **/
-  private int submitUser;
+  private int submitUserId;
 
   /**
    * 提交用户
    **/
-  private String submitUserName;
+  private String submitUser;
 
   /**
    * 代理用户
@@ -165,20 +166,20 @@ public class ExecutionFlow {
     this.status = status;
   }
 
-  public int getSubmitUser() {
+  public int getSubmitUserId() {
+    return submitUserId;
+  }
+
+  public void setSubmitUserId(int submitUserId) {
+    this.submitUserId = submitUserId;
+  }
+
+  public String getSubmitUser() {
     return submitUser;
   }
 
-  public void setSubmitUser(int submitUser) {
+  public void setSubmitUser(String submitUser) {
     this.submitUser = submitUser;
-  }
-
-  public String getSubmitUserName() {
-    return submitUserName;
-  }
-
-  public void setSubmitUserName(String submitUserName) {
-    this.submitUserName = submitUserName;
   }
 
   public Date getSubmitTime() {

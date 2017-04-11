@@ -321,7 +321,7 @@ public class ScheduleService {
         }
         case OFFLINE:{
           logger.info("Call master client set schedule offline , project id: {}, flow id: {},host: {}, port: {}", project.getId(), projectFlow.getId(), masterServer.getHost(), masterServer.getPort());
-          if (!masterClient.setSchedule(project.getId(), projectFlow.getId())) {
+          if (!masterClient.deleteSchedule(project.getId(), projectFlow.getId())) {
             response.setStatus(HttpStatus.SC_SERVICE_UNAVAILABLE);
             logger.error("Call master client set schedule offline false , project id: {}, flow id: {},host: {}, port: {}", project.getId(), projectFlow.getId(), masterServer.getHost(), masterServer.getPort());
             throw new Exception("Call master client set schedule offline false");

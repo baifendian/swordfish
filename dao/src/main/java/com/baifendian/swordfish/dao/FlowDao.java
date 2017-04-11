@@ -171,7 +171,7 @@ public class FlowDao extends BaseDao {
     ExecutionFlow executionFlow = new ExecutionFlow();
 
     executionFlow.setFlowId(workflowId);
-    executionFlow.setSubmitUser(submitUser);
+    executionFlow.setSubmitUserId(submitUser);
     executionFlow.setSubmitTime(new Date());
     executionFlow.setQueue(projectFlow.getQueue());
     executionFlow.setProxyUser(projectFlow.getProxyUser());
@@ -417,4 +417,5 @@ public class FlowDao extends BaseDao {
     }
     return projectFlowList;
   }
+
 }

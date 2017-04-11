@@ -15,8 +15,10 @@
  */
 package com.baifendian.swordfish.webserver.controller;
 
+import com.baifendian.swordfish.dao.enums.DepPolicyType;
 import com.baifendian.swordfish.dao.enums.ExecType;
 import com.baifendian.swordfish.dao.enums.NotifyType;
+import com.baifendian.swordfish.dao.model.ExecutionFlow;
 import com.baifendian.swordfish.dao.model.User;
 import com.baifendian.swordfish.webserver.dto.ExecutorIds;
 import com.baifendian.swordfish.webserver.dto.UserSessionData;
@@ -28,6 +30,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
+import java.util.Date;
+import java.util.List;
 
 /**
  * 执行任务的服务入口
@@ -57,57 +61,22 @@ public class ExecController {
    * @return
    */
   @PostMapping(value = "")
-  public ExecutorIds execExistWorkflow(@RequestAttribute(value = "session.user") User operator,
-                                       @RequestParam(value = "projectName") String projectName,
-                                       @RequestParam(value = "workflowName") String workflowName,
-                                       @RequestParam(value = "schedule", required = false) String schedule,
-                                       @RequestParam(value = "execType", required = false) ExecType execType,
-                                       @RequestParam(value = "nodeName", required = false) String nodeName,
-                                       @RequestParam(value = "nodeDep", required = false) String nodeDep,
-                                       @RequestParam(value = "notifyType", required = false) NotifyType notifyType,
-                                       @RequestParam(value = "notifyMails", required = false) String notifyMails,
-                                       @RequestParam(value = "timeout", required = false, defaultValue = "1800") int timeout,
-                                       HttpServletResponse response) {
+  public List<Integer> execExistWorkflow(@RequestAttribute(value = "session.user") User operator,
+                                         @RequestParam(value = "projectName") String projectName,
+                                         @RequestParam(value = "workflowName") String workflowName,
+                                         @RequestParam(value = "schedule", required = false) String schedule,
+                                         @RequestParam(value = "execType", required = false) ExecType execType,
+                                         @RequestParam(value = "nodeName", required = false) String nodeName,
+                                         @RequestParam(value = "nodeDep", required = false) DepPolicyType nodeDep,
+                                         @RequestParam(value = "notifyType", required = false) NotifyType notifyType,
+                                         @RequestParam(value = "notifyMails", required = false) String notifyMails,
+                                         @RequestParam(value = "timeout", required = false, defaultValue = "1800") int timeout,
+                                         HttpServletResponse response) {
     logger.info("Operator user {}, exec workflow, project name: {}, workflow name: {}, schedule: {}, node name: {}, node dep: {}, notify type: {}," +
             "notify mails: {}, timeout: {}",
         operator.getName(), projectName, workflowName, schedule, nodeName, nodeDep, notifyType, notifyMails, timeout);
 
-    return null;
-  }
-
-  /**
-   * 直接执行一个新的工作流, 这个工作流可能是没有创建的, 有可能是创建了
-   *
-   * @param operator
-   * @param projectName
-   * @param workflowName
-   * @param proxyUser
-   * @param queue
-   * @param nodeDep
-   * @param file
-   * @param notifyType
-   * @param notifyMails
-   * @param timeout
-   * @param response
-   * @return
-   */
-  @PostMapping(value = "/direct")
-  public UserSessionData execNewWorkflow(@RequestAttribute(value = "session.user") User operator,
-                                         @RequestParam(value = "projectName") String projectName,
-                                         @RequestParam(value = "workflowName") String workflowName,
-                                         @RequestParam(value = "proxyUser") String proxyUser,
-                                         @RequestParam(value = "queue") String queue,
-                                         @RequestParam(value = "data", required = false) String nodeDep,
-                                         @RequestParam(value = "file", required = false) MultipartFile file,
-                                         @RequestParam(value = "notifyType", required = false) String notifyType,
-                                         @RequestParam(value = "notifyMails", required = false) String notifyMails,
-                                         @RequestParam(value = "timeout", required = false, defaultValue = "1800") int timeout,
-                                         HttpServletResponse response) {
-    logger.info("Operator user {}, direct exec workflow, project name: {}, workflow name: {}, proxy user: {}, queue: {}, node dep: {}, file name: [{},{}], notify type: {}," +
-            "notify mails: {}, timeout: {}",
-        operator.getName(), projectName, workflowName, proxyUser, queue, nodeDep, file.getName(), file.getOriginalFilename(), notifyType, notifyMails, timeout);
-
-    return null;
+    return execService.postExecWorkflow(operator,projectName,workflowName,schedule,execType,nodeName,nodeDep,notifyType,notifyMails,timeout,response);
   }
 
   /**
@@ -125,9 +94,9 @@ public class ExecController {
    * @return
    */
   @GetMapping(value = "")
-  public UserSessionData queryExecs(@RequestAttribute(value = "session.user") User operator,
-                                    @RequestParam(value = "startDate") long startDate,
-                                    @RequestParam(value = "endDate") long endDate,
+  public List<ExecutionFlow> queryExecs(@RequestAttribute(value = "session.user") User operator,
+                                    @RequestParam(value = "startDate") Date startDate,
+                                    @RequestParam(value = "endDate") Date endDate,
                                     @RequestParam(value = "projectName") String projectName,
                                     @RequestParam(value = "workflowName", required = false) String workflowName,
                                     @RequestParam(value = "status", required = false) String status,
@@ -137,7 +106,9 @@ public class ExecController {
     logger.info("Operator user {}, query exec list, start date: {}, end date: {}, project name: {}, workflow name: {}, status: {}, from: {}, size: {}",
         operator.getName(), startDate, endDate, projectName, workflowName, status, from, size);
 
-    return null;
+
+
+    return execService.getExecWorkflow(operator,projectName,workflowName,startDate,endDate,status,from,size,response);
   }
 
   /**

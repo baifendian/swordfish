@@ -59,8 +59,8 @@ public class FlowDaoTest {
 
   @Test
   public void testScheduleFlowToExecution() {
-    ExecutionFlow executionFlow = flowDao.scheduleFlowToExecution(1, 2, 1, new Date(), ExecType.DISPATCH, 3, 5000);
-    System.out.println(executionFlow);
+    //ExecutionFlow executionFlow = flowDao.scheduleFlowToExecution(1, 2, 1, new Date(), ExecType.DISPATCH, 3, 5000);
+    //System.out.println(executionFlow);
   }
 
   @Test
