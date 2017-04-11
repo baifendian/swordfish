@@ -55,17 +55,6 @@ public class HiveSqlExec {
    */
   private static int defualtQueryLimit = 1000;
 
-  static {
-    // hive job 配置
-    Configuration conf = null;
-    try {
-      conf = new PropertiesConfiguration("job/hive.properties");
-    } catch (ConfigurationException e) {
-      e.printStackTrace();
-    }
-    defualtQueryLimit = conf.getInt("job.hive.queryLimit", 1000);
-  }
-
   /**
    * LOGGER
    */
