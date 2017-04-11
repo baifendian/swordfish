@@ -65,7 +65,7 @@ public class Master {
     this.flowDao = flowDao;
     executorServerManager = new ExecutorServerManager();
     executorService = Executors.newScheduledThreadPool(5);
-    executionFlowQueue = new LinkedBlockingQueue<>(MasterConfig.failRetryQueueSize);
+    executionFlowQueue = new LinkedBlockingQueue<>(MasterConfig.executionFlowQueueSize);
   }
 
   public void run(){

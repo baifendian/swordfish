@@ -29,9 +29,9 @@ public class MasterConfig {
   public static int failRetryCount;
 
   /**
-   * 失败重试的队列大小,默认为 10000
+   * executionflow队列大小,默认为 10000
    */
-  public static int failRetryQueueSize;
+  public static int executionFlowQueueSize;
 
   public static int heartBeatCheckInterval;
 
@@ -57,7 +57,7 @@ public class MasterConfig {
     }
 
     failRetryCount = conf.getInt("masterToWorker.failRetry.count", 2);
-    failRetryQueueSize = conf.getInt("masterToWorker.failRetry.queueSize", 10000);
+    executionFlowQueueSize = conf.getInt("masterToWorker.executionFlow.queueSize", 10000);
     heartBeatTimeoutInterval = conf.getInt("master.heartbeat.timeout.interval", 60) * 1000;
     heartBeatCheckInterval = conf.getInt("master.heartbeat.check.interval", 30);
     masterMinThreads = conf.getInt(MASTER_MIN_THREADS, 50);
