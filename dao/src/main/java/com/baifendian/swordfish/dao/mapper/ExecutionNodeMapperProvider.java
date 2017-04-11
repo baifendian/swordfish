@@ -96,6 +96,16 @@ public class ExecutionNodeMapperProvider {
     }.toString();
   }
 
+  public String selectExecNodeByJobId(Map<String, Object> parameter){
+    return new SQL() {
+      {
+        SELECT("*");
+        FROM(TABLE_NAME);
+        WHERE("job_id = #{jobId}");
+      }
+    }.toString();
+  }
+
   public String selectStatusByFlowId(Map<String, Object> parameter) {
     return new SQL() {
       {

@@ -15,6 +15,7 @@
  */
 package com.baifendian.swordfish.dao.mapper;
 
+import com.baifendian.swordfish.dao.enums.ScheduleStatus;
 import com.baifendian.swordfish.dao.mapper.utils.EnumFieldUtil;
 import com.baifendian.swordfish.dao.enums.ExecType;
 import com.baifendian.swordfish.dao.enums.FlowStatus;
@@ -22,6 +23,7 @@ import com.baifendian.swordfish.dao.enums.FlowType;
 import com.baifendian.swordfish.dao.model.ExecutionFlow;
 import com.baifendian.swordfish.dao.model.MaintainQuery;
 
+import com.sun.tools.javac.comp.Flow;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.jdbc.SQL;
@@ -249,6 +251,44 @@ public class ExecutionFlowMapperProvider {
             + " AND schedule_time >= #{startDate} AND schedule_time < #{endDate})");
 
     return sb.toString();
+  }
+
+  public String selectByFlowIdAndTimesAndStatusLimit(Map<String, Object> parameter) {
+    List<FlowStatus> flowStatuses = (List<FlowStatus>) parameter.get("status");
+
+    List<String> flowStatusStrList = new ArrayList<>();
+    for (FlowStatus status:flowStatuses){
+      flowStatusStrList.add(status.getType().toString());
+    }
+
+    String where = String.join(",",flowStatusStrList);
+
+    String sql = new SQL() {
+      {
+        SELECT("e_f.*");
+        SELECT("p_f.name as flow_name");
+        SELECT("p.name as project_name");
+        SELECT("p.name as owner");
+        FROM("execution_flows e_f");
+        JOIN("project_flows p_f on e_f.flow_id = p_f.id");
+        JOIN("project p on p_f.project_id = p.id");
+        JOIN("user u on p_f.owner = u.id");
+        WHERE("flow_id = #{flowId}");
+        WHERE("schedule_time >= #{startTime}");
+        WHERE("schedule_time < #{endTime}");
+        WHERE("`status` in ("+where+") limit #{from},#{limit}");
+
+      }
+    }.toString();
+
+    return new SQL(){
+      {
+        SELECT("e_f.*");
+        SELECT("u.name as submit_user_name");
+        FROM("("+sql+") e_f");
+        JOIN("user u on e_f.submit_user = u.id");
+      }
+    }.toString();
   }
 
   public String selectByFlowIdAndTime(Map<String, Object> parameter) {
