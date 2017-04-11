@@ -29,6 +29,7 @@ import com.baifendian.swordfish.dao.utils.json.JsonUtil;
 import com.baifendian.swordfish.rpc.ExecInfo;
 import com.baifendian.swordfish.rpc.RetInfo;
 import com.baifendian.swordfish.rpc.RetResultInfo;
+import com.baifendian.swordfish.rpc.ScheduleInfo;
 import com.baifendian.swordfish.rpc.client.MasterClient;
 import com.baifendian.swordfish.webserver.dto.ExecutorIds;
 import com.baifendian.swordfish.webserver.dto.LogResult;
@@ -114,21 +115,49 @@ public class ExecService {
     //链接execServer
     MasterClient masterClient = new MasterClient(masterServer.getHost(), masterServer.getPort());
 
-    ExecInfo execInfo = new ExecInfo(nodeName,nodeDep.getType(),notifyType.getType(),notifyMailList,timeout);
+
 
     try {
       logger.info("Call master client exec workflow , project id: {}, flow id: {},host: {}, port: {}", project.getId(), projectFlow.getId(), masterServer.getHost(), masterServer.getPort());
-      RetResultInfo retInfo = masterClient.execFlow(project.getId(), projectFlow.getId(), new Date().getTime(),execInfo);
-      if (retInfo == null || retInfo.getRetInfo().getStatus() != 0){
-        response.setStatus(HttpStatus.SC_SERVICE_UNAVAILABLE);
-        logger.error("Call master client set schedule false , project id: {}, flow id: {},host: {}, port: {}", project.getId(), projectFlow.getId(), masterServer.getHost(), masterServer.getPort());
-        return null;
+
+      switch (execType){
+        case DIRECT:{
+          ExecInfo execInfo = new ExecInfo(nodeName,nodeDep.getType(),notifyType.getType(),notifyMailList,timeout);
+          RetResultInfo retInfo = masterClient.execFlow(project.getId(), projectFlow.getId(), new Date().getTime(),execInfo);
+          if (retInfo == null || retInfo.getRetInfo().getStatus() != 0){
+            response.setStatus(HttpStatus.SC_SERVICE_UNAVAILABLE);
+            logger.error("Call master client exec workflow false , project id: {}, flow id: {},host: {}, port: {}", project.getId(), projectFlow.getId(), masterServer.getHost(), masterServer.getPort());
+            return null;
+          }
+          return retInfo.getExecIds();
+        }
+        case COMPLEMENT_DATA:{
+          ScheduleInfo scheduleInfo = null;
+          try {
+            scheduleInfo = JsonUtil.parseObject(schedule, ScheduleInfo.class);
+          }catch (Exception e){
+            response.setStatus(HttpStatus.SC_BAD_REQUEST);
+            logger.error("scheduleInfo des11n error",e);
+            return null;
+          }
+
+          RetResultInfo retInfo = masterClient.appendWorkFlow(project.getId(),projectFlow.getId(),scheduleInfo);
+          if (retInfo == null || retInfo.getRetInfo().getStatus() != 0){
+            response.setStatus(HttpStatus.SC_SERVICE_UNAVAILABLE);
+            logger.error("Call master client append workflow data false , project id: {}, flow id: {},host: {}, port: {}", project.getId(), projectFlow.getId(), masterServer.getHost(), masterServer.getPort());
+            return null;
+          }
+          return retInfo.getExecIds();
+        }
+        default:{
+          logger.error("exec workflow no support exec type {}",execType.getType());
+        }
       }
-      return retInfo.getExecIds();
+
 
     } catch (Exception e) {
       response.setStatus(HttpStatus.SC_SERVICE_UNAVAILABLE);
-      logger.error("Call master client set schedule error", e);
+      logger.error("Call master client exec workflow error", e);
       return null;
     }
   }
