@@ -745,7 +745,7 @@ public class FlowRunner implements Runnable {
   private void after() {
     ExecType flowRunType = executionFlow.getType();
     // 调度任务的发邮件处理
-    if (flowRunType == ExecType.DISPATCH) {
+    if (flowRunType == ExecType.SCHEDULER) {
       // 发送邮件
       try {
         sendEmail();

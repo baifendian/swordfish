@@ -158,5 +158,4 @@ public interface ExecutionFlowMapper {
 
   @DeleteProvider(type = ExecutionFlowMapperProvider.class, method = "deleteByExecId")
   int deleteByExecId(@Param("execId") int execId);
-
 }

@@ -21,9 +21,9 @@ package com.baifendian.swordfish.dao.enums;
 public enum ExecType {
 
   /**
-   * 0(开发测试) 1(调度的任务) 2(补数据的任务) 3(流式)
+   * 0(直接运行) 1(调度的任务) 2(补数据的任务)
    **/
-  DIRECT_RUN, DISPATCH, ADD_DATA, STREAMING;
+  DIRECT, SCHEDULER, COMPLEMENT_DATA;
 
   public Integer getType() {
     return ordinal();

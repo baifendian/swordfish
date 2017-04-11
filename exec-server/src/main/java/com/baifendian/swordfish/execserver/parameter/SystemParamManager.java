@@ -78,15 +78,15 @@ public class SystemParamManager {
     Date bizDate;
     Date execStartTime = executionFlow.getStartTime();
     switch (runType) {
-      case DIRECT_RUN:
+      case DIRECT:
         bizDate = org.apache.commons.lang.time.DateUtils.addDays(execStartTime, -1); // 运行日期的前一天
         break;
 
-      case DISPATCH:
+      case SCHEDULER:
         bizDate = org.apache.commons.lang.time.DateUtils.addDays(scheduleDate, -1); // 调度日期的前一天
         break;
 
-      case ADD_DATA:
+      case COMPLEMENT_DATA:
         bizDate = addDate; // 补数据的当天
         break;
 

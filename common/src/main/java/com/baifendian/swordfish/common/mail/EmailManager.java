@@ -180,20 +180,16 @@ public class EmailManager {
     String cnName;
 
     switch (runType) {
-      case ADD_DATA:
+      case COMPLEMENT_DATA:
         cnName = "Add data";
         break;
 
-      case DIRECT_RUN:
+      case DIRECT:
         cnName = "Direct run";
         break;
 
-      case DISPATCH:
+      case SCHEDULER:
         cnName = "Schedule";
-        break;
-
-      case STREAMING:
-        cnName = "Streaming task";
         break;
 
       default:
