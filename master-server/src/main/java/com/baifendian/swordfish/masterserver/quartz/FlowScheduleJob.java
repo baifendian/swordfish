@@ -40,7 +40,6 @@ import java.util.concurrent.BlockingQueue;
 
 /**
  * Workflow 调度 Job <p>
- *
  */
 public class FlowScheduleJob implements Job {
 
@@ -134,7 +133,7 @@ public class FlowScheduleJob implements Job {
 
     // 插入 ExecutionFlow
     ExecutionFlow executionFlow = flowDao.scheduleFlowToExecution(projectId, flowId, flow.getOwnerId(), scheduledFireTime,
-            ExecType.DISPATCH, schedule.getMaxTryTimes(), schedule.getTimeout());
+        ExecType.DISPATCH, schedule.getMaxTryTimes(), null, null, schedule.getNotifyType(), schedule.getNotifyMails(), schedule.getTimeout());
     executionFlow.setProjectId(projectId);
     executionFlow.setProjectName(flow.getProjectName());
     executionFlow.setFlowName(flow.getName());
