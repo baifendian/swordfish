@@ -126,6 +126,8 @@ public class ExecutionFlow {
    **/
   private String queue;
 
+  private String owner;
+
   public Integer getId() {
     return id;
   }
@@ -292,6 +294,14 @@ public class ExecutionFlow {
 
   public void setExtras(String extras) {
     this.extras = extras;
+  }
+
+  public String getOwner() {
+    return owner;
+  }
+
+  public void setOwner(String owner) {
+    this.owner = owner;
   }
 
   public Map<String, String> getUserDefinedParamMap() {

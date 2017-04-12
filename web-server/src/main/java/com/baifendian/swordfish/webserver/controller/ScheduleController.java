@@ -152,7 +152,7 @@ public class ScheduleController {
   public void postScheduleStatus(@RequestAttribute(value = "session.user") User operator,
                                  @PathVariable String projectName,
                                  @PathVariable String workflowName,
-                                 @PathVariable ScheduleStatus scheduleStatus,
+                                 @PathVariable String scheduleStatus,
                                  HttpServletResponse response){
     try {
       scheduleService.postScheduleStatus(operator, projectName, workflowName, scheduleStatus, response);

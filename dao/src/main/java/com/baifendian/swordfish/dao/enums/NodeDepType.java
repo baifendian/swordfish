@@ -24,7 +24,7 @@ public enum NodeDepType {
   /**
    * 0 表示仅执行 node ，1 表示执行 node 本身及其依赖，2 表示执行 node 及依赖当前 node 的 node
    */
-  NODE_ONLY, DEPENDENCIES_NODE, NODE_DEPENDENCIES;
+  NODE_ONLY, NODE_POST, NODE_PRE;
 
   /**
    * getter method

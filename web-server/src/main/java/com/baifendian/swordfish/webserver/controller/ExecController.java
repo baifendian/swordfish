@@ -17,17 +17,16 @@ package com.baifendian.swordfish.webserver.controller;
 
 import com.baifendian.swordfish.dao.enums.DepPolicyType;
 import com.baifendian.swordfish.dao.enums.ExecType;
+import com.baifendian.swordfish.dao.enums.NodeDepType;
 import com.baifendian.swordfish.dao.enums.NotifyType;
 import com.baifendian.swordfish.dao.model.ExecutionFlow;
 import com.baifendian.swordfish.dao.model.User;
-import com.baifendian.swordfish.webserver.dto.ExecutorIds;
-import com.baifendian.swordfish.webserver.dto.UserSessionData;
+import com.baifendian.swordfish.webserver.dto.LogResult;
 import com.baifendian.swordfish.webserver.service.ExecService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
 import java.util.Date;
@@ -67,7 +66,7 @@ public class ExecController {
                                          @RequestParam(value = "schedule", required = false) String schedule,
                                          @RequestParam(value = "execType", required = false) ExecType execType,
                                          @RequestParam(value = "nodeName", required = false) String nodeName,
-                                         @RequestParam(value = "nodeDep", required = false) DepPolicyType nodeDep,
+                                         @RequestParam(value = "nodeDep", required = false) NodeDepType nodeDep,
                                          @RequestParam(value = "notifyType", required = false) NotifyType notifyType,
                                          @RequestParam(value = "notifyMails", required = false) String notifyMails,
                                          @RequestParam(value = "timeout", required = false, defaultValue = "1800") int timeout,
@@ -120,13 +119,13 @@ public class ExecController {
    * @return
    */
   @GetMapping(value = "/{execId}")
-  public UserSessionData queryExecDetail(@RequestAttribute(value = "session.user") User operator,
+  public ExecutionFlow queryExecDetail(@RequestAttribute(value = "session.user") User operator,
                                          @PathVariable(value = "execId") int execId,
                                          HttpServletResponse response) {
     logger.info("Operator user {}, query exec detail, exec id: {}",
         operator.getName(), execId);
 
-    return null;
+    return execService.getExecWorkflow(operator,execId,response);
   }
 
   /**
@@ -140,15 +139,15 @@ public class ExecController {
    * @return
    */
   @GetMapping(value = "/{jobId}/logs")
-  public UserSessionData queryLogs(@RequestAttribute(value = "session.user") User operator,
-                                   @PathVariable(value = "jobId") int jobId,
-                                   @RequestParam(value = "from", required = false, defaultValue = "0") int from,
-                                   @RequestParam(value = "size", required = false, defaultValue = "100") int size,
-                                   HttpServletResponse response) {
+  public LogResult queryLogs(@RequestAttribute(value = "session.user") User operator,
+                             @PathVariable(value = "jobId") String jobId,
+                             @RequestParam(value = "from", required = false, defaultValue = "0") int from,
+                             @RequestParam(value = "size", required = false, defaultValue = "100") int size,
+                             HttpServletResponse response) {
     logger.info("Operator user {}, query log, job id: {}, from: {}, size: {}",
         operator.getName(), jobId, from, size);
 
-    return null;
+    return execService.getEexcWorkflowLog(operator,jobId,from,size,response);
   }
 
   /**
@@ -160,11 +159,11 @@ public class ExecController {
    */
   @PostMapping(value = "/{execId}/kill")
   public void killExec(@RequestAttribute(value = "session.user") User operator,
-                       @PathVariable String execId,
+                       @PathVariable int execId,
                        HttpServletResponse response) {
     logger.info("Operator user {}, kill exec, exec id: {}",
         operator.getName(), execId);
 
-
+    execService.postKillWorkflow(operator,execId,response);
   }
 }
