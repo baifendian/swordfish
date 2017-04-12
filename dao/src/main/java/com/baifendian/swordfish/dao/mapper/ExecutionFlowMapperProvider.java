@@ -274,7 +274,7 @@ public class ExecutionFlowMapperProvider {
     String workflowName = (String) parameter.get("workflowName");
 
     List<String> flowStatusStrList = new ArrayList<>();
-    if (flowStatuses != null) {
+    if (CollectionUtils.isNotEmpty(flowStatuses)) {
       for (FlowStatus status : flowStatuses) {
         flowStatusStrList.add(status.getType().toString());
       }
@@ -296,9 +296,12 @@ public class ExecutionFlowMapperProvider {
         if (!StringUtils.isEmpty(workflowName)) {
           WHERE("p_f.name = #{workflowName}");
         }
-        WHERE("schedule_time >= #{startTime}");
-        WHERE("schedule_time < #{endTime}");
-        WHERE("`status` in (" + where + ") limit #{from},#{limit}");
+        WHERE("schedule_time >= #{startDate}");
+        WHERE("schedule_time < #{endDate}");
+        if (CollectionUtils.isNotEmpty(flowStatuses)){
+          WHERE("`status` in (" + where + ") ");
+        }
+
 
       }
     }.toString();
@@ -310,7 +313,7 @@ public class ExecutionFlowMapperProvider {
         FROM("(" + sql + ") e_f");
         JOIN("user u on e_f.submit_user = u.id");
       }
-    }.toString();
+    }.toString()+" limit #{start},#{limit}";
   }
 
   public String selectByFlowIdAndTime(Map<String, Object> parameter) {
