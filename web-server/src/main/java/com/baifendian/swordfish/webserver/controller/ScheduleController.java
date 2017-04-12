@@ -31,7 +31,7 @@ import java.util.List;
  * 调度设置和管理入口
  */
 @RestController
-@RequestMapping(" /projects/{projectName}/workflows")
+@RequestMapping("/projects/{projectName}/workflows")
 public class ScheduleController {
 
   @Autowired
@@ -59,14 +59,17 @@ public class ScheduleController {
                                  @PathVariable String projectName,
                                  @PathVariable String workflowName,
                                  @RequestParam(value = "schedule") String schedule,
-                                 @RequestParam(value = "notifyType") NotifyType notifyType,
+                                 @RequestParam(value = "notifyType",required=false,defaultValue = "None") NotifyType notifyType,
                                  @RequestParam(value = "notifyMails",required=false) String notifyMails,
-                                 @RequestParam(value = "maxTryTimes") int maxTryTimes,
-                                 @RequestParam(value = "failurePolicy") FailurePolicyType failurePolicy,
-                                 @RequestParam(value = "depWorkflows") String  depWorkflows,
-                                 @RequestParam(value = "depPolicy") DepPolicyType depPolicyType,
-                                 @RequestParam(value = "timeout") int timeout,
+                                 @RequestParam(value = "maxTryTimes",required=false,defaultValue = "1") int maxTryTimes,
+                                 @RequestParam(value = "failurePolicy",required=false,defaultValue = "END") FailurePolicyType failurePolicy,
+                                 @RequestParam(value = "depWorkflows",required=false) String  depWorkflows,
+                                 @RequestParam(value = "depPolicy",required=false,defaultValue = "NO_DEP_PRE") DepPolicyType depPolicyType,
+                                 @RequestParam(value = "timeout",required=false,defaultValue = "18000") int timeout,
                                  HttpServletResponse response){
+    logger.info("Operator user {}, exec workflow, project name: {}, workflow name: {}, schedule: {}, notify type: {}, notify mails: {}, max try times: {}," +
+                    "failure policy: {}, dep workflows: {}, dep policy: {}, timeout: {}",
+            operator.getName(), projectName, workflowName, schedule, notifyType, notifyMails, maxTryTimes, failurePolicy, depWorkflows, depPolicyType, timeout);
     return scheduleService.createSchedule(operator,projectName,workflowName,schedule,notifyType,notifyMails,maxTryTimes,failurePolicy,depWorkflows,depPolicyType,timeout,response);
   }
 
@@ -90,14 +93,17 @@ public class ScheduleController {
                                           @PathVariable String projectName,
                                           @PathVariable String workflowName,
                                           @RequestParam(value = "schedule") String schedule,
-                                          @RequestParam(value = "notifyType") NotifyType notifyType,
+                                          @RequestParam(value = "notifyType",required=false,defaultValue = "None") NotifyType notifyType,
                                           @RequestParam(value = "notifyMails",required=false) String notifyMails,
-                                          @RequestParam(value = "maxTryTimes") int maxTryTimes,
-                                          @RequestParam(value = "failurePolicy") FailurePolicyType failurePolicy,
-                                          @RequestParam(value = "depWorkflows") String  depWorkflows,
-                                          @RequestParam(value = "depPolicy") DepPolicyType depPolicyType,
-                                          @RequestParam(value = "timeout") int timeout,
+                                          @RequestParam(value = "maxTryTimes",required=false,defaultValue = "1") int maxTryTimes,
+                                          @RequestParam(value = "failurePolicy",required=false,defaultValue = "END") FailurePolicyType failurePolicy,
+                                          @RequestParam(value = "depWorkflows",required=false) String  depWorkflows,
+                                          @RequestParam(value = "depPolicy",required=false,defaultValue = "NO_DEP_PRE") DepPolicyType depPolicyType,
+                                          @RequestParam(value = "timeout",required=false,defaultValue = "18000") int timeout,
                                           HttpServletResponse response){
+    logger.info("Operator user {}, exec workflow, project name: {}, workflow name: {}, schedule: {}, notify type: {}, notify mails: {}, max try times: {}," +
+                    "failure policy: {}, dep workflows: {}, dep policy: {}, timeout: {}",
+            operator.getName(), projectName, workflowName, schedule, notifyType, notifyMails, maxTryTimes, failurePolicy, depWorkflows, depPolicyType, timeout);
     return scheduleService.putSchedule(operator,projectName,workflowName,schedule,notifyType,notifyMails,maxTryTimes,failurePolicy,depWorkflows,depPolicyType,timeout,response);
   }
 
@@ -121,14 +127,17 @@ public class ScheduleController {
                                 @PathVariable String projectName,
                                 @PathVariable String workflowName,
                                 @RequestParam(value = "schedule") String schedule,
-                                @RequestParam(value = "notifyType") NotifyType notifyType,
+                                @RequestParam(value = "notifyType",required=false,defaultValue = "None") NotifyType notifyType,
                                 @RequestParam(value = "notifyMails",required=false) String notifyMails,
-                                @RequestParam(value = "maxTryTimes") int maxTryTimes,
-                                @RequestParam(value = "failurePolicy") FailurePolicyType failurePolicy,
-                                @RequestParam(value = "depWorkflows") String  depWorkflows,
-                                @RequestParam(value = "depPolicy") DepPolicyType depPolicyType,
-                                @RequestParam(value = "timeout") int timeout,
+                                @RequestParam(value = "maxTryTimes",required=false,defaultValue = "1") int maxTryTimes,
+                                @RequestParam(value = "failurePolicy",required=false,defaultValue = "END") FailurePolicyType failurePolicy,
+                                @RequestParam(value = "depWorkflows",required=false) String  depWorkflows,
+                                @RequestParam(value = "depPolicy",required=false,defaultValue = "NO_DEP_PRE") DepPolicyType depPolicyType,
+                                @RequestParam(value = "timeout",required=false,defaultValue = "18000") int timeout,
                                 HttpServletResponse response){
+    logger.info("Operator user {}, exec workflow, project name: {}, workflow name: {}, schedule: {}, notify type: {}, notify mails: {}, max try times: {}," +
+                    "failure policy: {}, dep workflows: {}, dep policy: {}, timeout: {}",
+            operator.getName(), projectName, workflowName, schedule, notifyType, notifyMails, maxTryTimes, failurePolicy, depWorkflows, depPolicyType, timeout);
     return scheduleService.patchSchedule(operator,projectName,workflowName,schedule,notifyType,notifyMails,maxTryTimes,failurePolicy,depWorkflows,depPolicyType,timeout,null,response);
   }
 
