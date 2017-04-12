@@ -82,7 +82,9 @@ public interface ExecutionFlowMapper {
           @Result(property = "projectId", column = "project_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
           @Result(property = "projectName", column = "project_name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
           @Result(property = "status", column = "status", typeHandler = EnumOrdinalTypeHandler.class, javaType = FlowStatus.class, jdbcType = JdbcType.TINYINT),
-          @Result(property = "submitUserId", column = "submit_user", javaType = int.class, jdbcType = JdbcType.INTEGER),
+          @Result(property = "submitUserId", column = "submit_user_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
+          @Result(property = "submitUser", column = "submit_user_name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+          @Result(property = "owner", column = "owner_name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
           @Result(property = "proxyUser", column = "proxy_user", javaType = String.class, jdbcType = JdbcType.VARCHAR),
           @Result(property = "submitTime", column = "submit_time", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP),
           @Result(property = "startTime", column = "start_time", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP),
@@ -139,7 +141,7 @@ public interface ExecutionFlowMapper {
           @Result(property = "submitUser", column = "schedule_user_name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
           @Result(property = "type", column = "type", typeHandler = EnumOrdinalTypeHandler.class, jdbcType = JdbcType.TINYINT),})
   @SelectProvider(type = ExecutionFlowMapperProvider.class, method = "selectByFlowIdAndTimesAndStatusLimit")
-  List<ExecutionFlow> selectByFlowIdAndTimesAndStatusLimit(@Param("flowId") int flowId, @Param("startDate") Date startDate, @Param("endDate") Date endDate, @Param("start") int start, @Param("limit") int limit, @Param("status")List<FlowStatus> statuses);
+  List<ExecutionFlow> selectByFlowIdAndTimesAndStatusLimit(@Param("projectName") String projectName,@Param("workflowName") String workflowName, @Param("startDate") Date startDate, @Param("endDate") Date endDate, @Param("start") int start, @Param("limit") int limit, @Param("status")List<FlowStatus> statuses);
 
   @Results(value = {
           @Result(property = "id", column = "id", id = true, javaType = int.class, jdbcType = JdbcType.INTEGER),

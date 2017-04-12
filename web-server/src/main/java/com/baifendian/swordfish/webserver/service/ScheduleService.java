@@ -259,7 +259,7 @@ public class ScheduleService {
   /**
    * 设置一个调度的上下线
    */
-  public void postScheduleStatus(User operator,String projectName,String workflowName,ScheduleStatus scheduleStatus,HttpServletResponse response) throws Exception{
+  public void postScheduleStatus(User operator,String projectName,String workflowName,String scheduleStatus,HttpServletResponse response) throws Exception{
     Project project = projectMapper.queryByName(projectName);
 
     if (project == null) {
@@ -300,7 +300,17 @@ public class ScheduleService {
       return;
     }
 
-    scheduleObj.setScheduleStatus(scheduleStatus);
+    switch (scheduleStatus){
+      case "online":scheduleObj.setScheduleStatus(ScheduleStatus.ONLINE);break;
+      case "offline":scheduleObj.setScheduleStatus(ScheduleStatus.OFFLINE);break;
+      default:{
+        logger.error("no support scheduleStatus: {}",scheduleStatus);
+        response.setStatus(HttpStatus.SC_NOT_FOUND);
+        return;
+      }
+    }
+
+
 
     scheduleMapper.update(scheduleObj);
 
@@ -309,7 +319,7 @@ public class ScheduleService {
 
     try {
 
-      switch (scheduleStatus){
+      switch (scheduleObj.getScheduleStatus()){
         case ONLINE:{
           logger.info("Call master client set schedule online , project id: {}, flow id: {},host: {}, port: {}", project.getId(), projectFlow.getId(), masterServer.getHost(), masterServer.getPort());
           if (!masterClient.setSchedule(project.getId(), projectFlow.getId())) {

@@ -16,10 +16,7 @@
 package com.baifendian.swordfish.webserver.service;
 
 import com.baifendian.swordfish.dao.FlowDao;
-import com.baifendian.swordfish.dao.enums.DepPolicyType;
-import com.baifendian.swordfish.dao.enums.ExecType;
-import com.baifendian.swordfish.dao.enums.FlowStatus;
-import com.baifendian.swordfish.dao.enums.NotifyType;
+import com.baifendian.swordfish.dao.enums.*;
 import com.baifendian.swordfish.dao.mapper.ExecutionFlowMapper;
 import com.baifendian.swordfish.dao.mapper.ExecutionNodeMapper;
 import com.baifendian.swordfish.dao.mapper.MasterServerMapper;
@@ -70,7 +67,7 @@ public class ExecService {
   @Autowired
   private FlowDao flowDao;
 
-  public List<Integer> postExecWorkflow(User operator, String projectName, String workflowName, String schedule, ExecType execType, String nodeName, DepPolicyType nodeDep, NotifyType notifyType, String notifyMails, int timeout, HttpServletResponse response) {
+  public List<Integer> postExecWorkflow(User operator, String projectName, String workflowName, String schedule, ExecType execType, String nodeName, NodeDepType nodeDep, NotifyType notifyType, String notifyMails, int timeout, HttpServletResponse response) {
 
     // 查看是否对项目具备相应的权限
     Project project = projectMapper.queryByName(projectName);
@@ -81,7 +78,7 @@ public class ExecService {
       return null;
     }
 
-    if (!projectService.hasWritePerm(operator.getId(), project)) {
+    if (!projectService.hasExecPerm(operator.getId(), project)) {
       logger.error("User {} has no right permission for the project {} to create project flow", operator.getName(), projectName);
       response.setStatus(HttpStatus.SC_UNAUTHORIZED);
       return null;
@@ -184,14 +181,6 @@ public class ExecService {
       return null;
     }
 
-    ProjectFlow projectFlow = flowDao.projectFlowfindByName(project.getId(), workflowName);
-
-    if (projectFlow == null) {
-      response.setStatus(HttpStatus.SC_NOT_MODIFIED);
-      logger.error("User {} has no exist workflow {} for the project {} to get exec workflow", operator.getName(), workflowName, project.getName());
-      return null;
-    }
-
     List<FlowStatus> flowStatusList;
     try {
       flowStatusList = JsonUtil.parseObjectList(status, FlowStatus.class);
@@ -201,7 +190,7 @@ public class ExecService {
       return null;
     }
 
-    return executionFlowMapper.selectByFlowIdAndTimesAndStatusLimit(projectFlow.getId(), startDate, endDate, from, size, flowStatusList);
+    return executionFlowMapper.selectByFlowIdAndTimesAndStatusLimit(projectName,workflowName, startDate, endDate, from, size, flowStatusList);
   }
 
   /**
@@ -236,6 +225,8 @@ public class ExecService {
       response.setStatus(HttpStatus.SC_UNAUTHORIZED);
       return null;
     }
+
+
 
     return executionFlow;
   }

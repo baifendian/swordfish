@@ -19,7 +19,7 @@ import com.baifendian.swordfish.dao.enums.FlowStatus;
 
 import java.util.Date;
 
-public class ExecutionNode {
+public class ExecutionNode{
 
   /**
    * 具体workflow执行的 id

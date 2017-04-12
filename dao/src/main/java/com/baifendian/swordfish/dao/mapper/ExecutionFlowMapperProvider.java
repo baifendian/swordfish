@@ -233,16 +233,28 @@ public class ExecutionFlowMapperProvider {
   }
 
   public String selectByExecId(Map<String, Object> parameter) {
-    return new SQL() {
+    String sql = new SQL() {
       {
         SELECT("a.*");
         SELECT("b.name as flow_name");
         SELECT("b.project_id as project_id");
+        SELECT("b.owner as owner_id");
         SELECT("c.name as project_name");
-        FROM("execution_flows as a");
-        INNER_JOIN("project_flows as b on a.flow_id = b.id");
-        INNER_JOIN("project as c on b.project_id = c.id");
+        SELECT("u.name as submit_user_name");
+        FROM("execution_flows a");
+        INNER_JOIN("project_flows b on a.flow_id = b.id");
+        INNER_JOIN("project c on b.project_id = c.id");
+        INNER_JOIN("user u on a.submit_user = u.id");
         WHERE("a.id = #{execId}");
+      }
+    }.toString();
+
+    return new SQL() {
+      {
+        SELECT("*");
+        SELECT("u.name as owner_name");
+        FROM("("+sql+") t");
+        JOIN("user u on t.owner_id = u.id");
       }
     }.toString();
   }
@@ -259,6 +271,8 @@ public class ExecutionFlowMapperProvider {
 
   public String selectByFlowIdAndTimesAndStatusLimit(Map<String, Object> parameter) {
     List<FlowStatus> flowStatuses = (List<FlowStatus>) parameter.get("status");
+
+    String workflowName = (String) parameter.get("workflowName");
 
     List<String> flowStatusStrList = new ArrayList<>();
     for (FlowStatus status:flowStatuses){
@@ -277,7 +291,10 @@ public class ExecutionFlowMapperProvider {
         JOIN("project_flows p_f on e_f.flow_id = p_f.id");
         JOIN("project p on p_f.project_id = p.id");
         JOIN("user u on p_f.owner = u.id");
-        WHERE("flow_id = #{flowId}");
+        WHERE("p.name = #{projectName}");
+        if (!StringUtils.isEmpty(workflowName)){
+          WHERE("p_f.name = #{workflowName}");
+        }
         WHERE("schedule_time >= #{startTime}");
         WHERE("schedule_time < #{endTime}");
         WHERE("`status` in ("+where+") limit #{from},#{limit}");
