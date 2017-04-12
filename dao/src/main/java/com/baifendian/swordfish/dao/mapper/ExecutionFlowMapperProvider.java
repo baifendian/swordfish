@@ -322,7 +322,7 @@ public class ExecutionFlowMapperProvider {
         FROM("(" + sql + ") e_f");
         JOIN("user u on e_f.submit_user = u.id");
       }
-    }.toString()+" limit #{start},#{limit}";
+    }.toString()+" order by schedule_time DESC limit #{start},#{limit}";
   }
 
   public String sumByFlowIdAndTimesAndStatus(Map<String, Object> parameter) {
