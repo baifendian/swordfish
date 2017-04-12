@@ -108,6 +108,12 @@ public class ExecutionFlow {
    */
   private String projectName;
 
+  private String workflowName;
+
+  private ExecType execType;
+
+  private Integer duration;
+
   /**
    * 调度时间
    **/
@@ -139,6 +145,35 @@ public class ExecutionFlow {
    **/
   private String queue;
 
+  public Integer getDuration() {
+    if (startTime!=null && endTime !=null){
+      return Math.toIntExact((endTime.getTime() - startTime.getTime()) / 1000);
+    }
+    return null;
+  }
+
+  public void setDuration(Integer duration) {
+    this.duration = duration;
+  }
+
+  public ExecType getExecType() {
+    return execType;
+  }
+
+  public void setExecType(ExecType execType) {
+    this.type = execType;
+    this.execType = execType;
+  }
+
+  public String getWorkflowName() {
+    return workflowName;
+  }
+
+  public void setWorkflowName(String workflowName) {
+    this.flowName = workflowName;
+    this.workflowName = workflowName;
+  }
+
   public Integer getId() {
     return id;
   }
@@ -161,6 +196,7 @@ public class ExecutionFlow {
   }
 
   public void setFlowName(String flowName) {
+    this.workflowName = flowName;
     this.flowName = flowName;
   }
 
@@ -237,6 +273,7 @@ public class ExecutionFlow {
   }
 
   public void setType(ExecType type) {
+    this.execType = type;
     this.type = type;
   }
 
