@@ -21,6 +21,7 @@ import com.baifendian.swordfish.dao.enums.NodeDepType;
 import com.baifendian.swordfish.dao.enums.NotifyType;
 import com.baifendian.swordfish.dao.model.ExecutionFlow;
 import com.baifendian.swordfish.dao.model.User;
+import com.baifendian.swordfish.webserver.dto.ExecWorkflowsResponse;
 import com.baifendian.swordfish.webserver.dto.LogResult;
 import com.baifendian.swordfish.webserver.service.ExecService;
 import org.slf4j.Logger;
@@ -93,15 +94,15 @@ public class ExecController {
    * @return
    */
   @GetMapping(value = "")
-  public List<ExecutionFlow> queryExecs(@RequestAttribute(value = "session.user") User operator,
-                                    @RequestParam(value = "startDate") long startDate,
-                                    @RequestParam(value = "endDate") long endDate,
-                                    @RequestParam(value = "projectName") String projectName,
-                                    @RequestParam(value = "workflowName", required = false) String workflowName,
-                                    @RequestParam(value = "status", required = false) String status,
-                                    @RequestParam(value = "from", required = false, defaultValue = "0") int from,
-                                    @RequestParam(value = "size", required = false, defaultValue = "100") int size,
-                                    HttpServletResponse response) {
+  public ExecWorkflowsResponse queryExecs(@RequestAttribute(value = "session.user") User operator,
+                                          @RequestParam(value = "startDate") long startDate,
+                                          @RequestParam(value = "endDate") long endDate,
+                                          @RequestParam(value = "projectName") String projectName,
+                                          @RequestParam(value = "workflowName", required = false) String workflowName,
+                                          @RequestParam(value = "status", required = false) String status,
+                                          @RequestParam(value = "from", required = false, defaultValue = "0") int from,
+                                          @RequestParam(value = "size", required = false, defaultValue = "100") int size,
+                                          HttpServletResponse response) {
     logger.info("Operator user {}, query exec list, start date: {}, end date: {}, project name: {}, workflow name: {}, status: {}, from: {}, size: {}",
         operator.getName(), startDate, endDate, projectName, workflowName, status, from, size);
 

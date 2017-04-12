@@ -146,6 +146,9 @@ public interface ExecutionFlowMapper {
   @SelectProvider(type = ExecutionFlowMapperProvider.class, method = "selectByFlowIdAndTimesAndStatusLimit")
   List<ExecutionFlow> selectByFlowIdAndTimesAndStatusLimit(@Param("projectName") String projectName,@Param("workflowList") List<String> workflowList, @Param("startDate") Date startDate, @Param("endDate") Date endDate, @Param("start") int start, @Param("limit") int limit, @Param("status")List<FlowStatus> statuses);
 
+  @SelectProvider(type = ExecutionFlowMapperProvider.class, method = "sumByFlowIdAndTimesAndStatus")
+  int sumByFlowIdAndTimesAndStatus(@Param("projectName") String projectName,@Param("workflowList") List<String> workflowList,@Param("startDate") Date startDate, @Param("endDate") Date endDate, @Param("status")List<FlowStatus> statuses);
+
   @Results(value = {
           @Result(property = "id", column = "id", id = true, javaType = int.class, jdbcType = JdbcType.INTEGER),
           @Result(property = "flowId", column = "flow_id", javaType = int.class, jdbcType = JdbcType.INTEGER),

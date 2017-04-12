@@ -29,6 +29,7 @@ import com.baifendian.swordfish.rpc.RetInfo;
 import com.baifendian.swordfish.rpc.RetResultInfo;
 import com.baifendian.swordfish.rpc.ScheduleInfo;
 import com.baifendian.swordfish.rpc.client.MasterClient;
+import com.baifendian.swordfish.webserver.dto.ExecWorkflowsResponse;
 import com.baifendian.swordfish.webserver.dto.ExecutorIds;
 import com.baifendian.swordfish.webserver.dto.LogResult;
 import org.apache.avro.data.Json;
@@ -170,7 +171,7 @@ public class ExecService {
    *
    * @return
    */
-  public List<ExecutionFlow> getExecWorkflow(User operator, String projectName, String workflowName, Date startDate, Date endDate, String status, int from, int size, HttpServletResponse response) {
+  public ExecWorkflowsResponse getExecWorkflow(User operator, String projectName, String workflowName, Date startDate, Date endDate, String status, int from, int size, HttpServletResponse response) {
 
     List<String> workflowList;
 
@@ -206,7 +207,9 @@ public class ExecService {
       return null;
     }
 
-    return executionFlowMapper.selectByFlowIdAndTimesAndStatusLimit(projectName,workflowList, startDate, endDate, from, size, flowStatusList);
+    List<ExecutionFlow> executionFlowList = executionFlowMapper.selectByFlowIdAndTimesAndStatusLimit(projectName,workflowList, startDate, endDate, from, size, flowStatusList);
+    int total = executionFlowMapper.sumByFlowIdAndTimesAndStatus(projectName,workflowList, startDate, endDate,  flowStatusList);
+    return new ExecWorkflowsResponse(total,size,executionFlowList);
   }
 
   /**

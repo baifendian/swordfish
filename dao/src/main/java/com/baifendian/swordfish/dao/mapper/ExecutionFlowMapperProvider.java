@@ -296,7 +296,7 @@ public class ExecutionFlowMapperProvider {
         SELECT("e_f.*");
         SELECT("p_f.name as flow_name");
         SELECT("p.name as project_name");
-        SELECT("p.name as owner");
+        SELECT("u.name as owner");
         FROM("execution_flows e_f");
         JOIN("project_flows p_f on e_f.flow_id = p_f.id");
         JOIN("project p on p_f.project_id = p.id");
@@ -323,6 +323,50 @@ public class ExecutionFlowMapperProvider {
         JOIN("user u on e_f.submit_user = u.id");
       }
     }.toString()+" limit #{start},#{limit}";
+  }
+
+  public String sumByFlowIdAndTimesAndStatus(Map<String, Object> parameter) {
+    List<FlowStatus> flowStatuses = (List<FlowStatus>) parameter.get("status");
+
+    List<String> workflowList = (List<String>) parameter.get("workflowList");
+
+    List<String> workflowList2 = new ArrayList<>();
+
+    if (CollectionUtils.isNotEmpty(workflowList)){
+      for (String workflow:workflowList){
+        workflowList2.add("\""+workflow+"\"");
+      }
+    }
+
+
+    List<String> flowStatusStrList = new ArrayList<>();
+    if (CollectionUtils.isNotEmpty(flowStatuses)) {
+      for (FlowStatus status : flowStatuses) {
+        flowStatusStrList.add(status.getType().toString());
+      }
+    }
+
+    String where = String.join(",", flowStatusStrList);
+
+    return new SQL() {
+      {
+        SELECT("count(0)");
+        FROM("execution_flows e_f");
+        JOIN("project_flows p_f on e_f.flow_id = p_f.id");
+        JOIN("project p on p_f.project_id = p.id");
+        WHERE("p.name = #{projectName}");
+        if (CollectionUtils.isNotEmpty(workflowList)) {
+          WHERE("p_f.name in ("+String.join(",",workflowList2)+")");
+        }
+        WHERE("schedule_time >= #{startDate}");
+        WHERE("schedule_time < #{endDate}");
+        if (CollectionUtils.isNotEmpty(flowStatuses)){
+          WHERE("`status` in (" + where + ") ");
+        }
+
+
+      }
+    }.toString();
   }
 
   public String selectByFlowIdAndTime(Map<String, Object> parameter) {
