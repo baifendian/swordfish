@@ -77,6 +77,8 @@ public class ExecutionFlowMapperProvider {
         VALUES("user_defined_params", "#{executionFlow.userDefinedParams}");
         VALUES("queue", "#{executionFlow.queue}");
         VALUES("extras", "#{executionFlow.extras}");
+        VALUES("notify_type", "#{executionFlow.notifyType}");
+        VALUES("notify_mails", "#{executionFlow.notifyMails}");
       }
     }.toString();
   }

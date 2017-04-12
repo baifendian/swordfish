@@ -70,7 +70,7 @@ public class ExecService {
   @Autowired
   private FlowDao flowDao;
 
-  public List<Integer> postExecWorkflow(User operator, String projectName, String workflowName, String schedule, ExecType execType, String nodeName, DepPolicyType nodeDep, NotifyType notifyType, String notifyMails, int timeout, HttpServletResponse response){
+  public List<Integer> postExecWorkflow(User operator, String projectName, String workflowName, String schedule, ExecType execType, String nodeName, DepPolicyType nodeDep, NotifyType notifyType, String notifyMails, int timeout, HttpServletResponse response) {
 
     // 查看是否对项目具备相应的权限
     Project project = projectMapper.queryByName(projectName);
@@ -104,10 +104,10 @@ public class ExecService {
     }
 
     List<String> notifyMailList = new ArrayList<>();
-    try{
-      notifyMailList = JsonUtil.parseObjectList(notifyMails,String.class);
-    }catch (Exception e) {
-      logger.error("notify mail list des11n error",e);
+    try {
+      notifyMailList = JsonUtil.parseObjectList(notifyMails, String.class);
+    } catch (Exception e) {
+      logger.error("notify mail list des11n error", e);
       response.setStatus(HttpStatus.SC_BAD_REQUEST);
       return null;
     }
@@ -115,42 +115,40 @@ public class ExecService {
     //链接execServer
     MasterClient masterClient = new MasterClient(masterServer.getHost(), masterServer.getPort());
 
-
-
     try {
       logger.info("Call master client exec workflow , project id: {}, flow id: {},host: {}, port: {}", project.getId(), projectFlow.getId(), masterServer.getHost(), masterServer.getPort());
 
-      switch (execType){
-        case DIRECT:{
-          ExecInfo execInfo = new ExecInfo(nodeName,nodeDep.getType(),notifyType.getType(),notifyMailList,timeout);
-          RetResultInfo retInfo = masterClient.execFlow(project.getId(), projectFlow.getId(), new Date().getTime(),execInfo);
-          if (retInfo == null || retInfo.getRetInfo().getStatus() != 0){
+      switch (execType) {
+        case DIRECT: {
+          ExecInfo execInfo = new ExecInfo(nodeName, nodeDep!=null?nodeDep.getType():0, notifyType!=null?notifyType.getType():0, notifyMailList, timeout);
+          RetResultInfo retInfo = masterClient.execFlow(project.getId(), projectFlow.getId(), new Date().getTime(), execInfo);
+          if (retInfo == null || retInfo.getRetInfo().getStatus() != 0) {
             response.setStatus(HttpStatus.SC_SERVICE_UNAVAILABLE);
             logger.error("Call master client exec workflow false , project id: {}, flow id: {},host: {}, port: {}", project.getId(), projectFlow.getId(), masterServer.getHost(), masterServer.getPort());
             return null;
           }
           return retInfo.getExecIds();
         }
-        case COMPLEMENT_DATA:{
+        case COMPLEMENT_DATA: {
           ScheduleInfo scheduleInfo = null;
           try {
             scheduleInfo = JsonUtil.parseObject(schedule, ScheduleInfo.class);
-          }catch (Exception e){
+          } catch (Exception e) {
             response.setStatus(HttpStatus.SC_BAD_REQUEST);
-            logger.error("scheduleInfo des11n error",e);
+            logger.error("scheduleInfo des11n error", e);
             return null;
           }
 
-          RetResultInfo retInfo = masterClient.appendWorkFlow(project.getId(),projectFlow.getId(),scheduleInfo);
-          if (retInfo == null || retInfo.getRetInfo().getStatus() != 0){
+          RetResultInfo retInfo = masterClient.appendWorkFlow(project.getId(), projectFlow.getId(), scheduleInfo);
+          if (retInfo == null || retInfo.getRetInfo().getStatus() != 0) {
             response.setStatus(HttpStatus.SC_SERVICE_UNAVAILABLE);
             logger.error("Call master client append workflow data false , project id: {}, flow id: {},host: {}, port: {}", project.getId(), projectFlow.getId(), masterServer.getHost(), masterServer.getPort());
             return null;
           }
           return retInfo.getExecIds();
         }
-        default:{
-          logger.error("exec workflow no support exec type {}",execType.getType());
+        default: {
+          logger.error("exec workflow no support exec type {}", execType.getType());
           response.setStatus(HttpStatus.SC_BAD_REQUEST);
           return null;
         }
@@ -166,9 +164,10 @@ public class ExecService {
 
   /**
    * 查询任务运行情况
+   *
    * @return
    */
-  public List<ExecutionFlow> getExecWorkflow(User operator, String projectName, String workflowName, Date startDate, Date endDate, String status,int from,int size, HttpServletResponse response){
+  public List<ExecutionFlow> getExecWorkflow(User operator, String projectName, String workflowName, Date startDate, Date endDate, String status, int from, int size, HttpServletResponse response) {
 
     // 查看是否对项目具备相应的权限
     Project project = projectMapper.queryByName(projectName);
@@ -194,29 +193,30 @@ public class ExecService {
     }
 
     List<FlowStatus> flowStatusList;
-    try{
-      flowStatusList = JsonUtil.parseObjectList(status,FlowStatus.class);
-    }catch (Exception e){
+    try {
+      flowStatusList = JsonUtil.parseObjectList(status, FlowStatus.class);
+    } catch (Exception e) {
       response.setStatus(HttpStatus.SC_BAD_REQUEST);
-      logger.error("flow status list des11n error",e);
+      logger.error("flow status list des11n error", e);
       return null;
     }
 
-    return executionFlowMapper.selectByFlowIdAndTimesAndStatusLimit(projectFlow.getId(),startDate,endDate,from,size,flowStatusList);
+    return executionFlowMapper.selectByFlowIdAndTimesAndStatusLimit(projectFlow.getId(), startDate, endDate, from, size, flowStatusList);
   }
 
   /**
    * 查询具体某个任务的运行情况
+   *
    * @param operator
    * @param execId
    * @param response
    * @return
    */
-  public ExecutionFlow getExecWorkflow(User operator, int execId, HttpServletResponse response){
+  public ExecutionFlow getExecWorkflow(User operator, int execId, HttpServletResponse response) {
 
     ExecutionFlow executionFlow = executionFlowMapper.selectByExecId(execId);
 
-    if (executionFlow == null){
+    if (executionFlow == null) {
       logger.error("exec flow does not exist: {}", execId);
       response.setStatus(HttpStatus.SC_NOT_FOUND);
       return null;
@@ -242,16 +242,17 @@ public class ExecService {
 
   /**
    * 查询日志信息
+   *
    * @param operator
    * @param jobId
    * @param from
    * @param size
    * @return
    */
-  public LogResult getEexcWorkflowLog(User operator,String jobId,int from,int size, HttpServletResponse response){
+  public LogResult getEexcWorkflowLog(User operator, String jobId, int from, int size, HttpServletResponse response) {
     ExecutionNode executionNode = executionNodeMapper.selectExecNodeByJobId(jobId);
 
-    if (executionNode == null){
+    if (executionNode == null) {
       logger.error("job id does not exist: {}", jobId);
       response.setStatus(HttpStatus.SC_NOT_FOUND);
       return null;
@@ -259,7 +260,7 @@ public class ExecService {
 
     ExecutionFlow executionFlow = executionFlowMapper.selectByExecId(executionNode.getExecId());
 
-    if (executionFlow == null){
+    if (executionFlow == null) {
       logger.error("execution flow does not exist: {}", executionNode.getExecId());
       response.setStatus(HttpStatus.SC_NOT_FOUND);
       return null;
@@ -267,7 +268,7 @@ public class ExecService {
 
     Project project = projectMapper.queryByName(executionFlow.getProjectName());
 
-    if (project == null){
+    if (project == null) {
       logger.error("project does not exist: {}", executionFlow.getProjectName());
       response.setStatus(HttpStatus.SC_NOT_FOUND);
       return null;
@@ -284,14 +285,15 @@ public class ExecService {
 
   /**
    * 停止运行
+   *
    * @param operator
    * @param execId
    * @param response
    */
-  public void postKillWorkflow(User operator,int execId, HttpServletResponse response){
+  public void postKillWorkflow(User operator, int execId, HttpServletResponse response) {
     ExecutionFlow executionFlow = executionFlowMapper.selectByExecId(execId);
 
-    if (executionFlow == null){
+    if (executionFlow == null) {
       logger.error("exec flow does not exist: {}", execId);
       response.setStatus(HttpStatus.SC_NOT_FOUND);
       return;
@@ -322,7 +324,7 @@ public class ExecService {
     MasterClient masterClient = new MasterClient(masterServer.getHost(), masterServer.getPort());
     try {
       logger.info("Call master client kill workflow , project id: {}, flow id: {},host: {}, port: {}", project.getId(), executionFlow.getFlowName(), masterServer.getHost(), masterServer.getPort());
-      if(!masterClient.cancelExecFlow(execId)){
+      if (!masterClient.cancelExecFlow(execId)) {
         logger.error("Call master client kill workflow false , project id: {}, exec flow id: {},host: {}, port: {}", project.getId(), execId, masterServer.getHost(), masterServer.getPort());
         response.setStatus(HttpStatus.SC_SERVICE_UNAVAILABLE);
       }
