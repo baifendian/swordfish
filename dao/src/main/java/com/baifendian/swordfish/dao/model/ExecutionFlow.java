@@ -41,6 +41,8 @@ public class ExecutionFlow {
   @JsonIgnore
   private int flowId;
 
+  private Integer execId;
+
   /**
    * workflow名称
    **/
@@ -142,6 +144,7 @@ public class ExecutionFlow {
   }
 
   public void setId(Integer id) {
+    this.execId = id;
     this.id = id;
   }
 
@@ -345,6 +348,19 @@ public class ExecutionFlow {
 
   public void setData(ExecutionFlowData data) {
     this.data = data;
+  }
+
+  public Integer getExecId() {
+    return execId;
+  }
+
+  public void setExecId(Integer execId) {
+    this.id = execId;
+    this.execId = execId;
+  }
+
+  public void setUserDefinedParamMap(Map<String, String> userDefinedParamMap) {
+    this.userDefinedParamMap = userDefinedParamMap;
   }
 
   public Map<String, String> getUserDefinedParamMap() {
