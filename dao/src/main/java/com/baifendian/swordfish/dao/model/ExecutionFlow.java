@@ -130,6 +130,8 @@ public class ExecutionFlow {
 
   private String owner;
 
+  private ExecutionFlowData data = new ExecutionFlowData();
+
   /**
    * 作业提交队列
    **/
@@ -337,6 +339,14 @@ public class ExecutionFlow {
     this.owner = owner;
   }
 
+  public ExecutionFlowData getData() {
+    return data;
+  }
+
+  public void setData(ExecutionFlowData data) {
+    this.data = data;
+  }
+
   public Map<String, String> getUserDefinedParamMap() {
     List<Property> propList;
     if (userDefinedParamMap == null && StringUtils.isNotEmpty(userDefinedParams)) {
@@ -344,5 +354,28 @@ public class ExecutionFlow {
       userDefinedParamMap = propList.stream().collect(Collectors.toMap(Property::getProp, Property::getValue));
     }
     return userDefinedParamMap;
+  }
+
+  public static class ExecutionFlowData{
+
+    private List<ExecutionNode> nodes;
+
+    private List<Property> userDefParams;
+
+    public List<ExecutionNode> getNodes() {
+      return nodes;
+    }
+
+    public void setNodes(List<ExecutionNode> nodes) {
+      this.nodes = nodes;
+    }
+
+    public List<Property> getUserDefParams() {
+      return userDefParams;
+    }
+
+    public void setUserDefParams(List<Property> userDefParams) {
+      this.userDefParams = userDefParams;
+    }
   }
 }

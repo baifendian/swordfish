@@ -19,7 +19,7 @@ import com.baifendian.swordfish.dao.enums.FlowStatus;
 
 import java.util.Date;
 
-public class ExecutionNode{
+public class ExecutionNode extends FlowNode{
 
   /**
    * 具体workflow执行的 id
@@ -121,4 +121,6 @@ public class ExecutionNode{
   public void setLogLinks(String logLinks) {
     this.logLinks = logLinks;
   }
+
+
 }

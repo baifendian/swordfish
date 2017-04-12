@@ -22,6 +22,7 @@ import com.baifendian.swordfish.dao.mapper.ExecutionNodeMapper;
 import com.baifendian.swordfish.dao.mapper.MasterServerMapper;
 import com.baifendian.swordfish.dao.mapper.ProjectMapper;
 import com.baifendian.swordfish.dao.model.*;
+import com.baifendian.swordfish.dao.model.flow.params.Property;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
 import com.baifendian.swordfish.rpc.ExecInfo;
 import com.baifendian.swordfish.rpc.RetInfo;
@@ -30,13 +31,18 @@ import com.baifendian.swordfish.rpc.ScheduleInfo;
 import com.baifendian.swordfish.rpc.client.MasterClient;
 import com.baifendian.swordfish.webserver.dto.ExecutorIds;
 import com.baifendian.swordfish.webserver.dto.LogResult;
+import org.apache.avro.data.Json;
 import org.apache.commons.httpclient.HttpStatus;
+import org.apache.commons.lang3.StringUtils;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -226,7 +232,31 @@ public class ExecService {
       return null;
     }
 
+    List<ExecutionNode> executionNodeList = executionNodeMapper.selectExecNodeById(execId);
 
+    try {
+      JSONObject jsonObject = new JSONObject(executionFlow.getWorkflowData());
+
+      List<FlowNode> nodes = JsonUtil.parseObjectList(jsonObject.getString("nodes"),FlowNode.class);
+
+      for (ExecutionNode executionNode:executionNodeList){
+        for (FlowNode node:nodes){
+          if (StringUtils.equals(node.getName(),executionNode.getName())){
+            executionNode.setDesc(node.getDesc());
+            executionNode.setType(node.getType());
+            executionNode.setParameter(node.getParameter());
+            executionNode.setDep(node.getDep());
+            executionNode.setExtras(node.getExtras());
+          }
+        }
+      }
+
+      executionFlow.getData().setNodes(executionNodeList);
+
+    } catch (Exception e) {
+      logger.error("des11n workflow data error",e);
+      response.setStatus(HttpStatus.SC_SERVICE_UNAVAILABLE);
+    }
 
     return executionFlow;
   }

@@ -75,8 +75,8 @@ public interface ExecutionNodeMapper {
           @Result(property = "logLinks", column = "log_links", javaType = String.class, jdbcType = JdbcType.VARCHAR),
           @Result(property = "jobId", column = "job_id", javaType = String.class, jdbcType = JdbcType.VARCHAR)
   })
-  @SelectProvider(type = ExecutionNodeMapperProvider.class, method = "selectExecNode")
-  ExecutionNode selectExecNodeById(@Param("execId") Long execId, @Param("name") String name);
+  @SelectProvider(type = ExecutionNodeMapperProvider.class, method = "selectExecNodeById")
+  List<ExecutionNode> selectExecNodeById(@Param("execId") int execId);
 
   /**
    * 根据jobId查询
