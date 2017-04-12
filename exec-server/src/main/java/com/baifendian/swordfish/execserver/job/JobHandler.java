@@ -18,6 +18,7 @@ package com.baifendian.swordfish.execserver.job;
 import com.baifendian.swordfish.common.job.Job;
 import com.baifendian.swordfish.common.job.JobProps;
 import com.baifendian.swordfish.common.job.exception.ExecException;
+import com.baifendian.swordfish.common.job.logger.JobLogger;
 import com.baifendian.swordfish.common.utils.DateUtils;
 import com.baifendian.swordfish.dao.FlowDao;
 import com.baifendian.swordfish.common.config.BaseConfig;
@@ -25,6 +26,7 @@ import com.baifendian.swordfish.dao.enums.FlowStatus;
 import com.baifendian.swordfish.dao.model.ExecutionFlow;
 import com.baifendian.swordfish.dao.model.ExecutionNode;
 import com.baifendian.swordfish.dao.model.FlowNode;
+import com.baifendian.swordfish.execserver.Constants;
 import com.baifendian.swordfish.execserver.exception.ExecTimeoutException;
 
 import org.slf4j.Logger;
@@ -39,8 +41,6 @@ import java.util.concurrent.*;
 public class JobHandler {
 
   private final Logger logger = LoggerFactory.getLogger(JobHandler.class);
-
-  private String DATETIME_FORMAT = "yyyyMMddHHmmss";
 
   private FlowNode node;
 
@@ -77,7 +77,7 @@ public class JobHandler {
     this.systemParamMap = systemParamMap;
     this.customParamMap = customParamMap;
     this.startTime = System.currentTimeMillis();
-    this.jobIdLog = String.format("%s_%s", executionNode.getJobId(), DateUtils.now(DATETIME_FORMAT));
+    this.jobIdLog = String.format("%s_%s", executionNode.getJobId(), DateUtils.now(Constants.DATETIME_FORMAT));
     // custom参数会覆盖system参数
     allParamMap = new HashMap<>();
     allParamMap.putAll(systemParamMap);
@@ -104,8 +104,9 @@ public class JobHandler {
     props.setEnvFile(BaseConfig.getSystemEnvPath());
     props.setQueue(executionFlow.getQueue());
 
+    JobLogger jobLogger = new JobLogger(executionNode.getJobId(), logger);
     //logger.info("props:{}", props);
-    job = JobTypeManager.newJob(jobIdLog, node.getType(), props, logger);
+    job = JobTypeManager.newJob(jobIdLog, node.getType(), props, jobLogger);
     Boolean result;
     try {
       result = submitJob(job);

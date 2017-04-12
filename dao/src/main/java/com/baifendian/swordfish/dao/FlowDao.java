@@ -184,6 +184,8 @@ public class FlowDao extends BaseDao {
     executionFlow.setTimeout(timeout);
     executionFlow.setStatus(FlowStatus.INIT);
     executionFlow.setExtras(projectFlow.getExtras());
+    executionFlow.setNotifyType(notifyType);
+    executionFlow.setNotifyMailList(mails);
 
     executionFlowMapper.insertAndGetId(executionFlow); // 插入执行信息
 

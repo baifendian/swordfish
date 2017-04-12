@@ -17,6 +17,7 @@ package com.baifendian.swordfish.dao.model;
 
 import com.baifendian.swordfish.dao.enums.ExecType;
 import com.baifendian.swordfish.dao.enums.FlowStatus;
+import com.baifendian.swordfish.dao.enums.NotifyType;
 import com.baifendian.swordfish.dao.model.flow.params.Property;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -121,12 +122,18 @@ public class ExecutionFlow {
   @JsonIgnore
   private Map<String, String> userDefinedParamMap;
 
+  private NotifyType notifyType;
+
+  private String notifyMails;
+
+  private List<String> notifyMailList;
+
+  private String owner;
+
   /**
    * 作业提交队列
    **/
   private String queue;
-
-  private String owner;
 
   public Integer getId() {
     return id;
@@ -296,6 +303,32 @@ public class ExecutionFlow {
     this.extras = extras;
   }
 
+  public NotifyType getNotifyType() {
+    return notifyType;
+  }
+
+  public void setNotifyType(NotifyType notifyType) {
+    this.notifyType = notifyType;
+  }
+
+  public String getNotifyMails() {
+    return notifyMails;
+  }
+
+  public void setNotifyMails(String notifyMails) {
+    this.notifyMails = notifyMails;
+    this.notifyMailList = JsonUtil.parseObjectList(notifyMails, String.class);
+  }
+
+  public List<String> getNotifyMailList() {
+    return notifyMailList;
+  }
+
+  public void setNotifyMailList(List<String> notifyMailList) {
+    this.notifyMailList = notifyMailList;
+    this.notifyMails = JsonUtil.toJsonString(notifyMailList);
+  }
+
   public String getOwner() {
     return owner;
   }
@@ -312,6 +345,4 @@ public class ExecutionFlow {
     }
     return userDefinedParamMap;
   }
-
-
 }
