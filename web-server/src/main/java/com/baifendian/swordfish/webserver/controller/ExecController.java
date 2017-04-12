@@ -94,8 +94,8 @@ public class ExecController {
    */
   @GetMapping(value = "")
   public List<ExecutionFlow> queryExecs(@RequestAttribute(value = "session.user") User operator,
-                                    @RequestParam(value = "startDate") Date startDate,
-                                    @RequestParam(value = "endDate") Date endDate,
+                                    @RequestParam(value = "startDate") long startDate,
+                                    @RequestParam(value = "endDate") long endDate,
                                     @RequestParam(value = "projectName") String projectName,
                                     @RequestParam(value = "workflowName", required = false) String workflowName,
                                     @RequestParam(value = "status", required = false) String status,
@@ -107,7 +107,7 @@ public class ExecController {
 
 
 
-    return execService.getExecWorkflow(operator,projectName,workflowName,startDate,endDate,status,from,size,response);
+    return execService.getExecWorkflow(operator,projectName,workflowName,new Date(startDate),new Date(endDate),status,from,size,response);
   }
 
   /**
