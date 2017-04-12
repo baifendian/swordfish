@@ -181,14 +181,6 @@ public class ExecService {
       return null;
     }
 
-    ProjectFlow projectFlow = flowDao.projectFlowfindByName(project.getId(), workflowName);
-
-    if (projectFlow == null) {
-      response.setStatus(HttpStatus.SC_NOT_MODIFIED);
-      logger.error("User {} has no exist workflow {} for the project {} to get exec workflow", operator.getName(), workflowName, project.getName());
-      return null;
-    }
-
     List<FlowStatus> flowStatusList;
     try {
       flowStatusList = JsonUtil.parseObjectList(status, FlowStatus.class);
@@ -198,7 +190,7 @@ public class ExecService {
       return null;
     }
 
-    return executionFlowMapper.selectByFlowIdAndTimesAndStatusLimit(projectFlow.getId(), startDate, endDate, from, size, flowStatusList);
+    return executionFlowMapper.selectByFlowIdAndTimesAndStatusLimit(projectName,workflowName, startDate, endDate, from, size, flowStatusList);
   }
 
   /**
@@ -233,6 +225,8 @@ public class ExecService {
       response.setStatus(HttpStatus.SC_UNAUTHORIZED);
       return null;
     }
+
+
 
     return executionFlow;
   }

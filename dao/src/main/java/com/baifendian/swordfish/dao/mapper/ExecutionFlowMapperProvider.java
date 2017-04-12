@@ -270,6 +270,8 @@ public class ExecutionFlowMapperProvider {
   public String selectByFlowIdAndTimesAndStatusLimit(Map<String, Object> parameter) {
     List<FlowStatus> flowStatuses = (List<FlowStatus>) parameter.get("status");
 
+    String workflowName = (String) parameter.get("workflowName");
+
     List<String> flowStatusStrList = new ArrayList<>();
     for (FlowStatus status:flowStatuses){
       flowStatusStrList.add(status.getType().toString());
@@ -287,7 +289,10 @@ public class ExecutionFlowMapperProvider {
         JOIN("project_flows p_f on e_f.flow_id = p_f.id");
         JOIN("project p on p_f.project_id = p.id");
         JOIN("user u on p_f.owner = u.id");
-        WHERE("flow_id = #{flowId}");
+        WHERE("p.name = #{projectName}");
+        if (!StringUtils.isEmpty(workflowName)){
+          WHERE("p_f.name = #{workflowName}");
+        }
         WHERE("schedule_time >= #{startTime}");
         WHERE("schedule_time < #{endTime}");
         WHERE("`status` in ("+where+") limit #{from},#{limit}");
