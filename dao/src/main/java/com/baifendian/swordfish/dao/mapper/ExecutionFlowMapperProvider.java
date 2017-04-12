@@ -78,7 +78,6 @@ public class ExecutionFlowMapperProvider {
         VALUES("user_defined_params", "#{executionFlow.userDefinedParams}");
         VALUES("queue", "#{executionFlow.queue}");
         VALUES("extras", "#{executionFlow.extras}");
-        VALUES("max_try_times", "#{executionFlow.maxTryTimes}");
         VALUES("notify_type", EnumFieldUtil.genFieldStr("executionFlow.notifyType", NotifyType.class));
         VALUES("notify_mails", "#{executionFlow.notifyMails}");
       }
