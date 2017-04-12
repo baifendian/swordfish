@@ -252,7 +252,7 @@ public class ExecutionFlowMapperProvider {
       {
         SELECT("*");
         SELECT("u.name as owner_name");
-        FROM("("+sql+") t");
+        FROM("(" + sql + ") t");
         JOIN("user u on t.owner_id = u.id");
       }
     }.toString();
@@ -274,11 +274,13 @@ public class ExecutionFlowMapperProvider {
     String workflowName = (String) parameter.get("workflowName");
 
     List<String> flowStatusStrList = new ArrayList<>();
-    for (FlowStatus status:flowStatuses){
-      flowStatusStrList.add(status.getType().toString());
+    if (flowStatuses != null) {
+      for (FlowStatus status : flowStatuses) {
+        flowStatusStrList.add(status.getType().toString());
+      }
     }
 
-    String where = String.join(",",flowStatusStrList);
+    String where = String.join(",", flowStatusStrList);
 
     String sql = new SQL() {
       {
@@ -291,21 +293,21 @@ public class ExecutionFlowMapperProvider {
         JOIN("project p on p_f.project_id = p.id");
         JOIN("user u on p_f.owner = u.id");
         WHERE("p.name = #{projectName}");
-        if (!StringUtils.isEmpty(workflowName)){
+        if (!StringUtils.isEmpty(workflowName)) {
           WHERE("p_f.name = #{workflowName}");
         }
         WHERE("schedule_time >= #{startTime}");
         WHERE("schedule_time < #{endTime}");
-        WHERE("`status` in ("+where+") limit #{from},#{limit}");
+        WHERE("`status` in (" + where + ") limit #{from},#{limit}");
 
       }
     }.toString();
 
-    return new SQL(){
+    return new SQL() {
       {
         SELECT("e_f.*");
         SELECT("u.name as submit_user_name");
-        FROM("("+sql+") e_f");
+        FROM("(" + sql + ") e_f");
         JOIN("user u on e_f.submit_user = u.id");
       }
     }.toString();
