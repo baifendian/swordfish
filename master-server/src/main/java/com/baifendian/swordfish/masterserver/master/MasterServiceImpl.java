@@ -137,6 +137,7 @@ public class MasterServiceImpl implements Iface {
   @Override
   public RetResultInfo execFlow(int projectId, int flowId, long scheduleDate, ExecInfo execInfo) throws TException {
     ExecutionFlow executionFlow;
+    LOGGER.debug("exec flow project id:{} flow id:{} schedule date:{} exec info:{}", projectId, flowId, scheduleDate, execInfo);
     try {
       ProjectFlow flow = flowDao.projectFlowfindById(flowId);
       if (flow == null) {

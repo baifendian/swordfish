@@ -64,7 +64,7 @@ public class ExecutionFlowMapperProvider {
         VALUES("flow_id", "#{executionFlow.flowId}");
         VALUES("worker", "#{executionFlow.worker}");
         VALUES("status", EnumFieldUtil.genFieldStr("executionFlow.status", FlowStatus.class));
-        VALUES("submit_user", "#{executionFlow.submitUser}");
+        VALUES("submit_user", "#{executionFlow.submitUserId}");
         VALUES("proxy_user", "#{executionFlow.proxyUser}");
         VALUES("submit_time", "#{executionFlow.submitTime}");
         VALUES("schedule_time", "#{executionFlow.scheduleTime}");

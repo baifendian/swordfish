@@ -162,7 +162,7 @@ public class FlowDao extends BaseDao {
       }
     }
 
-    ProjectFlow projectFlow = projectFlowMapper.findById(projectId);
+    ProjectFlow projectFlow = projectFlowMapper.findById(workflowId);
     FlowDag flowDag = new FlowDag();
     flowDag.setEdges(flowNodeRelations);
     flowDag.setNodes(flowNodes);

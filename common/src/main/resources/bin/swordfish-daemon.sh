@@ -57,6 +57,7 @@ case $startStop in
     echo starting $command, logging to $log
     echo "nohup $JAVA_HOME/bin/java $SWORDFISH_OPTS -classpath $SWORDFISH_CONF_DIR:$SWORDFISH_LIB_JARS $CLASS > $log 2>&1 < /dev/null &"
     nohup $JAVA_HOME/bin/java $SWORDFISH_OPTS -classpath $SWORDFISH_CONF_DIR:$SWORDFISH_LIB_JARS $CLASS > "$log" 2>&1 < /dev/null &
+    echo $! > $pid
     ;;
 
   (stop)
