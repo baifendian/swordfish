@@ -15,16 +15,15 @@
  */
 package com.baifendian.swordfish.common.job;
 
-import com.baifendian.swordfish.common.job.logger.JobLogger;
 import org.slf4j.Logger;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
 public abstract class AbstractJob implements Job {
-  protected final JobLogger logger;
+  protected final Logger logger;
 
-  private final Logger _logger;
+  //private final Logger _logger;
 
   /**
    * jobId
@@ -63,8 +62,7 @@ public abstract class AbstractJob implements Job {
   protected AbstractJob(String jobIdLog, JobProps props, Logger logger) throws IOException {
     this.jobIdLog = jobIdLog;
     this.props = props;
-    this._logger = logger;
-    this.logger = new JobLogger(jobIdLog, logger);
+    this.logger = logger;
     this.definedParamMap = props.getDefinedParams();
     this.projectId = props.getProjectId();
     initJobParams();

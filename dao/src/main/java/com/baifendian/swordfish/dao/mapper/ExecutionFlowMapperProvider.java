@@ -15,6 +15,7 @@
  */
 package com.baifendian.swordfish.dao.mapper;
 
+import com.baifendian.swordfish.dao.enums.NotifyType;
 import com.baifendian.swordfish.dao.enums.ScheduleStatus;
 import com.baifendian.swordfish.dao.mapper.utils.EnumFieldUtil;
 import com.baifendian.swordfish.dao.enums.ExecType;
@@ -77,7 +78,8 @@ public class ExecutionFlowMapperProvider {
         VALUES("user_defined_params", "#{executionFlow.userDefinedParams}");
         VALUES("queue", "#{executionFlow.queue}");
         VALUES("extras", "#{executionFlow.extras}");
-        VALUES("notify_type", "#{executionFlow.notifyType}");
+        VALUES("max_try_times", "#{executionFlow.maxTryTimes}");
+        VALUES("notify_type", EnumFieldUtil.genFieldStr("executionFlow.notifyType", NotifyType.class));
         VALUES("notify_mails", "#{executionFlow.notifyMails}");
       }
     }.toString();

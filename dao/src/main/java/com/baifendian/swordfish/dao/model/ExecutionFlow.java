@@ -17,6 +17,7 @@ package com.baifendian.swordfish.dao.model;
 
 import com.baifendian.swordfish.dao.enums.ExecType;
 import com.baifendian.swordfish.dao.enums.FlowStatus;
+import com.baifendian.swordfish.dao.enums.NotifyType;
 import com.baifendian.swordfish.dao.model.flow.params.Property;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -120,6 +121,13 @@ public class ExecutionFlow {
 
   @JsonIgnore
   private Map<String, String> userDefinedParamMap;
+
+  private NotifyType notifyType;
+
+  private String notifyMails;
+
+  @JsonIgnore
+  private List<String> notifyMailList;
 
   /**
    * 作业提交队列
@@ -292,6 +300,32 @@ public class ExecutionFlow {
 
   public void setExtras(String extras) {
     this.extras = extras;
+  }
+
+  public NotifyType getNotifyType() {
+    return notifyType;
+  }
+
+  public void setNotifyType(NotifyType notifyType) {
+    this.notifyType = notifyType;
+  }
+
+  public String getNotifyMails() {
+    return notifyMails;
+  }
+
+  public void setNotifyMails(String notifyMails) {
+    this.notifyMails = notifyMails;
+    this.notifyMailList = JsonUtil.parseObjectList(notifyMails, String.class);
+  }
+
+  public List<String> getNotifyMailList() {
+    return notifyMailList;
+  }
+
+  public void setNotifyMailList(List<String> notifyMailList) {
+    this.notifyMailList = notifyMailList;
+    this.notifyMails = JsonUtil.toJsonString(notifyMailList);
   }
 
   public Map<String, String> getUserDefinedParamMap() {
