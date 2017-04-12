@@ -172,6 +172,16 @@ public class ExecService {
    */
   public List<ExecutionFlow> getExecWorkflow(User operator, String projectName, String workflowName, Date startDate, Date endDate, String status, int from, int size, HttpServletResponse response) {
 
+    List<String> workflowList;
+
+    try{
+      workflowList = JsonUtil.parseObjectList(workflowName,String.class);
+    }catch (Exception e){
+      logger.error("des11n workflow list error",e);
+      response.setStatus(HttpStatus.SC_BAD_REQUEST);
+      return null;
+    }
+
     // 查看是否对项目具备相应的权限
     Project project = projectMapper.queryByName(projectName);
 
@@ -196,7 +206,7 @@ public class ExecService {
       return null;
     }
 
-    return executionFlowMapper.selectByFlowIdAndTimesAndStatusLimit(projectName,workflowName, startDate, endDate, from, size, flowStatusList);
+    return executionFlowMapper.selectByFlowIdAndTimesAndStatusLimit(projectName,workflowList, startDate, endDate, from, size, flowStatusList);
   }
 
   /**
