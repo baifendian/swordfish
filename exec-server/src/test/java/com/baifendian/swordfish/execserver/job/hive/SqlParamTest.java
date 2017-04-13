@@ -34,7 +34,7 @@ public class SqlParamTest {
 
   @Before
   public void before() {
-    String paramStr = "{\"sql\":\"use bfd_test; use bfd;select count(*) from bfd_test.test;\",\"udfs\":[{\"func\":\"md5\",\"className\":\"com.baifendian.hive.udf.Md5\",\"libJar\":{\"scope\":\"project\",\"res\":\"udf.jar\",\"alias\":null,\"projectScope\":true,\"symbolicRes\":\"udf.jar\"}}],\"resourceFiles\":[\"udf.jar\"],\"beContinue\":true}\n";
+    String paramStr = "{\"sql\":\"select count(*) from bfd_test.test;\", \"udfs\":[{ \"func\": \"md5\", \"className\": \"com.baifendian.hive.udf.Md5\", \"libJars\": [{ \"scope\": \"project\", \"res\": \"udf.jar\" }] }]}";
     param = JsonUtil.parseObject(paramStr, SqlParam.class);
   }
 
@@ -45,9 +45,4 @@ public class SqlParamTest {
     assertEquals(result, StringUtils.join(resources, ""));
   }
 
-  @Test
-  public void testIsContinue() {
-    System.out.println(JsonUtil.toJsonString(param));
-    SqlParam param1 = JsonUtil.parseObject(JsonUtil.toJsonString(param), SqlParam.class);
-  }
 }

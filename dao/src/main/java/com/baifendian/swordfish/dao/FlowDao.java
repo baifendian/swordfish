@@ -20,6 +20,7 @@ import com.baifendian.swordfish.dao.enums.*;
 import com.baifendian.swordfish.dao.mapper.*;
 import com.baifendian.swordfish.dao.model.*;
 import com.baifendian.swordfish.dao.model.flow.FlowDag;
+import com.baifendian.swordfish.dao.utils.DagHelper;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +28,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -148,7 +150,7 @@ public class FlowDao extends BaseDao {
    * @return {@link ExecutionFlow}
    */
   public ExecutionFlow scheduleFlowToExecution(Integer projectId, Integer workflowId, int submitUser, Date scheduleTime, ExecType runType,
-                                               Integer maxTryTimes, String nodeName, NodeDepType nodeDep, NotifyType notifyType, List<String> mails, int timeout) {
+                                               Integer maxTryTimes, String nodeName, NodeDepType nodeDep, NotifyType notifyType, List<String> mails, int timeout) throws Exception {
     List<FlowNode> flowNodes = flowNodeMapper.selectByFlowId(workflowId); // 节点信息
     List<FlowNodeRelation> flowNodeRelations = new ArrayList<>();
 
@@ -177,6 +179,24 @@ public class FlowDao extends BaseDao {
     executionFlow.setProxyUser(projectFlow.getProxyUser());
     executionFlow.setScheduleTime(scheduleTime);
     executionFlow.setStartTime(new Date());
+
+    if (nodeName != null){
+      FlowNode flowNode = DagHelper.findNodeByName(flowNodes, nodeName);
+      if(flowNode != null){
+        switch (nodeDep){
+          case NODE_ONLY:
+            flowDag.setEdges(null);
+            flowDag.setNodes(Arrays.asList(flowNode));
+            break;
+          case NODE_POST:  // 当前节点及其后续依赖
+            flowDag = DagHelper.findNodeDepDag(flowDag, flowNode, true);
+          case NODE_PRE:  // 当前节点及其前置依赖
+            flowDag = DagHelper.findNodeDepDag(flowDag, flowNode, false);
+        }
+      } else {
+        throw new Exception(String.format("node %s not found in flow %d", nodeName, workflowId));
+      }
+    }
     executionFlow.setWorkflowData(JsonUtil.toJsonString(flowDag));
     executionFlow.setUserDefinedParams(projectFlow.getUserDefinedParams());
     executionFlow.setType(runType);
