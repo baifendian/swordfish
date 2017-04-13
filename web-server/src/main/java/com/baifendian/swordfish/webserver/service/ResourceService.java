@@ -133,6 +133,7 @@ public class ResourceService {
 
     // 上传失败
     if (!upload(project, name, file)) {
+      logger.error("upload resource: {} file: {} failed.", name, file.getOriginalFilename());
       response.setStatus(HttpStatus.SC_BAD_REQUEST);
       throw new IllegalArgumentException("file suffix must the same with resource name suffix");
     }
@@ -239,6 +240,7 @@ public class ResourceService {
 
     // 上传失败
     if (!upload(project, name, file)) {
+      logger.error("upload resource: {} file: {} failed.", name, file.getOriginalFilename());
       response.setStatus(HttpStatus.SC_BAD_REQUEST);
       throw new IllegalArgumentException("file suffix must the same with resource name suffix");
     }
