@@ -79,14 +79,13 @@ public class EmailManager {
    * 发送 EMAIL(调度)
    *
    * @param executionFlow
-   * @param schedule
    */
-  public static void sendEmail(ExecutionFlow executionFlow, Schedule schedule) {
+  public static void sendEmail(ExecutionFlow executionFlow) {
     String title = genTitle(executionFlow.getType(), executionFlow.getStatus());
     String content = genContent(executionFlow.getType(), executionFlow.getProjectName(), executionFlow.getFlowName(),
         executionFlow.getScheduleTime(), executionFlow.getStatus());
 
-    mailSendService.sendToFlowMails(executionFlow.getFlowId(), title, content, true, schedule);
+    mailSendService.sendToFlowMails(executionFlow.getFlowId(), title, content, true, executionFlow.getNotifyMailList());
   }
 
   /**

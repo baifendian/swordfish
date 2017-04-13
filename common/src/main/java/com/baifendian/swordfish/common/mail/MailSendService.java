@@ -81,10 +81,9 @@ public class MailSendService extends BaseDao {
    * @param title                  邮件主题
    * @param content                邮件内容
    * @param sendToUserIfMailsEmpty 标志位，若项目无邮件组发送邮件给项目成员
+   * @param mails 邮件列表
    */
-  public boolean sendToFlowMails(int flowId, String title, String content, boolean sendToUserIfMailsEmpty, Schedule schedule) {
-    List<String> mails = schedule.getNotifyMails();
-
+  public boolean sendToFlowMails(int flowId, String title, String content, boolean sendToUserIfMailsEmpty, List<String> mails) {
     if (CollectionUtils.isEmpty(mails)) {
       if (sendToUserIfMailsEmpty) {
         return sendToProjectUsers(flowId, title, content);

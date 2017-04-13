@@ -113,11 +113,6 @@ public class FlowRunner implements Runnable {
   private final List<String> skipNodes = new CopyOnWriteArrayList<>();
 
   /**
-   * 执行的节点的 Future
-   */
-  private final Map<ExecutionNode, Future<?>> nodeFutureMap = new HashMap<>();
-
-  /**
    * 正在运行的nodeRunner
    */
   private Set<NodeRunner> activeNodeRunners = Collections.newSetFromMap(new ConcurrentHashMap<NodeRunner, Boolean>());
@@ -267,7 +262,7 @@ public class FlowRunner implements Runnable {
       // 超时时，取消所有正在执行的作业
       cancelAllExectingNode();
     } catch (Throwable e) {
-      LOGGER.error(e.getMessage(), e);
+      LOGGER.error("run exec id:"+executionFlow.getId(), e);
     } finally {
       if (status == null) { // 执行失败
         updateExecutionFlow(FlowStatus.FAILED);
@@ -515,7 +510,6 @@ public class FlowRunner implements Runnable {
     NodeRunner nodeRunner = new NodeRunner(executionFlow, executionNode, flowNode, jobExecutorService, synObject, nowTimeout, systemParamMap, customParamMap);
     Future<?> future = executorService.submit(nodeRunner);
     activeNodeRunners.add(nodeRunner);
-    nodeFutureMap.put(executionNode, future);
   }
 
   /**
@@ -778,11 +772,10 @@ public class FlowRunner implements Runnable {
    * 发送邮件 <p>
    */
   private void sendEmail() {
-    Schedule schedule = context.getSchedule();
     // 发送邮件
-    if (schedule != null && ((executionFlow.getStatus().typeIsSuccess() && schedule.getNotifyType().typeIsSendSuccessMail())
-        || (executionFlow.getStatus().typeIsFailure() && schedule.getNotifyType().typeIsSendFailureMail()))){
-      EmailManager.sendEmail(executionFlow, schedule);
+    if ((executionFlow.getStatus().typeIsSuccess() && executionFlow.getNotifyType().typeIsSendSuccessMail())
+        || (executionFlow.getStatus().typeIsFailure() && executionFlow.getNotifyType().typeIsSendFailureMail())){
+      EmailManager.sendEmail(executionFlow);
     }
   }
 

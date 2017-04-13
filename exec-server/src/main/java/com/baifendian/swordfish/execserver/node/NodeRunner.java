@@ -122,7 +122,7 @@ public class NodeRunner implements Runnable {
       // 具体执行
       status = jobHandler.handle();
 
-      LOGGER.info("run executor:{} finished, status:{}", executionNode.getName(), status);
+      LOGGER.info("run executor:{} node:{} finished, status:{}", executionFlow.getId(), executionNode.getName(), status);
 
       // 更新 executionNode 信息
       updateExecutionNode(status);

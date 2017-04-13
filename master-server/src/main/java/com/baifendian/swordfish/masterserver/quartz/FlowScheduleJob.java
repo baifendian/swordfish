@@ -156,8 +156,8 @@ public class FlowScheduleJob implements Job {
           flowDao.updateExecutionFlow(executionFlow);
           LOGGER.error("自依赖的上一周期执行失败");
           // 发送邮件
-          if (schedule.getNotifyType().typeIsSendFailureMail()) {
-            EmailManager.sendEmail(executionFlow, schedule);
+          if (executionFlow.getNotifyType().typeIsSendFailureMail()) {
+            EmailManager.sendEmail(executionFlow);
           }
           return;
         }
@@ -180,8 +180,8 @@ public class FlowScheduleJob implements Job {
         flowDao.updateExecutionFlow(executionFlow);
         LOGGER.error("依赖的 workflow 执行失败");
         // 发送邮件
-        if (schedule.getNotifyType().typeIsSendFailureMail()) {
-          EmailManager.sendEmail(executionFlow, schedule);
+        if (executionFlow.getNotifyType().typeIsSendFailureMail()) {
+          EmailManager.sendEmail(executionFlow);
         }
         return;
       }
