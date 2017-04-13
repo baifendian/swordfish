@@ -108,12 +108,6 @@ public class ResourceService {
       return null;
     }
 
-    // 上传失败
-    if (!upload(project, name, file)) {
-      response.setStatus(HttpStatus.SC_BAD_REQUEST);
-      return null;
-    }
-
     // 插入数据
     resource = new Resource();
     Date now = new Date();
@@ -135,6 +129,12 @@ public class ResourceService {
       logger.error("Resource has exist, can't create again.", e);
       response.setStatus(HttpStatus.SC_CONFLICT);
       return null;
+    }
+
+    // 上传失败
+    if (!upload(project, name, file)) {
+      response.setStatus(HttpStatus.SC_BAD_REQUEST);
+      throw new IllegalArgumentException("file suffix must the same with resource name suffix");
     }
 
     response.setStatus(HttpStatus.SC_CREATED);
@@ -220,9 +220,6 @@ public class ResourceService {
 
     if (file != null) {
       resource.setOriginFilename(file.getOriginalFilename());
-
-      // 上传文件
-      upload(project, name, file);
     }
 
     if (desc != null) {
@@ -238,6 +235,12 @@ public class ResourceService {
       logger.error("Resource {} upload failed", name);
       response.setStatus(HttpStatus.SC_NOT_MODIFIED);
       return null;
+    }
+
+    // 上传失败
+    if (!upload(project, name, file)) {
+      response.setStatus(HttpStatus.SC_BAD_REQUEST);
+      throw new IllegalArgumentException("file suffix must the same with resource name suffix");
     }
 
     return resource;
