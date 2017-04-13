@@ -188,7 +188,7 @@ public class MockDataService {
     return dataSource;
   }
 
-  public String MR_PARAMETER = "{\"mainClass\":\"com.baifendian.mr.WordCount\",\"mainJar\":{\"scope\":\"project\",\"res\":\"wordcount-examples.jar\"},\"args\":\"/user/joe/wordcount/input /user/joe/wordcount/output\",\"properties\":[{\"prop\":\"wordcount.case.sensitive\",\"value\":\"true\"},{\"prop\":\"stopwords\",\"value\":\"the,who,a,then\"}],\"files\":[{\"res\":\"ABC.conf\",\"alias\":\"aa\"},{\"scope\":\"workflow\",\"res\":\"conf/HEL.conf\",\"alias\":\"hh\"}],\"archives\":[{\"res\":\"JOB.zip\",\"alias\":\"jj\"}],\"libJars\":[{\"scope\":\"workflow\",\"res\":\"lib/tokenizer-0.1.jar\"}]}";
+  public String MR_PARAMETER = "{\"mainClass\":\"com.baifendian.mr.WordCount\",\"mainJar\":{\"scope\":\"project\",\"res\":\"wordcount-examples\"},\"args\":\"/user/joe/wordcount/input /user/joe/wordcount/output\",\"properties\":[{\"prop\":\"wordcount.case.sensitive\",\"value\":\"true\"},{\"prop\":\"stopwords\",\"value\":\"the,who,a,then\"}],\"files\":[{\"res\":\"ABC\",\"alias\":\"aa\"},{\"scope\":\"workflow\",\"res\":\"conf/HEL\",\"alias\":\"hh\"}],\"archives\":[{\"res\":\"JOB\",\"alias\":\"jj\"}],\"libJars\":[{\"scope\":\"workflow\",\"res\":\"lib/tokenizer-0.1\"}]}";
 
   public String USER_DEFINED_PARAMETER = "[{\"prop\":\"year\",\"value\":\"$[yyyy]\"}]";
 

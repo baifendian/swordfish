@@ -132,12 +132,12 @@ public class WorkflowService {
         return null;
       }
 
-      //工作流预处理
+      /*/工作流预处理
       if (!preNodeParam(project.getId(),flowNode.getParameter(),flowNode.getType())) {
         logger.error("Flow node {} pre parameter error", flowNode.getName());
         response.setStatus(HttpStatus.SC_BAD_REQUEST);
         return null;
-      }
+      }*/
     }
 
 
@@ -282,11 +282,11 @@ public class WorkflowService {
           }
 
           //工作流预处理
-          if (!preNodeParam(project.getId(),flowNode.getParameter(),flowNode.getType())) {
+          /*if (!preNodeParam(project.getId(),flowNode.getParameter(),flowNode.getType())) {
             logger.error("Flow node {} pre parameter error", flowNode.getName());
             response.setStatus(HttpStatus.SC_BAD_REQUEST);
             return null;
-          }
+          }*/
         }
 
       }
