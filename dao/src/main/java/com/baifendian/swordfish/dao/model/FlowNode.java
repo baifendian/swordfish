@@ -15,6 +15,7 @@
  */
 package com.baifendian.swordfish.dao.model;
 
+import com.baifendian.swordfish.dao.mapper.utils.EqualUtils;
 import com.baifendian.swordfish.dao.utils.json.JsonObjectDeserializer;
 import com.baifendian.swordfish.dao.utils.json.JsonObjectSerializer;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
@@ -172,7 +173,7 @@ public class FlowNode {
             Objects.equals(parameter, flowNode.parameter) &&
             Objects.equals(dep, flowNode.dep) &&
             Objects.equals(extras, flowNode.extras) &&
-            CollectionUtils.isEqualCollection(depList, flowNode.depList);
+            EqualUtils.equalLists(depList, flowNode.depList);
   }
 
   @Override
