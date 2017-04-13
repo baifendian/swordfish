@@ -34,7 +34,6 @@ public class ResourceSqlProvider {
         INSERT_INTO(TABLE_NAME);
 
         VALUES("`name`", "#{resource.name}");
-        VALUES("`suffix`", "#{resource.suffix}");
         VALUES("`origin_filename`", "#{resource.originFilename}");
         VALUES("`desc`", "#{resource.desc}");
         VALUES("`owner`", "#{resource.ownerId}");
