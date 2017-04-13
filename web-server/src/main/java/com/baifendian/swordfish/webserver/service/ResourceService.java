@@ -108,19 +108,11 @@ public class ResourceService {
       return null;
     }
 
-    upload(project, name, file);
-
     // 插入数据
     resource = new Resource();
     Date now = new Date();
 
     resource.setName(name);
-
-    // 设置后缀
-    String fileSuffix = CommonUtil.fileSuffix(file.getOriginalFilename()); // file suffix
-    if (StringUtils.isNotEmpty(fileSuffix)) {
-      resource.setSuffix(fileSuffix);
-    }
 
     resource.setOriginFilename(file.getOriginalFilename());
     resource.setDesc(desc);
@@ -137,6 +129,12 @@ public class ResourceService {
       logger.error("Resource has exist, can't create again.", e);
       response.setStatus(HttpStatus.SC_CONFLICT);
       return null;
+    }
+
+    // 上传失败
+    if (!upload(project, name, file)) {
+      response.setStatus(HttpStatus.SC_BAD_REQUEST);
+      throw new IllegalArgumentException("file suffix must the same with resource name suffix");
     }
 
     response.setStatus(HttpStatus.SC_CREATED);
@@ -222,8 +220,6 @@ public class ResourceService {
 
     if (file != null) {
       resource.setOriginFilename(file.getOriginalFilename());
-      // 上传文件
-      upload(project, name, file);
     }
 
     if (desc != null) {
@@ -241,6 +237,12 @@ public class ResourceService {
       return null;
     }
 
+    // 上传失败
+    if (!upload(project, name, file)) {
+      response.setStatus(HttpStatus.SC_BAD_REQUEST);
+      throw new IllegalArgumentException("file suffix must the same with resource name suffix");
+    }
+
     return resource;
   }
 
@@ -251,18 +253,25 @@ public class ResourceService {
    * @param name
    * @param file
    */
-  private void upload(Project project, String name, MultipartFile file) {
+  private boolean upload(Project project, String name, MultipartFile file) {
     // 保存到本地
     String fileSuffix = CommonUtil.fileSuffix(file.getOriginalFilename()); // file suffix
-    String filename = StringUtils.isEmpty(fileSuffix) ? name : String.format("%s.%s", name, fileSuffix); // destination filename
+    String nameSuffix = CommonUtil.fileSuffix(name);
+
+    // 判断后缀
+    if (!StringUtils.equals(fileSuffix, nameSuffix)) {
+      return false;
+    }
 
     String localFilename = BaseConfig.getLocalResourceFilename(project.getId(), UUID.randomUUID().toString()); // 随机的一个文件名称
 
     fileSystemStorageService.store(file, localFilename);
 
     // 保存到 hdfs 并删除源文件
-    String hdfsFilename = BaseConfig.getHdfsResourcesFilename(project.getId(), filename);
+    String hdfsFilename = BaseConfig.getHdfsResourcesFilename(project.getId(), name);
     HdfsClient.getInstance().copyLocalToHdfs(localFilename, hdfsFilename, true, true);
+
+    return true;
   }
 
   /**
@@ -287,6 +296,13 @@ public class ResourceService {
     // 源和目标不能是一样的名称
     if (StringUtils.equalsIgnoreCase(srcResName, destResName)) {
       logger.error("Src resource mustn't the same to dest resource.");
+      response.setStatus(HttpStatus.SC_NOT_MODIFIED);
+      return null;
+    }
+
+    // 源和目标后缀必须一样
+    if (!StringUtils.equals(CommonUtil.fileSuffix(srcResName), CommonUtil.fileSuffix(destResName))) {
+      logger.error("Src resource suffix must the same to dest resource suffix.");
       response.setStatus(HttpStatus.SC_NOT_MODIFIED);
       return null;
     }
@@ -325,8 +341,6 @@ public class ResourceService {
       destResource = new Resource();
 
       destResource.setName(destResName);
-      destResource.setSuffix(srcResource.getSuffix());
-
       destResource.setOriginFilename(srcResource.getOriginFilename());
       destResource.setDesc(desc);
       destResource.setOwnerId(operator.getId());
@@ -344,12 +358,6 @@ public class ResourceService {
         return null;
       }
     } else { // 存在
-      if (!StringUtils.equalsIgnoreCase(srcResource.getSuffix(), destResource.getSuffix())) {
-        logger.error("Src resource suffix must the same to dest resource suffix.");
-        response.setStatus(HttpStatus.SC_NOT_MODIFIED);
-        return null;
-      }
-
       if (desc != null) {
         destResource.setDesc(desc);
       }
@@ -361,11 +369,8 @@ public class ResourceService {
     }
 
     // 开始拷贝文件
-    String srcFilename = StringUtils.isEmpty(srcResource.getSuffix()) ? srcResName : String.format("%s.%s", srcResName, srcResource.getSuffix()); // destination filename
-    String srcHdfsFilename = BaseConfig.getHdfsResourcesFilename(project.getId(), srcFilename);
-
-    String destFilename = StringUtils.isEmpty(srcResource.getSuffix()) ? destResName : String.format("%s.%s", destResName, srcResource.getSuffix());
-    String destHdfsFilename = BaseConfig.getHdfsResourcesFilename(project.getId(), destFilename);
+    String srcHdfsFilename = BaseConfig.getHdfsResourcesFilename(project.getId(), srcResName);
+    String destHdfsFilename = BaseConfig.getHdfsResourcesFilename(project.getId(), destResName);
 
     HdfsClient.getInstance().copy(srcHdfsFilename, destHdfsFilename, false, true);
 
@@ -413,8 +418,7 @@ public class ResourceService {
     resourceMapper.delete(resource.getId());
 
     // 删除资源信息
-    String filename = StringUtils.isEmpty(resource.getSuffix()) ? name : String.format("%s.%s", name, resource.getSuffix()); // filename
-    String hdfsFilename = BaseConfig.getHdfsResourcesFilename(project.getId(), filename);
+    String hdfsFilename = BaseConfig.getHdfsResourcesFilename(project.getId(), name);
 
     HdfsClient.getInstance().delete(hdfsFilename, false);
   }
@@ -524,10 +528,8 @@ public class ResourceService {
       return null;
     }
 
-    String filename = StringUtils.isEmpty(resource.getSuffix()) ? name : String.format("%s.%s", name, resource.getSuffix());
-
-    String localFilename = BaseConfig.getLocalDownloadFilename(project.getId(), filename);
-    String hdfsFilename = BaseConfig.getHdfsResourcesFilename(project.getId(), filename);
+    String localFilename = BaseConfig.getLocalDownloadFilename(project.getId(), name);
+    String hdfsFilename = BaseConfig.getHdfsResourcesFilename(project.getId(), name);
 
     HdfsClient.getInstance().copyHdfsToLocal(hdfsFilename, localFilename, false, true);
 

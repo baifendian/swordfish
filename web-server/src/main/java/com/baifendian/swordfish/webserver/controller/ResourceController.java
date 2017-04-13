@@ -51,7 +51,7 @@ public class ResourceController {
    * @param file
    * @param response
    */
-  @PostMapping(value = "/{name}")
+  @PostMapping(value = "/{name:.+}")
   public Resource createResource(@RequestAttribute(value = "session.user") User operator,
                                  @PathVariable String projectName,
                                  @PathVariable String name,
@@ -75,6 +75,7 @@ public class ResourceController {
    * @param response
    * @return
    */
+  @PutMapping(value = "/{name:.+}")
   public Resource putResource(@RequestAttribute(value = "session.user") User operator,
                               @PathVariable String projectName,
                               @PathVariable String name,
@@ -97,7 +98,7 @@ public class ResourceController {
    * @param file
    * @param response
    */
-  @PatchMapping(value = "/{name}")
+  @PatchMapping(value = "/{name:.+}")
   public Resource modifyResource(@RequestAttribute(value = "session.user") User operator,
                                  @PathVariable String projectName,
                                  @PathVariable String name,
@@ -118,7 +119,7 @@ public class ResourceController {
    * @param name
    * @param response
    */
-  @DeleteMapping(value = "/{name}")
+  @DeleteMapping(value = "/{name:.+}")
   public void deleteResource(@RequestAttribute(value = "session.user") User operator,
                              @PathVariable String projectName,
                              @PathVariable String name,
@@ -154,7 +155,7 @@ public class ResourceController {
    * @param name
    * @param response
    */
-  @GetMapping(value = "/{name}")
+  @GetMapping(value = "/{name:.+}")
   public Resource getResource(@RequestAttribute(value = "session.user") User operator,
                               @PathVariable String projectName,
                               @PathVariable String name,
@@ -173,7 +174,7 @@ public class ResourceController {
    * @param name
    * @param response
    */
-  @GetMapping(value = "/{name}/file")
+  @GetMapping(value = "/{name:.+}/file")
   @ResponseBody
   public ResponseEntity<org.springframework.core.io.Resource> downloadResource(@RequestAttribute(value = "session.user") User operator,
                                                                                @PathVariable String projectName,
