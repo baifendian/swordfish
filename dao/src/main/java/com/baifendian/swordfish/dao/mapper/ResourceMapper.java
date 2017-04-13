@@ -43,7 +43,6 @@ public interface ResourceMapper {
    */
   @Results(value = {@Result(property = "id", column = "id", id = true, javaType = int.class, jdbcType = JdbcType.INTEGER),
       @Result(property = "name", column = "name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-      @Result(property = "suffix", column = "suffix", javaType = String.class, jdbcType = JdbcType.VARCHAR),
       @Result(property = "originFilename", column = "origin_filename", javaType = String.class, jdbcType = JdbcType.VARCHAR),
       @Result(property = "desc", column = "desc", javaType = String.class, jdbcType = JdbcType.VARCHAR),
       @Result(property = "ownerId", column = "owner_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
@@ -64,7 +63,6 @@ public interface ResourceMapper {
    */
   @Results(value = {@Result(property = "id", column = "id", id = true, javaType = int.class, jdbcType = JdbcType.INTEGER),
       @Result(property = "name", column = "name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-      @Result(property = "suffix", column = "suffix", javaType = String.class, jdbcType = JdbcType.VARCHAR),
       @Result(property = "originFilename", column = "origin_filename", javaType = String.class, jdbcType = JdbcType.VARCHAR),
       @Result(property = "desc", column = "desc", javaType = String.class, jdbcType = JdbcType.VARCHAR),
       @Result(property = "ownerId", column = "owner", javaType = int.class, jdbcType = JdbcType.INTEGER),
@@ -111,7 +109,6 @@ public interface ResourceMapper {
    */
   @Results(value = {@Result(property = "id", column = "id", id = true, javaType = int.class, jdbcType = JdbcType.INTEGER),
       @Result(property = "name", column = "name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-      @Result(property = "suffix", column = "suffix", javaType = String.class, jdbcType = JdbcType.VARCHAR),
       @Result(property = "originFilename", column = "origin_filename", javaType = String.class, jdbcType = JdbcType.VARCHAR),
       @Result(property = "desc", column = "desc", javaType = String.class, jdbcType = JdbcType.VARCHAR),
       @Result(property = "ownerId", column = "owner", javaType = int.class, jdbcType = JdbcType.INTEGER),
@@ -132,7 +129,6 @@ public interface ResourceMapper {
    */
   @Results(value = {@Result(property = "id", column = "id", id = true, javaType = int.class, jdbcType = JdbcType.INTEGER),
       @Result(property = "name", column = "name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-      @Result(property = "suffix", column = "suffix", javaType = String.class, jdbcType = JdbcType.VARCHAR),
       @Result(property = "originFilename", column = "origin_filename", javaType = String.class, jdbcType = JdbcType.VARCHAR),
       @Result(property = "desc", column = "desc", javaType = String.class, jdbcType = JdbcType.VARCHAR),
       @Result(property = "ownerId", column = "owner", javaType = int.class, jdbcType = JdbcType.INTEGER),

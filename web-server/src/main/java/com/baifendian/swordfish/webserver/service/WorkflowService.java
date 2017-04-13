@@ -23,9 +23,6 @@ import com.baifendian.swordfish.dao.mapper.ProjectMapper;
 import com.baifendian.swordfish.dao.mapper.ResourceMapper;
 import com.baifendian.swordfish.dao.model.*;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
-import com.baifendian.swordfish.webserver.dto.NodeParamMR;
-import com.baifendian.swordfish.webserver.dto.NodeParamMR.MainJar;
-import com.baifendian.swordfish.webserver.dto.enums.MRScope;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.lang.StringUtils;
@@ -131,13 +128,6 @@ public class WorkflowService {
         response.setStatus(HttpStatus.SC_BAD_REQUEST);
         return null;
       }
-
-      /*/工作流预处理
-      if (!preNodeParam(project.getId(),flowNode.getParameter(),flowNode.getType())) {
-        logger.error("Flow node {} pre parameter error", flowNode.getName());
-        response.setStatus(HttpStatus.SC_BAD_REQUEST);
-        return null;
-      }*/
     }
 
 
@@ -280,13 +270,6 @@ public class WorkflowService {
             response.setStatus(HttpStatus.SC_BAD_REQUEST);
             return null;
           }
-
-          //工作流预处理
-          /*if (!preNodeParam(project.getId(),flowNode.getParameter(),flowNode.getType())) {
-            logger.error("Flow node {} pre parameter error", flowNode.getName());
-            response.setStatus(HttpStatus.SC_BAD_REQUEST);
-            return null;
-          }*/
         }
 
       }
@@ -558,43 +541,4 @@ public class WorkflowService {
     }*/
     return true;
   }
-
-  //节点预处理
-  private boolean preNodeParam(int projectId,String parameter, String type){
-    try{
-      switch (type){
-        case "MR":
-        case "mr":{
-          NodeParamMR nodeParamMR = JsonUtil.parseObject(parameter, NodeParamMR.class);
-          if (nodeParamMR.getMainJar()!=null && nodeParamMR.getMainJar().getScope() == MRScope.PROJECT){
-            addSuffix(nodeParamMR.getMainJar(),projectId);
-          }
-          if (nodeParamMR.getLibJars()!=null){
-            for (NodeParamMR.File file:nodeParamMR.getLibJars()){
-              addSuffix(file,projectId);
-            }
-          }
-        }
-      }
-    }catch (Exception e){
-      logger.error("pre node param error",e);
-      return false;
-    }
-    return true;
-  }
-
-  /**
-   *
-   * @param file
-   * @param projectId
-   * @param <T>
-   */
-  private <T extends MainJar> void addSuffix(T file,int projectId){
-    MainJar mainJar = (MainJar) file;
-    com.baifendian.swordfish.dao.model.Resource resource = resourceMapper.queryResourceDetail(projectId,file.getRes());
-    if (resource!=null){
-      file.setRes(mainJar.getRes()+resource.getSuffix());
-    }
-  }
-
 }
