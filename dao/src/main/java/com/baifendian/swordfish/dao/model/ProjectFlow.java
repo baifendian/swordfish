@@ -15,6 +15,7 @@
  */
 package com.baifendian.swordfish.dao.model;
 
+import com.baifendian.swordfish.dao.mapper.utils.EqualUtils;
 import com.baifendian.swordfish.dao.model.flow.params.Property;
 import com.baifendian.swordfish.dao.utils.json.JsonObjectDeserializer;
 import com.baifendian.swordfish.dao.utils.json.JsonObjectSerializer;
@@ -297,7 +298,7 @@ public class ProjectFlow {
             Objects.equals(userDefinedParams, that.userDefinedParams) &&
             Objects.equals(extras, that.extras) &&
             Objects.equals(queue, that.queue) &&
-            CollectionUtils.isEqualCollection(flowsNodes, that.flowsNodes) &&
+            EqualUtils.equalLists(flowsNodes, that.flowsNodes) &&
             Objects.equals(data, that.data);
   }
 
@@ -319,8 +320,8 @@ public class ProjectFlow {
       if (this == o) return true;
       if (o == null || getClass() != o.getClass()) return false;
       ProjectFlowData that = (ProjectFlowData) o;
-      return CollectionUtils.isEqualCollection(nodes, that.nodes) &&
-              CollectionUtils.isEqualCollection(userDefParams, that.userDefParams) &&
+      return EqualUtils.equalLists(nodes, that.nodes) &&
+              EqualUtils.equalLists(userDefParams, that.userDefParams) &&
               Objects.equals(extras, that.extras);
     }
 
