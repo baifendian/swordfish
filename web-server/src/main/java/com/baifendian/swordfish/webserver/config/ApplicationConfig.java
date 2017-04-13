@@ -18,6 +18,7 @@ package com.baifendian.swordfish.webserver.config;
 import com.baifendian.swordfish.webserver.interceptor.LoginInterceptor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.config.annotation.ContentNegotiationConfigurer;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
@@ -37,5 +38,11 @@ public class ApplicationConfig extends WebMvcConfigurerAdapter {
   @Override
   public void addCorsMappings(CorsRegistry registry) {
     registry.addMapping("/**").allowedOrigins("*").allowedMethods("*");
+  }
+
+  @Override
+  public void configureContentNegotiation(final ContentNegotiationConfigurer configurer) {
+    // Turn off suffix-based content negotiation
+    configurer.favorPathExtension(false);
   }
 }
