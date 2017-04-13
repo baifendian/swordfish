@@ -20,11 +20,12 @@ import com.baifendian.swordfish.dao.FlowDao;
 import com.baifendian.swordfish.dao.mapper.FlowNodeMapper;
 import com.baifendian.swordfish.dao.mapper.ProjectFlowMapper;
 import com.baifendian.swordfish.dao.mapper.ProjectMapper;
-import com.baifendian.swordfish.dao.model.FlowNode;
-import com.baifendian.swordfish.dao.model.Project;
-import com.baifendian.swordfish.dao.model.ProjectFlow;
-import com.baifendian.swordfish.dao.model.User;
+import com.baifendian.swordfish.dao.mapper.ResourceMapper;
+import com.baifendian.swordfish.dao.model.*;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
+import com.baifendian.swordfish.webserver.dto.NodeParamMR;
+import com.baifendian.swordfish.webserver.dto.NodeParamMR.MainJar;
+import com.baifendian.swordfish.webserver.dto.enums.MRScope;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.lang.StringUtils;
@@ -32,10 +33,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
-import org.springframework.core.io.Resource;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.core.io.Resource;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.FileInputStream;
@@ -59,6 +60,9 @@ public class WorkflowService {
 
   @Autowired
   private ProjectService projectService;
+
+  @Autowired
+  private ResourceMapper resourceMapper;
 
   @Autowired
   private FlowDao flowDao;
@@ -127,7 +131,16 @@ public class WorkflowService {
         response.setStatus(HttpStatus.SC_BAD_REQUEST);
         return null;
       }
+
+      //工作流预处理
+      if (!preNodeParam(project.getId(),flowNode.getParameter(),flowNode.getType())) {
+        logger.error("Flow node {} pre parameter error", flowNode.getName());
+        response.setStatus(HttpStatus.SC_BAD_REQUEST);
+        return null;
+      }
     }
+
+
 
     ProjectFlow projectFlow = new ProjectFlow();
     Date now = new Date();
@@ -267,7 +280,15 @@ public class WorkflowService {
             response.setStatus(HttpStatus.SC_BAD_REQUEST);
             return null;
           }
+
+          //工作流预处理
+          if (!preNodeParam(project.getId(),flowNode.getParameter(),flowNode.getType())) {
+            logger.error("Flow node {} pre parameter error", flowNode.getName());
+            response.setStatus(HttpStatus.SC_BAD_REQUEST);
+            return null;
+          }
         }
+
       }
     }
 
@@ -536,6 +557,44 @@ public class WorkflowService {
       return false;
     }*/
     return true;
+  }
+
+  //节点预处理
+  private boolean preNodeParam(int projectId,String parameter, String type){
+    try{
+      switch (type){
+        case "MR":
+        case "mr":{
+          NodeParamMR nodeParamMR = JsonUtil.parseObject(parameter, NodeParamMR.class);
+          if (nodeParamMR.getMainJar()!=null && nodeParamMR.getMainJar().getScope() == MRScope.PROJECT){
+            addSuffix(nodeParamMR.getMainJar(),projectId);
+          }
+          if (nodeParamMR.getLibJars()!=null){
+            for (NodeParamMR.File file:nodeParamMR.getLibJars()){
+              addSuffix(file,projectId);
+            }
+          }
+        }
+      }
+    }catch (Exception e){
+      logger.error("pre node param error",e);
+      return false;
+    }
+    return true;
+  }
+
+  /**
+   *
+   * @param file
+   * @param projectId
+   * @param <T>
+   */
+  private <T extends MainJar> void addSuffix(T file,int projectId){
+    MainJar mainJar = (MainJar) file;
+    com.baifendian.swordfish.dao.model.Resource resource = resourceMapper.queryResourceDetail(projectId,file.getRes());
+    if (resource!=null){
+      file.setRes(mainJar.getRes()+resource.getSuffix());
+    }
   }
 
 }

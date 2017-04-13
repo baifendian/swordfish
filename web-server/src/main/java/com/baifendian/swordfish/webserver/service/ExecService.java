@@ -207,7 +207,7 @@ public class ExecService {
       return null;
     }
 
-    List<ExecutionFlow> executionFlowList = executionFlowMapper.selectByFlowIdAndTimesAndStatusLimit(projectName,workflowList, startDate, endDate, from, size, flowStatusList);
+    List<ExecutionFlow> executionFlowList = executionFlowMapper.selectByFlowIdAndTimesAndStatusLimit(projectName,workflowList, startDate, endDate, (from-1)*size, size, flowStatusList);
     int total = executionFlowMapper.sumByFlowIdAndTimesAndStatus(projectName,workflowList, startDate, endDate,  flowStatusList);
     return new ExecWorkflowsResponse(total,size,executionFlowList);
   }

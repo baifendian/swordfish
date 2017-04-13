@@ -306,7 +306,7 @@ public class ExecutionFlowMapperProvider {
           WHERE("p_f.name in ("+String.join(",",workflowList2)+")");
         }
         WHERE("schedule_time >= #{startDate}");
-        WHERE("schedule_time < #{endDate}");
+        WHERE("schedule_time <= #{endDate}");
         if (CollectionUtils.isNotEmpty(flowStatuses)){
           WHERE("`status` in (" + where + ") ");
         }
@@ -315,7 +315,7 @@ public class ExecutionFlowMapperProvider {
       }
     }.toString();
 
-    return new SQL() {
+    String sql2 = new SQL() {
       {
         SELECT("e_f.*");
         SELECT("u.name as submit_user_name");
@@ -323,6 +323,7 @@ public class ExecutionFlowMapperProvider {
         JOIN("user u on e_f.submit_user = u.id");
       }
     }.toString()+" order by schedule_time DESC limit #{start},#{limit}";
+    return sql2;
   }
 
   public String sumByFlowIdAndTimesAndStatus(Map<String, Object> parameter) {

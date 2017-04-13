@@ -114,28 +114,11 @@ public class NodeParamMR {
     }
   }
 
-  public static class File{
-    private MRScope scope;
-    private String res;
+  public static class File extends MainJar{
     private String alias;
 
     public File() {
-    }
-
-    public MRScope getScope() {
-      return scope;
-    }
-
-    public void setScope(MRScope scope) {
-      this.scope = scope;
-    }
-
-    public String getRes() {
-      return res;
-    }
-
-    public void setRes(String res) {
-      this.res = res;
+      super();
     }
 
     public String getAlias() {
