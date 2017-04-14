@@ -16,8 +16,12 @@
 package com.baifendian.swordfish.dao.model;
 
 import com.baifendian.swordfish.dao.enums.FlowStatus;
+import com.baifendian.swordfish.dao.utils.json.JsonUtil;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 
 public class ExecutionNode extends FlowNode{
 
@@ -57,6 +61,8 @@ public class ExecutionNode extends FlowNode{
   private String jobId;
 
   private String logLinks;
+
+  private List<String> logLinkList = new ArrayList<>();
 
   public Integer getExecId() {
     return execId;
@@ -102,6 +108,14 @@ public class ExecutionNode extends FlowNode{
     return jobId;
   }
 
+  public List<String> getLogLinkList() {
+    return logLinkList;
+  }
+
+  public void setLogLinkList(List<String> logLinkList) {
+    this.logLinkList = logLinkList;
+  }
+
   public void setJobId(String jobId) {
     this.jobId = jobId;
   }
@@ -119,6 +133,7 @@ public class ExecutionNode extends FlowNode{
   }
 
   public void setLogLinks(String logLinks) {
+    this.logLinkList = Arrays.asList(new String[] {logLinks});
     this.logLinks = logLinks;
   }
 

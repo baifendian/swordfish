@@ -23,7 +23,7 @@ public class Resource {
   /**
    * 资源id
    */
-  @JsonIgnore
+  //@JsonIgnore
   private int id;
 
   /**
@@ -44,7 +44,7 @@ public class Resource {
   /**
    * owner 的 id
    */
-  @JsonIgnore
+  //@JsonIgnore
   private int ownerId;
 
   /**
@@ -55,7 +55,7 @@ public class Resource {
   /**
    * 项目 id
    */
-  @JsonIgnore
+  //@JsonIgnore
   private int projectId;
 
   /**
@@ -72,6 +72,22 @@ public class Resource {
    * 修改时间
    */
   private Date modifyTime;
+
+  public Resource() {
+  }
+
+  public Resource(int id, String name, String originFilename, String desc, int ownerId, String owner, int projectId, String projectName, Date createTime, Date modifyTime) {
+    this.id = id;
+    this.name = name;
+    this.originFilename = originFilename;
+    this.desc = desc;
+    this.ownerId = ownerId;
+    this.owner = owner;
+    this.projectId = projectId;
+    this.projectName = projectName;
+    this.createTime = createTime;
+    this.modifyTime = modifyTime;
+  }
 
   public int getId() {
     return id;
