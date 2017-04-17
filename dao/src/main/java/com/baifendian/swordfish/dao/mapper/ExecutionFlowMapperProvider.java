@@ -24,6 +24,7 @@ import com.baifendian.swordfish.dao.enums.FlowType;
 import com.baifendian.swordfish.dao.model.ExecutionFlow;
 import com.baifendian.swordfish.dao.model.MaintainQuery;
 
+import com.fasterxml.jackson.databind.util.JSONPObject;
 import com.sun.tools.javac.comp.Flow;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -545,5 +546,61 @@ public class ExecutionFlowMapperProvider {
 
     String sql = String.format("%s LIMIT 0, #{num}", sqlTemp);
     return sql;
+  }
+
+  public String selectStateByProject(Map<String,Object> parameter) {
+    return new SQL(){
+      {
+        SELECT("str_to_date(DATE_FORMAT(e_f.schedule_time,'%Y%m%d'),'%Y%m%d') as day,\n" +
+                "SUM(case e_f.status when 0 then 1 else 0 end) as INIT,\n" +
+                "SUM(case e_f.status when 1 then 1 else 0 end) as WAITING_DEP,\n" +
+                "SUM(case e_f.status when 2 then 1 else 0 end) as WAITING_RES,\n" +
+                "SUM(case e_f.status when 3 then 1 else 0 end) as RUNNING,\n" +
+                "SUM(case e_f.status when 4 then 1 else 0 end) as SUCCESS,\n" +
+                "SUM(case e_f.status when 5 then 1 else 0 end) as `KILL`,\n" +
+                "SUM(case e_f.status when 6 then 1 else 0 end) as `FAILED`,\n" +
+                "SUM(case e_f.status when 7 then 1 else 0 end) as `DEP_FAILED`");
+        FROM("execution_flows e_f");
+        JOIN("project_flows p_f on e_f.flow_id = p_f.id");
+        WHERE("e_f.schedule_time >= #{startDate} AND e_f.schedule_time <= #{endDate}");
+        WHERE("p_f.project_id = #{projectId}");
+        GROUP_BY("day");
+      }
+    }.toString();
+  }
+
+  public String selectConsumesByProject(Map<String,Object> parameter) {
+    return new SQL(){
+      {
+        SELECT("timestampdiff(SECOND,start_time,end_time) as consume");
+        SELECT("e_f.*");
+        SELECT("p_f.name as flow_name");
+        SELECT("u.name as owner_name");
+        FROM("execution_flows e_f");
+        JOIN("project_flows p_f on e_f.flow_id = p_f.id");
+        JOIN("user u on p_f.owner = u.id");
+        WHERE("str_to_date(DATE_FORMAT(e_f.schedule_time,'%Y%m%d'),'%Y%m%d') = #{date}");
+        ORDER_BY("consume DESC");
+      }
+    }.toString()+" limit #{top}";
+  }
+
+  public String selectErrorsByProject(Map<String,Object> parameter) {
+    return new SQL(){
+      {
+        SELECT("count(0) as times");
+        SELECT("p_f.name as flow_name");
+        SELECT("u.name as owner_name");
+        SELECT("p.name as projectName");
+        FROM("execution_flows e_f");
+        JOIN("project_flows p_f on e_f.flow_id = p_f.id");
+        JOIN("user u on p_f.owner = u.id");
+        JOIN("project p on p_f.project_id = p.id");
+        WHERE("str_to_date(DATE_FORMAT(e_f.schedule_time,'%Y%m%d'),'%Y%m%d') = #{date}");
+        WHERE("e_f.status in ("+FlowStatus.FAILED.getType()+","+FlowStatus.DEP_FAILED.getType()+")");
+        GROUP_BY("e_f.flow_id");
+        ORDER_BY("times DESC");
+      }
+    }.toString()+" limit #{top}";
   }
 }

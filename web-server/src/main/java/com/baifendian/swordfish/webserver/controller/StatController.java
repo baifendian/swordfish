@@ -15,7 +15,10 @@
  */
 package com.baifendian.swordfish.webserver.controller;
 
+import com.baifendian.swordfish.dao.model.ExecutionFlow;
+import com.baifendian.swordfish.dao.model.ExecutionFlowError;
 import com.baifendian.swordfish.dao.model.User;
+import com.baifendian.swordfish.webserver.dto.StatResponse;
 import com.baifendian.swordfish.webserver.service.StatService;
 import org.apache.commons.httpclient.HttpStatus;
 import org.slf4j.Logger;
@@ -24,6 +27,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
+import java.util.Date;
+import java.util.List;
 
 @RestController
 @RequestMapping("/statistic")
@@ -45,17 +50,20 @@ public class StatController {
    * @return
    */
   @GetMapping(value = "/states")
-  public void queryStates(@RequestAttribute(value = "session.user") User operator,
-                          @RequestParam(value = "projectName") String projectName,
-                          @RequestParam(value = "startTime") long startTime,
-                          @RequestParam(value = "endTime") long endTime,
-                          HttpServletResponse response) {
+  public List<StatResponse> queryStates(@RequestAttribute(value = "session.user") User operator,
+                                        @RequestParam(value = "projectName") String projectName,
+                                        @RequestParam(value = "startTime") long startTime,
+                                        @RequestParam(value = "endTime") long endTime,
+                                        HttpServletResponse response) {
     logger.info("Operator user {}, get states, project name: {}, start time: {}, end time: {}",
         operator.getName(), projectName, startTime, endTime);
 
     // TODO:: 检测时间跨度, 必须是 (0, 30]
 
-    statService.queryStates(operator, projectName, startTime, endTime, response);
+    Date statDate = new Date(startTime);
+    Date endDate = new Date(endTime);
+
+    return statService.queryStates(operator, projectName, startTime, endTime, response);
   }
 
   /**
@@ -68,11 +76,11 @@ public class StatController {
    * @param response
    */
   @GetMapping(value = "/consumes")
-  public void queryTopConsumes(@RequestAttribute(value = "session.user") User operator,
-                               @RequestParam(value = "projectName") String projectName,
-                               @RequestParam(value = "date") long date,
-                               @RequestParam(value = "num") int num,
-                               HttpServletResponse response) {
+  public List<ExecutionFlow> queryTopConsumes(@RequestAttribute(value = "session.user") User operator,
+                                              @RequestParam(value = "projectName") String projectName,
+                                              @RequestParam(value = "date") long date,
+                                              @RequestParam(value = "num") int num,
+                                              HttpServletResponse response) {
     logger.info("Operator user {}, get top consumers of workflow,  project name: {}, date: {}, num: {}",
         operator.getName(), projectName, date, num);
 
@@ -83,7 +91,7 @@ public class StatController {
 
     }
 
-    statService.queryConsumes(operator, projectName, date, num, response);
+    return statService.queryConsumes(operator, projectName, date, num, response);
   }
 
   /**
@@ -96,11 +104,11 @@ public class StatController {
    * @param response
    */
   @GetMapping(value = "/errors")
-  public void queryTopErrors(@RequestAttribute(value = "session.user") User operator,
-                             @RequestParam(value = "projectName") String projectName,
-                             @RequestParam(value = "date") long date,
-                             @RequestParam(value = "num") int num,
-                             HttpServletResponse response) {
+  public List<ExecutionFlowError> queryTopErrors(@RequestAttribute(value = "session.user") User operator,
+                                                 @RequestParam(value = "projectName") String projectName,
+                                                 @RequestParam(value = "date") long date,
+                                                 @RequestParam(value = "num") int num,
+                                                 HttpServletResponse response) {
     logger.info("Operator user {}, get top errors of workflow, project name: {}, date: {}, num: {}",
         operator.getName(), projectName, date, num);
 
@@ -111,6 +119,6 @@ public class StatController {
 
     }
 
-    statService.queryErrors(operator, projectName, date, num, response);
+    return statService.queryErrors(operator, projectName, date, num, response);
   }
 }

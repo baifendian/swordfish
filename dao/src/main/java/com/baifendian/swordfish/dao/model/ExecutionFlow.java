@@ -114,6 +114,8 @@ public class ExecutionFlow {
 
   private Integer duration;
 
+  private int consume;
+
   /**
    * 调度时间
    **/
@@ -198,6 +200,14 @@ public class ExecutionFlow {
   public void setFlowName(String flowName) {
     this.workflowName = flowName;
     this.flowName = flowName;
+  }
+
+  public int getConsume() {
+    return consume;
+  }
+
+  public void setConsume(int consume) {
+    this.consume = consume;
   }
 
   public String getWorker() {

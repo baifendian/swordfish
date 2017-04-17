@@ -18,8 +18,9 @@ package com.baifendian.swordfish.dao.mapper;
 import com.baifendian.swordfish.dao.enums.ExecType;
 import com.baifendian.swordfish.dao.enums.FlowStatus;
 import com.baifendian.swordfish.dao.enums.NotifyType;
-import com.baifendian.swordfish.dao.enums.ScheduleStatus;
 import com.baifendian.swordfish.dao.model.ExecutionFlow;
+import com.baifendian.swordfish.dao.model.ExecutionFlowError;
+import com.baifendian.swordfish.dao.model.ExecutionState;
 import com.baifendian.swordfish.dao.model.MaintainQuery;
 
 import org.apache.ibatis.annotations.*;
@@ -169,4 +170,64 @@ public interface ExecutionFlowMapper {
 
   @DeleteProvider(type = ExecutionFlowMapperProvider.class, method = "deleteByExecId")
   int deleteByExecId(@Param("execId") int execId);
+
+  /**
+   * 统计出一段时间内，某个项目下各种状态下的任务数（天为单位）
+   * @return
+   */
+  @Results(value = {
+          @Result(property = "day", column = "day", id = true, javaType = Date.class, jdbcType = JdbcType.DATE),
+          @Result(property = "init", column = "INIT", javaType = int.class, jdbcType = JdbcType.INTEGER),
+          @Result(property = "waitingDep", column = "WAITING_DEP", javaType = int.class, jdbcType = JdbcType.INTEGER),
+          @Result(property = "waitingRes", column = "WAITING_RES", javaType = int.class, jdbcType = JdbcType.INTEGER),
+          @Result(property = "running", column = "RUNNING", javaType = int.class, jdbcType = JdbcType.INTEGER),
+          @Result(property = "success", column = "SUCCESS", javaType = int.class, jdbcType = JdbcType.INTEGER),
+          @Result(property = "kill", column = "KILL", javaType = int.class, jdbcType = JdbcType.INTEGER),
+          @Result(property = "failed", column = "FAILED", javaType = int.class, jdbcType = JdbcType.INTEGER),
+          @Result(property = "depFailed", column = "DEP_FAILED", javaType = int.class, jdbcType = JdbcType.INTEGER),
+  })
+  @SelectProvider(type = ExecutionFlowMapperProvider.class, method = "selectStateByProject")
+  List<ExecutionState> selectStateByProject(@Param("projectId") int projectId,@Param("startDate") Date startDate,@Param("endDate") Date endDate);
+
+  /**
+   * 统计某天的工作流耗时TOP
+   * @param projectId
+   * @param top
+   * @param date
+   * @return
+   */
+  @Results(value = {@Result(property = "id", column = "id", id = true, javaType = int.class, jdbcType = JdbcType.INTEGER),
+          @Result(property = "flowId", column = "flow_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
+          @Result(property = "flowName", column = "flow_name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+          @Result(property = "projectName", column = "project_name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+          @Result(property = "status", column = "status", typeHandler = EnumOrdinalTypeHandler.class, jdbcType = JdbcType.TINYINT),
+          @Result(property = "worker", column = "worker", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+          @Result(property = "status", column = "status", typeHandler = EnumOrdinalTypeHandler.class, jdbcType = JdbcType.TINYINT),
+          @Result(property = "scheduleTime", column = "schedule_time", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP),
+          @Result(property = "submitTime", column = "submit_time", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP),
+          @Result(property = "startTime", column = "start_time", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP),
+          @Result(property = "endTime", column = "end_time", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP),
+          @Result(property = "submitUserId", column = "schedule_user", javaType = int.class, jdbcType = JdbcType.INTEGER),
+          @Result(property = "submitUser", column = "submit_user_name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+          @Result(property = "type", column = "type", typeHandler = EnumOrdinalTypeHandler.class, jdbcType = JdbcType.TINYINT),
+          @Result(property = "consume", column = "consume", javaType = int.class, jdbcType = JdbcType.INTEGER),
+  })
+  @SelectProvider(type = ExecutionFlowMapperProvider.class, method = "selectConsumesByProject")
+  List<ExecutionFlow> selectConsumesByProject(@Param("projectId") int projectId,@Param("top") int top,@Param("date") Date date);
+
+  /**
+   * 统计某天的工作流异常数TOP
+   * @param projectId
+   * @param top
+   * @param date
+   * @return
+   */
+  @Results(value = {
+          @Result(property = "workflowName", column = "flow_name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+          @Result(property = "projectName", column = "project_name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+          @Result(property = "owner", column = "owner_name",javaType = String.class, jdbcType = JdbcType.VARCHAR),
+          @Result(property = "times", column = "times", javaType = int.class, jdbcType = JdbcType.INTEGER),
+  })
+  @SelectProvider(type = ExecutionFlowMapperProvider.class, method = "selectErrorsByProject")
+  List<ExecutionFlowError> selectErrorsByProject(@Param("projectId") int projectId, @Param("top") int top, @Param("date") Date date);
 }
