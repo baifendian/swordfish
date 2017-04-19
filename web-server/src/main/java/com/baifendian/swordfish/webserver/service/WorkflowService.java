@@ -15,6 +15,9 @@
  */
 package com.baifendian.swordfish.webserver.service;
 
+import com.baifendian.swordfish.common.config.BaseConfig;
+import com.baifendian.swordfish.common.hadoop.HdfsClient;
+import com.baifendian.swordfish.common.utils.CommonUtil;
 import com.baifendian.swordfish.common.utils.graph.Graph;
 import com.baifendian.swordfish.dao.FlowDao;
 import com.baifendian.swordfish.dao.mapper.FlowNodeMapper;
@@ -23,9 +26,12 @@ import com.baifendian.swordfish.dao.mapper.ProjectMapper;
 import com.baifendian.swordfish.dao.mapper.ResourceMapper;
 import com.baifendian.swordfish.dao.model.*;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
+import com.baifendian.swordfish.webserver.service.storage.FileSystemStorageService;
+import net.lingala.zip4j.exception.ZipException;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.lang.StringUtils;
+import org.apache.derby.vti.IFastPath;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,12 +40,15 @@ import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.core.io.Resource;
+import net.lingala.zip4j.core.ZipFile;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class WorkflowService {
@@ -60,6 +69,9 @@ public class WorkflowService {
 
   @Autowired
   private ResourceMapper resourceMapper;
+
+  @Autowired
+  private FileSystemStorageService fileSystemStorageService;
 
   @Autowired
   private FlowDao flowDao;
@@ -96,7 +108,7 @@ public class WorkflowService {
     }
 
     // 对工作流详定义json进行反序列化
-    ProjectFlow.ProjectFlowData projectFlowData = projectFlowDataDes(data, file);
+    ProjectFlow.ProjectFlowData projectFlowData = projectFlowDataDes(data, file, name, project);
 
     if (projectFlowData == null) {
       logger.error("Project flow data or file not valid");
@@ -241,7 +253,7 @@ public class WorkflowService {
     }
 
     // 解析
-    ProjectFlow.ProjectFlowData projectFlowData = projectFlowDataDes(data, file);
+    ProjectFlow.ProjectFlowData projectFlowData = projectFlowDataDes(data, file, name, project);
 
     if (projectFlowData != null) {
       if (!StringUtils.isEmpty(projectFlowData.getExtras())) {
@@ -468,21 +480,45 @@ public class WorkflowService {
    * @param file
    * @return
    */
-  private ProjectFlow.ProjectFlowData projectFlowDataDes(String data, MultipartFile file) {
+  private ProjectFlow.ProjectFlowData projectFlowDataDes(String data, MultipartFile file, String workflowName,Project project) {
     ProjectFlow.ProjectFlowData projectFlowData = null;
 
     if (file != null && !file.isEmpty()) {
       // TODO::
-      // 先将文件存放到本地
-
-      // 解压
-
-      // 读取 workflow.json 文件
+      String filename = UUID.randomUUID().toString();
+      String localFilename = BaseConfig.getLocalWorkflowFilename(project.getId(), filename); // 随机的一个文件名称
+      String localExtDir = BaseConfig.getLocalWorkflowExtDir(project.getId(), filename);
+      String workflowJson = BaseConfig.getLocalWorkflowJson(project.getId(),filename);
+      String hdfsFilename = BaseConfig.getHdfsWorkflowFilename(project.getId(),workflowName);
+      try {
+        // 先将文件存放到本地
+        logger.info("save workflow file {} to local {}",workflowName,localFilename);
+        fileSystemStorageService.store(file, localFilename);
+        // 解压 并读取workflow.json
+        ZipFile zipFile = new ZipFile(localFilename);
+        logger.info("ext file {} to {}",localFilename,localExtDir);
+        zipFile.extractAll(localExtDir);
+        String jsonString = fileSystemStorageService.readFileToString(workflowJson);
+        projectFlowData = JsonUtil.parseObject(jsonString, ProjectFlow.ProjectFlowData.class);
+        // 上传文件到HDFS
+        if (projectFlowData != null){
+          logger.info("update workflow local file {} to hdfs {}",localFilename,hdfsFilename);
+          HdfsClient.getInstance().copyLocalToHdfs(localFilename, hdfsFilename, true, true);
+        }
+      } catch (ZipException e) {
+        logger.error("ext file error",e);
+        return null;
+      } catch (IOException e) {
+        logger.error("read workflow.json error",e);
+        return null;
+      }catch (Exception e){
+        logger.error("workflow file process error",e);
+        return null;
+      }
 //
 //        ByteArrayInputStream stream = new ByteArrayInputStream(file.getBytes());
 //        String jsonString = IOUtils.toString(stream, "UTF-8");
-      String jsonString = "";
-      projectFlowData = JsonUtil.parseObject(jsonString, ProjectFlow.ProjectFlowData.class);
+
     } else if (data != null) {
       projectFlowData = JsonUtil.parseObject(data, ProjectFlow.ProjectFlowData.class);
     }

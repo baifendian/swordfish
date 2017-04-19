@@ -138,6 +138,26 @@ public class BaseConfig {
   }
 
   /**
+   * 本地工作流数据缓存解压文件夹名
+   * @param projectId
+   * @param filename
+   * @return
+   */
+  public static String getLocalWorkflowExtDir(int projectId, String filename) {
+    return MessageFormat.format("{0}/{1}", getLocalWorkflowDir(projectId), filename);
+  }
+
+  /**
+   * 本地工作流数据缓存workflow.json文件
+   * @param projectId
+   * @param filename
+   * @return
+   */
+  public static String getLocalWorkflowJson(int projectId,String filename){
+    return MessageFormat.format("{0}/{1}",getLocalWorkflowExtDir(projectId,filename),"workflow.json");
+  }
+
+  /**
    * hdfs 上资源的文件目录
    *
    * @param projectId
