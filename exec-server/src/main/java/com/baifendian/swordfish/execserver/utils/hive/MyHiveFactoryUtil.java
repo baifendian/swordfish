@@ -48,12 +48,6 @@ public class MyHiveFactoryUtil {
   public static void buildHiveConfig(HiveConfig hiveConfig) {
     hiveConfig.setMetastoreUris(PROPERTIES.getProperty("hive.metastore.uris"));
     hiveConfig.setThriftUris(PROPERTIES.getProperty("hive.thrift.uris"));
-    hiveConfig.setRootUser(PROPERTIES.getProperty("hive.root.user"));
-    hiveConfig.setPassword(PROPERTIES.getProperty("hive.root.password"));
-    hiveConfig.setJdoUrl(PROPERTIES.getProperty("javax.jdo.option.ConnectionURL"));
-    hiveConfig.setJdoDriverName(PROPERTIES.getProperty("javax.jdo.option.ConnectionDriverName"));
-    hiveConfig.setJdoUser(PROPERTIES.getProperty("javax.jdo.option.ConnectionUserName"));
-    hiveConfig.setJdoPassword(PROPERTIES.getProperty("javax.jdo.option.ConnectionPassword"));
   }
 
   public static HiveConfig getInstance() {

@@ -22,11 +22,6 @@ import java.util.Locale;
  */
 public class Constants {
   /**
-   * "utf-8"
-   */
-  public static final String UTF_8 = "utf-8";
-
-  /**
    * "yyyy-MM-dd HH:mm:ss"
    */
   public static final String BASE_DATETIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
