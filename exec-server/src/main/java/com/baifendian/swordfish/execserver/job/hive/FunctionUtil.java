@@ -15,6 +15,7 @@
  */
 package com.baifendian.swordfish.execserver.job.hive;
 
+import com.baifendian.swordfish.common.config.BaseConfig;
 import com.baifendian.swordfish.common.hadoop.HdfsClient;
 import com.baifendian.swordfish.common.job.ResourceInfo;
 import com.baifendian.swordfish.common.job.UdfsInfo;
@@ -40,25 +41,15 @@ import java.util.Set;
 public class FunctionUtil {
 
   private static final Logger logger = LoggerFactory.getLogger(FunctionUtil.class);
+
   /**
    * create function format
    */
   private static final String CREATE_FUNCTION_FORMAT = "create temporary function {0} as ''{1}''";
 
-  private static final String JOB_HIVE_UDFJAR_BASEPATH = "job.hive.udfjar.hdfs.basepath";
+  private static String hiveUdfJarBasePath = BaseConfig.getJobHiveUdfJarBasePath();
 
   private static Configuration conf;
-
-  private static String hiveUdfJarBasePath;
-
-  static {
-    try {
-      conf = new PropertiesConfiguration("job/hive.properties");
-      hiveUdfJarBasePath = conf.getString(JOB_HIVE_UDFJAR_BASEPATH);
-    } catch (ConfigurationException e) {
-      e.printStackTrace();
-    }
-  }
 
   public static List<String> createFuncs(List<UdfsInfo> udfsInfos, String jobIdLog, String srcDir, boolean isHdfsFile) throws IOException, InterruptedException {
     List<String> funcList = new ArrayList<>();
@@ -67,15 +58,18 @@ public class FunctionUtil {
       if (CollectionUtils.isNotEmpty(resources)) {
 
         if (StringUtils.isEmpty(hiveUdfJarBasePath)) {
-          throw new ExecException(JOB_HIVE_UDFJAR_BASEPATH + " not defined ");
+          throw new ExecException("Hive udf jar base path not defined ");
         }
+
         String uploadPath = hiveUdfJarBasePath + "/" + jobIdLog;
+
         // adHoc查询时直接通过复制hdfs上文件的方式来处理
         if(isHdfsFile){
           copyJars(resources, uploadPath, srcDir);
         } else {
           uploadUdfJars(resources, uploadPath, srcDir);
         }
+
         addJarSql(funcList, resources, uploadPath);
       }
     }
