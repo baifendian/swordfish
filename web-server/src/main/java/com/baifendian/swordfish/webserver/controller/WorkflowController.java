@@ -130,6 +130,27 @@ public class WorkflowController {
     return workflowService.patchWorkflow(operator, projectName, name, desc, proxyUser, queue, data, file, response);
   }
 
+
+  /**
+   * copy一个工作流
+   * @param operator
+   * @param projectName
+   * @param srcWorkflowName
+   * @param destWorkflowName
+   * @param response
+   * @return
+   */
+  @PostMapping(value = "workflow-copy")
+  public ProjectFlow postWorkflowCopy(@RequestAttribute(value = "session.user") User operator,
+                                      @PathVariable String projectName,
+                                      @RequestParam(value = "srcWorkflowName") String srcWorkflowName,
+                                      @RequestParam(value = "destWorkflowName") String destWorkflowName,
+                                      HttpServletResponse response){
+    logger.info("Operator user {},project name: {} , source workflow: {}, dest workflow: {}",operator.getName(),projectName,srcWorkflowName,destWorkflowName);
+
+    return workflowService.postWorkflowCopy(operator,projectName,srcWorkflowName,destWorkflowName,response);
+  }
+
   /**
    * 删除一个工作流
    *
@@ -229,12 +250,13 @@ public class WorkflowController {
 
     if (file == null) {
       return ResponseEntity
-          .noContent().build();
+              .noContent().build();
     }
 
     return ResponseEntity
-        .ok()
-        .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getFilename() + "\"")
-        .body(file);
+            .ok()
+            .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getFilename() + "\"")
+            .body(file);
+
   }
 }

@@ -320,6 +320,59 @@ public class WorkflowService {
   }
 
   /**
+   * 拷贝一个工作流
+   * @param operator
+   * @param projectName
+   * @param srcWorkflowName
+   * @param destWorkflowName
+   * @param response
+   * @return
+   */
+  public ProjectFlow postWorkflowCopy(User operator, String projectName,String srcWorkflowName,String destWorkflowName, HttpServletResponse response){
+    Project project = projectMapper.queryByName(projectName);
+
+    if (project == null) {
+      response.setStatus(HttpStatus.SC_NOT_MODIFIED);
+      return null;
+    }
+
+    if (!projectService.hasWritePerm(operator.getId(), project)) {
+      response.setStatus(HttpStatus.SC_UNAUTHORIZED);
+      return null;
+    }
+
+    // 获取数据库信息
+
+    ProjectFlow srcProjectFlow = flowDao.projectFlowfindByName(project.getId(), srcWorkflowName);
+
+    if (srcProjectFlow == null) {
+      response.setStatus(HttpStatus.SC_NOT_MODIFIED);
+      return null;
+    }
+
+    String data = JsonUtil.toJsonString(srcProjectFlow.getData());
+
+    // 尝试拷贝文件
+    String srcHdfsFilename = BaseConfig.getHdfsWorkflowFilename(project.getId(), srcWorkflowName);
+    String destHdfsFilename = BaseConfig.getHdfsWorkflowFilename(project.getId(), destWorkflowName);
+
+    logger.info("try copy workflow file {} to workflow file {}",srcHdfsFilename,destHdfsFilename);
+    try {
+      if (HdfsClient.getInstance().exists(srcHdfsFilename)){
+        HdfsClient.getInstance().copy(srcHdfsFilename,destHdfsFilename,false,true);
+      }else{
+        logger.info("workflow file {} not exists no copy required",srcHdfsFilename);
+      }
+    } catch (IOException e) {
+      logger.error("copy hdfs file error",e);
+      response.setStatus(HttpStatus.SC_SERVICE_UNAVAILABLE);
+      return null;
+    }
+
+    return putWorkflow(operator,projectName,destWorkflowName,srcProjectFlow.getDesc(),srcProjectFlow.getProxyUser(),srcProjectFlow.getQueue(),data,null,response);
+  }
+
+  /**
    * 删除一个工作流
    *
    * @param operator
@@ -439,7 +492,7 @@ public class WorkflowService {
    * @param response
    * @return
    */
-  public Resource downloadProjectFlowFile(User operator, String projectName, String name, HttpServletResponse response) {
+  public org.springframework.core.io.Resource downloadProjectFlowFile(User operator, String projectName, String name, HttpServletResponse response) {
     Project project = projectMapper.queryByName(projectName);
 
     if (project == null) {
@@ -452,25 +505,32 @@ public class WorkflowService {
       return null;
     }
 
+    // 尝试从hdfs下载
+    logger.info("try download workflow {} file from hdfs",name);
+    String localFilename = BaseConfig.getLocalWorkflowFilename(project.getId(), UUID.randomUUID().toString());
+    String hdfsFilename = BaseConfig.getHdfsWorkflowFilename(project.getId(), name);
+
+    logger.info("download hdfs {} to local {}",hdfsFilename,localFilename);
+    HdfsClient.getInstance().copyHdfsToLocal(hdfsFilename, localFilename, false, true);
+
+    org.springframework.core.io.Resource file = fileSystemStorageService.loadAsResource(localFilename);
+
+    if (file != null){
+      return file;
+    }
+
+    // 从数据库中导出
+    logger.info("try download workflow {} file from db",name);
     ProjectFlow projectFlow = flowDao.projectFlowfindByName(project.getId(), name);
 
-    String json = "";
-
     try {
-      json = JsonUtil.toJsonString(projectFlow.getData());
-    } catch (RuntimeException e) {
-      e.printStackTrace();
-      return null;
-    }
-
-    try {
+      String json = JsonUtil.toJsonString(projectFlow.getData());
       InputStreamResource resource = new InputStreamResource(new FileInputStream(json));
       return resource;
-    } catch (FileNotFoundException e) {
-      e.printStackTrace();
+    } catch (Exception e) {
+      logger.error("download workflow file from db error",e);
       return null;
     }
-
   }
 
   /**
