@@ -17,7 +17,10 @@ CREATE TABLE `user` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- Create a admin user, password is '123456'
-INSERT INTO `user`(`name`, `email`, `desc`, `phone`, `password`, `role`, `create_time`, `modify_time`) VALUES('admin', 'admin@baifendian.com', 'administrator user', '13800000000', 'e10adc3949ba59abbe56e057f20f883e', 0, now(),now());
+INSERT INTO `user`(`name`, `email`, `desc`, `phone`, `password`, `role`, `create_time`, `modify_time`) VALUES('admin', 'bdms-group@baifendian.com', 'administrator user', null, 'e10adc3949ba59abbe56e057f20f883e', 0, now(),now());
+
+-- Create a udp user, password is '123123', not necessary for swordfish project
+INSERT INTO `user`(`name`, `email`, `desc`, `phone`, `password`, `role`, `proxy_users`, `create_time`, `modify_time`) VALUES('udp', 'bdms-group@baifendian.com', 'udp user', null, '4297f44b13955235245b2497399d7a93', 1, '["*"]', now(),now());
 
 -- `project` table
 DROP TABLE If Exists `project`;

@@ -43,6 +43,8 @@ public class BaseConfig {
 
   private static String localExecBasePath; // 本地目录, 用于执行工作流
 
+  private static String jobHiveUdfJarBasePath; // 本地目录, udf jar 目录
+
   private static Set<String> prohibitUserSet; // 禁用用户列表
 
   /**
@@ -64,6 +66,7 @@ public class BaseConfig {
       localDownloadBasePath = properties.getProperty("local.download.base.path");
       hdfsDataBasePath = properties.getProperty("hdfs.data.base.path");
       localExecBasePath = properties.getProperty("local.exec.base.path");
+      jobHiveUdfJarBasePath = properties.getProperty("job.hive.udfjar.hdfs.basepath");
 
       systemEnvPath = properties.getProperty("sf.env.file");
 
@@ -218,6 +221,15 @@ public class BaseConfig {
    */
   public static String getSystemEnvPath() {
     return systemEnvPath;
+  }
+
+  /**
+   * 返回 hive 的 udf jar 路径
+   *
+   * @return
+   */
+  public static String getJobHiveUdfJarBasePath() {
+    return jobHiveUdfJarBasePath;
   }
 
   /**
