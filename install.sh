@@ -75,17 +75,20 @@ function file_replace()
 # compile project
 mvn -U clean package assembly:assembly -Dmaven.test.skip=true || { echo "maven failed."; exit 1; }
 
+# get script path
+CUR_DIR=`dirname $0`
+
 # web-server
-cd target/swordfish-all-${version}/swordfish-web-server-${version}/
+cd $CUR_DIR/target/swordfish-all-${version}/swordfish-web-server-${version}/
 
 file_replace web-server || { echo "Web server conf replace failed."; exit 1; }
 
 # master-server
-cd target/swordfish-all-${version}/swordfish-master-server-${version}/
+cd $CUR_DIR/target/swordfish-all-${version}/swordfish-master-server-${version}/
 
 file_replace master-server || { echo "Master server conf replace failed."; exit 1; }
 
 # exec-server
-cd target/swordfish-all-${version}/swordfish-exec-server-${version}/
+cd $CUR_DIR/target/swordfish-all-${version}/swordfish-exec-server-${version}/
 
 file_replace exec-server || { echo "Exec server conf replace failed."; exit 1; }
