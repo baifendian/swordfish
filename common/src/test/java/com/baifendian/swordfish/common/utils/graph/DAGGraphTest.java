@@ -30,11 +30,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-/**
- * author: smile8
- * date:   12/09/2016
- * desc:
- */
 public class DAGGraphTest {
   private Graph<Integer, String, String> graph;
 

@@ -19,9 +19,6 @@ import org.junit.Test;
 
 import java.util.Arrays;
 
-/**
- * author: smile8 date:   2017/2/28 desc:
- */
 public class MailSendUtilTest {
   @Test
   public void testSendMails() {
