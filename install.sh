@@ -77,7 +77,7 @@ mvn -U clean package assembly:assembly -Dmaven.test.skip=true || { echo "maven f
 
 # get script path
 CUR_DIR=`dirname $0`
-SWORDFISH_HOME=`cd "$CUR_DIR"; pwd`/..
+SWORDFISH_HOME=`cd "$CUR_DIR"; pwd`
 
 # web-server
 cd $SWORDFISH_HOME/target/swordfish-all-${version}/swordfish-web-server-${version}/
