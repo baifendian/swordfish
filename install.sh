@@ -72,6 +72,11 @@ function file_replace()
     fi
 }
 
+# stop all service
+sh bin/swordfish-daemon.sh stop web-server
+sh bin/swordfish-daemon.sh stop master-server
+sh bin/swordfish-daemon.sh stop exec-server
+
 # compile project
 mvn -U clean package assembly:assembly -Dmaven.test.skip=true || { echo "maven failed."; exit 1; }
 
@@ -84,21 +89,17 @@ cd $SWORDFISH_HOME/target/swordfish-all-${version}/swordfish-web-server-${versio
 
 file_replace web-server || { echo "Web server conf replace failed."; exit 1; }
 
-sh bin/swordfish-daemon.sh stop web-server
-sh bin/swordfish-daemon.sh start web-server
-
 # master-server
 cd $SWORDFISH_HOME/target/swordfish-all-${version}/swordfish-master-server-${version}/
 
 file_replace master-server || { echo "Master server conf replace failed."; exit 1; }
-
-sh bin/swordfish-daemon.sh stop master-server
-sh bin/swordfish-daemon.sh start master-server
 
 # exec-server
 cd $SWORDFISH_HOME/target/swordfish-all-${version}/swordfish-exec-server-${version}/
 
 file_replace exec-server || { echo "Exec server conf replace failed."; exit 1; }
 
-sh bin/swordfish-daemon.sh stop exec-server
+# start all service
+sh bin/swordfish-daemon.sh start web-server
+sh bin/swordfish-daemon.sh start master-server
 sh bin/swordfish-daemon.sh start exec-server
