@@ -34,7 +34,7 @@ hadoopNamenodeAddress="172.24.5.149"
 hadoopYarnAddress="172.24.5.149"
 
 # env config file
-envFile="/home/baseline/swordfish/conf/env/sf.env.file"
+envFile="/home/baseline/.sf_env.sh"
 
 # 文件替换
 function file_replace()
