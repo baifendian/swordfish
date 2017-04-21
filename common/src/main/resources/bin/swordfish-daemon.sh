@@ -13,6 +13,8 @@ shift
 command=$1
 shift
 
+echo "Begin $startStop $command......"
+
 BIN_DIR=`dirname $0`
 BIN_DIR=`cd "$BIN_DIR"; pwd`
 SWORDFISH_HOME=$BIN_DIR/..
@@ -87,3 +89,5 @@ case $startStop in
     ;;
 
 esac
+
+echo "End $startStop $command."
