@@ -73,8 +73,13 @@ function file_replace()
 }
 
 # stop all service
+cd $SWORDFISH_HOME/target/swordfish-all-${version}/swordfish-web-server-${version}/
 sh bin/swordfish-daemon.sh stop web-server
+
+cd $SWORDFISH_HOME/target/swordfish-all-${version}/swordfish-master-server-${version}/
 sh bin/swordfish-daemon.sh stop master-server
+
+cd $SWORDFISH_HOME/target/swordfish-all-${version}/swordfish-exec-server-${version}/
 sh bin/swordfish-daemon.sh stop exec-server
 
 # compile project
@@ -100,6 +105,11 @@ cd $SWORDFISH_HOME/target/swordfish-all-${version}/swordfish-exec-server-${versi
 file_replace exec-server || { echo "Exec server conf replace failed."; exit 1; }
 
 # start all service
+cd $SWORDFISH_HOME/target/swordfish-all-${version}/swordfish-web-server-${version}/
 sh bin/swordfish-daemon.sh start web-server
+
+cd $SWORDFISH_HOME/target/swordfish-all-${version}/swordfish-master-server-${version}/
 sh bin/swordfish-daemon.sh start master-server
+
+cd $SWORDFISH_HOME/target/swordfish-all-${version}/swordfish-exec-server-${version}/
 sh bin/swordfish-daemon.sh start exec-server
