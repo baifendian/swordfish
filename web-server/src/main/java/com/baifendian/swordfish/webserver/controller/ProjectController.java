@@ -54,7 +54,7 @@ public class ProjectController {
                                HttpServletResponse response) {
     logger.info("Operator user {}, create project, name: {}, desc: {}", operator.getName(), name, desc);
 
-    return projectService.createProject(operator, name, desc, response);
+    return projectService.createProject(operator, name, desc);
   }
 
   /**
@@ -72,7 +72,7 @@ public class ProjectController {
                                HttpServletResponse response) {
     logger.info("Operator user {}, modify project, name: {}, desc: {}", operator.getName(), name, desc);
 
-    return projectService.modifyProject(operator, name, desc, response);
+    return projectService.modifyProject(operator, name, desc);
   }
 
   /**
@@ -88,7 +88,7 @@ public class ProjectController {
                             HttpServletResponse response) {
     logger.info("Operator user {}, delete project, name: {}, desc: {}", operator.getName(), name);
 
-    projectService.deleteProject(operator, name, response);
+    projectService.deleteProject(operator, name);
   }
 
   /**
@@ -102,7 +102,7 @@ public class ProjectController {
                                      HttpServletResponse response) {
     logger.info("Operator user {}, get project list", operator.getName());
 
-    return projectService.queryProject(operator, response);
+    return projectService.queryProject(operator);
   }
 
   /**
@@ -123,7 +123,7 @@ public class ProjectController {
                                     HttpServletResponse response) {
     logger.info("Operator user {}, add user to project, project name: {}, user name: {}, perm: {}", operator.getName(), name, userName, perm);
 
-    return projectService.addProjectUser(operator, name, userName, perm, response);
+    return projectService.addProjectUser(operator, name, userName, perm);
   }
 
   /**
@@ -144,7 +144,7 @@ public class ProjectController {
                                     HttpServletResponse response) {
     logger.info("Operator user {}, modify user permission in the project, project name: {}, user name: {}, perm: {}", operator.getName(), name, userName, perm);
 
-    return projectService.modifyProjectUser(operator, name, userName, perm, response);
+    return projectService.modifyProjectUser(operator, name, userName, perm);
   }
   /**
    * 项目删除一个用户
@@ -161,7 +161,7 @@ public class ProjectController {
                                 HttpServletResponse response) {
     logger.info("Operator user {}, delete user from project, project name: {}, user name: {}, perm: {}", operator.getName(), name, userName);
 
-    projectService.deleteProjectUser(operator, name, userName, response);
+    projectService.deleteProjectUser(operator, name, userName);
   }
 
   /**
@@ -178,6 +178,6 @@ public class ProjectController {
                                      HttpServletResponse response) {
     logger.info("Operator user {}, query users of project, project name: {}", operator.getName(), name);
 
-    return projectService.queryUser(operator, name, response);
+    return projectService.queryUser(operator, name);
   }
 }

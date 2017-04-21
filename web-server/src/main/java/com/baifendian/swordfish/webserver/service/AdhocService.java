@@ -29,6 +29,10 @@ import com.baifendian.swordfish.webserver.dto.AdHocLogData;
 import com.baifendian.swordfish.webserver.dto.AdHocResultData;
 import com.baifendian.swordfish.webserver.dto.ExecutorId;
 import com.baifendian.swordfish.webserver.dto.LogResult;
+import com.baifendian.swordfish.webserver.exception.NotFoundException;
+import com.baifendian.swordfish.webserver.exception.NotModifiedException;
+import com.baifendian.swordfish.webserver.exception.PermissionException;
+import com.baifendian.swordfish.webserver.exception.ServerErrorException;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -72,33 +76,29 @@ public class AdhocService {
    * @param queue
    * @param udfs
    * @param timeout
-   * @param response
    * @return
    */
   // @Transactional(value = "TransactionManager")
-  public ExecutorId execAdhoc(User operator, String projectName, String stms, int limit, String proxyUser, String queue, List<UdfsInfo> udfs, int timeout, HttpServletResponse response) {
+  public ExecutorId execAdhoc(User operator, String projectName, String stms, int limit, String proxyUser, String queue, List<UdfsInfo> udfs, int timeout) {
 
     // 查看用户对项目是否具备相应权限
     Project project = projectMapper.queryByName(projectName);
 
     if (project == null) {
       logger.error("Project does not exist: {}", projectName);
-      response.setStatus(HttpStatus.SC_NOT_MODIFIED);
-      return null;
+      throw new NotFoundException("project",projectName);
     }
 
     if (!projectService.hasExecPerm(operator.getId(), project)) {
       logger.error("User {} has no right permission for the project {}", operator.getName(), projectName);
-      response.setStatus(HttpStatus.SC_UNAUTHORIZED);
-      return null;
+      throw new PermissionException("project exec or project owner",operator.getName());
     }
 
     // 查看 master 是否存在
     MasterServer masterServer = masterServerMapper.query();
     if (masterServer == null) {
       logger.error("Master server does not exist.");
-      response.setStatus(HttpStatus.SC_NOT_MODIFIED);
-      return null;
+      throw new ServerErrorException("Master server does not exist.");
     }
 
     // 插入数据库记录, 得到 exec id
@@ -131,8 +131,7 @@ public class AdhocService {
       adHocMapper.insert(adhoc);
     } catch (DuplicateKeyException e) {
       logger.error("Adhoc has exist, can't create again.", e);
-      response.setStatus(HttpStatus.SC_CONFLICT);
-      return null;
+      throw new NotModifiedException("Adhoc has exist, can't create again.");
     }
 
     // 连接
@@ -143,13 +142,11 @@ public class AdhocService {
       RetInfo retInfo = masterClient.execAdHoc(adhoc.getId());
 
       if (retInfo.getStatus() != 0) {
-        response.setStatus(HttpStatus.SC_INTERNAL_SERVER_ERROR);
-        return null;
+        throw new ServerErrorException("master server return error");
       }
     } catch (Exception e) {
       logger.error("Adhoc exec exception.", e);
-      response.setStatus(HttpStatus.SC_NOT_MODIFIED);
-      return null;
+      throw new ServerErrorException("Adhoc exec exception.");
     }
 
     return new ExecutorId(adhoc.getId());
@@ -163,24 +160,21 @@ public class AdhocService {
    * @param index
    * @param from
    * @param size
-   * @param response
    * @return
    */
-  public AdHocLogData queryLogs(User operator, int execId, int index, int from, int size, HttpServletResponse response) {
+  public AdHocLogData queryLogs(User operator, int execId, int index, int from, int size) {
 
     // 查看用户对项目是否具备相应权限
     Project project = adHocMapper.queryProjectByExecId(execId);
 
     if (project == null) {
       logger.error("Exec id: {} has no correspond project", execId);
-      response.setStatus(HttpStatus.SC_BAD_REQUEST);
-      return null;
+      throw new NotFoundException("project","for execId:"+execId);
     }
 
     if (!projectService.hasExecPerm(operator.getId(), project)) {
       logger.error("User [{},{}] has no right permission for the project [{}], execId: {}", operator.getId(), operator.getName(), project.getName(), execId);
-      response.setStatus(HttpStatus.SC_UNAUTHORIZED);
-      return null;
+      throw new PermissionException("project exec or project owner",operator.getName()+" to project:"+project.getName());
     }
 
     // 返回日志信息
@@ -188,15 +182,14 @@ public class AdhocService {
     AdHoc adhoc = adHocMapper.selectById(execId);
     if (adhoc == null) {
       logger.error("Exec id not exist: {}", execId);
-      response.setStatus(HttpStatus.SC_BAD_REQUEST);
-      return null;
+      throw new NotFoundException("execId",String.valueOf(execId));
     }
 
     String jobId = adhoc.getJobId();
 
     if (StringUtils.isEmpty(jobId)) {
       logger.warn("Job id of exec: {} is null", execId);
-      return null;
+      throw new ServerErrorException("jobId",jobId);
     }
 
     // 2. 先判断有多少个语句, index 如果超过了, 返回异常
@@ -205,8 +198,7 @@ public class AdhocService {
     // 3. 得到需要的 index
     if (results == null || index >= results.size()) {
       logger.error("Result is empty or index equal or more than results size");
-      response.setStatus(HttpStatus.SC_BAD_REQUEST);
-      return null;
+      throw new ServerErrorException("Result is empty or index equal or more than results size");
     }
 
     // 3. 查看结果
@@ -232,24 +224,21 @@ public class AdhocService {
    * @param operator
    * @param execId
    * @param index
-   * @param response
    * @return
    */
-  public AdHocResultData queryResult(User operator, int execId, int index, HttpServletResponse response) {
+  public AdHocResultData queryResult(User operator, int execId, int index) {
 
     // 查看用户对项目是否具备相应权限
     Project project = adHocMapper.queryProjectByExecId(execId);
 
     if (project == null) {
       logger.error("Exec id: {} has no correspond project", execId);
-      response.setStatus(HttpStatus.SC_BAD_REQUEST);
-      return null;
+      throw new NotFoundException("project","for execId:"+execId);
     }
 
     if (!projectService.hasExecPerm(operator.getId(), project)) {
       logger.error("User {} has no right permission for the project {}", operator.getName(), project.getName());
-      response.setStatus(HttpStatus.SC_UNAUTHORIZED);
-      return null;
+      throw new PermissionException("project exec or project owner",operator.getName()+" to project:"+project.getName());
     }
 
     // 返回结果

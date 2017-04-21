@@ -21,6 +21,9 @@ package com.baifendian.swordfish.webserver.controller;
 
 import com.baifendian.swordfish.dao.model.ProjectFlow;
 import com.baifendian.swordfish.dao.model.User;
+import com.baifendian.swordfish.webserver.exception.ParameterException;
+import com.baifendian.swordfish.webserver.exception.PermissionException;
+import com.baifendian.swordfish.webserver.exception.ServerErrorException;
 import com.baifendian.swordfish.webserver.service.WorkflowService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -69,7 +72,7 @@ public class WorkflowController {
     logger.info("Operator user {}, create workflow, project name: {}, workflow name: {}, desc: {}, proxyUser: {}, queue: {}, data: {}, file: [{},{}]",
         operator.getName(), projectName, name, desc, proxyUser, queue, data, (file == null) ? null : file.getName(), (file == null) ? null : file.getOriginalFilename());
 
-    return workflowService.createWorkflow(operator, projectName, name, desc, proxyUser, queue, data, file, response);
+    return workflowService.createWorkflow(operator, projectName, name, desc, proxyUser, queue, data, file);
   }
 
   /**
@@ -98,7 +101,7 @@ public class WorkflowController {
     logger.info("Operator user {}, put workflow, project name: {}, workflow name: {}, desc: {}, proxyUser: {}, queue: {}, data: {}, file: [{},{}]",
         operator.getName(), projectName, name, desc, proxyUser, queue, data, (file == null) ? null : file.getName(), (file == null) ? null : file.getOriginalFilename());
 
-    return workflowService.putWorkflow(operator, projectName, name, desc, proxyUser, queue, data, file, response);
+    return workflowService.putWorkflow(operator, projectName, name, desc, proxyUser, queue, data, file);
   }
 
   /**
@@ -127,7 +130,7 @@ public class WorkflowController {
     logger.info("Operator user {}, modify workflow, project name: {}, workflow name: {}, desc: {}, proxyUser: {}, queue: {}, data: {}, file: [{},{}]",
         operator.getName(), projectName, name, desc, proxyUser, queue, data, (file == null) ? null : file.getName(), (file == null) ? null : file.getOriginalFilename());
 
-    return workflowService.patchWorkflow(operator, projectName, name, desc, proxyUser, queue, data, file, response);
+    return workflowService.patchWorkflow(operator, projectName, name, desc, proxyUser, queue, data, file);
   }
 
 
@@ -148,7 +151,7 @@ public class WorkflowController {
                                       HttpServletResponse response){
     logger.info("Operator user {},project name: {} , source workflow: {}, dest workflow: {}",operator.getName(),projectName,srcWorkflowName,destWorkflowName);
 
-    return workflowService.postWorkflowCopy(operator,projectName,srcWorkflowName,destWorkflowName,response);
+    return workflowService.postWorkflowCopy(operator,projectName,srcWorkflowName,destWorkflowName);
   }
 
   /**
@@ -167,7 +170,7 @@ public class WorkflowController {
     logger.info("Operator user {}, delete workflow, project name: {}, workflow name: {}",
         operator.getName(), projectName, name);
 
-    workflowService.deleteProjectFlow(operator, projectName, name, response);
+    workflowService.deleteProjectFlow(operator, projectName, name);
   }
 
   /**
@@ -188,7 +191,7 @@ public class WorkflowController {
     logger.info("Operator user {}, modify workflow conf, project name: {}, proxyUser: {}, queue: {}",
         operator.getName(), projectName, proxyUser, queue);
 
-    workflowService.modifyWorkflowConf(operator, projectName, queue, proxyUser, response);
+    workflowService.modifyWorkflowConf(operator, projectName, queue, proxyUser);
   }
 
   /**
@@ -206,7 +209,7 @@ public class WorkflowController {
     logger.info("Operator user {}, query workflow list of project, project name: {}",
         operator.getName(), projectName);
 
-    return workflowService.queryAllProjectFlow(operator, projectName, response);
+    return workflowService.queryAllProjectFlow(operator, projectName);
   }
 
   /**
@@ -226,7 +229,7 @@ public class WorkflowController {
     logger.info("Operator user {}, query workflow detail, project name: {}, workflow name: {}",
         operator.getName(), projectName, name);
 
-    return workflowService.queryProjectFlow(operator, projectName, name, response);
+    return workflowService.queryProjectFlow(operator, projectName, name);
   }
 
   /**
@@ -246,7 +249,7 @@ public class WorkflowController {
     logger.info("Operator user {}, download workflow, project name: {}, workflow name: {}",
         operator.getName(), projectName, name);
 
-    org.springframework.core.io.Resource file = workflowService.downloadProjectFlowFile(operator, projectName, name, response);
+    org.springframework.core.io.Resource file = workflowService.downloadProjectFlowFile(operator, projectName, name);
 
     if (file == null) {
       return ResponseEntity

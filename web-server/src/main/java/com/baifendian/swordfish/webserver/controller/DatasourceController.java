@@ -62,7 +62,7 @@ public class DatasourceController {
     logger.info("Operator user {}, create datasource, project name: {}, data source name: {}, desc: {}, type: {}, parameter: {}",
         operator.getName(), projectName, name, desc, type, parameter);
 
-    return datasourceService.createDataSource(operator, projectName, name, desc, type, parameter, response);
+    return datasourceService.createDataSource(operator, projectName, name, desc, type, parameter);
   }
 
   /**
@@ -88,7 +88,7 @@ public class DatasourceController {
     logger.info("Operator user {}, put datasource, project name: {}, data source name: {}, desc: {}, type: {}, parameter: {}",
         operator.getName(), projectName, name, desc, type, parameter);
 
-    return datasourceService.putDataSource(operator, projectName, name, desc, DbType.valueOf(type), parameter, response);
+    return datasourceService.putDataSource(operator, projectName, name, desc, DbType.valueOf(type), parameter);
   }
 
   /**
@@ -112,7 +112,7 @@ public class DatasourceController {
     logger.info("Operator user {}, modify datasource, project name: {}, data source name: {}, desc: {}, type: {}, parameter: {}",
         operator.getName(), projectName, name, desc, parameter);
 
-    return datasourceService.modifyDataSource(operator, projectName, name, desc, parameter, response);
+    return datasourceService.modifyDataSource(operator, projectName, name, desc, parameter);
   }
 
   /**
@@ -131,7 +131,7 @@ public class DatasourceController {
     logger.info("Operator user {}, delete datasource, project name: {}, data source name: {}",
         operator.getName(), projectName, name);
 
-    datasourceService.deleteDataSource(operator, projectName, name, response);
+    datasourceService.deleteDataSource(operator, projectName, name);
   }
 
   /**
@@ -149,7 +149,7 @@ public class DatasourceController {
     logger.info("Operator user {}, query datasource of project, project name: {}",
         operator.getName(), projectName);
 
-    return datasourceService.query(operator, projectName, response);
+    return datasourceService.query(operator, projectName);
   }
 
   /**
@@ -169,6 +169,6 @@ public class DatasourceController {
     logger.info("Operator user {}, query datasource, project name: {}, data source name: {}",
         operator.getName(), projectName, name);
 
-    return datasourceService.queryByName(operator, projectName, name, response);
+    return datasourceService.queryByName(operator, projectName, name);
   }
 }

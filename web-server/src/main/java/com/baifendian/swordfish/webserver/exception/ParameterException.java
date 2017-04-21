@@ -15,18 +15,32 @@
  */
 package com.baifendian.swordfish.webserver.exception;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.ResponseStatus;
+
+import java.text.MessageFormat;
+
 /**
- * @author : liujin
- * @date : 2017-03-04 16:14
+ * Created by caojingwei on 2017/4/20.
  */
-public class ProjectConflictException extends RuntimeException {
-    private String projectName;
+public class ParameterException extends BadRequestException {
 
-    public ProjectConflictException(String projectName){
-        this.projectName = projectName;
-    }
+  private String parameter;
 
-    public String getProjectName(){
-        return projectName;
-    }
+  public ParameterException(String parameter) {
+    super("Parameter: {0} is invalid",parameter);
+    this.parameter = parameter;
+  }
+
+  public String getParameter() {
+    return parameter;
+  }
+
+  /**
+   *
+   */
+  public ParameterException() {
+    super();
+  }
+
 }

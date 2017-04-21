@@ -21,6 +21,10 @@ import com.baifendian.swordfish.dao.mapper.ProjectMapper;
 import com.baifendian.swordfish.dao.mapper.UserMapper;
 import com.baifendian.swordfish.dao.model.Project;
 import com.baifendian.swordfish.dao.model.User;
+import com.baifendian.swordfish.webserver.exception.NotFoundException;
+import com.baifendian.swordfish.webserver.exception.NotModifiedException;
+import com.baifendian.swordfish.webserver.exception.ParameterException;
+import com.baifendian.swordfish.webserver.exception.PermissionException;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.lang3.StringUtils;
@@ -55,7 +59,6 @@ public class UserService {
    * @param password
    * @param phone
    * @param proxyUsers
-   * @param response
    * @return
    */
   public User createUser(User operator,
@@ -64,12 +67,10 @@ public class UserService {
                          String desc,
                          String password,
                          String phone,
-                         String proxyUsers,
-                         HttpServletResponse response) {
+                         String proxyUsers) {
     // 如果不是管理员, 返回错误
     if (operator.getRole() != UserRoleType.ADMIN_USER) {
-      response.setStatus(HttpStatus.SC_UNAUTHORIZED);
-      return null;
+      throw new PermissionException("admin",operator.getName());
     }
 
     // 校验代理用户格式是否正确以及是否包含正常代理的内容
@@ -93,11 +94,8 @@ public class UserService {
       userMapper.insert(user);
     } catch (DuplicateKeyException e) {
       logger.error("User has exist, can't create again.", e);
-      response.setStatus(HttpStatus.SC_CONFLICT);
-      return null;
+      throw new NotModifiedException("User has exist, can't create again.");
     }
-
-    response.setStatus(HttpStatus.SC_CREATED);
 
     return user;
   }
@@ -112,7 +110,6 @@ public class UserService {
    * @param password
    * @param phone
    * @param proxyUsers
-   * @param response
    * @return
    */
   public User modifyUser(User operator,
@@ -121,27 +118,23 @@ public class UserService {
                          String desc,
                          String password,
                          String phone,
-                         String proxyUsers,
-                         HttpServletResponse response) {
+                         String proxyUsers) {
     if (operator.getRole() != UserRoleType.ADMIN_USER) {
       // 非管理员, 只能修改自身信息
       if (!StringUtils.equals(operator.getName(), name)) {
-        response.setStatus(HttpStatus.SC_UNAUTHORIZED);
-        return null;
+        throw new PermissionException("admin",operator.getName());
       }
 
       // 普通用户不能进行用户代理设置
       if (StringUtils.isNotEmpty(proxyUsers)) {
-        response.setStatus(HttpStatus.SC_UNAUTHORIZED);
-        return null;
+        throw new PermissionException("admin",operator.getName());
       }
     }
 
     User user = userMapper.queryByName(name);
 
     if (user == null) {
-      response.setStatus(HttpStatus.SC_NOT_MODIFIED);
-      return null;
+      throw new NotFoundException("user",name);
     }
 
     Date now = new Date();
@@ -176,8 +169,7 @@ public class UserService {
     int count = userMapper.update(user);
 
     if (count <= 0) {
-      response.setStatus(HttpStatus.SC_NOT_MODIFIED);
-      return null;
+      throw new NotModifiedException("Not update count");
     }
 
     return user;
@@ -188,22 +180,18 @@ public class UserService {
    *
    * @param operator
    * @param name
-   * @param response
    * @return
    */
   public void deleteUser(User operator,
-                         String name,
-                         HttpServletResponse response) {
+                         String name) {
     if (operator.getRole() != UserRoleType.ADMIN_USER) {
-      response.setStatus(HttpStatus.SC_UNAUTHORIZED);
-      return;
+      throw new PermissionException("admin",operator.getName());
     }
 
     // 删除, 是不能删除自己的
     if (StringUtils.equals(operator.getName(), name)) {
       logger.error("Can't delete user self");
-      response.setStatus(HttpStatus.SC_UNAUTHORIZED);
-      return;
+      throw new ParameterException("name");
     }
 
     // 删除用户的时候, 必须保证 "项目" 的信息不为空
@@ -211,15 +199,13 @@ public class UserService {
 
     if (CollectionUtils.isNotEmpty(projects)) {
       logger.error("Can't delete a account which has projects");
-      response.setStatus(HttpStatus.SC_NOT_MODIFIED);
-      return;
+      throw new NotModifiedException("Can't delete a account which has projects");
     }
 
     int count = userMapper.delete(name);
 
     if (count <= 0) {
-      response.setStatus(HttpStatus.SC_NOT_MODIFIED);
-      return;
+      throw new NotModifiedException("Not delete count");
     }
 
     return;
@@ -230,12 +216,10 @@ public class UserService {
    *
    * @param operator
    * @param allUser
-   * @param response
    * @return
    */
   public List<User> queryUser(User operator,
-                              boolean allUser,
-                              HttpServletResponse response) {
+                              boolean allUser) {
     List<User> users = new ArrayList<>();
 
     // 只查询自己

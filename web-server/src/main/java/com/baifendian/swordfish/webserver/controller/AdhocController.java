@@ -92,7 +92,7 @@ public class AdhocController {
       throw new IllegalArgumentException("Argument is not valid, udfs format not a valid.");
     }
 
-    return adhocService.execAdhoc(operator, projectName, stms, limit, proxyUser, queue, udfsInfos, timeout, response);
+    return adhocService.execAdhoc(operator, projectName, stms, limit, proxyUser, queue, udfsInfos, timeout);
   }
 
   /**
@@ -128,7 +128,7 @@ public class AdhocController {
       throw new IllegalArgumentException("Argument is not valid, size must be between (0, 1000]");
     }
 
-    return adhocService.queryLogs(operator, execId, index, from, size, response);
+    return adhocService.queryLogs(operator, execId, index, from, size);
   }
 
   /**
@@ -154,6 +154,6 @@ public class AdhocController {
       throw new IllegalArgumentException("Argument is not valid, index must be equal or more than zero");
     }
 
-    return adhocService.queryResult(operator, execId, index, response);
+    return adhocService.queryResult(operator, execId, index);
   }
 }

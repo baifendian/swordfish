@@ -70,7 +70,7 @@ public class ScheduleController {
     logger.info("Operator user {}, exec workflow, project name: {}, workflow name: {}, schedule: {}, notify type: {}, notify mails: {}, max try times: {}," +
                     "failure policy: {}, dep workflows: {}, dep policy: {}, timeout: {}",
             operator.getName(), projectName, workflowName, schedule, notifyType, notifyMails, maxTryTimes, failurePolicy, depWorkflows, depPolicyType, timeout);
-    return scheduleService.createSchedule(operator,projectName,workflowName,schedule,notifyType,notifyMails,maxTryTimes,failurePolicy,depWorkflows,depPolicyType,timeout,response);
+    return scheduleService.createSchedule(operator,projectName,workflowName,schedule,notifyType,notifyMails,maxTryTimes,failurePolicy,depWorkflows,depPolicyType,timeout);
   }
 
   /**
@@ -104,7 +104,7 @@ public class ScheduleController {
     logger.info("Operator user {}, exec workflow, project name: {}, workflow name: {}, schedule: {}, notify type: {}, notify mails: {}, max try times: {}," +
                     "failure policy: {}, dep workflows: {}, dep policy: {}, timeout: {}",
             operator.getName(), projectName, workflowName, schedule, notifyType, notifyMails, maxTryTimes, failurePolicy, depWorkflows, depPolicyType, timeout);
-    return scheduleService.putSchedule(operator,projectName,workflowName,schedule,notifyType,notifyMails,maxTryTimes,failurePolicy,depWorkflows,depPolicyType,timeout,response);
+    return scheduleService.putSchedule(operator,projectName,workflowName,schedule,notifyType,notifyMails,maxTryTimes,failurePolicy,depWorkflows,depPolicyType,timeout);
   }
 
   /**
@@ -138,7 +138,7 @@ public class ScheduleController {
     logger.info("Operator user {}, exec workflow, project name: {}, workflow name: {}, schedule: {}, notify type: {}, notify mails: {}, max try times: {}," +
                     "failure policy: {}, dep workflows: {}, dep policy: {}, timeout: {}",
             operator.getName(), projectName, workflowName, schedule, notifyType, notifyMails, maxTryTimes, failurePolicy, depWorkflows, depPolicyType, timeout);
-    return scheduleService.patchSchedule(operator,projectName,workflowName,schedule,notifyType,notifyMails,maxTryTimes,failurePolicy,depWorkflows,depPolicyType,timeout,null,response);
+    return scheduleService.patchSchedule(operator,projectName,workflowName,schedule,notifyType,notifyMails,maxTryTimes,failurePolicy,depWorkflows,depPolicyType,timeout,null);
   }
 
   /**
@@ -155,7 +155,7 @@ public class ScheduleController {
                                  @PathVariable String scheduleStatus,
                                  HttpServletResponse response){
     try {
-      scheduleService.postScheduleStatus(operator, projectName, workflowName, scheduleStatus, response);
+      scheduleService.postScheduleStatus(operator, projectName, workflowName, scheduleStatus);
     }catch (Exception e){
       logger.error("Post schedule status error",e);
     }
@@ -174,7 +174,7 @@ public class ScheduleController {
                                 @PathVariable String projectName,
                                 @PathVariable String workflowName,
                                 HttpServletResponse response){
-    return scheduleService.querySchedule(operator,projectName,workflowName,response);
+    return scheduleService.querySchedule(operator,projectName,workflowName);
   }
 
   /**
@@ -188,6 +188,6 @@ public class ScheduleController {
   public List<Schedule> queryAllSchedule(@RequestAttribute(value = "session.user") User operator,
                                          @PathVariable String projectName,
                                          HttpServletResponse response){
-    return scheduleService.queryAllSchedule(operator,projectName,response);
+    return scheduleService.queryAllSchedule(operator,projectName);
   }
 }

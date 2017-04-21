@@ -15,18 +15,26 @@
  */
 package com.baifendian.swordfish.webserver.exception;
 
+import java.text.MessageFormat;
+
+
 /**
- * @author : liujin
- * @date : 2017-03-04 16:14
+ * Created by caojingwei on 2017/4/20.
  */
-public class ProjectConflictException extends RuntimeException {
-    private String projectName;
+public class PermissionException extends UnAuthorizedException {
+  private String perm;
+  private String user;
 
-    public ProjectConflictException(String projectName){
-        this.projectName = projectName;
-    }
+  public String getPerm() {
+    return perm;
+  }
 
-    public String getProjectName(){
-        return projectName;
-    }
+  public String getUser() {
+    return user;
+  }
+
+  public PermissionException(String perm, String user) {
+    super(MessageFormat.format("User: {0} permission: {1} is invalid",perm,user));
+    this.perm = perm;
+  }
 }

@@ -15,18 +15,30 @@
  */
 package com.baifendian.swordfish.webserver.exception;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.ResponseStatus;
+
+import java.text.MessageFormat;
+
 /**
- * @author : liujin
- * @date : 2017-03-04 16:14
+ * Created by caojingwei on 2017/4/20.
  */
-public class ProjectConflictException extends RuntimeException {
-    private String projectName;
+@ResponseStatus(code = HttpStatus.NOT_FOUND)
+public class NotFoundException extends RuntimeException {
+  private String type;
+  private String name;
 
-    public ProjectConflictException(String projectName){
-        this.projectName = projectName;
-    }
+  public String getType() {
+    return type;
+  }
 
-    public String getProjectName(){
-        return projectName;
-    }
+  public String getName() {
+    return name;
+  }
+
+  public NotFoundException(String type, String name) {
+    super(MessageFormat.format("Type: {0} name: {1} not found",type,name));
+    this.type = type;
+    this.name = name;
+  }
 }

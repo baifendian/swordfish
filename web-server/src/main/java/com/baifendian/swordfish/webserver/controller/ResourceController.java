@@ -61,7 +61,7 @@ public class ResourceController {
     logger.info("Operator user {}, create resource, project name: {}, resource name: {}, desc: {}, file: [{},{}]",
         operator.getName(), projectName, name, desc, file.getName(), file.getOriginalFilename());
 
-    return resourceService.createResource(operator, projectName, name, desc, file, response);
+    return resourceService.createResource(operator, projectName, name, desc, file);
   }
 
   /**
@@ -85,7 +85,7 @@ public class ResourceController {
     logger.info("Operator user {}, put resource, project name: {}, resource name: {}, desc: {}, file: [{},{}]",
         operator.getName(), projectName, name, desc, file.getName(), file.getOriginalFilename());
 
-    return resourceService.putResource(operator, projectName, name, desc, file, response);
+    return resourceService.putResource(operator, projectName, name, desc, file);
   }
 
   /**
@@ -108,7 +108,7 @@ public class ResourceController {
     logger.info("Operator user {}, modify resource, project name: {}, resource name: {}, desc: {}, file: [{},{}]",
         operator.getName(), projectName, name, desc, (file == null) ? null : file.getName(), (file == null) ? null : file.getOriginalFilename());
 
-    return resourceService.modifyResource(operator, projectName, name, desc, file, response);
+    return resourceService.modifyResource(operator, projectName, name, desc, file);
   }
 
   /**
@@ -127,7 +127,7 @@ public class ResourceController {
     logger.info("Operator user {}, delete resource, project name: {}, resource name: {}",
         operator.getName(), projectName, name);
 
-    resourceService.deleteResource(operator, projectName, name, response);
+    resourceService.deleteResource(operator, projectName, name);
   }
 
   /**
@@ -144,7 +144,7 @@ public class ResourceController {
     logger.info("Operator user {}, get resource list of project, project name: {}",
         operator.getName(), projectName);
 
-    return resourceService.getResources(operator, projectName, response);
+    return resourceService.getResources(operator, projectName);
   }
 
   /**
@@ -163,7 +163,7 @@ public class ResourceController {
     logger.info("Operator user {}, get resource detail, project name: {}, resource name: {}",
         operator.getName(), projectName, name);
 
-    return resourceService.getResource(operator, projectName, name, response);
+    return resourceService.getResource(operator, projectName, name);
   }
 
   /**
@@ -183,7 +183,7 @@ public class ResourceController {
     logger.info("Operator user {}, download resource, project name: {}, resource name: {}",
         operator.getName(), projectName, name);
 
-    org.springframework.core.io.Resource file = resourceService.downloadResource(operator, projectName, name, response);
+    org.springframework.core.io.Resource file = resourceService.downloadResource(operator, projectName, name);
 
     if (file == null) {
       return ResponseEntity

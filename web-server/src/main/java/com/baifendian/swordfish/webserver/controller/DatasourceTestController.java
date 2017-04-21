@@ -53,6 +53,6 @@ public class DatasourceTestController {
     logger.info("Operator user id {}, test datasource, type: {}, parameter: {}",
         operator.getId(), type, parameter);
 
-    return datasourceService.testDataSource(DbType.valueOf(type), parameter, response);
+    return datasourceService.testDataSource(DbType.valueOf(type), parameter);
   }
 }

@@ -80,7 +80,7 @@ public class ProjectServiceTest {
       String name = mockDataService.getRandomString();
       String desc = mockDataService.getRandomString();
       MockHttpServletResponse mockHttpServletResponse = new MockHttpServletResponse();
-      Project res = projectService.createProject(user,name,desc,mockHttpServletResponse);
+      Project res = projectService.createProject(user,name,desc);
       assertEquals(mockHttpServletResponse.getStatus(),HttpStatus.SC_OK);
       assertTrue(res!=null);
     }
@@ -90,7 +90,7 @@ public class ProjectServiceTest {
       String name = mockDataService.getRandomString();
       String desc = mockDataService.getRandomString();
       MockHttpServletResponse mockHttpServletResponse = new MockHttpServletResponse();
-      Project res = projectService.createProject(userAdmin,name,desc,mockHttpServletResponse);
+      Project res = projectService.createProject(userAdmin,name,desc);
       assertEquals(res,null);
       assertEquals(mockHttpServletResponse.getStatus(),HttpStatus.SC_UNAUTHORIZED);
     }
@@ -100,7 +100,7 @@ public class ProjectServiceTest {
       String name = project.getName();
       String desc = mockDataService.getRandomString();
       MockHttpServletResponse mockHttpServletResponse = new MockHttpServletResponse();
-      Project res = projectService.createProject(user,name,desc,mockHttpServletResponse);
+      Project res = projectService.createProject(user,name,desc);
       assertEquals(res,null);
       assertEquals(mockHttpServletResponse.getStatus(), HttpStatus.SC_CONFLICT);
     }
@@ -111,7 +111,7 @@ public class ProjectServiceTest {
       //正常修改一个项目
       String desc = mockDataService.getRandomString();
       MockHttpServletResponse mockHttpServletResponse = new MockHttpServletResponse();
-      Project res = projectService.modifyProject(user,project.getName(),desc,mockHttpServletResponse);
+      Project res = projectService.modifyProject(user,project.getName(),desc);
       assertTrue(res != null);
       assertEquals(mockHttpServletResponse.getStatus(),HttpStatus.SC_OK);
       assertEquals(res.getDesc(),desc);
@@ -120,7 +120,7 @@ public class ProjectServiceTest {
       //非owner修改一个项目
       String desc = mockDataService.getRandomString();
       MockHttpServletResponse mockHttpServletResponse = new MockHttpServletResponse();
-      Project res = projectService.modifyProject(userAdmin,project.getName(),desc,mockHttpServletResponse);
+      Project res = projectService.modifyProject(userAdmin,project.getName(),desc);
       assertEquals(res,null);
       assertEquals(mockHttpServletResponse.getStatus(),HttpStatus.SC_UNAUTHORIZED);
     }
@@ -132,21 +132,21 @@ public class ProjectServiceTest {
       //正常删除一个项目
       Project project1 = mockDataService.createProject(user);
       MockHttpServletResponse mockHttpServletResponse = new MockHttpServletResponse();
-      projectService.deleteProject(user,project1.getName(),mockHttpServletResponse);
+      projectService.deleteProject(user,project1.getName());
       assertEquals(mockHttpServletResponse.getStatus(),HttpStatus.SC_OK);
     }
     {
       //删除一个不是自己的项目
       Project project1 = mockDataService.createProject(user);
       MockHttpServletResponse mockHttpServletResponse = new MockHttpServletResponse();
-      projectService.deleteProject(userAdmin,project1.getName(),mockHttpServletResponse);
+      projectService.deleteProject(userAdmin,project1.getName());
       assertEquals(mockHttpServletResponse.getStatus(),HttpStatus.SC_UNAUTHORIZED);
     }
     {
       //删除一个不存在的项目
       String name = mockDataService.getRandomString();
       MockHttpServletResponse mockHttpServletResponse = new MockHttpServletResponse();
-      projectService.deleteProject(user,name,mockHttpServletResponse);
+      projectService.deleteProject(user,name);
       assertEquals(mockHttpServletResponse.getStatus(),HttpStatus.SC_NOT_MODIFIED);
     }
   }
@@ -155,7 +155,7 @@ public class ProjectServiceTest {
     {
       //普通查询一个用户下所有项目
       MockHttpServletResponse mockHttpServletResponse = new MockHttpServletResponse();
-      List<Project> projectList = projectService.queryProject(user,mockHttpServletResponse);
+      List<Project> projectList = projectService.queryProject(user);
       assertEquals(mockHttpServletResponse.getStatus(),HttpStatus.SC_OK);
       assertTrue(projectList != null);
       assertTrue(projectList.size() > 0);
@@ -165,7 +165,7 @@ public class ProjectServiceTest {
       User user2 = mockDataService.createGeneralUser();
       Project project1 = mockDataService.createProject(user2);
       MockHttpServletResponse mockHttpServletResponse = new MockHttpServletResponse();
-      List<Project> projectList = projectService.queryProject(userAdmin,mockHttpServletResponse);
+      List<Project> projectList = projectService.queryProject(userAdmin);
       assertEquals(mockHttpServletResponse.getStatus(),HttpStatus.SC_OK);
       assertTrue(projectList != null);
       assertTrue(projectList.size() >= 2);
@@ -178,7 +178,7 @@ public class ProjectServiceTest {
       int perm = Constants.PROJECT_USER_PERM_READ;
       User user1 = mockDataService.createGeneralUser();
       MockHttpServletResponse mockHttpServletResponse = new MockHttpServletResponse();
-      ProjectUser projectUser = projectService.addProjectUser(user,project.getName(),user1.getName(),perm,mockHttpServletResponse);
+      ProjectUser projectUser = projectService.addProjectUser(user,project.getName(),user1.getName(),perm);
       assertEquals(mockHttpServletResponse.getStatus(),HttpStatus.SC_OK);
       assertTrue(projectUser != null);
       assertEquals(projectUser.getProjectId(),project.getId());
@@ -189,7 +189,7 @@ public class ProjectServiceTest {
       int perm = 1;
       User user1 = mockDataService.createGeneralUser();
       MockHttpServletResponse mockHttpServletResponse = new MockHttpServletResponse();
-      ProjectUser projectUser = projectService.addProjectUser(userAdmin,project.getName(),user1.getName(),perm,mockHttpServletResponse);
+      ProjectUser projectUser = projectService.addProjectUser(userAdmin,project.getName(),user1.getName(),perm);
       assertEquals(mockHttpServletResponse.getStatus(),HttpStatus.SC_UNAUTHORIZED);
       assertTrue(projectUser == null);
     }
@@ -198,7 +198,7 @@ public class ProjectServiceTest {
       int perm = 1;
       String userName = mockDataService.getRandomString();
       MockHttpServletResponse mockHttpServletResponse = new MockHttpServletResponse();
-      ProjectUser projectUser = projectService.addProjectUser(user,project.getName(),userName,perm,mockHttpServletResponse);
+      ProjectUser projectUser = projectService.addProjectUser(user,project.getName(),userName,perm);
       assertEquals(mockHttpServletResponse.getStatus(),HttpStatus.SC_NOT_MODIFIED);
       assertTrue(projectUser == null);
     }
@@ -206,7 +206,7 @@ public class ProjectServiceTest {
       //添加一个已经存在项目中的用户到项目中
       int perm = 1;
       MockHttpServletResponse mockHttpServletResponse = new MockHttpServletResponse();
-      ProjectUser projectUser = projectService.addProjectUser(user,project.getName(),user.getName(),perm,mockHttpServletResponse);
+      ProjectUser projectUser = projectService.addProjectUser(user,project.getName(),user.getName(),perm);
       assertEquals(mockHttpServletResponse.getStatus(),HttpStatus.SC_NOT_MODIFIED);
       assertTrue(projectUser == null);
     }
@@ -220,7 +220,7 @@ public class ProjectServiceTest {
       User user1 = mockDataService.createGeneralUser();
       mockDataService.createProjectUser(project.getId(),user1.getId(),perm);
       MockHttpServletResponse mockHttpServletResponse = new MockHttpServletResponse();
-      projectService.deleteProjectUser(user,project.getName(),user1.getName(),mockHttpServletResponse);
+      projectService.deleteProjectUser(user,project.getName(),user1.getName());
       assertEquals(mockHttpServletResponse.getStatus(),HttpStatus.SC_OK);
     }
     {
@@ -229,14 +229,14 @@ public class ProjectServiceTest {
       User user1 = mockDataService.createGeneralUser();
       mockDataService.createProjectUser(project.getId(),user1.getId(),perm);
       MockHttpServletResponse mockHttpServletResponse = new MockHttpServletResponse();
-      projectService.deleteProjectUser(userAdmin,project.getName(),user1.getName(),mockHttpServletResponse);
+      projectService.deleteProjectUser(userAdmin,project.getName(),user1.getName());
       assertEquals(mockHttpServletResponse.getStatus(),HttpStatus.SC_UNAUTHORIZED);
     }
     {
       //删除一个不存的的用户
       String userName = mockDataService.getRandomString();
       MockHttpServletResponse mockHttpServletResponse = new MockHttpServletResponse();
-      projectService.deleteProjectUser(user,project.getName(),userName,mockHttpServletResponse);
+      projectService.deleteProjectUser(user,project.getName(),userName);
       assertEquals(mockHttpServletResponse.getStatus(),HttpStatus.SC_NOT_MODIFIED);
     }
     {
@@ -244,13 +244,13 @@ public class ProjectServiceTest {
       User user1 = mockDataService.createGeneralUser();
       String userName = mockDataService.getRandomString();
       MockHttpServletResponse mockHttpServletResponse = new MockHttpServletResponse();
-      projectService.deleteProjectUser(user,project.getName(),user1.getName(),mockHttpServletResponse);
+      projectService.deleteProjectUser(user,project.getName(),user1.getName());
       assertEquals(mockHttpServletResponse.getStatus(),HttpStatus.SC_NOT_MODIFIED);
     }
     {
       //删除自己
       MockHttpServletResponse mockHttpServletResponse = new MockHttpServletResponse();
-      projectService.deleteProjectUser(user,project.getName(),user.getName(),mockHttpServletResponse);
+      projectService.deleteProjectUser(user,project.getName(),user.getName());
       assertEquals(mockHttpServletResponse.getStatus(),HttpStatus.SC_NOT_MODIFIED);
     }
   }
@@ -260,14 +260,14 @@ public class ProjectServiceTest {
     {
       //正常查询所有用户
       MockHttpServletResponse mockHttpServletResponse = new MockHttpServletResponse();
-      List<ProjectUser> projectUserList = projectService.queryUser(user,project.getName(),mockHttpServletResponse);
+      List<ProjectUser> projectUserList = projectService.queryUser(user,project.getName());
       assertEquals(mockHttpServletResponse.getStatus(),HttpStatus.SC_OK);
       assertTrue(projectUserList != null);
     }
     {
       //非项目owenr查询
       MockHttpServletResponse mockHttpServletResponse = new MockHttpServletResponse();
-      List<ProjectUser> projectUserList = projectService.queryUser(userAdmin,project.getName(),mockHttpServletResponse);
+      List<ProjectUser> projectUserList = projectService.queryUser(userAdmin,project.getName());
       assertEquals(mockHttpServletResponse.getStatus(),HttpStatus.SC_UNAUTHORIZED);
       assertTrue(projectUserList == null);
     }

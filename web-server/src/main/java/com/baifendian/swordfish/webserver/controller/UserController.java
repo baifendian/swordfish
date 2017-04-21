@@ -63,7 +63,7 @@ public class UserController {
     logger.info("Operator user {}, create user, name: {}, email: {}, desc: {}, password: {}, phone: {}, proxyUsers: {}",
         operator.getName(), name, email, desc, "******", phone, proxyUsers);
 
-    return userService.createUser(operator, name, email, desc, password, phone, proxyUsers, response);
+    return userService.createUser(operator, name, email, desc, password, phone, proxyUsers);
   }
 
   /**
@@ -91,7 +91,7 @@ public class UserController {
     logger.info("Operator user {}, modify user, name: {}, email: {}, desc: {}, password: {}, phone: {}, proxyUsers: {}",
         operator.getName(), name, email, desc, "******", phone, proxyUsers);
 
-    return userService.modifyUser(operator, name, email, desc, password, phone, proxyUsers, response);
+    return userService.modifyUser(operator, name, email, desc, password, phone, proxyUsers);
   }
 
   /**
@@ -109,7 +109,7 @@ public class UserController {
     logger.info("Operator user {}, delete user, name: {}",
         operator.getName(), name);
 
-    userService.deleteUser(operator, name, response);
+    userService.deleteUser(operator, name);
   }
 
   /**
@@ -127,6 +127,6 @@ public class UserController {
     logger.info("Operator user {}, query user, allUser: {}",
         operator.getName(), allUser);
 
-    return userService.queryUser(operator, allUser, response);
+    return userService.queryUser(operator, allUser);
   }
 }

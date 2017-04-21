@@ -15,18 +15,15 @@
  */
 package com.baifendian.swordfish.webserver.exception;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.ResponseStatus;
+
 /**
- * @author : liujin
- * @date : 2017-03-04 16:14
+ * Created by caojingwei on 2017/4/20.
  */
-public class ProjectConflictException extends RuntimeException {
-    private String projectName;
-
-    public ProjectConflictException(String projectName){
-        this.projectName = projectName;
-    }
-
-    public String getProjectName(){
-        return projectName;
-    }
+@ResponseStatus(code = HttpStatus.UNAUTHORIZED)
+public class UnAuthorizedException extends RuntimeException {
+  public UnAuthorizedException(String msg) {
+    super(msg);
+  }
 }

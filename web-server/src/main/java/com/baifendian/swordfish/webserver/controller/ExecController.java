@@ -76,7 +76,7 @@ public class ExecController {
             "notify mails: {}, timeout: {}",
         operator.getName(), projectName, workflowName, schedule, nodeName, nodeDep, notifyType, notifyMails, timeout);
 
-    return execService.postExecWorkflow(operator,projectName,workflowName,schedule,execType,nodeName,nodeDep,notifyType,notifyMails,timeout,response);
+    return execService.postExecWorkflow(operator,projectName,workflowName,schedule,execType,nodeName,nodeDep,notifyType,notifyMails,timeout);
   }
 
   /**
@@ -108,7 +108,7 @@ public class ExecController {
 
 
 
-    return execService.getExecWorkflow(operator,projectName,workflowName,new Date(startDate),new Date(endDate),status,from,size,response);
+    return execService.getExecWorkflow(operator,projectName,workflowName,new Date(startDate),new Date(endDate),status,from,size);
   }
 
   /**
@@ -126,7 +126,7 @@ public class ExecController {
     logger.info("Operator user {}, query exec detail, exec id: {}",
         operator.getName(), execId);
 
-    return execService.getExecWorkflow(operator,execId,response);
+    return execService.getExecWorkflow(operator,execId);
   }
 
   /**
@@ -148,7 +148,7 @@ public class ExecController {
     logger.info("Operator user {}, query log, job id: {}, from: {}, size: {}",
         operator.getName(), jobId, from, size);
 
-    return execService.getEexcWorkflowLog(operator,jobId,from,size,response);
+    return execService.getEexcWorkflowLog(operator,jobId,from,size);
   }
 
   /**
@@ -165,6 +165,6 @@ public class ExecController {
     logger.info("Operator user {}, kill exec, exec id: {}",
         operator.getName(), execId);
 
-    execService.postKillWorkflow(operator,execId,response);
+    execService.postKillWorkflow(operator,execId);
   }
 }

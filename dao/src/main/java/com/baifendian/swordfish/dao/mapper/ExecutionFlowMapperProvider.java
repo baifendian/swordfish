@@ -598,6 +598,7 @@ public class ExecutionFlowMapperProvider {
         JOIN("project p on p_f.project_id = p.id");
         WHERE("str_to_date(DATE_FORMAT(e_f.schedule_time,'%Y%m%d'),'%Y%m%d') = #{date}");
         WHERE("e_f.status in ("+FlowStatus.FAILED.getType()+","+FlowStatus.DEP_FAILED.getType()+")");
+        WHERE("p.id = #{projectId}");
         GROUP_BY("e_f.flow_id");
         ORDER_BY("times DESC");
       }

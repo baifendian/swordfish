@@ -19,6 +19,9 @@ import com.baifendian.swordfish.dao.mapper.ExecutionFlowMapper;
 import com.baifendian.swordfish.dao.mapper.ProjectMapper;
 import com.baifendian.swordfish.dao.model.*;
 import com.baifendian.swordfish.webserver.dto.StatResponse;
+import com.baifendian.swordfish.webserver.exception.NotFoundException;
+import com.baifendian.swordfish.webserver.exception.ParameterException;
+import com.baifendian.swordfish.webserver.exception.PermissionException;
 import org.apache.commons.httpclient.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,15 +54,13 @@ public class StatService {
    * @param projectName
    * @param startTime
    * @param endTime
-   * @param response
    */
-  public List<StatResponse> queryStates(User operator, String projectName, long startTime, long endTime, HttpServletResponse response) {
+  public List<StatResponse> queryStates(User operator, String projectName, long startTime, long endTime) {
 
     long timeInt = (endTime - startTime)/86400000;
     if (timeInt > 30){
       logger.error("time interval > 30: {}", timeInt);
-      response.setStatus(HttpStatus.SC_NOT_MODIFIED);
-      return null;
+      throw new ParameterException("time");
     }
 
     Date startDate = new Date(startTime);
@@ -70,14 +71,12 @@ public class StatService {
 
     if (project == null) {
       logger.error("Project does not exist: {}", projectName);
-      response.setStatus(HttpStatus.SC_NOT_MODIFIED);
-      return null;
+      throw new NotFoundException("project",projectName);
     }
 
     if (!projectService.hasExecPerm(operator.getId(), project)) {
       logger.error("User {} has no right permission for the project {} to query exec states", operator.getName(), projectName);
-      response.setStatus(HttpStatus.SC_UNAUTHORIZED);
-      return null;
+      throw new PermissionException("project exec or project owner",operator.getName());
     }
 
     List<ExecutionState> executionStateList = executionFlowMapper.selectStateByProject(project.getId(),startDate,endDate);
@@ -98,9 +97,8 @@ public class StatService {
    * @param projectName
    * @param date
    * @param num
-   * @param response
    */
-  public List<ExecutionFlow> queryConsumes(User operator, String projectName, long date, int num, HttpServletResponse response) {
+  public List<ExecutionFlow> queryConsumes(User operator, String projectName, long date, int num) {
 
     Date datetime = new Date(date);
 
@@ -109,14 +107,12 @@ public class StatService {
 
     if (project == null) {
       logger.error("Project does not exist: {}", projectName);
-      response.setStatus(HttpStatus.SC_NOT_MODIFIED);
-      return null;
+      throw new NotFoundException("project",projectName);
     }
 
     if (!projectService.hasExecPerm(operator.getId(), project)) {
       logger.error("User {} has no right permission for the project {} to create project flow", operator.getName(), projectName);
-      response.setStatus(HttpStatus.SC_UNAUTHORIZED);
-      return null;
+      throw new PermissionException("project read or project owner",operator.getName());
     }
 
     return executionFlowMapper.selectConsumesByProject(project.getId(),num,datetime);
@@ -129,9 +125,8 @@ public class StatService {
    * @param projectName
    * @param date
    * @param num
-   * @param response
    */
-  public List<ExecutionFlowError> queryErrors(User operator, String projectName, long date, int num, HttpServletResponse response) {
+  public List<ExecutionFlowError> queryErrors(User operator, String projectName, long date, int num) {
     Date datetime = new Date(date);
 
     // 查看是否对项目具备相应的权限
@@ -139,14 +134,12 @@ public class StatService {
 
     if (project == null) {
       logger.error("Project does not exist: {}", projectName);
-      response.setStatus(HttpStatus.SC_NOT_MODIFIED);
-      return null;
+      throw new NotFoundException("project",projectName);
     }
 
     if (!projectService.hasExecPerm(operator.getId(), project)) {
       logger.error("User {} has no right permission for the project {} to create project flow", operator.getName(), projectName);
-      response.setStatus(HttpStatus.SC_UNAUTHORIZED);
-      return null;
+      throw new PermissionException("project read or project owner",operator.getName());
     }
 
     return executionFlowMapper.selectErrorsByProject(project.getId(),num,datetime);

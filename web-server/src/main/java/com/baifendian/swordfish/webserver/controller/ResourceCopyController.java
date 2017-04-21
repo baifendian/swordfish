@@ -54,6 +54,6 @@ public class ResourceCopyController {
     logger.info("Operator user {}, copy resource, project name: {}, source resource name: {}, dest resource name: {}, desc: {}",
         operator.getName(), projectName, srcResName, destResName, desc);
 
-    return resourceService.copyResource(operator, projectName, srcResName, destResName, desc, response);
+    return resourceService.copyResource(operator, projectName, srcResName, destResName, desc);
   }
 }

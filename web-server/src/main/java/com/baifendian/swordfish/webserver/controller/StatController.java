@@ -63,7 +63,7 @@ public class StatController {
     Date statDate = new Date(startTime);
     Date endDate = new Date(endTime);
 
-    return statService.queryStates(operator, projectName, startTime, endTime, response);
+    return statService.queryStates(operator, projectName, startTime, endTime);
   }
 
   /**
@@ -91,7 +91,7 @@ public class StatController {
 
     }
 
-    return statService.queryConsumes(operator, projectName, date, num, response);
+    return statService.queryConsumes(operator, projectName, date, num);
   }
 
   /**
@@ -119,6 +119,6 @@ public class StatController {
 
     }
 
-    return statService.queryErrors(operator, projectName, date, num, response);
+    return statService.queryErrors(operator, projectName, date, num);
   }
 }
