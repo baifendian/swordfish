@@ -29,6 +29,10 @@ export SWORDFISH_LIB_JARS=$SWORDFISH_HOME/lib/*
 export SWORDFISH_OPTS="-server -Xmx4g -Xms4g -Xss256k -XX:+DisableExplicitGC -XX:+UseConcMarkSweepGC -XX:+CMSParallelRemarkEnabled -XX:LargePageSizeInBytes=128m -XX:+UseFastAccessorMethods -XX:+UseCMSInitiatingOccupancyOnly -XX:CMSInitiatingOccupancyFraction=70"
 export STOP_TIMEOUT=3
 
+if [ ! -d "$SWORDFISH_LOG_DIR" ]; then
+  mkdir $SWORDFISH_LOG_DIR
+fi
+
 log=$SWORDFISH_LOG_DIR/swordfish-$command-$HOSTNAME.out
 pid=$SWORDFISH_PID_DIR/swordfish-$command.pid
 
