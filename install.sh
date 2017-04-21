@@ -51,21 +51,25 @@ function file_replace()
 
     sed -i "s#sf.env.file.*#sf.env.file = ${envFile}#g" conf/common/base_config.properties
 
-    sed -i "s#fs.defaultFS.*#fs.defaultFS = hdfs://${hadoopNamenodeAddress}:8020#g" conf/hadoop/hadoop.properties
-    sed -i "s#yarn.resourcemanager.address.*#yarn.resourcemanager.address = ${hadoopYarnAddress}:8032#g" conf/hadoop/hadoop.properties
-    sed -i "s#yarn.resourcemanager.scheduler.address.*#yarn.resourcemanager.scheduler.address = ${hadoopYarnAddress}:8030#g" conf/hadoop/hadoop.properties
-    sed -i "s#mapreduce.jobhistory.address.*#mapreduce.jobhistory.address = ${hadoopYarnAddress}:10020#g" conf/hadoop/hadoop.properties
-    sed -i "s#yarn.resourcemanager.webapp.address.*#yarn.resourcemanager.webapp.address = ${hadoopYarnAddress}:8088#g" conf/hadoop/hadoop.properties
+    sed -i "s#fs.defaultFS.*#fs.defaultFS = hdfs://${hadoopNamenodeAddress}:8020#g" conf/common/hadoop/hadoop.properties
+    sed -i "s#yarn.resourcemanager.address.*#yarn.resourcemanager.address = ${hadoopYarnAddress}:8032#g" conf/common/hadoop/hadoop.properties
+    sed -i "s#yarn.resourcemanager.scheduler.address.*#yarn.resourcemanager.scheduler.address = ${hadoopYarnAddress}:8030#g" conf/common/hadoop/hadoop.properties
+    sed -i "s#mapreduce.jobhistory.address.*#mapreduce.jobhistory.address = ${hadoopYarnAddress}:10020#g" conf/common/hadoop/hadoop.properties
+    sed -i "s#yarn.resourcemanager.webapp.address.*#yarn.resourcemanager.webapp.address = ${hadoopYarnAddress}:8088#g" conf/common/hadoop/hadoop.properties
 
     # 4. quartz
-    sed -i "s#org.quartz.dataSource.myDS.URL.*#org.quartz.dataSource.myDS.URL= jdbc:mysql://${mysqlAddress}/${mysqlDb}?autoReconnect=true#g" conf/dao/data_source.properties
-    sed -i "s#org.quartz.dataSource.myDS.user.*#org.quartz.dataSource.myDS.user = ${mysqlUser}#g" conf/quartz.properties
-    sed -i "s#org.quartz.dataSource.myDS.password.*#org.quartz.dataSource.myDS.password = ${mysqlPassword}#g" conf/dao/quartz.properties
+    if [ "$1" = "master-server" ]; then
+        sed -i "s#org.quartz.dataSource.myDS.URL.*#org.quartz.dataSource.myDS.URL= jdbc:mysql://${mysqlAddress}/${mysqlDb}?autoReconnect=true#g" conf/quartz.properties
+        sed -i "s#org.quartz.dataSource.myDS.user.*#org.quartz.dataSource.myDS.user = ${mysqlUser}#g" conf/quartz.properties
+        sed -i "s#org.quartz.dataSource.myDS.password.*#org.quartz.dataSource.myDS.password = ${mysqlPassword}#g" conf/quartz.properties
+    fi
 
     # 5. common.hive 组件下的文件替换
-    sed -i "s#hive.metastore.uris.*#hive.metastore.uris = thrift://${hiveAddress}:9083#g" conf/common.hive/hive.properties
-    sed -i "s#hive.thrift.uris.*#hive.thrift.uris = jdbc:hive2://${hiveAddress}:10000/%s#g" conf/common.hive/hive.properties
-    sed -i "s#hive.uris.*#hive.uris = jdbc:hive2://${hiveAddress}:10000#g" conf/common.hive/hive.properties
+    if [ "$1" = "exec-server" ]; then
+        sed -i "s#hive.metastore.uris.*#hive.metastore.uris = thrift://${hiveAddress}:9083#g" conf/common.hive/hive.properties
+        sed -i "s#hive.thrift.uris.*#hive.thrift.uris = jdbc:hive2://${hiveAddress}:10000/%s#g" conf/common.hive/hive.properties
+        sed -i "s#hive.uris.*#hive.uris = jdbc:hive2://${hiveAddress}:10000#g" conf/common.hive/hive.properties
+    fi
 }
 
 # compile project
@@ -74,14 +78,14 @@ mvn -U clean package assembly:assembly -Dmaven.test.skip=true || { echo "maven f
 # web-server
 cd target/swordfish-all-${version}/swordfish-web-server-${version}/
 
-file_replace || { echo "Web server conf replace failed."; exit 1; }
+file_replace web-server || { echo "Web server conf replace failed."; exit 1; }
 
 # master-server
 cd target/swordfish-all-${version}/swordfish-master-server-${version}/
 
-file_replace || { echo "Master server conf replace failed."; exit 1; }
+file_replace master-server || { echo "Master server conf replace failed."; exit 1; }
 
 # exec-server
 cd target/swordfish-all-${version}/swordfish-exec-server-${version}/
 
-file_replace || { echo "Exec server conf replace failed."; exit 1; }
+file_replace exec-server || { echo "Exec server conf replace failed."; exit 1; }
