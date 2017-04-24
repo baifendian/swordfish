@@ -67,6 +67,25 @@ public class StatController {
   }
 
   /**
+   * 返回小时维度的统计信息
+   * @param operator
+   * @param projectName
+   * @param date
+   * @param response
+   * @return
+   */
+  @GetMapping(value = "/states-hour")
+  public List<StatResponse> queryStatesHour(@RequestAttribute(value = "session.user") User operator,
+                                            @RequestParam(value = "projectName") String projectName,
+                                            @RequestParam(value = "date") long date,
+                                            HttpServletResponse response){
+    logger.info("Operator user {}, get states, project name: {}, date: {}",
+            operator.getName(), projectName, date);
+
+    return statService.queryStatesHour(operator,projectName,date);
+  }
+
+  /**
    * 返回消耗的时间排行
    *
    * @param operator

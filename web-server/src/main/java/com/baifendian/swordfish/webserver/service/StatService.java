@@ -91,6 +91,39 @@ public class StatService {
   }
 
   /**
+   * 小时维度的查询状态信息
+   * @param operator
+   * @param projectName
+   * @param day
+   * @return
+   */
+  public List<StatResponse> queryStatesHour(User operator, String projectName, long day){
+    Date date = new Date(day);
+    // 查看是否对项目具备相应的权限
+    Project project = projectMapper.queryByName(projectName);
+
+    if (project == null) {
+      logger.error("Project does not exist: {}", projectName);
+      throw new NotFoundException("project",projectName);
+    }
+
+    if (!projectService.hasExecPerm(operator.getId(), project)) {
+      logger.error("User {} has no right permission for the project {} to query exec states", operator.getName(), projectName);
+      throw new PermissionException("project exec or project owner",operator.getName());
+    }
+
+    List<ExecutionState> executionStateList = executionFlowMapper.selectStateHourByProject(project.getId(),date);
+
+    List<StatResponse> statResponseList = new ArrayList<>();
+
+    for (ExecutionState executionState:executionStateList){
+      statResponseList.add(new StatResponse(executionState));
+    }
+
+    return statResponseList;
+  }
+
+  /**
    * 返回查询排行
    *
    * @param operator
