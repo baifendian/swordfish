@@ -189,6 +189,19 @@ public interface ExecutionFlowMapper {
   @SelectProvider(type = ExecutionFlowMapperProvider.class, method = "selectStateByProject")
   List<ExecutionState> selectStateByProject(@Param("projectId") int projectId,@Param("startDate") Date startDate,@Param("endDate") Date endDate);
 
+  @Results(value = {
+          @Result(property = "hour", column = "hour", id = true, javaType = int.class, jdbcType = JdbcType.INTEGER),
+          @Result(property = "init", column = "INIT", javaType = int.class, jdbcType = JdbcType.INTEGER),
+          @Result(property = "waitingDep", column = "WAITING_DEP", javaType = int.class, jdbcType = JdbcType.INTEGER),
+          @Result(property = "waitingRes", column = "WAITING_RES", javaType = int.class, jdbcType = JdbcType.INTEGER),
+          @Result(property = "running", column = "RUNNING", javaType = int.class, jdbcType = JdbcType.INTEGER),
+          @Result(property = "success", column = "SUCCESS", javaType = int.class, jdbcType = JdbcType.INTEGER),
+          @Result(property = "kill", column = "KILL", javaType = int.class, jdbcType = JdbcType.INTEGER),
+          @Result(property = "failed", column = "FAILED", javaType = int.class, jdbcType = JdbcType.INTEGER),
+          @Result(property = "depFailed", column = "DEP_FAILED", javaType = int.class, jdbcType = JdbcType.INTEGER),
+  })
+  @SelectProvider(type = ExecutionFlowMapperProvider.class, method = "selectStateHourByProject")
+  List<ExecutionState> selectStateHourByProject(@Param("projectId") int projectId,@Param("day") Date day);
   /**
    * 统计某天的工作流耗时TOP
    * @param projectId
@@ -211,6 +224,7 @@ public interface ExecutionFlowMapper {
           @Result(property = "submitUser", column = "submit_user_name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
           @Result(property = "type", column = "type", typeHandler = EnumOrdinalTypeHandler.class, jdbcType = JdbcType.TINYINT),
           @Result(property = "consume", column = "consume", javaType = int.class, jdbcType = JdbcType.INTEGER),
+          @Result(property = "proxyUser", column = "proxy_user", javaType = String.class, jdbcType = JdbcType.VARCHAR),
   })
   @SelectProvider(type = ExecutionFlowMapperProvider.class, method = "selectConsumesByProject")
   List<ExecutionFlow> selectConsumesByProject(@Param("projectId") int projectId,@Param("top") int top,@Param("date") Date date);

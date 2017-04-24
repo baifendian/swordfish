@@ -569,8 +569,29 @@ public class ExecutionFlowMapperProvider {
     }.toString();
   }
 
-  public String selectConsumesByProject(Map<String,Object> parameter) {
+  public String selectStateHourByProject(Map<String,Object> parameter) {
     return new SQL(){
+      {
+        SELECT("CONVERT(DATE_FORMAT(e_f.schedule_time,'%H'),SIGNED) as hour,\n" +
+                "SUM(case e_f.status when 0 then 1 else 0 end) as INIT,\n" +
+                "SUM(case e_f.status when 1 then 1 else 0 end) as WAITING_DEP,\n" +
+                "SUM(case e_f.status when 2 then 1 else 0 end) as WAITING_RES,\n" +
+                "SUM(case e_f.status when 3 then 1 else 0 end) as RUNNING,\n" +
+                "SUM(case e_f.status when 4 then 1 else 0 end) as SUCCESS,\n" +
+                "SUM(case e_f.status when 5 then 1 else 0 end) as `KILL`,\n" +
+                "SUM(case e_f.status when 6 then 1 else 0 end) as `FAILED`,\n" +
+                "SUM(case e_f.status when 7 then 1 else 0 end) as `DEP_FAILED`");
+        FROM("execution_flows e_f");
+        JOIN("project_flows p_f on e_f.flow_id = p_f.id");
+        WHERE("str_to_date(DATE_FORMAT(e_f.schedule_time,'%Y%m%d'),'%Y%m%d') = #{day}");
+        WHERE("p_f.project_id = #{projectId}");
+        GROUP_BY("hour");
+      }
+    }.toString();
+  }
+
+  public String selectConsumesByProject(Map<String,Object> parameter) {
+    String sql1 = new SQL(){
       {
         SELECT("timestampdiff(SECOND,start_time,end_time) as consume");
         SELECT("e_f.*");
@@ -583,6 +604,13 @@ public class ExecutionFlowMapperProvider {
         ORDER_BY("consume DESC");
       }
     }.toString()+" limit #{top}";
+
+    return new SQL(){{
+      SELECT("s1.*");
+      SELECT("u.name as proxyUser");
+      FROM("("+sql1+") s1");
+      LEFT_OUTER_JOIN("user u on s1.proxy_user = u.id");
+    }}.toString();
   }
 
   public String selectErrorsByProject(Map<String,Object> parameter) {

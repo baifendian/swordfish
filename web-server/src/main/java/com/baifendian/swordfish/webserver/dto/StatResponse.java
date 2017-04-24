@@ -16,6 +16,7 @@
 package com.baifendian.swordfish.webserver.dto;
 
 import com.baifendian.swordfish.dao.model.ExecutionState;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 import java.util.Date;
 
@@ -23,7 +24,11 @@ import java.util.Date;
  * 统计数据返回实体
  */
 public class StatResponse {
+  @JsonInclude(JsonInclude.Include.NON_NULL)
   private Date date;
+
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  private Integer hour;
 
   private Info info = new Info();
 
@@ -43,10 +48,19 @@ public class StatResponse {
     this.info = info;
   }
 
+  public Integer getHour() {
+    return hour;
+  }
+
+  public void setHour(Integer hour) {
+    this.hour = hour;
+  }
+
   public StatResponse() {
   }
 
   public StatResponse(ExecutionState executionState) {
+    this.hour = executionState.getHour();
     this.date = executionState.getDay();
     this.info.setWait(executionState.getInit()+executionState.getWaitingDep()+executionState.getWaitingRes());
     this.info.setFailed(executionState.getFailed()+executionState.getDepFailed());
