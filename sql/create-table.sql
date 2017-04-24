@@ -110,6 +110,7 @@ CREATE TABLE `project_flows` (
   `user_defined_params` text DEFAULT NULL COMMENT 'user defined parameter of the project flows.',
   `extras` text DEFAULT NULL COMMENT 'extends of the project flows',
   `queue` varchar(64) DEFAULT NULL COMMENT 'queue of the project flows',
+  `flag` tinyint(4) DEFAULT NULL COMMENT 'flow flag, 1 means a tmp flow, will be delete.',
   PRIMARY KEY (`id`),
   UNIQUE KEY `project_flowname` (`project_id`, `name`),
   FOREIGN KEY (`project_id`) REFERENCES `project`(`id`),
@@ -180,6 +181,8 @@ CREATE TABLE `execution_flows` (
   PRIMARY KEY (`id`),
   FOREIGN KEY (`flow_id`) REFERENCES `project_flows`(`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE INDEX proxy_user_index ON `execution_flows`(`proxy_user`);
 
 -- `execution_nodes` table
 DROP TABLE IF EXISTS `execution_nodes`;
