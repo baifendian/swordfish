@@ -22,29 +22,26 @@ import com.baifendian.swordfish.dao.mapper.ExecutionNodeMapper;
 import com.baifendian.swordfish.dao.mapper.MasterServerMapper;
 import com.baifendian.swordfish.dao.mapper.ProjectMapper;
 import com.baifendian.swordfish.dao.model.*;
-import com.baifendian.swordfish.dao.model.flow.params.Property;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
 import com.baifendian.swordfish.rpc.ExecInfo;
-import com.baifendian.swordfish.rpc.RetInfo;
 import com.baifendian.swordfish.rpc.RetResultInfo;
 import com.baifendian.swordfish.rpc.ScheduleInfo;
 import com.baifendian.swordfish.rpc.client.MasterClient;
-import com.baifendian.swordfish.webserver.dto.ExecWorkflowsResponse;
+import com.baifendian.swordfish.webserver.dto.ExecutorId;
 import com.baifendian.swordfish.webserver.dto.ExecutorIds;
+import com.baifendian.swordfish.webserver.dto.response.ExecWorkflowsResponse;
 import com.baifendian.swordfish.webserver.dto.LogResult;
+import com.baifendian.swordfish.webserver.dto.response.WorkflowResponse;
 import com.baifendian.swordfish.webserver.exception.*;
-import org.apache.avro.data.Json;
-import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.lang3.StringUtils;
-import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
+import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -70,12 +67,15 @@ public class ExecService {
   private ExecutionNodeMapper executionNodeMapper;
 
   @Autowired
+  private WorkflowService workflowService;
+
+  @Autowired
   private LogHelper logHelper;
 
   @Autowired
   private FlowDao flowDao;
 
-  public List<Integer> postExecWorkflow(User operator, String projectName, String workflowName, String schedule, ExecType execType, String nodeName, NodeDepType nodeDep, NotifyType notifyType, String notifyMails, int timeout) {
+  public ExecutorIds postExecWorkflow(User operator, String projectName, String workflowName, String schedule, ExecType execType, String nodeName, NodeDepType nodeDep, NotifyType notifyType, String notifyMails, int timeout) {
 
     // 查看是否对项目具备相应的权限
     Project project = projectMapper.queryByName(projectName);
@@ -126,7 +126,7 @@ public class ExecService {
             logger.error("Call master client exec workflow false , project id: {}, flow id: {},host: {}, port: {}", project.getId(), projectFlow.getId(), masterServer.getHost(), masterServer.getPort());
             throw new ServerErrorException("master server return error");
           }
-          return retInfo.getExecIds();
+          return new ExecutorIds(retInfo.getExecIds());
         }
         case COMPLEMENT_DATA: {
           ScheduleInfo scheduleInfo = null;
@@ -142,7 +142,7 @@ public class ExecService {
             logger.error("Call master client append workflow data false , project id: {}, flow id: {},host: {}, port: {}", project.getId(), projectFlow.getId(), masterServer.getHost(), masterServer.getPort());
             throw new ServerErrorException("Call master client append workflow data false , project id: {}, flow id: {},host: {}, port: {}",project.getId(), projectFlow.getId(), masterServer.getHost(), masterServer.getPort());
           }
-          return retInfo.getExecIds();
+          return new ExecutorIds(retInfo.getExecIds());
         }
         default: {
           logger.error("exec workflow no support exec type {}", execType.getType());
@@ -155,6 +155,35 @@ public class ExecService {
       logger.error("Call master client exec workflow error", e);
       throw e;
     }
+  }
+
+  /**
+   * 直接执行一个工作流
+   * @param operator
+   * @param projectName
+   * @param workflowName
+   * @param proxyUser
+   * @param queue
+   * @param data
+   * @param file
+   * @param notifyType
+   * @param notifyMails
+   * @param timeout
+   * @param extras
+   * @return
+   */
+  public ExecutorId postExecWorkflowDirect(User operator, String projectName, String workflowName, String desc, String proxyUser, String queue, String data, MultipartFile file, NotifyType notifyType, String notifyMails, int timeout, String extras){
+    logger.info("step1. create temp workflow");
+    WorkflowResponse projectFlow = workflowService.createWorkflow(operator, projectName, workflowName, desc, proxyUser, queue, data, file, extras, 1);
+    if (projectFlow == null){
+      throw new ServerErrorException("project workflow create return is null");
+    }
+    logger.info("step2. exec temp workflow");
+    ExecutorIds executorIds = postExecWorkflow(operator,projectName,workflowName,null,ExecType.DIRECT,null,null,notifyType,notifyMails,timeout);
+    if (CollectionUtils.isEmpty(executorIds.getExecIds())){
+      throw new ServerErrorException("project workflow exec return is null");
+    }
+    return new ExecutorId(executorIds.getExecIds().get(0));
   }
 
   /**

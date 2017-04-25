@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.baifendian.swordfish.webserver.dto;
+package com.baifendian.swordfish.webserver.dto.response;
 
 import com.baifendian.swordfish.dao.model.ExecutionState;
 import com.fasterxml.jackson.annotation.JsonInclude;

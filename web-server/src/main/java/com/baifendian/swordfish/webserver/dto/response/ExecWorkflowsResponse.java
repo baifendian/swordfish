@@ -1,4 +1,4 @@
-package com.baifendian.swordfish.webserver.dto;
+package com.baifendian.swordfish.webserver.dto.response;
 
 import com.baifendian.swordfish.dao.model.ExecutionFlow;
 

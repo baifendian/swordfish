@@ -13,43 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.baifendian.swordfish.webserver.dto;
+package com.baifendian.swordfish.webserver.dto.response;
+
+import java.util.List;
 
 /**
- * 基础返回结果
+ * 调度系统基本返回
  */
-public class BaseResponse {
-  /**
-   * 状态为 0 表示成功, 否则失败
-   */
-  private int status;
+public class ExecResponse extends BaseResponse {
+  private List<Integer> execIds;
+  private Integer execId;
 
-  /**
-   * 错误消息
-   */
-  private String message;
-
-  public BaseResponse() {
+  public List<Integer> getExecIds() {
+    return execIds;
   }
 
-  public BaseResponse(int status, String message) {
-    this.status = status;
-    this.message = message;
+  public void setExecIds(List<Integer> execIds) {
+    this.execIds = execIds;
   }
 
-  public int getStatus() {
-    return status;
+  public Integer getExecId() {
+    return execId;
   }
 
-  public void setStatus(int status) {
-    this.status = status;
-  }
-
-  public String getMessage() {
-    return message;
-  }
-
-  public void setMessage(String message) {
-    this.message = message;
+  public void setExecId(Integer execId) {
+    this.execId = execId;
   }
 }

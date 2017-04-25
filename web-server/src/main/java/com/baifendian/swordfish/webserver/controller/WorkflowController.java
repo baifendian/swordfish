@@ -21,6 +21,7 @@ package com.baifendian.swordfish.webserver.controller;
 
 import com.baifendian.swordfish.dao.model.ProjectFlow;
 import com.baifendian.swordfish.dao.model.User;
+import com.baifendian.swordfish.webserver.dto.response.WorkflowResponse;
 import com.baifendian.swordfish.webserver.exception.ParameterException;
 import com.baifendian.swordfish.webserver.exception.PermissionException;
 import com.baifendian.swordfish.webserver.exception.ServerErrorException;
@@ -60,19 +61,20 @@ public class WorkflowController {
    * @param response
    */
   @PostMapping(value = "/workflows/{name}")
-  public ProjectFlow createWorkflow(@RequestAttribute(value = "session.user") User operator,
-                                    @PathVariable String projectName,
-                                    @PathVariable String name,
-                                    @RequestParam(value = "desc", required = false) String desc,
-                                    @RequestParam(value = "proxyUser") String proxyUser,
-                                    @RequestParam(value = "queue") String queue,
-                                    @RequestParam(value = "data", required = false) String data,
-                                    @RequestParam(value = "file", required = false) MultipartFile file,
-                                    HttpServletResponse response) {
+  public WorkflowResponse createWorkflow(@RequestAttribute(value = "session.user") User operator,
+                                         @PathVariable String projectName,
+                                         @PathVariable String name,
+                                         @RequestParam(value = "desc", required = false) String desc,
+                                         @RequestParam(value = "proxyUser") String proxyUser,
+                                         @RequestParam(value = "queue") String queue,
+                                         @RequestParam(value = "data", required = false) String data,
+                                         @RequestParam(value = "file", required = false) MultipartFile file,
+                                         @RequestParam(value = "extras", required = false) String extras,
+                                         HttpServletResponse response) {
     logger.info("Operator user {}, create workflow, project name: {}, workflow name: {}, desc: {}, proxyUser: {}, queue: {}, data: {}, file: [{},{}]",
         operator.getName(), projectName, name, desc, proxyUser, queue, data, (file == null) ? null : file.getName(), (file == null) ? null : file.getOriginalFilename());
 
-    return workflowService.createWorkflow(operator, projectName, name, desc, proxyUser, queue, data, file);
+    return workflowService.createWorkflow(operator, projectName, name, desc, proxyUser, queue, data, file, extras, null);
   }
 
   /**
@@ -89,7 +91,7 @@ public class WorkflowController {
    * @param response
    */
   @PutMapping(value = "/workflows/{name}")
-  public ProjectFlow putWorkflow(@RequestAttribute(value = "session.user") User operator,
+  public WorkflowResponse putWorkflow(@RequestAttribute(value = "session.user") User operator,
                                  @PathVariable String projectName,
                                  @PathVariable String name,
                                  @RequestParam(value = "desc", required = false) String desc,
@@ -97,11 +99,12 @@ public class WorkflowController {
                                  @RequestParam(value = "queue") String queue,
                                  @RequestParam(value = "data", required = false) String data,
                                  @RequestParam(value = "file", required = false) MultipartFile file,
+                                 @RequestParam(value = "extras", required = false) String extras,
                                  HttpServletResponse response) {
     logger.info("Operator user {}, put workflow, project name: {}, workflow name: {}, desc: {}, proxyUser: {}, queue: {}, data: {}, file: [{},{}]",
         operator.getName(), projectName, name, desc, proxyUser, queue, data, (file == null) ? null : file.getName(), (file == null) ? null : file.getOriginalFilename());
 
-    return workflowService.putWorkflow(operator, projectName, name, desc, proxyUser, queue, data, file);
+    return workflowService.putWorkflow(operator, projectName, name, desc, proxyUser, queue, data, file, extras);
   }
 
   /**
@@ -118,7 +121,7 @@ public class WorkflowController {
    * @param response
    */
   @PatchMapping(value = "/workflows/{name}")
-  public ProjectFlow patchWorkflow(@RequestAttribute(value = "session.user") User operator,
+  public WorkflowResponse patchWorkflow(@RequestAttribute(value = "session.user") User operator,
                                    @PathVariable String projectName,
                                    @PathVariable String name,
                                    @RequestParam(value = "desc", required = false) String desc,
@@ -126,11 +129,12 @@ public class WorkflowController {
                                    @RequestParam(value = "queue", required = false) String queue,
                                    @RequestParam(value = "data", required = false) String data,
                                    @RequestParam(value = "file", required = false) MultipartFile file,
+                                   @RequestParam(value = "extras", required = false) String extras,
                                    HttpServletResponse response) {
     logger.info("Operator user {}, modify workflow, project name: {}, workflow name: {}, desc: {}, proxyUser: {}, queue: {}, data: {}, file: [{},{}]",
         operator.getName(), projectName, name, desc, proxyUser, queue, data, (file == null) ? null : file.getName(), (file == null) ? null : file.getOriginalFilename());
 
-    return workflowService.patchWorkflow(operator, projectName, name, desc, proxyUser, queue, data, file);
+    return workflowService.patchWorkflow(operator, projectName, name, desc, proxyUser, queue, data, file, extras);
   }
 
 
@@ -144,7 +148,7 @@ public class WorkflowController {
    * @return
    */
   @PostMapping(value = "workflow-copy")
-  public ProjectFlow postWorkflowCopy(@RequestAttribute(value = "session.user") User operator,
+  public WorkflowResponse postWorkflowCopy(@RequestAttribute(value = "session.user") User operator,
                                       @PathVariable String projectName,
                                       @RequestParam(value = "srcWorkflowName") String srcWorkflowName,
                                       @RequestParam(value = "destWorkflowName") String destWorkflowName,
@@ -203,7 +207,7 @@ public class WorkflowController {
    * @return
    */
   @GetMapping(value = "")
-  public List<ProjectFlow> queryWorkflow(@RequestAttribute(value = "session.user") User operator,
+  public List<WorkflowResponse> queryWorkflow(@RequestAttribute(value = "session.user") User operator,
                                          @PathVariable String projectName,
                                          HttpServletResponse response) {
     logger.info("Operator user {}, query workflow list of project, project name: {}",
@@ -222,7 +226,7 @@ public class WorkflowController {
    * @return
    */
   @GetMapping(value = "/workflows/{name}")
-  public ProjectFlow queryWorkflowDetail(@RequestAttribute(value = "session.user") User operator,
+  public WorkflowResponse queryWorkflowDetail(@RequestAttribute(value = "session.user") User operator,
                                          @PathVariable String projectName,
                                          @PathVariable String name,
                                          HttpServletResponse response) {

@@ -17,7 +17,7 @@ package com.baifendian.swordfish.webserver.controller;
 
 import com.baifendian.swordfish.dao.enums.DbType;
 import com.baifendian.swordfish.dao.model.User;
-import com.baifendian.swordfish.webserver.dto.BaseResponse;
+import com.baifendian.swordfish.webserver.dto.response.BaseResponse;
 import com.baifendian.swordfish.webserver.service.DatasourceService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
