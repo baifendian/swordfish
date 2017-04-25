@@ -195,6 +195,10 @@ public class ExecService {
 
     List<String> workflowList;
 
+    if (from < 0){
+      throw new BadRequestException("from");
+    }
+
     try{
       workflowList = JsonUtil.parseObjectList(workflowName,String.class);
     }catch (Exception e){
@@ -223,7 +227,7 @@ public class ExecService {
       throw new ParameterException("status");
     }
 
-    List<ExecutionFlow> executionFlowList = executionFlowMapper.selectByFlowIdAndTimesAndStatusLimit(projectName,workflowList, startDate, endDate, (from-1)*size, size, flowStatusList);
+    List<ExecutionFlow> executionFlowList = executionFlowMapper.selectByFlowIdAndTimesAndStatusLimit(projectName,workflowList, startDate, endDate, from, size, flowStatusList);
     int total = executionFlowMapper.sumByFlowIdAndTimesAndStatus(projectName,workflowList, startDate, endDate,  flowStatusList);
     return new ExecWorkflowsResponse(total,size,executionFlowList);
   }
