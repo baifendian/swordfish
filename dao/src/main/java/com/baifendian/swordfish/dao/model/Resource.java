@@ -23,7 +23,6 @@ public class Resource {
   /**
    * 资源id
    */
-  //@JsonIgnore
   private int id;
 
   /**
@@ -44,7 +43,6 @@ public class Resource {
   /**
    * owner 的 id
    */
-  //@JsonIgnore
   private int ownerId;
 
   /**
@@ -55,7 +53,6 @@ public class Resource {
   /**
    * 项目 id
    */
-  //@JsonIgnore
   private int projectId;
 
   /**

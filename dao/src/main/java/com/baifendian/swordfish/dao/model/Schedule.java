@@ -32,57 +32,131 @@ import java.util.List;
  */
 public class Schedule {
 
-  private ScheduleParam schedule = new ScheduleParam();
-
-  @JsonIgnore
-  private String scheduleStr;
-
-  @JsonIgnore
+  /**
+   * 对应工作流id
+   * 数据库映射字段
+   */
   private int flowId;
 
+  /**
+   * 工作流名称
+   * DTO需要字段
+   */
   private String flowName;
 
+  /**
+   * 工作流所属项目名称
+   * DTO需要字段
+   */
   private String projectName;
 
-  @JsonIgnore
+  /**
+   * 工作流的描述
+   * DTO需要字段
+   */
+  private String desc;
+
+  /**
+   * 调度的起始时间
+   * 数据库映射字段 start_date
+   */
   private Date startDate;
 
-  @JsonIgnore
+  /**
+   * 调度的结束时间
+   * 数据库映射字段 end_date
+   */
   private Date endDate;
 
-  @JsonIgnore
+  /**
+   * 定时调度配置
+   * 数据库映射字段 crontab
+   */
   private String crontab;
 
   @JsonIgnore
+  /**
+   * 依赖工作流
+   * 数据库映射字段 dep_workflows
+   */
   private String depWorkflowsStr;
 
+  /**
+   * 依赖策略
+   * 数据库映射字段/DTO需要字段 dep_policy
+   */
   private DepPolicyType depPolicy;
 
+  /**
+   * 失败策略
+   * 数据库映射字段/DTO需要字段 failure_policy
+   */
   private FailurePolicyType failurePolicy;
 
+  /**
+   * 最大有效时间
+   * 数据库映射字段/DTO需要字段 max_try_times
+   */
   private Integer maxTryTimes;
 
+  /**
+   * 报警策略
+   * 数据库映射字段/DTO需要字段 notify_type
+   */
   private NotifyType notifyType;
 
-  @JsonIgnore
+  /**
+   * 报警邮箱列表
+   * 数据库映射字段/DTO需要字段 notify_mails
+   */
   private String notifyMailsStr;
 
+  /**
+   * 工作流超时设置
+   * 数据库映射字段/DTO需要字段 timeout
+   */
   private Integer timeout;
 
+  /**
+   * 调度创建时间
+   * 数据库映射字段/DTO需要字段 create_time
+   */
   private Date createTime;
 
+  /**
+   * 修改时间
+   * 数据库映射字段/DTO需要字段 modify_time
+   */
   private Date modifyTime;
 
-  @JsonIgnore
+  /**
+   * 调度责任人
+   * 数据库映射字段 owner
+   */
   private int ownerId;
 
+  /**
+   * 调度责任人名称
+   * DTO需要字段
+   */
   private String owner;
 
-  @JsonIgnore
+  /**
+   * 调度状态（上线/下线）
+   * 数据库映射字段/DTO需要字段 schedule_status
+   */
   private ScheduleStatus scheduleStatus;
 
+  /**
+   * 报警通知邮件list
+   * DTO需要字段
+   */
   private List<String> notifyMails = new ArrayList<>();
 
+  /**
+   * 依赖工作流list
+   * DTO需要字段
+   */
   private List<DepWorkflow> depWorkflows = new ArrayList<>();
 
   public Schedule() {
@@ -94,24 +168,6 @@ public class Schedule {
 
   public void setProjectName(String projectName) {
     this.projectName = projectName;
-  }
-
-  public ScheduleParam getSchedule() {
-    return schedule;
-  }
-
-  public void setSchedule(ScheduleParam schedule) throws JsonProcessingException {
-    this.scheduleStr = JsonUtil.toJsonString(schedule);
-    this.schedule = schedule;
-  }
-
-  public String getScheduleStr() {
-    return scheduleStr;
-  }
-
-  public void setScheduleStr(String scheduleStr) throws IOException {
-    this.schedule = JsonUtil.parseObject(scheduleStr,ScheduleParam.class);
-    this.scheduleStr = scheduleStr;
   }
 
   public int getFlowId() {
@@ -136,7 +192,6 @@ public class Schedule {
   }
 
   public void setStartDate(Date startDate) {
-    this.schedule.setStartDate(startDate);
     this.startDate = startDate;
   }
 
@@ -145,7 +200,6 @@ public class Schedule {
   }
 
   public void setEndDate(Date endDate) {
-    this.schedule.setEndDate(endDate);
     this.endDate = endDate;
   }
 
@@ -154,7 +208,6 @@ public class Schedule {
   }
 
   public void setCrontab(String crontab) {
-    this.schedule.setCrontab(crontab);
     this.crontab = crontab;
   }
 
@@ -274,38 +327,14 @@ public class Schedule {
     this.scheduleStatus = scheduleStatus;
   }
 
-  public static class ScheduleParam{
-    private Date startDate;
-    private Date endDate;
-    private String crontab;
-
-    public ScheduleParam() {
-    }
-
-    public Date getStartDate() {
-      return startDate;
-    }
-
-    public void setStartDate(Date startDate) {
-      this.startDate = startDate;
-    }
-
-    public Date getEndDate() {
-      return endDate;
-    }
-
-    public void setEndDate(Date endDate) {
-      this.endDate = endDate;
-    }
-
-    public String getCrontab() {
-      return crontab;
-    }
-
-    public void setCrontab(String crontab) {
-      this.crontab = crontab;
-    }
+  public String getDesc() {
+    return desc;
   }
+
+  public void setDesc(String desc) {
+    this.desc = desc;
+  }
+
 
   public static class DepWorkflow{
     private String projectName;
