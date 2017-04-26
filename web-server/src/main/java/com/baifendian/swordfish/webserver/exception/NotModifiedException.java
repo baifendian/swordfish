@@ -29,7 +29,7 @@ public class NotModifiedException extends RuntimeException {
     super(msg);
   }
 
-  public NotModifiedException(String msg, Object ... arguments) {
-    super(MessageFormat.format(msg,arguments));
+  public NotModifiedException(String msg, Object... arguments) {
+    super(MessageFormat.format(msg, arguments));
   }
 }
