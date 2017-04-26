@@ -15,17 +15,40 @@
  */
 package com.baifendian.swordfish.webserver.exception;
 
-/**
- * 项目冲突异常
- */
-public class ProjectConflictException extends RuntimeException {
-  private String projectName;
+import org.springframework.http.HttpStatus;
 
-  public ProjectConflictException(String projectName) {
-    this.projectName = projectName;
+public class CustomErrorType {
+  private int status;
+  private String error;
+  private String message;
+
+  public CustomErrorType(HttpStatus status, String message) {
+    this.status = status.value();
+    this.error = status.getReasonPhrase();
+    this.message = message;
   }
 
-  public String getProjectName() {
-    return projectName;
+  public int getStatus() {
+    return status;
+  }
+
+  public void setStatus(int status) {
+    this.status = status;
+  }
+
+  public String getError() {
+    return error;
+  }
+
+  public void setError(String error) {
+    this.error = error;
+  }
+
+  public String getMessage() {
+    return message;
+  }
+
+  public void setMessage(String message) {
+    this.message = message;
   }
 }

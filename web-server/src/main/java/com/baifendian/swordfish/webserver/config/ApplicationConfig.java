@@ -16,18 +16,12 @@
 package com.baifendian.swordfish.webserver.config;
 
 import com.baifendian.swordfish.webserver.interceptor.LoginInterceptor;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.boot.autoconfigure.web.DefaultErrorAttributes;
-import org.springframework.boot.autoconfigure.web.ErrorAttributes;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.servlet.config.annotation.ContentNegotiationConfigurer;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
-
-import java.util.Map;
 
 @Configuration
 public class ApplicationConfig extends WebMvcConfigurerAdapter {
@@ -46,23 +40,33 @@ public class ApplicationConfig extends WebMvcConfigurerAdapter {
     registry.addMapping("/**").allowedOrigins("*").allowedMethods("*");
   }
 
-  @Bean
-  public ErrorAttributes errorAttributes() {
-    return new DefaultErrorAttributes() {
-      @Override
-      public Map<String, Object> getErrorAttributes(RequestAttributes requestAttributes, boolean includeStackTrace) {
-        Map<String, Object> errorAttributes = super.getErrorAttributes(requestAttributes, includeStackTrace);
-        // Customize the default entries in errorAttributes to suit your
-        Throwable exception = (Throwable) requestAttributes.getAttribute(DefaultErrorAttributes.class.getName() + ".ERROR", 0);
-        if (!StringUtils.isEmpty(exception.getMessage())){
-          errorAttributes.put("message",exception.getMessage());
-        }
-        return errorAttributes;
-      }
+//  /**
+//   * 处理 controller 的解决方法
+//   *
+//   * @return
+//   */
+//  @Bean
+//  public ErrorAttributes errorAttributes() {
+//    return new DefaultErrorAttributes() {
+//      @Override
+//      public Map<String, Object> getErrorAttributes(RequestAttributes requestAttributes, boolean includeStackTrace) {
+//        Map<String, Object> errorAttributes = super.getErrorAttributes(requestAttributes, includeStackTrace);
+//        // Customize the default entries in errorAttributes to suit your
+//        Throwable exception = (Throwable) requestAttributes.getAttribute(DefaultErrorAttributes.class.getName() + ".ERROR", 0);
+//        if (!StringUtils.isEmpty(exception.getMessage())) {
+//          errorAttributes.put("message", exception.getMessage());
+//        }
+//        return errorAttributes;
+//      }
+//
+//    };
+//  }
 
-    };
-  }
-
+  /**
+   * 解决路由中, 可以包含 ., +, 等特殊字符问题
+   *
+   * @param configurer
+   */
   @Override
   public void configureContentNegotiation(final ContentNegotiationConfigurer configurer) {
     // Turn off suffix-based content negotiation
