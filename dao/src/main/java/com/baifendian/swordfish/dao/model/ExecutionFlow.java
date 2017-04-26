@@ -32,11 +32,13 @@ import java.util.stream.Collectors;
 public class ExecutionFlow {
   /**
    * 具体执行的id
+   * 数据库映射字段
    **/
   private Integer id;
 
   /**
    * workflow的id
+   * 数据库映射字段 flow_id
    **/
   @JsonIgnore
   private int flowId;
@@ -45,56 +47,67 @@ public class ExecutionFlow {
 
   /**
    * workflow名称
+   * DTO需要字段
    **/
   private String flowName;
 
   /**
    * worker的host
+   * 数据库映射字段/DTO需要字段
    **/
   private String worker;
 
   /**
    * workflow执行的状态
+   * 数据库映射字段/DTO需要字段
    **/
   private FlowStatus status;
 
   /**
    * 提交用户id
+   * 数据库映射字段 submit_user
    **/
   private int submitUserId;
 
   /**
-   * 提交用户
+   * 提交用户名称
+   * DTO需要字段
    **/
   private String submitUser;
 
   /**
    * 代理用户
+   * 数据库映射字段/DTO需要字段 proxy_user
    **/
   private String proxyUser;
 
   /**
    * 提交时间
+   * 数据库映射字段/DTO需要字段 submit_time
    **/
   private Date submitTime;
 
   /**
    * 起始时间
+   * 数据库映射字段/DTO需要字段 start_time
    **/
   private Date startTime;
 
   /**
    * 结束时间
+   * 数据库映射字段/DTO需要字段 end_time
    **/
   private Date endTime;
 
   /**
    * workflow的数据
+   * 数据库映射字段 workflow_data
    **/
   private String workflowData;
 
   /**
    * workflow 等运行的类型
+   * 数据库映射字段/DTO需要字段 type
    **/
   private ExecType type;
 
@@ -105,9 +118,14 @@ public class ExecutionFlow {
 
   /**
    * workflow 所在项目的名称
+   * DTO需要字段
    */
   private String projectName;
 
+  /**
+   * 工作流名称
+   * DTO需要字段
+   */
   private String workflowName;
 
   private ExecType execType;
@@ -118,29 +136,60 @@ public class ExecutionFlow {
 
   /**
    * 调度时间
+   * 数据库映射字段/DTO需要字段
    **/
   private Date scheduleTime;
 
+  /**
+   * 最大重试次数
+   * 数据库映射字段
+   */
   private Integer maxTryTimes;
 
+  /**
+   * 执行超时
+   * 数据库映射字段
+   */
   private Integer timeout;
 
+  /**
+   * 工作流用户自行参数
+   * 数据库映射字段
+   */
   private String userDefinedParams;
 
+  /**
+   * 用户额外保存信息
+   * 数据库映射字段/DTO需要字段
+   */
   private String extras;
 
   @JsonIgnore
   private Map<String, String> userDefinedParamMap;
 
+  /**
+   * 报警类型
+   * 数据库映射字段 notify_type
+   */
   private NotifyType notifyType;
 
+  /**
+   * 报警邮件列表
+   * 数据库映射字段 notify_mails
+   */
   private String notifyMails;
 
+  /**
+   * 数据库映射列表
+   * DTO需要字段
+   */
   private List<String> notifyMailList;
 
+  /**
+   * 工作流责任人名称
+   * DTO需要字段
+   */
   private String owner;
-
-  private ExecutionFlowData data = new ExecutionFlowData();
 
   /**
    * 作业提交队列
@@ -347,14 +396,6 @@ public class ExecutionFlow {
     this.userDefinedParams = userDefinedParams;
   }
 
-  public String getExtras() {
-    return extras;
-  }
-
-  public void setExtras(String extras) {
-    this.extras = extras;
-  }
-
   public NotifyType getNotifyType() {
     return notifyType;
   }
@@ -389,16 +430,16 @@ public class ExecutionFlow {
     this.owner = owner;
   }
 
-  public ExecutionFlowData getData() {
-    return data;
-  }
-
-  public void setData(ExecutionFlowData data) {
-    this.data = data;
-  }
-
   public Integer getExecId() {
     return execId;
+  }
+
+  public String getExtras() {
+    return extras;
+  }
+
+  public void setExtras(String extras) {
+    this.extras = extras;
   }
 
   public void setExecId(Integer execId) {
@@ -419,26 +460,4 @@ public class ExecutionFlow {
     return userDefinedParamMap;
   }
 
-  public static class ExecutionFlowData{
-
-    private List<ExecutionNode> nodes;
-
-    private List<Property> userDefParams;
-
-    public List<ExecutionNode> getNodes() {
-      return nodes;
-    }
-
-    public void setNodes(List<ExecutionNode> nodes) {
-      this.nodes = nodes;
-    }
-
-    public List<Property> getUserDefParams() {
-      return userDefParams;
-    }
-
-    public void setUserDefParams(List<Property> userDefParams) {
-      this.userDefParams = userDefParams;
-    }
-  }
 }

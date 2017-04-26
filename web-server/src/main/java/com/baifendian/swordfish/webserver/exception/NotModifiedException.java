@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import java.text.MessageFormat;
 
 /**
- * Created by caojingwei on 2017/4/20.
+ * 没有操作异常
  */
 @ResponseStatus(code = HttpStatus.NOT_MODIFIED)
 public class NotModifiedException extends RuntimeException {

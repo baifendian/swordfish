@@ -31,6 +31,8 @@ import com.baifendian.swordfish.webserver.dto.ExecutorId;
 import com.baifendian.swordfish.webserver.dto.ExecutorIds;
 import com.baifendian.swordfish.webserver.dto.response.ExecWorkflowsResponse;
 import com.baifendian.swordfish.webserver.dto.LogResult;
+import com.baifendian.swordfish.webserver.dto.response.ExecutionFlowResponse;
+import com.baifendian.swordfish.webserver.dto.response.ExecutionNodeResponse;
 import com.baifendian.swordfish.webserver.dto.response.WorkflowResponse;
 import com.baifendian.swordfish.webserver.exception.*;
 import org.apache.commons.lang3.StringUtils;
@@ -228,8 +230,13 @@ public class ExecService {
     }
 
     List<ExecutionFlow> executionFlowList = executionFlowMapper.selectByFlowIdAndTimesAndStatusLimit(projectName,workflowList, startDate, endDate, from, size, flowStatusList);
+    List<ExecutionFlowResponse> executionFlowResponseList = new ArrayList<>();
+    for (ExecutionFlow executionFlow:executionFlowList){
+      executionFlowResponseList.add(new ExecutionFlowResponse(executionFlow));
+    }
+
     int total = executionFlowMapper.sumByFlowIdAndTimesAndStatus(projectName,workflowList, startDate, endDate,  flowStatusList);
-    return new ExecWorkflowsResponse(total,size,executionFlowList);
+    return new ExecWorkflowsResponse(total,size,executionFlowResponseList);
   }
 
   /**
@@ -239,7 +246,7 @@ public class ExecService {
    * @param execId
    * @return
    */
-  public ExecutionFlow getExecWorkflow(User operator, int execId) {
+  public ExecutionFlowResponse getExecWorkflow(User operator, int execId) {
 
     ExecutionFlow executionFlow = executionFlowMapper.selectByExecId(execId);
 
@@ -261,33 +268,18 @@ public class ExecService {
       throw new PermissionException("project exec or project owner",operator.getName());
     }
 
+    ExecutionFlowResponse executionFlowResponse = new ExecutionFlowResponse(executionFlow);
     List<ExecutionNode> executionNodeList = executionNodeMapper.selectExecNodeById(execId);
 
-    try {
-      JSONObject jsonObject = new JSONObject(executionFlow.getWorkflowData());
-
-      List<FlowNode> nodes = JsonUtil.parseObjectList(jsonObject.getString("nodes"),FlowNode.class);
-
+    for (ExecutionNodeResponse executionNodeResponse:executionFlowResponse.getData().getNodes()){
       for (ExecutionNode executionNode:executionNodeList){
-        for (FlowNode node:nodes){
-          if (StringUtils.equals(node.getName(),executionNode.getName())){
-            executionNode.setDesc(node.getDesc());
-            executionNode.setType(node.getType());
-            executionNode.setParameter(node.getParameter());
-            executionNode.setDep(node.getDep());
-            executionNode.setExtras(node.getExtras());
-          }
+        if (StringUtils.equals(executionNodeResponse.getName(),executionNode.getName())){
+          executionNodeResponse.mergeExecutionNode(executionNode);
         }
       }
-
-      executionFlow.getData().setNodes(executionNodeList);
-
-    } catch (Exception e) {
-      logger.error("des11n workflow data error",e);
-      throw new ServerErrorException("des11n workflow data error");
     }
 
-    return executionFlow;
+    return new ExecutionFlowResponse(executionFlow);
   }
 
   /**

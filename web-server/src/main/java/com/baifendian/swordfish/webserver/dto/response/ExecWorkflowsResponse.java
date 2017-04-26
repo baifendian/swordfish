@@ -1,21 +1,34 @@
+/*
+ * Copyright (C) 2017 Baifendian Corporation
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *          http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.baifendian.swordfish.webserver.dto.response;
-
-import com.baifendian.swordfish.dao.model.ExecutionFlow;
 
 import java.util.List;
 
 /**
- * Created by caojingwei on 2017/4/12.
+ * 工作流执行结果列表response.
  */
 public class ExecWorkflowsResponse {
   private int total;
   private int length;
-  private List<ExecutionFlow> executions;
+  private List<ExecutionFlowResponse> executions;
 
   public ExecWorkflowsResponse() {
   }
 
-  public ExecWorkflowsResponse(int total, int length, List<ExecutionFlow> executions) {
+  public ExecWorkflowsResponse(int total, int length, List<ExecutionFlowResponse> executions) {
     this.total = total;
     this.length = length;
     this.executions = executions;
@@ -37,11 +50,11 @@ public class ExecWorkflowsResponse {
     this.length = length;
   }
 
-  public List<ExecutionFlow> getExecutions() {
+  public List<ExecutionFlowResponse> getExecutions() {
     return executions;
   }
 
-  public void setExecutions(List<ExecutionFlow> executions) {
+  public void setExecutions(List<ExecutionFlowResponse> executions) {
     this.executions = executions;
   }
 }

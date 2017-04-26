@@ -18,7 +18,7 @@ package com.baifendian.swordfish.webserver.exception;
 import java.text.MessageFormat;
 
 /**
- * Created by caojingwei on 2017/4/20.
+ * 内部服务异常
  */
 public class ServerErrorException extends RuntimeException {
   public ServerErrorException(String msg) {

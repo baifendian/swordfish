@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import java.text.MessageFormat;
 
 /**
- * Created by caojingwei on 2017/4/20.
+ * 404 错误码异常
  */
 @ResponseStatus(code = HttpStatus.NOT_FOUND)
 public class NotFoundException extends RuntimeException {

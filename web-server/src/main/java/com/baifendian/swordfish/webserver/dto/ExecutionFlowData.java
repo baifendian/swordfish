@@ -15,53 +15,32 @@
  */
 package com.baifendian.swordfish.webserver.dto;
 
-import com.baifendian.swordfish.dao.mapper.utils.EqualUtils;
-import com.baifendian.swordfish.dao.model.FlowNode;
 import com.baifendian.swordfish.dao.model.flow.params.Property;
-import com.baifendian.swordfish.dao.utils.json.JsonObjectDeserializer;
-import com.baifendian.swordfish.dao.utils.json.JsonObjectSerializer;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.baifendian.swordfish.webserver.dto.response.ExecutionNodeResponse;
 
 import java.util.List;
-import java.util.Objects;
 
 /**
- * workflowData节点
+ * 执行flow node节点信息DTO
  */
-public class WorkflowData {
-  /**
-   * 结点信息
-   */
-  private List<FlowNode> nodes;
+public class ExecutionFlowData {
+  private List<ExecutionNodeResponse> nodes;
 
-  /**
-   * 用户自定义参数
-   */
   private List<Property> userDefParams;
 
-  public WorkflowData() {
+  public ExecutionFlowData() {
   }
 
-  public WorkflowData(List<FlowNode> nodes, List<Property> userDefParams) {
+  public ExecutionFlowData(List<ExecutionNodeResponse> nodes, List<Property> userDefParams) {
     this.nodes = nodes;
     this.userDefParams = userDefParams;
   }
 
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
-    WorkflowData that = (WorkflowData) o;
-    return EqualUtils.equalLists(nodes, that.nodes) &&
-            EqualUtils.equalLists(userDefParams, that.userDefParams);
-  }
-
-  public List<FlowNode> getNodes() {
+  public List<ExecutionNodeResponse> getNodes() {
     return nodes;
   }
 
-  public void setNodes(List<FlowNode> nodes) {
+  public void setNodes(List<ExecutionNodeResponse> nodes) {
     this.nodes = nodes;
   }
 

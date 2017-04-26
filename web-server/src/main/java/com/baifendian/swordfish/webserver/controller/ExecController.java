@@ -24,6 +24,7 @@ import com.baifendian.swordfish.webserver.dto.ExecutorId;
 import com.baifendian.swordfish.webserver.dto.ExecutorIds;
 import com.baifendian.swordfish.webserver.dto.response.ExecWorkflowsResponse;
 import com.baifendian.swordfish.webserver.dto.LogResult;
+import com.baifendian.swordfish.webserver.dto.response.ExecutionFlowResponse;
 import com.baifendian.swordfish.webserver.service.ExecService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -142,9 +143,9 @@ public class ExecController {
    * @return
    */
   @GetMapping(value = "/{execId}")
-  public ExecutionFlow queryExecDetail(@RequestAttribute(value = "session.user") User operator,
-                                         @PathVariable(value = "execId") int execId,
-                                         HttpServletResponse response) {
+  public ExecutionFlowResponse queryExecDetail(@RequestAttribute(value = "session.user") User operator,
+                                               @PathVariable(value = "execId") int execId,
+                                               HttpServletResponse response) {
     logger.info("Operator user {}, query exec detail, exec id: {}",
         operator.getName(), execId);
 

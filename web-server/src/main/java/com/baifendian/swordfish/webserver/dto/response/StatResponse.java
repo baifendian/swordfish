@@ -23,7 +23,7 @@ import java.util.Date;
 /**
  * 统计数据返回实体
  */
-public class StatResponse {
+public class  StatResponse {
   @JsonInclude(JsonInclude.Include.NON_NULL)
   private Date date;
 
