@@ -78,7 +78,7 @@ public class WorkflowServiceTest {
   @Autowired
   private FlowDao flowDao;
 
-  @Test
+/*  @Test
   public void testCreateWorkflow() throws IOException {
     {
       //正常创建一个 workflow
@@ -299,6 +299,6 @@ public class WorkflowServiceTest {
       //检测是否能正常识别MR parameter
 //      assertTrue(workflowService.flowNodeParamCheck(mockDataService.MR_PARAMETER.toString(), "MR"));
     }
-  }
+  }*/
 
 }

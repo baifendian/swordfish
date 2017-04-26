@@ -249,11 +249,12 @@ public class MockDataService {
 
     List<FlowNode> flowNodeList = Arrays.asList(new FlowNode[]{flowNode1, flowNode2, flowNode3});
 
-    WorkflowData projectFlowData = new WorkflowData();
-    projectFlowData.setUserDefParams(Arrays.asList(new Property[]{new Property("year","$[yyyy]")}));
-    projectFlowData.setNodes(flowNodeList);
+    //WorkflowData projectFlowData = new WorkflowData();
+    //projectFlowData.setUserDefParams(Arrays.asList(new Property[]{new Property("year","$[yyyy]")}));
+    //projectFlowData.setNodes(flowNodeList);
 
-    return projectFlowData;
+    //return projectFlowData;
+    return null;
   }
 
   /**

@@ -15,13 +15,16 @@
  */
 package com.baifendian.swordfish.webserver.dto.response;
 
+import com.baifendian.swordfish.dao.model.FlowNode;
 import com.baifendian.swordfish.dao.model.ProjectFlow;
 import com.baifendian.swordfish.webserver.dto.WorkflowData;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonRawValue;
 import org.apache.commons.collections.CollectionUtils;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * 工作流返回DTO
@@ -47,7 +50,11 @@ public class WorkflowResponse {
     this.name = projectFlow.getName();
     this.desc = projectFlow.getDesc();
     if (CollectionUtils.isNotEmpty(projectFlow.getFlowsNodes())){
-      this.data = new WorkflowData(projectFlow.getFlowsNodes(),projectFlow.getUserDefinedParamList());
+      List<WorkflowNodeDTO> workflowNodeResponseList = new ArrayList<>();
+      for (FlowNode flowNode:projectFlow.getFlowsNodes()){
+        workflowNodeResponseList.add(new WorkflowNodeDTO(flowNode));
+      }
+      this.data = new WorkflowData(workflowNodeResponseList,projectFlow.getUserDefinedParamList());
     }
     this.proxyUser = projectFlow.getProxyUser();
     this.queue = projectFlow.getQueue();

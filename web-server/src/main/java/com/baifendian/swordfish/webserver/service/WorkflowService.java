@@ -26,9 +26,11 @@ import com.baifendian.swordfish.dao.mapper.ResourceMapper;
 import com.baifendian.swordfish.dao.model.*;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
 import com.baifendian.swordfish.webserver.dto.WorkflowData;
+import com.baifendian.swordfish.webserver.dto.response.WorkflowNodeDTO;
 import com.baifendian.swordfish.webserver.dto.response.WorkflowResponse;
 import com.baifendian.swordfish.webserver.exception.*;
 import com.baifendian.swordfish.webserver.service.storage.FileSystemStorageService;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import net.lingala.zip4j.exception.ZipException;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
@@ -111,7 +113,7 @@ public class WorkflowService {
     }
 
     // 检测工作流节点是否正常
-    List<FlowNode> flowNodes = workflowData.getNodes();
+    List<WorkflowNodeDTO> flowNodes = workflowData.getNodes();
 
     if (CollectionUtils.isEmpty(flowNodes)) {
       logger.error("flow node information is empty");
@@ -125,7 +127,7 @@ public class WorkflowService {
     }
 
     // 检测工作流节点定义json是否正常
-    for (FlowNode flowNode : flowNodes) {
+    for (WorkflowNodeDTO flowNode : flowNodes) {
       // TODO:: 这个检测不是很合理, 需要修改, 不太完备
       if (!flowNodeParamCheck(flowNode.getParameter(), flowNode.getType())) {
         logger.error("Flow node {} parameter invalid", flowNode.getName());
@@ -139,14 +141,17 @@ public class WorkflowService {
 
     // 组装新建数据流实体
     try {
+      List<FlowNode> flowNodeList = new ArrayList<>();
+      for (WorkflowNodeDTO flowNode:flowNodes){
+        flowNodeList.add(flowNode.convertFlowNode());
+      }
       projectFlow.setExtras(extras);
-      projectFlow.setFlowsNodes(workflowData.getNodes());
+      projectFlow.setFlowsNodes(flowNodeList);
       projectFlow.setUserDefinedParamList(workflowData.getUserDefParams());
       projectFlow.setName(name);
       projectFlow.setProjectId(project.getId());
       projectFlow.setProjectName(projectName);
       projectFlow.setDesc(desc);
-      projectFlow.setFlowsNodes(flowNodes);
       projectFlow.setCreateTime(now);
       projectFlow.setModifyTime(now);
       projectFlow.setProxyUser(proxyUser);
@@ -247,18 +252,29 @@ public class WorkflowService {
         projectFlow.setUserDefinedParamList(workflowData.getUserDefParams());
       }
 
-      List<FlowNode> flowNodeList = workflowData.getNodes();
-      if (CollectionUtils.isNotEmpty(flowNodeList)) {
+      List<WorkflowNodeDTO> workflowNodeDTOList = workflowData.getNodes();
+      if (CollectionUtils.isNotEmpty(workflowNodeDTOList)) {
         // 闭环检测
-        if (graphHasCycle(flowNodeList)) {
+        if (graphHasCycle(workflowNodeDTOList)) {
           logger.error("Graph has cycle");
           throw new BadRequestException("Graph has cycle");
         }
 
         // parameter 检测
-        for (FlowNode flowNode : flowNodeList) {
+        for (WorkflowNodeDTO workflowNodeDTO : workflowNodeDTOList) {
           // TODO::参数检测存在问题
-          if (!flowNodeParamCheck(flowNode.getParameter(), flowNode.getType())) {
+          if (!flowNodeParamCheck(workflowNodeDTO.getParameter(), workflowNodeDTO.getType())) {
+            throw new BadRequestException("workflow node data not valid");
+          }
+        }
+
+        //拼装flowNode
+        List<FlowNode> flowNodeList = new ArrayList<>();
+        for (WorkflowNodeDTO workflowNodeDTO:workflowNodeDTOList){
+          try {
+            flowNodeList.add(workflowNodeDTO.convertFlowNode());
+          } catch (JsonProcessingException e) {
+            logger.error("workflow node dto convert flowNode error",e);
             throw new BadRequestException("workflow node data not valid");
           }
         }
@@ -330,7 +346,7 @@ public class WorkflowService {
       throw new NotFoundException("workflow", srcWorkflowName);
     }
 
-    String data = JsonUtil.toJsonString(new WorkflowData(srcProjectFlow.getFlowsNodes(),srcProjectFlow.getUserDefinedParamList()));
+    String data = JsonUtil.toJsonString(new WorkflowData(srcProjectFlow.getFlowsNodes(),srcProjectFlow.getUserDefinedParamList(),FlowNode.class));
 
     // 尝试拷贝文件
     String srcHdfsFilename = BaseConfig.getHdfsWorkflowFilename(project.getId(), srcWorkflowName);
@@ -492,7 +508,7 @@ public class WorkflowService {
     ProjectFlow projectFlow = flowDao.projectFlowfindByName(project.getId(), name);
 
     try {
-      String json = JsonUtil.toJsonString(new WorkflowData(projectFlow.getFlowsNodes(),projectFlow.getUserDefinedParamList()));
+      String json = JsonUtil.toJsonString(new WorkflowData(projectFlow.getFlowsNodes(),projectFlow.getUserDefinedParamList(),FlowNode.class));
       InputStreamResource resource = new InputStreamResource(new FileInputStream(json));
       return resource;
     } catch (Exception e) {
@@ -557,22 +573,22 @@ public class WorkflowService {
   /**
    * 闭环检测
    *
-   * @param flowNodeList
+   * @param workflowNodeResponseList
    * @return
    */
-  private boolean graphHasCycle(List<FlowNode> flowNodeList) {
-    Graph<String, FlowNode, String> graph = new Graph<>();
+  private boolean graphHasCycle(List<WorkflowNodeDTO> workflowNodeResponseList) {
+    Graph<String, WorkflowNodeDTO, String> graph = new Graph<>();
 
     // 填充顶点
-    for (FlowNode flowNode : flowNodeList) {
-      graph.addVertex(flowNode.getName(), flowNode);
+    for (WorkflowNodeDTO workflowNodeResponse : workflowNodeResponseList) {
+      graph.addVertex(workflowNodeResponse.getName(), workflowNodeResponse);
     }
 
     // 填充边关系
-    for (FlowNode flowNode : flowNodeList) {
-      if (CollectionUtils.isNotEmpty(flowNode.getDepList())) {
-        for (String dep : flowNode.getDepList()) {
-          graph.addEdge(dep, flowNode.getName());
+    for (WorkflowNodeDTO workflowNodeResponse : workflowNodeResponseList) {
+      if (CollectionUtils.isNotEmpty(workflowNodeResponse.getDep())) {
+        for (String dep : workflowNodeResponse.getDep()) {
+          graph.addEdge(dep, workflowNodeResponse.getName());
         }
       }
     }

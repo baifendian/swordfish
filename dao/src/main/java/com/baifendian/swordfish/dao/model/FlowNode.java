@@ -38,33 +38,39 @@ public class FlowNode {
 
   /**
    * 结点 id
+   * 数据库映射字段
    */
   @JsonIgnore
   private int id;
 
   /**
    * 结点名称
+   * 数据库映射字段/DTO需要字段
    */
   private String name;
 
   /**
    * 结点描述
+   * 数据库映射字段/DTO需要字段
    */
   private String desc;
 
   /**
    * 结点类型
+   * 数据库映射字段/DTO需要字段
    */
   private String type;
 
   /**
    * 所属工作流
+   * 数据库映射字段
    */
   @JsonIgnore
   private int flowId;
 
   /**
    * 参数信息
+   * 数据库映射字段/DTO需要字段
    */
   //@JsonRawValue
   @JsonDeserialize(using = JsonObjectDeserializer.class)
@@ -74,16 +80,24 @@ public class FlowNode {
 
   /**
    * 依赖信息
+   * 数据库映射字段
    */
   @JsonDeserialize(using = JsonObjectDeserializer.class)
   @JsonSerialize(using = JsonObjectSerializer.class)
   private String dep;
 
+  /**
+   * 用户存储额外信息
+   * 数据库映射字段/DTO需要字段
+   */
   @JsonDeserialize(using = JsonObjectDeserializer.class)
   @JsonSerialize(using = JsonObjectSerializer.class)
   private String extras;
 
-
+  /**
+   * 节点依赖列表
+   * 数据库映射字段/DTO需要字段
+   */
   @JsonIgnore
   private List<String> depList;
 

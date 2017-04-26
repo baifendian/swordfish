@@ -18,13 +18,10 @@ package com.baifendian.swordfish.webserver.dto;
 import com.baifendian.swordfish.dao.mapper.utils.EqualUtils;
 import com.baifendian.swordfish.dao.model.FlowNode;
 import com.baifendian.swordfish.dao.model.flow.params.Property;
-import com.baifendian.swordfish.dao.utils.json.JsonObjectDeserializer;
-import com.baifendian.swordfish.dao.utils.json.JsonObjectSerializer;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.baifendian.swordfish.webserver.dto.response.WorkflowNodeDTO;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * workflowData节点
@@ -33,19 +30,38 @@ public class WorkflowData {
   /**
    * 结点信息
    */
-  private List<FlowNode> nodes;
+  private List<WorkflowNodeDTO> nodes;
 
   /**
    * 用户自定义参数
    */
   private List<Property> userDefParams;
 
-  public WorkflowData() {
+  /**
+   * 支持通过数据库flowNode实体 或 DTO workflowNodeDTO 的方式构建
+   * @param nodes
+   * @param userDefParams
+   * @param clazz
+   */
+  public WorkflowData(List<?> nodes, List<Property> userDefParams,Class<?> clazz) {
+    if (clazz == WorkflowNodeDTO.class){
+      this.nodes = (List<WorkflowNodeDTO>) nodes;
+    }else if(clazz == FlowNode.class){
+      List<WorkflowNodeDTO> workflowNodeDTOList = new ArrayList<>();
+      for (Object node:nodes){
+        workflowNodeDTOList.add(new WorkflowNodeDTO((FlowNode) node));
+      }
+      this.nodes = workflowNodeDTOList;
+    }
+    this.userDefParams = userDefParams;
   }
 
-  public WorkflowData(List<FlowNode> nodes, List<Property> userDefParams) {
-    this.nodes = nodes;
-    this.userDefParams = userDefParams;
+  /**
+   * @param nodes
+   * @param userDefParams
+   */
+  public WorkflowData(List<WorkflowNodeDTO> nodes, List<Property> userDefParams) {
+    this(nodes,userDefParams,WorkflowNodeDTO.class);
   }
 
   @Override
@@ -57,11 +73,11 @@ public class WorkflowData {
             EqualUtils.equalLists(userDefParams, that.userDefParams);
   }
 
-  public List<FlowNode> getNodes() {
+  public List<WorkflowNodeDTO> getNodes() {
     return nodes;
   }
 
-  public void setNodes(List<FlowNode> nodes) {
+  public void setNodes(List<WorkflowNodeDTO> nodes) {
     this.nodes = nodes;
   }
 
