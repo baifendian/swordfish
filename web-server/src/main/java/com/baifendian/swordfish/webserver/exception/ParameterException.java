@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import java.text.MessageFormat;
 
 /**
- * Created by caojingwei on 2017/4/20.
+ * 请求参数异常
  */
 public class ParameterException extends BadRequestException {
 

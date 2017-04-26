@@ -85,6 +85,7 @@ public class ProjectFlowMapperSqlProvider {
         SET("extras=#{flow.extras}");
         SET("queue=#{flow.queue}");
         WHERE("id = #{flow.id}");
+        WHERE("flag is null");
       }
     }.toString();
   }
@@ -300,6 +301,7 @@ public class ProjectFlowMapperSqlProvider {
         SET("queue=#{flow.queue}");
         WHERE("project_id = #{flow.projectId}");
         WHERE("name = #{flow.name}");
+        WHERE("flag is null");
       }
     }.toString();
   }
@@ -328,6 +330,7 @@ public class ProjectFlowMapperSqlProvider {
           SET("proxy_user=#{proxyUser}");
         }
         WHERE("project_id = #{projectId}");
+        WHERE("flag is NULL");
       }
     }.toString();
   }

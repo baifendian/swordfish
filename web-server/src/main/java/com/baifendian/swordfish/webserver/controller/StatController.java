@@ -18,7 +18,7 @@ package com.baifendian.swordfish.webserver.controller;
 import com.baifendian.swordfish.dao.model.ExecutionFlow;
 import com.baifendian.swordfish.dao.model.ExecutionFlowError;
 import com.baifendian.swordfish.dao.model.User;
-import com.baifendian.swordfish.webserver.dto.StatResponse;
+import com.baifendian.swordfish.webserver.dto.response.StatResponse;
 import com.baifendian.swordfish.webserver.service.StatService;
 import org.apache.commons.httpclient.HttpStatus;
 import org.slf4j.Logger;

@@ -22,29 +22,28 @@ import com.baifendian.swordfish.dao.mapper.ExecutionNodeMapper;
 import com.baifendian.swordfish.dao.mapper.MasterServerMapper;
 import com.baifendian.swordfish.dao.mapper.ProjectMapper;
 import com.baifendian.swordfish.dao.model.*;
-import com.baifendian.swordfish.dao.model.flow.params.Property;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
 import com.baifendian.swordfish.rpc.ExecInfo;
-import com.baifendian.swordfish.rpc.RetInfo;
 import com.baifendian.swordfish.rpc.RetResultInfo;
 import com.baifendian.swordfish.rpc.ScheduleInfo;
 import com.baifendian.swordfish.rpc.client.MasterClient;
-import com.baifendian.swordfish.webserver.dto.ExecWorkflowsResponse;
+import com.baifendian.swordfish.webserver.dto.ExecutorId;
 import com.baifendian.swordfish.webserver.dto.ExecutorIds;
+import com.baifendian.swordfish.webserver.dto.response.ExecWorkflowsResponse;
 import com.baifendian.swordfish.webserver.dto.LogResult;
+import com.baifendian.swordfish.webserver.dto.response.ExecutionFlowResponse;
+import com.baifendian.swordfish.webserver.dto.response.ExecutionNodeResponse;
+import com.baifendian.swordfish.webserver.dto.response.WorkflowResponse;
 import com.baifendian.swordfish.webserver.exception.*;
-import org.apache.avro.data.Json;
-import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.lang3.StringUtils;
-import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
+import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -70,12 +69,15 @@ public class ExecService {
   private ExecutionNodeMapper executionNodeMapper;
 
   @Autowired
+  private WorkflowService workflowService;
+
+  @Autowired
   private LogHelper logHelper;
 
   @Autowired
   private FlowDao flowDao;
 
-  public List<Integer> postExecWorkflow(User operator, String projectName, String workflowName, String schedule, ExecType execType, String nodeName, NodeDepType nodeDep, NotifyType notifyType, String notifyMails, int timeout) {
+  public ExecutorIds postExecWorkflow(User operator, String projectName, String workflowName, String schedule, ExecType execType, String nodeName, NodeDepType nodeDep, NotifyType notifyType, String notifyMails, int timeout) {
 
     // 查看是否对项目具备相应的权限
     Project project = projectMapper.queryByName(projectName);
@@ -126,7 +128,7 @@ public class ExecService {
             logger.error("Call master client exec workflow false , project id: {}, flow id: {},host: {}, port: {}", project.getId(), projectFlow.getId(), masterServer.getHost(), masterServer.getPort());
             throw new ServerErrorException("master server return error");
           }
-          return retInfo.getExecIds();
+          return new ExecutorIds(retInfo.getExecIds());
         }
         case COMPLEMENT_DATA: {
           ScheduleInfo scheduleInfo = null;
@@ -142,7 +144,7 @@ public class ExecService {
             logger.error("Call master client append workflow data false , project id: {}, flow id: {},host: {}, port: {}", project.getId(), projectFlow.getId(), masterServer.getHost(), masterServer.getPort());
             throw new ServerErrorException("Call master client append workflow data false , project id: {}, flow id: {},host: {}, port: {}",project.getId(), projectFlow.getId(), masterServer.getHost(), masterServer.getPort());
           }
-          return retInfo.getExecIds();
+          return new ExecutorIds(retInfo.getExecIds());
         }
         default: {
           logger.error("exec workflow no support exec type {}", execType.getType());
@@ -158,6 +160,35 @@ public class ExecService {
   }
 
   /**
+   * 直接执行一个工作流
+   * @param operator
+   * @param projectName
+   * @param workflowName
+   * @param proxyUser
+   * @param queue
+   * @param data
+   * @param file
+   * @param notifyType
+   * @param notifyMails
+   * @param timeout
+   * @param extras
+   * @return
+   */
+  public ExecutorId postExecWorkflowDirect(User operator, String projectName, String workflowName, String desc, String proxyUser, String queue, String data, MultipartFile file, NotifyType notifyType, String notifyMails, int timeout, String extras){
+    logger.info("step1. create temp workflow");
+    WorkflowResponse projectFlow = workflowService.createWorkflow(operator, projectName, workflowName, desc, proxyUser, queue, data, file, extras, 1);
+    if (projectFlow == null){
+      throw new ServerErrorException("project workflow create return is null");
+    }
+    logger.info("step2. exec temp workflow");
+    ExecutorIds executorIds = postExecWorkflow(operator,projectName,workflowName,null,ExecType.DIRECT,null,null,notifyType,notifyMails,timeout);
+    if (CollectionUtils.isEmpty(executorIds.getExecIds())){
+      throw new ServerErrorException("project workflow exec return is null");
+    }
+    return new ExecutorId(executorIds.getExecIds().get(0));
+  }
+
+  /**
    * 查询任务运行情况
    *
    * @return
@@ -165,6 +196,10 @@ public class ExecService {
   public ExecWorkflowsResponse getExecWorkflow(User operator, String projectName, String workflowName, Date startDate, Date endDate, String status, int from, int size) {
 
     List<String> workflowList;
+
+    if (from < 0){
+      throw new BadRequestException("from");
+    }
 
     try{
       workflowList = JsonUtil.parseObjectList(workflowName,String.class);
@@ -194,9 +229,14 @@ public class ExecService {
       throw new ParameterException("status");
     }
 
-    List<ExecutionFlow> executionFlowList = executionFlowMapper.selectByFlowIdAndTimesAndStatusLimit(projectName,workflowList, startDate, endDate, (from-1)*size, size, flowStatusList);
+    List<ExecutionFlow> executionFlowList = executionFlowMapper.selectByFlowIdAndTimesAndStatusLimit(projectName,workflowList, startDate, endDate, from, size, flowStatusList);
+    List<ExecutionFlowResponse> executionFlowResponseList = new ArrayList<>();
+    for (ExecutionFlow executionFlow:executionFlowList){
+      executionFlowResponseList.add(new ExecutionFlowResponse(executionFlow));
+    }
+
     int total = executionFlowMapper.sumByFlowIdAndTimesAndStatus(projectName,workflowList, startDate, endDate,  flowStatusList);
-    return new ExecWorkflowsResponse(total,size,executionFlowList);
+    return new ExecWorkflowsResponse(total,size,executionFlowResponseList);
   }
 
   /**
@@ -206,7 +246,7 @@ public class ExecService {
    * @param execId
    * @return
    */
-  public ExecutionFlow getExecWorkflow(User operator, int execId) {
+  public ExecutionFlowResponse getExecWorkflow(User operator, int execId) {
 
     ExecutionFlow executionFlow = executionFlowMapper.selectByExecId(execId);
 
@@ -228,33 +268,18 @@ public class ExecService {
       throw new PermissionException("project exec or project owner",operator.getName());
     }
 
+    ExecutionFlowResponse executionFlowResponse = new ExecutionFlowResponse(executionFlow);
     List<ExecutionNode> executionNodeList = executionNodeMapper.selectExecNodeById(execId);
 
-    try {
-      JSONObject jsonObject = new JSONObject(executionFlow.getWorkflowData());
-
-      List<FlowNode> nodes = JsonUtil.parseObjectList(jsonObject.getString("nodes"),FlowNode.class);
-
+    for (ExecutionNodeResponse executionNodeResponse:executionFlowResponse.getData().getNodes()){
       for (ExecutionNode executionNode:executionNodeList){
-        for (FlowNode node:nodes){
-          if (StringUtils.equals(node.getName(),executionNode.getName())){
-            executionNode.setDesc(node.getDesc());
-            executionNode.setType(node.getType());
-            executionNode.setParameter(node.getParameter());
-            executionNode.setDep(node.getDep());
-            executionNode.setExtras(node.getExtras());
-          }
+        if (StringUtils.equals(executionNodeResponse.getName(),executionNode.getName())){
+          executionNodeResponse.mergeExecutionNode(executionNode);
         }
       }
-
-      executionFlow.getData().setNodes(executionNodeList);
-
-    } catch (Exception e) {
-      logger.error("des11n workflow data error",e);
-      throw new ServerErrorException("des11n workflow data error");
     }
 
-    return executionFlow;
+    return new ExecutionFlowResponse(executionFlow);
   }
 
   /**

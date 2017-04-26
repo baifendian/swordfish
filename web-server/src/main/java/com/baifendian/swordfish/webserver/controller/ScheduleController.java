@@ -18,6 +18,7 @@ package com.baifendian.swordfish.webserver.controller;
 import com.baifendian.swordfish.dao.enums.*;
 import com.baifendian.swordfish.dao.model.Schedule;
 import com.baifendian.swordfish.dao.model.User;
+import com.baifendian.swordfish.webserver.dto.response.ScheduleResponse;
 import com.baifendian.swordfish.webserver.service.ScheduleService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,18 +56,18 @@ public class ScheduleController {
    * @return
    */
   @PostMapping("/{workflowName}/schedules")
-  public Schedule createSchedule(@RequestAttribute(value = "session.user") User operator,
-                                 @PathVariable String projectName,
-                                 @PathVariable String workflowName,
-                                 @RequestParam(value = "schedule") String schedule,
-                                 @RequestParam(value = "notifyType",required=false,defaultValue = "None") NotifyType notifyType,
-                                 @RequestParam(value = "notifyMails",required=false) String notifyMails,
-                                 @RequestParam(value = "maxTryTimes",required=false,defaultValue = "1") int maxTryTimes,
-                                 @RequestParam(value = "failurePolicy",required=false,defaultValue = "END") FailurePolicyType failurePolicy,
-                                 @RequestParam(value = "depWorkflows",required=false) String  depWorkflows,
-                                 @RequestParam(value = "depPolicy",required=false,defaultValue = "NO_DEP_PRE") DepPolicyType depPolicyType,
-                                 @RequestParam(value = "timeout",required=false,defaultValue = "18000") int timeout,
-                                 HttpServletResponse response){
+  public ScheduleResponse createSchedule(@RequestAttribute(value = "session.user") User operator,
+                                         @PathVariable String projectName,
+                                         @PathVariable String workflowName,
+                                         @RequestParam(value = "schedule") String schedule,
+                                         @RequestParam(value = "notifyType",required=false,defaultValue = "None") NotifyType notifyType,
+                                         @RequestParam(value = "notifyMails",required=false) String notifyMails,
+                                         @RequestParam(value = "maxTryTimes",required=false,defaultValue = "1") int maxTryTimes,
+                                         @RequestParam(value = "failurePolicy",required=false,defaultValue = "END") FailurePolicyType failurePolicy,
+                                         @RequestParam(value = "depWorkflows",required=false) String  depWorkflows,
+                                         @RequestParam(value = "depPolicy",required=false,defaultValue = "NO_DEP_PRE") DepPolicyType depPolicyType,
+                                         @RequestParam(value = "timeout",required=false,defaultValue = "18000") int timeout,
+                                         HttpServletResponse response){
     logger.info("Operator user {}, exec workflow, project name: {}, workflow name: {}, schedule: {}, notify type: {}, notify mails: {}, max try times: {}," +
                     "failure policy: {}, dep workflows: {}, dep policy: {}, timeout: {}",
             operator.getName(), projectName, workflowName, schedule, notifyType, notifyMails, maxTryTimes, failurePolicy, depWorkflows, depPolicyType, timeout);
@@ -89,7 +90,7 @@ public class ScheduleController {
    * @return
    */
   @PutMapping("/{workflowName}/schedules")
-  public Schedule createAndModifySchedule(@RequestAttribute(value = "session.user") User operator,
+  public ScheduleResponse createAndModifySchedule(@RequestAttribute(value = "session.user") User operator,
                                           @PathVariable String projectName,
                                           @PathVariable String workflowName,
                                           @RequestParam(value = "schedule") String schedule,
@@ -123,7 +124,7 @@ public class ScheduleController {
    * @return
    */
   @PatchMapping("/{workflowName}/schedules")
-  public Schedule patchSchedule(@RequestAttribute(value = "session.user") User operator,
+  public ScheduleResponse patchSchedule(@RequestAttribute(value = "session.user") User operator,
                                 @PathVariable String projectName,
                                 @PathVariable String workflowName,
                                 @RequestParam(value = "schedule") String schedule,
@@ -170,7 +171,7 @@ public class ScheduleController {
    * @return
    */
   @GetMapping("/{workflowName}/schedules")
-  public Schedule querySchedule(@RequestAttribute(value = "session.user") User operator,
+  public ScheduleResponse querySchedule(@RequestAttribute(value = "session.user") User operator,
                                 @PathVariable String projectName,
                                 @PathVariable String workflowName,
                                 HttpServletResponse response){
@@ -185,7 +186,7 @@ public class ScheduleController {
    * @return
    */
   @GetMapping("/schedules")
-  public List<Schedule> queryAllSchedule(@RequestAttribute(value = "session.user") User operator,
+  public List<ScheduleResponse> queryAllSchedule(@RequestAttribute(value = "session.user") User operator,
                                          @PathVariable String projectName,
                                          HttpServletResponse response){
     return scheduleService.queryAllSchedule(operator,projectName);

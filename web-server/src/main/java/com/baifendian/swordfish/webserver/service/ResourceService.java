@@ -221,8 +221,8 @@ public class ResourceService {
       throw new NotModifiedException("Not resource update count");
     }
 
-    // 上传失败
-    if (!upload(project, name, file)) {
+    // 如果文件不是空的，则尝试上传新文件
+    if (file!=null && !upload(project, name, file)) {
       logger.error("upload resource: {} file: {} failed.", name, file.getOriginalFilename());
       throw new ServerErrorException("upload resource: {} file: {} failed.", name, file.getOriginalFilename());
     }

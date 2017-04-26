@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.baifendian.swordfish.webserver.dto;
+package com.baifendian.swordfish.webserver.dto.response;
 
 /**
  * 基础返回结果

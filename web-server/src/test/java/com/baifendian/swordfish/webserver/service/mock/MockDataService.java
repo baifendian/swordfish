@@ -20,6 +20,7 @@ import com.baifendian.swordfish.dao.mapper.*;
 import com.baifendian.swordfish.dao.model.*;
 import com.baifendian.swordfish.dao.model.flow.params.Property;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
+import com.baifendian.swordfish.webserver.dto.WorkflowData;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -241,15 +242,14 @@ public class MockDataService {
    *
    * @return
    */
-  public ProjectFlow.ProjectFlowData mocProjectFlowData(int flowId) throws IOException {
+  public WorkflowData mocProjectFlowData(int flowId) throws IOException {
     FlowNode flowNode1 = mocRmNodeJson(new String[]{}, flowId);
     FlowNode flowNode2 = mocRmNodeJson(new String[]{flowNode1.getName()}, flowId);
     FlowNode flowNode3 = mocRmNodeJson(new String[]{flowNode2.getName()}, flowId);
 
     List<FlowNode> flowNodeList = Arrays.asList(new FlowNode[]{flowNode1, flowNode2, flowNode3});
 
-    ProjectFlow.ProjectFlowData projectFlowData = new ProjectFlow.ProjectFlowData();
-    projectFlowData.setExtras(MR_PARAMETER);
+    WorkflowData projectFlowData = new WorkflowData();
     projectFlowData.setUserDefParams(Arrays.asList(new Property[]{new Property("year","$[yyyy]")}));
     projectFlowData.setNodes(flowNodeList);
 
@@ -263,7 +263,7 @@ public class MockDataService {
    * @return
    */
   public String mocProjectFlowDataJson(int flowId) throws IOException {
-    ProjectFlow.ProjectFlowData projectFlowData = mocProjectFlowData(flowId);
+    WorkflowData projectFlowData = mocProjectFlowData(flowId);
     return JsonUtil.toJsonString(projectFlowData);
   }
 

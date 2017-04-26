@@ -37,12 +37,11 @@ public class ProjectFlow {
    * 工作流 id
    * 数据库映射字段
    **/
-  @JsonIgnore
   private int id;
 
   /**
    * 工作流名称
-   * 数据库映射字段
+   * 数据库映射字段/DTO也需要使用
    */
   private String name;
 
@@ -55,25 +54,25 @@ public class ProjectFlow {
 
   /**
    * 项目名称
-   * API返回字段
+   * DTO需要字段
    */
   private String projectName;
 
   /**
    * 工作流描述
-   * 数据库映射字段
+   * 数据库映射字段/DTO需要字段
    */
   private String desc;
 
   /**
    * 创建时间
-   * 数据库映射字段
+   * 数据库映射字段/DTO需要字段
    */
   private Date createTime;
 
   /**
    * 修改时间
-   * 数据库映射字段
+   * 数据库映射字段/DTO需要字段
    */
   private Date modifyTime;
 
@@ -81,17 +80,17 @@ public class ProjectFlow {
    * owner id
    * 数据库映射字段
    */
-  @JsonIgnore
   private int ownerId;
 
   /**
    * owner 名称
+   * DTO需要字段
    */
   private String owner;
 
   /**
    * 代理用户
-   * 数据库映射字段
+   * 数据库映射字段/DTO需要字段
    */
   private String proxyUser;
 
@@ -105,6 +104,12 @@ public class ProjectFlow {
   private String userDefinedParams;
 
   /**
+   * 用户定义参数
+   * 已经反序列化后的结果，用于DTO显示
+   */
+  private List<Property> userDefinedParamList;
+
+  /**
    * 用户定义参数的 map 结构,
    */
   @JsonIgnore
@@ -112,16 +117,15 @@ public class ProjectFlow {
 
   /**
    * 额外字段
-   * 数据库映射字段
+   * 数据库映射字段/DTO需要字段
    */
-  @JsonIgnore
   @JsonDeserialize(using = JsonObjectDeserializer.class)
   @JsonSerialize(using = JsonObjectSerializer.class)
   private String extras;
 
   /**
    * 队列信息
-   * 数据库映射字段
+   * 数据库映射字段/DTO需要字段
    */
   private String queue;
 
@@ -132,9 +136,10 @@ public class ProjectFlow {
   private List<FlowNode> flowsNodes;
 
   /**
-   * 该数据结构其实是 db 中没有的, 用于构建的, 需要返回的
+   * 是否是临时节点
+   * 数据库映射字段
    */
-  private ProjectFlowData data = new ProjectFlowData();
+  private Integer flag;
 
   public ProjectFlow() {
   }
@@ -152,7 +157,6 @@ public class ProjectFlow {
   }
 
   public void setFlowsNodes(List<FlowNode> flowsNodes) {
-    this.data.setNodes(flowsNodes);
     this.flowsNodes = flowsNodes;
   }
 
@@ -233,7 +237,6 @@ public class ProjectFlow {
   }
 
   public void setExtras(String extras) {
-    this.data.setExtras(extras);
     this.extras = extras;
   }
 
@@ -245,24 +248,22 @@ public class ProjectFlow {
     this.queue = queue;
   }
 
-  public ProjectFlowData getData() {
-    return data;
-  }
-
-  public void setData(ProjectFlowData data) {
-    this.flowsNodes = data.getNodes();
-    this.extras = data.getExtras();
-    this.userDefinedParams = JsonUtil.toJsonString(data.getUserDefParams());
-    this.data = data;
-  }
-
   public String getUserDefinedParams() {
     return userDefinedParams;
   }
 
   public void setUserDefinedParams(String userDefinedParams) {
-    this.data.setUserDefParams(JsonUtil.parseObjectList(userDefinedParams,Property.class));
+    this.userDefinedParamList = JsonUtil.parseObjectList(userDefinedParams,Property.class);
     this.userDefinedParams = userDefinedParams;
+  }
+
+  public List<Property> getUserDefinedParamList() {
+    return userDefinedParamList;
+  }
+
+  public void setUserDefinedParamList(List<Property> userDefinedParamList) {
+    this.userDefinedParams = JsonUtil.toJsonString(userDefinedParamList);
+    this.userDefinedParamList = userDefinedParamList;
   }
 
   public Map<String, String> getUserDefinedParamMap() {
@@ -278,6 +279,14 @@ public class ProjectFlow {
 
   public void setUserDefinedParamMap(Map<String, String> userDefinedParamMap) {
     this.userDefinedParamMap = userDefinedParamMap;
+  }
+
+  public Integer getFlag() {
+    return flag;
+  }
+
+  public void setFlag(Integer flag) {
+    this.flag = flag;
   }
 
   @Override
@@ -298,62 +307,6 @@ public class ProjectFlow {
             Objects.equals(userDefinedParams, that.userDefinedParams) &&
             Objects.equals(extras, that.extras) &&
             Objects.equals(queue, that.queue) &&
-            EqualUtils.equalLists(flowsNodes, that.flowsNodes) &&
-            Objects.equals(data, that.data);
-  }
-
-
-
-  public static class ProjectFlowData {
-    /**
-     * 结点信息
-     */
-    private List<FlowNode> nodes;
-
-    /**
-     * 用户自定义参数
-     */
-    private List<Property> userDefParams;
-
-    @Override
-    public boolean equals(Object o) {
-      if (this == o) return true;
-      if (o == null || getClass() != o.getClass()) return false;
-      ProjectFlowData that = (ProjectFlowData) o;
-      return EqualUtils.equalLists(nodes, that.nodes) &&
-              EqualUtils.equalLists(userDefParams, that.userDefParams) &&
-              Objects.equals(extras, that.extras);
-    }
-
-    /**
-     * 额外信息
-     */
-    @JsonDeserialize(using = JsonObjectDeserializer.class)
-    @JsonSerialize(using = JsonObjectSerializer.class)
-    private String extras;
-
-    public List<FlowNode> getNodes() {
-      return nodes;
-    }
-
-    public void setNodes(List<FlowNode> nodes) {
-      this.nodes = nodes;
-    }
-
-    public List<Property> getUserDefParams() {
-      return userDefParams;
-    }
-
-    public void setUserDefParams(List<Property> userDefParams) {
-      this.userDefParams = userDefParams;
-    }
-
-    public String getExtras() {
-      return extras;
-    }
-
-    public void setExtras(String extras) {
-      this.extras = extras;
-    }
+            EqualUtils.equalLists(flowsNodes, that.flowsNodes);
   }
 }

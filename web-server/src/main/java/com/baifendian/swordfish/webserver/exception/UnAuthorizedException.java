@@ -19,7 +19,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 /**
- * Created by caojingwei on 2017/4/20.
+ * 无授权异常
  */
 @ResponseStatus(code = HttpStatus.UNAUTHORIZED)
 public class UnAuthorizedException extends RuntimeException {

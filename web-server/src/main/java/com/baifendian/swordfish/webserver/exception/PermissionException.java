@@ -19,7 +19,7 @@ import java.text.MessageFormat;
 
 
 /**
- * Created by caojingwei on 2017/4/20.
+ * 权限异常
  */
 public class PermissionException extends UnAuthorizedException {
   private String perm;
@@ -36,5 +36,6 @@ public class PermissionException extends UnAuthorizedException {
   public PermissionException(String perm, String user) {
     super(MessageFormat.format("User: {0} permission: {1} is invalid",perm,user));
     this.perm = perm;
+    this.user = user;
   }
 }

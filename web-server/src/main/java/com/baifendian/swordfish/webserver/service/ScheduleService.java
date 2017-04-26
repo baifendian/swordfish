@@ -23,6 +23,8 @@ import com.baifendian.swordfish.dao.mapper.ScheduleMapper;
 import com.baifendian.swordfish.dao.model.*;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
 import com.baifendian.swordfish.rpc.client.MasterClient;
+import com.baifendian.swordfish.webserver.dto.ScheduleParam;
+import com.baifendian.swordfish.webserver.dto.response.ScheduleResponse;
 import com.baifendian.swordfish.webserver.exception.*;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.lang3.StringUtils;
@@ -34,6 +36,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -75,7 +78,7 @@ public class ScheduleService {
    * @return
    */
   @Transactional(value = "TransactionManager", rollbackFor = Exception.class)
-  public Schedule createSchedule(User operator, String projectName, String workflowName, String schedule, NotifyType notifyType, String notifyMails, int maxTryTimes, FailurePolicyType failurePolicy, String depWorkflows, DepPolicyType depPolicyType, int timeout){
+  public ScheduleResponse createSchedule(User operator, String projectName, String workflowName, String schedule, NotifyType notifyType, String notifyMails, int maxTryTimes, FailurePolicyType failurePolicy, String depWorkflows, DepPolicyType depPolicyType, int timeout){
     Project project = projectMapper.queryByName(projectName);
 
     if (project == null) {
@@ -103,11 +106,10 @@ public class ScheduleService {
     scheduleObj.setFlowName(projectFlow.getName());
 
     try {
-      Schedule.ScheduleParam scheduleParam = JsonUtil.parseObject(schedule, Schedule.ScheduleParam.class);
+      ScheduleParam scheduleParam = JsonUtil.parseObject(schedule,ScheduleParam.class);
       scheduleObj.setStartDate(scheduleParam.getStartDate());
       scheduleObj.setEndDate(scheduleParam.getEndDate());
       scheduleObj.setCrontab(scheduleParam.getCrontab());
-      scheduleObj.setSchedule(scheduleParam);
       scheduleObj.setNotifyType(notifyType);
       scheduleObj.setNotifyMailsStr(notifyMails);
       scheduleObj.setMaxTryTimes(maxTryTimes);
@@ -132,7 +134,7 @@ public class ScheduleService {
       throw new NotModifiedException("schedule has exist, can't create again.");
     }
 
-    return scheduleObj;
+    return new ScheduleResponse(scheduleObj);
   }
 
   /**
@@ -152,7 +154,7 @@ public class ScheduleService {
    * @return
    */
   @Transactional(value = "TransactionManager", rollbackFor = Exception.class)
-  public Schedule patchSchedule(User operator, String projectName, String workflowName, String schedule, NotifyType notifyType, String notifyMails, Integer maxTryTimes, FailurePolicyType failurePolicy, String depWorkflows, DepPolicyType depPolicyType, Integer timeout, ScheduleStatus scheduleStatus) {
+  public ScheduleResponse patchSchedule(User operator, String projectName, String workflowName, String schedule, NotifyType notifyType, String notifyMails, Integer maxTryTimes, FailurePolicyType failurePolicy, String depWorkflows, DepPolicyType depPolicyType, Integer timeout, ScheduleStatus scheduleStatus) {
     Project project = projectMapper.queryByName(projectName);
 
     if (project == null) {
@@ -184,11 +186,10 @@ public class ScheduleService {
     //封装检查更新参数
     try {
       if (!StringUtils.isEmpty(schedule)) {
-        Schedule.ScheduleParam scheduleParam = JsonUtil.parseObject(schedule, Schedule.ScheduleParam.class);
+        ScheduleParam scheduleParam = JsonUtil.parseObject(schedule,ScheduleParam.class);
         scheduleObj.setStartDate(scheduleParam.getStartDate());
         scheduleObj.setEndDate(scheduleParam.getEndDate());
         scheduleObj.setCrontab(scheduleParam.getCrontab());
-        scheduleObj.setSchedule(scheduleParam);
       }
       if (notifyType != null) {
         scheduleObj.setNotifyType(notifyType);
@@ -228,7 +229,7 @@ public class ScheduleService {
 
     scheduleMapper.update(scheduleObj);
 
-    return scheduleObj;
+    return new ScheduleResponse(scheduleObj);
   }
 
   /**
@@ -236,7 +237,7 @@ public class ScheduleService {
    *
    * @return
    */
-  public Schedule putSchedule(User operator, String projectName, String workflowName, String schedule, NotifyType notifyType, String notifyMails, Integer maxTryTimes, FailurePolicyType failurePolicy, String depWorkflows, DepPolicyType depPolicyType, Integer timeout){
+  public ScheduleResponse putSchedule(User operator, String projectName, String workflowName, String schedule, NotifyType notifyType, String notifyMails, Integer maxTryTimes, FailurePolicyType failurePolicy, String depWorkflows, DepPolicyType depPolicyType, Integer timeout){
     Schedule scheduleObj = scheduleMapper.selectByFlowName(projectName, workflowName);
     if (scheduleObj == null) {
       return createSchedule(operator, projectName, workflowName, schedule, notifyType, notifyMails, maxTryTimes, failurePolicy, depWorkflows, depPolicyType, timeout);
@@ -293,8 +294,6 @@ public class ScheduleService {
       }
     }
 
-
-
     scheduleMapper.update(scheduleObj);
 
     //链接execServer
@@ -342,7 +341,7 @@ public class ScheduleService {
    * @param workflowName
    * @return
    */
-  public Schedule querySchedule(User operator, String projectName, String workflowName) {
+  public ScheduleResponse querySchedule(User operator, String projectName, String workflowName) {
     Project project = projectMapper.queryByName(projectName);
 
     if (project == null) {
@@ -361,7 +360,7 @@ public class ScheduleService {
       throw new NotFoundException("workflow",workflowName);
     }
 
-    return scheduleMapper.selectByFlowId(projectFlow.getId());
+    return new ScheduleResponse(scheduleMapper.selectByFlowId(projectFlow.getId()));
   }
 
   /**
@@ -370,7 +369,7 @@ public class ScheduleService {
    * @param projectName
    * @return
    */
-  public List<Schedule> queryAllSchedule(User operator, String projectName) {
+  public List<ScheduleResponse> queryAllSchedule(User operator, String projectName) {
     Project project = projectMapper.queryByName(projectName);
 
     if (project == null) {
@@ -382,6 +381,11 @@ public class ScheduleService {
       throw new PermissionException("project read or project owner",operator.getName());
     }
 
-    return scheduleMapper.selectByProject(projectName);
+    List<Schedule> scheduleList = scheduleMapper.selectByProject(projectName);
+    List<ScheduleResponse> scheduleResponseList = new ArrayList<>();
+    for (Schedule schedule:scheduleList){
+      scheduleResponseList.add(new ScheduleResponse(schedule));
+    }
+    return scheduleResponseList;
   }
 }

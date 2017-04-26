@@ -380,7 +380,6 @@ public class FlowDao extends BaseDao {
       flowNode.setFlowId(projectFlow.getId());
       flowNodeMapper.insert(flowNode);
     }
-    projectFlow.getData().setNodes(projectFlow.getFlowsNodes());
   }
 
   /**

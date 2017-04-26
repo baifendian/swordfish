@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import java.text.MessageFormat;
 
 /**
- * Created by caojingwei on 2017/4/21.
+ * 错误的请求异常
  */
 @ResponseStatus(code = HttpStatus.BAD_REQUEST)
 public class BadRequestException extends RuntimeException {

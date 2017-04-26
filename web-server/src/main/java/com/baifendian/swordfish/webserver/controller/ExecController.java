@@ -15,19 +15,22 @@
  */
 package com.baifendian.swordfish.webserver.controller;
 
-import com.baifendian.swordfish.dao.enums.DepPolicyType;
 import com.baifendian.swordfish.dao.enums.ExecType;
 import com.baifendian.swordfish.dao.enums.NodeDepType;
 import com.baifendian.swordfish.dao.enums.NotifyType;
 import com.baifendian.swordfish.dao.model.ExecutionFlow;
 import com.baifendian.swordfish.dao.model.User;
-import com.baifendian.swordfish.webserver.dto.ExecWorkflowsResponse;
+import com.baifendian.swordfish.webserver.dto.ExecutorId;
+import com.baifendian.swordfish.webserver.dto.ExecutorIds;
+import com.baifendian.swordfish.webserver.dto.response.ExecWorkflowsResponse;
 import com.baifendian.swordfish.webserver.dto.LogResult;
+import com.baifendian.swordfish.webserver.dto.response.ExecutionFlowResponse;
 import com.baifendian.swordfish.webserver.service.ExecService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
 import java.util.Date;
@@ -61,22 +64,42 @@ public class ExecController {
    * @return
    */
   @PostMapping(value = "")
-  public List<Integer> execExistWorkflow(@RequestAttribute(value = "session.user") User operator,
-                                         @RequestParam(value = "projectName") String projectName,
-                                         @RequestParam(value = "workflowName") String workflowName,
-                                         @RequestParam(value = "schedule", required = false) String schedule,
-                                         @RequestParam(value = "execType", required = false) ExecType execType,
-                                         @RequestParam(value = "nodeName", required = false) String nodeName,
-                                         @RequestParam(value = "nodeDep", required = false) NodeDepType nodeDep,
-                                         @RequestParam(value = "notifyType", required = false) NotifyType notifyType,
-                                         @RequestParam(value = "notifyMails", required = false) String notifyMails,
-                                         @RequestParam(value = "timeout", required = false, defaultValue = "1800") int timeout,
-                                         HttpServletResponse response) {
+  public ExecutorIds execExistWorkflow(@RequestAttribute(value = "session.user") User operator,
+                                       @RequestParam(value = "projectName") String projectName,
+                                       @RequestParam(value = "workflowName") String workflowName,
+                                       @RequestParam(value = "schedule", required = false) String schedule,
+                                       @RequestParam(value = "execType", required = false) ExecType execType,
+                                       @RequestParam(value = "nodeName", required = false) String nodeName,
+                                       @RequestParam(value = "nodeDep", required = false) NodeDepType nodeDep,
+                                       @RequestParam(value = "notifyType", required = false) NotifyType notifyType,
+                                       @RequestParam(value = "notifyMails", required = false) String notifyMails,
+                                       @RequestParam(value = "timeout", required = false, defaultValue = "1800") int timeout,
+                                       HttpServletResponse response) {
     logger.info("Operator user {}, exec workflow, project name: {}, workflow name: {}, schedule: {}, node name: {}, node dep: {}, notify type: {}," +
             "notify mails: {}, timeout: {}",
         operator.getName(), projectName, workflowName, schedule, nodeName, nodeDep, notifyType, notifyMails, timeout);
 
     return execService.postExecWorkflow(operator,projectName,workflowName,schedule,execType,nodeName,nodeDep,notifyType,notifyMails,timeout);
+  }
+
+  @PostMapping(value = "/direct")
+  public ExecutorId execExistWorkflowDirect(@RequestAttribute(value = "session.user") User operator,
+                                            @RequestParam(value = "projectName") String projectName,
+                                            @RequestParam(value = "workflowName") String workflowName,
+                                            @RequestParam(value = "proxyUser") String proxyUser,
+                                            @RequestParam(value = "queue") String queue,
+                                            @RequestParam(value = "desc", required = false) String desc,
+                                            @RequestParam(value = "data", required = false) String data,
+                                            @RequestParam(value = "file", required = false) MultipartFile file,
+                                            @RequestParam(value = "notifyType",required=false,defaultValue = "None") NotifyType notifyType,
+                                            @RequestParam(value = "notifyMails",required=false) String notifyMails,
+                                            @RequestParam(value = "timeout",required=false,defaultValue = "18000") int timeout,
+                                            @RequestParam(value = "extras",required=false) String extras,
+                                            HttpServletResponse response){
+    logger.info("Operator user {}, exec workflow, project name: {}, workflow name: {}, proxy user: {}, queue: {}, data: {}, file: {}," +
+            "notify type: {}, notify mails: {}, timeout: {}, extras: {}",operator.getName(),projectName,workflowName,proxyUser,queue,data,file.getName(),notifyType,notifyMails,timeout,extras);
+
+    return execService.postExecWorkflowDirect(operator,projectName,workflowName,desc,proxyUser,queue,data,file,notifyType,notifyMails,timeout,extras);
   }
 
   /**
@@ -120,9 +143,9 @@ public class ExecController {
    * @return
    */
   @GetMapping(value = "/{execId}")
-  public ExecutionFlow queryExecDetail(@RequestAttribute(value = "session.user") User operator,
-                                         @PathVariable(value = "execId") int execId,
-                                         HttpServletResponse response) {
+  public ExecutionFlowResponse queryExecDetail(@RequestAttribute(value = "session.user") User operator,
+                                               @PathVariable(value = "execId") int execId,
+                                               HttpServletResponse response) {
     logger.info("Operator user {}, query exec detail, exec id: {}",
         operator.getName(), execId);
 
