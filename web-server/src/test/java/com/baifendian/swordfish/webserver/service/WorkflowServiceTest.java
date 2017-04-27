@@ -15,35 +15,20 @@
  */
 package com.baifendian.swordfish.webserver.service;
 
-import com.baifendian.swordfish.common.consts.Constants;
 import com.baifendian.swordfish.dao.FlowDao;
 import com.baifendian.swordfish.dao.model.Project;
-import com.baifendian.swordfish.dao.model.ProjectFlow;
 import com.baifendian.swordfish.dao.model.User;
-import com.baifendian.swordfish.dao.utils.json.JsonUtil;
 import com.baifendian.swordfish.webserver.RestfulApiApplication;
-import com.baifendian.swordfish.webserver.dto.WorkflowData;
-import com.baifendian.swordfish.webserver.dto.response.WorkflowResponse;
-import com.baifendian.swordfish.webserver.exception.NotFoundException;
-import com.baifendian.swordfish.webserver.exception.NotModifiedException;
-import com.baifendian.swordfish.webserver.exception.PermissionException;
 import com.baifendian.swordfish.webserver.service.mock.MockDataService;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import org.apache.http.HttpStatus;
 import org.junit.Before;
-import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
-import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.io.IOException;
-import java.util.List;
 
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertTrue;
@@ -89,7 +74,7 @@ public class WorkflowServiceTest {
       String data = mockDataService.mocProjectFlowDataJson(0);
       String extras = "{}";
       MockHttpServletResponse mockHttpServletResponse = new MockHttpServletResponse();
-      WorkflowResponse projectFlow = workflowService.createWorkflow(user,project.getName(),name,desc,proxyUser,queue,data,null,extras,null);
+      WorkflowDto projectFlow = workflowService.createWorkflow(user,project.getName(),name,desc,proxyUser,queue,data,null,extras,null);
       ProjectFlow projectFlow1 = flowDao.projectFlowFindByPorjectNameAndName(project.getName(),projectFlow.getName());
       assertEquals(mockHttpServletResponse.getStatus(), HttpStatus.SC_OK);
       assertTrue(projectFlow!=null);
@@ -106,7 +91,7 @@ public class WorkflowServiceTest {
       MockHttpServletResponse mockHttpServletResponse = new MockHttpServletResponse();
       boolean thrown = false;
       try{
-         WorkflowResponse projectFlow2 = workflowService.createWorkflow(user,project.getName(),projectFlow.getName(),desc,proxyUser,queue,data,null,extras,null);
+         WorkflowDto projectFlow2 = workflowService.createWorkflow(user,project.getName(),projectFlow.getName(),desc,proxyUser,queue,data,null,extras,null);
       }catch (NotModifiedException e){
         thrown = true;
       }
@@ -125,7 +110,7 @@ public class WorkflowServiceTest {
       MockHttpServletResponse mockHttpServletResponse = new MockHttpServletResponse();
       boolean thrown = false;
       try{
-        WorkflowResponse projectFlow = workflowService.createWorkflow(user1,project.getName(),name,desc,proxyUser,queue,data,null,extras,null);
+        WorkflowDto projectFlow = workflowService.createWorkflow(user1,project.getName(),name,desc,proxyUser,queue,data,null,extras,null);
       }catch (PermissionException e){
         thrown = true;
       }
@@ -141,7 +126,7 @@ public class WorkflowServiceTest {
       String desc = mockDataService.getRandomString();
       projectFlow.setDesc(desc);
       MockHttpServletResponse mockHttpServletResponse = new MockHttpServletResponse();
-      WorkflowResponse projectFlow1 = workflowService.patchWorkflow(user,project.getName(),projectFlow.getName(),desc,null,null,null,null,null);
+      WorkflowDto projectFlow1 = workflowService.patchWorkflow(user,project.getName(),projectFlow.getName(),desc,null,null,null,null,null);
       ProjectFlow projectFlow2 = flowDao.projectFlowFindByPorjectNameAndName(project.getName(),projectFlow.getName());
       assertEquals(mockHttpServletResponse.getStatus(), HttpStatus.SC_OK);
       //assertTrue(projectFlow.equals(projectFlow1));
@@ -154,7 +139,7 @@ public class WorkflowServiceTest {
       projectFlow.setFlowsNodes(data.getNodes());
       projectFlow.setUserDefinedParamList(data.getUserDefParams());
       MockHttpServletResponse mockHttpServletResponse = new MockHttpServletResponse();
-      WorkflowResponse projectFlow1 = workflowService.patchWorkflow(user,project.getName(),projectFlow.getName(),null,null,null,JsonUtil.toJsonString(data),null,null);
+      WorkflowDto projectFlow1 = workflowService.patchWorkflow(user,project.getName(),projectFlow.getName(),null,null,null,JsonUtil.toJsonString(data),null,null);
       ProjectFlow projectFlow2 = flowDao.projectFlowFindByPorjectNameAndName(project.getName(),projectFlow.getName());
       assertEquals(mockHttpServletResponse.getStatus(), HttpStatus.SC_OK);
       assertTrue(projectFlow.equals(projectFlow1));
@@ -167,7 +152,7 @@ public class WorkflowServiceTest {
       MockHttpServletResponse mockHttpServletResponse = new MockHttpServletResponse();
       boolean thrown = false;
       try {
-        WorkflowResponse projectFlow = workflowService.patchWorkflow(user, project.getName(), name, null, null, null, data, null, null);
+        WorkflowDto projectFlow = workflowService.patchWorkflow(user, project.getName(), name, null, null, null, data, null, null);
       }catch (NotFoundException e){
         thrown = true;
       }
@@ -186,7 +171,7 @@ public class WorkflowServiceTest {
       String data = mockDataService.mocProjectFlowDataJson(0);
       String extras = "{}";
       MockHttpServletResponse mockHttpServletResponse = new MockHttpServletResponse();
-      WorkflowResponse projectFlow = workflowService.putWorkflow(user,project.getName(),name,desc,proxyUser,queue,data,null, extras);
+      WorkflowDto projectFlow = workflowService.putWorkflow(user,project.getName(),name,desc,proxyUser,queue,data,null, extras);
       assertEquals(mockHttpServletResponse.getStatus(), HttpStatus.SC_OK);
       assertTrue(projectFlow!=null);
     }
@@ -196,7 +181,7 @@ public class WorkflowServiceTest {
       String desc = mockDataService.getRandomString();
       String extras = "{}";
       MockHttpServletResponse mockHttpServletResponse = new MockHttpServletResponse();
-      WorkflowResponse projectFlow = workflowService.putWorkflow(user,project.getName(),projectFlow1.getName(),desc,null,null,null,null,extras);
+      WorkflowDto projectFlow = workflowService.putWorkflow(user,project.getName(),projectFlow1.getName(),desc,null,null,null,null,extras);
       assertEquals(mockHttpServletResponse.getStatus(), HttpStatus.SC_OK);
       assertTrue(projectFlow!=null);
     }
@@ -245,7 +230,7 @@ public class WorkflowServiceTest {
       //查询一个工作流
       ProjectFlow projectFlow = mockDataService.mocProjectFlow(project,user);
       MockHttpServletResponse mockHttpServletResponse = new MockHttpServletResponse();
-      WorkflowResponse projectFlow1 = workflowService.queryProjectFlow(user,project.getName(),projectFlow.getName());
+      WorkflowDto projectFlow1 = workflowService.queryProjectFlow(user,project.getName(),projectFlow.getName());
       assertEquals(mockHttpServletResponse.getStatus(), HttpStatus.SC_OK);
       assertTrue(projectFlow1!=null);
     }
@@ -257,7 +242,7 @@ public class WorkflowServiceTest {
       //查询一个项目下的工作流
       ProjectFlow projectFlow = mockDataService.mocProjectFlow(project,user);
       MockHttpServletResponse mockHttpServletResponse = new MockHttpServletResponse();
-      List<WorkflowResponse> projectFlowList = workflowService.queryAllProjectFlow(user,project.getName());
+      List<WorkflowDto> projectFlowList = workflowService.queryAllProjectFlow(user,project.getName());
       assertEquals(mockHttpServletResponse.getStatus(), HttpStatus.SC_OK);
       assertTrue(projectFlowList!=null);
       assertTrue(projectFlowList.size()>0);

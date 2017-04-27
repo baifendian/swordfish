@@ -17,6 +17,7 @@ package com.baifendian.swordfish.webserver.controller;
 
 import com.baifendian.swordfish.common.utils.http.HttpUtil;
 import com.baifendian.swordfish.dao.model.User;
+import com.baifendian.swordfish.webserver.dto.UserDto;
 import com.baifendian.swordfish.webserver.dto.UserSessionData;
 import com.baifendian.swordfish.webserver.exception.ParameterException;
 import com.baifendian.swordfish.webserver.exception.UnAuthorizedException;

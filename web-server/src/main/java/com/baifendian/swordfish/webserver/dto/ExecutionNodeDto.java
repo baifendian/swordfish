@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.baifendian.swordfish.webserver.dto.response;
+package com.baifendian.swordfish.webserver.dto;
 
 import com.baifendian.swordfish.dao.enums.FlowStatus;
 import com.baifendian.swordfish.dao.model.ExecutionNode;
@@ -27,7 +27,7 @@ import java.util.List;
 /**
  * 工作流调度节点返回结果
  */
-public class ExecutionNodeResponse {
+public class ExecutionNodeDto {
   private String name;
   private String desc;
   private String type;
@@ -43,7 +43,7 @@ public class ExecutionNodeResponse {
   @JsonDeserialize(using = JsonObjectDeserializer.class)
   private String extras;
 
-  public ExecutionNodeResponse() {
+  public ExecutionNodeDto() {
   }
 
   /**

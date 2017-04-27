@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.baifendian.swordfish.webserver.dto.response;
+package com.baifendian.swordfish.webserver.dto;
 
 import com.baifendian.swordfish.dao.model.ExecutionState;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -23,7 +23,7 @@ import java.util.Date;
 /**
  * 统计数据返回实体
  */
-public class  StatResponse {
+public class StatDto {
   @JsonInclude(JsonInclude.Include.NON_NULL)
   private Date date;
 
@@ -56,10 +56,10 @@ public class  StatResponse {
     this.hour = hour;
   }
 
-  public StatResponse() {
+  public StatDto() {
   }
 
-  public StatResponse(ExecutionState executionState) {
+  public StatDto(ExecutionState executionState) {
     this.hour = executionState.getHour();
     this.date = executionState.getDay();
     this.info.setWait(executionState.getInit()+executionState.getWaitingDep()+executionState.getWaitingRes());

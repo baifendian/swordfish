@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.baifendian.swordfish.webserver.dto.response;
+package com.baifendian.swordfish.webserver.dto;
 
 import com.baifendian.swordfish.dao.enums.ExecType;
 import com.baifendian.swordfish.dao.enums.FlowStatus;
@@ -32,7 +32,7 @@ import java.util.Date;
  * 执行flow返回response
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class ExecutionFlowResponse {
+public class ExecutionFlowDto {
   private int execId;
   private String projectName;
   private String workflowName;
@@ -52,10 +52,10 @@ public class ExecutionFlowResponse {
   private ExecutionFlowData data;
 
 
-  public ExecutionFlowResponse() {
+  public ExecutionFlowDto() {
   }
 
-  public ExecutionFlowResponse(ExecutionFlow executionFlow) {
+  public ExecutionFlowDto(ExecutionFlow executionFlow) {
     this.execId = executionFlow.getId();
     this.projectName = executionFlow.getProjectName();
     this.workflowName = executionFlow.getWorkflowName();

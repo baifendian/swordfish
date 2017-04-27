@@ -17,6 +17,7 @@ package com.baifendian.swordfish.webserver.controller;
 
 import com.baifendian.swordfish.dao.model.Resource;
 import com.baifendian.swordfish.dao.model.User;
+import com.baifendian.swordfish.webserver.dto.ResourceDto;
 import com.baifendian.swordfish.webserver.service.ResourceService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,6 +28,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -52,16 +54,16 @@ public class ResourceController {
    * @param response
    */
   @PostMapping(value = "/{name:.+}")
-  public Resource createResource(@RequestAttribute(value = "session.user") User operator,
-                                 @PathVariable String projectName,
-                                 @PathVariable String name,
-                                 @RequestParam(value = "desc", required = false) String desc,
-                                 @RequestParam("file") MultipartFile file,
-                                 HttpServletResponse response) {
+  public ResourceDto createResource(@RequestAttribute(value = "session.user") User operator,
+                                    @PathVariable String projectName,
+                                    @PathVariable String name,
+                                    @RequestParam(value = "desc", required = false) String desc,
+                                    @RequestParam("file") MultipartFile file,
+                                    HttpServletResponse response) {
     logger.info("Operator user {}, create resource, project name: {}, resource name: {}, desc: {}, file: [{},{}]",
         operator.getName(), projectName, name, desc, file.getName(), file.getOriginalFilename());
 
-    return resourceService.createResource(operator, projectName, name, desc, file);
+    return new ResourceDto(resourceService.createResource(operator, projectName, name, desc, file));
   }
 
   /**
@@ -76,7 +78,7 @@ public class ResourceController {
    * @return
    */
   @PutMapping(value = "/{name:.+}")
-  public Resource putResource(@RequestAttribute(value = "session.user") User operator,
+  public ResourceDto putResource(@RequestAttribute(value = "session.user") User operator,
                               @PathVariable String projectName,
                               @PathVariable String name,
                               @RequestParam(value = "desc", required = false) String desc,
@@ -85,7 +87,7 @@ public class ResourceController {
     logger.info("Operator user {}, put resource, project name: {}, resource name: {}, desc: {}, file: [{},{}]",
         operator.getName(), projectName, name, desc, file.getName(), file.getOriginalFilename());
 
-    return resourceService.putResource(operator, projectName, name, desc, file);
+    return new ResourceDto(resourceService.putResource(operator, projectName, name, desc, file));
   }
 
   /**
@@ -99,7 +101,7 @@ public class ResourceController {
    * @param response
    */
   @PatchMapping(value = "/{name:.+}")
-  public Resource modifyResource(@RequestAttribute(value = "session.user") User operator,
+  public ResourceDto modifyResource(@RequestAttribute(value = "session.user") User operator,
                                  @PathVariable String projectName,
                                  @PathVariable String name,
                                  @RequestParam(value = "desc", required = false) String desc,
@@ -108,7 +110,7 @@ public class ResourceController {
     logger.info("Operator user {}, modify resource, project name: {}, resource name: {}, desc: {}, file: [{},{}]",
         operator.getName(), projectName, name, desc, (file == null) ? null : file.getName(), (file == null) ? null : file.getOriginalFilename());
 
-    return resourceService.modifyResource(operator, projectName, name, desc, file);
+    return new ResourceDto(resourceService.modifyResource(operator, projectName, name, desc, file));
   }
 
   /**
@@ -138,13 +140,18 @@ public class ResourceController {
    * @param response
    */
   @GetMapping(value = "")
-  public List<Resource> getResources(@RequestAttribute(value = "session.user") User operator,
+  public List<ResourceDto> getResources(@RequestAttribute(value = "session.user") User operator,
                                      @PathVariable String projectName,
                                      HttpServletResponse response) {
     logger.info("Operator user {}, get resource list of project, project name: {}",
         operator.getName(), projectName);
 
-    return resourceService.getResources(operator, projectName);
+    List<Resource> resourceList = resourceService.getResources(operator, projectName);
+    List<ResourceDto> resourceDtoList = new ArrayList<>();
+    for (Resource resource:resourceList){
+      resourceDtoList.add(new ResourceDto(resource));
+    }
+    return resourceDtoList;
   }
 
   /**
@@ -156,14 +163,14 @@ public class ResourceController {
    * @param response
    */
   @GetMapping(value = "/{name:.+}")
-  public Resource getResource(@RequestAttribute(value = "session.user") User operator,
+  public ResourceDto getResource(@RequestAttribute(value = "session.user") User operator,
                               @PathVariable String projectName,
                               @PathVariable String name,
                               HttpServletResponse response) {
     logger.info("Operator user {}, get resource detail, project name: {}, resource name: {}",
         operator.getName(), projectName, name);
 
-    return resourceService.getResource(operator, projectName, name);
+    return new ResourceDto(resourceService.getResource(operator, projectName, name));
   }
 
   /**

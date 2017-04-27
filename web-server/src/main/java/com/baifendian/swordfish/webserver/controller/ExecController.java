@@ -18,13 +18,12 @@ package com.baifendian.swordfish.webserver.controller;
 import com.baifendian.swordfish.dao.enums.ExecType;
 import com.baifendian.swordfish.dao.enums.NodeDepType;
 import com.baifendian.swordfish.dao.enums.NotifyType;
-import com.baifendian.swordfish.dao.model.ExecutionFlow;
 import com.baifendian.swordfish.dao.model.User;
 import com.baifendian.swordfish.webserver.dto.ExecutorId;
 import com.baifendian.swordfish.webserver.dto.ExecutorIds;
-import com.baifendian.swordfish.webserver.dto.response.ExecWorkflowsResponse;
+import com.baifendian.swordfish.webserver.dto.ExecWorkflowsDto;
 import com.baifendian.swordfish.webserver.dto.LogResult;
-import com.baifendian.swordfish.webserver.dto.response.ExecutionFlowResponse;
+import com.baifendian.swordfish.webserver.dto.ExecutionFlowDto;
 import com.baifendian.swordfish.webserver.service.ExecService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,7 +33,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
 import java.util.Date;
-import java.util.List;
 
 /**
  * 执行任务的服务入口
@@ -117,15 +115,15 @@ public class ExecController {
    * @return
    */
   @GetMapping(value = "")
-  public ExecWorkflowsResponse queryExecs(@RequestAttribute(value = "session.user") User operator,
-                                          @RequestParam(value = "startDate") long startDate,
-                                          @RequestParam(value = "endDate") long endDate,
-                                          @RequestParam(value = "projectName") String projectName,
-                                          @RequestParam(value = "workflowName", required = false) String workflowName,
-                                          @RequestParam(value = "status", required = false) String status,
-                                          @RequestParam(value = "from", required = false, defaultValue = "0") int from,
-                                          @RequestParam(value = "size", required = false, defaultValue = "100") int size,
-                                          HttpServletResponse response) {
+  public ExecWorkflowsDto queryExecs(@RequestAttribute(value = "session.user") User operator,
+                                     @RequestParam(value = "startDate") long startDate,
+                                     @RequestParam(value = "endDate") long endDate,
+                                     @RequestParam(value = "projectName") String projectName,
+                                     @RequestParam(value = "workflowName", required = false) String workflowName,
+                                     @RequestParam(value = "status", required = false) String status,
+                                     @RequestParam(value = "from", required = false, defaultValue = "0") int from,
+                                     @RequestParam(value = "size", required = false, defaultValue = "100") int size,
+                                     HttpServletResponse response) {
     logger.info("Operator user {}, query exec list, start date: {}, end date: {}, project name: {}, workflow name: {}, status: {}, from: {}, size: {}",
         operator.getName(), startDate, endDate, projectName, workflowName, status, from, size);
 
@@ -143,13 +141,13 @@ public class ExecController {
    * @return
    */
   @GetMapping(value = "/{execId}")
-  public ExecutionFlowResponse queryExecDetail(@RequestAttribute(value = "session.user") User operator,
-                                               @PathVariable(value = "execId") int execId,
-                                               HttpServletResponse response) {
+  public ExecutionFlowDto queryExecDetail(@RequestAttribute(value = "session.user") User operator,
+                                          @PathVariable(value = "execId") int execId,
+                                          HttpServletResponse response) {
     logger.info("Operator user {}, query exec detail, exec id: {}",
         operator.getName(), execId);
 
-    return execService.getExecWorkflow(operator,execId);
+    return new ExecutionFlowDto(execService.getExecWorkflow(operator,execId));
   }
 
   /**

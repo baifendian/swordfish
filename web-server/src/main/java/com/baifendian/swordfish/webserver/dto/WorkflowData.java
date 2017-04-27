@@ -18,7 +18,6 @@ package com.baifendian.swordfish.webserver.dto;
 import com.baifendian.swordfish.dao.mapper.utils.EqualUtils;
 import com.baifendian.swordfish.dao.model.FlowNode;
 import com.baifendian.swordfish.dao.model.flow.params.Property;
-import com.baifendian.swordfish.webserver.dto.response.WorkflowNodeDTO;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,7 +29,7 @@ public class WorkflowData {
   /**
    * 结点信息
    */
-  private List<WorkflowNodeDTO> nodes;
+  private List<WorkflowNodeDto> nodes;
 
   /**
    * 用户自定义参数
@@ -47,12 +46,12 @@ public class WorkflowData {
    * @param clazz
    */
   public WorkflowData(List<?> nodes, List<Property> userDefParams,Class<?> clazz) {
-    if (clazz == WorkflowNodeDTO.class){
-      this.nodes = (List<WorkflowNodeDTO>) nodes;
+    if (clazz == WorkflowNodeDto.class){
+      this.nodes = (List<WorkflowNodeDto>) nodes;
     }else if(clazz == FlowNode.class){
-      List<WorkflowNodeDTO> workflowNodeDTOList = new ArrayList<>();
+      List<WorkflowNodeDto> workflowNodeDTOList = new ArrayList<>();
       for (Object node:nodes){
-        workflowNodeDTOList.add(new WorkflowNodeDTO((FlowNode) node));
+        workflowNodeDTOList.add(new WorkflowNodeDto((FlowNode) node));
       }
       this.nodes = workflowNodeDTOList;
     }
@@ -63,8 +62,8 @@ public class WorkflowData {
    * @param nodes
    * @param userDefParams
    */
-  public WorkflowData(List<WorkflowNodeDTO> nodes, List<Property> userDefParams) {
-    this(nodes,userDefParams,WorkflowNodeDTO.class);
+  public WorkflowData(List<WorkflowNodeDto> nodes, List<Property> userDefParams) {
+    this(nodes,userDefParams,WorkflowNodeDto.class);
   }
 
   @Override
@@ -76,11 +75,11 @@ public class WorkflowData {
             EqualUtils.equalLists(userDefParams, that.userDefParams);
   }
 
-  public List<WorkflowNodeDTO> getNodes() {
+  public List<WorkflowNodeDto> getNodes() {
     return nodes;
   }
 
-  public void setNodes(List<WorkflowNodeDTO> nodes) {
+  public void setNodes(List<WorkflowNodeDto> nodes) {
     this.nodes = nodes;
   }
 

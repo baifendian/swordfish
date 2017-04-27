@@ -26,8 +26,8 @@ import com.baifendian.swordfish.dao.mapper.ResourceMapper;
 import com.baifendian.swordfish.dao.model.*;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
 import com.baifendian.swordfish.webserver.dto.WorkflowData;
-import com.baifendian.swordfish.webserver.dto.response.WorkflowNodeDTO;
-import com.baifendian.swordfish.webserver.dto.response.WorkflowResponse;
+import com.baifendian.swordfish.webserver.dto.WorkflowDto;
+import com.baifendian.swordfish.webserver.dto.WorkflowNodeDto;
 import com.baifendian.swordfish.webserver.exception.*;
 import com.baifendian.swordfish.webserver.service.storage.FileSystemStorageService;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -89,7 +89,7 @@ public class WorkflowService {
    * @param file        工作流定义文件
    * @return 已经创建的工作流实体
    */
-  public WorkflowResponse createWorkflow(User operator, String projectName, String name, String desc, String proxyUser, String queue, String data, MultipartFile file, String extras, Integer flag) {
+  public ProjectFlow createWorkflow(User operator, String projectName, String name, String desc, String proxyUser, String queue, String data, MultipartFile file, String extras, Integer flag) {
 
     // 查看是否对项目具备相应的权限
     Project project = projectMapper.queryByName(projectName);
@@ -113,7 +113,7 @@ public class WorkflowService {
     }
 
     // 检测工作流节点是否正常
-    List<WorkflowNodeDTO> flowNodes = workflowData.getNodes();
+    List<WorkflowNodeDto> flowNodes = workflowData.getNodes();
 
     if (CollectionUtils.isEmpty(flowNodes)) {
       logger.error("flow node information is empty");
@@ -127,7 +127,7 @@ public class WorkflowService {
     }
 
     // 检测工作流节点定义json是否正常
-    for (WorkflowNodeDTO flowNode : flowNodes) {
+    for (WorkflowNodeDto flowNode : flowNodes) {
       // TODO:: 这个检测不是很合理, 需要修改, 不太完备
       if (!flowNodeParamCheck(flowNode.getParameter(), flowNode.getType())) {
         logger.error("Flow node {} parameter invalid", flowNode.getName());
@@ -142,7 +142,7 @@ public class WorkflowService {
     // 组装新建数据流实体
     try {
       List<FlowNode> flowNodeList = new ArrayList<>();
-      for (WorkflowNodeDTO flowNode:flowNodes){
+      for (WorkflowNodeDto flowNode:flowNodes){
         flowNodeList.add(flowNode.convertFlowNode());
       }
       projectFlow.setExtras(extras);
@@ -174,7 +174,7 @@ public class WorkflowService {
       throw new ServerErrorException("Workflow create has error");
     }
 
-    return new WorkflowResponse(projectFlow);
+    return projectFlow;
   }
 
   /**
@@ -193,7 +193,7 @@ public class WorkflowService {
    * @param file
    * @return
    */
-  public WorkflowResponse putWorkflow(User operator, String projectName, String name, String desc, String proxyUser, String queue, String data, MultipartFile file, String extras) {
+  public ProjectFlow putWorkflow(User operator, String projectName, String name, String desc, String proxyUser, String queue, String data, MultipartFile file, String extras) {
     ProjectFlow projectFlow = flowDao.projectFlowFindByPorjectNameAndName(projectName, name);
 
     if (projectFlow == null) {
@@ -219,7 +219,7 @@ public class WorkflowService {
    * @param file
    * @return
    */
-  public WorkflowResponse patchWorkflow(User operator, String projectName, String name, String desc, String proxyUser, String queue, String data, MultipartFile file, String extras) {
+  public ProjectFlow patchWorkflow(User operator, String projectName, String name, String desc, String proxyUser, String queue, String data, MultipartFile file, String extras) {
 
     // 查询项目是否存在以及是否具备相应权限
     Project project = projectMapper.queryByName(projectName);
@@ -252,7 +252,7 @@ public class WorkflowService {
         projectFlow.setUserDefinedParamList(workflowData.getUserDefParams());
       }
 
-      List<WorkflowNodeDTO> workflowNodeDTOList = workflowData.getNodes();
+      List<WorkflowNodeDto> workflowNodeDTOList = workflowData.getNodes();
       if (CollectionUtils.isNotEmpty(workflowNodeDTOList)) {
         // 闭环检测
         if (graphHasCycle(workflowNodeDTOList)) {
@@ -261,7 +261,7 @@ public class WorkflowService {
         }
 
         // parameter 检测
-        for (WorkflowNodeDTO workflowNodeDTO : workflowNodeDTOList) {
+        for (WorkflowNodeDto workflowNodeDTO : workflowNodeDTOList) {
           // TODO::参数检测存在问题
           if (!flowNodeParamCheck(workflowNodeDTO.getParameter(), workflowNodeDTO.getType())) {
             throw new BadRequestException("workflow node data not valid");
@@ -270,7 +270,7 @@ public class WorkflowService {
 
         //拼装flowNode
         List<FlowNode> flowNodeList = new ArrayList<>();
-        for (WorkflowNodeDTO workflowNodeDTO:workflowNodeDTOList){
+        for (WorkflowNodeDto workflowNodeDTO:workflowNodeDTOList){
           try {
             flowNodeList.add(workflowNodeDTO.convertFlowNode());
           } catch (JsonProcessingException e) {
@@ -315,7 +315,7 @@ public class WorkflowService {
       throw new ServerErrorException("Workflow modify has error");
     }
 
-    return new WorkflowResponse(projectFlow);
+    return projectFlow;
   }
 
   /**
@@ -327,7 +327,7 @@ public class WorkflowService {
    * @param destWorkflowName
    * @return
    */
-  public WorkflowResponse postWorkflowCopy(User operator, String projectName, String srcWorkflowName, String destWorkflowName) {
+  public ProjectFlow postWorkflowCopy(User operator, String projectName, String srcWorkflowName, String destWorkflowName) {
     Project project = projectMapper.queryByName(projectName);
 
     if (project == null) {
@@ -429,7 +429,7 @@ public class WorkflowService {
    * @param projectName
    * @return
    */
-  public List<WorkflowResponse> queryAllProjectFlow(User operator, String projectName) {
+  public List<ProjectFlow> queryAllProjectFlow(User operator, String projectName) {
 
     Project project = projectMapper.queryByName(projectName);
 
@@ -441,12 +441,7 @@ public class WorkflowService {
       throw new PermissionException("project read or project owener", operator.getName());
     }
 
-    List<ProjectFlow> projectFlowList = flowDao.projectFlowFindByProject(project.getId());
-    List<WorkflowResponse> workflowResponseList = new ArrayList<>();
-    for (ProjectFlow projectFlow:projectFlowList){
-      workflowResponseList.add(new WorkflowResponse(projectFlow));
-    }
-    return workflowResponseList;
+    return flowDao.projectFlowFindByProject(project.getId());
   }
 
   /**
@@ -457,7 +452,7 @@ public class WorkflowService {
    * @param name
    * @return
    */
-  public WorkflowResponse queryProjectFlow(User operator, String projectName, String name) {
+  public ProjectFlow queryProjectFlow(User operator, String projectName, String name) {
 
     Project project = projectMapper.queryByName(projectName);
 
@@ -469,7 +464,7 @@ public class WorkflowService {
       throw new PermissionException("project read or project owner", operator.getName());
     }
 
-    return new WorkflowResponse(flowDao.projectFlowfindByName(project.getId(), name));
+    return flowDao.projectFlowfindByName(project.getId(), name);
   }
 
   /**
@@ -576,16 +571,16 @@ public class WorkflowService {
    * @param workflowNodeResponseList
    * @return
    */
-  private boolean graphHasCycle(List<WorkflowNodeDTO> workflowNodeResponseList) {
-    Graph<String, WorkflowNodeDTO, String> graph = new Graph<>();
+  private boolean graphHasCycle(List<WorkflowNodeDto> workflowNodeResponseList) {
+    Graph<String, WorkflowNodeDto, String> graph = new Graph<>();
 
     // 填充顶点
-    for (WorkflowNodeDTO workflowNodeResponse : workflowNodeResponseList) {
+    for (WorkflowNodeDto workflowNodeResponse : workflowNodeResponseList) {
       graph.addVertex(workflowNodeResponse.getName(), workflowNodeResponse);
     }
 
     // 填充边关系
-    for (WorkflowNodeDTO workflowNodeResponse : workflowNodeResponseList) {
+    for (WorkflowNodeDto workflowNodeResponse : workflowNodeResponseList) {
       if (CollectionUtils.isNotEmpty(workflowNodeResponse.getDep())) {
         for (String dep : workflowNodeResponse.getDep()) {
           graph.addEdge(dep, workflowNodeResponse.getName());

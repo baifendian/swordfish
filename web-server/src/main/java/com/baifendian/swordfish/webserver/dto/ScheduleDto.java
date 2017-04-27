@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.baifendian.swordfish.webserver.dto.response;
+package com.baifendian.swordfish.webserver.dto;
 
 import com.baifendian.swordfish.dao.enums.DepPolicyType;
 import com.baifendian.swordfish.dao.enums.FailurePolicyType;
@@ -27,7 +27,7 @@ import java.util.List;
 /**
  * 调度返回DTO
  */
-public class ScheduleResponse {
+public class ScheduleDto {
   private String projectName;
   private String workflowName;
   private String desc;
@@ -43,10 +43,10 @@ public class ScheduleResponse {
   private String owner;
   private ScheduleParam scheduleParam;
 
-  public ScheduleResponse() {
+  public ScheduleDto() {
   }
 
-  public ScheduleResponse(Schedule schedule) {
+  public ScheduleDto(Schedule schedule) {
     this.projectName = schedule.getProjectName();
     this.workflowName = schedule.getFlowName();
     this.desc = schedule.getDesc();

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.baifendian.swordfish.webserver.dto.response;
+package com.baifendian.swordfish.webserver.dto;
 
 import com.baifendian.swordfish.dao.model.FlowNode;
 import com.baifendian.swordfish.dao.utils.json.JsonObjectDeserializer;
@@ -27,7 +27,7 @@ import java.util.List;
 /**
  * 工作流节点返回
  */
-public class WorkflowNodeDTO {
+public class WorkflowNodeDto {
   private String name;
   private String desc;
   private String type;
@@ -39,14 +39,14 @@ public class WorkflowNodeDTO {
   @JsonDeserialize(using = JsonObjectDeserializer.class)
   private String extras;
 
-  public WorkflowNodeDTO() {
+  public WorkflowNodeDto() {
   }
 
   /**
    * 通过一个数据实体实例化DTO
    * @param flowNode
    */
-  public WorkflowNodeDTO(FlowNode flowNode) {
+  public WorkflowNodeDto(FlowNode flowNode) {
     this.name = flowNode.getName();
     this.desc = flowNode.getDesc();
     this.type = flowNode.getType();

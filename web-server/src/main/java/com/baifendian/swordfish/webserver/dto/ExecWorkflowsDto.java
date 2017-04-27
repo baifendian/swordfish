@@ -13,22 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.baifendian.swordfish.webserver.dto.response;
+package com.baifendian.swordfish.webserver.dto;
+
+import com.baifendian.swordfish.webserver.dto.ExecutionFlowDto;
 
 import java.util.List;
 
 /**
  * 工作流执行结果列表response.
  */
-public class ExecWorkflowsResponse {
+public class ExecWorkflowsDto {
   private int total;
   private int length;
-  private List<ExecutionFlowResponse> executions;
+  private List<ExecutionFlowDto> executions;
 
-  public ExecWorkflowsResponse() {
+  public ExecWorkflowsDto() {
   }
 
-  public ExecWorkflowsResponse(int total, int length, List<ExecutionFlowResponse> executions) {
+  public ExecWorkflowsDto(int total, int length, List<ExecutionFlowDto> executions) {
     this.total = total;
     this.length = length;
     this.executions = executions;
@@ -50,11 +52,11 @@ public class ExecWorkflowsResponse {
     this.length = length;
   }
 
-  public List<ExecutionFlowResponse> getExecutions() {
+  public List<ExecutionFlowDto> getExecutions() {
     return executions;
   }
 
-  public void setExecutions(List<ExecutionFlowResponse> executions) {
+  public void setExecutions(List<ExecutionFlowDto> executions) {
     this.executions = executions;
   }
 }

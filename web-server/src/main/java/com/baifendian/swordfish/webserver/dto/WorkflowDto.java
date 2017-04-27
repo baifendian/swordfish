@@ -13,12 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.baifendian.swordfish.webserver.dto.response;
+package com.baifendian.swordfish.webserver.dto;
 
 import com.baifendian.swordfish.dao.model.FlowNode;
 import com.baifendian.swordfish.dao.model.ProjectFlow;
 import com.baifendian.swordfish.dao.utils.json.JsonObjectDeserializer;
 import com.baifendian.swordfish.webserver.dto.WorkflowData;
+import com.baifendian.swordfish.webserver.dto.WorkflowNodeDto;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonRawValue;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
@@ -32,7 +33,7 @@ import java.util.List;
  * 工作流返回DTO
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class WorkflowResponse {
+public class WorkflowDto {
   private String name;
   private String desc;
   private WorkflowData data;
@@ -46,16 +47,16 @@ public class WorkflowResponse {
   private String extras;
   private String projectName;
 
-  public WorkflowResponse() {
+  public WorkflowDto() {
   }
 
-  public WorkflowResponse(ProjectFlow projectFlow) {
+  public WorkflowDto(ProjectFlow projectFlow) {
     this.name = projectFlow.getName();
     this.desc = projectFlow.getDesc();
     if (CollectionUtils.isNotEmpty(projectFlow.getFlowsNodes())){
-      List<WorkflowNodeDTO> workflowNodeResponseList = new ArrayList<>();
+      List<WorkflowNodeDto> workflowNodeResponseList = new ArrayList<>();
       for (FlowNode flowNode:projectFlow.getFlowsNodes()){
-        workflowNodeResponseList.add(new WorkflowNodeDTO(flowNode));
+        workflowNodeResponseList.add(new WorkflowNodeDto(flowNode));
       }
       this.data = new WorkflowData(workflowNodeResponseList,projectFlow.getUserDefinedParamList());
     }

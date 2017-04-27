@@ -21,6 +21,7 @@ import com.baifendian.swordfish.dao.mapper.ProjectMapper;
 import com.baifendian.swordfish.dao.mapper.UserMapper;
 import com.baifendian.swordfish.dao.model.Project;
 import com.baifendian.swordfish.dao.model.User;
+import com.baifendian.swordfish.webserver.dto.UserDto;
 import com.baifendian.swordfish.webserver.exception.NotFoundException;
 import com.baifendian.swordfish.webserver.exception.NotModifiedException;
 import com.baifendian.swordfish.webserver.exception.ParameterException;
@@ -62,12 +63,12 @@ public class UserService {
    * @return
    */
   public User createUser(User operator,
-                         String name,
-                         String email,
-                         String desc,
-                         String password,
-                         String phone,
-                         String proxyUsers) {
+                            String name,
+                            String email,
+                            String desc,
+                            String password,
+                            String phone,
+                            String proxyUsers) {
     // 如果不是管理员, 返回错误
     if (operator.getRole() != UserRoleType.ADMIN_USER) {
       throw new PermissionException("admin",operator.getName());
@@ -220,13 +221,13 @@ public class UserService {
    */
   public List<User> queryUser(User operator,
                               boolean allUser) {
-    List<User> users = new ArrayList<>();
+    List<User> userList = new ArrayList<>();
 
     // 只查询自己
     if ((operator.getRole() != UserRoleType.ADMIN_USER) || !allUser) {
-      users.add(operator);
+      userList.add(operator);
 
-      return users;
+      return userList;
     }
 
     return userMapper.queryAllUsers();

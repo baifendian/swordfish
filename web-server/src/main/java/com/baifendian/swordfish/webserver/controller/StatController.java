@@ -18,7 +18,7 @@ package com.baifendian.swordfish.webserver.controller;
 import com.baifendian.swordfish.dao.model.ExecutionFlow;
 import com.baifendian.swordfish.dao.model.ExecutionFlowError;
 import com.baifendian.swordfish.dao.model.User;
-import com.baifendian.swordfish.webserver.dto.response.StatResponse;
+import com.baifendian.swordfish.webserver.dto.StatDto;
 import com.baifendian.swordfish.webserver.service.StatService;
 import org.apache.commons.httpclient.HttpStatus;
 import org.slf4j.Logger;
@@ -50,11 +50,11 @@ public class StatController {
    * @return
    */
   @GetMapping(value = "/states")
-  public List<StatResponse> queryStates(@RequestAttribute(value = "session.user") User operator,
-                                        @RequestParam(value = "projectName") String projectName,
-                                        @RequestParam(value = "startTime") long startTime,
-                                        @RequestParam(value = "endTime") long endTime,
-                                        HttpServletResponse response) {
+  public List<StatDto> queryStates(@RequestAttribute(value = "session.user") User operator,
+                                   @RequestParam(value = "projectName") String projectName,
+                                   @RequestParam(value = "startTime") long startTime,
+                                   @RequestParam(value = "endTime") long endTime,
+                                   HttpServletResponse response) {
     logger.info("Operator user {}, get states, project name: {}, start time: {}, end time: {}",
         operator.getName(), projectName, startTime, endTime);
 
@@ -75,10 +75,10 @@ public class StatController {
    * @return
    */
   @GetMapping(value = "/states-hour")
-  public List<StatResponse> queryStatesHour(@RequestAttribute(value = "session.user") User operator,
-                                            @RequestParam(value = "projectName") String projectName,
-                                            @RequestParam(value = "date") long date,
-                                            HttpServletResponse response){
+  public List<StatDto> queryStatesHour(@RequestAttribute(value = "session.user") User operator,
+                                       @RequestParam(value = "projectName") String projectName,
+                                       @RequestParam(value = "date") long date,
+                                       HttpServletResponse response){
     logger.info("Operator user {}, get states, project name: {}, date: {}",
             operator.getName(), projectName, date);
 

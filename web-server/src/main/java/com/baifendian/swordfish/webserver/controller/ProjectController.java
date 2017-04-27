@@ -18,6 +18,8 @@ package com.baifendian.swordfish.webserver.controller;
 import com.baifendian.swordfish.dao.model.Project;
 import com.baifendian.swordfish.dao.model.ProjectUser;
 import com.baifendian.swordfish.dao.model.User;
+import com.baifendian.swordfish.webserver.dto.ProjectDto;
+import com.baifendian.swordfish.webserver.dto.ProjectUserDto;
 import com.baifendian.swordfish.webserver.service.ProjectService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,6 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -48,13 +51,13 @@ public class ProjectController {
    * @return
    */
   @PostMapping(value = "/{name}")
-  public Project createProject(@RequestAttribute(value = "session.user") User operator,
-                               @PathVariable("name") String name,
-                               @RequestParam(value = "desc", required = false) String desc,
-                               HttpServletResponse response) {
+  public ProjectDto createProject(@RequestAttribute(value = "session.user") User operator,
+                                  @PathVariable("name") String name,
+                                  @RequestParam(value = "desc", required = false) String desc,
+                                  HttpServletResponse response) {
     logger.info("Operator user {}, create project, name: {}, desc: {}", operator.getName(), name, desc);
 
-    return projectService.createProject(operator, name, desc);
+    return new ProjectDto(projectService.createProject(operator, name, desc));
   }
 
   /**
@@ -66,13 +69,13 @@ public class ProjectController {
    * @return
    */
   @PatchMapping(value = "/{name}")
-  public Project modifyProject(@RequestAttribute(value = "session.user") User operator,
+  public ProjectDto modifyProject(@RequestAttribute(value = "session.user") User operator,
                                @PathVariable("name") String name,
                                @RequestParam(value = "desc", required = false) String desc,
                                HttpServletResponse response) {
     logger.info("Operator user {}, modify project, name: {}, desc: {}", operator.getName(), name, desc);
 
-    return projectService.modifyProject(operator, name, desc);
+    return new ProjectDto(projectService.modifyProject(operator, name, desc));
   }
 
   /**
@@ -98,11 +101,16 @@ public class ProjectController {
    * @return
    */
   @GetMapping(value = "")
-  public List<Project> queryProjects(@RequestAttribute(value = "session.user") User operator,
+  public List<ProjectDto> queryProjects(@RequestAttribute(value = "session.user") User operator,
                                      HttpServletResponse response) {
     logger.info("Operator user {}, get project list", operator.getName());
 
-    return projectService.queryProject(operator);
+    List<Project> projectList = projectService.queryProject(operator);
+    List<ProjectDto> projectDtoList = new ArrayList<>();
+    for(Project project:projectList){
+      projectDtoList.add(new ProjectDto(project));
+    }
+    return projectDtoList;
   }
 
   /**
@@ -116,14 +124,14 @@ public class ProjectController {
    * @return
    */
   @PostMapping(value = "/{name}/users/{userName}")
-  public ProjectUser addProjectUser(@RequestAttribute(value = "session.user") User operator,
-                                    @PathVariable("name") String name,
-                                    @PathVariable("userName") String userName,
-                                    @RequestParam(value = "perm") int perm,
-                                    HttpServletResponse response) {
+  public ProjectUserDto addProjectUser(@RequestAttribute(value = "session.user") User operator,
+                                       @PathVariable("name") String name,
+                                       @PathVariable("userName") String userName,
+                                       @RequestParam(value = "perm") int perm,
+                                       HttpServletResponse response) {
     logger.info("Operator user {}, add user to project, project name: {}, user name: {}, perm: {}", operator.getName(), name, userName, perm);
 
-    return projectService.addProjectUser(operator, name, userName, perm);
+    return new ProjectUserDto(projectService.addProjectUser(operator, name, userName, perm));
   }
 
   /**
@@ -137,14 +145,14 @@ public class ProjectController {
    * @return
    */
   @PutMapping(value = "/{name}/users/{userName}")
-  public ProjectUser modifyProjectUser(@RequestAttribute(value = "session.user") User operator,
+  public ProjectUserDto modifyProjectUser(@RequestAttribute(value = "session.user") User operator,
                                     @PathVariable("name") String name,
                                     @PathVariable("userName") String userName,
                                     @RequestParam(value = "perm") int perm,
                                     HttpServletResponse response) {
     logger.info("Operator user {}, modify user permission in the project, project name: {}, user name: {}, perm: {}", operator.getName(), name, userName, perm);
 
-    return projectService.modifyProjectUser(operator, name, userName, perm);
+    return new ProjectUserDto(projectService.modifyProjectUser(operator, name, userName, perm));
   }
   /**
    * 项目删除一个用户
@@ -173,11 +181,16 @@ public class ProjectController {
    * @return
    */
   @GetMapping(value = "/{name}/users")
-  public List<ProjectUser> queryUser(@RequestAttribute(value = "session.user") User operator,
+  public List<ProjectUserDto> queryUser(@RequestAttribute(value = "session.user") User operator,
                                      @PathVariable("name") String name,
                                      HttpServletResponse response) {
     logger.info("Operator user {}, query users of project, project name: {}", operator.getName(), name);
 
-    return projectService.queryUser(operator, name);
+    List<ProjectUser> projectUserList = projectService.queryUser(operator, name);
+    List<ProjectUserDto> projectUserDtoList = new ArrayList<>();
+    for (ProjectUser projectUser:projectUserList){
+      projectUserDtoList.add(new ProjectUserDto(projectUser));
+    }
+    return projectUserDtoList;
   }
 }

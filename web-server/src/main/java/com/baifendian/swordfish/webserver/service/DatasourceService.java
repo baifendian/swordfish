@@ -22,7 +22,7 @@ import com.baifendian.swordfish.dao.mapper.ProjectMapper;
 import com.baifendian.swordfish.dao.model.DataSource;
 import com.baifendian.swordfish.dao.model.Project;
 import com.baifendian.swordfish.dao.model.User;
-import com.baifendian.swordfish.webserver.dto.response.BaseResponse;
+import com.baifendian.swordfish.webserver.dto.BaseResponse;
 import com.baifendian.swordfish.webserver.exception.NotFoundException;
 import com.baifendian.swordfish.webserver.exception.NotModifiedException;
 import com.baifendian.swordfish.webserver.exception.PermissionException;

@@ -29,14 +29,13 @@ import com.baifendian.swordfish.rpc.ScheduleInfo;
 import com.baifendian.swordfish.rpc.client.MasterClient;
 import com.baifendian.swordfish.webserver.dto.ExecutorId;
 import com.baifendian.swordfish.webserver.dto.ExecutorIds;
-import com.baifendian.swordfish.webserver.dto.response.ExecWorkflowsResponse;
+import com.baifendian.swordfish.webserver.dto.ExecWorkflowsDto;
 import com.baifendian.swordfish.webserver.dto.LogResult;
-import com.baifendian.swordfish.webserver.dto.response.ExecutionFlowResponse;
-import com.baifendian.swordfish.webserver.dto.response.ExecutionNodeResponse;
-import com.baifendian.swordfish.webserver.dto.response.WorkflowResponse;
+import com.baifendian.swordfish.webserver.dto.ExecutionFlowDto;
+import com.baifendian.swordfish.webserver.dto.ExecutionNodeDto;
+import com.baifendian.swordfish.webserver.dto.WorkflowDto;
 import com.baifendian.swordfish.webserver.exception.*;
 import org.apache.commons.lang3.StringUtils;
-import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -176,7 +175,7 @@ public class ExecService {
    */
   public ExecutorId postExecWorkflowDirect(User operator, String projectName, String workflowName, String desc, String proxyUser, String queue, String data, MultipartFile file, NotifyType notifyType, String notifyMails, int timeout, String extras){
     logger.info("step1. create temp workflow");
-    WorkflowResponse projectFlow = workflowService.createWorkflow(operator, projectName, workflowName, desc, proxyUser, queue, data, file, extras, 1);
+    ProjectFlow projectFlow = workflowService.createWorkflow(operator, projectName, workflowName, desc, proxyUser, queue, data, file, extras, 1);
     if (projectFlow == null){
       throw new ServerErrorException("project workflow create return is null");
     }
@@ -193,7 +192,7 @@ public class ExecService {
    *
    * @return
    */
-  public ExecWorkflowsResponse getExecWorkflow(User operator, String projectName, String workflowName, Date startDate, Date endDate, String status, int from, int size) {
+  public ExecWorkflowsDto getExecWorkflow(User operator, String projectName, String workflowName, Date startDate, Date endDate, String status, int from, int size) {
 
     List<String> workflowList;
 
@@ -230,13 +229,13 @@ public class ExecService {
     }
 
     List<ExecutionFlow> executionFlowList = executionFlowMapper.selectByFlowIdAndTimesAndStatusLimit(projectName,workflowList, startDate, endDate, from, size, flowStatusList);
-    List<ExecutionFlowResponse> executionFlowResponseList = new ArrayList<>();
+    List<ExecutionFlowDto> executionFlowResponseList = new ArrayList<>();
     for (ExecutionFlow executionFlow:executionFlowList){
-      executionFlowResponseList.add(new ExecutionFlowResponse(executionFlow));
+      executionFlowResponseList.add(new ExecutionFlowDto(executionFlow));
     }
 
     int total = executionFlowMapper.sumByFlowIdAndTimesAndStatus(projectName,workflowList, startDate, endDate,  flowStatusList);
-    return new ExecWorkflowsResponse(total,size,executionFlowResponseList);
+    return new ExecWorkflowsDto(total,size,executionFlowResponseList);
   }
 
   /**
@@ -246,7 +245,7 @@ public class ExecService {
    * @param execId
    * @return
    */
-  public ExecutionFlowResponse getExecWorkflow(User operator, int execId) {
+  public ExecutionFlow getExecWorkflow(User operator, int execId) {
 
     ExecutionFlow executionFlow = executionFlowMapper.selectByExecId(execId);
 
@@ -268,10 +267,10 @@ public class ExecService {
       throw new PermissionException("project exec or project owner",operator.getName());
     }
 
-    ExecutionFlowResponse executionFlowResponse = new ExecutionFlowResponse(executionFlow);
+    ExecutionFlowDto executionFlowResponse = new ExecutionFlowDto(executionFlow);
     List<ExecutionNode> executionNodeList = executionNodeMapper.selectExecNodeById(execId);
 
-    for (ExecutionNodeResponse executionNodeResponse:executionFlowResponse.getData().getNodes()){
+    for (ExecutionNodeDto executionNodeResponse:executionFlowResponse.getData().getNodes()){
       for (ExecutionNode executionNode:executionNodeList){
         if (StringUtils.equals(executionNodeResponse.getName(),executionNode.getName())){
           executionNodeResponse.mergeExecutionNode(executionNode);
@@ -279,7 +278,7 @@ public class ExecService {
       }
     }
 
-    return new ExecutionFlowResponse(executionFlow);
+    return executionFlow;
   }
 
   /**

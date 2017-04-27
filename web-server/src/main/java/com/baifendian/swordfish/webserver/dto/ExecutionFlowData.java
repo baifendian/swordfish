@@ -16,7 +16,6 @@
 package com.baifendian.swordfish.webserver.dto;
 
 import com.baifendian.swordfish.dao.model.flow.params.Property;
-import com.baifendian.swordfish.webserver.dto.response.ExecutionNodeResponse;
 
 import java.util.List;
 
@@ -24,23 +23,23 @@ import java.util.List;
  * 执行flow node节点信息DTO
  */
 public class ExecutionFlowData {
-  private List<ExecutionNodeResponse> nodes;
+  private List<ExecutionNodeDto> nodes;
 
   private List<Property> userDefParams;
 
   public ExecutionFlowData() {
   }
 
-  public ExecutionFlowData(List<ExecutionNodeResponse> nodes, List<Property> userDefParams) {
+  public ExecutionFlowData(List<ExecutionNodeDto> nodes, List<Property> userDefParams) {
     this.nodes = nodes;
     this.userDefParams = userDefParams;
   }
 
-  public List<ExecutionNodeResponse> getNodes() {
+  public List<ExecutionNodeDto> getNodes() {
     return nodes;
   }
 
-  public void setNodes(List<ExecutionNodeResponse> nodes) {
+  public void setNodes(List<ExecutionNodeDto> nodes) {
     this.nodes = nodes;
   }
 

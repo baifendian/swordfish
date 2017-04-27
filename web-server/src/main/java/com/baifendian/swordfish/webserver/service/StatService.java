@@ -18,7 +18,7 @@ package com.baifendian.swordfish.webserver.service;
 import com.baifendian.swordfish.dao.mapper.ExecutionFlowMapper;
 import com.baifendian.swordfish.dao.mapper.ProjectMapper;
 import com.baifendian.swordfish.dao.model.*;
-import com.baifendian.swordfish.webserver.dto.response.StatResponse;
+import com.baifendian.swordfish.webserver.dto.StatDto;
 import com.baifendian.swordfish.webserver.exception.NotFoundException;
 import com.baifendian.swordfish.webserver.exception.ParameterException;
 import com.baifendian.swordfish.webserver.exception.PermissionException;
@@ -53,7 +53,7 @@ public class StatService {
    * @param startTime
    * @param endTime
    */
-  public List<StatResponse> queryStates(User operator, String projectName, long startTime, long endTime) {
+  public List<StatDto> queryStates(User operator, String projectName, long startTime, long endTime) {
 
     long timeInt = (endTime - startTime)/86400000;
     if (timeInt > 30){
@@ -79,10 +79,10 @@ public class StatService {
 
     List<ExecutionState> executionStateList = executionFlowMapper.selectStateByProject(project.getId(),startDate,endDate);
 
-    List<StatResponse> statResponseList = new ArrayList<>();
+    List<StatDto> statResponseList = new ArrayList<>();
 
     for (ExecutionState executionState:executionStateList){
-      statResponseList.add(new StatResponse(executionState));
+      statResponseList.add(new StatDto(executionState));
     }
 
     return statResponseList;
@@ -95,7 +95,7 @@ public class StatService {
    * @param day
    * @return
    */
-  public List<StatResponse> queryStatesHour(User operator, String projectName, long day){
+  public List<StatDto> queryStatesHour(User operator, String projectName, long day){
     Date date = new Date(day);
     // 查看是否对项目具备相应的权限
     Project project = projectMapper.queryByName(projectName);
@@ -112,10 +112,10 @@ public class StatService {
 
     List<ExecutionState> executionStateList = executionFlowMapper.selectStateHourByProject(project.getId(),date);
 
-    List<StatResponse> statResponseList = new ArrayList<>();
+    List<StatDto> statResponseList = new ArrayList<>();
 
     for (ExecutionState executionState:executionStateList){
-      statResponseList.add(new StatResponse(executionState));
+      statResponseList.add(new StatDto(executionState));
     }
 
     return statResponseList;
