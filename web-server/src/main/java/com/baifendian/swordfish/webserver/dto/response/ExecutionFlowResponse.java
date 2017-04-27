@@ -18,10 +18,12 @@ package com.baifendian.swordfish.webserver.dto.response;
 import com.baifendian.swordfish.dao.enums.ExecType;
 import com.baifendian.swordfish.dao.enums.FlowStatus;
 import com.baifendian.swordfish.dao.model.ExecutionFlow;
+import com.baifendian.swordfish.dao.utils.json.JsonObjectDeserializer;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
 import com.baifendian.swordfish.webserver.dto.ExecutionFlowData;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonRawValue;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import org.apache.commons.lang.StringUtils;
 
 import java.util.Date;
@@ -45,6 +47,7 @@ public class ExecutionFlowResponse {
   private FlowStatus status;
   private String owner;
   @JsonRawValue
+  @JsonDeserialize(using = JsonObjectDeserializer.class)
   private String extras;
   private ExecutionFlowData data;
 

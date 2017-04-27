@@ -17,9 +17,11 @@ package com.baifendian.swordfish.webserver.dto.response;
 
 import com.baifendian.swordfish.dao.model.FlowNode;
 import com.baifendian.swordfish.dao.model.ProjectFlow;
+import com.baifendian.swordfish.dao.utils.json.JsonObjectDeserializer;
 import com.baifendian.swordfish.webserver.dto.WorkflowData;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonRawValue;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import org.apache.commons.collections.CollectionUtils;
 
 import java.util.ArrayList;
@@ -40,6 +42,7 @@ public class WorkflowResponse {
   private Date modifyTime;
   private String owner;
   @JsonRawValue
+  @JsonDeserialize(using = JsonObjectDeserializer.class)
   private String extras;
   private String projectName;
 

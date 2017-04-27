@@ -17,7 +17,9 @@ package com.baifendian.swordfish.webserver.dto.response;
 
 import com.baifendian.swordfish.dao.enums.FlowStatus;
 import com.baifendian.swordfish.dao.model.ExecutionNode;
+import com.baifendian.swordfish.dao.utils.json.JsonObjectDeserializer;
 import com.fasterxml.jackson.annotation.JsonRawValue;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 import java.util.Date;
 import java.util.List;
@@ -38,6 +40,7 @@ public class ExecutionNodeResponse {
   private String jobId;
   private List<String> dep;
   @JsonRawValue
+  @JsonDeserialize(using = JsonObjectDeserializer.class)
   private String extras;
 
   public ExecutionNodeResponse() {

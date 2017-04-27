@@ -37,6 +37,9 @@ public class WorkflowData {
    */
   private List<Property> userDefParams;
 
+  public WorkflowData() {
+  }
+
   /**
    * 支持通过数据库flowNode实体 或 DTO workflowNodeDTO 的方式构建
    * @param nodes

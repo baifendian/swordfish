@@ -16,8 +16,11 @@
 package com.baifendian.swordfish.webserver.dto.response;
 
 import com.baifendian.swordfish.dao.model.FlowNode;
+import com.baifendian.swordfish.dao.utils.json.JsonObjectDeserializer;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonRawValue;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 import java.util.List;
 
@@ -29,9 +32,11 @@ public class WorkflowNodeDTO {
   private String desc;
   private String type;
   @JsonRawValue
+  @JsonDeserialize(using = JsonObjectDeserializer.class)
   private String parameter;
   private List<String> dep;
   @JsonRawValue
+  @JsonDeserialize(using = JsonObjectDeserializer.class)
   private String extras;
 
   public WorkflowNodeDTO() {
