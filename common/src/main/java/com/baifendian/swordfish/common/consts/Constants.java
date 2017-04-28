@@ -76,4 +76,34 @@ public class Constants {
    */
   public static final int PROJECT_USER_PERM_ALL = PROJECT_USER_PERM_WRITE | PROJECT_USER_PERM_READ | PROJECT_USER_PERM_EXEC;
 
+  /**
+   * 校验项目名称的正则表达式
+   */
+  public static final String PROJECT_NAME_REGEX = "^\\d[\\w\\d_]{2,64}$";
+
+  /**
+   * 校验用户名称的正则表达式
+   */
+  public static final String USER_NAME_REGEX = "^\\d[\\w\\d_]{6,64}$";
+
+  /**
+   * 邮箱的正则表达式
+   */
+  public static final String EMAIL_REGEX = "[\\w\\.-]+@[\\w-]+(\\.[\\w-]+)+";
+
+  /**
+   * 资源名称的正则表达式
+   */
+  public static final String RESOURCE_NAME_REGEX = "^\\d[\\w\\d._-]{2,64}$";
+
+  /**
+   * 工作流的正则表达式
+   */
+  public static final String WORKFLOW_NAME_REGEX = "^\\d[\\w\\d_]{2,64}$";
+
+  /**
+   * 数据源名称的正则表达式
+   */
+  public static final String DATASOURCE_NAME_REGEX = "^\\d[\\w\\d_]{2,64}$";
+
 }

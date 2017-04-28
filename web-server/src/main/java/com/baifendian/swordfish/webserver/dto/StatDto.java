@@ -60,12 +60,14 @@ public class StatDto {
   }
 
   public StatDto(ExecutionState executionState) {
-    this.hour = executionState.getHour();
-    this.date = executionState.getDay();
-    this.info.setWait(executionState.getInit()+executionState.getWaitingDep()+executionState.getWaitingRes());
-    this.info.setFailed(executionState.getFailed()+executionState.getDepFailed());
-    this.info.setSuccess(executionState.getSuccess());
-    this.info.setRunning(executionState.getRunning());
+    if (executionState != null){
+      this.hour = executionState.getHour();
+      this.date = executionState.getDay();
+      this.info.setWait(executionState.getInit()+executionState.getWaitingDep()+executionState.getWaitingRes());
+      this.info.setFailed(executionState.getFailed()+executionState.getDepFailed());
+      this.info.setSuccess(executionState.getSuccess());
+      this.info.setRunning(executionState.getRunning());
+    }
   }
 
   public static class Info {

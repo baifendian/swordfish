@@ -51,16 +51,18 @@ public class ExecutionNodeDto {
    * @param executionNode
    */
   public void mergeExecutionNode(ExecutionNode executionNode) {
-    this.startTime = executionNode.getStartTime();
-    this.endTime = executionNode.getEndTime();
-    if (this.startTime != null && this.endTime != null) {
-      this.duration = Math.toIntExact((this.endTime.getTime() - this.startTime.getTime()) / 1000);
+    if (executionNode !=null ){
+      this.startTime = executionNode.getStartTime();
+      this.endTime = executionNode.getEndTime();
+      if (this.startTime != null && this.endTime != null) {
+        this.duration = Math.toIntExact((this.endTime.getTime() - this.startTime.getTime()) / 1000);
+      }
+      this.status = executionNode.getStatus();
+      this.logLinks = executionNode.getLogLinkList();
+      this.jobId = executionNode.getJobId();
+      this.dep = executionNode.getDepList();
+      this.extras = executionNode.getExtras();
     }
-    this.status = executionNode.getStatus();
-    this.logLinks = executionNode.getLogLinkList();
-    this.jobId = executionNode.getJobId();
-    this.dep = executionNode.getDepList();
-    this.extras = executionNode.getExtras();
   }
 
   public String getName() {

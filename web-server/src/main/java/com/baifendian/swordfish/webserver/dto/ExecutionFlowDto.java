@@ -56,26 +56,27 @@ public class ExecutionFlowDto {
   }
 
   public ExecutionFlowDto(ExecutionFlow executionFlow) {
-    this.execId = executionFlow.getId();
-    this.projectName = executionFlow.getProjectName();
-    this.workflowName = executionFlow.getWorkflowName();
-    this.execType = executionFlow.getExecType();
-    this.submitTime = executionFlow.getSubmitTime();
-    this.startTime = executionFlow.getStartTime();
-    this.endTime = executionFlow.getEndTime();
-    if (this.startTime != null && this.endTime != null) {
-      this.duration = Math.toIntExact((this.endTime.getTime() - this.startTime.getTime()) / 1000);
+    if (executionFlow != null){
+      this.execId = executionFlow.getId();
+      this.projectName = executionFlow.getProjectName();
+      this.workflowName = executionFlow.getWorkflowName();
+      this.execType = executionFlow.getExecType();
+      this.submitTime = executionFlow.getSubmitTime();
+      this.startTime = executionFlow.getStartTime();
+      this.endTime = executionFlow.getEndTime();
+      if (this.startTime != null && this.endTime != null) {
+        this.duration = Math.toIntExact((this.endTime.getTime() - this.startTime.getTime()) / 1000);
+      }
+      this.submitUser = executionFlow.getSubmitUser();
+      this.proxyUser = executionFlow.getProxyUser();
+      this.queue = executionFlow.getQueue();
+      this.status = executionFlow.getStatus();
+      this.owner = executionFlow.getOwner();
+      this.extras = executionFlow.getExtras();
+      if (StringUtils.isNotEmpty(executionFlow.getWorkflowData())){
+        this.data = JsonUtil.parseObject(executionFlow.getWorkflowData(),ExecutionFlowData.class);
+      }
     }
-    this.submitUser = executionFlow.getSubmitUser();
-    this.proxyUser = executionFlow.getProxyUser();
-    this.queue = executionFlow.getQueue();
-    this.status = executionFlow.getStatus();
-    this.owner = executionFlow.getOwner();
-    this.extras = executionFlow.getExtras();
-    if (StringUtils.isNotEmpty(executionFlow.getWorkflowData())){
-      this.data = JsonUtil.parseObject(executionFlow.getWorkflowData(),ExecutionFlowData.class);
-    }
-
   }
 
   public int getExecId() {

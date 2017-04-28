@@ -37,14 +37,17 @@ public class ResourceDto {
   }
 
   public ResourceDto(Resource resource) {
-    this.name = resource.getName();
-    this.desc = resource.getDesc();
-    this.createTime = resource.getCreateTime();
-    this.modifyTime = resource.getModifyTime();
-    this.projectName = resource.getProjectName();
-    this.owner = resource.getOwner();
-    this.suffix = CommonUtil.fileSuffix(resource.getOriginFilename());
-    this.originFilename = resource.getOriginFilename();
+    if (resource != null){
+      this.name = resource.getName();
+      this.desc = resource.getDesc();
+      this.createTime = resource.getCreateTime();
+      this.modifyTime = resource.getModifyTime();
+      this.projectName = resource.getProjectName();
+      this.owner = resource.getOwner();
+      this.suffix = CommonUtil.fileSuffix(resource.getOriginFilename());
+      this.originFilename = resource.getOriginFilename();
+    }
+
   }
 
   public String getName() {

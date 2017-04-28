@@ -37,14 +37,16 @@ public class DatasourceDto {
   }
 
   public DatasourceDto(DataSource dataSource) {
-    this.name = dataSource.getName();
-    this.type = dataSource.getType();
-    this.desc = dataSource.getDesc();
-    this.parameter = dataSource.getParameter();
-    this.createTime = dataSource.getCreateTime();
-    this.modifyTime = dataSource.getModifyTime();
-    this.projectName = dataSource.getProjectName();
-    this.owner = dataSource.getOwnerName();
+    if (dataSource != null){
+      this.name = dataSource.getName();
+      this.type = dataSource.getType();
+      this.desc = dataSource.getDesc();
+      this.parameter = dataSource.getParameter();
+      this.createTime = dataSource.getCreateTime();
+      this.modifyTime = dataSource.getModifyTime();
+      this.projectName = dataSource.getProjectName();
+      this.owner = dataSource.getOwnerName();
+    }
   }
 
   public String getName() {

@@ -33,11 +33,13 @@ public class ProjectDto {
   }
 
   public ProjectDto(Project project) {
-    this.name = project.getName();
-    this.desc = project.getDesc();
-    this.createTime = project.getCreateTime();
-    this.modifyTime = project.getModifyTime();
-    this.owner = project.getOwner();
+    if(project != null){
+      this.name = project.getName();
+      this.desc = project.getDesc();
+      this.createTime = project.getCreateTime();
+      this.modifyTime = project.getModifyTime();
+      this.owner = project.getOwner();
+    }
   }
 
   public String getName() {

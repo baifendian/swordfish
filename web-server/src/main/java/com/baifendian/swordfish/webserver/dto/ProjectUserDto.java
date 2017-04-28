@@ -33,11 +33,13 @@ public class ProjectUserDto {
   }
 
   public ProjectUserDto(ProjectUser projectUser) {
-    this.projectName = projectUser.getProjectName();
-    this.userName = projectUser.getUserName();
-    this.perm = projectUser.getPerm();
-    this.createTime = projectUser.getCreateTime();
-    this.modifyTime = projectUser.getModifyTime();
+    if(projectUser != null){
+      this.projectName = projectUser.getProjectName();
+      this.userName = projectUser.getUserName();
+      this.perm = projectUser.getPerm();
+      this.createTime = projectUser.getCreateTime();
+      this.modifyTime = projectUser.getModifyTime();
+    }
   }
 
   public String getProjectName() {

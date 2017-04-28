@@ -36,13 +36,15 @@ public class UserDto {
   }
 
   public UserDto(User user){
-    this.name = user.getName();
-    this.email = user.getEmail();
-    this.desc = user.getDesc();
-    this.phone = user.getPhone();
-    this.proxyUsers = user.getProxyUserList();
-    this.createTime = user.getCreateTime();
-    this.modifyTime = user.getModifyTime();
+    if (user != null){
+      this.name = user.getName();
+      this.email = user.getEmail();
+      this.desc = user.getDesc();
+      this.phone = user.getPhone();
+      this.proxyUsers = user.getProxyUserList();
+      this.createTime = user.getCreateTime();
+      this.modifyTime = user.getModifyTime();
+    }
   }
 
   public String getName() {

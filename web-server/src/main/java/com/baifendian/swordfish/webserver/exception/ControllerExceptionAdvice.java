@@ -38,7 +38,7 @@ public class ControllerExceptionAdvice extends ResponseEntityExceptionHandler {
   @ResponseBody
   ResponseEntity<?> handleControllerException(HttpServletRequest request, Throwable ex) {
     HttpStatus status = getStatus(request);
-
+    logger.error("controller catch some error",ex);
     return new ResponseEntity<Object>(new CustomErrorType(status, ex.getMessage()), status);
   }
 

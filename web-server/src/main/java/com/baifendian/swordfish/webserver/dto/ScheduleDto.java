@@ -47,20 +47,22 @@ public class ScheduleDto {
   }
 
   public ScheduleDto(Schedule schedule) {
-    this.projectName = schedule.getProjectName();
-    this.workflowName = schedule.getFlowName();
-    this.desc = schedule.getDesc();
-    this.notifyType = schedule.getNotifyType();
-    this.notifyMails = schedule.getNotifyMails();
-    this.maxTryTimes = schedule.getMaxTryTimes();
-    this.failurePolicyType = schedule.getFailurePolicy();
-    this.depWorkflows = schedule.getDepWorkflows();
-    this.depPolicyType = schedule.getDepPolicy();
-    this.timeout = schedule.getTimeout();
-    this.createTime = schedule.getCreateTime();
-    this.modifyTime = schedule.getModifyTime();
-    this.owner = schedule.getOwner();
-    this.scheduleParam = new ScheduleParam(schedule.getStartDate(), schedule.getEndDate(), schedule.getCrontab());
+    if (schedule != null){
+      this.projectName = schedule.getProjectName();
+      this.workflowName = schedule.getFlowName();
+      this.desc = schedule.getDesc();
+      this.notifyType = schedule.getNotifyType();
+      this.notifyMails = schedule.getNotifyMails();
+      this.maxTryTimes = schedule.getMaxTryTimes();
+      this.failurePolicyType = schedule.getFailurePolicy();
+      this.depWorkflows = schedule.getDepWorkflows();
+      this.depPolicyType = schedule.getDepPolicy();
+      this.timeout = schedule.getTimeout();
+      this.createTime = schedule.getCreateTime();
+      this.modifyTime = schedule.getModifyTime();
+      this.owner = schedule.getOwner();
+      this.scheduleParam = new ScheduleParam(schedule.getStartDate(), schedule.getEndDate(), schedule.getCrontab());
+    }
   }
 
   public String getProjectName() {

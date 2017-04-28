@@ -51,22 +51,24 @@ public class WorkflowDto {
   }
 
   public WorkflowDto(ProjectFlow projectFlow) {
-    this.name = projectFlow.getName();
-    this.desc = projectFlow.getDesc();
-    if (CollectionUtils.isNotEmpty(projectFlow.getFlowsNodes())){
-      List<WorkflowNodeDto> workflowNodeResponseList = new ArrayList<>();
-      for (FlowNode flowNode:projectFlow.getFlowsNodes()){
-        workflowNodeResponseList.add(new WorkflowNodeDto(flowNode));
+    if (projectFlow != null){
+      this.name = projectFlow.getName();
+      this.desc = projectFlow.getDesc();
+      if (CollectionUtils.isNotEmpty(projectFlow.getFlowsNodes())){
+        List<WorkflowNodeDto> workflowNodeResponseList = new ArrayList<>();
+        for (FlowNode flowNode:projectFlow.getFlowsNodes()){
+          workflowNodeResponseList.add(new WorkflowNodeDto(flowNode));
+        }
+        this.data = new WorkflowData(workflowNodeResponseList,projectFlow.getUserDefinedParamList());
       }
-      this.data = new WorkflowData(workflowNodeResponseList,projectFlow.getUserDefinedParamList());
+      this.proxyUser = projectFlow.getProxyUser();
+      this.queue = projectFlow.getQueue();
+      this.createTime = projectFlow.getCreateTime();
+      this.modifyTime = projectFlow.getModifyTime();
+      this.owner = projectFlow.getOwner();
+      this.extras = projectFlow.getExtras();
+      this.projectName = projectFlow.getProjectName();
     }
-    this.proxyUser = projectFlow.getProxyUser();
-    this.queue = projectFlow.getQueue();
-    this.createTime = projectFlow.getCreateTime();
-    this.modifyTime = projectFlow.getModifyTime();
-    this.owner = projectFlow.getOwner();
-    this.extras = projectFlow.getExtras();
-    this.projectName = projectFlow.getProjectName();
   }
 
   public String getName() {

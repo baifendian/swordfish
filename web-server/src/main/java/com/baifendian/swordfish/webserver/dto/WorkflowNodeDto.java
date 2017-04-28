@@ -47,12 +47,14 @@ public class WorkflowNodeDto {
    * @param flowNode
    */
   public WorkflowNodeDto(FlowNode flowNode) {
-    this.name = flowNode.getName();
-    this.desc = flowNode.getDesc();
-    this.type = flowNode.getType();
-    this.parameter = flowNode.getParameter();
-    this.dep = flowNode.getDepList();
-    this.extras = flowNode.getExtras();
+    if (flowNode != null){
+      this.name = flowNode.getName();
+      this.desc = flowNode.getDesc();
+      this.type = flowNode.getType();
+      this.parameter = flowNode.getParameter();
+      this.dep = flowNode.getDepList();
+      this.extras = flowNode.getExtras();
+    }
   }
 
   /**
