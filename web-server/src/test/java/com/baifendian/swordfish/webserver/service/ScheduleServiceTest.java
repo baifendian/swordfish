@@ -28,7 +28,7 @@ import com.baifendian.swordfish.dao.utils.json.JsonUtil;
 import com.baifendian.swordfish.webserver.RestfulApiApplication;
 import com.baifendian.swordfish.webserver.dto.ScheduleParam;
 import com.baifendian.swordfish.webserver.dto.ScheduleDto;
-import com.baifendian.swordfish.webserver.service.mock.MockDataService;
+import com.baifendian.swordfish.mock.MockDataService;
 import org.apache.http.HttpStatus;
 import org.junit.Before;
 import org.junit.Test;
