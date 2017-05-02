@@ -15,6 +15,7 @@
  */
 package com.baifendian.swordfish.webserver.service;
 
+import com.baifendian.swordfish.common.utils.VerifyUtil;
 import com.baifendian.swordfish.common.utils.http.HttpUtil;
 import com.baifendian.swordfish.dao.enums.UserRoleType;
 import com.baifendian.swordfish.dao.mapper.ProjectMapper;
@@ -26,6 +27,7 @@ import com.baifendian.swordfish.webserver.exception.NotFoundException;
 import com.baifendian.swordfish.webserver.exception.NotModifiedException;
 import com.baifendian.swordfish.webserver.exception.ParameterException;
 import com.baifendian.swordfish.webserver.exception.PermissionException;
+import com.baifendian.swordfish.webserver.utils.VerifyUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.lang3.StringUtils;
@@ -69,6 +71,11 @@ public class UserService {
                             String password,
                             String phone,
                             String proxyUsers) {
+
+    VerifyUtils.verifyUserName(name);
+    VerifyUtils.verifyEmail(email);
+    VerifyUtils.verifyDesc(desc);
+
     // 如果不是管理员, 返回错误
     if (operator.getRole() != UserRoleType.ADMIN_USER) {
       throw new PermissionException("admin",operator.getName());
@@ -120,6 +127,10 @@ public class UserService {
                          String password,
                          String phone,
                          String proxyUsers) {
+
+    VerifyUtils.verifyEmail(email);
+    VerifyUtils.verifyDesc(desc);
+
     if (operator.getRole() != UserRoleType.ADMIN_USER) {
       // 非管理员, 只能修改自身信息
       if (!StringUtils.equals(operator.getName(), name)) {

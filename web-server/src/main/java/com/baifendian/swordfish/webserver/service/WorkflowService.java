@@ -30,6 +30,7 @@ import com.baifendian.swordfish.webserver.dto.WorkflowDto;
 import com.baifendian.swordfish.webserver.dto.WorkflowNodeDto;
 import com.baifendian.swordfish.webserver.exception.*;
 import com.baifendian.swordfish.webserver.service.storage.FileSystemStorageService;
+import com.baifendian.swordfish.webserver.utils.VerifyUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import net.lingala.zip4j.exception.ZipException;
 import org.apache.commons.collections.CollectionUtils;
@@ -90,6 +91,9 @@ public class WorkflowService {
    * @return 已经创建的工作流实体
    */
   public ProjectFlow createWorkflow(User operator, String projectName, String name, String desc, String proxyUser, String queue, String data, MultipartFile file, String extras, Integer flag) {
+
+    VerifyUtils.verifyWorkflowName(name);
+    VerifyUtils.verifyDesc(desc);
 
     // 查看是否对项目具备相应的权限
     Project project = projectMapper.queryByName(projectName);
@@ -220,6 +224,8 @@ public class WorkflowService {
    * @return
    */
   public ProjectFlow patchWorkflow(User operator, String projectName, String name, String desc, String proxyUser, String queue, String data, MultipartFile file, String extras) {
+
+    VerifyUtils.verifyDesc(desc);
 
     // 查询项目是否存在以及是否具备相应权限
     Project project = projectMapper.queryByName(projectName);

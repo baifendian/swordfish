@@ -25,6 +25,7 @@ import com.baifendian.swordfish.dao.model.Resource;
 import com.baifendian.swordfish.dao.model.User;
 import com.baifendian.swordfish.webserver.exception.*;
 import com.baifendian.swordfish.webserver.service.storage.FileSystemStorageService;
+import com.baifendian.swordfish.webserver.utils.VerifyUtils;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -75,6 +76,9 @@ public class ResourceService {
                                  String name,
                                  String desc,
                                  MultipartFile file) {
+
+    VerifyUtils.verifyResName(name);
+    VerifyUtils.verifyDesc(desc);
 
     // 文件为空
     if (file.isEmpty()) {
@@ -149,6 +153,8 @@ public class ResourceService {
                               String name,
                               String desc,
                               MultipartFile file) {
+    VerifyUtils.verifyDesc(desc);
+
     Resource resource = resourceMapper.queryByProjectAndResName(projectName, name);
 
     if (resource == null) {
@@ -174,6 +180,8 @@ public class ResourceService {
                                  String name,
                                  String desc,
                                  MultipartFile file) {
+    VerifyUtils.verifyDesc(desc);
+
     // 文件为空
     if (file != null && file.isEmpty()) {
       logger.error("File does not null but empty: {}", file.getOriginalFilename());
