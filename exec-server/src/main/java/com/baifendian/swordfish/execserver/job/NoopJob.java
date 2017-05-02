@@ -18,8 +18,6 @@ package com.baifendian.swordfish.execserver.job;
 import com.baifendian.swordfish.common.job.AbstractProcessJob;
 import com.baifendian.swordfish.common.job.BaseParam;
 import com.baifendian.swordfish.common.job.JobProps;
-
-import org.apache.commons.configuration.PropertiesConfiguration;
 import org.slf4j.Logger;
 
 import java.io.IOException;

@@ -132,4 +132,24 @@ public class ProjectUserSqlProvider {
       WHERE("p_u.project_id = #{projectId}");
     }}.toString();
   }
+
+  /**
+   * 根据用户名称进行查询
+   *
+   * @param parameter
+   * @return
+   */
+  public String queryByUser(Map<String, Object> parameter) {
+    return new SQL() {{
+      SELECT("*");
+      SELECT("u.name as user_name, p.name as project_name");
+
+      FROM(TABLE_NAME + " p_u");
+
+      JOIN("user u on p_u.user_id = u.id");
+      JOIN("project p on p_u.project_id = p.id");
+
+      WHERE("`user_id` = #{userId}");
+    }}.toString();
+  }
 }

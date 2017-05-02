@@ -12,6 +12,7 @@ g_url = "http://%s:%s" %(g_host, g_port)
 
 # user name & password for login
 g_user = 'unit_test'
+g_email = 'unit_test@baifendian.com'
 g_password = '123123'
 
 # admin user & password

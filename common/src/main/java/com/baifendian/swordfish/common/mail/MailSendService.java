@@ -19,19 +19,14 @@ import com.baifendian.swordfish.dao.BaseDao;
 import com.baifendian.swordfish.dao.datasource.ConnectionFactory;
 import com.baifendian.swordfish.dao.mapper.ProjectFlowMapper;
 import com.baifendian.swordfish.dao.mapper.ProjectUserMapper;
-import com.baifendian.swordfish.dao.model.Schedule;
 import com.baifendian.swordfish.dao.model.User;
-
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 
 @Component

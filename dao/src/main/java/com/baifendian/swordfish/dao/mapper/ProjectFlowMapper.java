@@ -15,19 +15,14 @@
  */
 package com.baifendian.swordfish.dao.mapper;
 
-import com.baifendian.swordfish.dao.enums.FlowType;
-import com.baifendian.swordfish.dao.enums.ScheduleType;
 import com.baifendian.swordfish.dao.model.ProjectFlow;
 import com.baifendian.swordfish.dao.model.User;
 import org.apache.ibatis.annotations.*;
-import org.apache.ibatis.type.EnumOrdinalTypeHandler;
 import org.apache.ibatis.type.JdbcType;
 import org.mybatis.spring.annotation.MapperScan;
 
 import java.sql.Timestamp;
-import java.util.Date;
 import java.util.List;
-import java.util.Set;
 
 @MapperScan
 public interface ProjectFlowMapper {

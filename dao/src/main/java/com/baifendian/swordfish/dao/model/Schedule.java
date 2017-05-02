@@ -16,7 +16,10 @@
 package com.baifendian.swordfish.dao.model;
 
 
-import com.baifendian.swordfish.dao.enums.*;
+import com.baifendian.swordfish.dao.enums.DepPolicyType;
+import com.baifendian.swordfish.dao.enums.FailurePolicyType;
+import com.baifendian.swordfish.dao.enums.NotifyType;
+import com.baifendian.swordfish.dao.enums.ScheduleStatus;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -74,7 +77,6 @@ public class Schedule {
    */
   private String crontab;
 
-  @JsonIgnore
   /**
    * 依赖工作流
    * 数据库映射字段 dep_workflows

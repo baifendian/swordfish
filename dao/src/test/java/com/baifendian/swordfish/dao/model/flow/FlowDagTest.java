@@ -19,7 +19,6 @@ import com.baifendian.swordfish.dao.DaoFactory;
 import com.baifendian.swordfish.dao.FlowDao;
 import com.baifendian.swordfish.dao.model.ExecutionFlow;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
-
 import org.junit.Test;
 
 public class FlowDagTest {

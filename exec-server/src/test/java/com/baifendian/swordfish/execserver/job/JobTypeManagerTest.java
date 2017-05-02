@@ -15,21 +15,14 @@
  */
 package com.baifendian.swordfish.execserver.job;
 
-import com.baifendian.swordfish.common.job.AbstractJob;
 import com.baifendian.swordfish.common.job.Job;
 import com.baifendian.swordfish.common.job.JobProps;
 import com.baifendian.swordfish.execserver.job.mr.MrJob;
 import com.baifendian.swordfish.execserver.job.shell.ShellJob;
-
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.configuration.PropertiesConfiguration;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Properties;
-
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 public class JobTypeManagerTest {

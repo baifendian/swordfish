@@ -15,17 +15,13 @@
  */
 package com.baifendian.swordfish.dao.mapper;
 
-import com.baifendian.swordfish.dao.enums.NotifyType;
-import com.baifendian.swordfish.dao.enums.ScheduleStatus;
-import com.baifendian.swordfish.dao.mapper.utils.EnumFieldUtil;
 import com.baifendian.swordfish.dao.enums.ExecType;
 import com.baifendian.swordfish.dao.enums.FlowStatus;
 import com.baifendian.swordfish.dao.enums.FlowType;
+import com.baifendian.swordfish.dao.enums.NotifyType;
+import com.baifendian.swordfish.dao.mapper.utils.EnumFieldUtil;
 import com.baifendian.swordfish.dao.model.ExecutionFlow;
 import com.baifendian.swordfish.dao.model.MaintainQuery;
-
-import com.fasterxml.jackson.databind.util.JSONPObject;
-import com.sun.tools.javac.comp.Flow;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.jdbc.SQL;

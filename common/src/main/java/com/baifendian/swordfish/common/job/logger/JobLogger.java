@@ -16,7 +16,6 @@
 package com.baifendian.swordfish.common.job.logger;
 
 import com.baifendian.swordfish.common.utils.StructuredArguments;
-
 import org.slf4j.Logger;
 import org.slf4j.Marker;
 

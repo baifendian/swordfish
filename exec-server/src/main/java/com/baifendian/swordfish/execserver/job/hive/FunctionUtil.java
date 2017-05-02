@@ -17,10 +17,9 @@ package com.baifendian.swordfish.execserver.job.hive;
 
 import com.baifendian.swordfish.common.config.BaseConfig;
 import com.baifendian.swordfish.common.hadoop.HdfsClient;
+import com.baifendian.swordfish.common.job.exception.ExecException;
 import com.baifendian.swordfish.common.job.struct.ResourceInfo;
 import com.baifendian.swordfish.common.job.struct.hql.UdfsInfo;
-import com.baifendian.swordfish.common.job.exception.ExecException;
-
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.io.IOUtils;

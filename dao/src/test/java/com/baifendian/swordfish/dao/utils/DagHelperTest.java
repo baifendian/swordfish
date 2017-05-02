@@ -19,7 +19,6 @@ import com.baifendian.swordfish.dao.model.FlowNode;
 import com.baifendian.swordfish.dao.model.FlowNodeRelation;
 import com.baifendian.swordfish.dao.model.flow.FlowDag;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
-
 import org.junit.Test;
 
 import java.util.ArrayList;

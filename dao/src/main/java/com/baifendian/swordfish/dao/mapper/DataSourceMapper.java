@@ -20,7 +20,6 @@ import com.baifendian.swordfish.dao.model.DataSource;
 import org.apache.ibatis.annotations.*;
 import org.apache.ibatis.type.EnumOrdinalTypeHandler;
 import org.apache.ibatis.type.JdbcType;
-import org.mybatis.spring.annotation.MapperScan;
 
 import java.sql.Timestamp;
 import java.util.List;

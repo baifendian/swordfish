@@ -16,7 +16,6 @@
 package com.baifendian.swordfish.dao.model;
 
 import com.baifendian.swordfish.dao.enums.FlowStatus;
-import com.baifendian.swordfish.dao.utils.json.JsonUtil;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -60,6 +59,9 @@ public class ExecutionNode extends FlowNode{
    **/
   private String jobId;
 
+  /**
+   * 日志 link
+   */
   private String logLinks;
 
   private List<String> logLinkList = new ArrayList<>();

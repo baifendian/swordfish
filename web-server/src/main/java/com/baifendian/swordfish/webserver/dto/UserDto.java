@@ -21,7 +21,7 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * 用于User返回的DTO
+ * 用于 User 返回的 DTO
  */
 public class UserDto {
   private String name;
@@ -35,8 +35,8 @@ public class UserDto {
   public UserDto() {
   }
 
-  public UserDto(User user){
-    if (user != null){
+  public UserDto(User user) {
+    if (user != null) {
       this.name = user.getName();
       this.email = user.getEmail();
       this.desc = user.getDesc();

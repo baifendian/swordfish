@@ -16,13 +16,9 @@
 package com.baifendian.swordfish.common.datasource.jdbc;
 
 import com.baifendian.swordfish.dao.enums.DbType;
-
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
 public class JDBCHandlerTest {
 

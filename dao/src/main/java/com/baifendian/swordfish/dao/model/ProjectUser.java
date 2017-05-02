@@ -26,7 +26,6 @@ public class ProjectUser {
   /**
    * 项目ID
    */
-  @JsonIgnore
   private int projectId;
 
   /**
@@ -37,7 +36,6 @@ public class ProjectUser {
   /**
    * 用户ID
    */
-  @JsonIgnore
   private int userId;
 
   /**

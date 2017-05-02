@@ -26,7 +26,6 @@ import com.baifendian.swordfish.dao.model.User;
 import com.baifendian.swordfish.webserver.exception.*;
 import com.baifendian.swordfish.webserver.service.storage.FileSystemStorageService;
 import com.baifendian.swordfish.webserver.utils.VerifyUtils;
-import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,7 +35,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.http.HttpServletResponse;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;

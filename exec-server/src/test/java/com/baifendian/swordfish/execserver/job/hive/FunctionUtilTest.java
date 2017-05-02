@@ -17,13 +17,10 @@ package com.baifendian.swordfish.execserver.job.hive;
 
 import com.baifendian.swordfish.common.job.struct.hql.UdfsInfo;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
-
 import org.junit.Before;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static org.junit.Assert.assertEquals;
 
 /**
  * @author : liujin

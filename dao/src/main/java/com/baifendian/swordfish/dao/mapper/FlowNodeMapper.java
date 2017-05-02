@@ -15,11 +15,7 @@
  */
 package com.baifendian.swordfish.dao.mapper;
 
-import com.baifendian.swordfish.dao.enums.FlowType;
-import com.baifendian.swordfish.dao.enums.NodeType;
 import com.baifendian.swordfish.dao.model.FlowNode;
-
-import com.sun.tools.javac.comp.Flow;
 import org.apache.ibatis.annotations.*;
 import org.apache.ibatis.type.JdbcType;
 

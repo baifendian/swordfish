@@ -15,17 +15,19 @@
  */
 package com.baifendian.swordfish.webserver.service;
 
-import com.baifendian.swordfish.common.utils.VerifyUtil;
 import com.baifendian.swordfish.dao.FlowDao;
-import com.baifendian.swordfish.dao.enums.*;
+import com.baifendian.swordfish.dao.enums.DepPolicyType;
+import com.baifendian.swordfish.dao.enums.FailurePolicyType;
+import com.baifendian.swordfish.dao.enums.NotifyType;
+import com.baifendian.swordfish.dao.enums.ScheduleStatus;
 import com.baifendian.swordfish.dao.mapper.MasterServerMapper;
 import com.baifendian.swordfish.dao.mapper.ProjectMapper;
 import com.baifendian.swordfish.dao.mapper.ScheduleMapper;
 import com.baifendian.swordfish.dao.model.*;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
 import com.baifendian.swordfish.rpc.client.MasterClient;
-import com.baifendian.swordfish.webserver.dto.ScheduleParam;
 import com.baifendian.swordfish.webserver.dto.ScheduleDto;
+import com.baifendian.swordfish.webserver.dto.ScheduleParam;
 import com.baifendian.swordfish.webserver.exception.*;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -39,7 +41,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import static com.baifendian.swordfish.dao.enums.ScheduleStatus.*;
+import static com.baifendian.swordfish.dao.enums.ScheduleStatus.OFFLINE;
 
 @Service
 public class ScheduleService {

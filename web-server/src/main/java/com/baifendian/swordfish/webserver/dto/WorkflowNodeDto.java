@@ -17,7 +17,6 @@ package com.baifendian.swordfish.webserver.dto;
 
 import com.baifendian.swordfish.dao.model.FlowNode;
 import com.baifendian.swordfish.dao.utils.json.JsonObjectDeserializer;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonRawValue;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;

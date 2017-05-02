@@ -22,7 +22,6 @@ import com.baifendian.swordfish.dao.model.ExecutionFlow;
 import com.baifendian.swordfish.dao.model.ExecutionFlowError;
 import com.baifendian.swordfish.dao.model.ExecutionState;
 import com.baifendian.swordfish.dao.model.MaintainQuery;
-
 import org.apache.ibatis.annotations.*;
 import org.apache.ibatis.type.EnumOrdinalTypeHandler;
 import org.apache.ibatis.type.JdbcType;

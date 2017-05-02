@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import requests
 import json
+import requests
 import time
 from login import login
 

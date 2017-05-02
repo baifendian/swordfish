@@ -18,7 +18,6 @@ package com.baifendian.swordfish.dao;
 import com.baifendian.swordfish.dao.datasource.ConnectionFactory;
 import com.baifendian.swordfish.dao.mapper.MasterServerMapper;
 import com.baifendian.swordfish.dao.model.MasterServer;
-
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Date;

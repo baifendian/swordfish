@@ -16,7 +16,6 @@
 package com.baifendian.swordfish.dao.enums;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
-
 import org.apache.commons.lang3.StringUtils;
 
 public enum NodeType {

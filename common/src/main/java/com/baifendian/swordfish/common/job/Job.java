@@ -15,8 +15,6 @@
  */
 package com.baifendian.swordfish.common.job;
 
-import org.apache.commons.configuration.PropertiesConfiguration;
-
 import java.util.List;
 
 /**

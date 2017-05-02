@@ -17,7 +17,6 @@ package com.baifendian.swordfish.common.datasource;
 
 import com.baifendian.swordfish.common.datasource.jdbc.JDBCHandler;
 import com.baifendian.swordfish.dao.enums.DbType;
-
 import org.junit.Test;
 
 import java.lang.reflect.InvocationTargetException;

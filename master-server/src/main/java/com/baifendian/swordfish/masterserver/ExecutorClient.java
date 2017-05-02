@@ -16,9 +16,9 @@
 package com.baifendian.swordfish.masterserver;
 
 import com.baifendian.swordfish.common.job.exception.ExecException;
+import com.baifendian.swordfish.masterserver.utils.ResultHelper;
 import com.baifendian.swordfish.rpc.RetInfo;
 import com.baifendian.swordfish.rpc.WorkerService;
-import com.baifendian.swordfish.masterserver.utils.ResultHelper;
 import org.apache.thrift.TException;
 import org.apache.thrift.protocol.TBinaryProtocol;
 import org.apache.thrift.protocol.TProtocol;

@@ -18,7 +18,6 @@ package com.baifendian.swordfish.execserver.job.hive;
 import com.baifendian.swordfish.common.job.BaseParam;
 import com.baifendian.swordfish.common.job.struct.ResourceInfo;
 import com.baifendian.swordfish.common.job.struct.hql.UdfsInfo;
-
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.hive.ql.parse.ParseDriver;

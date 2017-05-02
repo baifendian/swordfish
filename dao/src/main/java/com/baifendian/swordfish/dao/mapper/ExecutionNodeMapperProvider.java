@@ -19,8 +19,6 @@ import com.baifendian.swordfish.dao.enums.FlowStatus;
 import com.baifendian.swordfish.dao.enums.FlowType;
 import com.baifendian.swordfish.dao.mapper.utils.EnumFieldUtil;
 import com.baifendian.swordfish.dao.model.ExecutionNode;
-
-import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.jdbc.SQL;
 
 import java.util.ArrayList;

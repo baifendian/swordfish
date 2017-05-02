@@ -15,18 +15,17 @@
  */
 package com.baifendian.swordfish.execserver;
 
+import com.baifendian.swordfish.common.hadoop.ConfigurationUtil;
 import com.baifendian.swordfish.common.hadoop.HdfsClient;
 import com.baifendian.swordfish.common.job.exception.ExecException;
 import com.baifendian.swordfish.dao.DaoFactory;
 import com.baifendian.swordfish.dao.MasterDao;
-import com.baifendian.swordfish.execserver.utils.OsUtil;
-import com.baifendian.swordfish.common.hadoop.ConfigurationUtil;
 import com.baifendian.swordfish.dao.model.MasterServer;
 import com.baifendian.swordfish.execserver.service.ExecServiceImpl;
+import com.baifendian.swordfish.execserver.utils.OsUtil;
 import com.baifendian.swordfish.rpc.HeartBeatData;
 import com.baifendian.swordfish.rpc.WorkerService;
 import com.baifendian.swordfish.rpc.client.MasterClient;
-
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
@@ -34,7 +33,8 @@ import org.apache.thrift.TProcessor;
 import org.apache.thrift.protocol.TBinaryProtocol;
 import org.apache.thrift.protocol.TProtocolFactory;
 import org.apache.thrift.server.TServer;
-import org.apache.thrift.transport.*;
+import org.apache.thrift.transport.TTransportException;
+import org.apache.thrift.transport.TTransportFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -3,10 +3,6 @@
 
 import sys
 
-sys.path.append("%s/.." % (__file__))
-
-print __file__
-
 import json
 import requests
 import settings
@@ -21,7 +17,7 @@ def add_user(sessionId, name, email, desc, password, phone, proxyUsers):
                             'desc': desc,
                             'password': password,
                             'phone': phone,
-                            'proxyUsers': proxyUsers})
+                            'proxyUsers': json.dumps(proxyUsers)})
 
     return (r.status_code, r.json())
 
@@ -29,6 +25,8 @@ def add_user(sessionId, name, email, desc, password, phone, proxyUsers):
 if __name__ == '__main__':
     sessionId = login.get_session(settings.g_admin_user, settings.g_admin_password)
 
-    (status, data) = add_user(sessionId, settings.g_user, None, None, settings.g_password, None, ["*"])
+    print sessionId
+
+    (status, data) = add_user(sessionId, settings.g_user, settings.g_email, None, settings.g_password, None, ["*"])
 
     print status, json.dumps(data, indent=4)

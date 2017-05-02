@@ -17,17 +17,13 @@ package com.baifendian.swordfish.execserver.job.hive;
 
 import com.baifendian.swordfish.common.hive.ConnectionInfo;
 import com.baifendian.swordfish.common.hive.HiveConnectionClient;
+import com.baifendian.swordfish.common.job.ExecResult;
 import com.baifendian.swordfish.dao.DaoFactory;
+import com.baifendian.swordfish.dao.enums.FlowStatus;
 import com.baifendian.swordfish.dao.exception.DaoSemanticException;
 import com.baifendian.swordfish.dao.exception.SqlException;
 import com.baifendian.swordfish.execserver.utils.hive.HiveJdbcExec;
-import com.baifendian.swordfish.common.job.ExecResult;
-import com.baifendian.swordfish.dao.enums.FlowStatus;
-
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.configuration.ConfigurationException;
-import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.hive.jdbc.HiveConnection;
 import org.apache.hive.jdbc.HiveStatement;
 import org.slf4j.Logger;

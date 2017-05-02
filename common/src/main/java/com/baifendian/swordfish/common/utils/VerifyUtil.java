@@ -26,16 +26,6 @@ import java.util.regex.Pattern;
  */
 public class VerifyUtil {
   /**
-   * 得到 md5
-   *
-   * @param raw
-   * @return
-   */
-  public static String getMd5(String raw) {
-    return DigestUtils.md5Hex(raw);
-  }
-
-  /**
    * 正则匹配
    *
    * @param str

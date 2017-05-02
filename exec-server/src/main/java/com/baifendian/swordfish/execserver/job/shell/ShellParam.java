@@ -17,7 +17,6 @@ package com.baifendian.swordfish.execserver.job.shell;
 
 import com.baifendian.swordfish.common.job.BaseParam;
 import com.baifendian.swordfish.common.job.struct.ResourceInfo;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
