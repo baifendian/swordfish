@@ -25,18 +25,18 @@ public class PermissionException extends UnAuthorizedException {
   private String perm;
   private String user;
 
+  public PermissionException(String perm, String user) {
+    super(MessageFormat.format("User: {0} permission: {1} is invalid", perm, user));
+
+    this.perm = perm;
+    this.user = user;
+  }
+
   public String getPerm() {
     return perm;
   }
 
   public String getUser() {
     return user;
-  }
-
-  public PermissionException(String perm, String user) {
-    super(MessageFormat.format("User: {0} permission: {1} is invalid", perm, user));
-
-    this.perm = perm;
-    this.user = user;
   }
 }

@@ -24,10 +24,14 @@ import java.util.Date;
  * 项目实体
  */
 public class Project {
-  @JsonIgnore
+  /**
+   * 项目 id
+   */
   private int id;
 
-  @JsonIgnore
+  /**
+   * owner id
+   */
   private int ownerId;
 
   /**

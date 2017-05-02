@@ -15,32 +15,21 @@
  */
 package com.baifendian.swordfish.webserver.exception;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.ResponseStatus;
-
 import java.text.MessageFormat;
 
 /**
  * 请求参数异常
  */
-public class ParameterException extends BadRequestException {
+public class ParameterException extends RuntimeException {
 
   private String parameter;
 
   public ParameterException(String parameter) {
-    super("Parameter: {0} is invalid",parameter);
+    super(MessageFormat.format("Parameter: {0} is invalid", parameter));
     this.parameter = parameter;
   }
 
   public String getParameter() {
     return parameter;
   }
-
-  /**
-   *
-   */
-  public ParameterException() {
-    super();
-  }
-
 }

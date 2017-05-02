@@ -13,19 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.baifendian.swordfish.webserver.exception;
+package com.baifendian.swordfish.common.job.struct;
 
-/**
- * 项目冲突异常
- */
-public class ProjectConflictException extends RuntimeException {
-  private String projectName;
-
-  public ProjectConflictException(String projectName) {
-    this.projectName = projectName;
-  }
-
-  public String getProjectName() {
-    return projectName;
-  }
+public enum ResScope {
+  project, workflow
 }

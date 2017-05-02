@@ -25,6 +25,7 @@ import java.text.MessageFormat;
  */
 @ResponseStatus(code = HttpStatus.NOT_MODIFIED)
 public class NotModifiedException extends RuntimeException {
+
   public NotModifiedException(String msg) {
     super(msg);
   }

@@ -15,7 +15,7 @@
  */
 package com.baifendian.swordfish.execserver.adhoc;
 
-import com.baifendian.swordfish.common.adhoc.AdHocParam;
+import com.baifendian.swordfish.common.job.struct.hql.AdHocParam;
 import com.baifendian.swordfish.common.config.BaseConfig;
 import com.baifendian.swordfish.common.job.ExecResult;
 import com.baifendian.swordfish.common.job.JobProps;

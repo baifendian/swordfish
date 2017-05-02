@@ -13,7 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.baifendian.swordfish.common.job;
+package com.baifendian.swordfish.common.job.struct.hql;
+
+import com.baifendian.swordfish.common.job.struct.ResourceInfo;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -16,8 +16,8 @@
 package com.baifendian.swordfish.execserver.job.hive;
 
 import com.baifendian.swordfish.common.job.BaseParam;
-import com.baifendian.swordfish.common.job.ResourceInfo;
-import com.baifendian.swordfish.common.job.UdfsInfo;
+import com.baifendian.swordfish.common.job.struct.ResourceInfo;
+import com.baifendian.swordfish.common.job.struct.hql.UdfsInfo;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
@@ -27,7 +27,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * sql 节点参数 <p>

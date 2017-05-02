@@ -24,7 +24,10 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 
 import javax.servlet.http.HttpServletRequest;
 
-@ControllerAdvice//(basePackageClasses = {YourController.class})
+/**
+ * 异常的处理方式, 抛出的任何异常会进行截获, 并返回相应的提示信息
+ */
+@ControllerAdvice
 public class ControllerExceptionAdvice extends ResponseEntityExceptionHandler {
 
   /**
@@ -38,7 +41,7 @@ public class ControllerExceptionAdvice extends ResponseEntityExceptionHandler {
   @ResponseBody
   ResponseEntity<?> handleControllerException(HttpServletRequest request, Throwable ex) {
     HttpStatus status = getStatus(request);
-    logger.error("controller catch some error",ex);
+    logger.error("controller catch some error", ex);
     return new ResponseEntity<Object>(new CustomErrorType(status, ex.getMessage()), status);
   }
 
