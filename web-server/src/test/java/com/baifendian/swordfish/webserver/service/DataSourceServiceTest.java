@@ -21,7 +21,7 @@ import com.baifendian.swordfish.dao.model.DataSource;
 import com.baifendian.swordfish.dao.model.Project;
 import com.baifendian.swordfish.dao.model.User;
 import com.baifendian.swordfish.webserver.RestfulApiApplication;
-import com.baifendian.swordfish.webserver.service.mock.MockDataService;
+import com.baifendian.swordfish.mock.MockDataService;
 import org.apache.commons.httpclient.HttpStatus;
 import org.junit.Before;
 import org.junit.Test;

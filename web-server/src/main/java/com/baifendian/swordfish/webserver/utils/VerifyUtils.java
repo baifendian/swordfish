@@ -17,6 +17,7 @@ package com.baifendian.swordfish.webserver.utils;
 
 import com.baifendian.swordfish.common.utils.VerifyUtil;
 import com.baifendian.swordfish.webserver.exception.ParameterException;
+import org.apache.commons.lang.StringUtils;
 
 
 /**
@@ -88,7 +89,7 @@ public class VerifyUtils extends VerifyUtil {
    * @param desc
    */
   public static void verifyDesc(String desc){
-    if (desc.length() > 256){
+    if (StringUtils.isNotEmpty(desc) && desc.length() > 256){
       throw new ParameterException("desc");
     }
   }

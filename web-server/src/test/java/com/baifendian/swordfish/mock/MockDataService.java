@@ -13,8 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.baifendian.swordfish.webserver.service.mock;
+package com.baifendian.swordfish.mock;
 
+import com.baifendian.swordfish.dao.FlowDao;
 import com.baifendian.swordfish.dao.enums.*;
 import com.baifendian.swordfish.dao.mapper.*;
 import com.baifendian.swordfish.dao.model.*;
@@ -57,6 +58,9 @@ public class MockDataService {
   @Autowired
   private ScheduleMapper scheduleMapper;
 
+  @Autowired
+  private FlowDao flowDao;
+
   /**
    * 获取一个随机字符串
    *
@@ -93,7 +97,7 @@ public class MockDataService {
     user.setEmail(getRandomString());
     user.setPhone(getRandomString());
     user.setRole(userRoleType);
-    user.setProxyUsers("*");
+    user.setProxyUsers("[\"*\"]");
     user.setCreateTime(now);
     user.setModifyTime(now);
 
@@ -198,7 +202,7 @@ public class MockDataService {
    *
    * @return
    */
-  public FlowNode mocNode(String[] depList, int flowId, String parameter, String extras,boolean write) throws JsonProcessingException {
+  public FlowNode mocNode(String[] depList, int flowId, String parameter, String extras,boolean storage) throws JsonProcessingException {
     FlowNode flowNode = new FlowNode();
     flowNode.setName(getRandomString());
     flowNode.setDesc(getRandomString());
@@ -209,7 +213,7 @@ public class MockDataService {
     flowNode.setDepList(Arrays.asList(depList));
     flowNode.setExtras(extras);
 
-    if(write){
+    if(storage){
       flowNodeMapper.insert(flowNode);
     }
     return flowNode;
@@ -249,12 +253,7 @@ public class MockDataService {
 
     List<FlowNode> flowNodeList = Arrays.asList(new FlowNode[]{flowNode1, flowNode2, flowNode3});
 
-    //WorkflowData projectFlowData = new WorkflowData();
-    //projectFlowData.setUserDefParams(Arrays.asList(new Property[]{new Property("year","$[yyyy]")}));
-    //projectFlowData.setNodes(flowNodeList);
-
-    //return projectFlowData;
-    return null;
+    return new WorkflowData(flowNodeList,Arrays.asList(new Property[]{new Property("year","$[yyyy]")}),FlowNode.class);
   }
 
   /**
@@ -268,12 +267,20 @@ public class MockDataService {
     return JsonUtil.toJsonString(projectFlowData);
   }
 
+  public ProjectFlow mocProjectFlow(Project project,User user) throws JsonProcessingException {
+    return mocProjectFlow(project,user,true);
+  }
+
+  public ProjectFlow mocProjectFlowJson(Project project,User user) throws JsonProcessingException {
+    return mocProjectFlow(project,user,false);
+  }
+
   /**
    * 虚拟一个 正常pojectFlow 工作流
    *
    * @return
    */
-  public ProjectFlow mocProjectFlow(Project project, User user) throws JsonProcessingException {
+  public ProjectFlow mocProjectFlow(Project project, User user, boolean storage) throws JsonProcessingException {
     ProjectFlow projectFlow = new ProjectFlow();
     Date now = new Date();
 
@@ -290,15 +297,17 @@ public class MockDataService {
     projectFlow.setUserDefinedParams(USER_DEFINED_PARAMETER);
     projectFlow.setExtras(MR_PARAMETER);
 
-    projectFlowMapper.insertAndGetId(projectFlow);
-
-    FlowNode flowNode1 = mocRmNode(new String[]{}, projectFlow.getId());
-    FlowNode flowNode2 = mocRmNode(new String[]{flowNode1.getName()}, projectFlow.getId());
-    FlowNode flowNode3 = mocRmNode(new String[]{flowNode2.getName()}, projectFlow.getId());
+    FlowNode flowNode1 = mocRmNodeJson(new String[]{}, projectFlow.getId());
+    FlowNode flowNode2 = mocRmNodeJson(new String[]{flowNode1.getName()}, projectFlow.getId());
+    FlowNode flowNode3 = mocRmNodeJson(new String[]{flowNode2.getName()}, projectFlow.getId());
 
     List<FlowNode> flowNodeList = Arrays.asList(new FlowNode[]{flowNode1, flowNode2, flowNode3});
 
     projectFlow.setFlowsNodes(flowNodeList);
+
+    if (storage){
+      flowDao.createProjectFlow(projectFlow);
+    }
 
     return projectFlow;
   }
