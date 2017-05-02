@@ -33,6 +33,8 @@ public class ExecutionNodeDto {
   private String type;
   private Date startTime;
   private Date endTime;
+  @JsonRawValue
+  @JsonDeserialize(using = JsonObjectDeserializer.class)
   private String parameter;
   private int duration;
   private FlowStatus status;
