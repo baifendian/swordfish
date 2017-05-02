@@ -25,6 +25,7 @@ import com.baifendian.swordfish.dao.model.Project;
 import com.baifendian.swordfish.dao.model.ProjectUser;
 import com.baifendian.swordfish.dao.model.User;
 import com.baifendian.swordfish.webserver.exception.*;
+import com.baifendian.swordfish.webserver.utils.VerifyUtils;
 import org.apache.commons.httpclient.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,6 +60,10 @@ public class ProjectService {
    * @return
    */
   public Project createProject(User operator, String name, String desc) {
+
+    VerifyUtils.verifyProjectName(name);
+    VerifyUtils.verifyDesc(desc);
+
     // 管理员不能创建项目
     if (operator.getRole() == UserRoleType.ADMIN_USER) {
       throw new PermissionException("admin",operator.getName());
@@ -93,6 +98,9 @@ public class ProjectService {
    * @return
    */
   public Project modifyProject(User operator, String name, String desc) {
+
+    VerifyUtils.verifyDesc(desc);
+
     Project project = projectMapper.queryByName(name);
 
     if (project == null) {

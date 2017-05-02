@@ -36,6 +36,10 @@ public class NotFoundException extends RuntimeException {
     return name;
   }
 
+  public NotFoundException(){
+    super();
+  }
+
   public NotFoundException(String type, String name) {
     super(MessageFormat.format("Type: {0} name: {1} not found",type,name));
 

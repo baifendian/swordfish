@@ -15,6 +15,7 @@
  */
 package com.baifendian.swordfish.webserver.service;
 
+import com.baifendian.swordfish.common.utils.VerifyUtil;
 import com.baifendian.swordfish.dao.FlowDao;
 import com.baifendian.swordfish.dao.enums.*;
 import com.baifendian.swordfish.dao.mapper.MasterServerMapper;
@@ -77,6 +78,7 @@ public class ScheduleService {
    */
   @Transactional(value = "TransactionManager", rollbackFor = Exception.class)
   public ScheduleDto createSchedule(User operator, String projectName, String workflowName, String schedule, NotifyType notifyType, String notifyMails, int maxTryTimes, FailurePolicyType failurePolicy, String depWorkflows, DepPolicyType depPolicyType, int timeout){
+
     Project project = projectMapper.queryByName(projectName);
 
     if (project == null) {
