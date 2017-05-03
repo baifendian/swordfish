@@ -18,6 +18,7 @@ package com.baifendian.swordfish.webserver.controller;
 import com.baifendian.swordfish.dao.model.ExecutionFlow;
 import com.baifendian.swordfish.dao.model.ExecutionFlowError;
 import com.baifendian.swordfish.dao.model.User;
+import com.baifendian.swordfish.webserver.dto.ExecutionFlowDto;
 import com.baifendian.swordfish.webserver.dto.StatDto;
 import com.baifendian.swordfish.webserver.service.StatService;
 import org.apache.commons.httpclient.HttpStatus;
@@ -27,6 +28,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -95,11 +97,11 @@ public class StatController {
    * @param response
    */
   @GetMapping(value = "/consumes")
-  public List<ExecutionFlow> queryTopConsumes(@RequestAttribute(value = "session.user") User operator,
-                                              @RequestParam(value = "projectName") String projectName,
-                                              @RequestParam(value = "date") long date,
-                                              @RequestParam(value = "num") int num,
-                                              HttpServletResponse response) {
+  public List<ExecutionFlowDto> queryTopConsumes(@RequestAttribute(value = "session.user") User operator,
+                                                 @RequestParam(value = "projectName") String projectName,
+                                                 @RequestParam(value = "date") long date,
+                                                 @RequestParam(value = "num") int num,
+                                                 HttpServletResponse response) {
     logger.info("Operator user {}, get top consumers of workflow,  project name: {}, date: {}, num: {}",
         operator.getName(), projectName, date, num);
 
@@ -110,7 +112,12 @@ public class StatController {
 
     }
 
-    return statService.queryConsumes(operator, projectName, date, num);
+    List<ExecutionFlow> executionFlowList = statService.queryConsumes(operator, projectName, date, num);
+    List<ExecutionFlowDto> executionFlowDtoList = new ArrayList<>();
+    for (ExecutionFlow executionFlow:executionFlowList){
+      executionFlowDtoList.add(new ExecutionFlowDto(executionFlow));
+    }
+    return executionFlowDtoList;
   }
 
   /**
