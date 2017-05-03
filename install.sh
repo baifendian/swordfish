@@ -42,6 +42,18 @@ function usage() {
     exit 1;
 }
 
+while getopts ":r:" o; do
+    case "${o}" in
+        r)
+            r=${OPTARG}
+            [[ "$r" = "true" || "$r" = "false" ]] || usage
+            ;;
+        *)
+            usage
+            ;;
+    esac
+done
+
 # 文件替换
 function file_replace()
 {
@@ -94,18 +106,6 @@ mvn -U clean package assembly:assembly -Dmaven.test.skip=true || { echo "maven f
 # get script path
 CUR_DIR=`dirname $0`
 SWORDFISH_HOME=`cd "$CUR_DIR"; pwd`
-
-while getopts ":r:" o; do
-    case "${o}" in
-        r)
-            r=${OPTARG}
-            [[ "$r" = "true" || "$r" = "false" ]] || usage
-            ;;
-        *)
-            usage
-            ;;
-    esac
-done
 
 if [ "$r" = "true" ]; then
     echo "exec file replace"
