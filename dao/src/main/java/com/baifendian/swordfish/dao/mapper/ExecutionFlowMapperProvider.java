@@ -545,7 +545,7 @@ public class ExecutionFlowMapperProvider {
   }
 
   public String selectStateByProject(Map<String,Object> parameter) {
-    return new SQL(){
+    String sql = new SQL(){
       {
         SELECT("str_to_date(DATE_FORMAT(e_f.schedule_time,'%Y%m%d'),'%Y%m%d') as day,\n" +
                 "SUM(case e_f.status when 0 then 1 else 0 end) as INIT,\n" +
@@ -563,6 +563,7 @@ public class ExecutionFlowMapperProvider {
         GROUP_BY("day");
       }
     }.toString();
+    return sql;
   }
 
   public String selectStateHourByProject(Map<String,Object> parameter) {
@@ -597,6 +598,7 @@ public class ExecutionFlowMapperProvider {
         JOIN("project_flows p_f on e_f.flow_id = p_f.id");
         JOIN("user u on p_f.owner = u.id");
         WHERE("str_to_date(DATE_FORMAT(e_f.schedule_time,'%Y%m%d'),'%Y%m%d') = #{date}");
+        WHERE("p_f.project_id = #{projectId}");
         ORDER_BY("consume DESC");
       }
     }.toString()+" limit #{top}";

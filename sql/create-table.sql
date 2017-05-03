@@ -123,7 +123,7 @@ CREATE TABLE `flows_nodes` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'flow nodes id',
   `name` varchar(64) NOT NULL COMMENT 'flow nodes name',
   `flow_id` int(11) NOT NULL COMMENT 'project flow id of the flow nodes',
-  `desc` VARCHAR(256) NOT NULL COMMENT 'create time of the flow nodes',
+  `desc` VARCHAR(256) DEFAULT NULL COMMENT 'create time of the flow nodes',
   `type` varchar(32) NOT NULL COMMENT 'type of the flow nodes, string type',
   `parameter` text DEFAULT NULL COMMENT 'parameter of the flow nodes.',
   `extras` text DEFAULT NULL COMMENT 'extends of the flow nodes',
