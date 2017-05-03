@@ -54,6 +54,10 @@ while getopts ":r:" o; do
     esac
 done
 
+if [ -z "${r}" ]; then
+    usage
+fi
+
 # 文件替换
 function file_replace()
 {
@@ -105,6 +109,7 @@ cd $SWORDFISH_HOME/target/swordfish-all-${version}/swordfish-exec-server-${versi
 sh bin/swordfish-daemon.sh stop exec-server
 
 # compile project
+cd $SWORDFISH_HOME
 mvn -U clean package assembly:assembly -Dmaven.test.skip=true || { echo "maven failed."; exit 1; }
 
 if [ "$r" = "true" ]; then
