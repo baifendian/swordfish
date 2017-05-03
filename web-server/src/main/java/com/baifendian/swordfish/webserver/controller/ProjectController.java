@@ -70,9 +70,9 @@ public class ProjectController {
    */
   @PatchMapping(value = "/{name}")
   public ProjectDto modifyProject(@RequestAttribute(value = "session.user") User operator,
-                               @PathVariable("name") String name,
-                               @RequestParam(value = "desc", required = false) String desc,
-                               HttpServletResponse response) {
+                                  @PathVariable("name") String name,
+                                  @RequestParam(value = "desc", required = false) String desc,
+                                  HttpServletResponse response) {
     logger.info("Operator user {}, modify project, name: {}, desc: {}", operator.getName(), name, desc);
 
     return new ProjectDto(projectService.modifyProject(operator, name, desc));
@@ -102,14 +102,16 @@ public class ProjectController {
    */
   @GetMapping(value = "")
   public List<ProjectDto> queryProjects(@RequestAttribute(value = "session.user") User operator,
-                                     HttpServletResponse response) {
+                                        HttpServletResponse response) {
     logger.info("Operator user {}, get project list", operator.getName());
 
     List<Project> projectList = projectService.queryProject(operator);
     List<ProjectDto> projectDtoList = new ArrayList<>();
-    for(Project project:projectList){
+
+    for (Project project : projectList) {
       projectDtoList.add(new ProjectDto(project));
     }
+
     return projectDtoList;
   }
 
@@ -146,14 +148,15 @@ public class ProjectController {
    */
   @PutMapping(value = "/{name}/users/{userName}")
   public ProjectUserDto modifyProjectUser(@RequestAttribute(value = "session.user") User operator,
-                                    @PathVariable("name") String name,
-                                    @PathVariable("userName") String userName,
-                                    @RequestParam(value = "perm") int perm,
-                                    HttpServletResponse response) {
+                                          @PathVariable("name") String name,
+                                          @PathVariable("userName") String userName,
+                                          @RequestParam(value = "perm") int perm,
+                                          HttpServletResponse response) {
     logger.info("Operator user {}, modify user permission in the project, project name: {}, user name: {}, perm: {}", operator.getName(), name, userName, perm);
 
     return new ProjectUserDto(projectService.modifyProjectUser(operator, name, userName, perm));
   }
+
   /**
    * 项目删除一个用户
    *
@@ -182,13 +185,13 @@ public class ProjectController {
    */
   @GetMapping(value = "/{name}/users")
   public List<ProjectUserDto> queryUser(@RequestAttribute(value = "session.user") User operator,
-                                     @PathVariable("name") String name,
-                                     HttpServletResponse response) {
+                                        @PathVariable("name") String name,
+                                        HttpServletResponse response) {
     logger.info("Operator user {}, query users of project, project name: {}", operator.getName(), name);
 
     List<ProjectUser> projectUserList = projectService.queryUser(operator, name);
     List<ProjectUserDto> projectUserDtoList = new ArrayList<>();
-    for (ProjectUser projectUser:projectUserList){
+    for (ProjectUser projectUser : projectUserList) {
       projectUserDtoList.add(new ProjectUserDto(projectUser));
     }
     return projectUserDtoList;

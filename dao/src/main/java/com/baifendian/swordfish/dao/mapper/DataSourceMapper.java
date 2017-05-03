@@ -119,4 +119,13 @@ public interface DataSourceMapper {
   })
   @SelectProvider(type = DataSourceMapperProvider.class, method = "getByProjectNameAndName")
   DataSource getByProjectNameAndName(@Param("projectName") String projectName, @Param("name") String name);
+
+  /**
+   * 查询项目下数据源的数目
+   *
+   * @param projectId
+   * @return
+   */
+  @SelectProvider(type = DataSourceMapperProvider.class, method = "countProjectDatasource")
+  int countProjectDatasource(@Param("projectId") Integer projectId);
 }

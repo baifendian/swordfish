@@ -534,8 +534,10 @@ public class WorkflowService {
       // TODO::
       String filename = UUID.randomUUID().toString();
       String localFilename = BaseConfig.getLocalWorkflowFilename(project.getId(), filename); // 随机的一个文件名称
-      String localExtDir = BaseConfig.getLocalWorkflowExtDir(project.getId(), filename);
-      String workflowJson = BaseConfig.getLocalWorkflowJson(project.getId(), filename);
+      String localExtDir = BaseConfig.getLocalWorkflowExtractDir(project.getId(), filename);
+//      String workflowJson = BaseConfig.(project.getId(), filename);
+      String workflowJson = null;
+
       String hdfsFilename = BaseConfig.getHdfsWorkflowFilename(project.getId(), workflowName);
       try {
         // 先将文件存放到本地

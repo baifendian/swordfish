@@ -15,26 +15,29 @@
  */
 package com.baifendian.swordfish.webserver.service;
 
+import com.baifendian.swordfish.common.config.BaseConfig;
 import com.baifendian.swordfish.common.consts.Constants;
+import com.baifendian.swordfish.common.hadoop.HdfsClient;
 import com.baifendian.swordfish.common.utils.PermUtil;
 import com.baifendian.swordfish.dao.enums.UserRoleType;
-import com.baifendian.swordfish.dao.mapper.ProjectMapper;
-import com.baifendian.swordfish.dao.mapper.ProjectUserMapper;
-import com.baifendian.swordfish.dao.mapper.UserMapper;
+import com.baifendian.swordfish.dao.mapper.*;
 import com.baifendian.swordfish.dao.model.Project;
 import com.baifendian.swordfish.dao.model.ProjectUser;
 import com.baifendian.swordfish.dao.model.User;
+import com.baifendian.swordfish.webserver.exception.BadRequestException;
 import com.baifendian.swordfish.webserver.exception.NotFoundException;
 import com.baifendian.swordfish.webserver.exception.NotModifiedException;
-import com.baifendian.swordfish.webserver.exception.ParameterException;
 import com.baifendian.swordfish.webserver.exception.PermissionException;
 import com.baifendian.swordfish.webserver.utils.VerifyUtils;
+import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.io.File;
 import java.util.Date;
 import java.util.List;
 
@@ -52,6 +55,15 @@ public class ProjectService {
   @Autowired
   private ProjectUserMapper projectUserMapper;
 
+  @Autowired
+  private ProjectFlowMapper projectFlowMapper;
+
+  @Autowired
+  private ResourceMapper resourceMapper;
+
+  @Autowired
+  private DataSourceMapper dataSourceMapper;
+
   /**
    * 创建一个项目
    *
@@ -67,7 +79,7 @@ public class ProjectService {
 
     // 管理员不能创建项目
     if (operator.getRole() == UserRoleType.ADMIN_USER) {
-      throw new PermissionException("admin",operator.getName());
+      throw new PermissionException("User '{0}' is not admin", operator.getName());
     }
 
     Project project = new Project();
@@ -105,17 +117,17 @@ public class ProjectService {
     Project project = projectMapper.queryByName(name);
 
     if (project == null) {
-      throw new NotFoundException("project",name);
+      throw new NotFoundException("Project '{0}' not found", name);
     }
 
     // 需要是项目的 owner
     if (operator.getId() != project.getOwnerId()) {
-      throw new PermissionException("project owner",operator.getName());
+      throw new PermissionException("Only project owner can modify the project");
     }
 
     Date now = new Date();
 
-    if(desc != null) {
+    if (desc != null) {
       project.setDesc(desc);
     }
 
@@ -136,27 +148,46 @@ public class ProjectService {
    * @param operator
    * @param name
    */
+  @Transactional(value = "TransactionManager")
   public void deleteProject(User operator, String name) {
     Project project = projectMapper.queryByName(name);
 
     if (project == null) {
-      throw new NotFoundException("project",name);
+      throw new NotFoundException("Project '{0}' not exist", name);
     }
 
     // 只有 管理员或 owner 能够删除
     if (operator.getRole() != UserRoleType.ADMIN_USER && operator.getId() != project.getOwnerId()) {
-      throw new PermissionException("project owner or admin",operator.getName());
+      throw new PermissionException("User '{0}' has no right permission for the project '{1}'", operator.getName(), name);
     }
 
-    // TODO:: 需要判断项目下, 是否有 "工作流/资源/数据源" 存在
+    // 需要判断项目下, 是否有 "工作流/资源/数据源" 存在
+    int count;
 
-    // TODO:: 严格来说, 应该清理 Local/HDFS 上的相关目录
+    count = projectFlowMapper.countProjectFlows(project.getId());
+    if (count > 0) {
+      throw new NotModifiedException("Project's workflow is not empty");
+    }
 
-    int count = projectMapper.deleteById(project.getId());
+    count = resourceMapper.countProjectRes(project.getId());
+    if (count > 0) {
+      throw new NotModifiedException("Project's resource is not empty");
+    }
+
+    count = dataSourceMapper.countProjectDatasource(project.getId());
+    if (count > 0) {
+      throw new NotModifiedException("Project's data source is not empty");
+    }
+
+    count = projectMapper.deleteById(project.getId());
 
     if (count <= 0) {
       throw new NotModifiedException("Not delete count");
     }
+
+    // 应该清理 Local/HDFS 上的相关目录
+    HdfsClient.getInstance().delete(BaseConfig.getHdfsProjectDir(project.getId()), true);
+    FileUtils.deleteQuietly(new File(BaseConfig.getLocalProjectDir(project.getId())));
 
     return;
   }
@@ -192,12 +223,12 @@ public class ProjectService {
 
     // 不存在的项目名
     if (project == null) {
-      throw new NotFoundException("project",name);
+      throw new NotFoundException("Project '{0}' not found", name);
     }
 
     // 操作用户不是项目的 owner
     if (operator.getId() != project.getOwnerId()) {
-      throw new PermissionException("project owner",operator.getName());
+      throw new PermissionException("User '{0}' has no right permission for the project '{1}'", operator.getName(), name);
     }
 
     // 查询用户
@@ -205,12 +236,12 @@ public class ProjectService {
 
     // 增加的用户不存在
     if (user == null) {
-      throw new NotFoundException("user",name);
+      throw new NotFoundException("User '{0}' not found", name);
     }
 
     // 不能增加自己
     if (operator.getId() == user.getId()) {
-      throw new ParameterException("name");
+      throw new BadRequestException("Can't add myself");
     }
 
     ProjectUser projectUser = projectUserMapper.query(project.getId(), user.getId());
@@ -250,12 +281,12 @@ public class ProjectService {
 
     // 不存在的项目名
     if (project == null) {
-      throw new NotFoundException("project",name);
+      throw new NotFoundException("Project '{0}' not found", name);
     }
 
     // 操作用户不是项目的 owner
     if (operator.getId() != project.getOwnerId()) {
-      throw new PermissionException("project owner",operator.getName());
+      throw new PermissionException("Operator must be the project owner");
     }
 
     // 查询用户
@@ -263,14 +294,14 @@ public class ProjectService {
 
     // 增加的用户不存在
     if (user == null) {
-      throw new NotFoundException("user",userName);
+      throw new NotFoundException("User '{0}' not found", userName);
     }
 
     ProjectUser projectUser = projectUserMapper.query(project.getId(), user.getId());
 
     // 修改的信息不存在
     if (projectUser == null) {
-      throw new NotFoundException("project_user",name+" of "+userName);
+      throw new NotFoundException("Project '{0}' has no user '{1}'", name, userName);
     }
 
     // 构建信息, 插入
@@ -302,24 +333,24 @@ public class ProjectService {
 
     // 不存在的项目名
     if (project == null) {
-      throw new NotFoundException("project",name);
+      throw new NotFoundException("Project '{0}' not found", name);
     }
 
     // 操作用户不是项目的 owner
     if (operator.getId() != project.getOwnerId()) {
-      throw new PermissionException("project owner",operator.getName());
+      throw new PermissionException("Project is not the owner of project");
     }
 
     User user = userMapper.queryByName(userName);
 
     // 删除的用户不存在
     if (user == null) {
-      throw new NotFoundException("user",userName);
+      throw new NotFoundException("User '{0}' not found", userName);
     }
 
     // 不能删除自己
     if (operator.getId() == user.getId()) {
-      throw new ParameterException("userName");
+      throw new BadRequestException("Can't delete myself");
     }
 
     int count = projectUserMapper.delete(project.getId(), user.getId());
@@ -344,12 +375,12 @@ public class ProjectService {
 
     // 不存在的项目名
     if (project == null) {
-      throw new NotFoundException("project",name);
+      throw new NotFoundException("Project '{0}' not found", name);
     }
 
     // 操作用户不是项目的 owner
     if (operator.getId() != project.getOwnerId()) {
-      throw new PermissionException("project owner",operator.getName());
+      throw new PermissionException("Operator is not the project owner");
     }
 
     return projectUserMapper.queryByProject(project.getId());

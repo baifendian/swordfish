@@ -54,7 +54,7 @@ public class ProjectFlowMapperSqlProvider {
     }.toString();
   }
 
-  public String queryByProjectAndName(Map<String, Object> parameter){
+  public String queryByProjectAndName(Map<String, Object> parameter) {
     return new SQL() {
       {
         SELECT("p_f.*,p_f.owner as owner_id");
@@ -65,6 +65,7 @@ public class ProjectFlowMapperSqlProvider {
       }
     }.toString();
   }
+
   /**
    * 通过 id 更新(用于重命名) <p>
    *
@@ -321,14 +322,32 @@ public class ProjectFlowMapperSqlProvider {
     return new SQL() {
       {
         UPDATE(TABLE_NAME);
-        if (!StringUtils.isEmpty(queue)){
+        if (!StringUtils.isEmpty(queue)) {
           SET("`queue`=#{queue}");
         }
-        if (!StringUtils.isEmpty(desc)){
+        if (!StringUtils.isEmpty(desc)) {
           SET("proxy_user=#{proxyUser}");
         }
         WHERE("project_id = #{projectId}");
         WHERE("flag is NULL");
+      }
+    }.toString();
+  }
+
+  /**
+   * 计算项目下的工作流数
+   *
+   * @param parameter
+   * @return
+   */
+  public String countProjectFlows(Map<String, Object> parameter) {
+    return new SQL() {
+      {
+        SELECT("count(0)");
+
+        FROM(TABLE_NAME);
+
+        WHERE("project_id = #{projectId}");
       }
     }.toString();
   }

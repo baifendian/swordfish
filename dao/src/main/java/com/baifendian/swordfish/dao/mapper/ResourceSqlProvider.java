@@ -52,8 +52,9 @@ public class ResourceSqlProvider {
    */
   public String queryByProjectAndResName(Map<String, Object> parameter) {
     return new SQL() {{
-      SELECT("r.*, r.owner as owner_id");
+      SELECT("r.owner as owner_id");
       SELECT("u.name as owner, p.name as project_name");
+      SELECT("r.*");
 
       FROM(TABLE_NAME + " r");
 
@@ -143,8 +144,8 @@ public class ResourceSqlProvider {
    */
   public String queryResourceDetail(Map<String, Object> parameter) {
     return new SQL() {{
-      SELECT("r.*");
       SELECT("u.name as owner_name, p.name as project_name");
+      SELECT("r.*");
 
       FROM(TABLE_NAME + " r");
 
@@ -163,8 +164,8 @@ public class ResourceSqlProvider {
    */
   public String queryResourceDetails(Map<String, Object> parameter) {
     return new SQL() {{
-      SELECT("r.*");
       SELECT("u.name as owner_name, p.name as project_name");
+      SELECT("r.*");
 
       FROM(TABLE_NAME + " r");
 
@@ -172,6 +173,21 @@ public class ResourceSqlProvider {
       JOIN("project p on r.project_id = p.id");
 
       WHERE("p.project_id = #{projectId}");
+    }}.toString();
+  }
+
+  /**
+   * 查询项目的工作流数
+   * @param parameter
+   * @return
+   */
+  public String countProjectRes(Map<String, Object> parameter) {
+    return new SQL() {{
+      SELECT("count(0)");
+
+      FROM(TABLE_NAME);
+
+      WHERE("project_id = #{projectId}");
     }}.toString();
   }
 }
