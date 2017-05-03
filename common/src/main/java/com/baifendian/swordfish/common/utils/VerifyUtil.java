@@ -15,16 +15,16 @@
  */
 package com.baifendian.swordfish.common.utils;
 
+import com.baifendian.swordfish.common.config.BaseConfig;
 import com.baifendian.swordfish.common.consts.Constants;
-import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
-
 import java.util.regex.Pattern;
 
 /**
  * 校验工具类
  */
 public class VerifyUtil {
+
   /**
    * 正则匹配
    *
@@ -98,5 +98,14 @@ public class VerifyUtil {
    */
   public static boolean matchWorkflowName(String str) {
     return regexMatches(str, Constants.REGEX_DATASOURCE_NAME);
+  }
+
+  /**
+   * 检测代理用户是合法
+   * @param str
+   * @return
+   */
+  public static boolean matchProxyUser(String str) {
+    return BaseConfig.isProhibitUser(str);
   }
 }

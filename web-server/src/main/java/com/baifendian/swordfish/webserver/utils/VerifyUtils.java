@@ -18,11 +18,20 @@ package com.baifendian.swordfish.webserver.utils;
 import com.baifendian.swordfish.common.utils.VerifyUtil;
 import com.baifendian.swordfish.webserver.exception.ParameterException;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Configurable;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 /**
  * server校验工具
  */
 public class VerifyUtils extends VerifyUtil {
+
+
+
   /**
    * 校验项目名并抛出异常
    *
@@ -90,13 +99,36 @@ public class VerifyUtils extends VerifyUtil {
   }
 
   /**
-   * 校验描述是否付汇规范
+   * 校验描述是否符合规范
    *
    * @param desc
    */
   public static void verifyDesc(String desc) {
     if (StringUtils.isNotEmpty(desc) && desc.length() > 256) {
       throw new ParameterException("desc");
+    }
+  }
+
+  /**
+   * 校验代理用户列表是否符合规范
+   * @param proxyUserList
+   */
+  public static <T extends RuntimeException> void verifyProxyUser(List<String> proxyUserList, T e) {
+    for (String proxyUser:proxyUserList){
+      verifyProxyUser(proxyUser,e);
+    }
+  }
+
+  /**
+   * 指定代理用户是否符合规范
+   * @param proxyUser
+   * @param e
+   * @param <T>
+   */
+  public static <T extends RuntimeException> void verifyProxyUser(String proxyUser, T e) {
+      if (!matchProxyUser(proxyUser)){
+        throw e;
+      }
     }
   }
 }

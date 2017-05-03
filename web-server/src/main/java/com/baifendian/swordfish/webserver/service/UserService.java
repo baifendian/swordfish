@@ -101,6 +101,8 @@ public class UserService {
     user.setCreateTime(now);
     user.setModifyTime(now);
 
+    VerifyUtils.verifyProxyUser(user.getProxyUserList());
+
     // 插入一条用户信息
     try {
       userMapper.insert(user);
