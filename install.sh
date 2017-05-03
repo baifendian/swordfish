@@ -36,6 +36,12 @@ hadoopYarnAddress="172.24.5.149"
 # env config file
 envFile="~/.sf_env.sh"
 
+# 使用示例
+function usage() {
+    echo "Usage: $0 -r [<true|false>]" 1>&2;
+    exit 1;
+}
+
 # 文件替换
 function file_replace()
 {
@@ -89,20 +95,38 @@ mvn -U clean package assembly:assembly -Dmaven.test.skip=true || { echo "maven f
 CUR_DIR=`dirname $0`
 SWORDFISH_HOME=`cd "$CUR_DIR"; pwd`
 
-# web-server
-cd $SWORDFISH_HOME/target/swordfish-all-${version}/swordfish-web-server-${version}/
+while getopts ":r:" o; do
+    case "${o}" in
+        r)
+            r=${OPTARG}
+            [[ "$r" = "true" || "$r" = "false" ]] || usage
+            ;;
+        *)
+            usage
+            ;;
+    esac
+done
 
-file_replace web-server || { echo "Web server conf replace failed."; exit 1; }
+if [ "$r" = "true" ]; then
+    echo "exec file replace"
 
-# master-server
-cd $SWORDFISH_HOME/target/swordfish-all-${version}/swordfish-master-server-${version}/
+    # web-server
+    cd $SWORDFISH_HOME/target/swordfish-all-${version}/swordfish-web-server-${version}/
 
-file_replace master-server || { echo "Master server conf replace failed."; exit 1; }
+    file_replace web-server || { echo "Web server conf replace failed."; exit 1; }
 
-# exec-server
-cd $SWORDFISH_HOME/target/swordfish-all-${version}/swordfish-exec-server-${version}/
+    # master-server
+    cd $SWORDFISH_HOME/target/swordfish-all-${version}/swordfish-master-server-${version}/
 
-file_replace exec-server || { echo "Exec server conf replace failed."; exit 1; }
+    file_replace master-server || { echo "Master server conf replace failed."; exit 1; }
+
+    # exec-server
+    cd $SWORDFISH_HOME/target/swordfish-all-${version}/swordfish-exec-server-${version}/
+
+    file_replace exec-server || { echo "Exec server conf replace failed."; exit 1; }
+else
+    echo "do not exec file replace"
+fi
 
 # start all service
 cd $SWORDFISH_HOME/target/swordfish-all-${version}/swordfish-web-server-${version}/
