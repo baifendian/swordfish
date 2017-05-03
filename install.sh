@@ -90,6 +90,10 @@ function file_replace()
     fi
 }
 
+# get script path
+CUR_DIR=`dirname $0`
+SWORDFISH_HOME=`cd "$CUR_DIR"; pwd`
+
 # stop all service
 cd $SWORDFISH_HOME/target/swordfish-all-${version}/swordfish-web-server-${version}/
 sh bin/swordfish-daemon.sh stop web-server
@@ -102,10 +106,6 @@ sh bin/swordfish-daemon.sh stop exec-server
 
 # compile project
 mvn -U clean package assembly:assembly -Dmaven.test.skip=true || { echo "maven failed."; exit 1; }
-
-# get script path
-CUR_DIR=`dirname $0`
-SWORDFISH_HOME=`cd "$CUR_DIR"; pwd`
 
 if [ "$r" = "true" ]; then
     echo "exec file replace"
