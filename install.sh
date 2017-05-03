@@ -38,7 +38,7 @@ envFile="~/.sf_env.sh"
 
 # 使用示例
 function usage() {
-    echo "Usage: $0 -r [<true|false>]" 1>&2;
+    echo "Usage: $0 -r <true|false>" 1>&2;
     exit 1;
 }
 
