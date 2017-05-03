@@ -16,6 +16,7 @@
 package com.baifendian.swordfish.webserver.controller;
 
 import com.baifendian.swordfish.dao.enums.*;
+import com.baifendian.swordfish.dao.model.Schedule;
 import com.baifendian.swordfish.dao.model.User;
 import com.baifendian.swordfish.webserver.dto.ScheduleDto;
 import com.baifendian.swordfish.webserver.service.ScheduleService;
@@ -25,6 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -70,7 +72,7 @@ public class ScheduleController {
     logger.info("Operator user {}, exec workflow, project name: {}, workflow name: {}, schedule: {}, notify type: {}, notify mails: {}, max try times: {}," +
                     "failure policy: {}, dep workflows: {}, dep policy: {}, timeout: {}",
             operator.getName(), projectName, workflowName, schedule, notifyType, notifyMails, maxTryTimes, failurePolicy, depWorkflows, depPolicyType, timeout);
-    return scheduleService.createSchedule(operator,projectName,workflowName,schedule,notifyType,notifyMails,maxTryTimes,failurePolicy,depWorkflows,depPolicyType,timeout);
+    return new ScheduleDto(scheduleService.createSchedule(operator,projectName,workflowName,schedule,notifyType,notifyMails,maxTryTimes,failurePolicy,depWorkflows,depPolicyType,timeout));
   }
 
   /**
@@ -104,7 +106,7 @@ public class ScheduleController {
     logger.info("Operator user {}, exec workflow, project name: {}, workflow name: {}, schedule: {}, notify type: {}, notify mails: {}, max try times: {}," +
                     "failure policy: {}, dep workflows: {}, dep policy: {}, timeout: {}",
             operator.getName(), projectName, workflowName, schedule, notifyType, notifyMails, maxTryTimes, failurePolicy, depWorkflows, depPolicyType, timeout);
-    return scheduleService.putSchedule(operator,projectName,workflowName,schedule,notifyType,notifyMails,maxTryTimes,failurePolicy,depWorkflows,depPolicyType,timeout);
+    return new ScheduleDto(scheduleService.putSchedule(operator,projectName,workflowName,schedule,notifyType,notifyMails,maxTryTimes,failurePolicy,depWorkflows,depPolicyType,timeout));
   }
 
   /**
@@ -138,7 +140,7 @@ public class ScheduleController {
     logger.info("Operator user {}, exec workflow, project name: {}, workflow name: {}, schedule: {}, notify type: {}, notify mails: {}, max try times: {}," +
                     "failure policy: {}, dep workflows: {}, dep policy: {}, timeout: {}",
             operator.getName(), projectName, workflowName, schedule, notifyType, notifyMails, maxTryTimes, failurePolicy, depWorkflows, depPolicyType, timeout);
-    return scheduleService.patchSchedule(operator,projectName,workflowName,schedule,notifyType,notifyMails,maxTryTimes,failurePolicy,depWorkflows,depPolicyType,timeout,null);
+    return new ScheduleDto(scheduleService.patchSchedule(operator,projectName,workflowName,schedule,notifyType,notifyMails,maxTryTimes,failurePolicy,depWorkflows,depPolicyType,timeout,null));
   }
 
   /**
@@ -174,7 +176,7 @@ public class ScheduleController {
                                    @PathVariable String projectName,
                                    @PathVariable String workflowName,
                                    HttpServletResponse response){
-    return scheduleService.querySchedule(operator,projectName,workflowName);
+    return new ScheduleDto(scheduleService.querySchedule(operator,projectName,workflowName));
   }
 
   /**
@@ -188,6 +190,12 @@ public class ScheduleController {
   public List<ScheduleDto> queryAllSchedule(@RequestAttribute(value = "session.user") User operator,
                                             @PathVariable String projectName,
                                             HttpServletResponse response){
-    return scheduleService.queryAllSchedule(operator,projectName);
+    List<Schedule> scheduleList = scheduleService.queryAllSchedule(operator,projectName);
+    List<ScheduleDto> scheduleDtoList = new ArrayList<>();
+    for (Schedule schedule:scheduleList){
+      scheduleDtoList.add(new ScheduleDto(schedule));
+    }
+
+    return scheduleDtoList;
   }
 }

@@ -94,7 +94,7 @@ public class ScheduleServiceTest {
       DepPolicyType depPolicyType = DepPolicyType.NO_DEP_PRE;
       Integer timeout = 3600;
       MockHttpServletResponse mockHttpServletRespon = new MockHttpServletResponse();
-      ScheduleDto scheduleObj = scheduleService.createSchedule(user,project.getName(),projectFlow.getName(),schedule,notifyType,notifyMails,maxTryTimes,failurePolicyType,depWorkflows,depPolicyType,timeout);
+      Schedule scheduleObj = scheduleService.createSchedule(user,project.getName(),projectFlow.getName(),schedule,notifyType,notifyMails,maxTryTimes,failurePolicyType,depWorkflows,depPolicyType,timeout);
       assertEquals(mockHttpServletRespon.getStatus(), HttpStatus.SC_OK);
       assertTrue(scheduleObj!=null);
       logger.info(JsonUtil.toJsonString(scheduleObj));
@@ -115,7 +115,7 @@ public class ScheduleServiceTest {
       DepPolicyType depPolicyType = DepPolicyType.NO_DEP_PRE;
       Integer timeout = 3600;
       MockHttpServletResponse mockHttpServletRespon = new MockHttpServletResponse();
-      ScheduleDto scheduleObj = scheduleService.createSchedule(user,project.getName(),mockDataService.getRandomString(),schedule,notifyType,notifyMails,maxTryTimes,failurePolicyType,depWorkflows,depPolicyType,timeout);
+      Schedule scheduleObj = scheduleService.createSchedule(user,project.getName(),mockDataService.getRandomString(),schedule,notifyType,notifyMails,maxTryTimes,failurePolicyType,depWorkflows,depPolicyType,timeout);
       assertEquals(mockHttpServletRespon.getStatus(), HttpStatus.SC_NOT_MODIFIED);
       assertEquals(scheduleObj,null);
     }
@@ -137,7 +137,7 @@ public class ScheduleServiceTest {
       DepPolicyType depPolicyType = DepPolicyType.NO_DEP_PRE;
       Integer timeout = 3600;
       MockHttpServletResponse mockHttpServletRespon = new MockHttpServletResponse();
-      ScheduleDto scheduleObj = scheduleService.createSchedule(user,project.getName(),projectFlow.getName(),schedule,notifyType,notifyMails,maxTryTimes,failurePolicyType,depWorkflows,depPolicyType,timeout);
+      Schedule scheduleObj = scheduleService.createSchedule(user,project.getName(),projectFlow.getName(),schedule,notifyType,notifyMails,maxTryTimes,failurePolicyType,depWorkflows,depPolicyType,timeout);
       assertEquals(mockHttpServletRespon.getStatus(), HttpStatus.SC_CONFLICT);
       assertEquals(scheduleObj,null);
     }
@@ -160,7 +160,7 @@ public class ScheduleServiceTest {
       DepPolicyType depPolicyType = DepPolicyType.NO_DEP_PRE;
       Integer timeout = 3600;
       MockHttpServletResponse mockHttpServletRespon = new MockHttpServletResponse();
-      ScheduleDto scheduleObj = scheduleService.createSchedule(user1,project.getName(),projectFlow.getName(),schedule,notifyType,notifyMails,maxTryTimes,failurePolicyType,depWorkflows,depPolicyType,timeout);
+      Schedule scheduleObj = scheduleService.createSchedule(user1,project.getName(),projectFlow.getName(),schedule,notifyType,notifyMails,maxTryTimes,failurePolicyType,depWorkflows,depPolicyType,timeout);
       assertEquals(mockHttpServletRespon.getStatus(), HttpStatus.SC_UNAUTHORIZED);
       assertEquals(scheduleObj,null);
     }
@@ -187,7 +187,7 @@ public class ScheduleServiceTest {
       ScheduleStatus scheduleStatus = ScheduleStatus.ONLINE;
       Integer timeout = 3600;
       MockHttpServletResponse mockHttpServletRespon = new MockHttpServletResponse();
-      ScheduleDto scheduleObj = scheduleService.patchSchedule(user,project.getName(),projectFlow.getName(),schedule,notifyType,notifyMails,maxTryTimes,failurePolicyType,depWorkflows,depPolicyType,timeout,scheduleStatus);
+      Schedule scheduleObj = scheduleService.patchSchedule(user,project.getName(),projectFlow.getName(),schedule,notifyType,notifyMails,maxTryTimes,failurePolicyType,depWorkflows,depPolicyType,timeout,scheduleStatus);
       assertEquals(mockHttpServletRespon.getStatus(), HttpStatus.SC_OK);
       assertTrue(scheduleObj!=null);
     }
@@ -208,7 +208,7 @@ public class ScheduleServiceTest {
       ScheduleStatus scheduleStatus = ScheduleStatus.ONLINE;
       Integer timeout = 3600;
       MockHttpServletResponse mockHttpServletRespon = new MockHttpServletResponse();
-      ScheduleDto scheduleObj = scheduleService.patchSchedule(user,project.getName(),mockDataService.getRandomString(),schedule,notifyType,notifyMails,maxTryTimes,failurePolicyType,depWorkflows,depPolicyType,timeout,scheduleStatus);
+      Schedule scheduleObj = scheduleService.patchSchedule(user,project.getName(),mockDataService.getRandomString(),schedule,notifyType,notifyMails,maxTryTimes,failurePolicyType,depWorkflows,depPolicyType,timeout,scheduleStatus);
       assertEquals(mockHttpServletRespon.getStatus(), HttpStatus.SC_NOT_MODIFIED);
       assertEquals(scheduleObj,null);
     }
@@ -233,7 +233,7 @@ public class ScheduleServiceTest {
       ScheduleStatus scheduleStatus = ScheduleStatus.ONLINE;
       Integer timeout = 3600;
       MockHttpServletResponse mockHttpServletRespon = new MockHttpServletResponse();
-      ScheduleDto scheduleObj = scheduleService.patchSchedule(user1,project.getName(),projectFlow.getName(),schedule,notifyType,notifyMails,maxTryTimes,failurePolicyType,depWorkflows,depPolicyType,timeout,scheduleStatus);
+      Schedule scheduleObj = scheduleService.patchSchedule(user1,project.getName(),projectFlow.getName(),schedule,notifyType,notifyMails,maxTryTimes,failurePolicyType,depWorkflows,depPolicyType,timeout,scheduleStatus);
       assertEquals(mockHttpServletRespon.getStatus(), HttpStatus.SC_UNAUTHORIZED);
       assertEquals(scheduleObj,null);
     }
@@ -259,7 +259,7 @@ public class ScheduleServiceTest {
       DepPolicyType depPolicyType = DepPolicyType.NO_DEP_PRE;
       Integer timeout = 3600;
       MockHttpServletResponse mockHttpServletRespon = new MockHttpServletResponse();
-      ScheduleDto scheduleObj = scheduleService.putSchedule(user,project.getName(),projectFlow.getName(),schedule,notifyType,notifyMails,maxTryTimes,failurePolicyType,depWorkflows,depPolicyType,timeout);
+      Schedule scheduleObj = scheduleService.putSchedule(user,project.getName(),projectFlow.getName(),schedule,notifyType,notifyMails,maxTryTimes,failurePolicyType,depWorkflows,depPolicyType,timeout);
       assertEquals(mockHttpServletRespon.getStatus(), HttpStatus.SC_OK);
       assertTrue(scheduleObj!=null);
     }
@@ -280,7 +280,7 @@ public class ScheduleServiceTest {
       DepPolicyType depPolicyType = DepPolicyType.NO_DEP_PRE;
       Integer timeout = 3600;
       MockHttpServletResponse mockHttpServletRespon = new MockHttpServletResponse();
-      ScheduleDto scheduleObj = scheduleService.putSchedule(user,project.getName(),projectFlow.getName(),schedule,notifyType,notifyMails,maxTryTimes,failurePolicyType,depWorkflows,depPolicyType,timeout);
+      Schedule scheduleObj = scheduleService.putSchedule(user,project.getName(),projectFlow.getName(),schedule,notifyType,notifyMails,maxTryTimes,failurePolicyType,depWorkflows,depPolicyType,timeout);
       assertEquals(mockHttpServletRespon.getStatus(), HttpStatus.SC_OK);
       assertTrue(scheduleObj!=null);
     }
@@ -293,7 +293,7 @@ public class ScheduleServiceTest {
       ProjectFlow projectFlow = mockDataService.mocProjectFlow(project,user);
       mockDataService.mockSchedule(project.getName(),projectFlow.getId(),user.getId());
       MockHttpServletResponse mockHttpServletRespon = new MockHttpServletResponse();
-      ScheduleDto schedule = scheduleService.querySchedule(user,project.getName(),projectFlow.getName());
+      Schedule schedule = scheduleService.querySchedule(user,project.getName(),projectFlow.getName());
       assertEquals(mockHttpServletRespon.getStatus(), HttpStatus.SC_OK);
       assertTrue(schedule!=null);
     }

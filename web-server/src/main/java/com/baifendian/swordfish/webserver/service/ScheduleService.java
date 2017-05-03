@@ -77,7 +77,7 @@ public class ScheduleService {
    * @return
    */
   @Transactional(value = "TransactionManager", rollbackFor = Exception.class)
-  public ScheduleDto createSchedule(User operator, String projectName, String workflowName, String schedule, NotifyType notifyType, String notifyMails, int maxTryTimes, FailurePolicyType failurePolicy, String depWorkflows, DepPolicyType depPolicyType, int timeout){
+  public Schedule createSchedule(User operator, String projectName, String workflowName, String schedule, NotifyType notifyType, String notifyMails, int maxTryTimes, FailurePolicyType failurePolicy, String depWorkflows, DepPolicyType depPolicyType, int timeout){
 
     Project project = projectMapper.queryByName(projectName);
 
@@ -95,7 +95,7 @@ public class ScheduleService {
 
     if (projectFlow == null) {
       logger.error("User {} has no exist workflow {} for the project {} to post schedule",operator.getName(),workflowName,project.getName());
-      throw new NotModifiedException("User {} has no exist workflow {} for the project {} to post schedule",operator.getName(),workflowName,project.getName());
+      throw new NotModifiedException("User {0} has no exist workflow {1} for the project {2} to post schedule",operator.getName(),workflowName,project.getName());
     }
 
     Schedule scheduleObj = new Schedule();
@@ -134,7 +134,7 @@ public class ScheduleService {
       throw new NotModifiedException("schedule has exist, can't create again.");
     }
 
-    return new ScheduleDto(scheduleObj);
+    return scheduleObj;
   }
 
   /**
@@ -154,7 +154,7 @@ public class ScheduleService {
    * @return
    */
   @Transactional(value = "TransactionManager", rollbackFor = Exception.class)
-  public ScheduleDto patchSchedule(User operator, String projectName, String workflowName, String schedule, NotifyType notifyType, String notifyMails, Integer maxTryTimes, FailurePolicyType failurePolicy, String depWorkflows, DepPolicyType depPolicyType, Integer timeout, ScheduleStatus scheduleStatus) {
+  public Schedule patchSchedule(User operator, String projectName, String workflowName, String schedule, NotifyType notifyType, String notifyMails, Integer maxTryTimes, FailurePolicyType failurePolicy, String depWorkflows, DepPolicyType depPolicyType, Integer timeout, ScheduleStatus scheduleStatus) {
     Project project = projectMapper.queryByName(projectName);
 
     if (project == null) {
@@ -229,7 +229,7 @@ public class ScheduleService {
 
     scheduleMapper.update(scheduleObj);
 
-    return new ScheduleDto(scheduleObj);
+    return scheduleObj;
   }
 
   /**
@@ -237,7 +237,7 @@ public class ScheduleService {
    *
    * @return
    */
-  public ScheduleDto putSchedule(User operator, String projectName, String workflowName, String schedule, NotifyType notifyType, String notifyMails, Integer maxTryTimes, FailurePolicyType failurePolicy, String depWorkflows, DepPolicyType depPolicyType, Integer timeout){
+  public Schedule putSchedule(User operator, String projectName, String workflowName, String schedule, NotifyType notifyType, String notifyMails, Integer maxTryTimes, FailurePolicyType failurePolicy, String depWorkflows, DepPolicyType depPolicyType, Integer timeout){
     Schedule scheduleObj = scheduleMapper.selectByFlowName(projectName, workflowName);
     if (scheduleObj == null) {
       return createSchedule(operator, projectName, workflowName, schedule, notifyType, notifyMails, maxTryTimes, failurePolicy, depWorkflows, depPolicyType, timeout);
@@ -341,7 +341,7 @@ public class ScheduleService {
    * @param workflowName
    * @return
    */
-  public ScheduleDto querySchedule(User operator, String projectName, String workflowName) {
+  public Schedule querySchedule(User operator, String projectName, String workflowName) {
     Project project = projectMapper.queryByName(projectName);
 
     if (project == null) {
@@ -360,7 +360,7 @@ public class ScheduleService {
       throw new NotFoundException("workflow",workflowName);
     }
 
-    return new ScheduleDto(scheduleMapper.selectByFlowId(projectFlow.getId()));
+    return scheduleMapper.selectByFlowId(projectFlow.getId());
   }
 
   /**
@@ -369,7 +369,7 @@ public class ScheduleService {
    * @param projectName
    * @return
    */
-  public List<ScheduleDto> queryAllSchedule(User operator, String projectName) {
+  public List<Schedule> queryAllSchedule(User operator, String projectName) {
     Project project = projectMapper.queryByName(projectName);
 
     if (project == null) {
@@ -381,11 +381,6 @@ public class ScheduleService {
       throw new PermissionException("project read or project owner",operator.getName());
     }
 
-    List<Schedule> scheduleList = scheduleMapper.selectByProject(projectName);
-    List<ScheduleDto> scheduleResponseList = new ArrayList<>();
-    for (Schedule schedule:scheduleList){
-      scheduleResponseList.add(new ScheduleDto(schedule));
-    }
-    return scheduleResponseList;
+    return scheduleMapper.selectByProject(projectName);
   }
 }
