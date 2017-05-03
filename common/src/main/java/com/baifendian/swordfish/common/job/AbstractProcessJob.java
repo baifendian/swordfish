@@ -15,9 +15,8 @@
  */
 package com.baifendian.swordfish.common.job;
 
-import com.baifendian.swordfish.common.job.utils.ProcessUtil;
 import com.baifendian.swordfish.common.job.exception.ExecException;
-
+import com.baifendian.swordfish.common.job.utils.ProcessUtil;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;

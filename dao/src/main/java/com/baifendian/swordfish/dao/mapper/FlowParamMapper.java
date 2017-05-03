@@ -16,7 +16,6 @@
 package com.baifendian.swordfish.dao.mapper;
 
 import com.baifendian.swordfish.dao.model.FlowParam;
-
 import org.apache.ibatis.annotations.*;
 import org.apache.ibatis.type.JdbcType;
 

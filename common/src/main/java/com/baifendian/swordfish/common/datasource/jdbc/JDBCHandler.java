@@ -18,7 +18,6 @@ package com.baifendian.swordfish.common.datasource.jdbc;
 import com.baifendian.swordfish.common.datasource.DataSourceHandler;
 import com.baifendian.swordfish.dao.enums.DbType;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

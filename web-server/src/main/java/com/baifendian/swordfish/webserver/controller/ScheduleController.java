@@ -17,6 +17,9 @@ package com.baifendian.swordfish.webserver.controller;
 
 import com.baifendian.swordfish.dao.enums.*;
 import com.baifendian.swordfish.dao.model.Schedule;
+import com.baifendian.swordfish.dao.enums.DepPolicyType;
+import com.baifendian.swordfish.dao.enums.FailurePolicyType;
+import com.baifendian.swordfish.dao.enums.NotifyType;
 import com.baifendian.swordfish.dao.model.User;
 import com.baifendian.swordfish.webserver.dto.ScheduleDto;
 import com.baifendian.swordfish.webserver.service.ScheduleService;

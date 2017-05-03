@@ -15,8 +15,8 @@
  */
 package com.baifendian.swordfish.webserver.service;
 
-import com.baifendian.swordfish.common.adhoc.AdHocParam;
-import com.baifendian.swordfish.common.job.UdfsInfo;
+import com.baifendian.swordfish.common.job.struct.hql.AdHocParam;
+import com.baifendian.swordfish.common.job.struct.hql.UdfsInfo;
 import com.baifendian.swordfish.dao.enums.FlowStatus;
 import com.baifendian.swordfish.dao.mapper.AdHocMapper;
 import com.baifendian.swordfish.dao.mapper.MasterServerMapper;
@@ -29,11 +29,8 @@ import com.baifendian.swordfish.webserver.dto.AdHocLogData;
 import com.baifendian.swordfish.webserver.dto.AdHocResultData;
 import com.baifendian.swordfish.webserver.dto.ExecutorId;
 import com.baifendian.swordfish.webserver.dto.LogResult;
-import com.baifendian.swordfish.webserver.exception.NotFoundException;
-import com.baifendian.swordfish.webserver.exception.NotModifiedException;
-import com.baifendian.swordfish.webserver.exception.PermissionException;
-import com.baifendian.swordfish.webserver.exception.ServerErrorException;
-import org.apache.commons.httpclient.HttpStatus;
+import com.baifendian.swordfish.webserver.exception.*;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,7 +38,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 
-import javax.servlet.http.HttpServletResponse;
 import java.util.Date;
 import java.util.List;
 
@@ -86,12 +82,12 @@ public class AdhocService {
 
     if (project == null) {
       logger.error("Project does not exist: {}", projectName);
-      throw new NotFoundException("project",projectName);
+      throw new NotFoundException("project", projectName);
     }
 
     if (!projectService.hasExecPerm(operator.getId(), project)) {
       logger.error("User {} has no right permission for the project {}", operator.getName(), projectName);
-      throw new PermissionException("project exec or project owner",operator.getName());
+      throw new PermissionException("project exec or project owner", operator.getName());
     }
 
     // 查看 master 是否存在
@@ -99,6 +95,19 @@ public class AdhocService {
     if (masterServer == null) {
       logger.error("Master server does not exist.");
       throw new ServerErrorException("Master server does not exist.");
+    }
+
+    // 判断 proxyUser 是否合理的
+    if (CollectionUtils.isEmpty(operator.getProxyUserList())) {
+      logger.error("Proxy user list is empty, operator: {}", operator.getName());
+      throw new ServerErrorException("Proxy user list of the operator is empty.");
+    }
+
+    // 如果不是代理所有用户, 且不包含代理的用户
+    List<String> proxyUserList = operator.getProxyUserList();
+    if (!proxyUserList.get(0).equals("*") && !proxyUserList.contains(proxyUser)) {
+      logger.error("Proxy user '{}' not allowed for user '{}'", proxyUser, operator.getName());
+      throw new BadRequestException("Proxy user '{0}' not allowed for user '{1}'", proxyUser, operator.getName());
     }
 
     // 插入数据库记录, 得到 exec id
@@ -169,12 +178,12 @@ public class AdhocService {
 
     if (project == null) {
       logger.error("Exec id: {} has no correspond project", execId);
-      throw new NotFoundException("project","for execId:"+execId);
+      throw new NotFoundException("project", "for execId:" + execId);
     }
 
     if (!projectService.hasExecPerm(operator.getId(), project)) {
       logger.error("User [{},{}] has no right permission for the project [{}], execId: {}", operator.getId(), operator.getName(), project.getName(), execId);
-      throw new PermissionException("project exec or project owner",operator.getName()+" to project:"+project.getName());
+      throw new PermissionException("project exec or project owner", operator.getName() + " to project:" + project.getName());
     }
 
     // 返回日志信息
@@ -182,14 +191,14 @@ public class AdhocService {
     AdHoc adhoc = adHocMapper.selectById(execId);
     if (adhoc == null) {
       logger.error("Exec id not exist: {}", execId);
-      throw new NotFoundException("execId",String.valueOf(execId));
+      throw new NotFoundException("execId", String.valueOf(execId));
     }
 
     String jobId = adhoc.getJobId();
 
     if (StringUtils.isEmpty(jobId)) {
       logger.warn("Job id of exec: {} is null", execId);
-      throw new ServerErrorException("jobId",jobId);
+      throw new ServerErrorException("jobId", jobId);
     }
 
     // 2. 先判断有多少个语句, index 如果超过了, 返回异常
@@ -233,12 +242,12 @@ public class AdhocService {
 
     if (project == null) {
       logger.error("Exec id: {} has no correspond project", execId);
-      throw new NotFoundException("project","for execId:"+execId);
+      throw new NotFoundException("project", "for execId:" + execId);
     }
 
     if (!projectService.hasExecPerm(operator.getId(), project)) {
       logger.error("User {} has no right permission for the project {}", operator.getName(), project.getName());
-      throw new PermissionException("project exec or project owner",operator.getName()+" to project:"+project.getName());
+      throw new PermissionException("project exec or project owner", operator.getName() + " to project:" + project.getName());
     }
 
     // 返回结果

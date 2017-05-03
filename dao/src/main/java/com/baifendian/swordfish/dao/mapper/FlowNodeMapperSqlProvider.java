@@ -15,13 +15,10 @@
  */
 package com.baifendian.swordfish.dao.mapper;
 
-import com.baifendian.swordfish.dao.mapper.utils.EnumFieldUtil;
-import com.baifendian.swordfish.dao.enums.FlowType;
 import com.baifendian.swordfish.dao.enums.NodeType;
+import com.baifendian.swordfish.dao.mapper.utils.EnumFieldUtil;
 import com.baifendian.swordfish.dao.model.FlowNode;
-
 import org.apache.commons.lang.StringUtils;
-import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.jdbc.SQL;
 
 import java.text.MessageFormat;

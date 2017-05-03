@@ -15,21 +15,22 @@
  */
 package com.baifendian.swordfish.webserver.service;
 
-import com.baifendian.swordfish.common.utils.VerifyUtil;
+import com.baifendian.swordfish.common.config.BaseConfig;
 import com.baifendian.swordfish.common.utils.http.HttpUtil;
 import com.baifendian.swordfish.dao.enums.UserRoleType;
 import com.baifendian.swordfish.dao.mapper.ProjectMapper;
+import com.baifendian.swordfish.dao.mapper.ProjectUserMapper;
 import com.baifendian.swordfish.dao.mapper.UserMapper;
 import com.baifendian.swordfish.dao.model.Project;
+import com.baifendian.swordfish.dao.model.ProjectUser;
 import com.baifendian.swordfish.dao.model.User;
-import com.baifendian.swordfish.webserver.dto.UserDto;
+import com.baifendian.swordfish.dao.utils.json.JsonUtil;
 import com.baifendian.swordfish.webserver.exception.NotFoundException;
 import com.baifendian.swordfish.webserver.exception.NotModifiedException;
 import com.baifendian.swordfish.webserver.exception.ParameterException;
 import com.baifendian.swordfish.webserver.exception.PermissionException;
 import com.baifendian.swordfish.webserver.utils.VerifyUtils;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,7 +38,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 
-import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -52,6 +52,9 @@ public class UserService {
   @Autowired
   private ProjectMapper projectMapper;
 
+  @Autowired
+  private ProjectUserMapper projectUserMapper;
+
   /**
    * 创建用户, 只有系统管理员有权限增加用户
    *
@@ -65,12 +68,12 @@ public class UserService {
    * @return
    */
   public User createUser(User operator,
-                            String name,
-                            String email,
-                            String desc,
-                            String password,
-                            String phone,
-                            String proxyUsers) {
+                         String name,
+                         String email,
+                         String desc,
+                         String password,
+                         String phone,
+                         String proxyUsers) {
 
     VerifyUtils.verifyUserName(name);
     VerifyUtils.verifyEmail(email);
@@ -78,12 +81,13 @@ public class UserService {
 
     // 如果不是管理员, 返回错误
     if (operator.getRole() != UserRoleType.ADMIN_USER) {
-      throw new PermissionException("admin",operator.getName());
+      throw new PermissionException("User '{0}' is not admin user", operator.getName());
     }
 
     // 校验代理用户格式是否正确以及是否包含正常代理的内容
-    // TODO::
+    proxyUsers = checkProxyUser(proxyUsers);
 
+    // 构建用户
     User user = new User();
     Date now = new Date();
 
@@ -134,19 +138,19 @@ public class UserService {
     if (operator.getRole() != UserRoleType.ADMIN_USER) {
       // 非管理员, 只能修改自身信息
       if (!StringUtils.equals(operator.getName(), name)) {
-        throw new PermissionException("admin",operator.getName());
+        throw new PermissionException("User '{0}' has no permission modify '{1}' information", operator.getName(), name);
       }
 
       // 普通用户不能进行用户代理设置
       if (StringUtils.isNotEmpty(proxyUsers)) {
-        throw new PermissionException("admin",operator.getName());
+        throw new PermissionException("User '{0}' has no permission to modify proxy users information", operator.getName());
       }
     }
 
     User user = userMapper.queryByName(name);
 
     if (user == null) {
-      throw new NotFoundException("user",name);
+      throw new NotFoundException("Not found user '{0}'", name);
     }
 
     Date now = new Date();
@@ -169,10 +173,9 @@ public class UserService {
       }
     }
 
+    // 校验代理用户格式是否正确以及是否包含正常代理的内容
     if (proxyUsers != null) {
-      // 校验代理用户格式是否正确以及是否包含正常代理的内容
-      // TODO::
-
+      proxyUsers = checkProxyUser(proxyUsers);
       user.setProxyUsers(proxyUsers);
     }
 
@@ -196,17 +199,18 @@ public class UserService {
    */
   public void deleteUser(User operator,
                          String name) {
+
     if (operator.getRole() != UserRoleType.ADMIN_USER) {
-      throw new PermissionException("admin",operator.getName());
+      throw new PermissionException("User '{0}' is not admin user", operator.getName());
     }
 
     // 删除, 是不能删除自己的
     if (StringUtils.equals(operator.getName(), name)) {
       logger.error("Can't delete user self");
-      throw new ParameterException("name");
+      throw new ParameterException("Can't not delete user self");
     }
 
-    // 删除用户的时候, 必须保证 "项目" 的信息不为空
+    // 删除用户的时候, 必须保证用户没有参与到任何的项目开发之中
     List<Project> projects = projectMapper.queryProjectByUser(operator.getId());
 
     if (CollectionUtils.isNotEmpty(projects)) {
@@ -214,6 +218,14 @@ public class UserService {
       throw new NotModifiedException("Can't delete a account which has projects");
     }
 
+    List<ProjectUser> projectUsers = projectUserMapper.queryByUser(operator.getId());
+
+    if (CollectionUtils.isNotEmpty(projectUsers)) {
+      logger.error("Can't delete a account which join some projects");
+      throw new NotModifiedException("Can't delete a account which join some projects");
+    }
+
+    // 如果没有加入到任何项目, 则可以进行删除了
     int count = userMapper.delete(name);
 
     if (count <= 0) {
@@ -257,4 +269,33 @@ public class UserService {
 
     return userMapper.queryForCheck(name, email, md5);
   }
+
+  /**
+   * 检测代理用户是否正常
+   *
+   * @param proxyUsers
+   * @return 如果包含 *, 则会返回 *, 不会返回其它的
+   */
+  private String checkProxyUser(String proxyUsers) {
+    List<String> proxyUsersList = JsonUtil.parseObjectList(proxyUsers, String.class);
+
+    if (CollectionUtils.isEmpty(proxyUsersList)) {
+      throw new ParameterException("ProxyUsers '{0}' not valid", proxyUsers);
+    }
+
+    // 如果包含了禁用的用户, 则会报警
+    for (String user : proxyUsersList) {
+      if (BaseConfig.isProhibitUser(user)) {
+        throw new ParameterException("ProxyUsers '{0}' not valid, can't contains '{1}'", proxyUsers, user);
+      }
+
+      // 如果是全部用户, 直接跳过
+      if (user.equals("*")) {
+        proxyUsers = "[\"*\"]"; // 认为是全部的用户
+      }
+    }
+
+    return proxyUsers;
+  }
+
 }

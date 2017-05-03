@@ -15,14 +15,14 @@
  */
 package com.baifendian.swordfish.webserver.controller;
 
-import com.baifendian.swordfish.common.job.UdfsInfo;
+import com.baifendian.swordfish.common.job.struct.hql.UdfsInfo;
 import com.baifendian.swordfish.dao.model.User;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
 import com.baifendian.swordfish.webserver.dto.AdHocLogData;
 import com.baifendian.swordfish.webserver.dto.AdHocResultData;
 import com.baifendian.swordfish.webserver.dto.ExecutorId;
+import com.baifendian.swordfish.webserver.exception.BadRequestException;
 import com.baifendian.swordfish.webserver.service.AdhocService;
-import org.apache.commons.httpclient.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,6 +53,7 @@ public class AdhocController {
    * @param proxyUser
    * @param queue
    * @param udfs
+   * @param timeout
    * @param response
    * @return
    */
@@ -71,14 +72,12 @@ public class AdhocController {
 
     // limit 的限制
     if (limit <= 0 || limit > 5000) {
-      response.setStatus(HttpStatus.SC_NOT_MODIFIED);
-      throw new IllegalArgumentException("Argument is not valid, limit must be between (0, 5000]");
+      throw new BadRequestException("Argument is not valid, limit must be between (0, 5000]");
     }
 
     // timeout 的限制
     if (timeout <= 0 || timeout > 14400) {
-      response.setStatus(HttpStatus.SC_NOT_MODIFIED);
-      throw new IllegalArgumentException("Argument is not valid, timeout must be between (0, 14400]");
+      throw new BadRequestException("Argument is not valid, timeout must be between (0, 14400]");
     }
 
     // 检验 udfs, 生成对象
@@ -88,8 +87,7 @@ public class AdhocController {
       udfsInfos = JsonUtil.parseObjectList(udfs, UdfsInfo.class);
     } catch (Exception e) {
       logger.error("Parse json exception.", e);
-      response.setStatus(HttpStatus.SC_BAD_REQUEST);
-      throw new IllegalArgumentException("Argument is not valid, udfs format not a valid.");
+      throw new BadRequestException("Argument is not valid, udfs format not a valid.");
     }
 
     return adhocService.execAdhoc(operator, projectName, stms, limit, proxyUser, queue, udfsInfos, timeout);
@@ -118,14 +116,12 @@ public class AdhocController {
 
     // index & from 的限制
     if (index < 0 || from < 0) {
-      response.setStatus(HttpStatus.SC_NOT_MODIFIED);
-      throw new IllegalArgumentException("Argument is not valid, index & from must be equal or more than zero");
+      throw new BadRequestException("Argument is not valid, index & from must be equal or more than zero");
     }
 
     // size 的限制
     if (size <= 0 || size > 1000) {
-      response.setStatus(HttpStatus.SC_NOT_MODIFIED);
-      throw new IllegalArgumentException("Argument is not valid, size must be between (0, 1000]");
+      throw new BadRequestException("Argument is not valid, size must be between (0, 1000]");
     }
 
     return adhocService.queryLogs(operator, execId, index, from, size);
@@ -150,8 +146,7 @@ public class AdhocController {
 
     // index 的限制
     if (index < 0) {
-      response.setStatus(HttpStatus.SC_NOT_MODIFIED);
-      throw new IllegalArgumentException("Argument is not valid, index must be equal or more than zero");
+      throw new BadRequestException("Argument is not valid, index must be equal or more than zero");
     }
 
     return adhocService.queryResult(operator, execId, index);

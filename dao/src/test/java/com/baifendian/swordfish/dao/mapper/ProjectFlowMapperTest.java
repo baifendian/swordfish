@@ -1,12 +1,9 @@
 package com.baifendian.swordfish.dao.mapper;
 
 import com.baifendian.swordfish.dao.datasource.ConnectionFactory;
-import com.baifendian.swordfish.dao.model.FlowNode;
 import com.baifendian.swordfish.dao.model.ProjectFlow;
 import org.junit.Before;
 import org.junit.Test;
-
-import java.util.List;
 
 import static junit.framework.TestCase.assertTrue;
 

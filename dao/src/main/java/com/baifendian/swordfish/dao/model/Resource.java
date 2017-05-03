@@ -15,8 +15,6 @@
  */
 package com.baifendian.swordfish.dao.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import java.util.Date;
 
 public class Resource {

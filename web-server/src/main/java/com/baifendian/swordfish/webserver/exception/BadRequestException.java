@@ -25,14 +25,12 @@ import java.text.MessageFormat;
  */
 @ResponseStatus(code = HttpStatus.BAD_REQUEST)
 public class BadRequestException extends RuntimeException {
+
   public BadRequestException(String msg) {
     super(msg);
   }
 
-  public BadRequestException(String msg, Object ... arguments) {
-    super(MessageFormat.format(msg,arguments));
-  }
-
-  public BadRequestException() {
+  public BadRequestException(String msg, Object... arguments) {
+    super(MessageFormat.format(msg, arguments));
   }
 }

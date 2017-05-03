@@ -20,7 +20,6 @@ import com.baifendian.swordfish.common.job.JobProps;
 import com.baifendian.swordfish.common.job.yarn.AbstractYarnJob;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
 import com.baifendian.swordfish.execserver.parameter.ParamHelper;
-
 import org.slf4j.Logger;
 
 import java.io.IOException;

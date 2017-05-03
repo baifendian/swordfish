@@ -19,9 +19,6 @@ import com.baifendian.swordfish.dao.exception.DagException;
 import com.baifendian.swordfish.dao.model.FlowNode;
 import com.baifendian.swordfish.dao.model.FlowNodeRelation;
 import com.baifendian.swordfish.dao.model.flow.FlowDag;
-import com.baifendian.swordfish.dao.utils.json.JsonUtil;
-
-import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.Iterator;

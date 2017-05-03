@@ -16,7 +16,6 @@
 package com.baifendian.swordfish.dao;
 
 import com.baifendian.swordfish.dao.model.AdHoc;
-
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

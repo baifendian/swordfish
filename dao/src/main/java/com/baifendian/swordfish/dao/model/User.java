@@ -26,7 +26,6 @@ public class User {
   /**
    * 用户 ID
    */
-  @JsonIgnore
   private int id;
 
   /**
@@ -47,7 +46,6 @@ public class User {
   /**
    * 用户密码
    */
-  @JsonIgnore
   private String password;
 
   /**
@@ -58,7 +56,6 @@ public class User {
   /**
    * 角色
    */
-  @JsonIgnore
   private UserRoleType role;
 
   /**
@@ -142,7 +139,7 @@ public class User {
   }
 
   public void setProxyUsers(String proxyUsers) {
-    this.proxyUserList = JsonUtil.parseObjectList(proxyUsers,String.class);
+    this.proxyUserList = JsonUtil.parseObjectList(proxyUsers, String.class);
     this.proxyUsers = proxyUsers;
   }
 

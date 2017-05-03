@@ -22,20 +22,18 @@ import com.baifendian.swordfish.dao.model.Project;
 import com.baifendian.swordfish.dao.model.ProjectFlow;
 import com.baifendian.swordfish.dao.model.User;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
+import com.baifendian.swordfish.mock.MockDataService;
 import com.baifendian.swordfish.utils.TestUtils;
 import com.baifendian.swordfish.webserver.RestfulApiApplication;
 import com.baifendian.swordfish.webserver.dto.WorkflowData;
-import com.baifendian.swordfish.webserver.dto.WorkflowDto;
 import com.baifendian.swordfish.webserver.exception.NotFoundException;
 import com.baifendian.swordfish.webserver.exception.NotModifiedException;
 import com.baifendian.swordfish.webserver.exception.PermissionException;
-import com.baifendian.swordfish.mock.MockDataService;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import org.apache.commons.lang.StringUtils;
 import org.junit.Before;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
-import org.junit.Test;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
@@ -46,7 +44,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.IOException;
 import java.util.List;
 
-import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertTrue;
 
 /**

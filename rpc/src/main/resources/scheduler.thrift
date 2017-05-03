@@ -154,6 +154,7 @@ service MasterService {
    * 注册 execServer
    * ip :  ip 地址
    * port : 端口号
+   * registerTime : 注册时间
    */
   RetInfo registerExecutor(1:string ip, 2:i32 port, 3:i64 registerTime),
 
@@ -162,6 +163,7 @@ service MasterService {
    *
    * ip :  ip 地址
    * port : 端口号
+   * heartBeatData : 心跳信息
    */
   RetInfo executorReport(1:string ip, 2:i32 port, 3:HeartBeatData heartBeatData),
 

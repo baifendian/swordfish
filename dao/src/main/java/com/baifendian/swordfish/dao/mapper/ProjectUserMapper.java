@@ -37,8 +37,12 @@ public interface ProjectUserMapper {
    * @return
    */
   @Results(value = {@Result(property = "projectId", column = "project_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
+      @Result(property = "projectName", column = "project_name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
       @Result(property = "userId", column = "user_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
-      @Result(property = "createTime", column = "create_time", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP),})
+      @Result(property = "userName", column = "user_name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+      @Result(property = "perm", column = "perm", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
+      @Result(property = "createTime", column = "create_time", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP),
+      @Result(property = "modifyTime", column = "modify_time", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP)})
   @SelectProvider(type = ProjectUserSqlProvider.class, method = "query")
   ProjectUser query(@Param("projectId") int projectId, @Param("userId") int userId);
 
@@ -83,7 +87,7 @@ public interface ProjectUserMapper {
       @Result(property = "userName", column = "userName", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
       @Result(property = "createTime", column = "create_time", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP),
       @Result(property = "modifyTime", column = "modify_time", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP),
-      @Result(property = "perm", column = "perm", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
+      @Result(property = "perm", column = "perm", javaType = Integer.class, jdbcType = JdbcType.INTEGER)
   })
   @SelectProvider(type = ProjectUserSqlProvider.class, method = "queryByProject")
   List<ProjectUser> queryByProject(@Param("projectId") int projectId);
@@ -107,4 +111,20 @@ public interface ProjectUserMapper {
   })
   @SelectProvider(type = ProjectUserSqlProvider.class, method = "queryForUser")
   List<User> queryForUser(@Param("projectId") int projectId);
+
+  /**
+   * 根据用户名称进行查询
+   *
+   * @param userId
+   * @return
+   */
+  @Results(value = {@Result(property = "projectId", column = "project_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
+      @Result(property = "projectName", column = "project_name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+      @Result(property = "userId", column = "user_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
+      @Result(property = "userName", column = "user_name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+      @Result(property = "perm", column = "perm", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
+      @Result(property = "createTime", column = "create_time", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP),
+      @Result(property = "modifyTime", column = "modify_time", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP)})
+  @SelectProvider(type = ProjectUserSqlProvider.class, method = "queryByUser")
+  List<ProjectUser> queryByUser(@Param("userId") int userId);
 }

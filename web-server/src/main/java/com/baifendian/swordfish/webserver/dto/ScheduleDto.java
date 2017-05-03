@@ -19,7 +19,6 @@ import com.baifendian.swordfish.dao.enums.DepPolicyType;
 import com.baifendian.swordfish.dao.enums.FailurePolicyType;
 import com.baifendian.swordfish.dao.enums.NotifyType;
 import com.baifendian.swordfish.dao.model.Schedule;
-import com.baifendian.swordfish.webserver.dto.ScheduleParam;
 
 import java.util.Date;
 import java.util.List;

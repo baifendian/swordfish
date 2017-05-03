@@ -22,7 +22,6 @@ import com.baifendian.swordfish.common.job.exception.ExecException;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
 import com.baifendian.swordfish.execserver.utils.hive.HiveConfig;
 import com.baifendian.swordfish.execserver.utils.hive.MyHiveFactoryUtil;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
@@ -34,8 +33,6 @@ import java.nio.charset.Charset;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-
-import static java.nio.charset.StandardCharsets.UTF_8;
 
 public class UploadJob extends AbstractProcessJob {
   private UploadParam param;

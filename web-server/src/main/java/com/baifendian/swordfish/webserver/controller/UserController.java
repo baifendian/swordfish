@@ -18,7 +18,6 @@ package com.baifendian.swordfish.webserver.controller;
 import com.baifendian.swordfish.dao.model.User;
 import com.baifendian.swordfish.webserver.dto.UserDto;
 import com.baifendian.swordfish.webserver.service.UserService;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

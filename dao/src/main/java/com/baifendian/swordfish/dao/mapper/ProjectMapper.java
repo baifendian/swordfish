@@ -18,7 +18,6 @@ package com.baifendian.swordfish.dao.mapper;
 import com.baifendian.swordfish.dao.model.Project;
 import org.apache.ibatis.annotations.*;
 import org.apache.ibatis.type.JdbcType;
-import org.mybatis.spring.annotation.MapperScan;
 
 import java.util.Date;
 import java.util.List;

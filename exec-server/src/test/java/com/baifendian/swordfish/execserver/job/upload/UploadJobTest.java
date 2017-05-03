@@ -17,8 +17,6 @@ package com.baifendian.swordfish.execserver.job.upload;
 
 import com.baifendian.swordfish.execserver.utils.hive.HiveConfig;
 import com.baifendian.swordfish.execserver.utils.hive.MyHiveFactoryUtil;
-
-import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
 import org.apache.hadoop.hive.metastore.api.Table;
 import org.apache.thrift.TException;

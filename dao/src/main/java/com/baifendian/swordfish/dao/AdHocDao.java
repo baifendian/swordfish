@@ -21,12 +21,10 @@ import com.baifendian.swordfish.dao.mapper.AdHocMapper;
 import com.baifendian.swordfish.dao.mapper.AdHocResultMapper;
 import com.baifendian.swordfish.dao.model.AdHoc;
 import com.baifendian.swordfish.dao.model.AdHocResult;
-
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
 

@@ -18,7 +18,6 @@ package com.baifendian.swordfish.common.datasource.hbase;
 import com.baifendian.swordfish.common.datasource.DataSourceHandler;
 import com.baifendian.swordfish.dao.enums.DbType;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HBaseConfiguration;

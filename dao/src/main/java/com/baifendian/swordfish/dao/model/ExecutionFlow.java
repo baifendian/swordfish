@@ -20,8 +20,6 @@ import com.baifendian.swordfish.dao.enums.FlowStatus;
 import com.baifendian.swordfish.dao.enums.NotifyType;
 import com.baifendian.swordfish.dao.model.flow.params.Property;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import org.apache.commons.lang.StringUtils;
 
 import java.util.Date;
@@ -40,14 +38,16 @@ public class ExecutionFlow {
    * workflow的id
    * 数据库映射字段 flow_id
    **/
-  @JsonIgnore
   private int flowId;
 
+  /**
+   * 执行 id
+   */
   private Integer execId;
 
   /**
-   * workflow名称
-   * DTO需要字段
+   * workflow 名称
+   * DTO 需要字段
    **/
   private String flowName;
 
@@ -128,10 +128,19 @@ public class ExecutionFlow {
    */
   private String workflowName;
 
+  /**
+   *
+   */
   private ExecType execType;
 
+  /**
+   * 执行时间
+   */
   private Integer duration;
 
+  /**
+   * 消耗时间
+   */
   private int consume;
 
   /**
@@ -164,7 +173,9 @@ public class ExecutionFlow {
    */
   private String extras;
 
-  @JsonIgnore
+  /**
+   * 用户定义参数
+   */
   private Map<String, String> userDefinedParamMap;
 
   /**
@@ -197,7 +208,7 @@ public class ExecutionFlow {
   private String queue;
 
   public Integer getDuration() {
-    if (startTime!=null && endTime !=null){
+    if (startTime != null && endTime != null) {
       return Math.toIntExact((endTime.getTime() - startTime.getTime()) / 1000);
     }
     return null;

@@ -16,10 +16,7 @@
 package com.baifendian.swordfish.common.datasource.mongodb;
 
 import com.baifendian.swordfish.dao.enums.DbType;
-
 import org.junit.Test;
-
-import static org.junit.Assert.assertTrue;
 
 public class MongoDBHandlerTest {
 

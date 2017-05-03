@@ -23,24 +23,15 @@ import java.text.MessageFormat;
 /**
  * 请求参数异常
  */
-public class ParameterException extends BadRequestException {
+@ResponseStatus(code = HttpStatus.BAD_REQUEST)
+public class ParameterException extends RuntimeException {
 
-  private String parameter;
-
-  public ParameterException(String parameter) {
-    super("Parameter: {0} is invalid",parameter);
-    this.parameter = parameter;
+  public ParameterException(String msg) {
+    super(msg);
   }
 
-  public String getParameter() {
-    return parameter;
-  }
-
-  /**
-   *
-   */
-  public ParameterException() {
-    super();
+  public ParameterException(String msg, Object... arguments) {
+    super(MessageFormat.format(msg, arguments));
   }
 
 }

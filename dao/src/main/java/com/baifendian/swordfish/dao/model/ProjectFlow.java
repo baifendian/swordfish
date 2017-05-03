@@ -23,12 +23,12 @@ import com.baifendian.swordfish.dao.utils.json.JsonUtil;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-import java.util.*;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class ProjectFlow {
@@ -49,7 +49,6 @@ public class ProjectFlow {
    * 项目 id
    * 数据库映射字段
    */
-  @JsonIgnore
   private int projectId;
 
   /**
@@ -98,7 +97,6 @@ public class ProjectFlow {
    * 用户定义参数
    * 数据库映射字段
    */
-  @JsonIgnore
   @JsonDeserialize(using = JsonObjectDeserializer.class)
   @JsonSerialize(using = JsonObjectSerializer.class)
   private String userDefinedParams;
@@ -112,7 +110,6 @@ public class ProjectFlow {
   /**
    * 用户定义参数的 map 结构,
    */
-  @JsonIgnore
   private Map<String, String> userDefinedParamMap;
 
   /**
@@ -132,7 +129,6 @@ public class ProjectFlow {
   /**
    * 结点信息, 数据库中数据解析出来的
    */
-  @JsonIgnore
   private List<FlowNode> flowsNodes;
 
   /**

@@ -216,7 +216,7 @@ CREATE TABLE `ad_hocs` (
   `end_time` datetime DEFAULT NULL COMMENT 'end time of this exec',
   PRIMARY KEY (`id`),
   FOREIGN KEY (`project_id`) REFERENCES `project`(`id`) ON DELETE CASCADE,
-  FOREIGN KEY (`owner`) REFERENCES `user`(`id`)
+  FOREIGN KEY (`owner`) REFERENCES `user`(`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- `ad_hoc_results` table

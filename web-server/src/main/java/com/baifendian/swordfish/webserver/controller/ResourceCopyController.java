@@ -15,7 +15,6 @@
  */
 package com.baifendian.swordfish.webserver.controller;
 
-import com.baifendian.swordfish.dao.model.Resource;
 import com.baifendian.swordfish.dao.model.User;
 import com.baifendian.swordfish.webserver.dto.ResourceDto;
 import com.baifendian.swordfish.webserver.service.ResourceService;

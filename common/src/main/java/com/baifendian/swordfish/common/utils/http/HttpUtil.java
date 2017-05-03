@@ -15,7 +15,6 @@
  */
 package com.baifendian.swordfish.common.utils.http;
 
-import com.baifendian.swordfish.common.consts.Constants;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -23,7 +22,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
-import java.util.regex.Pattern;
 
 public class HttpUtil {
   private static final Logger logger = LoggerFactory.getLogger(HttpUtil.class);
@@ -84,6 +82,4 @@ public class HttpUtil {
   public static String getMd5(String raw) {
     return DigestUtils.md5Hex(raw);
   }
-
-
 }

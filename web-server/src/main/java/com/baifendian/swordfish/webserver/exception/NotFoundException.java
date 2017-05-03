@@ -25,25 +25,15 @@ import java.text.MessageFormat;
  */
 @ResponseStatus(code = HttpStatus.NOT_FOUND)
 public class NotFoundException extends RuntimeException {
-  private String type;
-  private String name;
 
-  public String getType() {
-    return type;
+  public NotFoundException() {
   }
 
-  public String getName() {
-    return name;
+  public NotFoundException(String msg) {
+    super(msg);
   }
 
-  public NotFoundException(){
-    super();
-  }
-
-  public NotFoundException(String type, String name) {
-    super(MessageFormat.format("Type: {0} name: {1} not found",type,name));
-
-    this.type = type;
-    this.name = name;
+  public NotFoundException(String msg, Object... arguments) {
+    super(MessageFormat.format(msg, arguments));
   }
 }

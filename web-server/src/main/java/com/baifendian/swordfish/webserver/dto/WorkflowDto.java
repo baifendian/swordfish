@@ -18,8 +18,6 @@ package com.baifendian.swordfish.webserver.dto;
 import com.baifendian.swordfish.dao.model.FlowNode;
 import com.baifendian.swordfish.dao.model.ProjectFlow;
 import com.baifendian.swordfish.dao.utils.json.JsonObjectDeserializer;
-import com.baifendian.swordfish.webserver.dto.WorkflowData;
-import com.baifendian.swordfish.webserver.dto.WorkflowNodeDto;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonRawValue;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;

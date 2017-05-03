@@ -20,7 +20,6 @@ import com.baifendian.swordfish.common.job.logger.JobLogger;
 import com.baifendian.swordfish.dao.AdHocDao;
 import com.baifendian.swordfish.dao.enums.FlowStatus;
 import com.baifendian.swordfish.dao.model.AdHoc;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

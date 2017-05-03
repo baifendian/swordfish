@@ -25,11 +25,9 @@ import com.baifendian.swordfish.dao.model.Schedule;
 import com.baifendian.swordfish.execserver.adhoc.AdHocRunnerManager;
 import com.baifendian.swordfish.execserver.flow.FlowRunnerManager;
 import com.baifendian.swordfish.execserver.utils.ResultHelper;
-import com.baifendian.swordfish.rpc.WorkerService.Iface;
 import com.baifendian.swordfish.rpc.RetInfo;
-
+import com.baifendian.swordfish.rpc.WorkerService.Iface;
 import org.apache.commons.configuration.Configuration;
-import org.apache.commons.lang.StringUtils;
 import org.apache.thrift.TException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

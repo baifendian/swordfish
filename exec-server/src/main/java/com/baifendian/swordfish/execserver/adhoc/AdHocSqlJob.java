@@ -15,20 +15,19 @@
  */
 package com.baifendian.swordfish.execserver.adhoc;
 
-import com.baifendian.swordfish.common.adhoc.AdHocParam;
 import com.baifendian.swordfish.common.config.BaseConfig;
 import com.baifendian.swordfish.common.job.ExecResult;
 import com.baifendian.swordfish.common.job.JobProps;
+import com.baifendian.swordfish.common.job.struct.hql.AdHocParam;
 import com.baifendian.swordfish.common.utils.CommonUtil;
 import com.baifendian.swordfish.dao.AdHocDao;
 import com.baifendian.swordfish.dao.DaoFactory;
-import com.baifendian.swordfish.dao.utils.json.JsonUtil;
 import com.baifendian.swordfish.dao.model.AdHocJsonObject;
 import com.baifendian.swordfish.dao.model.AdHocResult;
+import com.baifendian.swordfish.dao.utils.json.JsonUtil;
 import com.baifendian.swordfish.execserver.job.hive.FunctionUtil;
 import com.baifendian.swordfish.execserver.job.hive.HiveSqlExec;
 import com.baifendian.swordfish.execserver.job.hive.ResultCallback;
-
 import org.slf4j.Logger;
 
 import java.io.IOException;

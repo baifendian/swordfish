@@ -17,15 +17,12 @@ package com.baifendian.swordfish.dao.mapper;
 
 import com.baifendian.swordfish.dao.enums.*;
 import com.baifendian.swordfish.dao.model.Schedule;
-
 import org.apache.ibatis.annotations.*;
 import org.apache.ibatis.type.EnumOrdinalTypeHandler;
 import org.apache.ibatis.type.JdbcType;
-import org.mybatis.spring.annotation.MapperScan;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Set;
 
 public interface ScheduleMapper {
 

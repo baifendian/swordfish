@@ -20,15 +20,9 @@ import com.baifendian.swordfish.dao.utils.json.JsonObjectDeserializer;
 import com.baifendian.swordfish.dao.utils.json.JsonObjectSerializer;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonRawValue;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.databind.util.JSONPObject;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import java.io.IOException;
 import java.util.List;
@@ -40,7 +34,6 @@ public class FlowNode {
    * 结点 id
    * 数据库映射字段
    */
-  @JsonIgnore
   private int id;
 
   /**
@@ -65,18 +58,15 @@ public class FlowNode {
    * 所属工作流
    * 数据库映射字段
    */
-  @JsonIgnore
   private int flowId;
 
   /**
    * 参数信息
    * 数据库映射字段/DTO需要字段
    */
-  //@JsonRawValue
   @JsonDeserialize(using = JsonObjectDeserializer.class)
   @JsonSerialize(using = JsonObjectSerializer.class)
   private String parameter;
-
 
   /**
    * 依赖信息
@@ -98,7 +88,6 @@ public class FlowNode {
    * 节点依赖列表
    * 数据库映射字段/DTO需要字段
    */
-  @JsonIgnore
   private List<String> depList;
 
   public int getId() {
