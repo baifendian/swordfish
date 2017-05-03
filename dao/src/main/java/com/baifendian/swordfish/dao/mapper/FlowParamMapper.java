@@ -30,7 +30,7 @@ public interface FlowParamMapper {
    *
    * @return 修改记录数
    */
-  @InsertProvider(type = FlowParamSqlProvider.class, method = "insert")
+  @InsertProvider(type = FlowParamProvider.class, method = "insert")
   int insertAndGetId(@Param("flowParam") FlowParam flowParam);
 
   /**
@@ -38,7 +38,7 @@ public interface FlowParamMapper {
    *
    * @return 修改记录数
    */
-  @DeleteProvider(type = FlowParamSqlProvider.class, method = "deleteByFlowId")
+  @DeleteProvider(type = FlowParamProvider.class, method = "deleteByFlowId")
   int deleteByFlowId(@Param("flowId") int flowId);
 
   /**
@@ -46,7 +46,7 @@ public interface FlowParamMapper {
    *
    * @return 修改记录数
    */
-  @DeleteProvider(type = FlowParamSqlProvider.class, method = "deleteByFlowIdAndKey")
+  @DeleteProvider(type = FlowParamProvider.class, method = "deleteByFlowIdAndKey")
   int deleteByFlowIdAndKey(@Param("flowId") int flowId, @Param("key") String key);
 
   /**
@@ -57,7 +57,7 @@ public interface FlowParamMapper {
   @Results(value = {@Result(property = "flowId", column = "flow_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
           @Result(property = "key", column = "key", javaType = String.class, jdbcType = JdbcType.VARCHAR),
           @Result(property = "value", column = "value", javaType = String.class, jdbcType = JdbcType.VARCHAR)})
-  @SelectProvider(type = FlowParamSqlProvider.class, method = "queryAllByFlowId")
+  @SelectProvider(type = FlowParamProvider.class, method = "queryAllByFlowId")
   List<FlowParam> queryAllByFlowId(@Param("flowId") int flowId);
 
 }

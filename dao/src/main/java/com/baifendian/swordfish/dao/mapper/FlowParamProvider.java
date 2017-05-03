@@ -19,7 +19,7 @@ import org.apache.ibatis.jdbc.SQL;
 
 import java.util.Map;
 
-public class FlowParamSqlProvider {
+public class FlowParamProvider {
 
   /**
    * 表名

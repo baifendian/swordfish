@@ -32,14 +32,14 @@ public interface ProjectFlowMapper {
    *
    * @return 修改记录数
    */
-  @InsertProvider(type = ProjectFlowMapperSqlProvider.class, method = "insert")
+  @InsertProvider(type = ProjectFlowMapperProvider.class, method = "insert")
   @SelectKey(statement = "SELECT LAST_INSERT_ID() AS id", keyProperty = "flow.id", resultType = int.class, before = false)
   int insertAndGetId(@Param("flow") ProjectFlow flow);
 
   /**
    * 通过 id 更新记录 <p>
    */
-  @UpdateProvider(type = ProjectFlowMapperSqlProvider.class, method = "updateById")
+  @UpdateProvider(type = ProjectFlowMapperProvider.class, method = "updateById")
   int updateById(@Param("flow") ProjectFlow flow);
 
   /**
@@ -47,7 +47,7 @@ public interface ProjectFlowMapper {
    *
    * @return 删除记录数
    */
-  @DeleteProvider(type = ProjectFlowMapperSqlProvider.class, method = "deleteById")
+  @DeleteProvider(type = ProjectFlowMapperProvider.class, method = "deleteById")
   int deleteById(@Param("id") int flowId);
 
   /**
@@ -70,7 +70,7 @@ public interface ProjectFlowMapper {
       @Result(property = "extras", column = "extras", javaType = String.class, jdbcType = JdbcType.VARCHAR),
       @Result(property = "queue", column = "queue", javaType = String.class, jdbcType = JdbcType.VARCHAR),
   })
-  @SelectProvider(type = ProjectFlowMapperSqlProvider.class, method = "queryByName")
+  @SelectProvider(type = ProjectFlowMapperProvider.class, method = "queryByName")
   ProjectFlow findByName(@Param("projectId") int projectId, @Param("name") String name);
 
   /**
@@ -94,7 +94,7 @@ public interface ProjectFlowMapper {
       @Result(property = "extras", column = "extras", javaType = String.class, jdbcType = JdbcType.VARCHAR),
       @Result(property = "queue", column = "queue", javaType = String.class, jdbcType = JdbcType.VARCHAR),
   })
-  @SelectProvider(type = ProjectFlowMapperSqlProvider.class, method = "queryById")
+  @SelectProvider(type = ProjectFlowMapperProvider.class, method = "queryById")
   ProjectFlow findById(@Param("id") int id);
 
   @Results(value = {@Result(property = "id", column = "id", id = true, javaType = int.class, jdbcType = JdbcType.INTEGER),
@@ -112,7 +112,7 @@ public interface ProjectFlowMapper {
       @Result(property = "extras", column = "extras", javaType = String.class, jdbcType = JdbcType.VARCHAR),
       @Result(property = "queue", column = "queue", javaType = String.class, jdbcType = JdbcType.VARCHAR),
   })
-  @SelectProvider(type = ProjectFlowMapperSqlProvider.class, method = "findByProjectNameAndName")
+  @SelectProvider(type = ProjectFlowMapperProvider.class, method = "findByProjectNameAndName")
   ProjectFlow findByProjectNameAndName(@Param("projectName") String projectName, @Param("name") String name);
 
   @Results(value = {@Result(property = "id", column = "id", id = true, javaType = int.class, jdbcType = JdbcType.INTEGER),
@@ -130,7 +130,7 @@ public interface ProjectFlowMapper {
       @Result(property = "extras", column = "extras", javaType = String.class, jdbcType = JdbcType.VARCHAR),
       @Result(property = "queue", column = "queue", javaType = String.class, jdbcType = JdbcType.VARCHAR)
   })
-  @SelectProvider(type = ProjectFlowMapperSqlProvider.class, method = "findByProject")
+  @SelectProvider(type = ProjectFlowMapperProvider.class, method = "findByProject")
   List<ProjectFlow> findByProject(@Param("projectId") Integer projectId);
 
   /**
@@ -140,7 +140,7 @@ public interface ProjectFlowMapper {
    * @param name
    * @return
    */
-  @DeleteProvider(type = ProjectFlowMapperSqlProvider.class, method = "deleteByProjectAndName")
+  @DeleteProvider(type = ProjectFlowMapperProvider.class, method = "deleteByProjectAndName")
   int deleteByProjectAndName(@Param("projectId") int projectId, @Param("name") String name);
 
   /**
@@ -148,7 +148,7 @@ public interface ProjectFlowMapper {
    *
    * @return
    */
-  @UpdateProvider(type = ProjectFlowMapperSqlProvider.class, method = "updateByName")
+  @UpdateProvider(type = ProjectFlowMapperProvider.class, method = "updateByName")
   int updateByName(@Param("flow") ProjectFlow projectFlow);
 
   /**
@@ -161,7 +161,7 @@ public interface ProjectFlowMapper {
       @Result(property = "name", column = "name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
       @Result(property = "email", column = "email", javaType = String.class, jdbcType = JdbcType.VARCHAR)
   })
-  @SelectProvider(type = ProjectFlowMapperSqlProvider.class, method = "queryFlowOwner")
+  @SelectProvider(type = ProjectFlowMapperProvider.class, method = "queryFlowOwner")
   User queryFlowOwner(@Param("id") Integer id);
 
   /**
@@ -172,7 +172,7 @@ public interface ProjectFlowMapper {
    * @param proxyUser
    * @return
    */
-  @UpdateProvider(type = ProjectFlowMapperSqlProvider.class, method = "updateProjectConf")
+  @UpdateProvider(type = ProjectFlowMapperProvider.class, method = "updateProjectConf")
   int updateProjectConf(@Param("projectId") int projectId, @Param("queue") String queue, @Param("proxyUser") String proxyUser);
 
   /**
@@ -181,6 +181,6 @@ public interface ProjectFlowMapper {
    * @param projectId
    * @return
    */
-  @SelectProvider(type = ProjectFlowMapperSqlProvider.class, method = "countProjectFlows")
+  @SelectProvider(type = ProjectFlowMapperProvider.class, method = "countProjectFlows")
   int countProjectFlows(@Param("projectId") Integer projectId);
 }

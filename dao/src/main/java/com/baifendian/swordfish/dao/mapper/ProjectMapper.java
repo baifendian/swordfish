@@ -30,7 +30,7 @@ public interface ProjectMapper {
    * @param project
    * @return
    */
-  @InsertProvider(type = ProjectSqlProvider.class, method = "insert")
+  @InsertProvider(type = ProjectMapperProvider.class, method = "insert")
   @SelectKey(statement = "SELECT LAST_INSERT_ID()", keyProperty = "newProject.id", before = false, resultType = int.class)
   int insert(@Param("newProject") Project project);
 
@@ -40,7 +40,7 @@ public interface ProjectMapper {
    * @param project
    * @return
    */
-  @UpdateProvider(type = ProjectSqlProvider.class, method = "updateById")
+  @UpdateProvider(type = ProjectMapperProvider.class, method = "updateById")
   int updateById(@Param("project") Project project);
 
   /**
@@ -49,7 +49,7 @@ public interface ProjectMapper {
    * @param id
    * @return
    */
-  @DeleteProvider(type = ProjectSqlProvider.class, method = "deleteById")
+  @DeleteProvider(type = ProjectMapperProvider.class, method = "deleteById")
   int deleteById(@Param("id") int id);
 
   /**
@@ -65,7 +65,7 @@ public interface ProjectMapper {
       @Result(property = "ownerId", column = "owner_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
       @Result(property = "owner", column = "owner", javaType = String.class, jdbcType = JdbcType.VARCHAR)
   })
-  @SelectProvider(type = ProjectSqlProvider.class, method = "queryAllProject")
+  @SelectProvider(type = ProjectMapperProvider.class, method = "queryAllProject")
   List<Project> queryAllProject();
 
   /**
@@ -82,7 +82,7 @@ public interface ProjectMapper {
       @Result(property = "ownerId", column = "owner_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
       @Result(property = "owner", column = "owner", javaType = String.class, jdbcType = JdbcType.VARCHAR)
   })
-  @SelectProvider(type = ProjectSqlProvider.class, method = "queryProjectByUser")
+  @SelectProvider(type = ProjectMapperProvider.class, method = "queryProjectByUser")
   List<Project> queryProjectByUser(@Param("userId") int userId);
 
   /**
@@ -100,6 +100,6 @@ public interface ProjectMapper {
       @Result(property = "ownerId", column = "owner_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
       @Result(property = "owner", column = "owner", javaType = String.class, jdbcType = JdbcType.VARCHAR)
   })
-  @SelectProvider(type = ProjectSqlProvider.class, method = "queryByName")
+  @SelectProvider(type = ProjectMapperProvider.class, method = "queryByName")
   Project queryByName(@Param("name") String name);
 }

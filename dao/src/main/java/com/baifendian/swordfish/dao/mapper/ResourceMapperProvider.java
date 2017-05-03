@@ -19,7 +19,7 @@ import org.apache.ibatis.jdbc.SQL;
 
 import java.util.Map;
 
-public class ResourceSqlProvider {
+public class ResourceMapperProvider {
 
   private final String TABLE_NAME = "resources";
 

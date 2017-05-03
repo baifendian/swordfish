@@ -34,7 +34,7 @@ import java.util.Set;
  * @author : dsfan
  * @date : 2016年8月27日
  */
-public class FlowNodeMapperSqlProvider {
+public class FlowNodeMapperProvider {
   /**
    * 表名
    */

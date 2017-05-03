@@ -19,7 +19,7 @@ import org.apache.ibatis.jdbc.SQL;
 
 import java.util.Map;
 
-public class ProjectUserSqlProvider {
+public class ProjectUserMapperProvider {
 
   private static final String TABLE_NAME = "project_user";
 
