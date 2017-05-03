@@ -87,7 +87,7 @@ public class AdhocController {
       udfsInfos = JsonUtil.parseObjectList(udfs, UdfsInfo.class);
     } catch (Exception e) {
       logger.error("Parse json exception.", e);
-      throw new BadRequestException("Argument is not valid, udfs format not a valid.");
+      throw new BadRequestException("Argument is not valid, udfs format is invalid.");
     }
 
     return adhocService.execAdhoc(operator, projectName, stms, limit, proxyUser, queue, udfsInfos, timeout);

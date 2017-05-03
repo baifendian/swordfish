@@ -140,4 +140,13 @@ public interface ResourceMapper {
   })
   @SelectProvider(type = ResourceSqlProvider.class, method = "queryResourceDetails")
   List<Resource> queryResourceDetails(@Param("projectId") int projectId);
+
+  /**
+   * 查询项目下的资源数目
+   *
+   * @param projectId
+   * @return
+   */
+  @SelectProvider(type = ResourceSqlProvider.class, method = "countProjectRes")
+  int countProjectRes(@Param("projectId") int projectId);
 }

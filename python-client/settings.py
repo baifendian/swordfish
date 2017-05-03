@@ -1,14 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-# api web server host
-g_host = 'localhost'
-
-# api web server port
-g_port = 12345
-
 # api url
-g_url = "http://%s:%s" %(g_host, g_port)
+g_url = "http://%s:%s" %('localhost', '12345')
 
 # user name & password for login
 g_user = 'unit_test'

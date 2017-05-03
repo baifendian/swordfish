@@ -35,17 +35,23 @@ public class BaseConfig {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(BaseConfig.class);
 
-  private static String localDataBasePath; // 本地目录, 用于存放 资源和工作流 的数据
+  // 本地目录, 用于存放 资源和工作流 的数据
+  private static String localDataBasePath;
 
-  private static String localDownloadBasePath;//本地目录, 用于存放下载的临时文件
+  // 本地目录, 用于存放下载的临时文件
+  private static String localDownloadBasePath;
 
-  private static String hdfsDataBasePath; // hdfs 目录, 用于存放 资源和工作流 的数据
+  // hdfs 目录, 用于存放 资源和工作流 的数据
+  private static String hdfsDataBasePath;
 
-  private static String localExecBasePath; // 本地目录, 用于执行工作流
+  // 本地目录, 用于执行工作流
+  private static String localExecBasePath;
 
-  private static String jobHiveUdfJarBasePath; // 本地目录, udf jar 目录
+  // 本地目录, udf jar 目录
+  private static String jobHiveUdfJarBasePath;
 
-  private static Set<String> prohibitUserSet; // 禁用用户列表
+  // 禁用用户列表
+  private static Set<String> prohibitUserSet;
 
   /**
    * 环境变量信息
@@ -88,14 +94,24 @@ public class BaseConfig {
   }
 
   /**
-   * 得到下载到本地的文件名称
+   * 得到下载到本地的文件名称, 能保证区分开来名称
    *
    * @param projectId
    * @param filename
    * @return
    */
   public static String getLocalDownloadFilename(int projectId, String filename) {
-    return MessageFormat.format("{0}/{1}/{3}", localDownloadBasePath, UUID.randomUUID().toString(), filename);
+    return MessageFormat.format("{0}/{1}/{2}", localDownloadBasePath, UUID.randomUUID().toString(), filename);
+  }
+
+  /**
+   * local 上项目的文件目录
+   *
+   * @param projectId
+   * @return
+   */
+  public static String getLocalProjectDir(int projectId) {
+    return MessageFormat.format("{0}/{1}", localDataBasePath, projectId);
   }
 
   /**
@@ -105,7 +121,7 @@ public class BaseConfig {
    * @return
    */
   public static String getLocalResourceDir(int projectId) {
-    return MessageFormat.format("{0}/{1}/resources", localDataBasePath, projectId);
+    return MessageFormat.format("{0}/resources", getLocalProjectDir(projectId));
   }
 
   /**
@@ -126,7 +142,7 @@ public class BaseConfig {
    * @return
    */
   public static String getLocalWorkflowDir(int projectId) {
-    return MessageFormat.format("{0}/{1}/workflows", localDataBasePath, projectId);
+    return MessageFormat.format("{0}/workflows", getLocalProjectDir(projectId));
   }
 
   /**
@@ -142,22 +158,34 @@ public class BaseConfig {
 
   /**
    * 本地工作流数据缓存解压文件夹名
+   *
    * @param projectId
    * @param filename
    * @return
    */
-  public static String getLocalWorkflowExtDir(int projectId, String filename) {
+  public static String getLocalWorkflowExtractDir(int projectId, String filename) {
     return MessageFormat.format("{0}/{1}", getLocalWorkflowDir(projectId), filename);
   }
 
+//  /**
+//   * 本地工作流数据缓存 workflow.json 文件
+//   *
+//   * @param projectId
+//   * @param filename
+//   * @return
+//   */
+//  public static String getLocalWorkflowJson(int projectId, String filename) {
+//    return MessageFormat.format("{0}/{1}", getLocalWorkflowExtractDir(projectId, filename), "workflow.json");
+//  }
+
   /**
-   * 本地工作流数据缓存workflow.json文件
+   * hdfs 上项目的文件目录
+   *
    * @param projectId
-   * @param filename
    * @return
    */
-  public static String getLocalWorkflowJson(int projectId,String filename){
-    return MessageFormat.format("{0}/{1}",getLocalWorkflowExtDir(projectId,filename),"workflow.json");
+  public static String getHdfsProjectDir(int projectId) {
+    return MessageFormat.format("{0}/{1}", hdfsDataBasePath, projectId);
   }
 
   /**
@@ -167,7 +195,7 @@ public class BaseConfig {
    * @return
    */
   public static String getHdfsResourcesDir(int projectId) {
-    return MessageFormat.format("{0}/{1}/resources", hdfsDataBasePath, projectId);
+    return MessageFormat.format("{0}/resources", getHdfsProjectDir(projectId));
   }
 
   /**
@@ -188,7 +216,7 @@ public class BaseConfig {
    * @return
    */
   public static String getHdfsWorkflowDir(int projectId) {
-    return MessageFormat.format("{0}/{1}/workflows", hdfsDataBasePath, projectId);
+    return MessageFormat.format("{0}/workflows", getHdfsProjectDir(projectId));
   }
 
   /**

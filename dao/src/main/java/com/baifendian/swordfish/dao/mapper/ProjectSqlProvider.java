@@ -80,8 +80,9 @@ public class ProjectSqlProvider {
    */
   public String queryAllProject(Map<String, Object> parameter) {
     return new SQL() {{
-      SELECT("p.*, p.owner as owner_id");
+      SELECT("p.owner as owner_id");
       SELECT("u.name as owner");
+      SELECT("p.*");
 
       FROM(TABLE_NAME + " p");
 
@@ -98,8 +99,9 @@ public class ProjectSqlProvider {
   public String queryProjectByUser(Map<String, Object> parameter) {
     return new SQL() {
       {
-        SELECT("p.*, p.owner as owner_id");
+        SELECT("p.owner as owner_id");
         SELECT("u.name as owner");
+        SELECT("p.*");
 
         FROM(TABLE_NAME + " p");
 
@@ -119,8 +121,9 @@ public class ProjectSqlProvider {
    */
   public String queryByName(Map<String, Object> parameter) {
     return new SQL() {{
-      SELECT("p.*, p.owner as owner_id");
+      SELECT("p.owner as owner_id");
       SELECT("u.name as owner");
+      SELECT("p.*");
 
       FROM(TABLE_NAME + " p");
 
