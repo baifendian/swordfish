@@ -62,7 +62,6 @@ public interface ProjectFlowMapper {
       @Result(property = "desc", column = "desc", javaType = String.class, jdbcType = JdbcType.VARCHAR),
       @Result(property = "projectId", column = "project_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
       @Result(property = "projectName", column = "project_name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-      @Result(property = "lastModifyBy", column = "last_modify_by", javaType = int.class, jdbcType = JdbcType.INTEGER),
       @Result(property = "ownerId", column = "owner_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
       @Result(property = "owner", column = "owner_name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
       @Result(property = "proxyUser", column = "proxy_user", javaType = String.class, jdbcType = JdbcType.VARCHAR),
@@ -86,7 +85,6 @@ public interface ProjectFlowMapper {
       @Result(property = "desc", column = "desc", javaType = String.class, jdbcType = JdbcType.VARCHAR),
       @Result(property = "projectId", column = "project_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
       @Result(property = "projectName", column = "project_name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-      @Result(property = "lastModifyBy", column = "last_modify_by", javaType = int.class, jdbcType = JdbcType.INTEGER),
       @Result(property = "ownerId", column = "owner_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
       @Result(property = "owner", column = "owner_name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
       @Result(property = "proxyUser", column = "proxy_user", javaType = String.class, jdbcType = JdbcType.VARCHAR),
@@ -104,7 +102,6 @@ public interface ProjectFlowMapper {
       @Result(property = "desc", column = "desc", javaType = String.class, jdbcType = JdbcType.VARCHAR),
       @Result(property = "projectId", column = "project_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
       @Result(property = "projectName", column = "project_name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-      @Result(property = "lastModifyBy", column = "last_modify_by", javaType = int.class, jdbcType = JdbcType.INTEGER),
       @Result(property = "ownerId", column = "owner_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
       @Result(property = "owner", column = "owner_name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
       @Result(property = "proxyUser", column = "proxy_user", javaType = String.class, jdbcType = JdbcType.VARCHAR),
@@ -142,14 +139,6 @@ public interface ProjectFlowMapper {
    */
   @DeleteProvider(type = ProjectFlowMapperProvider.class, method = "deleteByProjectAndName")
   int deleteByProjectAndName(@Param("projectId") int projectId, @Param("name") String name);
-
-  /**
-   * 修改覆盖式
-   *
-   * @return
-   */
-  @UpdateProvider(type = ProjectFlowMapperProvider.class, method = "updateByName")
-  int updateByName(@Param("flow") ProjectFlow projectFlow);
 
   /**
    * 查询工作流 owner

@@ -75,8 +75,8 @@ public class ResourceService {
                                  String desc,
                                  MultipartFile file) {
 
-    VerifyUtils.verifyResName(name);
-    VerifyUtils.verifyDesc(desc);
+    VerifyUtils.verifyResName(name, new ParameterException("Parameter name: \"{0}\" is invalid", name));
+    VerifyUtils.verifyDesc(desc, new ParameterException("Parameter desc: \"{0}\" is invalid", name));
 
     // 文件为空
     if (file.isEmpty()) {
@@ -151,7 +151,7 @@ public class ResourceService {
                               String name,
                               String desc,
                               MultipartFile file) {
-    VerifyUtils.verifyDesc(desc);
+    VerifyUtils.verifyDesc(desc, new ParameterException("Parameter name: \"{0}\" is invalid", name));
 
     Resource resource = resourceMapper.queryByProjectAndResName(projectName, name);
 
@@ -178,7 +178,7 @@ public class ResourceService {
                                  String name,
                                  String desc,
                                  MultipartFile file) {
-    VerifyUtils.verifyDesc(desc);
+    VerifyUtils.verifyDesc(desc, new ParameterException("Parameter name: \"{0}\" is invalid", name));
 
     // 文件为空
     if (file != null && file.isEmpty()) {
