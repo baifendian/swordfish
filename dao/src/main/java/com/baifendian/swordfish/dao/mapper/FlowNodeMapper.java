@@ -33,7 +33,7 @@ public interface FlowNodeMapper {
    *
    * @return 插入记录数
    */
-  @InsertProvider(type = FlowNodeMapperSqlProvider.class, method = "insertAll")
+  @InsertProvider(type = FlowNodeMapperProvider.class, method = "insertAll")
   int insertAll(List<FlowNode> flowNodes);
 
   /**
@@ -41,7 +41,7 @@ public interface FlowNodeMapper {
    *
    * @return 插入记录数
    */
-  @InsertProvider(type = FlowNodeMapperSqlProvider.class, method = "insert")
+  @InsertProvider(type = FlowNodeMapperProvider.class, method = "insert")
   @SelectKey(statement = "SELECT LAST_INSERT_ID() AS id", keyProperty = "flowNode.id", resultType = int.class, before = false)
   int insert(@Param("flowNode") FlowNode flowNode);
 
@@ -50,7 +50,7 @@ public interface FlowNodeMapper {
    *
    * @return 删除记录数
    */
-  @DeleteProvider(type = FlowNodeMapperSqlProvider.class, method = "deleteByFlowId")
+  @DeleteProvider(type = FlowNodeMapperProvider.class, method = "deleteByFlowId")
   int deleteByFlowId(@Param("flowId") int flowId);
 
   /**
@@ -67,7 +67,7 @@ public interface FlowNodeMapper {
           @Result(property = "parameter", column = "parameter", javaType = String.class, jdbcType = JdbcType.VARCHAR),
           @Result(property = "extras", column = "extras", javaType = String.class, jdbcType = JdbcType.VARCHAR),
           @Result(property = "dep", column = "dep", javaType = String.class, jdbcType = JdbcType.VARCHAR), })
-  @SelectProvider(type = FlowNodeMapperSqlProvider.class, method = "selectByNodeId")
+  @SelectProvider(type = FlowNodeMapperProvider.class, method = "selectByNodeId")
   FlowNode selectByNodeId(@Param("nodeId") int nodeId);
 
   /**
@@ -84,7 +84,7 @@ public interface FlowNodeMapper {
           @Result(property = "flowId", column = "flow_id", id = true, javaType = int.class, jdbcType = JdbcType.INTEGER),
           @Result(property = "parameter", column = "parameter", javaType = String.class, jdbcType = JdbcType.VARCHAR),
           })
-  @SelectProvider(type = FlowNodeMapperSqlProvider.class, method = "selectByFlowId")
+  @SelectProvider(type = FlowNodeMapperProvider.class, method = "selectByFlowId")
   List<FlowNode> selectByFlowId(@Param("flowId") int flowId);
 
   /**

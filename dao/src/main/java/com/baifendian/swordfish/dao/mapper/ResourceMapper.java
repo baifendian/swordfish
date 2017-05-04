@@ -30,7 +30,7 @@ public interface ResourceMapper {
    * @param resource
    * @return
    */
-  @InsertProvider(type = ResourceSqlProvider.class, method = "insert")
+  @InsertProvider(type = ResourceMapperProvider.class, method = "insert")
   @SelectKey(statement = "SELECT LAST_INSERT_ID() AS id", keyProperty = "resource.id", resultType = int.class, before = false)
   int insert(@Param("resource") Resource resource);
 
@@ -52,7 +52,7 @@ public interface ResourceMapper {
       @Result(property = "createTime", column = "create_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE),
       @Result(property = "modifyTime", column = "modify_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE)
   })
-  @SelectProvider(type = ResourceSqlProvider.class, method = "queryByProjectAndResName")
+  @SelectProvider(type = ResourceMapperProvider.class, method = "queryByProjectAndResName")
   Resource queryByProjectAndResName(@Param("projectName") String projectName, @Param("name") String name);
 
   /**
@@ -70,7 +70,7 @@ public interface ResourceMapper {
       @Result(property = "createTime", column = "create_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE),
       @Result(property = "modifyTime", column = "modify_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE)
   })
-  @SelectProvider(type = ResourceSqlProvider.class, method = "queryResource")
+  @SelectProvider(type = ResourceMapperProvider.class, method = "queryResource")
   Resource queryResource(@Param("projectId") int projectId, @Param("name") String name);
 
   /**
@@ -78,7 +78,7 @@ public interface ResourceMapper {
    *
    * @param resource
    */
-  @UpdateProvider(type = ResourceSqlProvider.class, method = "update")
+  @UpdateProvider(type = ResourceMapperProvider.class, method = "update")
   int update(@Param("resource") Resource resource);
 
   /**
@@ -87,7 +87,7 @@ public interface ResourceMapper {
    * @param resourceId
    * @return
    */
-  @DeleteProvider(type = ResourceSqlProvider.class, method = "delete")
+  @DeleteProvider(type = ResourceMapperProvider.class, method = "delete")
   int delete(@Param("resourceId") int resourceId);
 
   /**
@@ -97,7 +97,7 @@ public interface ResourceMapper {
    * @param name
    * @return
    */
-  @DeleteProvider(type = ResourceSqlProvider.class, method = "deleteResource")
+  @DeleteProvider(type = ResourceMapperProvider.class, method = "deleteResource")
   int deleteResource(@Param("projectId") int projectId, @Param("name") String name);
 
   /**
@@ -118,7 +118,7 @@ public interface ResourceMapper {
       @Result(property = "createTime", column = "create_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE),
       @Result(property = "modifyTime", column = "modify_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE)
   })
-  @SelectProvider(type = ResourceSqlProvider.class, method = "queryResourceDetail")
+  @SelectProvider(type = ResourceMapperProvider.class, method = "queryResourceDetail")
   Resource queryResourceDetail(@Param("projectId") int projectId, @Param("name") String name);
 
   /**
@@ -138,7 +138,7 @@ public interface ResourceMapper {
       @Result(property = "createTime", column = "create_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE),
       @Result(property = "modifyTime", column = "modify_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE)
   })
-  @SelectProvider(type = ResourceSqlProvider.class, method = "queryResourceDetails")
+  @SelectProvider(type = ResourceMapperProvider.class, method = "queryResourceDetails")
   List<Resource> queryResourceDetails(@Param("projectId") int projectId);
 
   /**
@@ -147,6 +147,6 @@ public interface ResourceMapper {
    * @param projectId
    * @return
    */
-  @SelectProvider(type = ResourceSqlProvider.class, method = "countProjectRes")
+  @SelectProvider(type = ResourceMapperProvider.class, method = "countProjectRes")
   int countProjectRes(@Param("projectId") int projectId);
 }
