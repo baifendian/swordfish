@@ -191,9 +191,11 @@ public class ProjectController {
 
     List<ProjectUser> projectUserList = projectService.queryUser(operator, name);
     List<ProjectUserDto> projectUserDtoList = new ArrayList<>();
+
     for (ProjectUser projectUser : projectUserList) {
       projectUserDtoList.add(new ProjectUserDto(projectUser));
     }
+
     return projectUserDtoList;
   }
 }

@@ -30,7 +30,7 @@ public class VerifyUtils extends VerifyUtil {
    */
   public static void verifyProjectName(String projectName) {
     if (!matcheProjectName(projectName)) {
-      throw new ParameterException("project name");
+      throw new ParameterException("Project name '{0}' not valid", projectName);
     }
   }
 
@@ -41,7 +41,7 @@ public class VerifyUtils extends VerifyUtil {
    */
   public static void verifyUserName(String userName) {
     if (!matcheUserName(userName)) {
-      throw new ParameterException("user name");
+      throw new ParameterException("User name '{0}' not valid", userName);
     }
   }
 
@@ -52,7 +52,7 @@ public class VerifyUtils extends VerifyUtil {
    */
   public static void verifyWorkflowName(String workflowName) {
     if (!matchWorkflowName(workflowName)) {
-      throw new ParameterException("workflow name");
+      throw new ParameterException("Workflow name '{0}' not valid", workflowName);
     }
   }
 
@@ -63,7 +63,7 @@ public class VerifyUtils extends VerifyUtil {
    */
   public static void verifyEmail(String email) {
     if (!matchEmail(email)) {
-      throw new ParameterException("email");
+      throw new ParameterException("Email name '{0}' not valid", email);
     }
   }
 
@@ -74,7 +74,7 @@ public class VerifyUtils extends VerifyUtil {
    */
   public static void verifyResName(String resourceName) {
     if (!matcheResName(resourceName)) {
-      throw new ParameterException("resource name");
+      throw new ParameterException("Resource name '{0}' not valid", resourceName);
     }
   }
 
@@ -85,18 +85,40 @@ public class VerifyUtils extends VerifyUtil {
    */
   public static void verifyDatasourceName(String datasourceName) {
     if (!matcheDatasourceName(datasourceName)) {
-      throw new ParameterException("datasource name");
+      throw new ParameterException("Datasource name '{0}' not valid", datasourceName);
     }
   }
 
   /**
-   * 校验描述是否付汇规范
+   * 校验描述是否符合规范
    *
    * @param desc
    */
   public static void verifyDesc(String desc) {
     if (StringUtils.isNotEmpty(desc) && desc.length() > 256) {
-      throw new ParameterException("desc");
+      throw new ParameterException("Desc name '{0}' not valid", desc);
+    }
+  }
+
+  /**
+   * 校验密码是否符合规范
+   *
+   * @param password
+   */
+  public static void verifyPassword(String password) {
+    if (StringUtils.isEmpty(password) || password.length() < 2 || password.length() > 20) {
+      throw new ParameterException("Password '{0}' not valid", password);
+    }
+  }
+
+  /**
+   * 校验电话号码是否符合规范
+   *
+   * @param phone
+   */
+  public static void verifyPhone(String phone) {
+    if (StringUtils.isNotEmpty(phone) && phone.length() > 18) {
+      throw new ParameterException("Phone number '{0}' not valid", phone);
     }
   }
 }

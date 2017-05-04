@@ -78,6 +78,8 @@ public class UserService {
     VerifyUtils.verifyUserName(name);
     VerifyUtils.verifyEmail(email);
     VerifyUtils.verifyDesc(desc);
+    VerifyUtils.verifyPassword(password);
+    VerifyUtils.verifyPhone(phone);
 
     // 如果不是管理员, 返回错误
     if (operator.getRole() != UserRoleType.ADMIN_USER) {
@@ -134,6 +136,8 @@ public class UserService {
 
     VerifyUtils.verifyEmail(email);
     VerifyUtils.verifyDesc(desc);
+    VerifyUtils.verifyPassword(password);
+    VerifyUtils.verifyPhone(phone);
 
     if (operator.getRole() != UserRoleType.ADMIN_USER) {
       // 非管理员, 只能修改自身信息

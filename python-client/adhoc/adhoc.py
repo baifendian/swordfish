@@ -5,24 +5,20 @@ import json
 import requests
 import time
 from login import login
+import settings
 
-sessionId = login.get_session()
-
-def exec_adhoc(sessionId, data):
+def exec_adhoc(sessionId, projectName, stms, limit, proxyUser, queue, udfs, timeout):
     # 发送一个即席的执行请求
-    r = requests.post('%s/projects/bdi/adHoc' %(host),
+    r = requests.post('%s/projects/%s/adHoc' %(settings.g_url, projectName),
                       headers={'sessionId': sessionId},
-                      data={'proxyUser': 'swordfish', 'queue': 'others',
-                            'stms': "show databases;use bfd_test; use bfd;select count(*) from bfd_test.test;select * from bfd_test.test;",
-                            'udfs': json.dumps([{"func": "md5", "className": "com.baifendian.hive.udf.Md5",
-                                                 "libJars": [{"scope": "project", "res": "udf.jar"}]}]),
-                            "limit": 2000})
+                      data={'stms': stms,
+                            'limit': limit,
+                            'proxyUser': proxyUser,
+                            'queue': queue,
+                            'udfs': json.dumps(udfs),
+                            'timeout': timeout})
 
-    printf(r)
-
-    execId = r.json().get('execId')
-
-    index = 0
+    return r.json().get('execId')
 
 def query_adhoc():
 while True:
@@ -31,7 +27,6 @@ while True:
                      headers={'sessionId': sessionId},
                      params={'index': index, 'from': 0, 'size': 1000})
 
-    printf(r)
 
     # 如果有结果则查询结果
     if r.json().get('hasResult') == True:

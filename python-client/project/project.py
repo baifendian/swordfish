@@ -37,8 +37,8 @@ def delete_project(sessionId, name):
 def query_project_list(sessionId):
     '''查询项目列表'''
     r = requests.get('%s/projects' % (settings.g_url),
-                        headers={'sessionId': sessionId}
-                        )
+                     headers={'sessionId': sessionId}
+                     )
 
     return (r.status_code, r.json())
 

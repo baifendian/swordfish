@@ -4,7 +4,7 @@ CREATE TABLE `user` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'user id',
   `name` varchar(64) NOT NULL COMMENT 'user name',
   `email` varchar(64) NOT NULL COMMENT 'user email',
-  `desc` varchar(64) DEFAULT NULL COMMENT 'description information of user',
+  `desc` varchar(256) DEFAULT NULL COMMENT 'description information of user',
   `phone` varchar(20) DEFAULT NULL COMMENT 'user phone number',
   `password` varchar(32) NOT NULL COMMENT 'user password for login, md5-value',
   `role` tinyint(4) NOT NULL COMMENT '0 means administrator, others means normal user',
