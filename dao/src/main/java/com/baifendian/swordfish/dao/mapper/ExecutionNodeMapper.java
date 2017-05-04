@@ -64,6 +64,11 @@ public interface ExecutionNodeMapper {
   @SelectProvider(type = ExecutionNodeMapperProvider.class, method = "selectExecNode")
   ExecutionNode selectExecNode(@Param("execId") Long execId, @Param("name") String name);
 
+  /**
+   * 查询某个exec下所有的node信息
+   * @param execId
+   * @return
+   */
   @Results(value = {
           @Result(property = "execId", column = "exec_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
           @Result(property = "name", column = "name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
@@ -94,7 +99,4 @@ public interface ExecutionNodeMapper {
   })
   @SelectProvider(type = ExecutionNodeMapperProvider.class, method = "selectExecNodeByJobId")
   ExecutionNode selectExecNodeByJobId(@Param("jobId") String jobId);
-
-  @DeleteProvider(type = ExecutionNodeMapperProvider.class, method = "deleteByExecId")
-  int deleteByExecId(@Param("execId") Long execId);
 }

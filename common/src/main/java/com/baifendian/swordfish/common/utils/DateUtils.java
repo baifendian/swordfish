@@ -117,4 +117,61 @@ public class DateUtils {
       throw new RuntimeException("Time parse failed exception", e);
     }
   }
+
+  /**
+   * 获取两个日期相差多少天
+   */
+  public static long diffDays(Date d1,Date d2){
+    return (long) Math.ceil(diffHours(d1,d2)/24.0);
+  }
+
+  /**
+   * 获取两个日期相差多少小时
+   * @param d1
+   * @param d2
+   * @return
+   */
+  public static long diffHours(Date d1,Date d2){
+    return (long) Math.ceil(diffMin(d1,d2)/60.0);
+  }
+
+  /**
+   * 获取两个日期相差多少分钟
+   * @param d1
+   * @param d2
+   * @return
+   */
+  public static long diffMin(Date d1,Date d2){
+    return (long) Math.ceil(diffSec(d1,d2)/60.0);
+  }
+
+  /**
+   * 获取两个日期只想相差多少秒
+   * @param d1
+   * @param d2
+   * @return
+   */
+  public static long diffSec(Date d1,Date d2){
+    return (long) Math.ceil(diffMs(d1,d2)/1000.0);
+  }
+
+  /**\
+   * 获取两个日期之间相差多少毫秒
+   * @param d1
+   * @param d2
+   * @return
+   */
+  public static long diffMs(Date d1,Date d2){
+    return Math.abs(d1.getTime()-d2.getTime());
+  }
+
+  /**
+   * 比较两个日期大小
+   * @param future
+   * @param old
+   * @return
+   */
+  public static boolean compare(Date future,Date old){
+    return future.getTime() > old.getTime();
+  }
 }

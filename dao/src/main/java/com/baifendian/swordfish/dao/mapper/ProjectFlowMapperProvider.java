@@ -54,18 +54,6 @@ public class ProjectFlowMapperProvider {
     }.toString();
   }
 
-  public String queryByProjectAndName(Map<String, Object> parameter) {
-    return new SQL() {
-      {
-        SELECT("p_f.*,p_f.owner as owner_id");
-        SELECT("u.name as owner_name,p.name as project_name");
-        FROM("project_flows p_f");
-        JOIN("user u on p_f.owner = u.id");
-        JOIN("project p on p_f.project_id = p.id");
-      }
-    }.toString();
-  }
-
   /**
    * 通过 id 更新(用于重命名) <p>
    *
@@ -85,23 +73,6 @@ public class ProjectFlowMapperProvider {
         SET("queue=#{flow.queue}");
         WHERE("id = #{flow.id}");
         WHERE("flag is null");
-      }
-    }.toString();
-  }
-
-  /**
-   * 查询一个记录 <p>
-   *
-   * @return sql 语句
-   */
-  public String query(Map<String, Object> parameter) {
-    return new SQL() {
-      {
-        SELECT("f.*");
-        SELECT("p.name as project_name");
-        FROM(TABLE_NAME + " as f");
-        INNER_JOIN("project as p on p.id = f.project_id");
-        WHERE("f.id = #{id}");
       }
     }.toString();
   }
@@ -161,31 +132,6 @@ public class ProjectFlowMapperProvider {
   }
 
   /**
-   * 查询多个记录 <p>
-   *
-   * @return sql 语句
-   */
-  public String findByIds(Set<Integer> flowIds) {
-    StringBuilder sb = new StringBuilder();
-    sb.append("select a.*, b.name as project_name, c.name as owner_name, s.schedule_status ");
-    sb.append("from ");
-    sb.append(TABLE_NAME);
-    sb.append(" as a ");
-    sb.append("inner join schedules as s on a.id = s.flow_id ");
-    sb.append("inner join project as b on a.project_id = b.id ");
-    sb.append("inner join user as c on a.owner_id = c.id ");
-
-    if (flowIds != null && flowIds.size() > 0) {
-      StringUtils.join(flowIds, ",");
-      sb.append("where a.id in (");
-      sb.append(StringUtils.join(flowIds, ","));
-      sb.append(") ");
-    }
-
-    return sb.toString();
-  }
-
-  /**
    * 删除某个workflow <p>
    *
    * @return sql 语句
@@ -195,112 +141,6 @@ public class ProjectFlowMapperProvider {
       {
         DELETE_FROM(TABLE_NAME);
         WHERE("id = #{id}");
-      }
-    }.toString();
-  }
-
-  /**
-   * 删除某个workflow <p>
-   *
-   * @return sql 语句
-   */
-  public String deleteByProjectAndName(Map<String, Object> parameter) {
-    return new SQL() {
-      {
-        DELETE_FROM(TABLE_NAME);
-        WHERE("project_id = #{projectId}");
-        WHERE("name = #{name}");
-      }
-    }.toString();
-  }
-
-  public String queryFlowNum(int tenantId, List<FlowType> flowTypes) {
-
-    StringBuilder sb = new StringBuilder();
-    sb.append("select count(0) ");
-    sb.append("from " + TABLE_NAME + " as a ");
-    sb.append("inner join project as b on a.project_id = b.id ");
-    sb.append("inner join tenant as c on b.tenant_id = c.id and c.id = #{tenantId} ");
-
-    if (flowTypes != null && flowTypes.size() > 0) {
-      sb.append("where a.type in (-1 ");
-      for (FlowType flowType : flowTypes) {
-        sb.append(",");
-        sb.append(flowType.getType());
-      }
-      sb.append(") ");
-    }
-
-    return sb.toString();
-  }
-
-  public String queryFlowNumByProjectId(int projectId, List<FlowType> flowTypes) {
-
-    StringBuilder sb = new StringBuilder();
-    sb.append("select count(0) ");
-    sb.append("from " + TABLE_NAME + " as a ");
-    sb.append("inner join project as b on a.project_id = b.id and b.id = #{projectId} ");
-
-    if (flowTypes != null && flowTypes.size() > 0) {
-      sb.append("where a.type in (-1 ");
-      for (FlowType flowType : flowTypes) {
-        sb.append(",");
-        sb.append(flowType.getType());
-      }
-      sb.append(") ");
-    }
-
-    return sb.toString();
-  }
-
-  /**
-   * 查询某个项目下的特定类型的所有workflow <p>
-   *
-   * @return sql 语句
-   */
-  public String queryFlowsByProjectId(int projectId, FlowType flowType) {
-
-    StringBuilder sb = new StringBuilder();
-    sb.append("select a.* ");
-    sb.append("from " + TABLE_NAME + " as a ");
-    sb.append("inner join project as b on a.project_id = b.id and b.id = #{projectId} ");
-
-    if (flowType != null) {
-      sb.append("where a.type = ");
-      sb.append(flowType.getType());
-    }
-
-    return sb.toString();
-  }
-
-  /**
-   * 删除某个项目下的工作流类型
-   */
-  public String deleteByProjectId(Map<String, Object> parameter) {
-    return new SQL() {
-      {
-        DELETE_FROM(TABLE_NAME);
-        WHERE("project_id = #{projectId}");
-        WHERE("type = " + EnumFieldUtil.genFieldStr("flowType", FlowType.class));
-      }
-    }.toString();
-  }
-
-  public String updateByName(Map<String, Object> parameter) {
-    return new SQL() {
-      {
-        UPDATE(TABLE_NAME);
-        SET("`desc`=#{flow.desc}");
-        SET("modify_time=#{flow.modifyTime}");
-        SET("create_time=#{flow.createTime}");
-        SET("owner=#{flow.ownerId}");
-        SET("proxy_user=#{flow.proxyUser}");
-        SET("user_defined_params=#{flow.userDefinedParams}");
-        SET("extras=#{flow.extras}");
-        SET("queue=#{flow.queue}");
-        WHERE("project_id = #{flow.projectId}");
-        WHERE("name = #{flow.name}");
-        WHERE("flag is null");
       }
     }.toString();
   }

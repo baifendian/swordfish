@@ -95,6 +95,12 @@ public interface ProjectFlowMapper {
   @SelectProvider(type = ProjectFlowMapperProvider.class, method = "queryById")
   ProjectFlow findById(@Param("id") int id);
 
+  /**
+   * 根据项目名和工作流名称，查询一个工作流
+   * @param projectName
+   * @param name
+   * @return
+   */
   @Results(value = {@Result(property = "id", column = "id", id = true, javaType = int.class, jdbcType = JdbcType.INTEGER),
       @Result(property = "name", column = "name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
       @Result(property = "createTime", column = "create_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE),
@@ -112,6 +118,11 @@ public interface ProjectFlowMapper {
   @SelectProvider(type = ProjectFlowMapperProvider.class, method = "findByProjectNameAndName")
   ProjectFlow findByProjectNameAndName(@Param("projectName") String projectName, @Param("name") String name);
 
+  /**
+   * 根据工作流ID查询一个工作流
+   * @param projectId
+   * @return
+   */
   @Results(value = {@Result(property = "id", column = "id", id = true, javaType = int.class, jdbcType = JdbcType.INTEGER),
       @Result(property = "name", column = "name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
       @Result(property = "createTime", column = "create_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE),
@@ -129,16 +140,6 @@ public interface ProjectFlowMapper {
   })
   @SelectProvider(type = ProjectFlowMapperProvider.class, method = "findByProject")
   List<ProjectFlow> findByProject(@Param("projectId") Integer projectId);
-
-  /**
-   * 根据项目和名字删除一个工作流
-   *
-   * @param projectId
-   * @param name
-   * @return
-   */
-  @DeleteProvider(type = ProjectFlowMapperProvider.class, method = "deleteByProjectAndName")
-  int deleteByProjectAndName(@Param("projectId") int projectId, @Param("name") String name);
 
   /**
    * 查询工作流 owner
