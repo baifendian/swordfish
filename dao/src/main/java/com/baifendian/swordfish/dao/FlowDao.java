@@ -58,11 +58,6 @@ public class FlowDao extends BaseDao {
     executionNodeMapper = ConnectionFactory.getSqlSession().getMapper(ExecutionNodeMapper.class);
   }
 
-  public FlowNode queryNodeInfo(Integer nodeId) {
-    FlowNode flowNode = flowNodeMapper.selectByNodeId(nodeId);
-    return flowNode;
-  }
-
   /**
    * 获取 flow 执行详情 <p>
    *

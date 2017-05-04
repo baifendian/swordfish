@@ -30,7 +30,15 @@ public class BadRequestException extends RuntimeException {
     super(msg);
   }
 
+  public BadRequestException(String msg, Throwable cause) {
+    super(msg, cause);
+  }
+
   public BadRequestException(String msg, Object... arguments) {
     super(MessageFormat.format(msg, arguments));
+  }
+
+  public BadRequestException(Throwable cause, String msg, Object... arguments) {
+    super(MessageFormat.format(msg, arguments), cause);
   }
 }

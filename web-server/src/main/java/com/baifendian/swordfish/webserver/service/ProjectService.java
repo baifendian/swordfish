@@ -406,6 +406,7 @@ public class ProjectService {
     return projectUser.getPerm();
   }
 
+
   /**
    * 是否具备写权限
    *

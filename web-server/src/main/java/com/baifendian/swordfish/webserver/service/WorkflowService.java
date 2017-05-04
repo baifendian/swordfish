@@ -19,10 +19,7 @@ import com.baifendian.swordfish.common.config.BaseConfig;
 import com.baifendian.swordfish.common.hadoop.HdfsClient;
 import com.baifendian.swordfish.common.utils.graph.Graph;
 import com.baifendian.swordfish.dao.FlowDao;
-import com.baifendian.swordfish.dao.mapper.FlowNodeMapper;
-import com.baifendian.swordfish.dao.mapper.ProjectFlowMapper;
-import com.baifendian.swordfish.dao.mapper.ProjectMapper;
-import com.baifendian.swordfish.dao.mapper.ResourceMapper;
+import com.baifendian.swordfish.dao.mapper.*;
 import com.baifendian.swordfish.dao.model.FlowNode;
 import com.baifendian.swordfish.dao.model.Project;
 import com.baifendian.swordfish.dao.model.ProjectFlow;
@@ -82,6 +79,9 @@ public class WorkflowService {
   @Autowired
   private FlowDao flowDao;
 
+  @Autowired
+  private ScheduleMapper scheduleMapper;
+
   /**
    * 创建一个工作流, 需要具备项目的 'w' 权限。
    *
@@ -106,12 +106,12 @@ public class WorkflowService {
 
     if (project == null) {
       logger.error("Project does not exist: {}", projectName);
-      throw new NotFoundException("project", projectName);
+      throw new NotFoundException("Not found project '{0}'", projectName);
     }
 
     if (!projectService.hasWritePerm(operator.getId(), project)) {
       logger.error("User {} has no right permission for the project {} to create project flow", operator.getName(), projectName);
-      throw new PermissionException("project write or project owenr", operator.getName());
+      throw new PermissionException("User '{0}' is not has project '{1}' write permission and not is project '{1}' admin", operator.getName(),projectName);
     }
 
     // 对工作流详定义json进行反序列化
@@ -119,7 +119,7 @@ public class WorkflowService {
 
     if (workflowData == null) {
       logger.error("Project flow data or file not valid");
-      throw new ParameterException("data");
+      throw new ParameterException("Data '{0}' not valid",data);
     }
 
     // 检测工作流节点是否正常
@@ -127,13 +127,13 @@ public class WorkflowService {
 
     if (CollectionUtils.isEmpty(flowNodes)) {
       logger.error("flow node information is empty");
-      throw new ParameterException("data");
+      throw new ParameterException("Data '{0}' is null",data);
     }
 
     // 检测工作节点是否存在闭环
     if (graphHasCycle(flowNodes)) {
       logger.error("Proejct flow DAG has cycle");
-      throw new ParameterException("data");
+      throw new ParameterException("Flow node has cycle");
     }
 
     // 检测工作流节点定义json是否正常
@@ -141,7 +141,7 @@ public class WorkflowService {
       // TODO:: 这个检测不是很合理, 需要修改, 不太完备
       if (!flowNodeParamCheck(flowNode.getParameter(), flowNode.getType())) {
         logger.error("Flow node {} parameter invalid", flowNode.getName());
-        throw new ParameterException("data");
+        throw new ParameterException("Flow node parameter not valid");
       }
     }
 
@@ -173,7 +173,7 @@ public class WorkflowService {
       projectFlow.setFlag(flag);
     } catch (Exception e) {
       logger.error("Project flow set value error", e);
-      throw new BadRequestException("Project flow set value error");
+      throw new BadRequestException("Project flow set value error",e);
     }
 
     try {
@@ -183,7 +183,7 @@ public class WorkflowService {
       throw new NotModifiedException("Workflow has exist, can't create again.");
     } catch (Exception e) {
       logger.error("Workflow create has error", e);
-      throw new ServerErrorException("Workflow create has error");
+      throw new ServerErrorException("Workflow create has error", e);
     }
 
     return projectFlow;
@@ -240,7 +240,7 @@ public class WorkflowService {
 
     if (project == null) {
       logger.error("Project does not exist: {}", projectName);
-      throw new NotFoundException("project", projectName);
+      throw new NotFoundException("Not found project '{0}'", projectName);
     }
 
     if (!projectService.hasWritePerm(operator.getId(), project)) {
@@ -388,7 +388,6 @@ public class WorkflowService {
    * @param projectName
    * @param name
    */
-  @Transactional(value = "TransactionManager")
   public void deleteProjectFlow(User operator, String projectName, String name) {
 
     // 查询项目是否存在以及是否具备相应权限
@@ -408,10 +407,8 @@ public class WorkflowService {
       throw new NotFoundException("workflow", name);
     }
 
-    projectFlowMapper.deleteByProjectAndName(project.getId(), name);
-
-    // TODO 删除调度，删除日志等
-
+    //删除工作流
+    flowDao.deleteWorkflow(projectFlow.getId());
 
     return;
   }
@@ -539,11 +536,10 @@ public class WorkflowService {
     WorkflowData workflowData = null;
 
     if (file != null && !file.isEmpty()) {
-      // TODO::
+      //生成路径
       String filename = UUID.randomUUID().toString();
       String localFilename = BaseConfig.getLocalWorkflowFilename(project.getId(), filename); // 随机的一个文件名称
       String localExtDir = BaseConfig.getLocalWorkflowExtractDir(project.getId(), filename);
-//      String workflowJson = BaseConfig.(project.getId(), filename);
       String workflowJson = null;
 
       String hdfsFilename = BaseConfig.getHdfsWorkflowFilename(project.getId(), workflowName);
