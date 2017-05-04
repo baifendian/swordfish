@@ -38,4 +38,12 @@ public class VerifyUtilTest {
       assertTrue(VerifyUtil.matcheProjectName(test));
     }
   }
+
+  @Test
+  public void testMatcheResName(){
+    {
+      String test = "aa.jar";
+      assertTrue(VerifyUtil.matcheResName(test));
+    }
+  }
 }

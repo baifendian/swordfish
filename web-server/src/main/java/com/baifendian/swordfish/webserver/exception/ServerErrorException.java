@@ -25,6 +25,10 @@ public class ServerErrorException extends RuntimeException {
     super(msg);
   }
 
+  public ServerErrorException(String msg, Throwable cause) {
+    super(msg, cause);
+  }
+
   public ServerErrorException(String msg, Object... arguments) {
     super(MessageFormat.format(msg, arguments));
   }
