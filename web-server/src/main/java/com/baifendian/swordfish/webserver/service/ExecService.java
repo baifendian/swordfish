@@ -80,19 +80,19 @@ public class ExecService {
 
     if (project == null) {
       logger.error("Project does not exist: {}", projectName);
-      throw new NotFoundException("project",projectName);
+      throw new NotFoundException("Not found project '{0}'", projectName);
     }
 
     if (!projectService.hasExecPerm(operator.getId(), project)) {
       logger.error("User {} has no right permission for the project {} to create project flow", operator.getName(), projectName);
-      throw new PermissionException("project exec or project owner",operator.getName());
+      throw new PermissionException("User '{0}' is not has project '{1}' exec permission", operator.getName(), projectName);
     }
 
     ProjectFlow projectFlow = flowDao.projectFlowfindByName(project.getId(), workflowName);
 
     if (projectFlow == null) {
       logger.error("User {} has no exist workflow {} for the project {} to exec workflow", operator.getName(), workflowName, project.getName());
-      throw new NotFoundException("workflow",workflowName);
+      throw new NotFoundException("Not found workflow '{0}'", workflowName);
     }
 
     // 查看 master 是否存在
@@ -100,14 +100,6 @@ public class ExecService {
     if (masterServer == null) {
       logger.error("Master server does not exist.");
       throw new ServerErrorException("Master server does not exist.");
-    }
-
-    List<String> notifyMailList = new ArrayList<>();
-    try {
-      notifyMailList = JsonUtil.parseObjectList(notifyMails, String.class);
-    } catch (Exception e) {
-      logger.error("notify mail list des11n error", e);
-      throw new ParameterException("notifyMail");
     }
 
     //链接execServer
@@ -118,7 +110,19 @@ public class ExecService {
 
       switch (execType) {
         case DIRECT: {
-          ExecInfo execInfo = new ExecInfo(nodeName, nodeDep!=null?nodeDep.getType():0, notifyType!=null?notifyType.getType():0, notifyMailList, timeout);
+
+          // 反序列化邮箱列表
+          List<String> notifyMailList = new ArrayList<>();
+          try {
+            if (StringUtils.isNotEmpty(notifyMails)) {
+              notifyMailList = JsonUtil.parseObjectList(notifyMails, String.class);
+            }
+          } catch (Exception e) {
+            logger.error("notify mail list des11n error", e);
+            throw new ParameterException("Notify mail '{0}' not valid", notifyMails);
+          }
+
+          ExecInfo execInfo = new ExecInfo(nodeName, nodeDep != null ? nodeDep.getType() : 0, notifyType != null ? notifyType.getType() : 0, notifyMailList, timeout);
           RetResultInfo retInfo = masterClient.execFlow(project.getId(), projectFlow.getId(), new Date().getTime(), execInfo);
           if (retInfo == null || retInfo.getRetInfo().getStatus() != 0) {
             logger.error("Call master client exec workflow false , project id: {}, flow id: {},host: {}, port: {}", project.getId(), projectFlow.getId(), masterServer.getHost(), masterServer.getPort());
@@ -127,24 +131,25 @@ public class ExecService {
           return new ExecutorIds(retInfo.getExecIds());
         }
         case COMPLEMENT_DATA: {
+          // 反序列化调度信息
           ScheduleInfo scheduleInfo = null;
           try {
             scheduleInfo = JsonUtil.parseObject(schedule, ScheduleInfo.class);
           } catch (Exception e) {
             logger.error("scheduleInfo des11n error", e);
-            throw new ParameterException("scheduleInfo");
+            throw new ParameterException("Schedule info '{0}' not valid", notifyMails);
           }
 
           RetResultInfo retInfo = masterClient.appendWorkFlow(project.getId(), projectFlow.getId(), scheduleInfo);
           if (retInfo == null || retInfo.getRetInfo().getStatus() != 0) {
             logger.error("Call master client append workflow data false , project id: {}, flow id: {},host: {}, port: {}", project.getId(), projectFlow.getId(), masterServer.getHost(), masterServer.getPort());
-            throw new ServerErrorException("Call master client append workflow data false , project id: {}, flow id: {},host: {}, port: {}",project.getId(), projectFlow.getId(), masterServer.getHost(), masterServer.getPort());
+            throw new ServerErrorException("Call master client append workflow data false , project id: {}, flow id: {},host: {}, port: {}", project.getId(), projectFlow.getId(), masterServer.getHost(), masterServer.getPort());
           }
           return new ExecutorIds(retInfo.getExecIds());
         }
         default: {
           logger.error("exec workflow no support exec type {}", execType.getType());
-          throw new ParameterException("execType");
+          throw new ParameterException("Exec type '{0}' not valid", execType.getType());
         }
       }
 
@@ -157,6 +162,7 @@ public class ExecService {
 
   /**
    * 直接执行一个工作流
+   *
    * @param operator
    * @param projectName
    * @param workflowName
@@ -170,15 +176,15 @@ public class ExecService {
    * @param extras
    * @return
    */
-  public ExecutorId postExecWorkflowDirect(User operator, String projectName, String workflowName, String desc, String proxyUser, String queue, String data, MultipartFile file, NotifyType notifyType, String notifyMails, int timeout, String extras){
+  public ExecutorId postExecWorkflowDirect(User operator, String projectName, String workflowName, String desc, String proxyUser, String queue, String data, MultipartFile file, NotifyType notifyType, String notifyMails, int timeout, String extras) {
     logger.info("step1. create temp workflow");
     ProjectFlow projectFlow = workflowService.createWorkflow(operator, projectName, workflowName, desc, proxyUser, queue, data, file, extras, 1);
-    if (projectFlow == null){
+    if (projectFlow == null) {
       throw new ServerErrorException("project workflow create return is null");
     }
     logger.info("step2. exec temp workflow");
-    ExecutorIds executorIds = postExecWorkflow(operator,projectName,workflowName,null,ExecType.DIRECT,null,null,notifyType,notifyMails,timeout);
-    if (CollectionUtils.isEmpty(executorIds.getExecIds())){
+    ExecutorIds executorIds = postExecWorkflow(operator, projectName, workflowName, null, ExecType.DIRECT, null, null, notifyType, notifyMails, timeout);
+    if (CollectionUtils.isEmpty(executorIds.getExecIds())) {
       throw new ServerErrorException("project workflow exec return is null");
     }
     return new ExecutorId(executorIds.getExecIds().get(0));
@@ -193,15 +199,15 @@ public class ExecService {
 
     List<String> workflowList;
 
-    if (from < 0){
-      throw new BadRequestException("from");
+    if (from < 0) {
+      throw new BadRequestException("From '{0}' < 0",from);
     }
 
-    try{
-      workflowList = JsonUtil.parseObjectList(workflowName,String.class);
-    }catch (Exception e){
-      logger.error("des11n workflow list error",e);
-      throw new ParameterException("workflowName");
+    try {
+      workflowList = JsonUtil.parseObjectList(workflowName, String.class);
+    } catch (Exception e) {
+      logger.error("des11n workflow list error", e);
+      throw new ParameterException("Workflow name '{0}' not valid",workflowName);
     }
 
     // 查看是否对项目具备相应的权限
@@ -209,12 +215,12 @@ public class ExecService {
 
     if (project == null) {
       logger.error("Project does not exist: {}", projectName);
-      throw new NotFoundException("project",projectName);
+      throw new NotFoundException("Not found project '{0}'", projectName);
     }
 
     if (!projectService.hasExecPerm(operator.getId(), project)) {
       logger.error("User {} has no right permission for the project {} to get exec project flow", operator.getName(), projectName);
-      throw new PermissionException("project exec or project owner",operator.getName());
+      throw new PermissionException("User '{0}' is not has project '{1}' exec permission", operator.getName(), projectName);
     }
 
     List<FlowStatus> flowStatusList;
@@ -222,17 +228,17 @@ public class ExecService {
       flowStatusList = JsonUtil.parseObjectList(status, FlowStatus.class);
     } catch (Exception e) {
       logger.error("flow status list des11n error", e);
-      throw new ParameterException("status");
+      throw new ParameterException("Flow status list '{0}' not valid",status);
     }
 
-    List<ExecutionFlow> executionFlowList = executionFlowMapper.selectByFlowIdAndTimesAndStatusLimit(projectName,workflowList, startDate, endDate, from, size, flowStatusList);
+    List<ExecutionFlow> executionFlowList = executionFlowMapper.selectByFlowIdAndTimesAndStatusLimit(projectName, workflowList, startDate, endDate, from, size, flowStatusList);
     List<ExecutionFlowDto> executionFlowResponseList = new ArrayList<>();
-    for (ExecutionFlow executionFlow:executionFlowList){
+    for (ExecutionFlow executionFlow : executionFlowList) {
       executionFlowResponseList.add(new ExecutionFlowDto(executionFlow));
     }
 
-    int total = executionFlowMapper.sumByFlowIdAndTimesAndStatus(projectName,workflowList, startDate, endDate,  flowStatusList);
-    return new ExecWorkflowsDto(total,size,executionFlowResponseList);
+    int total = executionFlowMapper.sumByFlowIdAndTimesAndStatus(projectName, workflowList, startDate, endDate, flowStatusList);
+    return new ExecWorkflowsDto(total, size, executionFlowResponseList);
   }
 
   /**
@@ -248,7 +254,7 @@ public class ExecService {
 
     if (executionFlow == null) {
       logger.error("exec flow does not exist: {}", execId);
-      throw new NotFoundException("execId",String.valueOf(execId));
+      throw new NotFoundException("Not found execId '{0}'", execId);
     }
 
     // 查看是否对项目具备相应的权限
@@ -256,20 +262,20 @@ public class ExecService {
 
     if (project == null) {
       logger.error("Project does not exist: {}", executionFlow.getProjectName());
-      throw new NotFoundException("project",executionFlow.getProjectName());
+      throw new NotFoundException("Not found project '{0}'", executionFlow.getProjectName());
     }
 
     if (!projectService.hasExecPerm(operator.getId(), project)) {
       logger.error("User {} has no right permission for the project {} to get exec project flow", operator.getName(), project.getName());
-      throw new PermissionException("project exec or project owner",operator.getName());
+      throw new PermissionException("User '{0}' is not has project '{1}' exec permission", operator.getName(), executionFlow.getProjectName());
     }
 
     ExecutionFlowDto executionFlowResponse = new ExecutionFlowDto(executionFlow);
     List<ExecutionNode> executionNodeList = executionNodeMapper.selectExecNodeById(execId);
 
-    for (ExecutionNodeDto executionNodeResponse:executionFlowResponse.getData().getNodes()){
-      for (ExecutionNode executionNode:executionNodeList){
-        if (StringUtils.equals(executionNodeResponse.getName(),executionNode.getName())){
+    for (ExecutionNodeDto executionNodeResponse : executionFlowResponse.getData().getNodes()) {
+      for (ExecutionNode executionNode : executionNodeList) {
+        if (StringUtils.equals(executionNodeResponse.getName(), executionNode.getName())) {
           executionNodeResponse.mergeExecutionNode(executionNode);
         }
       }
@@ -292,26 +298,26 @@ public class ExecService {
 
     if (executionNode == null) {
       logger.error("job id does not exist: {}", jobId);
-      throw new NotFoundException("jobId",jobId);
+      throw new NotFoundException("Not found jobId '{0}'", jobId);
     }
 
     ExecutionFlow executionFlow = executionFlowMapper.selectByExecId(executionNode.getExecId());
 
     if (executionFlow == null) {
       logger.error("execution flow does not exist: {}", executionNode.getExecId());
-      throw new NotFoundException("execId",String.valueOf(executionNode.getExecId()));
+      throw new NotFoundException("Not found execId '{0}'", executionNode.getExecId());
     }
 
     Project project = projectMapper.queryByName(executionFlow.getProjectName());
 
     if (project == null) {
       logger.error("project does not exist: {}", executionFlow.getProjectName());
-      throw new NotFoundException("project",executionFlow.getProjectName());
+      throw new NotFoundException("Not found project '{0}'", executionFlow.getProjectName());
     }
 
     if (!projectService.hasExecPerm(operator.getId(), project)) {
       logger.error("User {} has no right permission for the project {} to get exec project flow log", operator.getName(), project.getName());
-      throw new PermissionException("project exec or project owner",operator.getName());
+      throw new PermissionException("User '{0}' is not has project '{1}' exec permission", operator.getName(), executionFlow.getProjectName());
     }
 
     return logHelper.getLog(from, size, jobId);
@@ -328,7 +334,7 @@ public class ExecService {
 
     if (executionFlow == null) {
       logger.error("exec flow does not exist: {}", execId);
-      throw new NotFoundException("execId",String.valueOf(execId));
+      throw new NotFoundException("Not found execId '{0}'", execId);
     }
 
     // 查看是否对项目具备相应的权限
@@ -336,12 +342,12 @@ public class ExecService {
 
     if (project == null) {
       logger.error("Project does not exist: {}", executionFlow.getProjectName());
-      throw new NotFoundException("project",executionFlow.getProjectName());
+      throw new NotFoundException("Not found project '{0}'", executionFlow.getProjectName());
     }
 
     if (!projectService.hasExecPerm(operator.getId(), project)) {
       logger.error("User {} has no right permission for the project {} to get exec project flow", operator.getName(), project.getName());
-      throw new PermissionException("project exec or project owenr",operator.getName());
+      throw new PermissionException("User '{0}' is not has project '{1}' exec permission", operator.getName(), project.getName());
     }
 
     MasterServer masterServer = masterServerMapper.query();

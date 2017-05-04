@@ -114,24 +114,4 @@ public class ExecutionNodeMapperProvider {
     }.toString();
   }
 
-  public String selectStatusByFlowId(Map<String, Object> parameter) {
-    return new SQL() {
-      {
-        SELECT("flow_id, node_id, status, attempt");
-        FROM(TABLE_NAME);
-        WHERE("exec_id = #{execId}");
-        WHERE("flow_id = #{flowId}");
-      }
-    }.toString();
-  }
-
-  public String deleteByExecId(Map<String, Object> parameter) {
-    return new SQL() {
-      {
-        DELETE_FROM(TABLE_NAME);
-        WHERE("exec_id = #{execId}");
-      }
-    }.toString();
-  }
-
 }

@@ -50,7 +50,6 @@ public class DatasourceController {
    * @param desc
    * @param type
    * @param parameter
-   * @param response
    * @return
    */
   @PostMapping(value = "/{name}")
@@ -59,8 +58,7 @@ public class DatasourceController {
                                         @PathVariable("name") String name,
                                         @RequestParam(value = "desc", required = false) String desc,
                                         @RequestParam(value = "type") DbType type,
-                                        @RequestParam(value = "parameter") String parameter,
-                                        HttpServletResponse response) {
+                                        @RequestParam(value = "parameter") String parameter) {
     logger.info("Operator user {}, create datasource, project name: {}, data source name: {}, desc: {}, type: {}, parameter: {}",
         operator.getName(), projectName, name, desc, type, parameter);
 
@@ -76,7 +74,6 @@ public class DatasourceController {
    * @param desc
    * @param type
    * @param parameter
-   * @param response
    * @return
    */
   @PutMapping(value = "/{name}")
@@ -85,8 +82,7 @@ public class DatasourceController {
                                            @PathVariable("name") String name,
                                            @RequestParam(value = "desc", required = false) String desc,
                                            @RequestParam(value = "type") String type,
-                                           @RequestParam(value = "parameter") String parameter,
-                                           HttpServletResponse response) {
+                                           @RequestParam(value = "parameter") String parameter) {
     logger.info("Operator user {}, put datasource, project name: {}, data source name: {}, desc: {}, type: {}, parameter: {}",
         operator.getName(), projectName, name, desc, type, parameter);
 
@@ -101,7 +97,6 @@ public class DatasourceController {
    * @param projectName
    * @param desc
    * @param parameter
-   * @param response
    * @return
    */
   @PatchMapping(value = "/{name}")
@@ -109,8 +104,7 @@ public class DatasourceController {
                                      @PathVariable("projectName") String projectName,
                                      @PathVariable("name") String name,
                                      @RequestParam(value = "desc", required = false) String desc,
-                                     @RequestParam(value = "parameter") String parameter,
-                                     HttpServletResponse response) {
+                                     @RequestParam(value = "parameter") String parameter) {
     logger.info("Operator user {}, modify datasource, project name: {}, data source name: {}, desc: {}, type: {}, parameter: {}",
         operator.getName(), projectName, name, desc, parameter);
 
@@ -123,13 +117,11 @@ public class DatasourceController {
    * @param operator
    * @param projectName
    * @param name
-   * @param response
    */
   @DeleteMapping(value = "/{name}")
   public void deleteDataSource(@RequestAttribute(value = "session.user") User operator,
                                @PathVariable("projectName") String projectName,
-                               @PathVariable("name") String name,
-                               HttpServletResponse response) {
+                               @PathVariable("name") String name) {
     logger.info("Operator user {}, delete datasource, project name: {}, data source name: {}",
         operator.getName(), projectName, name);
 
@@ -141,13 +133,11 @@ public class DatasourceController {
    *
    * @param operator
    * @param projectName
-   * @param response
    * @return
    */
   @GetMapping(value = "")
   public List<DatasourceDto> query(@RequestAttribute(value = "session.user") User operator,
-                                @PathVariable("projectName") String projectName,
-                                HttpServletResponse response) {
+                                @PathVariable("projectName") String projectName) {
     logger.info("Operator user {}, query datasource of project, project name: {}",
         operator.getName(), projectName);
 
@@ -165,14 +155,12 @@ public class DatasourceController {
    * @param operator
    * @param projectName
    * @param name
-   * @param response
    * @return
    */
   @GetMapping(value = "/{name}")
   public DatasourceDto queryByName(@RequestAttribute(value = "session.user") User operator,
                                 @PathVariable("projectName") String projectName,
-                                @PathVariable("name") String name,
-                                HttpServletResponse response) {
+                                @PathVariable("name") String name) {
     logger.info("Operator user {}, query datasource, project name: {}, data source name: {}",
         operator.getName(), projectName, name);
 

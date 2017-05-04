@@ -66,6 +66,11 @@ public interface ScheduleMapper {
   @SelectProvider(type = ScheduleMapperProvider.class, method = "selectByFlowId")
   Schedule selectByFlowId(@Param("flowId") int flowId);
 
+  /**
+   * 查询一个项目下所有的调度
+   * @param projectName
+   * @return
+   */
   @Results(value = {
           @Result(property = "flowId", column = "flow_id", id = true, javaType = int.class, jdbcType = JdbcType.INTEGER),
           @Result(property = "startDate", column = "start_date", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP),
@@ -110,56 +115,4 @@ public interface ScheduleMapper {
   })
   @SelectProvider(type = ScheduleMapperProvider.class, method = "selectByFlowName")
   Schedule selectByFlowName(@Param("projectName") String projectName,@Param("name") String name);
-
-
-
-  @Results(value = {
-          @Result(property = "flowId", column = "flow_id", id = true, javaType = int.class, jdbcType = JdbcType.INTEGER),
-          @Result(property = "depWorkflows", column = "dep_workflows", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-  })
-  @SelectProvider(type = ScheduleMapperProvider.class, method = "queryAll")
-  List<Schedule> queryAll();
-
-  @DeleteProvider(type = ScheduleMapperProvider.class, method = "deleteByFlowId")
-  int deleteByFlowId(@Param("flowId") int flowId);
-//
-//  /**
-//   * 工作流类型分布 <p>
-//   */
-//  @Results(value = {@Result(property = "flowType", column = "flow_type", typeHandler = EnumOrdinalTypeHandler.class, jdbcType = JdbcType.TINYINT),
-//          @Result(property = "value", column = "num", javaType = int.class, jdbcType = JdbcType.INTEGER),
-//  })
-//  @SelectProvider(type = ScheduleMapperProvider.class, method = "queryFlowTypeDis")
-//  List<DisField> queryFlowTypeDis(@Param("projectId") int projectId);
-
-  /**
-   * 查询一个项目中图形化ETL上线的的数目 <p>
-   *
-   * @return 查询记录数
-   */
-  @SelectProvider(type = ScheduleMapperProvider.class, method = "queryFlowEtlNum")
-  int queryFlowEtlNum(@Param("projectId") int projectId);
-
-//
-//  /**
-//   * 工作流调度类型分布 <p>
-//   */
-//  @Results(value = {@Result(property = "scheduleType", column = "schedule_type", typeHandler = EnumOrdinalTypeHandler.class, jdbcType = JdbcType.TINYINT),
-//          @Result(property = "value", column = "num", javaType = int.class, jdbcType = JdbcType.INTEGER),
-//  })
-//  @SelectProvider(type = ScheduleMapperProvider.class, method = "selectScheduleTypeDis")
-//  List<DisField> selectScheduleTypeDis(@Param("projectId") int projectId);
-
-  @SelectProvider(type = ScheduleMapperProvider.class, method = "selectScheduleTypeNull")
-  int selectScheduleTypeNull(@Param("projectId") int projectId);
-
-
-  /**
-   * 查询一个组织里面的workflow数量 <p>
-   *
-   * @return 查询记录数
-   */
-  @SelectProvider(type = ScheduleMapperProvider.class, method = "queryFlowNum")
-  int queryFlowNum(@Param("tenantId") int tenantId, @Param("flowTypes") List<FlowType> flowTypes);
-
 }

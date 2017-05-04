@@ -84,12 +84,12 @@ public class ScheduleService {
     Project project = projectMapper.queryByName(projectName);
 
     if (project == null) {
-      throw new NotFoundException("project",projectName);
+      throw new NotFoundException("Not found project '{0}'", projectName);
     }
 
-    if (!projectService.hasReadPerm(operator.getId(), project)) {
+    if (!projectService.hasExecPerm(operator.getId(), project)) {
       logger.error("User {} has no right permission for the project {} to post schedule",operator.getName(),project.getName());
-      throw new PermissionException("project read or project owner",operator.getName());
+      throw new PermissionException("User '{0}' is not has project '{1}' exec permission", operator.getName(),projectName);
     }
 
     //检查是否存在工作流
@@ -160,12 +160,12 @@ public class ScheduleService {
     Project project = projectMapper.queryByName(projectName);
 
     if (project == null) {
-      throw new NotFoundException("project",projectName);
+      throw new NotFoundException("Not found project '{0}'", projectName);
     }
 
-    if (!projectService.hasReadPerm(operator.getId(), project)) {
+    if (!projectService.hasExecPerm(operator.getId(), project)) {
       logger.error("User {} has no right permission for the project {} to patch schedule",operator.getName(),project.getName());
-      throw new PermissionException("project read or project owner",operator.getName());
+      throw new PermissionException("User '{0}' is not has project '{1}' exec permission", operator.getName(),projectName);
     }
 
     //检查是否存在工作流
@@ -173,7 +173,7 @@ public class ScheduleService {
 
     if (projectFlow == null) {
       logger.error("User {} has no exist workflow {} for the project {} to patch schedule",operator.getName(),workflowName,project.getName());
-      throw new NotFoundException("workflow",workflowName);
+      throw new NotFoundException("Not found workflow '{0}'", workflowName);
     }
 
     //检查调度是否存在
@@ -182,7 +182,7 @@ public class ScheduleService {
     Date now = new Date();
 
     if (scheduleObj == null) {
-      throw new NotFoundException("Schedule","Schedule.flowId:"+projectFlow.getId());
+      throw new NotFoundException("Not found schedule's workflow '{0}'",projectFlow.getId());
     }
 
     //封装检查更新参数
@@ -226,7 +226,7 @@ public class ScheduleService {
       scheduleObj.setModifyTime(now);
     } catch (Exception e) {
       logger.error(e.toString());
-      throw new ParameterException("create schedule param object error");
+      throw new ParameterException("create schedule param object error",e);
     }
 
     scheduleMapper.update(scheduleObj);
@@ -255,12 +255,12 @@ public class ScheduleService {
     Project project = projectMapper.queryByName(projectName);
 
     if (project == null) {
-      throw new NotFoundException("project",projectName);
+      throw new NotFoundException("Not found project '{0}'", projectName);
     }
 
-    if (!projectService.hasReadPerm(operator.getId(), project)) {
+    if (!projectService.hasExecPerm(operator.getId(), project)) {
       logger.error("User {} has no right permission for the project {} to post schedule status",operator.getName(),project.getName());
-      throw new PermissionException("project read or project owner",operator.getName());
+      throw new PermissionException("User '{0}' is not has project '{1}' exec permission", operator.getName(),projectName);
     }
 
     //检查是否存在工作流
@@ -268,7 +268,7 @@ public class ScheduleService {
 
     if (projectFlow == null) {
       logger.error("User {} has no exist workflow {} for the project {} to post schedule status",operator.getName(),workflowName,project.getName());
-      throw new NotFoundException("workflow",workflowName);
+      throw new NotFoundException("Not found schedule's workflow '{0}'",projectFlow.getId());
     }
 
     // 查看 master 是否存在
@@ -292,7 +292,7 @@ public class ScheduleService {
       case "offline":scheduleObj.setScheduleStatus(ScheduleStatus.OFFLINE);break;
       default:{
         logger.error("no support scheduleStatus: {}",scheduleStatus);
-        throw new ParameterException("schedule status");
+        throw new ParameterException("Schedule status '{0}' not valid",scheduleStatus);
       }
     }
 
@@ -322,7 +322,7 @@ public class ScheduleService {
         }
         default:{
           logger.error("unknown schedule status {}",scheduleStatus.toString());
-          throw new ParameterException("schedule status");
+          throw new ParameterException("Schedule status '{0}' not valid",scheduleStatus);
         }
       }
 
@@ -347,19 +347,19 @@ public class ScheduleService {
     Project project = projectMapper.queryByName(projectName);
 
     if (project == null) {
-      throw new NotFoundException("project",projectName);
+      throw new NotFoundException("Not found project '{0}'", projectName);
     }
 
     if (!projectService.hasReadPerm(operator.getId(), project)) {
       logger.error("User {} has no right permission for the project {} to get schedule",operator.getName(),project.getName());
-      throw new PermissionException("project read or project owner",operator.getName());
+      throw new PermissionException("User '{0}' is not has project '{1}' read permission", operator.getName(),projectName);
     }
 
     //检查是否存在工作流
     ProjectFlow projectFlow = flowDao.projectFlowfindByName(project.getId(), workflowName);
 
     if (projectFlow == null) {
-      throw new NotFoundException("workflow",workflowName);
+      throw new NotFoundException("Not found workflow '{0}'", workflowName);
     }
 
     return scheduleMapper.selectByFlowId(projectFlow.getId());
@@ -375,12 +375,12 @@ public class ScheduleService {
     Project project = projectMapper.queryByName(projectName);
 
     if (project == null) {
-      throw new NotFoundException("project",projectName);
+      throw new NotFoundException("Not found project '{0}'", projectName);
     }
 
     if (!projectService.hasReadPerm(operator.getId(), project)) {
       logger.error("User {} has no right permission for the project {} to get all schedule",operator.getName(),project.getName());
-      throw new PermissionException("project read or project owner",operator.getName());
+      throw new PermissionException("User '{0}' is not has project '{1}' read permission", operator.getName(),projectName);
     }
 
     return scheduleMapper.selectByProject(projectName);

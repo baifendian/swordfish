@@ -54,7 +54,6 @@ public class AdhocController {
    * @param queue
    * @param udfs
    * @param timeout
-   * @param response
    * @return
    */
   @PostMapping(value = "/projects/{projectName}/adHoc")
@@ -65,8 +64,7 @@ public class AdhocController {
                               @RequestParam(value = "proxyUser") String proxyUser,
                               @RequestParam(value = "queue") String queue,
                               @RequestParam(value = "udfs", required = false) String udfs,
-                              @RequestParam(value = "timeout", required = false, defaultValue = "1800") int timeout,
-                              HttpServletResponse response) {
+                              @RequestParam(value = "timeout", required = false, defaultValue = "1800") int timeout) {
     logger.info("Operator user {}, exec adhoc, project name: {}, stms: {}, limit: {}, proxyUser: {}, queue: {}, udfs: {}, timeout: {}",
         operator.getName(), projectName, stms, limit, proxyUser, queue, udfs, timeout);
 
@@ -101,7 +99,6 @@ public class AdhocController {
    * @param index
    * @param from
    * @param size
-   * @param response
    * @return
    */
   @GetMapping(value = "/adHoc/{execId}/logs")
@@ -109,8 +106,7 @@ public class AdhocController {
                                 @PathVariable int execId,
                                 @RequestParam(value = "index") int index,
                                 @RequestParam(value = "from", required = false, defaultValue = "0") int from,
-                                @RequestParam(value = "size", required = false, defaultValue = "100") int size,
-                                HttpServletResponse response) {
+                                @RequestParam(value = "size", required = false, defaultValue = "100") int size) {
     logger.info("Operator user {}, get adhoc logs, exec id: {}, index: {}, from: {}, size: {}",
         operator.getName(), execId, index, from, size);
 
@@ -133,14 +129,12 @@ public class AdhocController {
    * @param operator
    * @param execId
    * @param index
-   * @param response
    * @return
    */
   @GetMapping(value = "/adHoc/{execId}/result")
   public AdHocResultData queryResult(@RequestAttribute(value = "session.user") User operator,
                                      @PathVariable int execId,
-                                     @RequestParam(value = "index") int index,
-                                     HttpServletResponse response) {
+                                     @RequestParam(value = "index") int index) {
     logger.info("Operator user {}, get adhoc result, exec id: {}, index: {}",
         operator.getName(), execId, index);
 

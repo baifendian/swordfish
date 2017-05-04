@@ -25,6 +25,7 @@ import com.baifendian.swordfish.dao.model.User;
 import com.baifendian.swordfish.webserver.dto.BaseResponse;
 import com.baifendian.swordfish.webserver.exception.NotFoundException;
 import com.baifendian.swordfish.webserver.exception.NotModifiedException;
+import com.baifendian.swordfish.webserver.exception.ParameterException;
 import com.baifendian.swordfish.webserver.exception.PermissionException;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -67,28 +68,36 @@ public class DatasourceService {
 
     // 不存在的项目名
     if (project == null) {
-      throw new NotFoundException("project",projectName);
+      throw new NotFoundException("Not found project '{0}'", projectName);
     }
 
     // 没有权限
     if (!projectService.hasWritePerm(operator.getId(), project)) {
-      throw new PermissionException("project write or project owner",operator.getName());
+      throw new PermissionException("User '{0}' is not has project '{1}' write permission", operator.getName(),projectName);
     }
+
+    //TODO parameter参数检测
 
     // 构建数据源
     DataSource dataSource = new DataSource();
-    Date now = new Date();
+    try{
+      Date now = new Date();
 
-    dataSource.setName(name);
-    dataSource.setDesc(desc);
-    dataSource.setOwnerId(operator.getId());
-    dataSource.setOwnerName(operator.getName());
-    dataSource.setType(type);
-    dataSource.setProjectId(project.getId());
-    dataSource.setProjectName(project.getName());
-    dataSource.setParameter(parameter);
-    dataSource.setCreateTime(now);
-    dataSource.setModifyTime(now);
+      dataSource.setName(name);
+      dataSource.setDesc(desc);
+      dataSource.setOwnerId(operator.getId());
+      dataSource.setOwnerName(operator.getName());
+      dataSource.setType(type);
+      dataSource.setProjectId(project.getId());
+      dataSource.setProjectName(project.getName());
+      dataSource.setParameter(parameter);
+      dataSource.setCreateTime(now);
+      dataSource.setModifyTime(now);
+    }catch (Exception e){
+      logger.error("Datasource set value error",e);
+      throw new ParameterException("Datasource set value error ");
+    }
+
 
     try {
       dataSourceMapper.insert(dataSource);
@@ -158,12 +167,12 @@ public class DatasourceService {
 
     // 不存在的项目名
     if (project == null) {
-      throw new NotFoundException("project",projectName);
+      throw new NotFoundException("Not found project '{0}'", projectName);
     }
 
     // 没有权限
     if (!projectService.hasWritePerm(operator.getId(), project)) {
-      throw new PermissionException("project write or owner",operator.getName());
+      throw new PermissionException("User '{0}' is not has project '{1}' write permission", operator.getName(),projectName);
     }
 
     // 查找指定数据源
@@ -172,7 +181,7 @@ public class DatasourceService {
     Date now = new Date();
 
     if (dataSource == null){
-      throw new NotFoundException("datasource",name);
+      throw new NotFoundException("Not found datasource '{0}'", name);
     }
 
     if (!StringUtils.isEmpty(desc)){
@@ -205,12 +214,12 @@ public class DatasourceService {
 
     //不存在的项目名
     if (project == null) {
-      throw new NotFoundException("project",projectName);
+      throw new NotFoundException("Not found project '{0}'", projectName);
     }
 
     //没有权限
     if (!projectService.hasWritePerm(operator.getId(), project)) {
-      throw new PermissionException("project write or project owner",operator.getName());
+      throw new PermissionException("User '{0}' is not has project '{1}' write permission", operator.getName(),projectName);
     }
 
     int count = dataSourceMapper.deleteByProjectAndName(project.getId(), name);
@@ -234,12 +243,12 @@ public class DatasourceService {
 
     // 不存在的项目名
     if (project == null) {
-      throw new NotFoundException("project",projectName);
+      throw new NotFoundException("Not found project '{0}'", projectName);
     }
 
     // 没有权限
     if (!projectService.hasReadPerm(operator.getId(), project)) {
-      throw new PermissionException("project read or project owner",operator.getName());
+      throw new PermissionException("User '{0}' is not has project '{1}' read permission", operator.getName(),projectName);
     }
 
     return dataSourceMapper.getByProjectId(project.getId());
@@ -259,12 +268,12 @@ public class DatasourceService {
 
     // 不存在的项目名
     if (project == null) {
-      throw new NotFoundException("project",projectName);
+      throw new NotFoundException("Not found project '{0}'", projectName);
     }
 
     // 没有权限
     if (!projectService.hasReadPerm(operator.getId(), project)) {
-      throw new PermissionException("project read or project owner",operator.getName());
+      throw new PermissionException("User '{0}' is not has project '{1}' read permission", operator.getName(),projectName);
     }
 
     return dataSourceMapper.getByName(project.getId(), name);
