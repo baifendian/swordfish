@@ -38,12 +38,14 @@ public enum ScheduleStatus {
   /**
    * 通过 type 获取枚举对象 <p>
    *
+   * @param type
    * @return {@link ScheduleStatus}
    */
   public static ScheduleStatus valueOfType(Integer type) throws IllegalArgumentException {
     if (type == null) {
       return null;
     }
+
     try {
       return ScheduleStatus.values()[type];
     } catch (Exception ex) {

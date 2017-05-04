@@ -64,12 +64,13 @@ public class ExecutorClient {
 
   private void connect() {
     tTransport = new TSocket(host, port, timeout);
+
     try {
       TProtocol protocol = new TBinaryProtocol(tTransport);
       client = new WorkerService.Client(protocol);
       tTransport.open();
     } catch (TTransportException e) {
-      e.printStackTrace();
+      logger.error("Catch an exception", e);
     }
   }
 
@@ -79,8 +80,16 @@ public class ExecutorClient {
     }
   }
 
+  /**
+   * 调度执行
+   *
+   * @param execId
+   * @param scheduleDate
+   * @return
+   */
   public boolean scheduleExecFlow(int execId, long scheduleDate) {
     connect();
+
     try {
       client.scheduleExecFlow(execId, scheduleDate);
     } catch (TException e) {
@@ -89,11 +98,19 @@ public class ExecutorClient {
     } finally {
       close();
     }
+
     return true;
   }
 
+  /**
+   * 执行即席查询
+   *
+   * @param id
+   * @throws TException
+   */
   public void execAdHoc(int id) throws TException {
     connect();
+
     try {
       client.execAdHoc(id);
     } finally {
@@ -101,26 +118,44 @@ public class ExecutorClient {
     }
   }
 
+  /**
+   * 执行工作流
+   *
+   * @param execId
+   * @return
+   * @throws TException
+   */
   public boolean execFlow(int execId) throws TException {
     boolean result = false;
+
     for (int i = 0; i < retries; i++) {
       result = execFlowOne(execId);
-      if(result)
+      if (result) {
         break;
+      }
       try {
         Thread.sleep(1000);
       } catch (InterruptedException e) {
-        e.printStackTrace();
+        logger.error("Catch an exception", e);
       }
     }
+
     return result;
   }
 
+  /**
+   * 执行一次
+   *
+   * @param execId
+   * @return
+   * @throws TException
+   */
   public boolean execFlowOne(int execId) throws TException {
     connect();
+
     try {
       RetInfo retInfo = client.execFlow(execId);
-      if(retInfo.getStatus() != ResultHelper.SUCCESS.getStatus()){
+      if (retInfo.getStatus() != ResultHelper.SUCCESS.getStatus()) {
         throw new ExecException(retInfo.getMsg());
       }
     } catch (TException e) {
@@ -129,16 +164,24 @@ public class ExecutorClient {
     } finally {
       close();
     }
+
     return true;
   }
 
+  /**
+   * 取消执行
+   *
+   * @param execId
+   * @return
+   * @throws TException
+   */
   public RetInfo cancelExecFlow(int execId) throws TException {
     connect();
+
     try {
       return client.cancelExecFlow(execId);
     } finally {
       close();
     }
   }
-
 }

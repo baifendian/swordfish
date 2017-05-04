@@ -18,7 +18,7 @@ package com.baifendian.swordfish.dao.enums;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 /**
- * 描述一个 workflow和node的运行状态 <p>
+ * 描述一个 workflow 和 node 的运行状态 <p>
  */
 public enum FlowStatus {
   /**
@@ -26,6 +26,13 @@ public enum FlowStatus {
    **/
   INIT, WAITING_DEP, WAITING_RES, RUNNING, SUCCESS, KILL, FAILED, DEP_FAILED;
 
+  /**
+   * 得到序号
+   * <p>
+   * 采用 @JsonValue 标签主要是在返回的时候, 序列化使用
+   *
+   * @return
+   */
   @JsonValue
   public Integer getType() {
     return ordinal();
@@ -34,12 +41,14 @@ public enum FlowStatus {
   /**
    * 通过 type 获取枚举对象 <p>
    *
+   * @param type
    * @return {@link FlowStatus}
    */
   public static FlowStatus valueOfType(Integer type) throws IllegalArgumentException {
     if (type == null) {
       return null;
     }
+
     try {
       return FlowStatus.values()[type];
     } catch (Exception ex) {

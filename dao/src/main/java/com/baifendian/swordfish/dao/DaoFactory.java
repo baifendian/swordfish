@@ -40,7 +40,8 @@ public class DaoFactory {
       if (!daoMap.containsKey(className)) {
         try {
           T t = clazz.getConstructor().newInstance();
-          t.init(); // 实例初始化
+          // 实例初始化
+          t.init();
           daoMap.put(className, t);
         } catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException e) {
           LOGGER.error(e.getMessage(), e);

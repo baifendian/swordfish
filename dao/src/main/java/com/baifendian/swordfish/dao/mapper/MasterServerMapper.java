@@ -30,10 +30,11 @@ public interface MasterServerMapper {
    * @return
    */
   @Results(value = {
+      @Result(property = "id", column = "id", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
       @Result(property = "host", column = "host", javaType = String.class, jdbcType = JdbcType.VARCHAR),
       @Result(property = "port", column = "port", javaType = int.class, jdbcType = JdbcType.INTEGER),
       @Result(property = "createTime", column = "create_time", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP),
-      @Result(property = "modifyTime", column = "modify_time", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP),
+      @Result(property = "modifyTime", column = "modify_time", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP)
   })
   @SelectProvider(type = MasterServerMapperProvider.class, method = "query")
   MasterServer query();

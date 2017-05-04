@@ -18,6 +18,7 @@ package com.baifendian.swordfish.dao.enums;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import org.apache.commons.lang3.StringUtils;
 
+@Deprecated
 public enum NodeType {
 
   /**
@@ -105,7 +106,6 @@ public enum NodeType {
    *
    * @return {@link NodeType}
    */
-  // @JsonCreator
   public static NodeType valueOfType(Integer type) throws IllegalArgumentException {
     if (type == null) {
       return null;

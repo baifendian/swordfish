@@ -38,6 +38,7 @@ public enum DepPolicyType {
   /**
    * 通过 type 获取枚举对象 <p>
    *
+   * @param type
    * @return {@link DepPolicyType}
    */
   public static DepPolicyType valueOfType(Integer type) throws IllegalArgumentException {

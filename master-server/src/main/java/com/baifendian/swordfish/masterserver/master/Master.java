@@ -61,32 +61,34 @@ public class Master {
 
   private ScheduledExecutorService executorService;
 
-  public Master(FlowDao flowDao){
+  public Master(FlowDao flowDao) {
     this.flowDao = flowDao;
+
     executorServerManager = new ExecutorServerManager();
     executorService = Executors.newScheduledThreadPool(5);
     executionFlowQueue = new LinkedBlockingQueue<>(MasterConfig.executionFlowQueueSize);
   }
 
-  public void run(){
+  public void run() {
     flowExecManager = new FlowExecManager(this, flowDao);
+
     // 初始化调度作业
     FlowScheduleJob.init(executionFlowQueue, flowDao);
 
-    // 启动请求 executor server的处理线程
+    // 启动请求 executor server 的处理线程
     retryToWorkerThread = new Submit2ExecutorServerThread(executorServerManager, flowDao, executionFlowQueue);
     retryToWorkerThread.setDaemon(true);
     retryToWorkerThread.start();
 
     executorCheckThread = new ExecutorCheckThread(executorServerManager, MasterConfig.heartBeatTimeoutInterval,
-            executionFlowQueue, flowDao);
+        executionFlowQueue, flowDao);
     executorService.scheduleAtFixedRate(executorCheckThread, 10, MasterConfig.heartBeatCheckInterval, TimeUnit.SECONDS);
 
     recoveryExecFlow();
   }
 
-  public void stop(){
-    if(!executorService.isShutdown()){
+  public void stop() {
+    if (!executorService.isShutdown()) {
       executorService.shutdownNow();
     }
     flowExecManager.destroy();
@@ -130,7 +132,7 @@ public class Master {
 
   }
 
-  public void addExecFlow(ExecFlowInfo execFlowInfo){
+  public void addExecFlow(ExecFlowInfo execFlowInfo) {
     executionFlowQueue.add(execFlowInfo);
   }
 
@@ -140,10 +142,13 @@ public class Master {
 
   public void execAdHoc(int id) throws TException {
     ExecutorServerInfo executorServerInfo = executorServerManager.getExecutorServer();
-    if(executorServerInfo == null){
+
+    if (executorServerInfo == null) {
       throw new ExecException("can't found active executor server");
     }
+
     logger.info("exec adhoc {} on server {}:{}", id, executorServerInfo.getHost(), executorServerInfo.getPort());
+
     ExecutorClient executorClient = new ExecutorClient(executorServerInfo);
     executorClient.execAdHoc(id);
   }
@@ -167,7 +172,7 @@ public class Master {
     executorServerManager.addServer(key, executorServerInfo);
   }
 
-  public void executorReport(String host, int port, HeartBeatData heartBeatData){
+  public void executorReport(String host, int port, HeartBeatData heartBeatData) {
     logger.debug("executor server[{}:{}] report info {}", host, port, heartBeatData);
     String key = String.format("%s:%d", host, port);
 
@@ -181,15 +186,15 @@ public class Master {
 
   public RetInfo cancelExecFlow(int execId) throws TException {
     ExecutionFlow executionFlow = flowDao.queryExecutionFlow(execId);
-    if(executionFlow == null) {
+    if (executionFlow == null) {
       throw new MasterException("execId is not exists");
     }
     String worker = executionFlow.getWorker();
-    if(worker == null) {
+    if (worker == null) {
       throw new MasterException("worker is not exists");
     }
     String[] workerInfo = worker.split(":");
-    if(workerInfo.length < 2) {
+    if (workerInfo.length < 2) {
       throw new MasterException("worker is not validate format " + worker);
     }
     logger.info("cancel exec flow {} on worker {}", execId, worker);

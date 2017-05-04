@@ -37,7 +37,7 @@ public class ParamVerify {
    */
   public static void verifyProjectName(String projectName) {
     if (!matcheProjectName(projectName)) {
-      throw new ParameterException("Project name '{0}' not valid", projectName);
+      throw new ParameterException("Project name \"{0}\" not valid", projectName);
     }
   }
 
@@ -48,7 +48,7 @@ public class ParamVerify {
    */
   public static void verifyUserName(String userName) {
     if (!matcheUserName(userName)) {
-      throw new ParameterException("User name '{0}' not valid", userName);
+      throw new ParameterException("User name \"{0}\" not valid", userName);
     }
   }
 
@@ -59,7 +59,7 @@ public class ParamVerify {
    */
   public static void verifyWorkflowName(String workflowName) {
     if (!matchWorkflowName(workflowName)) {
-      throw new ParameterException("Workflow name '{0}' not valid", workflowName);
+      throw new ParameterException("Workflow name \"{0}\" not valid", workflowName);
     }
   }
 
@@ -70,7 +70,7 @@ public class ParamVerify {
    */
   public static void verifyEmail(String email) {
     if (!matchEmail(email)) {
-      throw new ParameterException("Email name '{0}' not valid", email);
+      throw new ParameterException("Email name \"{0}\" not valid", email);
     }
   }
 
@@ -81,7 +81,7 @@ public class ParamVerify {
    */
   public static void verifyResName(String resourceName) {
     if (!matcheResName(resourceName)) {
-      throw new ParameterException("Resource name '{0}' not valid", resourceName);
+      throw new ParameterException("Resource name \"{0}\" not valid", resourceName);
     }
   }
 
@@ -92,7 +92,7 @@ public class ParamVerify {
    */
   public static void verifyDatasourceName(String datasourceName) {
     if (!matcheDatasourceName(datasourceName)) {
-      throw new ParameterException("Datasource name '{0}' not valid", datasourceName);
+      throw new ParameterException("Datasource name \"{0}\" not valid", datasourceName);
     }
   }
 
@@ -103,7 +103,7 @@ public class ParamVerify {
    */
   public static void verifyDesc(String desc) {
     if (StringUtils.isNotEmpty(desc) && desc.length() > 256) {
-      throw new ParameterException("Desc name '{0}' not valid", desc);
+      throw new ParameterException("Desc name \"{0}\" not valid", desc);
     }
   }
 
@@ -114,7 +114,7 @@ public class ParamVerify {
    */
   public static void verifyPassword(String password) {
     if (StringUtils.isEmpty(password) || password.length() < 2 || password.length() > 20) {
-      throw new ParameterException("Password '{0}' not valid", password);
+      throw new ParameterException("Password \"{0}\" not valid", password);
     }
   }
 
@@ -125,7 +125,7 @@ public class ParamVerify {
    */
   public static void verifyPhone(String phone) {
     if (StringUtils.isNotEmpty(phone) && phone.length() > 18) {
-      throw new ParameterException("Phone number '{0}' not valid", phone);
+      throw new ParameterException("Phone number \"{0}\" not valid", phone);
     }
   }
 
@@ -137,7 +137,7 @@ public class ParamVerify {
    */
   public static void verifyProxyUser(List<String> proxyUserList, String proxyUser) {
     if (StringUtils.isEmpty(proxyUser)) {
-      throw new BadRequestException("Proxy user '{0}' is empty", proxyUser);
+      throw new BadRequestException("Proxy user \"{0}\" is empty", proxyUser);
     }
 
     if (CollectionUtils.isEmpty(proxyUserList)) {
@@ -145,12 +145,12 @@ public class ParamVerify {
     }
 
     if (BaseConfig.isProhibitUser(proxyUser)) {
-      throw new BadRequestException("Proxy user '{0}' not allowed", proxyUser);
+      throw new BadRequestException("Proxy user \"{0}\" not allowed", proxyUser);
     }
 
     // 如果不是代理所有用户, 且不包含代理的用户
     if (!proxyUserList.get(0).equals("*") && !proxyUserList.contains(proxyUser)) {
-      throw new BadRequestException("Proxy user '{0}' not allowed", proxyUser);
+      throw new BadRequestException("Proxy user \"{0}\" not allowed", proxyUser);
     }
   }
 }

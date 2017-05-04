@@ -32,6 +32,11 @@ public class MasterDao extends BaseDao {
     masterServerMapper = ConnectionFactory.getSqlSession().getMapper(MasterServerMapper.class);
   }
 
+  /**
+   * 查询 master server
+   *
+   * @return
+   */
   public MasterServer getMasterServer() {
     return masterServerMapper.query();
   }

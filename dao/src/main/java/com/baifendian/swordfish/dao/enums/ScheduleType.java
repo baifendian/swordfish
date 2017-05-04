@@ -37,12 +37,14 @@ public enum ScheduleType {
   /**
    * 通过 type 获取枚举对象 <p>
    *
+   * @param type
    * @return {@link ScheduleType}
    */
   public static ScheduleType valueOfType(Integer type) throws IllegalArgumentException {
     if (type == null) {
       return null;
     }
+
     try {
       return ScheduleType.values()[type];
     } catch (Exception ex) {

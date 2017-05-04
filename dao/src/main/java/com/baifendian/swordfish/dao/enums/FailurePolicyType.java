@@ -35,6 +35,7 @@ public enum FailurePolicyType {
   /**
    * 通过 type 获取枚举对象 <p>
    *
+   * @param type
    * @return {@link FailurePolicyType}
    */
   public static FailurePolicyType valueOfType(Integer type) throws IllegalArgumentException {

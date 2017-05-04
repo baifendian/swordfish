@@ -32,12 +32,14 @@ public enum ExecType {
   /**
    * 通过 type 获取枚举对象 <p>
    *
+   * @param type
    * @return {@link FlowStatus}
    */
   public static ExecType valueOfType(Integer type) throws IllegalArgumentException {
     if (type == null) {
       return null;
     }
+
     try {
       return ExecType.values()[type];
     } catch (Exception ex) {

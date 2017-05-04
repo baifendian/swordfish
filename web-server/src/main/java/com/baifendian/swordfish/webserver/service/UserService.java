@@ -83,7 +83,7 @@ public class UserService {
 
     // 如果不是管理员, 返回错误
     if (operator.getRole() != UserRoleType.ADMIN_USER) {
-      throw new PermissionException("User '{0}' is not admin user", operator.getName());
+      throw new PermissionException("User \"{0}\" is not admin user", operator.getName());
     }
 
     // 校验代理用户格式是否正确以及是否包含正常代理的内容
@@ -142,19 +142,19 @@ public class UserService {
     if (operator.getRole() != UserRoleType.ADMIN_USER) {
       // 非管理员, 只能修改自身信息
       if (!StringUtils.equals(operator.getName(), name)) {
-        throw new PermissionException("User '{0}' has no permission modify '{1}' information", operator.getName(), name);
+        throw new PermissionException("User \"{0}\" has no permission modify \"{1}\" information", operator.getName(), name);
       }
 
       // 普通用户不能进行用户代理设置
       if (StringUtils.isNotEmpty(proxyUsers)) {
-        throw new PermissionException("User '{0}' has no permission to modify proxy users information", operator.getName());
+        throw new PermissionException("User \"{0}\" has no permission to modify proxy users information", operator.getName());
       }
     }
 
     User user = userMapper.queryByName(name);
 
     if (user == null) {
-      throw new NotFoundException("Not found user '{0}'", name);
+      throw new NotFoundException("Not found user \"{0}\"", name);
     }
 
     Date now = new Date();
@@ -205,7 +205,7 @@ public class UserService {
                          String name) {
 
     if (operator.getRole() != UserRoleType.ADMIN_USER) {
-      throw new PermissionException("User '{0}' is not admin user", operator.getName());
+      throw new PermissionException("User \"{0}\" is not admin user", operator.getName());
     }
 
     // 删除, 是不能删除自己的
@@ -284,13 +284,13 @@ public class UserService {
     List<String> proxyUsersList = JsonUtil.parseObjectList(proxyUsers, String.class);
 
     if (CollectionUtils.isEmpty(proxyUsersList)) {
-      throw new ParameterException("ProxyUsers '{0}' not valid", proxyUsers);
+      throw new ParameterException("ProxyUsers \"{0}\" not valid", proxyUsers);
     }
 
     // 如果包含了禁用的用户, 则会报警
     for (String user : proxyUsersList) {
       if (BaseConfig.isProhibitUser(user)) {
-        throw new ParameterException("ProxyUsers '{0}' not valid, can't contains '{1}'", proxyUsers, user);
+        throw new ParameterException("ProxyUsers \"{0}\" not valid, can't contains \"{1}\"", proxyUsers, user);
       }
 
       // 如果是全部用户, 直接跳过

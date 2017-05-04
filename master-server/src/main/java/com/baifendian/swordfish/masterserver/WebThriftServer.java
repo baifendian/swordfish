@@ -50,79 +50,107 @@ public class WebThriftServer {
 
   private final int port;
 
+  // master 的 dao
   private MasterDao masterDao;
 
+  // 工作流的 dao
   private FlowDao flowDao;
 
+  // master 的具体实现
   private MasterServiceImpl masterService;
 
+  // master
   private Master master;
 
   public WebThriftServer() throws UnknownHostException {
     host = InetAddress.getLocalHost().getHostAddress();
     port = MasterConfig.masterPort;
+
     masterDao = DaoFactory.getDaoInstance(MasterDao.class);
     flowDao = DaoFactory.getDaoInstance(FlowDao.class);
   }
 
+  /**
+   * 入口方法
+   *
+   * @throws SchedulerException
+   * @throws TTransportException
+   * @throws MasterException
+   */
   public void run() throws SchedulerException, TTransportException, MasterException {
-
     try {
       registerMaster();
       init();
 
-      Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
-        @Override
-        public void run() {
-          server.stop(); // 关闭 server
-          if(master != null) {
-            master.stop();
-          }
-          try {
-            // 关闭调度
-            QuartzManager.shutdown();
-            // 关闭资源
-          } catch (SchedulerException e) {
-            logger.error(e.getMessage(), e);
-          }
+      Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+        // 关闭 server
+        server.stop();
+
+        if (master != null) {
+          master.stop();
+        }
+
+        try {
+          // 关闭调度
+          QuartzManager.shutdown();
+        } catch (SchedulerException e) {
+          logger.error(e.getMessage(), e);
         }
       }));
 
       master.run();
+
       // 启动调度
       QuartzManager.start();
+
       server.serve();
     } catch (Exception e) {
       QuartzManager.shutdown();
+      logger.error("Catch an exception", e);
       throw e;
     }
   }
 
+  /**
+   * 初始化连接
+   *
+   * @throws MasterException
+   * @throws TTransportException
+   */
   private void init() throws MasterException, TTransportException {
     master = new Master(flowDao);
     masterService = new MasterServiceImpl(flowDao, master);
+
     TProtocolFactory protocolFactory = new TBinaryProtocol.Factory();
     TTransportFactory tTransportFactory = new TTransportFactory();
     TProcessor tProcessor = new MasterService.Processor(masterService);
     InetSocketAddress inetSocketAddress = new InetSocketAddress(host, port);
-    server = ThriftUtil.getTThreadPoolServer(protocolFactory, tProcessor, tTransportFactory, inetSocketAddress,
-            MasterConfig.masterMinThreads, MasterConfig.masterMaxThreads);
-    logger.info("start thrift server on port:{}", port);
 
+    server = ThriftUtil.getTThreadPoolServer(protocolFactory, tProcessor, tTransportFactory, inetSocketAddress,
+        MasterConfig.masterMinThreads, MasterConfig.masterMaxThreads);
+
+    logger.info("start thrift server on port: {}", port);
   }
 
+  /**
+   * 注册 master 到 database 中
+   *
+   * @throws MasterException
+   */
   public void registerMaster() throws MasterException {
     MasterServer masterServer = masterDao.getMasterServer();
+
     if (masterServer != null && !(masterServer.getHost().equals(host) && masterServer.getPort() == port)) {
       String msg = String.format("can't register more then one master, exist master:%s:%d, " +
-                      "if you change the master deploy server please clean the table master_server and start up again",
-              masterServer.getHost(), masterServer.getPort());
+              "if you change the master deploy server please clean the table master_server and start up again",
+          masterServer.getHost(), masterServer.getPort());
       throw new MasterException(msg);
     } else {
-      if (masterServer == null)
+      if (masterServer == null) {
         masterDao.registerMasterServer(host, port);
-      else
+      } else {
         masterDao.updateMasterServer(host, port);
+      }
     }
   }
 

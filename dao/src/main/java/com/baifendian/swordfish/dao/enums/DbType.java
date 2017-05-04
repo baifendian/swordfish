@@ -33,12 +33,14 @@ public enum DbType {
   /**
    * 通过 type 获取枚举对象 <p>
    *
+   * @param type
    * @return {@link DbType}
    */
   public static DbType valueOfType(Integer type) throws IllegalArgumentException {
     if (type == null) {
       return null;
     }
+
     try {
       return DbType.values()[type];
     } catch (Exception ex) {
@@ -49,6 +51,7 @@ public enum DbType {
   /**
    * 通过 type 获取枚举对象 <p>
    *
+   * @param type
    * @return {@link DbType}
    */
   public static DbType valueOfType(String type) throws IllegalArgumentException {

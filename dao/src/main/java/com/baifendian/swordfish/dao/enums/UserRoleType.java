@@ -29,6 +29,11 @@ public enum UserRoleType {
     return role;
   }
 
+  /**
+   * @param type
+   * @return
+   * @throws IllegalArgumentException
+   */
   public static UserRoleType valueOfType(Integer type) throws IllegalArgumentException {
     if (type == null) {
       return null;

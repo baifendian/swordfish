@@ -78,7 +78,7 @@ public class ProjectService {
 
     // 管理员不能创建项目
     if (operator.getRole() == UserRoleType.ADMIN_USER) {
-      throw new PermissionException("User '{0}' is not admin", operator.getName());
+      throw new PermissionException("User \"{0}\" is not admin", operator.getName());
     }
 
     Project project = new Project();
@@ -116,7 +116,7 @@ public class ProjectService {
     Project project = projectMapper.queryByName(name);
 
     if (project == null) {
-      throw new NotFoundException("Project '{0}' not found", name);
+      throw new NotFoundException("Project \"{0}\" not found", name);
     }
 
     // 需要是项目的 owner
@@ -152,12 +152,12 @@ public class ProjectService {
     Project project = projectMapper.queryByName(name);
 
     if (project == null) {
-      throw new NotFoundException("Project '{0}' not exist", name);
+      throw new NotFoundException("Project \"{0}\" not exist", name);
     }
 
     // 只有 管理员或 owner 能够删除
     if (operator.getRole() != UserRoleType.ADMIN_USER && operator.getId() != project.getOwnerId()) {
-      throw new PermissionException("User '{0}' has no right permission for the project '{1}'", operator.getName(), name);
+      throw new PermissionException("User \"{0}\" has no right permission for the project \"{1}\"", operator.getName(), name);
     }
 
     // 需要判断项目下, 是否有 "工作流/资源/数据源" 存在
@@ -222,12 +222,12 @@ public class ProjectService {
 
     // 不存在的项目名
     if (project == null) {
-      throw new NotFoundException("Project '{0}' not found", name);
+      throw new NotFoundException("Project \"{0}\" not found", name);
     }
 
     // 操作用户不是项目的 owner
     if (operator.getId() != project.getOwnerId()) {
-      throw new PermissionException("User '{0}' has no right permission for the project '{1}'", operator.getName(), name);
+      throw new PermissionException("User \"{0}\" has no right permission for the project \"{1}\"", operator.getName(), name);
     }
 
     // 查询用户
@@ -235,7 +235,7 @@ public class ProjectService {
 
     // 增加的用户不存在
     if (user == null) {
-      throw new NotFoundException("User '{0}' not found", name);
+      throw new NotFoundException("User \"{0}\" not found", name);
     }
 
     // 不能增加自己
@@ -280,7 +280,7 @@ public class ProjectService {
 
     // 不存在的项目名
     if (project == null) {
-      throw new NotFoundException("Project '{0}' not found", name);
+      throw new NotFoundException("Project \"{0}\" not found", name);
     }
 
     // 操作用户不是项目的 owner
@@ -293,14 +293,14 @@ public class ProjectService {
 
     // 增加的用户不存在
     if (user == null) {
-      throw new NotFoundException("User '{0}' not found", userName);
+      throw new NotFoundException("User \"{0}\" not found", userName);
     }
 
     ProjectUser projectUser = projectUserMapper.query(project.getId(), user.getId());
 
     // 修改的信息不存在
     if (projectUser == null) {
-      throw new NotFoundException("Project '{0}' has no user '{1}'", name, userName);
+      throw new NotFoundException("Project \"{0}\" has no user \"{1}\"", name, userName);
     }
 
     // 构建信息, 插入
@@ -332,7 +332,7 @@ public class ProjectService {
 
     // 不存在的项目名
     if (project == null) {
-      throw new NotFoundException("Project '{0}' not found", name);
+      throw new NotFoundException("Project \"{0}\" not found", name);
     }
 
     // 操作用户不是项目的 owner
@@ -344,7 +344,7 @@ public class ProjectService {
 
     // 删除的用户不存在
     if (user == null) {
-      throw new NotFoundException("User '{0}' not found", userName);
+      throw new NotFoundException("User \"{0}\" not found", userName);
     }
 
     // 不能删除自己
@@ -374,7 +374,7 @@ public class ProjectService {
 
     // 不存在的项目名
     if (project == null) {
-      throw new NotFoundException("Project '{0}' not found", name);
+      throw new NotFoundException("Project \"{0}\" not found", name);
     }
 
     // 操作用户不是项目的 owner

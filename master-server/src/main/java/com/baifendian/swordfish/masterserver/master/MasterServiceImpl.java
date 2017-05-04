@@ -61,14 +61,12 @@ public class MasterServiceImpl implements Iface {
   /**
    * {@link FlowExecManager}
    */
-
   private final Master master;
 
   public MasterServiceImpl(FlowDao flowDao, Master master) {
     this.flowDao = flowDao;
     this.adHocDao = DaoFactory.getDaoInstance(AdHocDao.class);
     this.master = master;
-
   }
 
   /**
@@ -168,20 +166,29 @@ public class MasterServiceImpl implements Iface {
     return new RetResultInfo(ResultHelper.SUCCESS, Arrays.asList(executionFlow.getId()));
   }
 
+  /**
+   * 执行即席查询
+   *
+   * @param adHocId
+   * @return
+   */
   @Override
   public RetInfo execAdHoc(int adHocId) {
     try {
-      LOGGER.debug("receive exec ad hoc request, id:{}", adHocId);
+      LOGGER.info("receive exec ad hoc request, id: {}", adHocId);
+
       AdHoc adHoc = adHocDao.getAdHoc(adHocId);
       if (adHoc == null) {
-        LOGGER.error("adhoc id {} not exists", adHocId);
-        return ResultHelper.createErrorResult("adhoc id not exists");
+        LOGGER.error("ad hoc id {} not exists", adHocId);
+        return ResultHelper.createErrorResult("ad hoc id not exists");
       }
+
       master.execAdHoc(adHocId);
     } catch (Exception e) {
       LOGGER.error(e.getMessage(), e);
       return ResultHelper.createErrorResult(e.getMessage());
     }
+
     return ResultHelper.SUCCESS;
   }
 

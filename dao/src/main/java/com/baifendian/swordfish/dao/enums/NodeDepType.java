@@ -30,9 +30,8 @@ public enum NodeDepType {
    * getter method
    *
    * @return the type
-   * @see NodeDepType#type
+   * @see NodeDepType
    */
-  @JsonValue
   public Integer getType() {
     return ordinal();
   }
@@ -40,12 +39,14 @@ public enum NodeDepType {
   /**
    * 通过 type 获取枚举对象 <p>
    *
+   * @param type
    * @return {@link NodeDepType}
    */
   public static NodeDepType valueOfType(Integer type) throws IllegalArgumentException {
     if (type == null) {
       return null;
     }
+
     try {
       return NodeDepType.values()[type];
     } catch (Exception ex) {

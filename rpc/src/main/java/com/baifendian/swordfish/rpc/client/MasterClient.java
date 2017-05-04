@@ -22,6 +22,7 @@ import org.apache.thrift.protocol.TProtocol;
 import org.apache.thrift.transport.TSocket;
 import org.apache.thrift.transport.TTransport;
 import org.apache.thrift.transport.TTransportException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,7 +31,7 @@ import org.slf4j.LoggerFactory;
  */
 public class MasterClient {
 
-  private static Logger logger = LoggerFactory.getLogger(MasterClient.class);
+  private static Logger logger = LoggerFactory.getLogger(MasterClient.class.getName());
 
   /**
    * 默认的 client 与 server 重连次数

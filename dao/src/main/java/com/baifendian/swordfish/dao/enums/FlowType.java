@@ -18,6 +18,7 @@ package com.baifendian.swordfish.dao.enums;
 /**
  * workflow 类型 <p>
  */
+@Deprecated
 public enum FlowType {
 
   /**
@@ -44,6 +45,7 @@ public enum FlowType {
     if (type == null) {
       return null;
     }
+
     try {
       return FlowType.values()[type];
     } catch (Exception ex) {

@@ -23,13 +23,25 @@ public class MasterServerMapperProvider {
 
   public static final String TABLE_NAME = "master_server";
 
+  /**
+   * 查询 master 的所有信息
+   *
+   * @return
+   */
   public String query() {
     return new SQL() {{
       SELECT("*");
+
       FROM(TABLE_NAME);
     }}.toString();
   }
 
+  /**
+   * 插入到 table 中
+   *
+   * @param parameter
+   * @return
+   */
   public String insert(Map<String, Object> parameter) {
     return new SQL() {{
       INSERT_INTO(TABLE_NAME);
@@ -41,6 +53,12 @@ public class MasterServerMapperProvider {
     }}.toString();
   }
 
+  /**
+   * 更新信息
+   *
+   * @param parameter
+   * @return
+   */
   public String update(Map<String, Object> parameter) {
     return new SQL() {{
       UPDATE(TABLE_NAME);
@@ -52,6 +70,11 @@ public class MasterServerMapperProvider {
     }}.toString();
   }
 
+  /**
+   * 删除记录
+   *
+   * @return
+   */
   public String delete() {
     return new SQL() {{
       DELETE_FROM(TABLE_NAME);

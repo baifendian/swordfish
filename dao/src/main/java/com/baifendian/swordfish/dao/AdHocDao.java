@@ -45,30 +45,40 @@ public class AdHocDao extends BaseDao {
     return adHocMapper.update(adHoc) > 0;
   }
 
-  public int insertAdHoc(AdHoc adHoc) {
-    return adHocMapper.insert(adHoc);
-  }
-
-  public AdHoc getAdHoc(int id){
+  /**
+   * 查询信息
+   *
+   * @param id
+   * @return
+   */
+  public AdHoc getAdHoc(int id) {
     return adHocMapper.selectById(id);
   }
 
+  /**
+   * 更新结果
+   *
+   * @param adHocResult
+   * @return
+   */
   public boolean updateAdHocResult(AdHocResult adHocResult) {
     return adHocResultMapper.update(adHocResult) > 0;
   }
 
   @Transactional(value = "TransactionManager")
-  public void initAdHocResult(int execId, List<String> execSqls){
-    if(CollectionUtils.isNotEmpty(execSqls)){
+  public void initAdHocResult(int execId, List<String> execSqls) {
+    if (CollectionUtils.isNotEmpty(execSqls)) {
       adHocResultMapper.delete(execId);
-      int index=0;
-      for(String stm: execSqls){
+      int index = 0;
+
+      for (String stm : execSqls) {
         AdHocResult adHocResult = new AdHocResult();
         adHocResult.setExecId(execId);
         adHocResult.setStm(stm);
         adHocResult.setIndex(index++);
         adHocResult.setStatus(FlowStatus.INIT);
         adHocResult.setCreateTime(new Date());
+
         adHocResultMapper.insert(adHocResult);
       }
     }
