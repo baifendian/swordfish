@@ -41,20 +41,53 @@ public class MasterDao extends BaseDao {
     return masterServerMapper.query();
   }
 
+  /**
+   * 注册 master
+   *
+   * @param host
+   * @param port
+   * @return
+   */
   public int registerMasterServer(String host, int port) {
+    Date now = new Date();
+
     MasterServer masterServer = new MasterServer();
+
     masterServer.setHost(host);
     masterServer.setPort(port);
-    masterServer.setCreateTime(new Date());
-    masterServer.setModifyTime(new Date());
+    masterServer.setCreateTime(now);
+    masterServer.setModifyTime(now);
+
     return masterServerMapper.insert(masterServer);
   }
 
+  /**
+   * 更新 master
+   *
+   * @param host
+   * @param port
+   * @return
+   */
   public int updateMasterServer(String host, int port) {
+    Date now = new Date();
+
     MasterServer masterServer = new MasterServer();
+
     masterServer.setHost(host);
     masterServer.setPort(port);
-    masterServer.setModifyTime(new Date());
+    masterServer.setModifyTime(now);
+
     return masterServerMapper.update(masterServer);
+  }
+
+  /**
+   * 删除 master server
+   *
+   * @param host
+   * @param port
+   * @return
+   */
+  public int deleteMasterServer(String host, int port) {
+    return masterServerMapper.deleteByHostPort(host, port);
   }
 }

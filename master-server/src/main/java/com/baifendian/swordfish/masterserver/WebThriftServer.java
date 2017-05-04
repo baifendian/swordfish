@@ -83,6 +83,9 @@ public class WebThriftServer {
       init();
 
       Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+        // 清理数据库
+        masterDao.deleteMasterServer(host, port);
+
         // 关闭 server
         server.stop();
 

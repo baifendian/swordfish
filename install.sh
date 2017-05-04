@@ -94,6 +94,22 @@ function file_replace()
     fi
 }
 
+function process_check()
+{
+    sleep 2s
+
+    pid=`cat *.pid`
+    ps -fe|grep ${pid}|grep -v grep
+
+    if [ $? -ne 0 ]
+    then
+        echo "[pid $pid not exist]"
+        exit 1
+    else
+        echo "[pid $pid start success]"
+    fi
+}
+
 # get script path
 CUR_DIR=`dirname $0`
 SWORDFISH_HOME=`cd "$CUR_DIR"; pwd`
@@ -137,8 +153,14 @@ fi
 cd $SWORDFISH_HOME/target/swordfish-all-${version}/swordfish-web-server-${version}/
 sh bin/swordfish-daemon.sh start web-server
 
+process_check
+
 cd $SWORDFISH_HOME/target/swordfish-all-${version}/swordfish-master-server-${version}/
 sh bin/swordfish-daemon.sh start master-server
 
+process_check
+
 cd $SWORDFISH_HOME/target/swordfish-all-${version}/swordfish-exec-server-${version}/
 sh bin/swordfish-daemon.sh start exec-server
+
+process_check

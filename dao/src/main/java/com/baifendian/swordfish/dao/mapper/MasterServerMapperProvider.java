@@ -80,4 +80,19 @@ public class MasterServerMapperProvider {
       DELETE_FROM(TABLE_NAME);
     }}.toString();
   }
+
+  /**
+   * 删除指定的 host, port 信息
+   *
+   * @param parameter
+   * @return
+   */
+  public String deleteByHostPort(Map<String, Object> parameter) {
+    return new SQL() {{
+      DELETE_FROM(TABLE_NAME);
+
+      WHERE("host = #{host}");
+      WHERE("port = #{port}");
+    }}.toString();
+  }
 }

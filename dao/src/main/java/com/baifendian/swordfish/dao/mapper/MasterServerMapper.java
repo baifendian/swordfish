@@ -60,6 +60,15 @@ public interface MasterServerMapper {
   /**
    * 删除 master 信息
    */
-  @SelectProvider(type = MasterServerMapperProvider.class, method = "delete")
+  @DeleteProvider(type = MasterServerMapperProvider.class, method = "delete")
   void delete();
+
+  /**
+   * 根据 host, port 删除
+   *
+   * @param host
+   * @param port
+   */
+  @DeleteProvider(type = MasterServerMapperProvider.class, method = "deleteByHostPort")
+  int deleteByHostPort(@Param("host") String host, @Param("port") int port);
 }
