@@ -32,7 +32,6 @@ import com.baifendian.swordfish.webserver.dto.WorkflowData;
 import com.baifendian.swordfish.webserver.dto.WorkflowNodeDto;
 import com.baifendian.swordfish.webserver.exception.*;
 import com.baifendian.swordfish.webserver.service.storage.FileSystemStorageService;
-import com.baifendian.swordfish.webserver.utils.VerifyUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import net.lingala.zip4j.core.ZipFile;
 import net.lingala.zip4j.exception.ZipException;
@@ -53,6 +52,9 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
+
+import static com.baifendian.swordfish.webserver.utils.ParamVerify.verifyDesc;
+import static com.baifendian.swordfish.webserver.utils.ParamVerify.verifyWorkflowName;
 
 @Service
 public class WorkflowService {
@@ -95,9 +97,9 @@ public class WorkflowService {
    */
   public ProjectFlow createWorkflow(User operator, String projectName, String name, String desc, String proxyUser, String queue, String data, MultipartFile file, String extras, Integer flag) {
 
-    //校验变量
-    VerifyUtils.verifyWorkflowName(name, new ParameterException("Parameter name: \"{0}\" is invalid", name));
-    VerifyUtils.verifyDesc(desc, new ParameterException("Parameter desc: \"{0}\" is invalid", desc));
+    // 校验变量
+    verifyWorkflowName(name);
+    verifyDesc(desc);
 
     // 查看是否对项目具备相应的权限
     Project project = projectMapper.queryByName(projectName);
@@ -150,9 +152,11 @@ public class WorkflowService {
     // 组装新建数据流实体
     try {
       List<FlowNode> flowNodeList = new ArrayList<>();
-      for (WorkflowNodeDto flowNode:flowNodes){
+
+      for (WorkflowNodeDto flowNode : flowNodes) {
         flowNodeList.add(flowNode.convertFlowNode());
       }
+
       projectFlow.setExtras(extras);
       projectFlow.setFlowsNodes(flowNodeList);
       projectFlow.setUserDefinedParamList(workflowData.getUserDefParams());
@@ -229,7 +233,7 @@ public class WorkflowService {
    */
   public ProjectFlow patchWorkflow(User operator, String projectName, String name, String desc, String proxyUser, String queue, String data, MultipartFile file, String extras) {
 
-    VerifyUtils.verifyDesc(desc, new ParameterException("Parameter desc: \"{0}\" is invalid", desc));
+    verifyDesc(desc);
 
     // 查询项目是否存在以及是否具备相应权限
     Project project = projectMapper.queryByName(projectName);
@@ -280,11 +284,11 @@ public class WorkflowService {
 
         //拼装flowNode
         List<FlowNode> flowNodeList = new ArrayList<>();
-        for (WorkflowNodeDto workflowNodeDTO:workflowNodeDTOList){
+        for (WorkflowNodeDto workflowNodeDTO : workflowNodeDTOList) {
           try {
             flowNodeList.add(workflowNodeDTO.convertFlowNode());
           } catch (JsonProcessingException e) {
-            logger.error("workflow node dto convert flowNode error",e);
+            logger.error("workflow node dto convert flowNode error", e);
             throw new BadRequestException("workflow node data not valid");
           }
         }
@@ -356,7 +360,7 @@ public class WorkflowService {
       throw new NotFoundException("workflow", srcWorkflowName);
     }
 
-    String data = JsonUtil.toJsonString(new WorkflowData(srcProjectFlow.getFlowsNodes(),srcProjectFlow.getUserDefinedParamList(),FlowNode.class));
+    String data = JsonUtil.toJsonString(new WorkflowData(srcProjectFlow.getFlowsNodes(), srcProjectFlow.getUserDefinedParamList(), FlowNode.class));
 
     // 尝试拷贝文件
     String srcHdfsFilename = BaseConfig.getHdfsWorkflowFilename(project.getId(), srcWorkflowName);
@@ -407,7 +411,6 @@ public class WorkflowService {
     projectFlowMapper.deleteByProjectAndName(project.getId(), name);
 
     // TODO 删除调度，删除日志等
-
 
 
     return;
@@ -516,7 +519,7 @@ public class WorkflowService {
     ProjectFlow projectFlow = flowDao.projectFlowfindByName(project.getId(), name);
 
     try {
-      String json = JsonUtil.toJsonString(new WorkflowData(projectFlow.getFlowsNodes(),projectFlow.getUserDefinedParamList(),FlowNode.class));
+      String json = JsonUtil.toJsonString(new WorkflowData(projectFlow.getFlowsNodes(), projectFlow.getUserDefinedParamList(), FlowNode.class));
       InputStreamResource resource = new InputStreamResource(new FileInputStream(json));
       return resource;
     } catch (Exception e) {

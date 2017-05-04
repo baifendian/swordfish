@@ -29,7 +29,7 @@ import com.baifendian.swordfish.webserver.exception.NotFoundException;
 import com.baifendian.swordfish.webserver.exception.NotModifiedException;
 import com.baifendian.swordfish.webserver.exception.ParameterException;
 import com.baifendian.swordfish.webserver.exception.PermissionException;
-import com.baifendian.swordfish.webserver.utils.VerifyUtils;
+import com.baifendian.swordfish.webserver.utils.ParamVerify;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -75,11 +75,11 @@ public class UserService {
                          String phone,
                          String proxyUsers) {
 
-    VerifyUtils.verifyUserName(name);
-    VerifyUtils.verifyEmail(email);
-    VerifyUtils.verifyDesc(desc);
-    VerifyUtils.verifyPassword(password);
-    VerifyUtils.verifyPhone(phone);
+    ParamVerify.verifyUserName(name);
+    ParamVerify.verifyEmail(email);
+    ParamVerify.verifyDesc(desc);
+    ParamVerify.verifyPassword(password);
+    ParamVerify.verifyPhone(phone);
 
     // 如果不是管理员, 返回错误
     if (operator.getRole() != UserRoleType.ADMIN_USER) {
@@ -134,10 +134,10 @@ public class UserService {
                          String phone,
                          String proxyUsers) {
 
-    VerifyUtils.verifyEmail(email);
-    VerifyUtils.verifyDesc(desc);
-    VerifyUtils.verifyPassword(password);
-    VerifyUtils.verifyPhone(phone);
+    ParamVerify.verifyEmail(email);
+    ParamVerify.verifyDesc(desc);
+    ParamVerify.verifyPassword(password);
+    ParamVerify.verifyPhone(phone);
 
     if (operator.getRole() != UserRoleType.ADMIN_USER) {
       // 非管理员, 只能修改自身信息

@@ -20,27 +20,31 @@ def exec_adhoc(sessionId, projectName, stms, limit, proxyUser, queue, udfs, time
 
     return r.json().get('execId')
 
-def query_adhoc():
-while True:
-    # 查询日志
-    r = requests.get('http://%s:12345/adHoc/%s/logs?' % (host, execId),
-                     headers={'sessionId': sessionId},
-                     params={'index': index, 'from': 0, 'size': 1000})
+def query_logs(sessionId, execId):
+    '''查询日志'''
+    while True:
+        # 查询日志
+        r = requests.get('http://%s:12345/adHoc/%s/logs?' % (host, execId),
+                         headers={'sessionId': sessionId},
+                         params={'index': index, 'from': 0, 'size': 1000})
 
 
-    # 如果有结果则查询结果
-    if r.json().get('hasResult') == True:
-        r2 = requests.get('http://%s:12345/adHoc/%s/result?' % (host, execId),
-                          headers={'sessionId': sessionId},
-                          params={'index': index})
+        # 如果有结果则查询结果
+        if r.json().get('hasResult') == True:
+            r2 = requests.get('http://%s:12345/adHoc/%s/result?' % (host, execId),
+                              headers={'sessionId': sessionId},
+                              params={'index': index})
 
-        printf(r2)
+            printf(r2)
 
-        index = index + 1
+            index = index + 1
 
-        if r.json().get('lastSql') == True:
-            break
+            if r.json().get('lastSql') == True:
+                break
 
-    time.sleep(2)
+        time.sleep(2)
+
+def query_result(sessionId, execId, index):
+    '''查询结果'''
 
 if __name__ == '__main__':

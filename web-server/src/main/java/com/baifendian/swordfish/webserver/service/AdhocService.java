@@ -29,8 +29,10 @@ import com.baifendian.swordfish.webserver.dto.AdHocLogData;
 import com.baifendian.swordfish.webserver.dto.AdHocResultData;
 import com.baifendian.swordfish.webserver.dto.ExecutorId;
 import com.baifendian.swordfish.webserver.dto.LogResult;
-import com.baifendian.swordfish.webserver.exception.*;
-import org.apache.commons.collections.CollectionUtils;
+import com.baifendian.swordfish.webserver.exception.NotFoundException;
+import com.baifendian.swordfish.webserver.exception.NotModifiedException;
+import com.baifendian.swordfish.webserver.exception.PermissionException;
+import com.baifendian.swordfish.webserver.exception.ServerErrorException;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,6 +43,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
+
+import static com.baifendian.swordfish.webserver.utils.ParamVerify.verifyProxyUser;
 
 @Service
 public class AdhocService {
@@ -91,24 +95,14 @@ public class AdhocService {
       throw new PermissionException("User '{0}' has no right permission for the project '{1}'", operator.getName(), projectName);
     }
 
+    // 判断 proxyUser 是否合理的
+    verifyProxyUser(operator.getProxyUserList(), proxyUser);
+
     // 查看 master 是否存在
     MasterServer masterServer = masterServerMapper.query();
     if (masterServer == null) {
       logger.error("Master server does not exist.");
       throw new ServerErrorException("Master server does not exist.");
-    }
-
-    // 判断 proxyUser 是否合理的
-    if (CollectionUtils.isEmpty(operator.getProxyUserList())) {
-      logger.error("Proxy user list is empty, operator: {}", operator.getName());
-      throw new ServerErrorException("Proxy user list of the operator is empty.");
-    }
-
-    // 如果不是代理所有用户, 且不包含代理的用户
-    List<String> proxyUserList = operator.getProxyUserList();
-    if (!proxyUserList.get(0).equals("*") && !proxyUserList.contains(proxyUser)) {
-      logger.error("Proxy user '{}' not allowed for user '{}'", proxyUser, operator.getName());
-      throw new BadRequestException("Proxy user '{0}' not allowed for user '{1}'", proxyUser, operator.getName());
     }
 
     // 插入数据库记录, 得到 exec id

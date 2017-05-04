@@ -15,14 +15,21 @@
  */
 package com.baifendian.swordfish.webserver.utils;
 
-import com.baifendian.swordfish.common.utils.VerifyUtil;
+import com.baifendian.swordfish.common.config.BaseConfig;
+import com.baifendian.swordfish.webserver.exception.BadRequestException;
 import com.baifendian.swordfish.webserver.exception.ParameterException;
+import com.baifendian.swordfish.webserver.exception.ServerErrorException;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
+
+import java.util.List;
+
+import static com.baifendian.swordfish.common.utils.VerifyUtil.*;
 
 /**
  * server校验工具
  */
-public class VerifyUtils extends VerifyUtil {
+public class ParamVerify {
   /**
    * 校验项目名并抛出异常
    *
@@ -119,6 +126,31 @@ public class VerifyUtils extends VerifyUtil {
   public static void verifyPhone(String phone) {
     if (StringUtils.isNotEmpty(phone) && phone.length() > 18) {
       throw new ParameterException("Phone number '{0}' not valid", phone);
+    }
+  }
+
+  /**
+   * 判断代理用户是否合法
+   *
+   * @param proxyUserList
+   * @param proxyUser
+   */
+  public static void verifyProxyUser(List<String> proxyUserList, String proxyUser) {
+    if (StringUtils.isEmpty(proxyUser)) {
+      throw new BadRequestException("Proxy user '{0}' is empty", proxyUser);
+    }
+
+    if (CollectionUtils.isEmpty(proxyUserList)) {
+      throw new ServerErrorException("Proxy user list of the operator is empty.");
+    }
+
+    if (BaseConfig.isProhibitUser(proxyUser)) {
+      throw new BadRequestException("Proxy user '{0}' not allowed", proxyUser);
+    }
+
+    // 如果不是代理所有用户, 且不包含代理的用户
+    if (!proxyUserList.get(0).equals("*") && !proxyUserList.contains(proxyUser)) {
+      throw new BadRequestException("Proxy user '{0}' not allowed", proxyUser);
     }
   }
 }

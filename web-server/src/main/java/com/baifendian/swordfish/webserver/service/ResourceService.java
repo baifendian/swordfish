@@ -25,7 +25,7 @@ import com.baifendian.swordfish.dao.model.Resource;
 import com.baifendian.swordfish.dao.model.User;
 import com.baifendian.swordfish.webserver.exception.*;
 import com.baifendian.swordfish.webserver.service.storage.FileSystemStorageService;
-import com.baifendian.swordfish.webserver.utils.VerifyUtils;
+import com.baifendian.swordfish.webserver.utils.ParamVerify;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,6 +38,8 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
+
+import static com.baifendian.swordfish.webserver.utils.ParamVerify.*;
 
 @Service
 public class ResourceService {
@@ -75,8 +77,8 @@ public class ResourceService {
                                  String desc,
                                  MultipartFile file) {
 
-    VerifyUtils.verifyResName(name, new ParameterException("Parameter name: \"{0}\" is invalid", name));
-    VerifyUtils.verifyDesc(desc, new ParameterException("Parameter desc: \"{0}\" is invalid", name));
+    verifyResName(name);
+    verifyDesc(desc);
 
     // 文件为空
     if (file.isEmpty()) {
@@ -151,7 +153,7 @@ public class ResourceService {
                               String name,
                               String desc,
                               MultipartFile file) {
-    VerifyUtils.verifyDesc(desc, new ParameterException("Parameter name: \"{0}\" is invalid", name));
+    verifyDesc(desc);
 
     Resource resource = resourceMapper.queryByProjectAndResName(projectName, name);
 
@@ -178,7 +180,7 @@ public class ResourceService {
                                  String name,
                                  String desc,
                                  MultipartFile file) {
-    VerifyUtils.verifyDesc(desc, new ParameterException("Parameter name: \"{0}\" is invalid", name));
+    verifyDesc(desc);
 
     // 文件为空
     if (file != null && file.isEmpty()) {
