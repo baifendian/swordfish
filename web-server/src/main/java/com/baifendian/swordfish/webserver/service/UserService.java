@@ -75,9 +75,9 @@ public class UserService {
                          String phone,
                          String proxyUsers) {
 
-    VerifyUtils.verifyUserName(name);
-    VerifyUtils.verifyEmail(email);
-    VerifyUtils.verifyDesc(desc);
+    VerifyUtils.verifyUserName(name, new ParameterException("Parameter name: \"{0}\" is invalid", name));
+    VerifyUtils.verifyEmail(email, new ParameterException("Parameter email: \"{0}\" is invalid", email));
+    VerifyUtils.verifyDesc(desc, new ParameterException("Parameter desc: \"{0}\" is invalid", desc));
 
     // 如果不是管理员, 返回错误
     if (operator.getRole() != UserRoleType.ADMIN_USER) {
@@ -85,23 +85,29 @@ public class UserService {
     }
 
     // 校验代理用户格式是否正确以及是否包含正常代理的内容
-    proxyUsers = checkProxyUser(proxyUsers);
+    //proxyUsers = checkProxyUser(proxyUsers);
 
-    // 构建用户
     User user = new User();
-    Date now = new Date();
 
-    user.setName(name);
-    user.setEmail(email);
-    user.setDesc(desc);
-    user.setPhone(phone);
-    user.setPassword(HttpUtil.getMd5(password));
-    user.setRole(UserRoleType.GENERAL_USER); // 创建的用户都是普通用户, 管理员用户当前是内置的
-    user.setProxyUsers(proxyUsers);
-    user.setCreateTime(now);
-    user.setModifyTime(now);
+    try{
+      // 构建用户
+      Date now = new Date();
 
-    VerifyUtils.verifyProxyUser(user.getProxyUserList());
+      user.setName(name);
+      user.setEmail(email);
+      user.setDesc(desc);
+      user.setPhone(phone);
+      user.setPassword(HttpUtil.getMd5(password));
+      user.setRole(UserRoleType.GENERAL_USER); // 创建的用户都是普通用户, 管理员用户当前是内置的
+      user.setProxyUsers(proxyUsers);
+      user.setCreateTime(now);
+      user.setModifyTime(now);
+    }catch (Exception e){
+      throw new ParameterException("Parameter deserialization failed");
+    }
+
+    //检测是否有非法的代理用户
+    VerifyUtils.verifyProxyUser(user.getProxyUserList(),new ParameterException("Parameter proxyUser: \"{0}\" has invalid proxyUser"));
 
     // 插入一条用户信息
     try {
@@ -134,8 +140,8 @@ public class UserService {
                          String phone,
                          String proxyUsers) {
 
-    VerifyUtils.verifyEmail(email);
-    VerifyUtils.verifyDesc(desc);
+    VerifyUtils.verifyEmail(email, new ParameterException("Parameter email: \"{0}\" is invalid", email));
+    VerifyUtils.verifyDesc(desc, new ParameterException("Parameter desc: \"{0}\" is invalid", desc));
 
     if (operator.getRole() != UserRoleType.ADMIN_USER) {
       // 非管理员, 只能修改自身信息

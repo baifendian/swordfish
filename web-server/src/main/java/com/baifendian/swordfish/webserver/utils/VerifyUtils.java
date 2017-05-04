@@ -31,15 +31,14 @@ import java.util.List;
 public class VerifyUtils extends VerifyUtil {
 
 
-
   /**
    * 校验项目名并抛出异常
    *
    * @param projectName
    */
-  public static void verifyProjectName(String projectName) {
+  public static <T extends RuntimeException> void verifyProjectName(String projectName, T e) {
     if (!matcheProjectName(projectName)) {
-      throw new ParameterException("project name");
+      throw e;
     }
   }
 
@@ -48,9 +47,9 @@ public class VerifyUtils extends VerifyUtil {
    *
    * @param userName
    */
-  public static void verifyUserName(String userName) {
+  public static <T extends RuntimeException> void verifyUserName(String userName, T e) {
     if (!matcheUserName(userName)) {
-      throw new ParameterException("user name");
+      throw e;
     }
   }
 
@@ -59,9 +58,9 @@ public class VerifyUtils extends VerifyUtil {
    *
    * @param workflowName
    */
-  public static void verifyWorkflowName(String workflowName) {
+  public static <T extends RuntimeException> void verifyWorkflowName(String workflowName, T e) {
     if (!matchWorkflowName(workflowName)) {
-      throw new ParameterException("workflow name");
+      throw e;
     }
   }
 
@@ -70,9 +69,9 @@ public class VerifyUtils extends VerifyUtil {
    *
    * @param email
    */
-  public static void verifyEmail(String email) {
+  public static <T extends RuntimeException> void verifyEmail(String email, T e) {
     if (!matchEmail(email)) {
-      throw new ParameterException("email");
+      throw e;
     }
   }
 
@@ -81,9 +80,9 @@ public class VerifyUtils extends VerifyUtil {
    *
    * @param resourceName
    */
-  public static void verifyResName(String resourceName) {
+  public static <T extends RuntimeException> void verifyResName(String resourceName, T e) {
     if (!matcheResName(resourceName)) {
-      throw new ParameterException("resource name");
+      throw e;
     }
   }
 
@@ -92,9 +91,9 @@ public class VerifyUtils extends VerifyUtil {
    *
    * @param datasourceName
    */
-  public static void verifyDatasourceName(String datasourceName) {
+  public static <T extends RuntimeException> void verifyDatasourceName(String datasourceName, T e) {
     if (!matcheDatasourceName(datasourceName)) {
-      throw new ParameterException("datasource name");
+      throw e;
     }
   }
 
@@ -103,32 +102,33 @@ public class VerifyUtils extends VerifyUtil {
    *
    * @param desc
    */
-  public static void verifyDesc(String desc) {
+  public static <T extends RuntimeException> void verifyDesc(String desc, T e) {
     if (StringUtils.isNotEmpty(desc) && desc.length() > 256) {
-      throw new ParameterException("desc");
+      throw e;
     }
   }
 
   /**
    * 校验代理用户列表是否符合规范
+   *
    * @param proxyUserList
    */
   public static <T extends RuntimeException> void verifyProxyUser(List<String> proxyUserList, T e) {
-    for (String proxyUser:proxyUserList){
-      verifyProxyUser(proxyUser,e);
+    for (String proxyUser : proxyUserList) {
+      verifyProxyUser(proxyUser, e);
     }
   }
 
   /**
    * 指定代理用户是否符合规范
+   *
    * @param proxyUser
    * @param e
    * @param <T>
    */
   public static <T extends RuntimeException> void verifyProxyUser(String proxyUser, T e) {
-      if (!matchProxyUser(proxyUser)){
-        throw e;
-      }
+    if (!matchProxyUser(proxyUser)) {
+      throw e;
     }
   }
 }

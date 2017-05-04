@@ -24,10 +24,7 @@ import com.baifendian.swordfish.dao.mapper.*;
 import com.baifendian.swordfish.dao.model.Project;
 import com.baifendian.swordfish.dao.model.ProjectUser;
 import com.baifendian.swordfish.dao.model.User;
-import com.baifendian.swordfish.webserver.exception.BadRequestException;
-import com.baifendian.swordfish.webserver.exception.NotFoundException;
-import com.baifendian.swordfish.webserver.exception.NotModifiedException;
-import com.baifendian.swordfish.webserver.exception.PermissionException;
+import com.baifendian.swordfish.webserver.exception.*;
 import com.baifendian.swordfish.webserver.utils.VerifyUtils;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
@@ -74,8 +71,8 @@ public class ProjectService {
    */
   public Project createProject(User operator, String name, String desc) {
 
-    VerifyUtils.verifyProjectName(name);
-    VerifyUtils.verifyDesc(desc);
+    VerifyUtils.verifyProjectName(name, new ParameterException("Parameter name: \"{0}\" is invalid", name));
+    VerifyUtils.verifyDesc(desc, new ParameterException("Parameter name: \"{0}\" is invalid", name));
 
     // 管理员不能创建项目
     if (operator.getRole() == UserRoleType.ADMIN_USER) {
@@ -112,7 +109,7 @@ public class ProjectService {
    */
   public Project modifyProject(User operator, String name, String desc) {
 
-    VerifyUtils.verifyDesc(desc);
+    VerifyUtils.verifyDesc(desc, new ParameterException("Parameter name: \"{0}\" is invalid", name));
 
     Project project = projectMapper.queryByName(name);
 

@@ -95,8 +95,9 @@ public class WorkflowService {
    */
   public ProjectFlow createWorkflow(User operator, String projectName, String name, String desc, String proxyUser, String queue, String data, MultipartFile file, String extras, Integer flag) {
 
-    VerifyUtils.verifyWorkflowName(name);
-    VerifyUtils.verifyDesc(desc);
+    //校验变量
+    VerifyUtils.verifyWorkflowName(name, new ParameterException("Parameter name: \"{0}\" is invalid", name));
+    VerifyUtils.verifyDesc(desc, new ParameterException("Parameter desc: \"{0}\" is invalid", desc));
 
     // 查看是否对项目具备相应的权限
     Project project = projectMapper.queryByName(projectName);
@@ -228,7 +229,7 @@ public class WorkflowService {
    */
   public ProjectFlow patchWorkflow(User operator, String projectName, String name, String desc, String proxyUser, String queue, String data, MultipartFile file, String extras) {
 
-    VerifyUtils.verifyDesc(desc);
+    VerifyUtils.verifyDesc(desc, new ParameterException("Parameter desc: \"{0}\" is invalid", desc));
 
     // 查询项目是否存在以及是否具备相应权限
     Project project = projectMapper.queryByName(projectName);
