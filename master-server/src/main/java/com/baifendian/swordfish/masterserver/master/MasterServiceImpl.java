@@ -178,6 +178,7 @@ public class MasterServiceImpl implements Iface {
       LOGGER.info("receive exec ad hoc request, id: {}", adHocId);
 
       AdHoc adHoc = adHocDao.getAdHoc(adHocId);
+
       if (adHoc == null) {
         LOGGER.error("ad hoc id {} not exists", adHocId);
         return ResultHelper.createErrorResult("ad hoc id not exists");
@@ -234,7 +235,7 @@ public class MasterServiceImpl implements Iface {
   }
 
   /**
-   * execServer汇报心跳 host : host地址 port : 端口号
+   * execServer 汇报心跳 host: host 地址, port : 端口号
    */
   @Override
   public RetInfo executorReport(String host, int port, HeartBeatData heartBeatData) throws TException {

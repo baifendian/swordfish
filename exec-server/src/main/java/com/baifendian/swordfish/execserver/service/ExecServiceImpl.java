@@ -127,13 +127,21 @@ public class ExecServiceImpl implements Iface {
     return ResultHelper.SUCCESS;
   }
 
+  /**
+   * 执行即席查询
+   *
+   * @param adHocId
+   * @return
+   */
   @Override
-  public RetInfo execAdHoc(int adHocId){
+  public RetInfo execAdHoc(int adHocId) {
     AdHoc adHoc = adHocDao.getAdHoc(adHocId);
-    if(adHoc == null){
-      LOGGER.error("adhoc id {} not exists", adHocId);
+
+    if (adHoc == null) {
+      LOGGER.error("ad hoc id {} not exists", adHocId);
       return ResultHelper.createErrorResult("adhoc id not exists");
     }
+
     adHocRunnerManager.submitAdHoc(adHoc);
     return ResultHelper.SUCCESS;
   }
@@ -146,7 +154,7 @@ public class ExecServiceImpl implements Iface {
     adHocRunnerManager.destory();
   }
 
-  public RetInfo cancelExecFlow(int execId)  throws TException {
+  public RetInfo cancelExecFlow(int execId) throws TException {
     LOGGER.debug("cancel exec flow {}", execId);
     try {
       // 查询 ExecutionFlow

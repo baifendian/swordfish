@@ -67,23 +67,20 @@ public class AdHocSqlJob {
       List<String> execSqls = CommonUtil.sqlSplit(sqls);
       logger.info("exec sql:{}, funcs:{}", sqls, funcs);
       /** 查询结果写入数据库 */
-      ResultCallback resultCallback = new ResultCallback() {
-        @Override
-        public void handleResult(ExecResult execResult, Date startTime, Date endTime) {
-          AdHocResult adHocResult = new AdHocResult();
-          adHocResult.setExecId(props.getAdHocId());
-          adHocResult.setStm(execResult.getStm());
-          adHocResult.setIndex(execResult.getIndex());
-          adHocResult.setStatus(execResult.getStatus());
-          AdHocJsonObject adHocJsonObject = new AdHocJsonObject();
-          adHocJsonObject.setTitles(execResult.getTitles());
-          adHocJsonObject.setValues(execResult.getValues());
-          adHocResult.setResult(JsonUtil.toJsonString(adHocJsonObject));
-          adHocResult.setStartTime(startTime);
-          adHocResult.setEndTime(endTime);
+      ResultCallback resultCallback = (execResult, startTime, endTime) -> {
+        AdHocResult adHocResult = new AdHocResult();
+        adHocResult.setExecId(props.getAdHocId());
+        adHocResult.setStm(execResult.getStm());
+        adHocResult.setIndex(execResult.getIndex());
+        adHocResult.setStatus(execResult.getStatus());
+        AdHocJsonObject adHocJsonObject = new AdHocJsonObject();
+        adHocJsonObject.setTitles(execResult.getTitles());
+        adHocJsonObject.setValues(execResult.getValues());
+        adHocResult.setResult(JsonUtil.toJsonString(adHocJsonObject));
+        adHocResult.setStartTime(startTime);
+        adHocResult.setEndTime(endTime);
 
-          adHocDao.updateAdHocResult(adHocResult); // 更新结果到数据库中
-        }
+        adHocDao.updateAdHocResult(adHocResult); // 更新结果到数据库中
       };
       HiveSqlExec hiveSqlExec = new HiveSqlExec(funcs, execSqls, props.getProxyUser(), null, true, resultCallback, param.getLimit(), logger);
       adHocDao.initAdHocResult(props.getAdHocId(), execSqls);
