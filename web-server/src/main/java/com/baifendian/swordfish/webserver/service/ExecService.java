@@ -143,7 +143,7 @@ public class ExecService {
           RetResultInfo retInfo = masterClient.appendWorkFlow(project.getId(), projectFlow.getId(), scheduleInfo);
           if (retInfo == null || retInfo.getRetInfo().getStatus() != 0) {
             logger.error("Call master client append workflow data false , project id: {}, flow id: {},host: {}, port: {}", project.getId(), projectFlow.getId(), masterServer.getHost(), masterServer.getPort());
-            throw new ServerErrorException("Call master client append workflow data false , project id: {}, flow id: {},host: {}, port: {}", project.getId(), projectFlow.getId(), masterServer.getHost(), masterServer.getPort());
+            throw new ServerErrorException("Call master client append workflow data false , project id: {0}, flow id: {1},host: {2}, port: {3}", project.getId(), projectFlow.getId(), masterServer.getHost(), masterServer.getPort());
           }
           return new ExecutorIds(retInfo.getExecIds());
         }
@@ -361,7 +361,7 @@ public class ExecService {
       logger.info("Call master client kill workflow , project id: {}, flow id: {},host: {}, port: {}", project.getId(), executionFlow.getFlowName(), masterServer.getHost(), masterServer.getPort());
       if (!masterClient.cancelExecFlow(execId)) {
         logger.error("Call master client kill workflow false , project id: {}, exec flow id: {},host: {}, port: {}", project.getId(), execId, masterServer.getHost(), masterServer.getPort());
-        throw new ServerErrorException("Call master client kill workflow false , project id: {}, exec flow id: {},host: {}, port: {}", project.getId(), execId, masterServer.getHost(), masterServer.getPort());
+        throw new ServerErrorException("Call master client kill workflow false , project id: {0}, exec flow id: {1},host: {2}, port: {3}", project.getId(), execId, masterServer.getHost(), masterServer.getPort());
       }
     } catch (Exception e) {
       logger.error("Call master client set schedule error", e);

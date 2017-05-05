@@ -148,6 +148,7 @@ public interface ExecutionFlowMapper {
           @Result(property = "endTime", column = "end_time", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP),
           @Result(property = "submitUserId", column = "schedule_user", javaType = int.class, jdbcType = JdbcType.INTEGER),
           @Result(property = "submitUser", column = "submit_user_name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+          @Result(property = "proxyUser", column = "proxy_user", javaType = String.class, jdbcType = JdbcType.VARCHAR),
           @Result(property = "type", column = "type", typeHandler = EnumOrdinalTypeHandler.class, jdbcType = JdbcType.TINYINT),})
   @SelectProvider(type = ExecutionFlowMapperProvider.class, method = "selectByFlowIdAndTimesAndStatusLimit")
   List<ExecutionFlow> selectByFlowIdAndTimesAndStatusLimit(@Param("projectName") String projectName,@Param("workflowList") List<String> workflowList, @Param("startDate") Date startDate, @Param("endDate") Date endDate, @Param("start") int start, @Param("limit") int limit, @Param("status")List<FlowStatus> statuses);

@@ -243,10 +243,10 @@ public class ExecutionFlowMapperProvider {
 
     String sql = new SQL() {
       {
-        SELECT("e_f.*");
         SELECT("p_f.name as flow_name");
         SELECT("p.name as project_name");
         SELECT("u.name as owner");
+        SELECT("e_f.*");
         FROM("execution_flows e_f");
         JOIN("project_flows p_f on e_f.flow_id = p_f.id");
         JOIN("project p on p_f.project_id = p.id");
