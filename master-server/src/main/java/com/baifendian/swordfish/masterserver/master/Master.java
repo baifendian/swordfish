@@ -39,6 +39,7 @@ public class Master {
 
   private static final Logger logger = LoggerFactory.getLogger(Master.class);
 
+  // 管理 executor server
   private ExecutorServerManager executorServerManager;
 
   private FlowExecManager flowExecManager;
@@ -47,6 +48,7 @@ public class Master {
    * workflow 执行队列
    */
   private final BlockingQueue<ExecFlowInfo> executionFlowQueue;
+
   private final FlowDao flowDao;
 
   /**
@@ -140,6 +142,12 @@ public class Master {
     flowExecManager.submitAddData(flow, cron, startDateTime, endDateTime);
   }
 
+  /**
+   * 执行即席查询
+   *
+   * @param id
+   * @throws TException
+   */
   public void execAdHoc(int id) throws TException {
     ExecutorServerInfo executorServerInfo = executorServerManager.getExecutorServer();
 
@@ -147,7 +155,7 @@ public class Master {
       throw new ExecException("can't found active executor server");
     }
 
-    logger.info("exec adhoc {} on server {}:{}", id, executorServerInfo.getHost(), executorServerInfo.getPort());
+    logger.info("exec ad hoc {} on server {}:{}", id, executorServerInfo.getHost(), executorServerInfo.getPort());
 
     ExecutorClient executorClient = new ExecutorClient(executorServerInfo);
     executorClient.execAdHoc(id);

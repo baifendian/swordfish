@@ -144,6 +144,8 @@ public class AdhocService {
     RetInfo retInfo = masterClient.execAdHoc(adhoc.getId());
 
     if (retInfo == null || retInfo.getStatus() != 0) {
+      // TODO:: 查询状态, 如果还是 INIT, 则需要更新
+
       throw new ServerErrorException("master server return error");
     }
 

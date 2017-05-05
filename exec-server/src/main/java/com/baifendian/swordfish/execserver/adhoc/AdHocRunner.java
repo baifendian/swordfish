@@ -50,6 +50,7 @@ public class AdHocRunner implements Runnable {
     Logger jobLogger = new JobLogger(adHoc.getJobId(), logger);
     AdHocSqlJob job = null;
     FlowStatus status = FlowStatus.SUCCESS;
+
     try {
       adHoc.setStatus(FlowStatus.RUNNING);
       adHocDao.updateAdHoc(adHoc);

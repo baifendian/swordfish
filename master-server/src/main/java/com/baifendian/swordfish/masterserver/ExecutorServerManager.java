@@ -44,15 +44,20 @@ public class ExecutorServerManager {
   }
 
   /**
-   * 获取一个可用的executor server, 选取执行的workflow最少的那个excutorserver
+   * 获取一个可用的 executor server, 选取执行的 workflow 最少的那个 executor server
+   *
+   * @return
    */
   public synchronized ExecutorServerInfo getExecutorServer() {
-    logger.debug("executor servers:{}", executorServers.toString());
+    logger.debug("executor servers: {}", executorServers.toString());
+
     ExecutorServerInfo result = null;
+
     for (ExecutorServerInfo executorServerInfo : executorServers.values()) {
       if (executorServerInfo.getHeartBeatData() == null) {
         continue;
       }
+
       if (result == null) {
         result = executorServerInfo;
       } else {
@@ -61,6 +66,7 @@ public class ExecutorServerManager {
         }
       }
     }
+
     return result;
   }
 

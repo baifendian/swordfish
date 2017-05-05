@@ -110,24 +110,30 @@ public class ExecThriftServer {
     host = InetAddress.getLocalHost().getHostAddress();
 
     logger.info("register to master {}:{}", masterServer.getHost(), masterServer.getPort());
+
     /** 注册到master */
     boolean ret = masterClient.registerExecutor(host, port, System.currentTimeMillis());
     if (!ret) {
       throw new ExecException("register executor error");
     }
+
     heartBeatInterval = conf.getInt(Constants.EXECUTOR_HEARTBEAT_INTERVAL, 60);
 
     executorService = Executors.newScheduledThreadPool(5);
+
     Runnable heartBeatThread = getHeartBeatThread();
     executorService.scheduleAtFixedRate(heartBeatThread, 10, heartBeatInterval, TimeUnit.SECONDS);
 
     TProtocolFactory protocolFactory = new TBinaryProtocol.Factory();
     TTransportFactory tTransportFactory = new TTransportFactory();
     workerService = new ExecServiceImpl(host, port, conf);
+
     TProcessor tProcessor = new WorkerService.Processor(workerService);
     inetSocketAddress = new InetSocketAddress(host, port);
     server = getTThreadPoolServer(protocolFactory, tProcessor, tTransportFactory, inetSocketAddress, 50, 200);
+
     logger.info("start thrift server on port:{}", port);
+
     Thread serverThread = new TServerThread(server);
     serverThread.setDaemon(true);
     serverThread.start();
@@ -135,12 +141,17 @@ public class ExecThriftServer {
     Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
       @Override
       public void run() {
-        if(executorService != null)
+        if (executorService != null) {
           executorService.shutdownNow();
-        if(workerService != null)
+        }
+
+        if (workerService != null) {
           workerService.destory();
-        if(server != null)
+        }
+
+        if (server != null) {
           server.stop();
+        }
       }
     }));
 
@@ -153,37 +164,38 @@ public class ExecThriftServer {
           logger.error("error", e);
         }
       }
+
       executorService.shutdownNow();
       workerService.destory();
       server.stop();
+
       logger.info("exec server stop");
     }
-
   }
 
   public Runnable getHeartBeatThread() {
-    Runnable heartBeatThread = new Runnable() {
-      @Override
-      public void run() {
-        if (running.get()) {
-          MasterServer masterServer = masterDao.getMasterServer();
-          HeartBeatData heartBeatData = new HeartBeatData();
-          heartBeatData.setReportDate(System.currentTimeMillis());
-          heartBeatData.setCpuUsed(OsUtil.cpuUsage());
-          heartBeatData.setMemUsed(OsUtil.memoryUsage());
-          MasterClient client = new MasterClient(masterServer.getHost(), masterServer.getPort(), THRIFT_RPC_RETRIES);
-          logger.debug("executor report heartbeat:{}", heartBeatData);
-          boolean result = client.executorReport(host, port, heartBeatData);
-          if (!result) {
-            logger.warn("heart beat time out");
-            running.compareAndSet(true, false);
-            synchronized (syncObject) {
-              syncObject.notify();
-            }
+    Runnable heartBeatThread = () -> {
+      if (running.get()) {
+        MasterServer masterServer1 = masterDao.getMasterServer();
+        HeartBeatData heartBeatData = new HeartBeatData();
+        heartBeatData.setReportDate(System.currentTimeMillis());
+        heartBeatData.setCpuUsed(OsUtil.cpuUsage());
+        heartBeatData.setMemUsed(OsUtil.memoryUsage());
+        MasterClient client = new MasterClient(masterServer1.getHost(), masterServer1.getPort(), THRIFT_RPC_RETRIES);
+
+        logger.debug("executor report heartbeat:{}", heartBeatData);
+
+        boolean result = client.executorReport(host, port, heartBeatData);
+        if (!result) {
+          logger.warn("heart beat time out");
+          running.compareAndSet(true, false);
+          synchronized (syncObject) {
+            syncObject.notify();
           }
         }
       }
     };
+
     return heartBeatThread;
   }
 
