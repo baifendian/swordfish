@@ -68,12 +68,12 @@ public class DatasourceService {
 
     // 不存在的项目名
     if (project == null) {
-      throw new NotFoundException("Not found project '{0}'", projectName);
+      throw new NotFoundException("Not found project \"{0}\"", projectName);
     }
 
     // 没有权限
     if (!projectService.hasWritePerm(operator.getId(), project)) {
-      throw new PermissionException("User '{0}' is not has project '{1}' write permission", operator.getName(),projectName);
+      throw new PermissionException("User \"{0}\" is not has project \"{1}\" write permission", operator.getName(),projectName);
     }
 
     //TODO parameter参数检测
@@ -167,12 +167,12 @@ public class DatasourceService {
 
     // 不存在的项目名
     if (project == null) {
-      throw new NotFoundException("Not found project '{0}'", projectName);
+      throw new NotFoundException("Not found project \"{0}\"", projectName);
     }
 
     // 没有权限
     if (!projectService.hasWritePerm(operator.getId(), project)) {
-      throw new PermissionException("User '{0}' is not has project '{1}' write permission", operator.getName(),projectName);
+      throw new PermissionException("User \"{0}\" is not has project \"{1}\" write permission", operator.getName(),projectName);
     }
 
     // 查找指定数据源
@@ -181,7 +181,7 @@ public class DatasourceService {
     Date now = new Date();
 
     if (dataSource == null){
-      throw new NotFoundException("Not found datasource '{0}'", name);
+      throw new NotFoundException("Not found datasource \"{0}\"", name);
     }
 
     if (!StringUtils.isEmpty(desc)){
@@ -214,12 +214,12 @@ public class DatasourceService {
 
     //不存在的项目名
     if (project == null) {
-      throw new NotFoundException("Not found project '{0}'", projectName);
+      throw new NotFoundException("Not found project \"{0}\"", projectName);
     }
 
     //没有权限
     if (!projectService.hasWritePerm(operator.getId(), project)) {
-      throw new PermissionException("User '{0}' is not has project '{1}' write permission", operator.getName(),projectName);
+      throw new PermissionException("User \"{0}\" is not has project \"{1}\" write permission", operator.getName(),projectName);
     }
 
     int count = dataSourceMapper.deleteByProjectAndName(project.getId(), name);
@@ -243,12 +243,12 @@ public class DatasourceService {
 
     // 不存在的项目名
     if (project == null) {
-      throw new NotFoundException("Not found project '{0}'", projectName);
+      throw new NotFoundException("Not found project \"{0}\"", projectName);
     }
 
     // 没有权限
     if (!projectService.hasReadPerm(operator.getId(), project)) {
-      throw new PermissionException("User '{0}' is not has project '{1}' read permission", operator.getName(),projectName);
+      throw new PermissionException("User \"{0}\" is not has project \"{1}\" read permission", operator.getName(),projectName);
     }
 
     return dataSourceMapper.getByProjectId(project.getId());
@@ -268,12 +268,12 @@ public class DatasourceService {
 
     // 不存在的项目名
     if (project == null) {
-      throw new NotFoundException("Not found project '{0}'", projectName);
+      throw new NotFoundException("Not found project \"{0}\"", projectName);
     }
 
     // 没有权限
     if (!projectService.hasReadPerm(operator.getId(), project)) {
-      throw new PermissionException("User '{0}' is not has project '{1}' read permission", operator.getName(),projectName);
+      throw new PermissionException("User \"{0}\" is not has project \"{1}\" read permission", operator.getName(),projectName);
     }
 
     return dataSourceMapper.getByName(project.getId(), name);
