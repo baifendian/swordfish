@@ -62,8 +62,6 @@ public class ExecutionNodeDto {
       this.status = executionNode.getStatus();
       this.logLinks = executionNode.getLogLinkList();
       this.jobId = executionNode.getJobId();
-      this.dep = executionNode.getDepList();
-      this.extras = executionNode.getExtras();
     }
   }
 
