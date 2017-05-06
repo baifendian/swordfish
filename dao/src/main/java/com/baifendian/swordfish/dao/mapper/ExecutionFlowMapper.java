@@ -244,6 +244,7 @@ public interface ExecutionFlowMapper {
           @Result(property = "workflowName", column = "flow_name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
           @Result(property = "projectName", column = "project_name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
           @Result(property = "owner", column = "owner_name",javaType = String.class, jdbcType = JdbcType.VARCHAR),
+          @Result(property = "proxyUser", column = "proxy_user",javaType = String.class, jdbcType = JdbcType.VARCHAR),
           @Result(property = "times", column = "times", javaType = int.class, jdbcType = JdbcType.INTEGER),
   })
   @SelectProvider(type = ExecutionFlowMapperProvider.class, method = "selectErrorsByProject")

@@ -403,6 +403,7 @@ public class ExecutionFlowMapperProvider {
         SELECT("p_f.name as flow_name");
         SELECT("u.name as owner_name");
         SELECT("p.name as projectName");
+        SELECT("p_f.proxy_user");
         FROM("execution_flows e_f");
         JOIN("project_flows p_f on e_f.flow_id = p_f.id");
         JOIN("user u on p_f.owner = u.id");
