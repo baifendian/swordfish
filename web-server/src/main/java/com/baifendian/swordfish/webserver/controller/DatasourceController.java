@@ -25,7 +25,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -78,11 +77,11 @@ public class DatasourceController {
    */
   @PutMapping(value = "/{name}")
   public DatasourceDto putDataSource(@RequestAttribute(value = "session.user") User operator,
-                                           @PathVariable("projectName") String projectName,
-                                           @PathVariable("name") String name,
-                                           @RequestParam(value = "desc", required = false) String desc,
-                                           @RequestParam(value = "type") String type,
-                                           @RequestParam(value = "parameter") String parameter) {
+                                     @PathVariable("projectName") String projectName,
+                                     @PathVariable("name") String name,
+                                     @RequestParam(value = "desc", required = false) String desc,
+                                     @RequestParam(value = "type") String type,
+                                     @RequestParam(value = "parameter") String parameter) {
     logger.info("Operator user {}, put datasource, project name: {}, data source name: {}, desc: {}, type: {}, parameter: {}",
         operator.getName(), projectName, name, desc, type, parameter);
 
@@ -101,10 +100,10 @@ public class DatasourceController {
    */
   @PatchMapping(value = "/{name}")
   public DatasourceDto modifyDataSource(@RequestAttribute(value = "session.user") User operator,
-                                     @PathVariable("projectName") String projectName,
-                                     @PathVariable("name") String name,
-                                     @RequestParam(value = "desc", required = false) String desc,
-                                     @RequestParam(value = "parameter") String parameter) {
+                                        @PathVariable("projectName") String projectName,
+                                        @PathVariable("name") String name,
+                                        @RequestParam(value = "desc", required = false) String desc,
+                                        @RequestParam(value = "parameter") String parameter) {
     logger.info("Operator user {}, modify datasource, project name: {}, data source name: {}, desc: {}, type: {}, parameter: {}",
         operator.getName(), projectName, name, desc, parameter);
 
@@ -137,15 +136,17 @@ public class DatasourceController {
    */
   @GetMapping(value = "")
   public List<DatasourceDto> query(@RequestAttribute(value = "session.user") User operator,
-                                @PathVariable("projectName") String projectName) {
+                                   @PathVariable("projectName") String projectName) {
     logger.info("Operator user {}, query datasource of project, project name: {}",
         operator.getName(), projectName);
 
     List<DataSource> dataSourceList = datasourceService.query(operator, projectName);
     List<DatasourceDto> datasourceDtoList = new ArrayList<>();
-    for (DataSource dataSource:dataSourceList){
+
+    for (DataSource dataSource : dataSourceList) {
       datasourceDtoList.add(new DatasourceDto(dataSource));
     }
+
     return datasourceDtoList;
   }
 
@@ -159,8 +160,8 @@ public class DatasourceController {
    */
   @GetMapping(value = "/{name}")
   public DatasourceDto queryByName(@RequestAttribute(value = "session.user") User operator,
-                                @PathVariable("projectName") String projectName,
-                                @PathVariable("name") String name) {
+                                   @PathVariable("projectName") String projectName,
+                                   @PathVariable("name") String name) {
     logger.info("Operator user {}, query datasource, project name: {}, data source name: {}",
         operator.getName(), projectName, name);
 

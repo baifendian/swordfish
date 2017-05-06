@@ -23,13 +23,11 @@ import com.baifendian.swordfish.webserver.dto.ExecutionFlowDto;
 import com.baifendian.swordfish.webserver.dto.StatDto;
 import com.baifendian.swordfish.webserver.exception.ParameterException;
 import com.baifendian.swordfish.webserver.service.StatService;
-import org.apache.commons.httpclient.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -61,12 +59,11 @@ public class StatController {
         operator.getName(), projectName, startTime, endTime);
 
     // 检测时间跨度是否合法
-
     Date startDate = new Date(startTime);
     Date endDate = new Date(endTime);
 
-    if (DateUtils.compare(startDate,endDate) || DateUtils.diffDays(startDate,endDate) > 30){
-      throw new ParameterException("start date '{0} and end date '{1} must be between [0,30] day",startDate.getTime(),endDate.getTime());
+    if (DateUtils.compare(startDate, endDate) || DateUtils.diffDays(startDate, endDate) > 30) {
+      throw new ParameterException("start date \"{0}\" and end date \"{1}\" must be between [0,30] day", startDate.getTime(), endDate.getTime());
     }
 
     return statService.queryStates(operator, projectName, startTime, endTime);
@@ -74,6 +71,7 @@ public class StatController {
 
   /**
    * 返回小时维度的统计信息
+   *
    * @param operator
    * @param projectName
    * @param date
@@ -82,11 +80,11 @@ public class StatController {
   @GetMapping(value = "/states-hour")
   public List<StatDto> queryStatesHour(@RequestAttribute(value = "session.user") User operator,
                                        @RequestParam(value = "projectName") String projectName,
-                                       @RequestParam(value = "date") long date){
+                                       @RequestParam(value = "date") long date) {
     logger.info("Operator user {}, get states, project name: {}, date: {}",
-            operator.getName(), projectName, date);
+        operator.getName(), projectName, date);
 
-    return statService.queryStatesHour(operator,projectName,date);
+    return statService.queryStatesHour(operator, projectName, date);
   }
 
   /**
@@ -107,15 +105,17 @@ public class StatController {
 
     // 校验返回数目
     if (num <= 0 || num > 100) {
-      throw new ParameterException("Num '{0}' is not valid, num must be between (0, 100]",num);
+      throw new ParameterException("Num \"{0}\" is not valid, num must be between (0, 100]", num);
 
     }
 
     List<ExecutionFlow> executionFlowList = statService.queryConsumes(operator, projectName, date, num);
     List<ExecutionFlowDto> executionFlowDtoList = new ArrayList<>();
-    for (ExecutionFlow executionFlow:executionFlowList){
+
+    for (ExecutionFlow executionFlow : executionFlowList) {
       executionFlowDtoList.add(new ExecutionFlowDto(executionFlow));
     }
+
     return executionFlowDtoList;
   }
 
@@ -137,7 +137,7 @@ public class StatController {
 
     // 校验返回数目
     if (num <= 0 || num > 100) {
-      throw new ParameterException("Num '{0}' is not valid, num must be between (0, 100]",num);
+      throw new ParameterException("Num \"{0}\" is not valid, num must be between (0, 100]", num);
     }
 
     return statService.queryErrors(operator, projectName, date, num);

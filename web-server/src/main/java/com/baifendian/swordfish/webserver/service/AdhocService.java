@@ -253,4 +253,14 @@ public class AdhocService {
 
     return adHocResultData;
   }
+
+  /**
+   * 删除即席查询
+   *
+   * @param operator
+   * @param execId
+   */
+  public void killAdhoc(User operator, int execId) {
+    // TODO::
+  }
 }

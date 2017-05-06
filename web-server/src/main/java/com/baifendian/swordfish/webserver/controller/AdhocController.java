@@ -28,7 +28,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
 /**
@@ -144,5 +143,14 @@ public class AdhocController {
     }
 
     return adhocService.queryResult(operator, execId, index);
+  }
+
+  @PostMapping(value = "/adHoc/{execId}/kill")
+  public void killAdhoc(@RequestAttribute(value = "session.user") User operator,
+                        @PathVariable int execId) {
+    logger.info("Operator user {}, kill adhoc result, exec id: {}",
+        operator.getName(), execId);
+
+    adhocService.killAdhoc(operator, execId);
   }
 }
