@@ -82,13 +82,13 @@ public class UserController {
    */
   @PatchMapping(value = "/{name}")
   public UserDto modifyUser(@RequestAttribute(value = "session.user") User operator,
-                         @PathVariable String name,
-                         @RequestParam(value = "email", required = false) String email,
-                         @RequestParam(value = "desc", required = false) String desc,
-                         @RequestParam(value = "password", required = false) String password,
-                         @RequestParam(value = "phone", required = false) String phone,
-                         @RequestParam(value = "proxyUsers", required = false) String proxyUsers,
-                         HttpServletResponse response) {
+                            @PathVariable String name,
+                            @RequestParam(value = "email", required = false) String email,
+                            @RequestParam(value = "desc", required = false) String desc,
+                            @RequestParam(value = "password", required = false) String password,
+                            @RequestParam(value = "phone", required = false) String phone,
+                            @RequestParam(value = "proxyUsers", required = false) String proxyUsers,
+                            HttpServletResponse response) {
     logger.info("Operator user {}, modify user, name: {}, email: {}, desc: {}, password: {}, phone: {}, proxyUsers: {}",
         operator.getName(), name, email, desc, "******", phone, proxyUsers);
 
@@ -123,16 +123,18 @@ public class UserController {
    */
   @GetMapping(value = "")
   public List<UserDto> queryUsers(@RequestAttribute(value = "session.user") User operator,
-                               @RequestParam(value = "allUser", required = false, defaultValue = "false") boolean allUser,
-                               HttpServletResponse response) {
+                                  @RequestParam(value = "allUser", required = false, defaultValue = "false") boolean allUser,
+                                  HttpServletResponse response) {
     logger.info("Operator user {}, query user, allUser: {}",
         operator.getName(), allUser);
 
     List<User> userList = userService.queryUser(operator, allUser);
     List<UserDto> userDtoList = new ArrayList<>();
-    for (User user:userList){
+
+    for (User user : userList) {
       userDtoList.add(new UserDto(user));
     }
+
     return userDtoList;
   }
 }

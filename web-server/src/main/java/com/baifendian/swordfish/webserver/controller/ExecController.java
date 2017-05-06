@@ -73,7 +73,7 @@ public class ExecController {
             "notify mails: {}, timeout: {}",
         operator.getName(), projectName, workflowName, schedule, nodeName, nodeDep, notifyType, notifyMails, timeout);
 
-    return execService.postExecWorkflow(operator,projectName,workflowName,schedule,execType,nodeName,nodeDep,notifyType,notifyMails,timeout);
+    return execService.postExecWorkflow(operator, projectName, workflowName, schedule, execType, nodeName, nodeDep, notifyType, notifyMails, timeout);
   }
 
   @PostMapping(value = "/direct")
@@ -85,15 +85,15 @@ public class ExecController {
                                             @RequestParam(value = "desc", required = false) String desc,
                                             @RequestParam(value = "data", required = false) String data,
                                             @RequestParam(value = "file", required = false) MultipartFile file,
-                                            @RequestParam(value = "notifyType",required=false,defaultValue = "None") NotifyType notifyType,
-                                            @RequestParam(value = "notifyMails",required=false) String notifyMails,
-                                            @RequestParam(value = "timeout",required=false,defaultValue = "18000") int timeout,
-                                            @RequestParam(value = "extras",required=false) String extras,
-                                            HttpServletResponse response){
+                                            @RequestParam(value = "notifyType", required = false, defaultValue = "None") NotifyType notifyType,
+                                            @RequestParam(value = "notifyMails", required = false) String notifyMails,
+                                            @RequestParam(value = "timeout", required = false, defaultValue = "18000") int timeout,
+                                            @RequestParam(value = "extras", required = false) String extras,
+                                            HttpServletResponse response) {
     logger.info("Operator user {}, exec workflow, project name: {}, workflow name: {}, proxy user: {}, queue: {}, data: {}, file: {}," +
-            "notify type: {}, notify mails: {}, timeout: {}, extras: {}",operator.getName(),projectName,workflowName,proxyUser,queue,data,file.getName(),notifyType,notifyMails,timeout,extras);
+        "notify type: {}, notify mails: {}, timeout: {}, extras: {}", operator.getName(), projectName, workflowName, proxyUser, queue, data, file.getName(), notifyType, notifyMails, timeout, extras);
 
-    return execService.postExecWorkflowDirect(operator,projectName,workflowName,desc,proxyUser,queue,data,file,notifyType,notifyMails,timeout,extras);
+    return execService.postExecWorkflowDirect(operator, projectName, workflowName, desc, proxyUser, queue, data, file, notifyType, notifyMails, timeout, extras);
   }
 
   /**
@@ -123,9 +123,7 @@ public class ExecController {
     logger.info("Operator user {}, query exec list, start date: {}, end date: {}, project name: {}, workflow name: {}, status: {}, from: {}, size: {}",
         operator.getName(), startDate, endDate, projectName, workflowName, status, from, size);
 
-
-
-    return execService.getExecWorkflow(operator,projectName,workflowName,new Date(startDate),new Date(endDate),status,from,size);
+    return execService.getExecWorkflow(operator, projectName, workflowName, new Date(startDate), new Date(endDate), status, from, size);
   }
 
   /**
@@ -165,7 +163,7 @@ public class ExecController {
     logger.info("Operator user {}, query log, job id: {}, from: {}, size: {}",
         operator.getName(), jobId, from, size);
 
-    return execService.getEexcWorkflowLog(operator,jobId,from,size);
+    return execService.getEexcWorkflowLog(operator, jobId, from, size);
   }
 
   /**
@@ -182,6 +180,6 @@ public class ExecController {
     logger.info("Operator user {}, kill exec, exec id: {}",
         operator.getName(), execId);
 
-    execService.postKillWorkflow(operator,execId);
+    execService.postKillWorkflow(operator, execId);
   }
 }

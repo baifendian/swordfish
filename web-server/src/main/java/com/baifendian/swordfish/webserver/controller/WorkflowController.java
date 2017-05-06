@@ -138,6 +138,7 @@ public class WorkflowController {
 
   /**
    * copy一个工作流
+   *
    * @param operator
    * @param projectName
    * @param srcWorkflowName
@@ -150,10 +151,10 @@ public class WorkflowController {
                                       @PathVariable String projectName,
                                       @RequestParam(value = "srcWorkflowName") String srcWorkflowName,
                                       @RequestParam(value = "destWorkflowName") String destWorkflowName,
-                                      HttpServletResponse response){
-    logger.info("Operator user {},project name: {} , source workflow: {}, dest workflow: {}",operator.getName(),projectName,srcWorkflowName,destWorkflowName);
+                                      HttpServletResponse response) {
+    logger.info("Operator user {},project name: {} , source workflow: {}, dest workflow: {}", operator.getName(), projectName, srcWorkflowName, destWorkflowName);
 
-    return new WorkflowDto(workflowService.postWorkflowCopy(operator,projectName,srcWorkflowName,destWorkflowName));
+    return new WorkflowDto(workflowService.postWorkflowCopy(operator, projectName, srcWorkflowName, destWorkflowName));
   }
 
   /**
@@ -213,9 +214,11 @@ public class WorkflowController {
 
     List<ProjectFlow> projectFlowList = workflowService.queryAllProjectFlow(operator, projectName);
     List<WorkflowDto> workflowDtoList = new ArrayList<>();
-    for (ProjectFlow projectFlow:projectFlowList){
+
+    for (ProjectFlow projectFlow : projectFlowList) {
       workflowDtoList.add(new WorkflowDto(projectFlow));
     }
+
     return workflowDtoList;
   }
 
@@ -260,13 +263,13 @@ public class WorkflowController {
 
     if (file == null) {
       return ResponseEntity
-              .noContent().build();
+          .noContent().build();
     }
 
     return ResponseEntity
-            .ok()
-            .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getFilename() + "\"")
-            .body(file);
+        .ok()
+        .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getFilename() + "\"")
+        .body(file);
 
   }
 }
