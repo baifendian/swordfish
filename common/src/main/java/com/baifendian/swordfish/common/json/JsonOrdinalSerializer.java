@@ -16,7 +16,6 @@
 package com.baifendian.swordfish.common.json;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
 
@@ -25,9 +24,10 @@ import java.io.IOException;
 /**
  * 直接序列化出枚举序列
  */
-public class JsonOrdinalSerializer extends JsonSerializer<Enum> {
+public class JsonOrdinalSerializer<E extends Enum> extends JsonSerializer<E> {
+
   @Override
-  public void serialize(Enum e, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException, JsonProcessingException {
+  public void serialize(E e, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
     jsonGenerator.writeString(String.valueOf(e.ordinal()));
   }
 }

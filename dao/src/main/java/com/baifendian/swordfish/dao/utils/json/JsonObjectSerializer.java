@@ -32,7 +32,6 @@
 package com.baifendian.swordfish.dao.utils.json;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
 
@@ -44,7 +43,7 @@ import java.io.IOException;
 public class JsonObjectSerializer extends JsonSerializer<String> {
 
   @Override
-  public void serialize(String value, JsonGenerator jgen, SerializerProvider provider) throws IOException, JsonProcessingException {
+  public void serialize(String value, JsonGenerator jgen, SerializerProvider provider) throws IOException {
     String v = value;
     jgen.writeRawValue(v);
   }

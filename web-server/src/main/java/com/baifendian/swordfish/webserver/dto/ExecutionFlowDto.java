@@ -15,6 +15,7 @@
  */
 package com.baifendian.swordfish.webserver.dto;
 
+import com.baifendian.swordfish.common.json.JsonOrdinalSerializer;
 import com.baifendian.swordfish.dao.enums.ExecType;
 import com.baifendian.swordfish.dao.enums.FlowStatus;
 import com.baifendian.swordfish.dao.model.ExecutionFlow;
@@ -23,6 +24,7 @@ import com.baifendian.swordfish.dao.utils.json.JsonUtil;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonRawValue;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.apache.commons.lang.StringUtils;
 
 import java.util.Date;

@@ -17,14 +17,14 @@ package com.baifendian.swordfish.webserver.dto;
 
 import com.baifendian.swordfish.common.json.JsonOrdinalSerializer;
 import com.baifendian.swordfish.dao.enums.FlowStatus;
-import org.codehaus.jackson.map.annotate.JsonSerialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 public class AdHocLogData {
   /**
    * 工作量的状态
    */
   @JsonSerialize(using = JsonOrdinalSerializer.class)
-  private FlowStatus status = FlowStatus.INIT;
+  private FlowStatus status;
 
   /**
    * 是否最后一条 sql
@@ -40,6 +40,10 @@ public class AdHocLogData {
    * 日志信息
    */
   private LogResult logContent = null;
+
+  public AdHocLogData() {
+    status = FlowStatus.INIT;
+  }
 
   public FlowStatus getStatus() {
     return status;
