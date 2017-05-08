@@ -42,17 +42,15 @@ public class DatasourceTestController {
    * @param operator
    * @param type
    * @param parameter
-   * @param response
    * @return
    */
   @GetMapping(value = "/test")
   public BaseResponse testDataSource(@RequestAttribute(value = "session.user") User operator,
-                                     @RequestParam(value = "type") String type,
-                                     @RequestParam(value = "parameter") String parameter,
-                                     HttpServletResponse response) {
+                                     @RequestParam(value = "type") DbType type,
+                                     @RequestParam(value = "parameter") String parameter) {
     logger.info("Operator user id {}, test datasource, type: {}, parameter: {}",
         operator.getId(), type, parameter);
 
-    return datasourceService.testDataSource(DbType.valueOf(type), parameter);
+    return datasourceService.testDataSource(type, parameter);
   }
 }

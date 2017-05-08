@@ -15,12 +15,15 @@
  */
 package com.baifendian.swordfish.webserver.dto;
 
+import com.baifendian.swordfish.common.json.JsonOrdinalSerializer;
 import com.baifendian.swordfish.dao.enums.FlowStatus;
+import org.codehaus.jackson.map.annotate.JsonSerialize;
 
 public class AdHocLogData {
   /**
    * 工作量的状态
    */
+  @JsonSerialize(using = JsonOrdinalSerializer.class)
   private FlowStatus status = FlowStatus.INIT;
 
   /**

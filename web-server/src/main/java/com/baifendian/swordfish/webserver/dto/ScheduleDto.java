@@ -46,7 +46,7 @@ public class ScheduleDto {
   }
 
   public ScheduleDto(Schedule schedule) {
-    if (schedule != null){
+    if (schedule != null) {
       this.projectName = schedule.getProjectName();
       this.workflowName = schedule.getFlowName();
       this.desc = schedule.getDesc();
