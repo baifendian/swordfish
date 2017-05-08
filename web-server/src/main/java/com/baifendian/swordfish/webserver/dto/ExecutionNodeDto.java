@@ -15,11 +15,13 @@
  */
 package com.baifendian.swordfish.webserver.dto;
 
+import com.baifendian.swordfish.common.json.JsonOrdinalSerializer;
 import com.baifendian.swordfish.dao.enums.FlowStatus;
 import com.baifendian.swordfish.dao.model.ExecutionNode;
 import com.baifendian.swordfish.dao.utils.json.JsonObjectDeserializer;
 import com.fasterxml.jackson.annotation.JsonRawValue;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import java.util.Date;
 import java.util.List;
@@ -37,6 +39,7 @@ public class ExecutionNodeDto {
   @JsonDeserialize(using = JsonObjectDeserializer.class)
   private String parameter;
   private int duration;
+  @JsonSerialize(using = JsonOrdinalSerializer.class)
   private FlowStatus status;
   private List<String> logLinks;
   private String jobId;
@@ -63,8 +66,6 @@ public class ExecutionNodeDto {
       this.status = executionNode.getStatus();
       this.logLinks = executionNode.getLogLinkList();
       this.jobId = executionNode.getJobId();
-      this.dep = executionNode.getDepList();
-      this.extras = executionNode.getExtras();
     }
   }
 

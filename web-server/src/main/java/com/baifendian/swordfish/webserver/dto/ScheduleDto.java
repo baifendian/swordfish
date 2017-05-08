@@ -15,10 +15,13 @@
  */
 package com.baifendian.swordfish.webserver.dto;
 
+import com.baifendian.swordfish.common.json.JsonOrdinalSerializer;
 import com.baifendian.swordfish.dao.enums.DepPolicyType;
 import com.baifendian.swordfish.dao.enums.FailurePolicyType;
 import com.baifendian.swordfish.dao.enums.NotifyType;
+import com.baifendian.swordfish.dao.enums.ScheduleStatus;
 import com.baifendian.swordfish.dao.model.Schedule;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import java.util.Date;
 import java.util.List;
@@ -41,12 +44,15 @@ public class ScheduleDto {
   private Date modifyTime;
   private String owner;
   private ScheduleParam scheduleParam;
+  @JsonSerialize(using = JsonOrdinalSerializer.class)
+  private ScheduleStatus scheduleStatus;
+
 
   public ScheduleDto() {
   }
 
   public ScheduleDto(Schedule schedule) {
-    if (schedule != null){
+    if (schedule != null) {
       this.projectName = schedule.getProjectName();
       this.workflowName = schedule.getFlowName();
       this.desc = schedule.getDesc();
@@ -61,6 +67,7 @@ public class ScheduleDto {
       this.modifyTime = schedule.getModifyTime();
       this.owner = schedule.getOwner();
       this.scheduleParam = new ScheduleParam(schedule.getStartDate(), schedule.getEndDate(), schedule.getCrontab());
+      this.scheduleStatus = schedule.getScheduleStatus();
     }
   }
 

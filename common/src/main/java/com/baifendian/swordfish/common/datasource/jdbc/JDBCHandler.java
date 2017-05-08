@@ -36,26 +36,44 @@ public class JDBCHandler implements DataSourceHandler {
 
   private static Map<DbType, String> dbDriverMap = new HashMap<>();
 
-  static{
+  static {
     dbDriverMap.put(DbType.MYSQL, "com.mysql.jdbc.Driver");
     dbDriverMap.put(DbType.ORACLE, "oracle.jdbc.driver.OracleDriver");
   }
 
-  public JDBCHandler(DbType dbType, String paramStr){
+  public JDBCHandler(DbType dbType, String paramStr) {
     this.dbType = dbType;
     param = JsonUtil.parseObject(paramStr, JDBCParam.class);
   }
+
   public void isConnectable() throws Exception {
-    if(!dbDriverMap.containsKey(dbType)){
+    if (!dbDriverMap.containsKey(dbType)) {
       throw new Exception(String.format("can't found db type %s driver info", dbType.name()));
     }
 
     Connection con = null;
     try {
       Class.forName(dbDriverMap.get(dbType));
-      con = DriverManager.getConnection(param.getAddress(), param.getUser(), param.getPassword());
+      // TODO oracle mysql 的链接方式分开处理
+
+      String url = "";
+      String dbName = param.getDatabase();
+
+      switch (this.dbType) {
+        case MYSQL: {
+          String address = param.getAddress();
+          if (address.lastIndexOf("/") != address.length()) {
+            dbName += "/";
+          }
+          url = param.getAddress() + dbName;
+        }
+        case ORACLE: {
+          url = param.getAddress();
+        }
+      }
+      con = DriverManager.getConnection(url, param.getUser(), param.getPassword());
     } finally {
-      if(con != null) {
+      if (con != null) {
         try {
           con.close();
         } catch (SQLException e) {

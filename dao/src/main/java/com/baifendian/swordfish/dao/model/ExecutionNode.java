@@ -22,7 +22,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
-public class ExecutionNode extends FlowNode{
+public class ExecutionNode {
 
   /**
    * 具体workflow执行的 id

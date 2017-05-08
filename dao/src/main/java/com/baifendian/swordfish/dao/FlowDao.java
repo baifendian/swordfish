@@ -175,10 +175,10 @@ public class FlowDao extends BaseDao {
     executionFlow.setScheduleTime(scheduleTime);
     executionFlow.setStartTime(new Date());
 
-    if (nodeName != null){
+    if (nodeName != null) {
       FlowNode flowNode = DagHelper.findNodeByName(flowNodes, nodeName);
-      if(flowNode != null){
-        switch (nodeDep){
+      if (flowNode != null) {
+        switch (nodeDep) {
           case NODE_ONLY:
             flowDag.setEdges(null);
             flowDag.setNodes(Arrays.asList(flowNode));
@@ -205,27 +205,6 @@ public class FlowDao extends BaseDao {
     executionFlowMapper.insertAndGetId(executionFlow); // 插入执行信息
 
     return executionFlow;
-  }
-
-  /**
-   * 创建工作流 创建的工作流已有发布时间
-   *
-   * @return workflowId
-   */
-  public int createWorkflow(int projectId, String name, FlowType type, int userId) throws Exception {
-    ProjectFlow projectFlow = new ProjectFlow();
-
-    projectFlow.setName(name);
-    projectFlow.setCreateTime(new Date());
-    projectFlow.setModifyTime(new Date());
-    projectFlow.setOwnerId(userId);
-    projectFlow.setProjectId(projectId);
-
-    int count = projectFlowMapper.insertAndGetId(projectFlow); // 插入函数记录
-    if (count <= 0) {
-      throw new Exception("工作流插入失败");
-    }
-    return projectFlow.getId();
   }
 
   /**

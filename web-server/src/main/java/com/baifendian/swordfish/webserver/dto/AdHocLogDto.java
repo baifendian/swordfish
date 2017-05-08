@@ -15,15 +15,16 @@
  */
 package com.baifendian.swordfish.webserver.dto;
 
+import com.baifendian.swordfish.common.json.JsonOrdinalSerializer;
 import com.baifendian.swordfish.dao.enums.FlowStatus;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
-public class AdHocLogDto {
+public class AdHocLogData {
   /**
    * 工作量的状态
    */
-  @JsonSerialize()
-  private FlowStatus status = FlowStatus.INIT;
+  @JsonSerialize(using = JsonOrdinalSerializer.class)
+  private FlowStatus status;
 
   /**
    * 是否最后一条 sql

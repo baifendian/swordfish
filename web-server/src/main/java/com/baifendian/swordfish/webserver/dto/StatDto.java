@@ -63,19 +63,57 @@ public class StatDto {
     if (executionState != null){
       this.hour = executionState.getHour();
       this.date = executionState.getDay();
-      this.info.setWait(executionState.getInit()+executionState.getWaitingDep()+executionState.getWaitingRes());
-      this.info.setFailed(executionState.getFailed()+executionState.getDepFailed());
-      this.info.setSuccess(executionState.getSuccess());
-      this.info.setRunning(executionState.getRunning());
+      this.info = new Info(executionState);
     }
   }
 
   public static class Info {
+    private int init;
+    private int waiting_dep;
+    private int waiting_res;
     private int running;
-    private int total;
-    private int wait;
     private int success;
+    private int kill;
     private int failed;
+    private int total;
+
+    public Info(){}
+
+    public Info(ExecutionState executionState){
+      if (executionState!=null){
+        this.init = executionState.getInit();
+        this.waiting_dep = executionState.getWaitingDep();
+        this.waiting_res = executionState.getWaitingRes();
+        this.running = executionState.getRunning();
+        this.success = executionState.getSuccess();
+        this.kill = executionState.getKill();
+        this.failed = executionState.getFailed();
+      }
+    }
+
+    public int getInit() {
+      return init;
+    }
+
+    public void setInit(int init) {
+      this.init = init;
+    }
+
+    public int getWaiting_dep() {
+      return waiting_dep;
+    }
+
+    public void setWaiting_dep(int waiting_dep) {
+      this.waiting_dep = waiting_dep;
+    }
+
+    public int getWaiting_res() {
+      return waiting_res;
+    }
+
+    public void setWaiting_res(int waiting_res) {
+      this.waiting_res = waiting_res;
+    }
 
     public int getRunning() {
       return running;
@@ -83,22 +121,6 @@ public class StatDto {
 
     public void setRunning(int running) {
       this.running = running;
-    }
-
-    public int getTotal() {
-      return this.running+this.wait+this.success+this.failed;
-    }
-
-    public void setTotal(int total) {
-      this.total = total;
-    }
-
-    public int getWait() {
-      return wait;
-    }
-
-    public void setWait(int wait) {
-      this.wait = wait;
     }
 
     public int getSuccess() {
@@ -109,6 +131,14 @@ public class StatDto {
       this.success = success;
     }
 
+    public int getKill() {
+      return kill;
+    }
+
+    public void setKill(int kill) {
+      this.kill = kill;
+    }
+
     public int getFailed() {
       return failed;
     }
@@ -116,5 +146,10 @@ public class StatDto {
     public void setFailed(int failed) {
       this.failed = failed;
     }
+
+    public int getTotal() {
+      return this.init+this.waiting_dep+this.waiting_res+this.running+this.success+this.kill+this.failed;
+    }
+
   }
 }

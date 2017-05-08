@@ -21,14 +21,12 @@ import com.baifendian.swordfish.dao.enums.NotifyType;
 import com.baifendian.swordfish.dao.model.ExecutionFlow;
 import com.baifendian.swordfish.dao.model.ExecutionFlowError;
 import com.baifendian.swordfish.dao.model.ExecutionState;
-import com.baifendian.swordfish.dao.model.MaintainQuery;
 import org.apache.ibatis.annotations.*;
 import org.apache.ibatis.type.EnumOrdinalTypeHandler;
 import org.apache.ibatis.type.JdbcType;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Set;
 
 /**
  * workflow 执行的信息操作 <p>
@@ -244,6 +242,7 @@ public interface ExecutionFlowMapper {
           @Result(property = "workflowName", column = "flow_name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
           @Result(property = "projectName", column = "project_name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
           @Result(property = "owner", column = "owner_name",javaType = String.class, jdbcType = JdbcType.VARCHAR),
+          @Result(property = "proxyUser", column = "proxy_user",javaType = String.class, jdbcType = JdbcType.VARCHAR),
           @Result(property = "times", column = "times", javaType = int.class, jdbcType = JdbcType.INTEGER),
   })
   @SelectProvider(type = ExecutionFlowMapperProvider.class, method = "selectErrorsByProject")

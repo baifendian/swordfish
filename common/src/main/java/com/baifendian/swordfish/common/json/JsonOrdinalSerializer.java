@@ -13,9 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.baifendian.swordfish.dao.enums;
+package com.baifendian.swordfish.common.json;
 
-public enum UserRoleType {
-  ADMIN_USER,
-  GENERAL_USER;
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.databind.JsonSerializer;
+import com.fasterxml.jackson.databind.SerializerProvider;
+
+import java.io.IOException;
+
+/**
+ * 直接序列化出枚举序列
+ */
+public class JsonOrdinalSerializer<E extends Enum> extends JsonSerializer<E> {
+
+  @Override
+  public void serialize(E e, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
+    jsonGenerator.writeString(String.valueOf(e.ordinal()));
+  }
 }

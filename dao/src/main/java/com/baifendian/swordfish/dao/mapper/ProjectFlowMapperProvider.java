@@ -15,14 +15,10 @@
  */
 package com.baifendian.swordfish.dao.mapper;
 
-import com.baifendian.swordfish.dao.enums.FlowType;
-import com.baifendian.swordfish.dao.mapper.utils.EnumFieldUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.jdbc.SQL;
 
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 public class ProjectFlowMapperProvider {
 

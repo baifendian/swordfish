@@ -83,7 +83,7 @@ public class WorkflowService {
   private ScheduleMapper scheduleMapper;
 
   /**
-   * 创建一个工作流, 需要具备项目的 'w' 权限。
+   * 创建一个工作流, 需要具备项目的 \"w\" 权限。
    *
    * @param operator    操作用户实体
    * @param projectName 工作流所在项目名称
@@ -106,12 +106,12 @@ public class WorkflowService {
 
     if (project == null) {
       logger.error("Project does not exist: {}", projectName);
-      throw new NotFoundException("Not found project '{0}'", projectName);
+      throw new NotFoundException("Not found project \"{0}\"", projectName);
     }
 
     if (!projectService.hasWritePerm(operator.getId(), project)) {
       logger.error("User {} has no right permission for the project {} to create project flow", operator.getName(), projectName);
-      throw new PermissionException("User '{0}' is not has project '{1}' write permission", operator.getName(), projectName);
+      throw new PermissionException("User \"{0}\" is not has project \"{1}\" write permission", operator.getName(), projectName);
     }
 
     // 对工作流详定义json进行反序列化
@@ -119,7 +119,7 @@ public class WorkflowService {
 
     if (workflowData == null) {
       logger.error("Project flow data or file not valid");
-      throw new ParameterException("Data '{0}' not valid", data);
+      throw new ParameterException("Data \"{0}\" not valid", data);
     }
 
     // 检测工作流节点是否正常
@@ -127,7 +127,7 @@ public class WorkflowService {
 
     if (CollectionUtils.isEmpty(flowNodes)) {
       logger.error("flow node information is empty");
-      throw new ParameterException("Data '{0}' is null", data);
+      throw new ParameterException("Data \"{0}\" is null", data);
     }
 
     // 检测工作节点是否存在闭环
@@ -190,7 +190,7 @@ public class WorkflowService {
   }
 
   /**
-   * 覆盖式修改一个工作流，如果不存在就创建。需要具备项目的 'w' 权限。
+   * 覆盖式修改一个工作流，如果不存在就创建。需要具备项目的 \"w\" 权限。
    * <p>
    * 覆盖式的更新所有可以更新的字段,对于传null的值也会覆盖写入。
    * </p>
@@ -216,7 +216,7 @@ public class WorkflowService {
   }
 
   /**
-   * 非覆盖式修改一个已经存在的工作流。需要具备项目的 'w' 权限。
+   * 非覆盖式修改一个已经存在的工作流。需要具备项目的 \"w\" 权限。
    * <p>
    * 非覆盖式的更新所有可以更新的字段，对于传null的值不写入。
    * </p>
@@ -240,12 +240,12 @@ public class WorkflowService {
 
     if (project == null) {
       logger.error("Project does not exist: {}", projectName);
-      throw new NotFoundException("Not found project '{0}'", projectName);
+      throw new NotFoundException("Not found project \"{0}\"", projectName);
     }
 
     if (!projectService.hasWritePerm(operator.getId(), project)) {
       logger.error("User {} has no right permission for the project {} to patch project flow", operator.getName(), projectName);
-      throw new PermissionException("User '{0}' is not has project '{1}' write permission", operator.getName(), projectName);
+      throw new PermissionException("User \"{0}\" is not has project \"{1}\" write permission", operator.getName(), projectName);
     }
 
     // 查询工作流信息
@@ -254,7 +254,7 @@ public class WorkflowService {
 
     if (projectFlow == null) {
       logger.error("Workflow does not exist: {}", name);
-      throw new NotFoundException("Not found project '{0}'", projectName);
+      throw new NotFoundException("Not found project \"{0}\"", projectName);
     }
 
     // 解析
@@ -345,11 +345,11 @@ public class WorkflowService {
     Project project = projectMapper.queryByName(projectName);
 
     if (project == null) {
-      throw new NotFoundException("Not found project '{0}'", projectName);
+      throw new NotFoundException("Not found project \"{0}\"", projectName);
     }
 
     if (!projectService.hasWritePerm(operator.getId(), project)) {
-      throw new PermissionException("User '{0}' is not has project '{1}' write permission", operator.getName(), projectName);
+      throw new PermissionException("User \"{0}\" is not has project \"{1}\" write permission", operator.getName(), projectName);
     }
 
     // 获取数据库信息
@@ -357,7 +357,7 @@ public class WorkflowService {
     ProjectFlow srcProjectFlow = flowDao.projectFlowfindByName(project.getId(), srcWorkflowName);
 
     if (srcProjectFlow == null) {
-      throw new NotFoundException("Not found workflow '{0}'", srcWorkflowName);
+      throw new NotFoundException("Not found workflow \"{0}\"", srcWorkflowName);
     }
 
     String data = JsonUtil.toJsonString(new WorkflowData(srcProjectFlow.getFlowsNodes(), srcProjectFlow.getUserDefinedParamList(), FlowNode.class));
@@ -394,17 +394,17 @@ public class WorkflowService {
     Project project = projectMapper.queryByName(projectName);
 
     if (project == null) {
-      throw new NotFoundException("Not found project '{0}'", projectName);
+      throw new NotFoundException("Not found project \"{0}\"", projectName);
     }
 
     if (!projectService.hasWritePerm(operator.getId(), project)) {
-      throw new PermissionException("User '{0}' is not has project '{1}' write permission", operator.getName(), projectName);
+      throw new PermissionException("User \"{0}\" is not has project \"{1}\" write permission", operator.getName(), projectName);
     }
 
     ProjectFlow projectFlow = flowDao.projectFlowfindByName(project.getId(), name);
 
     if (projectFlow == null) {
-      throw new NotFoundException("Not found workflow '{0}'", name);
+      throw new NotFoundException("Not found workflow \"{0}\"", name);
     }
 
     //删除工作流
@@ -425,11 +425,11 @@ public class WorkflowService {
     Project project = projectMapper.queryByName(projectName);
 
     if (project == null) {
-      throw new NotFoundException("Not found project '{0}'", projectName);
+      throw new NotFoundException("Not found project \"{0}\"", projectName);
     }
 
     if (!projectService.hasWritePerm(operator.getId(), project)) {
-      throw new PermissionException("User '{0}' is not has project '{1}' write permission", operator.getName(), projectName);
+      throw new PermissionException("User \"{0}\" is not has project \"{1}\" write permission", operator.getName(), projectName);
     }
 
     projectFlowMapper.updateProjectConf(project.getId(), queue, proxyUser);
@@ -447,11 +447,11 @@ public class WorkflowService {
     Project project = projectMapper.queryByName(projectName);
 
     if (project == null) {
-      throw new NotFoundException("Not found project '{0}'", projectName);
+      throw new NotFoundException("Not found project \"{0}\"", projectName);
     }
 
     if (!projectService.hasReadPerm(operator.getId(), project)) {
-      throw new PermissionException("User '{0}' is not has project '{1}' read permission", operator.getName(), projectName);
+      throw new PermissionException("User \"{0}\" is not has project \"{1}\" read permission", operator.getName(), projectName);
     }
 
     return flowDao.projectFlowFindByProject(project.getId());
@@ -470,11 +470,11 @@ public class WorkflowService {
     Project project = projectMapper.queryByName(projectName);
 
     if (project == null) {
-      throw new NotFoundException("Not found project '{0}'", projectName);
+      throw new NotFoundException("Not found project \"{0}\"", projectName);
     }
 
     if (!projectService.hasReadPerm(operator.getId(), project)) {
-      throw new PermissionException("User '{0}' is not has project '{1}' read permission", operator.getName(), projectName);
+      throw new PermissionException("User \"{0}\" is not has project \"{1}\" read permission", operator.getName(), projectName);
     }
 
     return flowDao.projectFlowfindByName(project.getId(), name);
@@ -490,11 +490,11 @@ public class WorkflowService {
     Project project = projectMapper.queryByName(projectName);
 
     if (project == null) {
-      throw new NotFoundException("Not found project '{0}'", projectName);
+      throw new NotFoundException("Not found project \"{0}\"", projectName);
     }
 
     if (!projectService.hasReadPerm(operator.getId(), project)) {
-      throw new PermissionException("User '{0}' is not has project '{1}' read permission", operator.getName(), projectName);
+      throw new PermissionException("User \"{0}\" is not has project \"{1}\" read permission", operator.getName(), projectName);
     }
 
     // 尝试从hdfs下载

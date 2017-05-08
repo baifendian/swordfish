@@ -141,7 +141,7 @@ public class ExecController {
     logger.info("Operator user {}, query exec detail, exec id: {}",
         operator.getName(), execId);
 
-    return new ExecutionFlowDto(execService.getExecWorkflow(operator, execId));
+    return execService.getExecWorkflow(operator,execId);
   }
 
   /**

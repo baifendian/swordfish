@@ -32,7 +32,7 @@ public class DataSourceMapperProvider {
    */
   public String insert(Map<String, Object> parameter) {
     DataSource dataSource = (DataSource) parameter.get("dataSource");
-    int type = dataSource.getType().getType();
+    int type = dataSource.getType().ordinal();
 
     return new SQL() {{
       INSERT_INTO(TABLE_NAME);

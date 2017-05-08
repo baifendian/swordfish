@@ -24,31 +24,4 @@ public enum ScheduleType {
    */
   MINUTE, HOUR, DAY, WEEK, MONTH;
 
-  /**
-   * getter method
-   *
-   * @return the type
-   * @see ScheduleType
-   */
-  public Integer getType() {
-    return ordinal();
-  }
-
-  /**
-   * 通过 type 获取枚举对象 <p>
-   *
-   * @param type
-   * @return {@link ScheduleType}
-   */
-  public static ScheduleType valueOfType(Integer type) throws IllegalArgumentException {
-    if (type == null) {
-      return null;
-    }
-
-    try {
-      return ScheduleType.values()[type];
-    } catch (Exception ex) {
-      throw new IllegalArgumentException("Cannot convert " + type + " to " + ScheduleType.class.getSimpleName() + " .", ex);
-    }
-  }
 }
