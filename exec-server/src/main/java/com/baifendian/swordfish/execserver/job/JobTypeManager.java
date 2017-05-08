@@ -54,7 +54,7 @@ public class JobTypeManager {
   private static final String SPARK = "SPARK";
   private static final String VIRTUAL = "VIRTUAL";
   private static final String HQL = "HQL";
-  private static final String SPARK_STREAMING = "SPARK-STREAMING";
+  private static final String SPARK_STREAMING = "SPARK_STREAMING";
 
   private static Map<String, JobType> jobTypeMap = new HashMap<>();
 

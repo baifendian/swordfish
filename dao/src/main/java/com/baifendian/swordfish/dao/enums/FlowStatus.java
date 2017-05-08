@@ -82,4 +82,13 @@ public enum FlowStatus {
   public boolean typeIsFinished() {
     return typeIsSuccess() || typeIsFailure();
   }
+
+  /**
+   * 判断是否非终止状态
+   *
+   * @return
+   */
+  public boolean typeIsNotFinished() {
+    return !typeIsFinished();
+  }
 }

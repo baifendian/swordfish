@@ -16,6 +16,7 @@
 package com.baifendian.swordfish.masterserver.master;
 
 import com.baifendian.swordfish.common.job.exception.ExecException;
+import com.baifendian.swordfish.dao.DaoFactory;
 import com.baifendian.swordfish.dao.FlowDao;
 import com.baifendian.swordfish.dao.model.ExecutionFlow;
 import com.baifendian.swordfish.dao.model.ProjectFlow;
@@ -39,9 +40,14 @@ public class Master {
 
   private static final Logger logger = LoggerFactory.getLogger(Master.class);
 
-  // 管理 executor server
+  /**
+   *
+    */
   private ExecutorServerManager executorServerManager;
 
+  /**
+   *
+   */
   private FlowExecManager flowExecManager;
 
   /**
@@ -49,6 +55,9 @@ public class Master {
    */
   private final BlockingQueue<ExecFlowInfo> executionFlowQueue;
 
+  /**
+   * flow 的数据库接口
+   */
   private final FlowDao flowDao;
 
   /**
@@ -57,14 +66,17 @@ public class Master {
   private Submit2ExecutorServerThread retryToWorkerThread;
 
   /**
-   * executor server服务检查线程
+   * executor server 服务检查线程
    **/
   private ExecutorCheckThread executorCheckThread;
 
+  /**
+   *
+   */
   private ScheduledExecutorService executorService;
 
-  public Master(FlowDao flowDao) {
-    this.flowDao = flowDao;
+  public Master() {
+    flowDao = DaoFactory.getDaoInstance(FlowDao.class);
 
     executorServerManager = new ExecutorServerManager();
     executorService = Executors.newScheduledThreadPool(5);

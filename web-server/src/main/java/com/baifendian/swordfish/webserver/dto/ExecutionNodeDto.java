@@ -50,10 +50,11 @@ public class ExecutionNodeDto {
 
   /**
    * 与executionNode 实体的信息合并
+   *
    * @param executionNode
    */
   public void mergeExecutionNode(ExecutionNode executionNode) {
-    if (executionNode !=null ){
+    if (executionNode != null) {
       this.startTime = executionNode.getStartTime();
       this.endTime = executionNode.getEndTime();
       if (this.startTime != null && this.endTime != null) {

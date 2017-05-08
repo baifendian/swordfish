@@ -17,7 +17,7 @@ package com.baifendian.swordfish.webserver.controller;
 
 import com.baifendian.swordfish.common.utils.http.HttpUtil;
 import com.baifendian.swordfish.dao.model.User;
-import com.baifendian.swordfish.webserver.dto.UserSessionData;
+import com.baifendian.swordfish.webserver.dto.UserSessionDto;
 import com.baifendian.swordfish.webserver.exception.ParameterException;
 import com.baifendian.swordfish.webserver.exception.UnAuthorizedException;
 import com.baifendian.swordfish.webserver.service.SessionService;
@@ -60,11 +60,11 @@ public class LoginController {
    * @return
    */
   @RequestMapping(value = "", method = {RequestMethod.POST, RequestMethod.GET})
-  public UserSessionData login(@RequestParam(value = "name", required = false) String name,
-                               @RequestParam(value = "email", required = false) String email,
-                               @RequestParam(value = "password") String password,
-                               HttpServletRequest request,
-                               HttpServletResponse response) {
+  public UserSessionDto login(@RequestParam(value = "name", required = false) String name,
+                              @RequestParam(value = "email", required = false) String email,
+                              @RequestParam(value = "password") String password,
+                              HttpServletRequest request,
+                              HttpServletResponse response) {
     logger.info("Login, user name: {}, email: {}, password: {}", name, email, "******");
 
     // 必须存在一个
@@ -91,7 +91,7 @@ public class LoginController {
     }
 
     // 创建 session
-    UserSessionData data = sessionService.createSession(user, ip);
+    UserSessionDto data = sessionService.createSession(user, ip);
 
     if (data == null) {
       throw new UnAuthorizedException("Create session error");

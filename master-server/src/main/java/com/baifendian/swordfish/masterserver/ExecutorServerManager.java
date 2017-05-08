@@ -29,13 +29,26 @@ public class ExecutorServerManager {
 
   private Map<String, ExecutorServerInfo> executorServers = new ConcurrentHashMap<>();
 
+  /**
+   * @param key
+   * @param executorServerInfo
+   * @return
+   * @throws MasterException
+   */
   public synchronized ExecutorServerInfo addServer(String key, ExecutorServerInfo executorServerInfo) throws MasterException {
     if (executorServers.containsKey(key)) {
       throw new MasterException("executor is register");
     }
+
     return executorServers.put(key, executorServerInfo);
   }
 
+  /**
+   * @param key
+   * @param executorServerInfo
+   * @return
+   * @throws MasterException
+   */
   public synchronized ExecutorServerInfo updateServer(String key, ExecutorServerInfo executorServerInfo) throws MasterException {
     if (!executorServers.containsKey(key)) {
       throw new MasterException("executor is not register");
@@ -70,31 +83,46 @@ public class ExecutorServerManager {
     return result;
   }
 
+  /**
+   * @param timeoutInterval
+   * @return
+   */
   public synchronized List<ExecutorServerInfo> checkTimeoutServer(long timeoutInterval) {
     List<ExecutorServerInfo> faultServers = new ArrayList<>();
+
     logger.debug("{} ", executorServers);
     for (Map.Entry<String, ExecutorServerInfo> entry : executorServers.entrySet()) {
       logger.debug("{} {}", entry.getKey(), entry.getValue().getHeartBeatData());
+
       long nowTime = System.currentTimeMillis();
       long diff = nowTime - entry.getValue().getHeartBeatData().getReportDate();
+
       if (diff > timeoutInterval) {
         logger.warn("executor server time out {}", entry.getKey());
         executorServers.remove(entry.getKey());
+
         faultServers.add(entry.getValue());
       }
     }
+
     return faultServers;
   }
 
+  /**
+   * @param executorServerInfo
+   * @return
+   */
   public synchronized ExecutorServerInfo removeServer(ExecutorServerInfo executorServerInfo) {
     String key = executorServerInfo.getHost() + ":" + executorServerInfo.getPort();
     return executorServers.remove(key);
   }
 
+  /**
+   * @param executorServerInfoMap
+   */
   public synchronized void initServers(Map<String, ExecutorServerInfo> executorServerInfoMap) {
     for (Map.Entry<String, ExecutorServerInfo> entry : executorServerInfoMap.entrySet()) {
       executorServers.put(entry.getKey(), entry.getValue());
     }
   }
-
 }

@@ -77,6 +77,7 @@ public class JobHandler {
     this.customParamMap = customParamMap;
     this.startTime = System.currentTimeMillis();
     this.jobIdLog = String.format("%s_%s", executionNode.getJobId(), DateUtils.now(Constants.DATETIME_FORMAT));
+
     // custom参数会覆盖system参数
     allParamMap = new HashMap<>();
     allParamMap.putAll(systemParamMap);
@@ -161,7 +162,7 @@ public class JobHandler {
         throw new ExecException("execute task get error", e);
       }
     } else { // 长任务定时检查作业是否有报错，如果报错就返回
-      while(true){
+      while (true) {
         try {
           future.get(60, TimeUnit.SECONDS);
         } catch (InterruptedException | ExecutionException e) {

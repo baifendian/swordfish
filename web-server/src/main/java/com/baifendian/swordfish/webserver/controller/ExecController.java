@@ -58,17 +58,17 @@ public class ExecController {
    * @return
    */
   @PostMapping(value = "")
-  public ExecutorIds execExistWorkflow(@RequestAttribute(value = "session.user") User operator,
-                                       @RequestParam(value = "projectName") String projectName,
-                                       @RequestParam(value = "workflowName") String workflowName,
-                                       @RequestParam(value = "schedule", required = false) String schedule,
-                                       @RequestParam(value = "execType", required = false) ExecType execType,
-                                       @RequestParam(value = "nodeName", required = false) String nodeName,
-                                       @RequestParam(value = "nodeDep", required = false) NodeDepType nodeDep,
-                                       @RequestParam(value = "notifyType", required = false) NotifyType notifyType,
-                                       @RequestParam(value = "notifyMails", required = false) String notifyMails,
-                                       @RequestParam(value = "timeout", required = false, defaultValue = "1800") int timeout,
-                                       HttpServletResponse response) {
+  public ExecutorIdsDto execExistWorkflow(@RequestAttribute(value = "session.user") User operator,
+                                          @RequestParam(value = "projectName") String projectName,
+                                          @RequestParam(value = "workflowName") String workflowName,
+                                          @RequestParam(value = "schedule", required = false) String schedule,
+                                          @RequestParam(value = "execType", required = false) ExecType execType,
+                                          @RequestParam(value = "nodeName", required = false) String nodeName,
+                                          @RequestParam(value = "nodeDep", required = false) NodeDepType nodeDep,
+                                          @RequestParam(value = "notifyType", required = false) NotifyType notifyType,
+                                          @RequestParam(value = "notifyMails", required = false) String notifyMails,
+                                          @RequestParam(value = "timeout", required = false, defaultValue = "1800") int timeout,
+                                          HttpServletResponse response) {
     logger.info("Operator user {}, exec workflow, project name: {}, workflow name: {}, schedule: {}, node name: {}, node dep: {}, notify type: {}," +
             "notify mails: {}, timeout: {}",
         operator.getName(), projectName, workflowName, schedule, nodeName, nodeDep, notifyType, notifyMails, timeout);
@@ -77,19 +77,19 @@ public class ExecController {
   }
 
   @PostMapping(value = "/direct")
-  public ExecutorId execExistWorkflowDirect(@RequestAttribute(value = "session.user") User operator,
-                                            @RequestParam(value = "projectName") String projectName,
-                                            @RequestParam(value = "workflowName") String workflowName,
-                                            @RequestParam(value = "proxyUser") String proxyUser,
-                                            @RequestParam(value = "queue") String queue,
-                                            @RequestParam(value = "desc", required = false) String desc,
-                                            @RequestParam(value = "data", required = false) String data,
-                                            @RequestParam(value = "file", required = false) MultipartFile file,
-                                            @RequestParam(value = "notifyType", required = false, defaultValue = "None") NotifyType notifyType,
-                                            @RequestParam(value = "notifyMails", required = false) String notifyMails,
-                                            @RequestParam(value = "timeout", required = false, defaultValue = "18000") int timeout,
-                                            @RequestParam(value = "extras", required = false) String extras,
-                                            HttpServletResponse response) {
+  public ExecutorIdDto execExistWorkflowDirect(@RequestAttribute(value = "session.user") User operator,
+                                               @RequestParam(value = "projectName") String projectName,
+                                               @RequestParam(value = "workflowName") String workflowName,
+                                               @RequestParam(value = "proxyUser") String proxyUser,
+                                               @RequestParam(value = "queue") String queue,
+                                               @RequestParam(value = "desc", required = false) String desc,
+                                               @RequestParam(value = "data", required = false) String data,
+                                               @RequestParam(value = "file", required = false) MultipartFile file,
+                                               @RequestParam(value = "notifyType", required = false, defaultValue = "None") NotifyType notifyType,
+                                               @RequestParam(value = "notifyMails", required = false) String notifyMails,
+                                               @RequestParam(value = "timeout", required = false, defaultValue = "18000") int timeout,
+                                               @RequestParam(value = "extras", required = false) String extras,
+                                               HttpServletResponse response) {
     logger.info("Operator user {}, exec workflow, project name: {}, workflow name: {}, proxy user: {}, queue: {}, data: {}, file: {}," +
         "notify type: {}, notify mails: {}, timeout: {}, extras: {}", operator.getName(), projectName, workflowName, proxyUser, queue, data, file.getName(), notifyType, notifyMails, timeout, extras);
 

@@ -17,7 +17,7 @@ package com.baifendian.swordfish.webserver.dto;
 
 import com.baifendian.swordfish.dao.model.User;
 
-public class UserSessionData {
+public class UserSessionDto {
   /**
    * 用户 session id
    */
@@ -28,10 +28,10 @@ public class UserSessionData {
    */
   private User user;
 
-  public UserSessionData() {
+  public UserSessionDto() {
   }
 
-  public UserSessionData(String sessionId, User user) {
+  public UserSessionDto(String sessionId, User user) {
     this.sessionId = sessionId;
     this.user = user;
   }
@@ -54,7 +54,7 @@ public class UserSessionData {
 
   @Override
   public String toString() {
-    return "UserSessionData{" +
+    return "UserSessionDto{" +
         "sessionId='" + sessionId + '\'' +
         ", user=" + user +
         '}';

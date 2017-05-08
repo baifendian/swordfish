@@ -17,7 +17,7 @@ package com.baifendian.swordfish.webserver.controller;
 
 import com.baifendian.swordfish.dao.enums.DbType;
 import com.baifendian.swordfish.dao.model.User;
-import com.baifendian.swordfish.webserver.dto.BaseResponse;
+import com.baifendian.swordfish.webserver.dto.BaseStatusDto;
 import com.baifendian.swordfish.webserver.service.DatasourceService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,10 +46,10 @@ public class DatasourceTestController {
    * @return
    */
   @GetMapping(value = "/test")
-  public BaseResponse testDataSource(@RequestAttribute(value = "session.user") User operator,
-                                     @RequestParam(value = "type") String type,
-                                     @RequestParam(value = "parameter") String parameter,
-                                     HttpServletResponse response) {
+  public BaseStatusDto testDataSource(@RequestAttribute(value = "session.user") User operator,
+                                      @RequestParam(value = "type") String type,
+                                      @RequestParam(value = "parameter") String parameter,
+                                      HttpServletResponse response) {
     logger.info("Operator user id {}, test datasource, type: {}, parameter: {}",
         operator.getId(), type, parameter);
 

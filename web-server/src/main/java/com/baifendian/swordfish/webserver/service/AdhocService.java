@@ -25,9 +25,9 @@ import com.baifendian.swordfish.dao.model.*;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
 import com.baifendian.swordfish.rpc.RetInfo;
 import com.baifendian.swordfish.rpc.client.MasterClient;
-import com.baifendian.swordfish.webserver.dto.AdHocLogData;
-import com.baifendian.swordfish.webserver.dto.AdHocResultData;
-import com.baifendian.swordfish.webserver.dto.ExecutorId;
+import com.baifendian.swordfish.webserver.dto.AdHocLogDto;
+import com.baifendian.swordfish.webserver.dto.AdHocResultDto;
+import com.baifendian.swordfish.webserver.dto.ExecutorIdDto;
 import com.baifendian.swordfish.webserver.dto.LogResult;
 import com.baifendian.swordfish.webserver.exception.NotFoundException;
 import com.baifendian.swordfish.webserver.exception.NotModifiedException;
@@ -78,14 +78,14 @@ public class AdhocService {
    * @param timeout
    * @return
    */
-  public ExecutorId execAdhoc(User operator, String projectName, String stms, int limit, String proxyUser, String queue, List<UdfsInfo> udfs, int timeout) {
+  public ExecutorIdDto execAdhoc(User operator, String projectName, String stms, int limit, String proxyUser, String queue, List<UdfsInfo> udfs, int timeout) {
 
     // 查看用户对项目是否具备相应权限
     Project project = projectMapper.queryByName(projectName);
 
     if (project == null) {
       logger.error("Project does not exist: {}", projectName);
-      throw new NotFoundException("Not found project {\"0\"}", projectName);
+      throw new NotFoundException("Not found project \"{0}\"", projectName);
     }
 
     if (!projectService.hasExecPerm(operator.getId(), project)) {
@@ -144,12 +144,18 @@ public class AdhocService {
     RetInfo retInfo = masterClient.execAdHoc(adhoc.getId());
 
     if (retInfo == null || retInfo.getStatus() != 0) {
-      // TODO:: 查询状态, 如果还是 INIT, 则需要更新
+      // 查询状态, 如果还是 INIT, 则需要更新为 FAILED
+      AdHoc adHoc = adHocMapper.selectById(adhoc.getId());
+
+      if (adHoc != null && adHoc.getStatus() == FlowStatus.INIT) {
+        adHoc.setStatus(FlowStatus.FAILED);
+        adHocMapper.updateStatus(adHoc);
+      }
 
       throw new ServerErrorException("master server return error");
     }
 
-    return new ExecutorId(adhoc.getId());
+    return new ExecutorIdDto(adhoc.getId());
   }
 
   /**
@@ -162,7 +168,7 @@ public class AdhocService {
    * @param size
    * @return
    */
-  public AdHocLogData queryLogs(User operator, int execId, int index, int from, int size) {
+  public AdHocLogDto queryLogs(User operator, int execId, int index, int from, int size) {
 
     // 查看用户对项目是否具备相应权限
     Project project = adHocMapper.queryProjectByExecId(execId);
@@ -185,6 +191,7 @@ public class AdhocService {
       throw new NotFoundException("Exec id \"{0}\" not exist", execId);
     }
 
+    // 查看是否分配了 jobId
     String jobId = adhoc.getJobId();
 
     if (StringUtils.isEmpty(jobId)) {
@@ -208,14 +215,21 @@ public class AdhocService {
     LogResult logResult = logHelper.getLog(from, size, jobId);
 
     // 构造结果返回
-    AdHocLogData adHocLogData = new AdHocLogData();
+    AdHocLogDto adHocLogDto = new AdHocLogDto();
 
-    adHocLogData.setStatus(adHocResult.getStatus());
-    adHocLogData.setHasResult(adHocResult.getStatus().typeIsFinished());
-    adHocLogData.setLastSql(index == results.size() - 1);
-    adHocLogData.setLogContent(logResult);
+    // 如果任务被 kill 了或者是某些异常导致失败
+    if (!adHocResult.getStatus().typeIsFinished() && adhoc.getStatus().typeIsFinished()) {
+      adHocLogDto.setStatus(adhoc.getStatus());
+      adHocLogDto.setHasResult(true);
+    } else {
+      adHocLogDto.setStatus(adHocResult.getStatus());
+      adHocLogDto.setHasResult(adHocResult.getStatus().typeIsFinished());
+    }
 
-    return adHocLogData;
+    adHocLogDto.setLastSql(index == results.size() - 1);
+    adHocLogDto.setLogContent(logResult);
+
+    return adHocLogDto;
   }
 
   /**
@@ -226,7 +240,7 @@ public class AdhocService {
    * @param index
    * @return
    */
-  public AdHocResultData queryResult(User operator, int execId, int index) {
+  public AdHocResultDto queryResult(User operator, int execId, int index) {
 
     // 查看用户对项目是否具备相应权限
     Project project = adHocMapper.queryProjectByExecId(execId);
@@ -244,23 +258,48 @@ public class AdhocService {
     // 返回结果
     AdHocResult adHocResult = adHocMapper.selectResultByIdAndIndex(execId, index);
 
-    AdHocResultData adHocResultData = new AdHocResultData();
+    AdHocResultDto adHocResultDto = new AdHocResultDto();
 
-    adHocResultData.setStartTime(adHocResult.getStartTime());
-    adHocResultData.setEndTime(adHocResult.getEndTime());
-    adHocResultData.setStm(adHocResult.getStm());
-    adHocResultData.setResults(JsonUtil.parseObject(adHocResult.getResult(), AdHocJsonObject.class));
+    adHocResultDto.setStartTime(adHocResult.getStartTime());
+    adHocResultDto.setEndTime(adHocResult.getEndTime());
+    adHocResultDto.setStm(adHocResult.getStm());
+    adHocResultDto.setResults(JsonUtil.parseObject(adHocResult.getResult(), AdHocJsonObject.class));
 
-    return adHocResultData;
+    return adHocResultDto;
   }
 
   /**
-   * 删除即席查询
+   * kill 即席查询任务, 只有在没有运行完的任务才可以 kill
    *
    * @param operator
    * @param execId
    */
   public void killAdhoc(User operator, int execId) {
-    // TODO::
+
+    // 查看用户对项目是否具备相应权限
+    Project project = adHocMapper.queryProjectByExecId(execId);
+
+    if (project == null) {
+      logger.error("Exec id: {} has no correspond project", execId);
+      throw new NotFoundException("Exec id \"{0}\" has no correspond project", execId);
+    }
+
+    if (!projectService.hasExecPerm(operator.getId(), project)) {
+      logger.error("User {} has no right permission for the project {}", operator.getName(), project.getName());
+      throw new PermissionException("User \"{0}\" has no right permission for the project \"{1}\"", operator.getName(), project.getName());
+    }
+
+    // kill 即席, 通过数据库来做到
+    AdHoc adhoc = adHocMapper.selectById(execId);
+    if (adhoc == null) {
+      logger.error("Exec id not exist: {}", execId);
+      throw new NotFoundException("Exec id \"{0}\" not exist", execId);
+    }
+
+    // 如果没有完成, 则更新为 kill
+    if (!adhoc.getStatus().typeIsFinished()) {
+      adhoc.setStatus(FlowStatus.KILL);
+      adHocMapper.updateStatus(adhoc);
+    }
   }
 }

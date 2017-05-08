@@ -42,13 +42,16 @@ public class ExecServiceImpl implements Iface {
   /**
    * LOGGER
    */
-  private final Logger LOGGER = LoggerFactory.getLogger(getClass());
+  private static Logger logger = LoggerFactory.getLogger(ExecServiceImpl.class);
 
   /**
    * {@link FlowDao}
    */
   private final FlowDao flowDao;
 
+  /**
+   * {@link AdHocDao}
+   */
   private final AdHocDao adHocDao;
 
   /**
@@ -56,17 +59,21 @@ public class ExecServiceImpl implements Iface {
    */
   private final FlowRunnerManager flowRunnerManager;
 
+  /**
+   * {@link AdHocRunnerManager}
+   */
   private final AdHocRunnerManager adHocRunnerManager;
 
+  /**
+   * 当前 executor 的 host
+   */
   private String host;
 
+  /**
+   * 当前 executor 的 port
+   */
   private int port;
 
-  private Configuration conf;
-
-  /**
-   * constructor
-   */
   public ExecServiceImpl(String host, int port, Configuration conf) {
     this.flowDao = DaoFactory.getDaoInstance(FlowDao.class);
     this.adHocDao = DaoFactory.getDaoInstance(AdHocDao.class);
@@ -74,16 +81,22 @@ public class ExecServiceImpl implements Iface {
     this.adHocRunnerManager = new AdHocRunnerManager(conf);
     this.host = host;
     this.port = port;
-    this.conf = conf;
   }
 
+  /**
+   * 执行指定的工作流
+   *
+   * @param execId
+   * @return
+   * @throws TException
+   */
   @Override
   public RetInfo execFlow(int execId) throws TException {
     try {
       // 查询 ExecutionFlow
       ExecutionFlow executionFlow = flowDao.queryExecutionFlow(execId);
       if (executionFlow == null) {
-        return ResultHelper.createErrorResult("execId 对应的记录不存在");
+        return ResultHelper.createErrorResult("execId not find");
       }
 
       // 更新状态为 RUNNING
@@ -93,25 +106,34 @@ public class ExecServiceImpl implements Iface {
       // 提交任务运行
       flowRunnerManager.submitFlow(executionFlow);
     } catch (Exception e) {
-      LOGGER.error(e.getMessage(), e);
+      logger.error(e.getMessage(), e);
       return ResultHelper.createErrorResult(e.getMessage());
     }
+
     return ResultHelper.SUCCESS;
   }
 
+  /**
+   * 调度执行一个工作流
+   *
+   * @param execId
+   * @param scheduleDate
+   * @return
+   * @throws TException
+   */
   @Override
   public RetInfo scheduleExecFlow(int execId, long scheduleDate) throws TException {
     try {
       // 查询 ExecutionFlow
       ExecutionFlow executionFlow = flowDao.queryExecutionFlow(execId);
       if (executionFlow == null) {
-        return ResultHelper.createErrorResult("execId 对应的记录不存在");
+        return ResultHelper.createErrorResult("execId not find");
       }
 
       // 查询 Schedule
       Schedule schedule = flowDao.querySchedule(executionFlow.getFlowId());
       if (schedule == null) {
-        return ResultHelper.createErrorResult("对应的调度信息不存在");
+        return ResultHelper.createErrorResult("schedule information not find");
       }
 
       // 更新状态为 RUNNING
@@ -121,9 +143,10 @@ public class ExecServiceImpl implements Iface {
       // 提交任务运行
       flowRunnerManager.submitFlow(executionFlow, schedule, new Date(scheduleDate));
     } catch (Exception e) {
-      LOGGER.error(e.getMessage(), e);
+      logger.error(e.getMessage(), e);
       return ResultHelper.createErrorResult(e.getMessage());
     }
+
     return ResultHelper.SUCCESS;
   }
 
@@ -138,7 +161,7 @@ public class ExecServiceImpl implements Iface {
     AdHoc adHoc = adHocDao.getAdHoc(adHocId);
 
     if (adHoc == null) {
-      LOGGER.error("ad hoc id {} not exists", adHocId);
+      logger.error("ad hoc id {} not exists", adHocId);
       return ResultHelper.createErrorResult("adhoc id not exists");
     }
 
@@ -147,15 +170,15 @@ public class ExecServiceImpl implements Iface {
   }
 
   /**
-   * 销毁资源 <p>
+   * 取消工作流的执行
+   *
+   * @param execId
+   * @return
+   * @throws TException
    */
-  public void destory() {
-    flowRunnerManager.destroy();
-    adHocRunnerManager.destory();
-  }
-
   public RetInfo cancelExecFlow(int execId) throws TException {
-    LOGGER.debug("cancel exec flow {}", execId);
+    logger.debug("cancel exec flow {}", execId);
+
     try {
       // 查询 ExecutionFlow
       ExecutionFlow executionFlow = flowDao.queryExecutionFlow(execId);
@@ -169,10 +192,18 @@ public class ExecServiceImpl implements Iface {
 
       flowRunnerManager.cancelFlow(execId, "master");
     } catch (Exception e) {
-      LOGGER.error(e.getMessage(), e);
+      logger.error(e.getMessage(), e);
       return ResultHelper.createErrorResult(e.getMessage());
     }
-    return ResultHelper.SUCCESS;
 
+    return ResultHelper.SUCCESS;
+  }
+
+  /**
+   * 销毁资源 <p>
+   */
+  public void destory() {
+    flowRunnerManager.destroy();
+    adHocRunnerManager.destory();
   }
 }

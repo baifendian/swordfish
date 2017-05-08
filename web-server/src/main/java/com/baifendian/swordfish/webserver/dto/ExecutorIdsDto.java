@@ -15,24 +15,26 @@
  */
 package com.baifendian.swordfish.webserver.dto;
 
+import java.util.List;
+
 /**
- * 获取执行的 id 信息
+ * 执行的 id 列表
  */
-public class ExecutorId {
+public class ExecutorIdsDto {
   /**
-   * 执行 id
+   * 执行的 id 列表
    */
-  private int execId;
+  private List<Integer> execIds;
 
-  public ExecutorId(int execId) {
-    this.execId = execId;
+  public ExecutorIdsDto(List<Integer> execIds) {
+    this.execIds = execIds;
   }
 
-  public int getExecId() {
-    return execId;
+  public List<Integer> getExecIds() {
+    return execIds;
   }
 
-  public void setExecId(int execId) {
-    this.execId = execId;
+  public void setExecIds(List<Integer> execIds) {
+    this.execIds = execIds;
   }
 }

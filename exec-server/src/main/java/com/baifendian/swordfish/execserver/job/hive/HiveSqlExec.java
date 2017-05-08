@@ -27,11 +27,11 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.hive.jdbc.HiveConnection;
 import org.apache.hive.jdbc.HiveStatement;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.Statement;
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -40,21 +40,12 @@ import java.util.List;
  * Hive sql执行 <p>
  */
 public class HiveSqlExec {
+  private static final Logger logger = LoggerFactory.getLogger(HiveSqlExec.class);
 
   /**
-   * 受限查询的格式化字符串
-   */
-  public static final String LIMITED_QUERY_FORMAT = "SELECT * FROM ({0}) AS dw_limit_tb LIMIT {1}";
-
-  /**
-   * 查询限制，默认为1000
+   * 查询限制，默认为 1000
    */
   private static int defualtQueryLimit = 1000;
-
-  /**
-   * LOGGER
-   */
-  private Logger LOGGER;
 
   /**
    * create function 语句
@@ -67,14 +58,14 @@ public class HiveSqlExec {
   private final List<String> sqls;
 
   /**
+   * 执行用户
+   */
+  private String userName;
+
+  /**
    * 某一句执行失败，是否继续
    */
   private final boolean isContinue;
-
-  /**
-   * {@link HiveJdbcExec}
-   */
-  private final HiveJdbcExec hiveJdbcExec;
 
   /**
    * 执行结果回调处理
@@ -87,80 +78,65 @@ public class HiveSqlExec {
   private final Integer queryLimit;
 
   /**
-   * 查询数据库名
+   * {@link HiveJdbcExec}
    */
-  private String dbName = "default";
+  private final HiveJdbcExec hiveJdbcExec;
 
   /**
-   * 执行用户
+   * 记录 job 的 id
    */
-  private String userName;
+  private final String jobId;
 
+  /**
+   * 执行的结果
+   */
   private List<ExecResult> results;
 
-  /**
-   * @param createFuncs 临时函数创建语句列表
-   * @param sqls        要执行的sql列表
-   * @param userName    执行用户名
-   * @param dbName      数据库
-   * @param isContinue  报错是否继续
-   */
-  public HiveSqlExec(List<String> createFuncs, List<String> sqls, String userName, String dbName, boolean isContinue, ResultCallback resultCallback, Integer queryLimit, Logger logger) {
-    hiveJdbcExec = DaoFactory.getDaoInstance(HiveJdbcExec.class);
-
+  public HiveSqlExec(List<String> createFuncs, List<String> sqls, String userName, boolean isContinue, ResultCallback resultCallback, Integer queryLimit, String jobId) {
     this.createFuncs = createFuncs;
     this.sqls = sqls;
     this.userName = userName;
-    if (dbName != null) {
-      this.dbName = dbName;
-    }
+
     this.isContinue = isContinue;
     this.resultCallback = resultCallback;
-    if (queryLimit != null) {
-      this.queryLimit = queryLimit;
-    } else {
-      this.queryLimit = defualtQueryLimit;
-    }
-    this.LOGGER = logger;
+    this.queryLimit = (queryLimit != null) ? queryLimit : defualtQueryLimit;
+
+    this.hiveJdbcExec = DaoFactory.getDaoInstance(HiveJdbcExec.class);
+
+    this.jobId = jobId;
   }
 
   /**
-   * @param sqls
-   * @param isContinue
+   * 执行
+   *
+   * @throws Exception
    */
-  public HiveSqlExec(List<String> sqls, String userName, String dbName, boolean isContinue, Logger logger) {
-    hiveJdbcExec = DaoFactory.getDaoInstance(HiveJdbcExec.class);
-
-    this.createFuncs = null;
-    this.sqls = sqls;
-    this.userName = userName;
-    if (dbName != null) {
-      this.dbName = dbName;
-    }
-    this.isContinue = isContinue;
-    this.resultCallback = null;
-    this.queryLimit = defualtQueryLimit;
-    this.LOGGER = logger;
-  }
-
   public void run() throws Exception {
     results = executeQuerys(createFuncs, sqls, isContinue);
   }
 
   /**
-   * 执行多个sql 语句 并返回查询的语句 <p>
+   * 执行多个sql 语句 并返回查询的语句
+   *
+   * @param createFuncs
+   * @param sqls
+   * @param isContinue
+   * @return
    */
   public List<ExecResult> executeQuerys(List<String> createFuncs, List<String> sqls, boolean isContinue) {
     List<ExecResult> execResults = new ArrayList<>();
+
     HiveConnection hiveConnection = null;
     Statement sta = null;
     Thread logThread = null;
-    ConnectionInfo connectionInfo = hiveJdbcExec.getConnectionInfo(userName, dbName);
+
+    ConnectionInfo connectionInfo = hiveJdbcExec.getConnectionInfo(userName);
     HiveConnectionClient hiveConnectionClient = hiveJdbcExec.getHiveConnectionClient();
 
     try {
       hiveConnection = hiveConnectionClient.borrowClient(connectionInfo);
       sta = hiveConnection.createStatement();
+
       // 日志线程
       logThread = new Thread(new JdbcLogRunnable(sta));
       logThread.setDaemon(true);
@@ -169,7 +145,7 @@ public class HiveSqlExec {
       // 创建临时 function
       if (createFuncs != null) {
         for (String createFunc : createFuncs) {
-          LOGGER.info("hive create function sql : {}", createFunc);
+          logger.info("hive create function sql : {}", createFunc);
           sta.execute(createFunc);
         }
       }
@@ -178,7 +154,7 @@ public class HiveSqlExec {
       int index = 0;
       for (String sql : sqls) {
         Date startTime = new Date();
-        LOGGER.info("hive execute sql : {}", sql);
+        logger.info("hive execute sql : {}", sql);
         ExecResult execResult = new ExecResult();
         execResult.setIndex(index++);
         execResult.setStm(sql);
@@ -220,23 +196,23 @@ public class HiveSqlExec {
           status = FlowStatus.SUCCESS;
         } catch (Exception e) {
           if (e.toString().contains("SemanticException")) {
-            LOGGER.error("executeQuery DaoSemanticException", e);
+            logger.error("executeQuery DaoSemanticException", e);
             if (!isContinue) {
               throw new DaoSemanticException(e.getMessage());
             }
           }
           if (e.toString().contains("TTransportException")) {
-            LOGGER.error("Get TTransportException return a client", e);
+            logger.error("Get TTransportException return a client", e);
             hiveConnectionClient.invalidateObject(connectionInfo, hiveConnection);
             hiveConnection = null;
             throw new Exception(e);
           }
           if (e.toString().contains("SocketException")) {
-            LOGGER.error("SocketException clear pool", e);
+            logger.error("SocketException clear pool", e);
             hiveConnectionClient.clear();
             throw new Exception(e);
           }
-          LOGGER.error("executeQuery Exception", e);
+          logger.error("executeQuery Exception", e);
           if (!isContinue) {
             throw new Exception(e);
           }
@@ -255,7 +231,7 @@ public class HiveSqlExec {
       //hiveJdbcExec.useDatabase(projectId, sta);
 
     } catch (Exception e) {
-      LOGGER.error("executeQuerys exception", e);
+      logger.error("execute Querys exception", e);
       throw (new SqlException(e.getMessage()));
     } finally {
       try {
@@ -264,14 +240,15 @@ public class HiveSqlExec {
           logThread.join(HiveJdbcExec.DEFAULT_QUERY_PROGRESS_THREAD_TIMEOUT);
         }
       } catch (Exception e) {
-        LOGGER.error(e.getMessage(), e);
+        logger.error(e.getMessage(), e);
       }
+
       try {
         if (sta != null) {
           sta.close();
         }
       } catch (Exception e) {
-        LOGGER.error(e.getMessage(), e);
+        logger.error(e.getMessage(), e);
       }
 
       if (hiveConnection != null) {
@@ -320,17 +297,6 @@ public class HiveSqlExec {
     return columnName;
   }
 
-  /**
-   * 转换为受限的 sql 查询 <p>
-   *
-   * @return 受限的sql
-   */
-  @SuppressWarnings("unused")
-  @Deprecated
-  private static String transferLimitedSql(String sql, Integer limit) {
-    return MessageFormat.format(LIMITED_QUERY_FORMAT, sql, limit.toString());
-  }
-
   private class JdbcLogRunnable implements Runnable {
 
     private static final int DEFAULT_QUERY_PROGRESS_INTERVAL = 1000;
@@ -348,14 +314,14 @@ public class HiveSqlExec {
       while (true) {
         try {
           for (String log : hiveStatement.getQueryLog()) {
-            LOGGER.info("hive execute log : {}", log);
+            logger.info("hive execute log : {}", log);
           }
           Thread.sleep(DEFAULT_QUERY_PROGRESS_INTERVAL);
         } catch (InterruptedException e) {
           showRemainingLogsIfAny(hiveStatement);
           return;
         } catch (Exception e) {
-          LOGGER.error(e.getMessage(), e);
+          logger.error(e.getMessage(), e);
           return;
         }
       }
@@ -367,11 +333,11 @@ public class HiveSqlExec {
         try {
           logsTemp = hiveStatement.getQueryLog();
         } catch (Exception e) {
-          LOGGER.error(e.getMessage(), e);
+          logger.error(e.getMessage(), e);
           return;
         }
         for (String log : logsTemp) {
-          LOGGER.info("hive execute log : {}", log);
+          logger.info("hive execute log : {}", log);
         }
       } while (logsTemp.size() > 0);
     }
@@ -382,15 +348,15 @@ public class HiveSqlExec {
    */
   private void logResult(ExecResult execResult) {
     if (execResult.getStatus().typeIsSuccess()) {
-      LOGGER.info("执行结果：成功");
+      logger.info("执行结果：成功");
       List<String> titles = execResult.getTitles();
       if (CollectionUtils.isNotEmpty(titles)) {
         StringBuilder titleBuilder = new StringBuilder();
         for (String title : titles) {
           titleBuilder.append(title).append("\t");
         }
-        LOGGER.info("{}", titleBuilder.toString());
-        LOGGER.info("{}", "-------------------------------");
+        logger.info("{}", titleBuilder.toString());
+        logger.info("{}", "-------------------------------");
 
         List<List<String>> valueList = execResult.getValues();
         if (CollectionUtils.isNotEmpty(valueList)) {
@@ -400,13 +366,13 @@ public class HiveSqlExec {
               for (String value : values) {
                 valueBuilder.append(value).append("\t");
               }
-              LOGGER.info("{}", valueBuilder.toString());
+              logger.info("{}", valueBuilder.toString());
             }
           }
         }
       }
     } else {
-      LOGGER.info("执行结果：失败");
+      logger.info("执行结果：失败");
     }
   }
 

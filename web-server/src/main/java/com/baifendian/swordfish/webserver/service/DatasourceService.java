@@ -22,7 +22,7 @@ import com.baifendian.swordfish.dao.mapper.ProjectMapper;
 import com.baifendian.swordfish.dao.model.DataSource;
 import com.baifendian.swordfish.dao.model.Project;
 import com.baifendian.swordfish.dao.model.User;
-import com.baifendian.swordfish.webserver.dto.BaseResponse;
+import com.baifendian.swordfish.webserver.dto.BaseStatusDto;
 import com.baifendian.swordfish.webserver.exception.NotFoundException;
 import com.baifendian.swordfish.webserver.exception.NotModifiedException;
 import com.baifendian.swordfish.webserver.exception.ParameterException;
@@ -116,7 +116,7 @@ public class DatasourceService {
    * @param parameter
    * @return
    */
-  public BaseResponse testDataSource(DbType type, String parameter) {
+  public BaseStatusDto testDataSource(DbType type, String parameter) {
     int status = 0;
     String msg = null;
 
@@ -127,7 +127,7 @@ public class DatasourceService {
       msg = e.toString();
     }
 
-    return new BaseResponse(status, msg);
+    return new BaseStatusDto(status, msg);
   }
 
   /**

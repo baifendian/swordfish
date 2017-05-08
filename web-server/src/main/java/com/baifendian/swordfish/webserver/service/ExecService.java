@@ -73,7 +73,7 @@ public class ExecService {
   @Autowired
   private FlowDao flowDao;
 
-  public ExecutorIds postExecWorkflow(User operator, String projectName, String workflowName, String schedule, ExecType execType, String nodeName, NodeDepType nodeDep, NotifyType notifyType, String notifyMails, int timeout) {
+  public ExecutorIdsDto postExecWorkflow(User operator, String projectName, String workflowName, String schedule, ExecType execType, String nodeName, NodeDepType nodeDep, NotifyType notifyType, String notifyMails, int timeout) {
 
     // 查看是否对项目具备相应的权限
     Project project = projectMapper.queryByName(projectName);
@@ -128,7 +128,7 @@ public class ExecService {
             logger.error("Call master client exec workflow false , project id: {}, flow id: {},host: {}, port: {}", project.getId(), projectFlow.getId(), masterServer.getHost(), masterServer.getPort());
             throw new ServerErrorException("master server return error");
           }
-          return new ExecutorIds(retInfo.getExecIds());
+          return new ExecutorIdsDto(retInfo.getExecIds());
         }
         case COMPLEMENT_DATA: {
           // 反序列化调度信息
@@ -145,7 +145,7 @@ public class ExecService {
             logger.error("Call master client append workflow data false , project id: {}, flow id: {},host: {}, port: {}", project.getId(), projectFlow.getId(), masterServer.getHost(), masterServer.getPort());
             throw new ServerErrorException("Call master client append workflow data false , project id: {0}, flow id: {1},host: {2}, port: {3}", project.getId(), projectFlow.getId(), masterServer.getHost(), masterServer.getPort());
           }
-          return new ExecutorIds(retInfo.getExecIds());
+          return new ExecutorIdsDto(retInfo.getExecIds());
         }
         default: {
           logger.error("exec workflow no support exec type {}", execType.getType());
@@ -176,18 +176,18 @@ public class ExecService {
    * @param extras
    * @return
    */
-  public ExecutorId postExecWorkflowDirect(User operator, String projectName, String workflowName, String desc, String proxyUser, String queue, String data, MultipartFile file, NotifyType notifyType, String notifyMails, int timeout, String extras) {
+  public ExecutorIdDto postExecWorkflowDirect(User operator, String projectName, String workflowName, String desc, String proxyUser, String queue, String data, MultipartFile file, NotifyType notifyType, String notifyMails, int timeout, String extras) {
     logger.info("step1. create temp workflow");
     ProjectFlow projectFlow = workflowService.createWorkflow(operator, projectName, workflowName, desc, proxyUser, queue, data, file, extras, 1);
     if (projectFlow == null) {
       throw new ServerErrorException("project workflow create return is null");
     }
     logger.info("step2. exec temp workflow");
-    ExecutorIds executorIds = postExecWorkflow(operator, projectName, workflowName, null, ExecType.DIRECT, null, null, notifyType, notifyMails, timeout);
-    if (CollectionUtils.isEmpty(executorIds.getExecIds())) {
+    ExecutorIdsDto executorIdsDto = postExecWorkflow(operator, projectName, workflowName, null, ExecType.DIRECT, null, null, notifyType, notifyMails, timeout);
+    if (CollectionUtils.isEmpty(executorIdsDto.getExecIds())) {
       throw new ServerErrorException("project workflow exec return is null");
     }
-    return new ExecutorId(executorIds.getExecIds().get(0));
+    return new ExecutorIdDto(executorIdsDto.getExecIds().get(0));
   }
 
   /**

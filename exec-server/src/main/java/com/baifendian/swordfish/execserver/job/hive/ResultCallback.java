@@ -25,7 +25,11 @@ import java.util.Date;
 public interface ResultCallback {
 
   /**
-   * 处理执行结果 <p>
+   * 处理执行结果
+   *
+   * @param execResult
+   * @param startTime
+   * @param endTime
    */
   void handleResult(ExecResult execResult, Date startTime, Date endTime);
 }

@@ -16,7 +16,6 @@
 package com.baifendian.swordfish.execserver.adhoc;
 
 import com.baifendian.swordfish.common.job.JobProps;
-import com.baifendian.swordfish.common.job.logger.JobLogger;
 import com.baifendian.swordfish.dao.AdHocDao;
 import com.baifendian.swordfish.dao.enums.FlowStatus;
 import com.baifendian.swordfish.dao.model.AdHoc;
@@ -25,45 +24,59 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Date;
 
+import static com.baifendian.swordfish.common.utils.StructuredArguments.jobValue;
+
 public class AdHocRunner implements Runnable {
 
   private Logger logger = LoggerFactory.getLogger(AdHocRunner.class);
 
+  /**
+   * 即席查询结构
+   */
   private AdHoc adHoc;
 
+  /**
+   * 即席查询数据库接口
+   */
   private AdHocDao adHocDao;
 
-  public AdHocRunner(AdHoc adHoc, AdHocDao adHocDao){
+  /**
+   * 用于记录日志的 id
+   */
+  private String jobId;
+
+  public AdHocRunner(AdHoc adHoc, AdHocDao adHocDao) {
     this.adHocDao = adHocDao;
     this.adHoc = adHoc;
+    this.jobId = adHoc.getJobId();
   }
 
   @Override
-  public void run(){
+  public void run() {
     JobProps props = new JobProps();
+
     props.setJobParams(adHoc.getParameter());
     props.setProxyUser(adHoc.getProxyUser());
     props.setQueue(adHoc.getQueue());
     props.setProjectId(adHoc.getProjectId());
     props.setAdHocId(adHoc.getId());
+    props.setJobId(adHoc.getJobId());
 
-    Logger jobLogger = new JobLogger(adHoc.getJobId(), logger);
-    AdHocSqlJob job = null;
     FlowStatus status = FlowStatus.SUCCESS;
 
     try {
-      adHoc.setStatus(FlowStatus.RUNNING);
-      adHocDao.updateAdHoc(adHoc);
-      job = new AdHocSqlJob(adHoc.getJobId(), props, jobLogger);
+      AdHocSqlJob job = new AdHocSqlJob(props);
       job.process();
     } catch (Exception e) {
-      logger.error("run adHoc job error", e);
+      logger.error(String.format("%s run adHoc job error", jobValue(jobId)), e);
       status = FlowStatus.FAILED;
     }
 
-    adHoc.setStatus(status);
-    adHoc.setEndTime(new Date());
-    adHocDao.updateAdHoc(adHoc);
+    Date now = new Date();
 
+    adHoc.setStatus(status);
+    adHoc.setEndTime(now);
+
+    adHocDao.updateAdHoc(adHoc);
   }
 }

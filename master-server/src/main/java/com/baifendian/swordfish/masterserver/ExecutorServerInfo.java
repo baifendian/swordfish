@@ -17,6 +17,9 @@ package com.baifendian.swordfish.masterserver;
 
 import com.baifendian.swordfish.rpc.HeartBeatData;
 
+/**
+ * executor 的心跳信息
+ */
 public class ExecutorServerInfo {
 
   private String host;

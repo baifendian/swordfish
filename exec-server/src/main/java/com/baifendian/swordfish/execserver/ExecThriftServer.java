@@ -58,24 +58,46 @@ public class ExecThriftServer {
 
   private static Configuration conf;
 
+  /**
+   * master 数据库接口
+   */
   private MasterDao masterDao;
 
+  /**
+   * master 的地址信息
+   */
   private final MasterServer masterServer;
 
+  /**
+   * master 的连接实例
+   */
+  private final MasterClient masterClient;
+
+  /**
+   * 当前 exec 的 host 信息
+   */
   private String host;
 
+  /**
+   * 当前 exec 的 port 信息
+   */
   private final int port;
 
   private InetSocketAddress inetSocketAddress;
 
+  /**
+   * exec service
+   */
   private ScheduledExecutorService executorService;
 
-  private MasterClient masterClient;
-
+  /**
+   * 运行状态
+   */
   private AtomicBoolean running = new AtomicBoolean(true);
 
-  private Object syncObject = new Object();
-
+  /**
+   * exec 服务的实现
+   */
   private ExecServiceImpl workerService;
 
   private final int THRIFT_RPC_RETRIES = 3;
@@ -89,43 +111,56 @@ public class ExecThriftServer {
     try {
       conf = new PropertiesConfiguration("worker.properties");
     } catch (ConfigurationException e) {
-      e.printStackTrace();
+      logger.error("Load configuration exception", e);
+      System.exit(1);
     }
   }
 
   public ExecThriftServer() throws TTransportException, UnknownHostException {
     masterDao = DaoFactory.getDaoInstance(MasterDao.class);
     masterServer = masterDao.getMasterServer();
+
     if (masterServer == null) {
+      logger.error("Can't found master server");
       throw new ExecException("can't found master server");
     }
 
+    masterClient = new MasterClient(masterServer.getHost(), masterServer.getPort(), THRIFT_RPC_RETRIES);
+
+    // executor 的地址, 端口信息
+    host = InetAddress.getLocalHost().getHostAddress();
     port = conf.getInt(Constants.EXECUTOR_PORT, 10000);
   }
 
+  /**
+   * @throws UnknownHostException
+   * @throws TTransportException
+   */
   public void run() throws UnknownHostException, TTransportException {
     HdfsClient.init(ConfigurationUtil.getConfiguration());
 
-    masterClient = new MasterClient(masterServer.getHost(), masterServer.getPort(), THRIFT_RPC_RETRIES);
-    host = InetAddress.getLocalHost().getHostAddress();
-
     logger.info("register to master {}:{}", masterServer.getHost(), masterServer.getPort());
 
-    /** 注册到master */
+    // 注册到 master
     boolean ret = masterClient.registerExecutor(host, port, System.currentTimeMillis());
     if (!ret) {
+      logger.error("register to master {}:{} failed", masterServer.getHost(), masterServer.getPort());
       throw new ExecException("register executor error");
     }
 
     heartBeatInterval = conf.getInt(Constants.EXECUTOR_HEARTBEAT_INTERVAL, 60);
 
+    // 执行启动
     executorService = Executors.newScheduledThreadPool(5);
 
+    // 心跳任务启动
     Runnable heartBeatThread = getHeartBeatThread();
     executorService.scheduleAtFixedRate(heartBeatThread, 10, heartBeatInterval, TimeUnit.SECONDS);
 
+    // 启动实际的 worker service
     TProtocolFactory protocolFactory = new TBinaryProtocol.Factory();
     TTransportFactory tTransportFactory = new TTransportFactory();
+
     workerService = new ExecServiceImpl(host, port, conf);
 
     TProcessor tProcessor = new WorkerService.Processor(workerService);
@@ -134,32 +169,32 @@ public class ExecThriftServer {
 
     logger.info("start thrift server on port:{}", port);
 
+    // 这里完全是为了设置为 daemon, 实际意义倒不是很大
     Thread serverThread = new TServerThread(server);
     serverThread.setDaemon(true);
     serverThread.start();
 
-    Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
-      @Override
-      public void run() {
-        if (executorService != null) {
-          executorService.shutdownNow();
-        }
+    // 注册钩子
+    Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+      if (executorService != null) {
+        executorService.shutdownNow();
+      }
 
-        if (workerService != null) {
-          workerService.destory();
-        }
+      if (workerService != null) {
+        workerService.destory();
+      }
 
-        if (server != null) {
-          server.stop();
-        }
+      if (server != null) {
+        server.stop();
       }
     }));
 
-    synchronized (syncObject) {
+    synchronized (this) {
+      // 等待心跳线程退出
       while (running.get()) {
         try {
           logger.info("wait....................");
-          syncObject.wait();
+          wait();
         } catch (InterruptedException e) {
           logger.error("error", e);
         }
@@ -173,24 +208,29 @@ public class ExecThriftServer {
     }
   }
 
+  /**
+   * 得到发送心跳的线程
+   *
+   * @return
+   */
   public Runnable getHeartBeatThread() {
     Runnable heartBeatThread = () -> {
       if (running.get()) {
-        MasterServer masterServer1 = masterDao.getMasterServer();
         HeartBeatData heartBeatData = new HeartBeatData();
         heartBeatData.setReportDate(System.currentTimeMillis());
         heartBeatData.setCpuUsed(OsUtil.cpuUsage());
         heartBeatData.setMemUsed(OsUtil.memoryUsage());
-        MasterClient client = new MasterClient(masterServer1.getHost(), masterServer1.getPort(), THRIFT_RPC_RETRIES);
 
         logger.debug("executor report heartbeat:{}", heartBeatData);
 
-        boolean result = client.executorReport(host, port, heartBeatData);
+        boolean result = masterClient.executorReport(host, port, heartBeatData);
+
         if (!result) {
           logger.warn("heart beat time out");
           running.compareAndSet(true, false);
-          synchronized (syncObject) {
-            syncObject.notify();
+
+          synchronized (this) {
+            notify();
           }
         }
       }

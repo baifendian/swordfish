@@ -46,30 +46,26 @@ public class ParamHelper {
     }
 
     // 获取 dw.system.cyctime
-    Date cycTime = null;
     String cycTimeStr = systemParamMap.get(SystemParamManager.CYC_TIME);
-    if (StringUtils.isNotEmpty(cycTimeStr)) {
-      try {
-        cycTime = DateUtils.parseDate(cycTimeStr, new String[]{SystemParamManager.TIME_FORMAT});
-      } catch (ParseException e) {
-        LOGGER.error(e.getMessage(), e);
-      }
-    } else {
-      cycTime = new Date();
-    }
+
+    Date cycTime = getCycTime(cycTimeStr);
 
     text = PlaceholderUtil.resolvePlaceholders(text, systemParamMap, true);
     text = PlaceholderUtil.resolvePlaceholders(text, customParamMap, true);
+
     if (cycTime != null) {
       text = TimePlaceholderUtil.resolvePlaceholders(text, cycTime, true);
     }
+
     return text;
   }
 
   /**
-   * 替换参数的占位符 <p>
+   * 替换参数的占位符
    *
-   * @return 替换后的文本
+   * @param text
+   * @param paramMap
+   * @return
    */
   public static String resolvePlaceholders(String text, Map<String, String> paramMap) {
     if (StringUtils.isEmpty(text)) {
@@ -77,8 +73,27 @@ public class ParamHelper {
     }
 
     // 获取 dw.system.cyctime
-    Date cycTime = null;
     String cycTimeStr = paramMap.get(SystemParamManager.CYC_TIME);
+    Date cycTime = getCycTime(cycTimeStr);
+
+    text = PlaceholderUtil.resolvePlaceholders(text, paramMap, true);
+
+    if (cycTime != null) {
+      text = TimePlaceholderUtil.resolvePlaceholders(text, cycTime, true);
+    }
+
+    return text;
+  }
+
+  /**
+   * 获取 "当前时间参数信息" 信息
+   *
+   * @param cycTimeStr
+   * @return
+   */
+  private static Date getCycTime(String cycTimeStr) {
+    Date cycTime = null;
+
     if (StringUtils.isNotEmpty(cycTimeStr)) {
       try {
         cycTime = DateUtils.parseDate(cycTimeStr, new String[]{SystemParamManager.TIME_FORMAT});
@@ -89,10 +104,6 @@ public class ParamHelper {
       cycTime = new Date();
     }
 
-    text = PlaceholderUtil.resolvePlaceholders(text, paramMap, true);
-    if (cycTime != null) {
-      text = TimePlaceholderUtil.resolvePlaceholders(text, cycTime, true);
-    }
-    return text;
+    return cycTime;
   }
 }

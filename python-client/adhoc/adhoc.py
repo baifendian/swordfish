@@ -76,7 +76,6 @@ if __name__ == '__main__':
 
         (status, result) = query_result(sessionId, execId, index)
 
-
         index = index + 1
     else:
         logContent = result.get("logContent")

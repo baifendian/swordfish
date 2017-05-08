@@ -46,10 +46,10 @@ public class SystemParamManager {
   /**
    * 日常调度实例定时的定时时间日期，格式为 yyyymmdd，取值为 ${sf.system.bizdate} + 1
    */
-  private static final String BIZ_CUR_DATE = "dw.system.bizcurdate";
+  private static final String BIZ_CUR_DATE = "sf.system.bizcurdate";
 
   /**
-   * ${dw.system.cyctime}，格式 yyyyMMddHHmmss，表示的是日常调度实例定时时间（年月日时分秒）
+   * 格式 yyyyMMddHHmmss，表示的是日常调度实例定时时间（年月日时分秒）
    */
   public static final String CYC_TIME = "sf.system.cyctime";
 
@@ -57,11 +57,6 @@ public class SystemParamManager {
    * 调度时刻的时间，格式为 yyyyMMddHHmmss
    */
   private static final String RUN_TIME = "sf.system.runtime";
-
-  /**
-   * 当前项目的 HDFS 路径
-   */
-  private static final String FILES = "sf.system.files";
 
   /**
    * 当前 workflow 的名称

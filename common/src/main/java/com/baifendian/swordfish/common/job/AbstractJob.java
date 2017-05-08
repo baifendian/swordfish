@@ -22,14 +22,10 @@ import java.util.List;
 import java.util.Map;
 
 public abstract class AbstractJob implements Job {
-  protected final Logger logger;
-
-  //private final Logger _logger;
-
   /**
    * jobId
    **/
-  protected final String jobIdLog;
+  protected final String jobId;
 
   /**
    * {@link Process}
@@ -56,12 +52,12 @@ public abstract class AbstractJob implements Job {
   protected int projectId;
 
   /**
-   * @param jobIdLog  生成的作业idLog
+   * @param jobId  生成的作业idLog
    * @param props  作业配置信息,各类作业根据此配置信息生成具体的作业
    * @param logger 日志
    */
-  protected AbstractJob(String jobIdLog, JobProps props, Logger logger) throws IOException {
-    this.jobIdLog = jobIdLog;
+  protected AbstractJob(String jobId, JobProps props, Logger logger) throws IOException {
+    this.jobId = jobId;
     this.props = props;
     this.logger = logger;
     this.definedParamMap = props.getDefinedParams();
@@ -69,9 +65,8 @@ public abstract class AbstractJob implements Job {
     initJobParams();
   }
 
-  @Override
-  public String getJobIdLog() {
-    return jobIdLog;
+  public String getJobId() {
+    return jobId;
   }
 
   @Override

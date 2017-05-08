@@ -38,3 +38,6 @@ $ git clone https://github.com/baifendian/swordfish.git
 ```
   $ export PYTHONPATH=$PYTHONPATH:.; python user/user.py
 ```
+
+# 系统设计参考
+[系统设计参考](https://github.com/baifendian/swordfish/wiki/develop)

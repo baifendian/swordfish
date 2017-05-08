@@ -19,7 +19,7 @@ import com.baifendian.swordfish.common.utils.http.HttpUtil;
 import com.baifendian.swordfish.dao.mapper.SessionMapper;
 import com.baifendian.swordfish.dao.model.Session;
 import com.baifendian.swordfish.dao.model.User;
-import com.baifendian.swordfish.webserver.dto.UserSessionData;
+import com.baifendian.swordfish.webserver.dto.UserSessionDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -84,7 +84,7 @@ public class SessionService {
    * @param ip
    * @return
    */
-  public UserSessionData createSession(User user, String ip) {
+  public UserSessionDto createSession(User user, String ip) {
     // 查询是否登录过
     Session session = sessionMapper.queryByUserIdAndIp(user.getId(), ip);
     Date now = new Date();
@@ -95,7 +95,7 @@ public class SessionService {
         // 更新最新登录时间
         sessionMapper.update(session.getId(), now);
 
-        return new UserSessionData(session.getId(), user);
+        return new UserSessionDto(session.getId(), user);
       } else { // 有效期外, 则删除
         sessionMapper.deleteById(session.getId());
       }
@@ -111,6 +111,6 @@ public class SessionService {
 
     sessionMapper.insert(session);
 
-    return new UserSessionData(session.getId(), user);
+    return new UserSessionDto(session.getId(), user);
   }
 }

@@ -65,7 +65,7 @@ public class ShellJob extends AbstractProcessJob {
     shellParam.setScript(script);
     logger.info("script:\n{}", shellParam.getScript());
     logger.info("currentPath: {}", currentPath);
-    String fileName = currentPath + "/" + jobIdLog + "_" + UUID.randomUUID().toString().substring(0, 8) + ".sh";
+    String fileName = currentPath + "/" + jobId + "_" + UUID.randomUUID().toString().substring(0, 8) + ".sh";
     Path path = new File(fileName).toPath();
 
     Set<PosixFilePermission> perms = PosixFilePermissions.fromString("rwxr-xr-x");

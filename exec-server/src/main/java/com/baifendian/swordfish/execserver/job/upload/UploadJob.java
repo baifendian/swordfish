@@ -51,7 +51,7 @@ public class UploadJob extends AbstractProcessJob {
   @Override
   public ProcessBuilder createProcessBuilder() throws Exception {
     String sourceFile = getWorkingDirectory() + "/" + param.getFile();
-    String outFile = getWorkingDirectory() + "/" + jobIdLog + ".data";
+    String outFile = getWorkingDirectory() + "/" + jobId + ".data";
     String targetFile = sourceFile;
 
     // 文件标题行和字符集处理
@@ -72,7 +72,7 @@ public class UploadJob extends AbstractProcessJob {
 
     int maxColNum = param.getMappingRelation().stream().mapToInt(p -> p.getOriginFieldIndex()).max().getAsInt();
 
-    String tempTableName = jobIdLog;
+    String tempTableName = jobId;
     StringBuilder sb = new StringBuilder();
     String tempCreateTableSql = genTempCreateTableSql(tempTableName, param.getSeparator(), maxColNum);
     sb.append(tempCreateTableSql);
@@ -120,7 +120,7 @@ public class UploadJob extends AbstractProcessJob {
     sb.append("SELECT " + StringUtils.join(selectStatement, ",") + " FROM ");
     sb.append(tempTableName + ";\n");
 
-    String tempSqlFile = getWorkingDirectory() + "/" + jobIdLog + ".hql";
+    String tempSqlFile = getWorkingDirectory() + "/" + jobId + ".hql";
     FileUtils.writeStringToFile(new File(tempSqlFile), sb.toString(), Charset.forName("UTF-8"));
 
     // 创建 ProcessBuilder

@@ -19,7 +19,7 @@ import com.baifendian.swordfish.dao.model.AdHocJsonObject;
 
 import java.util.Date;
 
-public class AdHocResultData {
+public class AdHocResultDto {
 
   /**
    * start time of exec

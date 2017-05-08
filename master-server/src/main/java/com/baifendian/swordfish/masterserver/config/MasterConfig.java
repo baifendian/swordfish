@@ -24,23 +24,38 @@ import org.apache.commons.configuration.PropertiesConfiguration;
  */
 public class MasterConfig {
   /**
-   * 失败重试次数,默认为 2 次
+   * 失败重试次数, 默认为 2 次, 即失败后还会运行 2 次
    */
   public static int failRetryCount;
 
   /**
-   * executionflow队列大小,默认为 10000
+   * execution flow 队列大小
    */
   public static int executionFlowQueueSize;
 
+  /**
+   * executor 向 master 发送心跳检测的间隔
+   */
   public static int heartBeatCheckInterval;
 
+  /**
+   * 心跳超时后, 发送的间隔时间
+   */
   public static int heartBeatTimeoutInterval;
 
+  /**
+   * master 的最小线程数
+   */
   public static int masterMinThreads;
 
+  /**
+   * master 的最大线程数
+   */
   public static int masterMaxThreads;
 
+  /**
+   * master 端口
+   */
   public static int masterPort;
 
   private static final String MASTER_MIN_THREADS = "master.min.threads";

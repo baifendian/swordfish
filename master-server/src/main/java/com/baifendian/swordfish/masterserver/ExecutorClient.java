@@ -32,18 +32,23 @@ public class ExecutorClient {
 
   private static Logger logger = LoggerFactory.getLogger(ExecutorClient.class);
 
+  // executor host
   private String host;
 
+  // executor 端口信息
   private int port;
 
+  // 超时设置
   private int timeout = 3000;
 
+  // rpc 失败的重试次数
   private static final int RPC_RETRIES = 3;
 
   private TTransport tTransport;
 
   private WorkerService.Client client;
 
+  // 重试次数
   private int retries;
 
   public ExecutorClient(String host, int port, int retries) {

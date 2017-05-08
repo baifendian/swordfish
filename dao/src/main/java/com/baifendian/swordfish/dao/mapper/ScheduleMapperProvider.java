@@ -15,13 +15,14 @@
  */
 package com.baifendian.swordfish.dao.mapper;
 
-import com.baifendian.swordfish.dao.enums.*;
+import com.baifendian.swordfish.dao.enums.DepPolicyType;
+import com.baifendian.swordfish.dao.enums.FailurePolicyType;
+import com.baifendian.swordfish.dao.enums.NotifyType;
+import com.baifendian.swordfish.dao.enums.ScheduleStatus;
 import com.baifendian.swordfish.dao.mapper.utils.EnumFieldUtil;
 import org.apache.ibatis.jdbc.SQL;
 
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 public class ScheduleMapperProvider {
 
@@ -57,16 +58,16 @@ public class ScheduleMapperProvider {
         SET("end_date = #{schedule.endDate}");
         SET("crontab=#{schedule.crontab}");
         SET("dep_workflows=#{schedule.depWorkflowsStr}");
-        SET("dep_policy="+EnumFieldUtil.genFieldStr("schedule.depPolicy", DepPolicyType.class));
-        SET("failure_policy="+EnumFieldUtil.genFieldStr("schedule.failurePolicy", FailurePolicyType.class));
+        SET("dep_policy=" + EnumFieldUtil.genFieldStr("schedule.depPolicy", DepPolicyType.class));
+        SET("failure_policy=" + EnumFieldUtil.genFieldStr("schedule.failurePolicy", FailurePolicyType.class));
         SET("max_try_times=#{schedule.maxTryTimes}");
-        SET("notify_type="+EnumFieldUtil.genFieldStr("schedule.notifyType", NotifyType.class));
+        SET("notify_type=" + EnumFieldUtil.genFieldStr("schedule.notifyType", NotifyType.class));
         SET("notify_mails=#{schedule.notifyMailsStr}");
         SET("timeout=#{schedule.timeout}");
         SET("create_time=#{schedule.createTime}");
         SET("modify_time=#{schedule.modifyTime}");
         SET("owner=#{schedule.ownerId}");
-        SET("schedule_status="+EnumFieldUtil.genFieldStr("schedule.scheduleStatus", ScheduleStatus.class));
+        SET("schedule_status=" + EnumFieldUtil.genFieldStr("schedule.scheduleStatus", ScheduleStatus.class));
         WHERE("flow_id = #{schedule.flowId}");
       }
     }.toString();

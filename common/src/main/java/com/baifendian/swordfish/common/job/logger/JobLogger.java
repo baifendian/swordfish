@@ -19,6 +19,7 @@ import com.baifendian.swordfish.common.utils.StructuredArguments;
 import org.slf4j.Logger;
 import org.slf4j.Marker;
 
+@Deprecated
 public class JobLogger implements Logger {
 
   private Logger logger;

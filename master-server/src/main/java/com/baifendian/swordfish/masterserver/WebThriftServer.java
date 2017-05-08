@@ -46,20 +46,18 @@ public class WebThriftServer {
 
   private TServer server;
 
+  // master host
   private final String host;
 
+  // master port
   private final int port;
 
   // master 的 dao
   private MasterDao masterDao;
 
-  // 工作流的 dao
-  private FlowDao flowDao;
-
-  // master 的具体实现
+  // master service 的具体实现
   private MasterServiceImpl masterService;
 
-  // master
   private Master master;
 
   public WebThriftServer() throws UnknownHostException {
@@ -67,7 +65,6 @@ public class WebThriftServer {
     port = MasterConfig.masterPort;
 
     masterDao = DaoFactory.getDaoInstance(MasterDao.class);
-    flowDao = DaoFactory.getDaoInstance(FlowDao.class);
   }
 
   /**
@@ -121,8 +118,8 @@ public class WebThriftServer {
    * @throws TTransportException
    */
   private void init() throws MasterException, TTransportException {
-    master = new Master(flowDao);
-    masterService = new MasterServiceImpl(flowDao, master);
+    master = new Master();
+    masterService = new MasterServiceImpl(master);
 
     TProtocolFactory protocolFactory = new TBinaryProtocol.Factory();
     TTransportFactory tTransportFactory = new TTransportFactory();

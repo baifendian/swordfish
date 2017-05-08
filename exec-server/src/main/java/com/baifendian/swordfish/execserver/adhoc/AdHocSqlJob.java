@@ -16,7 +16,6 @@
 package com.baifendian.swordfish.execserver.adhoc;
 
 import com.baifendian.swordfish.common.config.BaseConfig;
-import com.baifendian.swordfish.common.job.ExecResult;
 import com.baifendian.swordfish.common.job.JobProps;
 import com.baifendian.swordfish.common.job.struct.hql.AdHocParam;
 import com.baifendian.swordfish.common.utils.CommonUtil;
@@ -29,66 +28,96 @@ import com.baifendian.swordfish.execserver.job.hive.FunctionUtil;
 import com.baifendian.swordfish.execserver.job.hive.HiveSqlExec;
 import com.baifendian.swordfish.execserver.job.hive.ResultCallback;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.Date;
 import java.util.List;
+
+import static com.baifendian.swordfish.common.utils.StructuredArguments.jobValue;
 
 /**
  * 即席查询作业
  */
 public class AdHocSqlJob {
+  private static Logger logger = LoggerFactory.getLogger(AdHocSqlJob.class.getName());
 
-  private AdHocDao adHocDao;
-
-  private AdHocParam param;
-
-  private String jobIdLog;
-
+  /**
+   * job 通用参数
+   */
   private JobProps props;
 
-  private Logger logger;
+  /**
+   * 日志记录的唯一 id
+   */
+  private String jobId;
 
-  public AdHocSqlJob(String jobIdLog, JobProps props, Logger logger) throws IOException {
-    this.jobIdLog = jobIdLog;
-    this.logger = logger;
+  /**
+   * 即席的数据库连接参数
+   */
+  private AdHocDao adHocDao;
+
+  /**
+   * 即席的参数信息
+   */
+  private AdHocParam param;
+
+  public AdHocSqlJob(JobProps props) throws IOException {
     this.props = props;
+    this.jobId = props.getJobId();
+
     this.adHocDao = DaoFactory.getDaoInstance(AdHocDao.class);
-    param = JsonUtil.parseObject(props.getJobParams(), AdHocParam.class);
+    this.param = JsonUtil.parseObject(props.getJobParams(), AdHocParam.class);
   }
 
+  /**
+   * 具体执行的过程
+   *
+   * @throws Exception
+   */
   public void process() throws Exception {
-    logger.debug("{}", props.getJobParams());
+    logger.debug("{} {}", jobValue(jobId), props.getJobParams());
+
+    // 得到查询语句
     String sqls = param.getStms();
-    // 不支持参数替换
-    //sqls = ParamHelper.resolvePlaceholders(sqls, definedParamMap);
+
+    // 需要支持变量参数替换, 如 $[yyyyMMdd], TODO::
+    // sqls = ParamHelper.resolvePlaceholders(sqls, definedParamMap);
+
     try {
-      List<String> funcs = FunctionUtil.createFuncs(param.getUdfs(), jobIdLog, BaseConfig.getHdfsResourcesDir(props.getProjectId()), true);
-      List<String> execSqls = CommonUtil.sqlSplit(sqls);
-      logger.info("exec sql:{}, funcs:{}", sqls, funcs);
-      /** 查询结果写入数据库 */
+      // 创建自定义函数
+      List<String> funcs = FunctionUtil.createFuncs(param.getUdfs(), jobId, BaseConfig.getHdfsResourcesDir(props.getProjectId()), true);
+
+      logger.info("{} exec sql:{}, funcs:{}", jobValue(jobId), sqls, funcs);
+
+      // 查询结果写入数据库
       ResultCallback resultCallback = (execResult, startTime, endTime) -> {
         AdHocResult adHocResult = new AdHocResult();
+
         adHocResult.setExecId(props.getAdHocId());
+
         adHocResult.setStm(execResult.getStm());
         adHocResult.setIndex(execResult.getIndex());
         adHocResult.setStatus(execResult.getStatus());
+
         AdHocJsonObject adHocJsonObject = new AdHocJsonObject();
         adHocJsonObject.setTitles(execResult.getTitles());
         adHocJsonObject.setValues(execResult.getValues());
         adHocResult.setResult(JsonUtil.toJsonString(adHocJsonObject));
+
         adHocResult.setStartTime(startTime);
         adHocResult.setEndTime(endTime);
 
-        adHocDao.updateAdHocResult(adHocResult); // 更新结果到数据库中
+        // 更新结果到数据库中
+        adHocDao.updateAdHocResult(adHocResult);
       };
-      HiveSqlExec hiveSqlExec = new HiveSqlExec(funcs, execSqls, props.getProxyUser(), null, true, resultCallback, param.getLimit(), logger);
-      adHocDao.initAdHocResult(props.getAdHocId(), execSqls);
+
+      List<String> execSqls = CommonUtil.sqlSplit(sqls);
+
+      HiveSqlExec hiveSqlExec = new HiveSqlExec(funcs, execSqls, props.getProxyUser(), true, resultCallback, param.getLimit());
       hiveSqlExec.run();
-    } catch (Exception e){
+    } catch (Exception e) {
       logger.error("ad hoc job run error", e);
       throw e;
     }
   }
-
 }

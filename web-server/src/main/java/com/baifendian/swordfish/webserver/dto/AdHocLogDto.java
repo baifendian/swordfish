@@ -16,11 +16,13 @@
 package com.baifendian.swordfish.webserver.dto;
 
 import com.baifendian.swordfish.dao.enums.FlowStatus;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
-public class AdHocLogData {
+public class AdHocLogDto {
   /**
    * 工作量的状态
    */
+  @JsonSerialize()
   private FlowStatus status = FlowStatus.INIT;
 
   /**

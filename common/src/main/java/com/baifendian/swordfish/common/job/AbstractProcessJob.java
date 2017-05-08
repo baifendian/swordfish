@@ -71,9 +71,9 @@ public abstract class AbstractProcessJob extends AbstractJob {
 
       String proxyUser = getProxyUser();
       String workDir = getWorkingDirectory();
-      logger.info("jobIdLog:{} proxyUser:{} workDir:{}", jobIdLog, proxyUser, workDir);
+      logger.info("jobId:{} proxyUser:{} workDir:{}", jobId, proxyUser, workDir);
       if (proxyUser != null) {
-        String commandFile = workDir + File.separator + jobIdLog + ".command";
+        String commandFile = workDir + File.separator + jobId + ".command";
         logger.info("generate command file:{}", commandFile);
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("#!/bin/sh\n");
@@ -124,7 +124,7 @@ public abstract class AbstractProcessJob extends AbstractJob {
       throw new IllegalStateException("not started.");
     }
     int processId = getProcessId(process);
-    logger.info("job:{} cancel job. kill process:{}", jobIdLog, processId);
+    logger.info("job:{} cancel job. kill process:{}", jobId, processId);
 
     boolean killed = softKill(processId, KILL_TIME_MS, TimeUnit.MILLISECONDS);
     if (!killed) {
@@ -216,7 +216,7 @@ public abstract class AbstractProcessJob extends AbstractJob {
    * 获取进程的标准输出 <p>
    */
   protected void readProcessOutput() {
-    String threadLoggerInfoName = "LoggerInfo-" + jobIdLog;
+    String threadLoggerInfoName = "LoggerInfo-" + jobId;
 
     Thread loggerInfoThread = new Thread(new Runnable() {
       @Override

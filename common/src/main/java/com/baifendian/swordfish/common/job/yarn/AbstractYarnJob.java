@@ -95,7 +95,7 @@ public abstract class AbstractYarnJob extends AbstractProcessJob {
     super.cancel();
 
     if (appid != null) {
-      String commandFile = "/tmp/" + jobIdLog + ".kill";
+      String commandFile = "/tmp/" + jobId + ".kill";
       String cmd = "yarn application -kill " + appid;
 
       StringBuilder sb = new StringBuilder();

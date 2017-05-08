@@ -19,6 +19,7 @@ import com.baifendian.swordfish.dao.AdHocDao;
 import com.baifendian.swordfish.dao.DaoFactory;
 import com.baifendian.swordfish.dao.FlowDao;
 import com.baifendian.swordfish.dao.enums.ExecType;
+import com.baifendian.swordfish.dao.enums.FlowStatus;
 import com.baifendian.swordfish.dao.enums.NodeDepType;
 import com.baifendian.swordfish.dao.enums.NotifyType;
 import com.baifendian.swordfish.dao.model.AdHoc;
@@ -52,25 +53,35 @@ public class MasterServiceImpl implements Iface {
   private final Logger LOGGER = LoggerFactory.getLogger(getClass());
 
   /**
-   * {@link FlowDao}
+   * 工作流的数据库接口
    */
   private final FlowDao flowDao;
 
+  /**
+   * 即席查询的数据库接口
+   */
   private final AdHocDao adHocDao;
 
   /**
-   * {@link FlowExecManager}
+   * 工作流执行管理器
    */
   private final Master master;
 
-  public MasterServiceImpl(FlowDao flowDao, Master master) {
-    this.flowDao = flowDao;
-    this.adHocDao = DaoFactory.getDaoInstance(AdHocDao.class);
+  public MasterServiceImpl(Master master) {
     this.master = master;
+
+    this.flowDao = DaoFactory.getDaoInstance(FlowDao.class);
+    this.adHocDao = DaoFactory.getDaoInstance(AdHocDao.class);
   }
 
   /**
    * 设置调度信息, 最终设置的是 Crontab 表达式(其实是按照 Quartz 的语法)
+   *
+   * @param projectId
+   * @param flowId
+   * @return
+   * @throws TException
+   * @see CronExpression
    */
   @Override
   public RetInfo setSchedule(int projectId, int flowId) throws TException {
@@ -100,6 +111,11 @@ public class MasterServiceImpl implements Iface {
 
   /**
    * 删除调度信息
+   *
+   * @param projectId
+   * @param flowId
+   * @return
+   * @throws TException
    */
   @Override
   public RetInfo deleteSchedule(int projectId, int flowId) throws TException {
@@ -118,6 +134,10 @@ public class MasterServiceImpl implements Iface {
 
   /**
    * 删除一个项目的所有调度信息
+   *
+   * @param projectId
+   * @return
+   * @throws TException
    */
   @Override
   public RetInfo deleteSchedules(int projectId) throws TException {
@@ -132,6 +152,14 @@ public class MasterServiceImpl implements Iface {
     return ResultHelper.SUCCESS;
   }
 
+  /**
+   * @param projectId
+   * @param flowId
+   * @param scheduleDate
+   * @param execInfo
+   * @return
+   * @throws TException
+   */
   @Override
   public RetResultInfo execFlow(int projectId, int flowId, long scheduleDate, ExecInfo execInfo) throws TException {
     ExecutionFlow executionFlow;
@@ -167,7 +195,7 @@ public class MasterServiceImpl implements Iface {
   }
 
   /**
-   * 执行即席查询
+   * 根据即席查询的执行 id 执行即席查询
    *
    * @param adHocId
    * @return
@@ -184,9 +212,26 @@ public class MasterServiceImpl implements Iface {
         return ResultHelper.createErrorResult("ad hoc id not exists");
       }
 
+      // 接收到了, 会更新状态, 在依赖资源中
+      if (adHoc.getStatus().typeIsFinished()) {
+        return null;
+      }
+
+      adHoc.setStatus(FlowStatus.WAITING_RES);
+      adHocDao.updateAdHocStatus(adHoc);
+
       master.execAdHoc(adHocId);
     } catch (Exception e) {
       LOGGER.error(e.getMessage(), e);
+
+      // 如果是依赖资源中的状态, 更新为失败, 因为调用失败了
+      AdHoc adHoc = adHocDao.getAdHoc(adHocId);
+
+      if (adHoc != null && adHoc.getStatus() == FlowStatus.WAITING_RES) {
+        adHoc.setStatus(FlowStatus.FAILED);
+        adHocDao.updateAdHocStatus(adHoc);
+      }
+
       return ResultHelper.createErrorResult(e.getMessage());
     }
 
@@ -195,6 +240,12 @@ public class MasterServiceImpl implements Iface {
 
   /**
    * 补数据
+   *
+   * @param projectId
+   * @param flowId
+   * @param scheduleInfo
+   * @return
+   * @throws TException
    */
   @Override
   public RetResultInfo appendWorkFlow(int projectId, int flowId, ScheduleInfo scheduleInfo) throws TException {
@@ -223,6 +274,30 @@ public class MasterServiceImpl implements Iface {
     return ResultDetailHelper.createSuccessResult(Collections.emptyList());
   }
 
+  /**
+   * @param execId
+   * @return
+   * @throws TException
+   */
+  @Override
+  public RetInfo cancelExecFlow(int execId) throws TException {
+    try {
+      return master.cancelExecFlow(execId);
+    } catch (Exception e) {
+      LOGGER.warn("executor report error", e);
+      return ResultHelper.createErrorResult(e.getMessage());
+    }
+  }
+
+  /**
+   * 接受 executor 注册的接口
+   *
+   * @param host         executor 注册的 host 地址
+   * @param port         executor 注册的 port
+   * @param registerTime
+   * @return
+   * @throws TException
+   */
   @Override
   public RetInfo registerExecutor(String host, int port, long registerTime) throws TException {
     try {
@@ -231,11 +306,18 @@ public class MasterServiceImpl implements Iface {
       LOGGER.warn("executor register error", e);
       return ResultHelper.createErrorResult(e.getMessage());
     }
+
     return ResultHelper.SUCCESS;
   }
 
   /**
-   * execServer 汇报心跳 host: host 地址, port : 端口号
+   * 接受 executor 汇报心跳的接口
+   *
+   * @param host          executor 的 host 地址
+   * @param port          executor 的 port
+   * @param heartBeatData
+   * @return
+   * @throws TException
    */
   @Override
   public RetInfo executorReport(String host, int port, HeartBeatData heartBeatData) throws TException {
@@ -245,16 +327,7 @@ public class MasterServiceImpl implements Iface {
       LOGGER.warn("executor report error", e);
       return ResultHelper.createErrorResult(e.getMessage());
     }
-    return ResultHelper.SUCCESS;
-  }
 
-  @Override
-  public RetInfo cancelExecFlow(int execId) throws TException {
-    try {
-      return master.cancelExecFlow(execId);
-    } catch (Exception e) {
-      LOGGER.warn("executor report error", e);
-      return ResultHelper.createErrorResult(e.getMessage());
-    }
+    return ResultHelper.SUCCESS;
   }
 }

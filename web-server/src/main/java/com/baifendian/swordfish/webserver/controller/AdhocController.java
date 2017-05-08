@@ -18,9 +18,9 @@ package com.baifendian.swordfish.webserver.controller;
 import com.baifendian.swordfish.common.job.struct.hql.UdfsInfo;
 import com.baifendian.swordfish.dao.model.User;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
-import com.baifendian.swordfish.webserver.dto.AdHocLogData;
-import com.baifendian.swordfish.webserver.dto.AdHocResultData;
-import com.baifendian.swordfish.webserver.dto.ExecutorId;
+import com.baifendian.swordfish.webserver.dto.AdHocLogDto;
+import com.baifendian.swordfish.webserver.dto.AdHocResultDto;
+import com.baifendian.swordfish.webserver.dto.ExecutorIdDto;
 import com.baifendian.swordfish.webserver.exception.BadRequestException;
 import com.baifendian.swordfish.webserver.service.AdhocService;
 import org.slf4j.Logger;
@@ -56,14 +56,14 @@ public class AdhocController {
    * @return
    */
   @PostMapping(value = "/projects/{projectName}/adHoc")
-  public ExecutorId execAdhoc(@RequestAttribute(value = "session.user") User operator,
-                              @PathVariable String projectName,
-                              @RequestParam(value = "stms") String stms,
-                              @RequestParam(value = "limit", required = false, defaultValue = "1000") int limit,
-                              @RequestParam(value = "proxyUser") String proxyUser,
-                              @RequestParam(value = "queue") String queue,
-                              @RequestParam(value = "udfs", required = false) String udfs,
-                              @RequestParam(value = "timeout", required = false, defaultValue = "1800") int timeout) {
+  public ExecutorIdDto execAdhoc(@RequestAttribute(value = "session.user") User operator,
+                                 @PathVariable String projectName,
+                                 @RequestParam(value = "stms") String stms,
+                                 @RequestParam(value = "limit", required = false, defaultValue = "1000") int limit,
+                                 @RequestParam(value = "proxyUser") String proxyUser,
+                                 @RequestParam(value = "queue") String queue,
+                                 @RequestParam(value = "udfs", required = false) String udfs,
+                                 @RequestParam(value = "timeout", required = false, defaultValue = "1800") int timeout) {
     logger.info("Operator user {}, exec adhoc, project name: {}, stms: {}, limit: {}, proxyUser: {}, queue: {}, udfs: {}, timeout: {}",
         operator.getName(), projectName, stms, limit, proxyUser, queue, udfs, timeout);
 
@@ -101,11 +101,11 @@ public class AdhocController {
    * @return
    */
   @GetMapping(value = "/adHoc/{execId}/logs")
-  public AdHocLogData queryLogs(@RequestAttribute(value = "session.user") User operator,
-                                @PathVariable int execId,
-                                @RequestParam(value = "index") int index,
-                                @RequestParam(value = "from", required = false, defaultValue = "0") int from,
-                                @RequestParam(value = "size", required = false, defaultValue = "100") int size) {
+  public AdHocLogDto queryLogs(@RequestAttribute(value = "session.user") User operator,
+                               @PathVariable int execId,
+                               @RequestParam(value = "index") int index,
+                               @RequestParam(value = "from", required = false, defaultValue = "0") int from,
+                               @RequestParam(value = "size", required = false, defaultValue = "100") int size) {
     logger.info("Operator user {}, get adhoc logs, exec id: {}, index: {}, from: {}, size: {}",
         operator.getName(), execId, index, from, size);
 
@@ -131,9 +131,9 @@ public class AdhocController {
    * @return
    */
   @GetMapping(value = "/adHoc/{execId}/result")
-  public AdHocResultData queryResult(@RequestAttribute(value = "session.user") User operator,
-                                     @PathVariable int execId,
-                                     @RequestParam(value = "index") int index) {
+  public AdHocResultDto queryResult(@RequestAttribute(value = "session.user") User operator,
+                                    @PathVariable int execId,
+                                    @RequestParam(value = "index") int index) {
     logger.info("Operator user {}, get adhoc result, exec id: {}, index: {}",
         operator.getName(), execId, index);
 
@@ -145,6 +145,12 @@ public class AdhocController {
     return adhocService.queryResult(operator, execId, index);
   }
 
+  /**
+   * 关闭即席查询
+   *
+   * @param operator
+   * @param execId
+   */
   @PostMapping(value = "/adHoc/{execId}/kill")
   public void killAdhoc(@RequestAttribute(value = "session.user") User operator,
                         @PathVariable int execId) {

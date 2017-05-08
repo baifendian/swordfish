@@ -62,6 +62,15 @@ public interface AdHocMapper {
   int update(@Param("adHoc") AdHoc adHoc);
 
   /**
+   * 更新状态
+   *
+   * @param adHoc
+   * @return
+   */
+  @UpdateProvider(type = AdHocMapperProvider.class, method = "updateStatus")
+  int updateStatus(@Param("adHoc") AdHoc adHoc);
+
+  /**
    * 根据 id 查询
    *
    * @param id
