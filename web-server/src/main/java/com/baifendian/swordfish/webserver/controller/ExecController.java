@@ -54,7 +54,6 @@ public class ExecController {
    * @param notifyType
    * @param notifyMails
    * @param timeout
-   * @param response
    * @return
    */
   @PostMapping(value = "")
@@ -67,8 +66,7 @@ public class ExecController {
                                           @RequestParam(value = "nodeDep", required = false) NodeDepType nodeDep,
                                           @RequestParam(value = "notifyType", required = false) NotifyType notifyType,
                                           @RequestParam(value = "notifyMails", required = false) String notifyMails,
-                                          @RequestParam(value = "timeout", required = false, defaultValue = "1800") int timeout,
-                                          HttpServletResponse response) {
+                                          @RequestParam(value = "timeout", required = false, defaultValue = "1800") int timeout) {
     logger.info("Operator user {}, exec workflow, project name: {}, workflow name: {}, schedule: {}, node name: {}, node dep: {}, notify type: {}," +
             "notify mails: {}, timeout: {}",
         operator.getName(), projectName, workflowName, schedule, nodeName, nodeDep, notifyType, notifyMails, timeout);
@@ -88,8 +86,7 @@ public class ExecController {
                                                @RequestParam(value = "notifyType", required = false, defaultValue = "None") NotifyType notifyType,
                                                @RequestParam(value = "notifyMails", required = false) String notifyMails,
                                                @RequestParam(value = "timeout", required = false, defaultValue = "18000") int timeout,
-                                               @RequestParam(value = "extras", required = false) String extras,
-                                               HttpServletResponse response) {
+                                               @RequestParam(value = "extras", required = false) String extras) {
     logger.info("Operator user {}, exec workflow, project name: {}, workflow name: {}, proxy user: {}, queue: {}, data: {}, file: {}," +
         "notify type: {}, notify mails: {}, timeout: {}, extras: {}", operator.getName(), projectName, workflowName, proxyUser, queue, data, file.getName(), notifyType, notifyMails, timeout, extras);
 
@@ -107,7 +104,6 @@ public class ExecController {
    * @param status
    * @param from
    * @param size
-   * @param response
    * @return
    */
   @GetMapping(value = "")
@@ -118,8 +114,7 @@ public class ExecController {
                                      @RequestParam(value = "workflowName", required = false) String workflowName,
                                      @RequestParam(value = "status", required = false) String status,
                                      @RequestParam(value = "from", required = false, defaultValue = "0") int from,
-                                     @RequestParam(value = "size", required = false, defaultValue = "100") int size,
-                                     HttpServletResponse response) {
+                                     @RequestParam(value = "size", required = false, defaultValue = "100") int size) {
     logger.info("Operator user {}, query exec list, start date: {}, end date: {}, project name: {}, workflow name: {}, status: {}, from: {}, size: {}",
         operator.getName(), startDate, endDate, projectName, workflowName, status, from, size);
 
@@ -131,17 +126,15 @@ public class ExecController {
    *
    * @param operator
    * @param execId
-   * @param response
    * @return
    */
   @GetMapping(value = "/{execId}")
   public ExecutionFlowDto queryExecDetail(@RequestAttribute(value = "session.user") User operator,
-                                          @PathVariable(value = "execId") int execId,
-                                          HttpServletResponse response) {
+                                          @PathVariable(value = "execId") int execId) {
     logger.info("Operator user {}, query exec detail, exec id: {}",
         operator.getName(), execId);
 
-    return execService.getExecWorkflow(operator,execId);
+    return execService.getExecWorkflow(operator, execId);
   }
 
   /**
@@ -151,15 +144,13 @@ public class ExecController {
    * @param jobId
    * @param from
    * @param size
-   * @param response
    * @return
    */
   @GetMapping(value = "/{jobId}/logs")
   public LogResult queryLogs(@RequestAttribute(value = "session.user") User operator,
                              @PathVariable(value = "jobId") String jobId,
                              @RequestParam(value = "from", required = false, defaultValue = "0") int from,
-                             @RequestParam(value = "size", required = false, defaultValue = "100") int size,
-                             HttpServletResponse response) {
+                             @RequestParam(value = "size", required = false, defaultValue = "100") int size) {
     logger.info("Operator user {}, query log, job id: {}, from: {}, size: {}",
         operator.getName(), jobId, from, size);
 
@@ -171,12 +162,10 @@ public class ExecController {
    *
    * @param operator
    * @param execId
-   * @param response
    */
   @PostMapping(value = "/{execId}/kill")
   public void killExec(@RequestAttribute(value = "session.user") User operator,
-                       @PathVariable int execId,
-                       HttpServletResponse response) {
+                       @PathVariable int execId) {
     logger.info("Operator user {}, kill exec, exec id: {}",
         operator.getName(), execId);
 

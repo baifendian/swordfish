@@ -23,8 +23,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletResponse;
-
 @RestController
 @RequestMapping("/projects/{projectName}/resource-copy")
 public class ResourceCopyController {
@@ -42,15 +40,13 @@ public class ResourceCopyController {
    * @param srcResName
    * @param destResName
    * @param desc
-   * @param response
    */
   @PostMapping(value = "")
   public ResourceDto copyResource(@RequestAttribute(value = "session.user") User operator,
                                   @PathVariable String projectName,
                                   @RequestParam(value = "srcResName") String srcResName,
                                   @RequestParam(value = "destResName") String destResName,
-                                  @RequestParam(value = "desc", required = false) String desc,
-                                  HttpServletResponse response) {
+                                  @RequestParam(value = "desc", required = false) String desc) {
     logger.info("Operator user {}, copy resource, project name: {}, source resource name: {}, dest resource name: {}, desc: {}",
         operator.getName(), projectName, srcResName, destResName, desc);
 

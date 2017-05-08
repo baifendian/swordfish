@@ -49,7 +49,6 @@ public class UserController {
    * @param password
    * @param phone
    * @param proxyUsers
-   * @param response
    * @return
    */
   @PostMapping(value = "/{name}")
@@ -59,8 +58,7 @@ public class UserController {
                             @RequestParam(value = "desc", required = false) String desc,
                             @RequestParam(value = "password") String password,
                             @RequestParam(value = "phone", required = false) String phone,
-                            @RequestParam(value = "proxyUsers") String proxyUsers,
-                            HttpServletResponse response) {
+                            @RequestParam(value = "proxyUsers") String proxyUsers) {
     logger.info("Operator user {}, create user, name: {}, email: {}, desc: {}, password: {}, phone: {}, proxyUsers: {}",
         operator.getName(), name, email, desc, "******", phone, proxyUsers);
 
@@ -77,7 +75,6 @@ public class UserController {
    * @param password
    * @param phone
    * @param proxyUsers: 代理用户信息, 普通用户无权限修改自身代理用户信息
-   * @param response
    * @return
    */
   @PatchMapping(value = "/{name}")
@@ -87,8 +84,7 @@ public class UserController {
                             @RequestParam(value = "desc", required = false) String desc,
                             @RequestParam(value = "password", required = false) String password,
                             @RequestParam(value = "phone", required = false) String phone,
-                            @RequestParam(value = "proxyUsers", required = false) String proxyUsers,
-                            HttpServletResponse response) {
+                            @RequestParam(value = "proxyUsers", required = false) String proxyUsers) {
     logger.info("Operator user {}, modify user, name: {}, email: {}, desc: {}, password: {}, phone: {}, proxyUsers: {}",
         operator.getName(), name, email, desc, "******", phone, proxyUsers);
 
@@ -100,13 +96,11 @@ public class UserController {
    *
    * @param operator
    * @param name
-   * @param response
    * @return
    */
   @DeleteMapping(value = "/{name}")
   public void deleteUser(@RequestAttribute(value = "session.user") User operator,
-                         @PathVariable String name,
-                         HttpServletResponse response) {
+                         @PathVariable String name) {
     logger.info("Operator user {}, delete user, name: {}",
         operator.getName(), name);
 
@@ -118,13 +112,11 @@ public class UserController {
    *
    * @param operator
    * @param allUser
-   * @param response
    * @return
    */
   @GetMapping(value = "")
   public List<UserDto> queryUsers(@RequestAttribute(value = "session.user") User operator,
-                                  @RequestParam(value = "allUser", required = false, defaultValue = "false") boolean allUser,
-                                  HttpServletResponse response) {
+                                  @RequestParam(value = "allUser", required = false, defaultValue = "false") boolean allUser) {
     logger.info("Operator user {}, query user, allUser: {}",
         operator.getName(), allUser);
 

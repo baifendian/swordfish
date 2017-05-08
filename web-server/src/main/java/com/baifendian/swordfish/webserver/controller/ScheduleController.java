@@ -27,7 +27,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -56,7 +55,6 @@ public class ScheduleController {
    * @param depWorkflows
    * @param depPolicyType
    * @param timeout
-   * @param response
    * @return
    */
   @PostMapping("/{workflowName}/schedules")
@@ -70,8 +68,7 @@ public class ScheduleController {
                                     @RequestParam(value = "failurePolicy", required = false, defaultValue = "END") FailurePolicyType failurePolicy,
                                     @RequestParam(value = "depWorkflows", required = false) String depWorkflows,
                                     @RequestParam(value = "depPolicy", required = false, defaultValue = "NO_DEP_PRE") DepPolicyType depPolicyType,
-                                    @RequestParam(value = "timeout", required = false, defaultValue = "18000") int timeout,
-                                    HttpServletResponse response) {
+                                    @RequestParam(value = "timeout", required = false, defaultValue = "18000") int timeout) {
     logger.info("Operator user {}, exec workflow, project name: {}, workflow name: {}, schedule: {}, notify type: {}, notify mails: {}, max try times: {}," +
             "failure policy: {}, dep workflows: {}, dep policy: {}, timeout: {}",
         operator.getName(), projectName, workflowName, schedule, notifyType, notifyMails, maxTryTimes, failurePolicy, depWorkflows, depPolicyType, timeout);
@@ -106,8 +103,7 @@ public class ScheduleController {
                                              @RequestParam(value = "failurePolicy", required = false, defaultValue = "END") FailurePolicyType failurePolicy,
                                              @RequestParam(value = "depWorkflows", required = false) String depWorkflows,
                                              @RequestParam(value = "depPolicy", required = false, defaultValue = "NO_DEP_PRE") DepPolicyType depPolicyType,
-                                             @RequestParam(value = "timeout", required = false, defaultValue = "18000") int timeout,
-                                             HttpServletResponse response) {
+                                             @RequestParam(value = "timeout", required = false, defaultValue = "18000") int timeout) {
     logger.info("Operator user {}, exec workflow, project name: {}, workflow name: {}, schedule: {}, notify type: {}, notify mails: {}, max try times: {}," +
             "failure policy: {}, dep workflows: {}, dep policy: {}, timeout: {}",
         operator.getName(), projectName, workflowName, schedule, notifyType, notifyMails, maxTryTimes, failurePolicy, depWorkflows, depPolicyType, timeout);
@@ -128,7 +124,6 @@ public class ScheduleController {
    * @param depWorkflows
    * @param depPolicyType
    * @param timeout
-   * @param response
    * @return
    */
   @PatchMapping("/{workflowName}/schedules")
@@ -142,8 +137,7 @@ public class ScheduleController {
                                    @RequestParam(value = "failurePolicy", required = false, defaultValue = "END") FailurePolicyType failurePolicy,
                                    @RequestParam(value = "depWorkflows", required = false) String depWorkflows,
                                    @RequestParam(value = "depPolicy", required = false, defaultValue = "NO_DEP_PRE") DepPolicyType depPolicyType,
-                                   @RequestParam(value = "timeout", required = false, defaultValue = "18000") int timeout,
-                                   HttpServletResponse response) {
+                                   @RequestParam(value = "timeout", required = false, defaultValue = "18000") int timeout) {
     logger.info("Operator user {}, exec workflow, project name: {}, workflow name: {}, schedule: {}, notify type: {}, notify mails: {}, max try times: {}," +
             "failure policy: {}, dep workflows: {}, dep policy: {}, timeout: {}",
         operator.getName(), projectName, workflowName, schedule, notifyType, notifyMails, maxTryTimes, failurePolicy, depWorkflows, depPolicyType, timeout);
@@ -157,14 +151,12 @@ public class ScheduleController {
    * @param operator
    * @param projectName
    * @param workflowName
-   * @param response
    */
   @PostMapping("/{workflowName}/schedules/{scheduleStatus}")
   public void postScheduleStatus(@RequestAttribute(value = "session.user") User operator,
                                  @PathVariable String projectName,
                                  @PathVariable String workflowName,
-                                 @PathVariable String scheduleStatus,
-                                 HttpServletResponse response) {
+                                 @PathVariable String scheduleStatus) {
     // TODO:: logger
 
     try {
@@ -180,14 +172,12 @@ public class ScheduleController {
    * @param operator
    * @param projectName
    * @param workflowName
-   * @param response
    * @return
    */
   @GetMapping("/{workflowName}/schedules")
   public ScheduleDto querySchedule(@RequestAttribute(value = "session.user") User operator,
                                    @PathVariable String projectName,
-                                   @PathVariable String workflowName,
-                                   HttpServletResponse response) {
+                                   @PathVariable String workflowName) {
     // TODO:: logger
 
     return new ScheduleDto(scheduleService.querySchedule(operator, projectName, workflowName));
@@ -198,13 +188,12 @@ public class ScheduleController {
    *
    * @param operator
    * @param projectName
-   * @param response
    * @return
    */
   @GetMapping("/schedules")
   public List<ScheduleDto> queryAllSchedule(@RequestAttribute(value = "session.user") User operator,
-                                            @PathVariable String projectName,
-                                            HttpServletResponse response) {
+                                            @PathVariable String projectName
+  ) {
     // TODO:: logger
 
     List<Schedule> scheduleList = scheduleService.queryAllSchedule(operator, projectName);
