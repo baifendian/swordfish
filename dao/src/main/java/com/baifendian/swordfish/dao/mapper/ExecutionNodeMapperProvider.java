@@ -16,7 +16,6 @@
 package com.baifendian.swordfish.dao.mapper;
 
 import com.baifendian.swordfish.dao.enums.FlowStatus;
-import com.baifendian.swordfish.dao.enums.FlowType;
 import com.baifendian.swordfish.dao.mapper.utils.EnumFieldUtil;
 import com.baifendian.swordfish.dao.model.ExecutionNode;
 import org.apache.ibatis.jdbc.SQL;
@@ -35,12 +34,7 @@ public class ExecutionNodeMapperProvider {
 
   public static final String TABLE_NAME = "execution_nodes";
 
-  List<Integer> flowTypes = new ArrayList<>();
-
   public ExecutionNodeMapperProvider() {
-    flowTypes.add(FlowType.LONG.getType());
-    flowTypes.add(FlowType.SHORT.getType());
-    flowTypes.add(FlowType.ETL.getType());
   }
 
   public String insert(Map<String, Object> parameter) {
@@ -94,7 +88,7 @@ public class ExecutionNodeMapperProvider {
     }.toString();
   }
 
-  public String selectExecNodeById(Map<String, Object> parameter){
+  public String selectExecNodeById(Map<String, Object> parameter) {
     return new SQL() {
       {
         SELECT("*");
@@ -104,7 +98,7 @@ public class ExecutionNodeMapperProvider {
     }.toString();
   }
 
-  public String selectExecNodeByJobId(Map<String, Object> parameter){
+  public String selectExecNodeByJobId(Map<String, Object> parameter) {
     return new SQL() {
       {
         SELECT("*");

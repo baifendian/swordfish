@@ -25,10 +25,6 @@ public enum NotifyType {
    */
   NONE, SUCCESS, FAILURE, ALL;
 
-  public Integer getType() {
-    return ordinal();
-  }
-
   /**
    * 通过 type 获取枚举对象 <p>
    *

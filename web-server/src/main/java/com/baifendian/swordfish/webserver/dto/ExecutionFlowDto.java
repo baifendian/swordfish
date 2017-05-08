@@ -45,6 +45,7 @@ public class ExecutionFlowDto {
   private String submitUser;
   private String proxyUser;
   private String queue;
+  @JsonSerialize(using = JsonOrdinalSerializer.class)
   private FlowStatus status;
   private String owner;
   @JsonRawValue

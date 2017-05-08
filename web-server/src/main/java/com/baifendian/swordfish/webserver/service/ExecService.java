@@ -122,7 +122,7 @@ public class ExecService {
             throw new ParameterException("Notify mail \"{0}\" not valid", notifyMails);
           }
 
-          ExecInfo execInfo = new ExecInfo(nodeName, nodeDep != null ? nodeDep.getType() : 0, notifyType != null ? notifyType.getType() : 0, notifyMailList, timeout);
+          ExecInfo execInfo = new ExecInfo(nodeName, nodeDep != null ? nodeDep.ordinal() : 0, notifyType != null ? notifyType.ordinal() : 0, notifyMailList, timeout);
           RetResultInfo retInfo = masterClient.execFlow(project.getId(), projectFlow.getId(), new Date().getTime(), execInfo);
           if (retInfo == null || retInfo.getRetInfo().getStatus() != 0) {
             logger.error("Call master client exec workflow false , project id: {}, flow id: {},host: {}, port: {}", project.getId(), projectFlow.getId(), masterServer.getHost(), masterServer.getPort());
@@ -148,8 +148,8 @@ public class ExecService {
           return new ExecutorIds(retInfo.getExecIds());
         }
         default: {
-          logger.error("exec workflow no support exec type {}", execType.getType());
-          throw new ParameterException("Exec type \"{0}\" not valid", execType.getType());
+          logger.error("exec workflow no support exec type {}", execType.name());
+          throw new ParameterException("Exec type \"{0}\" not valid", execType.name());
         }
       }
 

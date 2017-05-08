@@ -16,35 +16,6 @@
 package com.baifendian.swordfish.dao.enums;
 
 public enum UserRoleType {
-  ADMIN_USER(0),
-  GENERAL_USER(1);
-
-  private int role;
-
-  UserRoleType(int val) {
-    this.role = val;
-  }
-
-  public Integer getType() {
-    return role;
-  }
-
-  /**
-   * @param type
-   * @return
-   * @throws IllegalArgumentException
-   */
-  public static UserRoleType valueOfType(Integer type) throws IllegalArgumentException {
-    if (type == null) {
-      return null;
-    }
-
-    for (UserRoleType roleType : UserRoleType.values()) {
-      if (roleType.getType().equals(type)) {
-        return roleType;
-      }
-    }
-
-    throw new IllegalArgumentException("Cannot convert " + type + " to " + UserRoleType.class.getSimpleName() + " .");
-  }
+  ADMIN_USER,
+  GENERAL_USER;
 }

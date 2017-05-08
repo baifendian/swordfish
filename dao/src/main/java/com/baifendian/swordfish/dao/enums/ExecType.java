@@ -24,26 +24,4 @@ public enum ExecType {
    * 0(直接运行) 1(调度的任务) 2(补数据的任务)
    **/
   DIRECT, SCHEDULER, COMPLEMENT_DATA;
-
-  public Integer getType() {
-    return ordinal();
-  }
-
-  /**
-   * 通过 type 获取枚举对象 <p>
-   *
-   * @param type
-   * @return {@link FlowStatus}
-   */
-  public static ExecType valueOfType(Integer type) throws IllegalArgumentException {
-    if (type == null) {
-      return null;
-    }
-
-    try {
-      return ExecType.values()[type];
-    } catch (Exception ex) {
-      throw new IllegalArgumentException("Cannot convert " + type + " to " + ExecType.class.getSimpleName() + " .", ex);
-    }
-  }
 }

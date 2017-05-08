@@ -15,18 +15,9 @@
  */
 package com.baifendian.swordfish.dao.mapper;
 
-import com.baifendian.swordfish.dao.enums.NodeType;
-import com.baifendian.swordfish.dao.mapper.utils.EnumFieldUtil;
-import com.baifendian.swordfish.dao.model.FlowNode;
-import org.apache.commons.lang.StringUtils;
 import org.apache.ibatis.jdbc.SQL;
 
-import java.text.MessageFormat;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
 
 /**
  * workflow 节点表的 sql 生成器 <p>

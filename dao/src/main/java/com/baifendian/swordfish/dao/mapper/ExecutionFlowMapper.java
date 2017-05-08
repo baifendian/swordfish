@@ -21,14 +21,12 @@ import com.baifendian.swordfish.dao.enums.NotifyType;
 import com.baifendian.swordfish.dao.model.ExecutionFlow;
 import com.baifendian.swordfish.dao.model.ExecutionFlowError;
 import com.baifendian.swordfish.dao.model.ExecutionState;
-import com.baifendian.swordfish.dao.model.MaintainQuery;
 import org.apache.ibatis.annotations.*;
 import org.apache.ibatis.type.EnumOrdinalTypeHandler;
 import org.apache.ibatis.type.JdbcType;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Set;
 
 /**
  * workflow 执行的信息操作 <p>

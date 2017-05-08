@@ -27,16 +27,6 @@ public enum NodeDepType {
   NODE_ONLY, NODE_POST, NODE_PRE;
 
   /**
-   * getter method
-   *
-   * @return the type
-   * @see NodeDepType
-   */
-  public Integer getType() {
-    return ordinal();
-  }
-
-  /**
    * 通过 type 获取枚举对象 <p>
    *
    * @param type
@@ -46,7 +36,6 @@ public enum NodeDepType {
     if (type == null) {
       return null;
     }
-
     try {
       return NodeDepType.values()[type];
     } catch (Exception ex) {
