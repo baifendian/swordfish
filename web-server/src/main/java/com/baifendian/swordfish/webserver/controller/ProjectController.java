@@ -53,7 +53,7 @@ public class ProjectController {
   public ProjectDto createProject(@RequestAttribute(value = "session.user") User operator,
                                   @PathVariable("name") String name,
                                   @RequestParam(value = "desc", required = false) String desc) {
-    logger.info("Operator user {}, create project, name: {}, desc: {}", operator.getName(), name, desc);
+    logger.info("Operator user {}, create PROJECT, name: {}, desc: {}", operator.getName(), name, desc);
 
     return new ProjectDto(projectService.createProject(operator, name, desc));
   }
@@ -70,7 +70,7 @@ public class ProjectController {
   public ProjectDto modifyProject(@RequestAttribute(value = "session.user") User operator,
                                   @PathVariable("name") String name,
                                   @RequestParam(value = "desc", required = false) String desc) {
-    logger.info("Operator user {}, modify project, name: {}, desc: {}", operator.getName(), name, desc);
+    logger.info("Operator user {}, modify PROJECT, name: {}, desc: {}", operator.getName(), name, desc);
 
     return new ProjectDto(projectService.modifyProject(operator, name, desc));
   }
@@ -85,7 +85,7 @@ public class ProjectController {
   @DeleteMapping(value = "/{name}")
   public void deleteProject(@RequestAttribute(value = "session.user") User operator,
                             @PathVariable("name") String name) {
-    logger.info("Operator user {}, delete project, name: {}, desc: {}", operator.getName(), name);
+    logger.info("Operator user {}, delete PROJECT, name: {}, desc: {}", operator.getName(), name);
 
     projectService.deleteProject(operator, name);
   }
@@ -98,7 +98,7 @@ public class ProjectController {
    */
   @GetMapping(value = "")
   public List<ProjectDto> queryProjects(@RequestAttribute(value = "session.user") User operator) {
-    logger.info("Operator user {}, get project list", operator.getName());
+    logger.info("Operator user {}, get PROJECT list", operator.getName());
 
     List<Project> projectList = projectService.queryProject(operator);
     List<ProjectDto> projectDtoList = new ArrayList<>();
@@ -124,7 +124,7 @@ public class ProjectController {
                                        @PathVariable("name") String name,
                                        @PathVariable("userName") String userName,
                                        @RequestParam(value = "perm") int perm) {
-    logger.info("Operator user {}, add user to project, project name: {}, user name: {}, perm: {}", operator.getName(), name, userName, perm);
+    logger.info("Operator user {}, add user to PROJECT, PROJECT name: {}, user name: {}, perm: {}", operator.getName(), name, userName, perm);
 
     return new ProjectUserDto(projectService.addProjectUser(operator, name, userName, perm));
   }
@@ -143,7 +143,7 @@ public class ProjectController {
                                           @PathVariable("name") String name,
                                           @PathVariable("userName") String userName,
                                           @RequestParam(value = "perm") int perm) {
-    logger.info("Operator user {}, modify user permission in the project, project name: {}, user name: {}, perm: {}", operator.getName(), name, userName, perm);
+    logger.info("Operator user {}, modify user permission in the PROJECT, PROJECT name: {}, user name: {}, perm: {}", operator.getName(), name, userName, perm);
 
     return new ProjectUserDto(projectService.modifyProjectUser(operator, name, userName, perm));
   }
@@ -159,7 +159,7 @@ public class ProjectController {
   public void deleteProjectUser(@RequestAttribute(value = "session.user") User operator,
                                 @PathVariable("name") String name,
                                 @PathVariable("userName") String userName) {
-    logger.info("Operator user {}, delete user from project, project name: {}, user name: {}, perm: {}", operator.getName(), name, userName);
+    logger.info("Operator user {}, delete user from PROJECT, PROJECT name: {}, user name: {}, perm: {}", operator.getName(), name, userName);
 
     projectService.deleteProjectUser(operator, name, userName);
   }
@@ -174,7 +174,7 @@ public class ProjectController {
   @GetMapping(value = "/{name}/users")
   public List<ProjectUserDto> queryUser(@RequestAttribute(value = "session.user") User operator,
                                         @PathVariable("name") String name) {
-    logger.info("Operator user {}, query users of project, project name: {}", operator.getName(), name);
+    logger.info("Operator user {}, query users of PROJECT, PROJECT name: {}", operator.getName(), name);
 
     List<ProjectUser> projectUserList = projectService.queryUser(operator, name);
     List<ProjectUserDto> projectUserDtoList = new ArrayList<>();

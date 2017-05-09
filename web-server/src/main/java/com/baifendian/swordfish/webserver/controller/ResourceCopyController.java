@@ -47,7 +47,7 @@ public class ResourceCopyController {
                                   @RequestParam(value = "srcResName") String srcResName,
                                   @RequestParam(value = "destResName") String destResName,
                                   @RequestParam(value = "desc", required = false) String desc) {
-    logger.info("Operator user {}, copy resource, project name: {}, source resource name: {}, dest resource name: {}, desc: {}",
+    logger.info("Operator user {}, copy resource, PROJECT name: {}, source resource name: {}, dest resource name: {}, desc: {}",
         operator.getName(), projectName, srcResName, destResName, desc);
 
     return new ResourceDto(resourceService.copyResource(operator, projectName, srcResName, destResName, desc));

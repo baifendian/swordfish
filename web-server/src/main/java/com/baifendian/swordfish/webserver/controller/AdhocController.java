@@ -15,7 +15,7 @@
  */
 package com.baifendian.swordfish.webserver.controller;
 
-import com.baifendian.swordfish.common.job.struct.hql.UdfsInfo;
+import com.baifendian.swordfish.common.job.struct.node.common.UdfsInfo;
 import com.baifendian.swordfish.dao.model.User;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
 import com.baifendian.swordfish.webserver.dto.AdHocLogDto;
@@ -64,7 +64,7 @@ public class AdhocController {
                                  @RequestParam(value = "queue") String queue,
                                  @RequestParam(value = "udfs", required = false) String udfs,
                                  @RequestParam(value = "timeout", required = false, defaultValue = "1800") int timeout) {
-    logger.info("Operator user {}, exec adhoc, project name: {}, stms: {}, limit: {}, proxyUser: {}, queue: {}, udfs: {}, timeout: {}",
+    logger.info("Operator user {}, exec adhoc, PROJECT name: {}, stms: {}, limit: {}, proxyUser: {}, queue: {}, udfs: {}, timeout: {}",
         operator.getName(), projectName, stms, limit, proxyUser, queue, udfs, timeout);
 
     // limit 的限制

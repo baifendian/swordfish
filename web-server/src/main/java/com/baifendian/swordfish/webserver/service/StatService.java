@@ -69,12 +69,12 @@ public class StatService {
 
     if (project == null) {
       logger.error("Project does not exist: {}", projectName);
-      throw new NotFoundException("Not found project \"{0}\"", projectName);
+      throw new NotFoundException("Not found PROJECT \"{0}\"", projectName);
     }
 
     if (!projectService.hasExecPerm(operator.getId(), project)) {
-      logger.error("User {} has no right permission for the project {} to query exec states", operator.getName(), projectName);
-      throw new PermissionException("User \"{0}\" is not has project \"{1}\" exec permission", operator.getName(), projectName);
+      logger.error("User {} has no right permission for the PROJECT {} to query exec states", operator.getName(), projectName);
+      throw new PermissionException("User \"{0}\" is not has PROJECT \"{1}\" exec permission", operator.getName(), projectName);
     }
 
     List<ExecutionState> executionStateList = executionFlowMapper.selectStateByProject(project.getId(),startDate,endDate);
@@ -102,12 +102,12 @@ public class StatService {
 
     if (project == null) {
       logger.error("Project does not exist: {}", projectName);
-      throw new NotFoundException("Not found project \"{0}\"", projectName);
+      throw new NotFoundException("Not found PROJECT \"{0}\"", projectName);
     }
 
     if (!projectService.hasExecPerm(operator.getId(), project)) {
-      logger.error("User {} has no right permission for the project {} to query exec states", operator.getName(), projectName);
-      throw new PermissionException("User \"{0}\" is not has project \"{1}\" exec permission", operator.getName(), projectName);
+      logger.error("User {} has no right permission for the PROJECT {} to query exec states", operator.getName(), projectName);
+      throw new PermissionException("User \"{0}\" is not has PROJECT \"{1}\" exec permission", operator.getName(), projectName);
     }
 
     List<ExecutionState> executionStateList = executionFlowMapper.selectStateHourByProject(project.getId(),date);
@@ -138,12 +138,12 @@ public class StatService {
 
     if (project == null) {
       logger.error("Project does not exist: {}", projectName);
-      throw new NotFoundException("Not found project \"{0}\"", projectName);
+      throw new NotFoundException("Not found PROJECT \"{0}\"", projectName);
     }
 
     if (!projectService.hasExecPerm(operator.getId(), project)) {
-      logger.error("User {} has no right permission for the project {} to create project flow", operator.getName(), projectName);
-      throw new PermissionException("User \"{0}\" is not has project \"{1}\" exec permission", operator.getName(), projectName);
+      logger.error("User {} has no right permission for the PROJECT {} to create PROJECT flow", operator.getName(), projectName);
+      throw new PermissionException("User \"{0}\" is not has PROJECT \"{1}\" exec permission", operator.getName(), projectName);
     }
 
     return executionFlowMapper.selectConsumesByProject(project.getId(),num,datetime);
@@ -165,12 +165,12 @@ public class StatService {
 
     if (project == null) {
       logger.error("Project does not exist: {}", projectName);
-      throw new NotFoundException("Not found project \"{0}\"", projectName);
+      throw new NotFoundException("Not found PROJECT \"{0}\"", projectName);
     }
 
     if (!projectService.hasExecPerm(operator.getId(), project)) {
-      logger.error("User {} has no right permission for the project {} to create project flow", operator.getName(), projectName);
-      throw new PermissionException("User \"{0}\" is not has project \"{1}\" exec permission", operator.getName(), projectName);
+      logger.error("User {} has no right permission for the PROJECT {} to create PROJECT flow", operator.getName(), projectName);
+      throw new PermissionException("User \"{0}\" is not has PROJECT \"{1}\" exec permission", operator.getName(), projectName);
     }
 
     return executionFlowMapper.selectErrorsByProject(project.getId(),num,datetime);
