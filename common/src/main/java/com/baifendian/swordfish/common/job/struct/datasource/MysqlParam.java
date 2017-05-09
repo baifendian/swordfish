@@ -13,9 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.baifendian.swordfish.common.datasource.jdbc;
+package com.baifendian.swordfish.common.job.struct.datasource;
 
-public class JDBCParam {
+/**
+ * mysql数据源的配置参数
+ */
+public class MysqlParam {
   private String address;
 
   private String database;

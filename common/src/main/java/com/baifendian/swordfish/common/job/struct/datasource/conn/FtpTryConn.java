@@ -13,10 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.baifendian.swordfish.common.datasource;
+package com.baifendian.swordfish.common.job.struct.datasource.conn;
 
-public interface DataSourceHandler {
 
-  public void isConnectable() throws Exception;
+import com.baifendian.swordfish.common.job.struct.datasource.FtpParam;
+import org.apache.commons.net.ftp.FTPClient;
 
+/**
+ * ftp 尝试连接工具类
+ */
+public class FtpTryConn extends TryConn<FtpParam> {
+
+  public FtpTryConn(FtpParam param) {
+    super(param);
+  }
+
+  @Override
+  public void isConnectable() throws Exception {
+    FTPClient ftpClient = new FTPClient();
+    ftpClient.connect(param.getHost(), param.getPort());
+    ftpClient.login(param.getUser(), param.getPassword());
+  }
 }

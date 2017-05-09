@@ -85,12 +85,12 @@ public class AdhocService {
 
     if (project == null) {
       logger.error("Project does not exist: {}", projectName);
-      throw new NotFoundException("Not found PROJECT \"{0}\"", projectName);
+      throw new NotFoundException("Not found project \"{0}\"", projectName);
     }
 
     if (!projectService.hasExecPerm(operator.getId(), project)) {
-      logger.error("User {} has no right permission for the PROJECT {}", operator.getName(), projectName);
-      throw new PermissionException("User \"{0}\" has no right permission for the PROJECT \"{1}\"", operator.getName(), projectName);
+      logger.error("User {} has no right permission for the project {}", operator.getName(), projectName);
+      throw new PermissionException("User \"{0}\" has no right permission for the project \"{1}\"", operator.getName(), projectName);
     }
 
     // 判断 proxyUser 是否合理的
@@ -174,13 +174,13 @@ public class AdhocService {
     Project project = adHocMapper.queryProjectByExecId(execId);
 
     if (project == null) {
-      logger.error("Exec id: {} has no correspond PROJECT", execId);
-      throw new NotFoundException("Exec id \"{0}\" has no correspond PROJECT", execId);
+      logger.error("Exec id: {} has no correspond project", execId);
+      throw new NotFoundException("Exec id \"{0}\" has no correspond project", execId);
     }
 
     if (!projectService.hasExecPerm(operator.getId(), project)) {
-      logger.error("User [{},{}] has no right permission for the PROJECT [{}], execId: {}", operator.getId(), operator.getName(), project.getName(), execId);
-      throw new PermissionException("User [\"{0}\",\"{1}\"] has no right permission for the PROJECT [\"{2}\"], execId \"{3}\"", operator.getId(), operator.getName(), project.getName(), execId);
+      logger.error("User [{},{}] has no right permission for the project [{}], execId: {}", operator.getId(), operator.getName(), project.getName(), execId);
+      throw new PermissionException("User [\"{0}\",\"{1}\"] has no right permission for the project [\"{2}\"], execId \"{3}\"", operator.getId(), operator.getName(), project.getName(), execId);
     }
 
     // 返回日志信息
@@ -246,13 +246,13 @@ public class AdhocService {
     Project project = adHocMapper.queryProjectByExecId(execId);
 
     if (project == null) {
-      logger.error("Exec id: {} has no correspond PROJECT", execId);
-      throw new NotFoundException("Exec id \"{0}\" has no correspond PROJECT", execId);
+      logger.error("Exec id: {} has no correspond project", execId);
+      throw new NotFoundException("Exec id \"{0}\" has no correspond project", execId);
     }
 
     if (!projectService.hasExecPerm(operator.getId(), project)) {
-      logger.error("User {} has no right permission for the PROJECT {}", operator.getName(), project.getName());
-      throw new PermissionException("User \"{0}\" has no right permission for the PROJECT \"{1}\"", operator.getName(), project.getName());
+      logger.error("User {} has no right permission for the project {}", operator.getName(), project.getName());
+      throw new PermissionException("User \"{0}\" has no right permission for the project \"{1}\"", operator.getName(), project.getName());
     }
 
     // 返回结果
@@ -280,13 +280,13 @@ public class AdhocService {
     Project project = adHocMapper.queryProjectByExecId(execId);
 
     if (project == null) {
-      logger.error("Exec id: {} has no correspond PROJECT", execId);
-      throw new NotFoundException("Exec id \"{0}\" has no correspond PROJECT", execId);
+      logger.error("Exec id: {} has no correspond project", execId);
+      throw new NotFoundException("Exec id \"{0}\" has no correspond project", execId);
     }
 
     if (!projectService.hasExecPerm(operator.getId(), project)) {
-      logger.error("User {} has no right permission for the PROJECT {}", operator.getName(), project.getName());
-      throw new PermissionException("User \"{0}\" has no right permission for the PROJECT \"{1}\"", operator.getName(), project.getName());
+      logger.error("User {} has no right permission for the project {}", operator.getName(), project.getName());
+      throw new PermissionException("User \"{0}\" has no right permission for the project \"{1}\"", operator.getName(), project.getName());
     }
 
     // kill 即席, 通过数据库来做到

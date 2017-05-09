@@ -13,26 +13,39 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.baifendian.swordfish.common.datasource.mongodb;
+package com.baifendian.swordfish.common.job.struct.datasource;
 
-public class MongoDBParam {
-  private String address;
+/**
+ * HBASE参数配置
+ */
+public class HBaseParam {
+  private String zkQuorum;
 
-  private String database;
+  private String zkZnodeParent;
 
-  public String getAddress() {
-    return address;
+  private Integer zkPort;
+
+  public String getZkQuorum() {
+    return zkQuorum;
   }
 
-  public void setAddress(String address) {
-    this.address = address;
+  public void setZkQuorum(String zkQuorum) {
+    this.zkQuorum = zkQuorum;
   }
 
-  public String getDatabase() {
-    return database;
+  public String getZkZnodeParent() {
+    return zkZnodeParent;
   }
 
-  public void setDatabase(String database) {
-    this.database = database;
+  public void setZkZnodeParent(String zkZnodeParent) {
+    this.zkZnodeParent = zkZnodeParent;
+  }
+
+  public Integer getZkPort() {
+    return zkPort;
+  }
+
+  public void setZkPort(Integer zkPort) {
+    this.zkPort = zkPort;
   }
 }

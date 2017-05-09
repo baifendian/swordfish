@@ -13,11 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.baifendian.swordfish.common.datasource.hbase;
+package com.baifendian.swordfish.common.job.struct.datasource.conn;
 
-import com.baifendian.swordfish.common.datasource.DataSourceHandler;
-import com.baifendian.swordfish.dao.enums.DbType;
-import com.baifendian.swordfish.dao.utils.json.JsonUtil;
+import com.baifendian.swordfish.common.job.struct.datasource.HBaseParam;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HBaseConfiguration;
@@ -28,19 +27,19 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
-public class HBaseHandler implements DataSourceHandler {
+/**
+ * HBase 数据源测试连接
+ */
+public class HBaseTryConn extends TryConn<HBaseParam> {
 
-  private static final Logger logger = LoggerFactory.getLogger(HBaseHandler.class);
+  private static Logger logger = LoggerFactory.getLogger(HBaseTryConn.class);
 
-  private DbType dbType;
-
-  private HBaseParam param;
-
-  public HBaseHandler(DbType dbType, String paramStr){
-    param = JsonUtil.parseObject(paramStr, HBaseParam.class);
+  public HBaseTryConn(HBaseParam param) {
+    super(param);
   }
 
-  public void isConnectable() throws IOException {
+  @Override
+  public void isConnectable() throws Exception {
     Connection con = null;
     try{
       Configuration config = HBaseConfiguration.create();
@@ -57,9 +56,11 @@ public class HBaseHandler implements DataSourceHandler {
         try {
           con.close();
         } catch (IOException e) {
-          e.printStackTrace();
+          logger.error("hbase try conn close conn error",e);
+          throw e;
         }
       }
     }
   }
+
 }
