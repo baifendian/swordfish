@@ -13,14 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.baifendian.swordfish.common.job.node.hive;
+package com.baifendian.swordfish.common.job.struct.node.hql;
 
-import com.baifendian.swordfish.common.job.node.BaseParam;
-import com.baifendian.swordfish.common.job.resource.ResourceInfo;
-import com.baifendian.swordfish.common.job.node.adhoc.UdfsInfo;
+import com.baifendian.swordfish.common.job.struct.node.BaseParam;
+import com.baifendian.swordfish.common.job.struct.node.common.UdfsInfo;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.hadoop.hive.ql.parse.ParseDriver;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,29 +33,10 @@ public class SqlParam extends BaseParam {
    */
   private String sql;
 
+  /**
+   * udfs 函数列表
+   */
   private List<UdfsInfo> udfs;
-
-  @Override
-  public boolean checkValid() {
-    if (StringUtils.isEmpty(sql)) {
-      return false;
-    }
-    try {
-      for (String sqlOne : sql.split(";")) {
-        sqlOne = sqlOne.replaceAll("\n", " ");
-        sqlOne = sqlOne.replaceAll("\r", "");
-        if (StringUtils.isNotBlank(sqlOne)) {
-          ParseDriver pd = new ParseDriver();
-          pd.parse(sqlOne);
-        }
-      }
-    } catch (Exception e) {
-//      LOGGER.error(e.getMessage(), e);
-      return false;
-    }
-
-    return true;
-  }
 
   public String getSql() {
     return sql;
@@ -76,21 +55,26 @@ public class SqlParam extends BaseParam {
   }
 
   @Override
-  public List<String> getResourceFiles() {
-    if (udfs != null && !udfs.isEmpty()) {
-      List<String> resFiles = new ArrayList<>();
-      for(UdfsInfo udfsInfo:udfs){
-        if(CollectionUtils.isNotEmpty(udfsInfo.getLibJars())) {
-          for (ResourceInfo resourceInfo : udfsInfo.getLibJars()) {
-            if(resourceInfo.isProjectScope()) {
-              resFiles.add(resourceInfo.getRes());
-            }
-          }
-        }
-      }
-      return resFiles;
-    } else {
-      return null;
+  public boolean checkValid() {
+    if (StringUtils.isEmpty(sql)) {
+      return false;
     }
+
+    return true;
+  }
+
+  @Override
+  public List<String> getProjectResourceFiles() {
+    if (CollectionUtils.isNotEmpty(udfs)) {
+      List<String> resFiles = new ArrayList<>();
+
+      for (UdfsInfo udfsInfo : udfs) {
+        addProjectResourceFiles(udfsInfo.getLibJars(), resFiles);
+      }
+
+      return resFiles;
+    }
+
+    return null;
   }
 }

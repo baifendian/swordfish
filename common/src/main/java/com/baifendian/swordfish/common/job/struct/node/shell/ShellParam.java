@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.baifendian.swordfish.common.job.node.shell;
+package com.baifendian.swordfish.common.job.struct.node.shell;
 
-import com.baifendian.swordfish.common.job.node.BaseParam;
-import com.baifendian.swordfish.common.job.resource.ResourceInfo;
+import com.baifendian.swordfish.common.job.struct.node.BaseParam;
+import com.baifendian.swordfish.common.job.struct.resource.ResourceInfo;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -27,12 +27,10 @@ public class ShellParam extends BaseParam {
    */
   private String script;
 
+  /**
+   * 资料列表
+   */
   private List<ResourceInfo> resources;
-
-  @Override
-  public boolean checkValid() {
-    return script != null && !script.isEmpty();
-  }
 
   public String getScript() {
     return script;
@@ -51,12 +49,17 @@ public class ShellParam extends BaseParam {
   }
 
   @Override
-  public List<String> getResourceFiles() {
+  public boolean checkValid() {
+    return script != null && !script.isEmpty();
+  }
+
+  @Override
+  public List<String> getProjectResourceFiles() {
     if (resources != null) {
       return resources.stream().filter(p -> p.isProjectScope())
           .map(p -> p.getRes()).collect(Collectors.toList());
-    } else {
-      return null;
     }
+
+    return null;
   }
 }

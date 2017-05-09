@@ -13,9 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.baifendian.swordfish.common.job.node;
+package com.baifendian.swordfish.common.job.struct.node;
+
+import com.baifendian.swordfish.common.job.struct.resource.ResourceInfo;
+import org.apache.commons.collections.CollectionUtils;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * 参数基类(需要校验参数和获取资源的子类需要 @Override 对应的方法)
@@ -34,6 +38,16 @@ public abstract class BaseParam {
   /**
    * 获取 node 需要的项目级资源文件清单
    */
-  public abstract List<String> getResourceFiles();
+  public abstract List<String> getProjectResourceFiles();
 
+  /**
+   * @param resourceInfos
+   * @param resFiles
+   */
+  public static void addProjectResourceFiles(List<ResourceInfo> resourceInfos, List<String> resFiles) {
+    if (CollectionUtils.isNotEmpty(resourceInfos)) {
+      resFiles.addAll(resourceInfos.stream().filter(p -> p.isProjectScope())
+          .map(p -> p.getRes()).collect(Collectors.toList()));
+    }
+  }
 }

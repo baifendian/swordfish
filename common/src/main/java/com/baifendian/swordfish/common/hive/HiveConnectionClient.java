@@ -20,17 +20,14 @@ import org.apache.hive.jdbc.HiveConnection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * Created by wenting on 9/8/16.
- */
 public class HiveConnectionClient {
 
-  private final Logger LOGGER = LoggerFactory.getLogger(getClass());
+  private final Logger logger = LoggerFactory.getLogger(getClass());
 
-  GenericKeyedObjectPool pool;
+  private GenericKeyedObjectPool pool;
 
   /**
-   * 超时时间，单位为ms，默认为3s
+   * 超时时间，单位为 ms，默认为 3s
    */
   private int timeout = 3000;
 
@@ -40,12 +37,12 @@ public class HiveConnectionClient {
   private int maxActive = 1024;
 
   /**
-   * 链接池中最大空闲的连接数,默认为100
+   * 链接池中最大空闲的连接数, 默认为 100
    */
   private int maxIdle = 100;
 
   /**
-   * 连接池中最少空闲的连接数,默认为0
+   * 连接池中最少空闲的连接数, 默认为 0
    */
   private int minIdle = 0;
 
@@ -55,25 +52,33 @@ public class HiveConnectionClient {
   private int maxWait = 2000;
 
   /**
-   * 空闲链接”检测线程，检测的周期，毫秒数，默认位3min，-1表示关闭空闲检测
+   * 空闲链接检测线程，检测的周期，毫秒数，默认为 3 min，-1 表示关闭空闲检测
    */
   private int timeBetweenEvictionRunsMillis = 180000;
 
   /**
-   * 空闲时是否进行连接有效性验证，如果验证失败则移除，默认为true
+   * 空闲时是否进行连接有效性验证，如果验证失败则移除，默认为 true
    */
   private boolean testWhileIdle = true;
 
+  /**
+   * hive 的连接客户端
+   */
   private static HiveConnectionClient hiveConnectionClient;
 
   private HiveConnectionClient() {
     try {
       pool = bulidClientPool();
     } catch (Exception e) {
-      System.out.print(e.getMessage());
+      logger.error("build client pool exception", e);
     }
   }
 
+  /**
+   * 构建单例, 初始化 hive 连接的客户端
+   *
+   * @return
+   */
   public static HiveConnectionClient getInstance() {
     if (hiveConnectionClient == null) {
       synchronized (HiveConnectionClient.class) {
@@ -82,44 +87,74 @@ public class HiveConnectionClient {
         }
       }
     }
+
     return hiveConnectionClient;
   }
 
+  /**
+   * 构建 hive 客户端的连接池
+   *
+   * @return
+   */
   protected GenericKeyedObjectPool bulidClientPool() {
-    // 设置poolConfig
     GenericKeyedObjectPool.Config poolConfig = new GenericKeyedObjectPool.Config();
+
     poolConfig.maxActive = maxActive;
     poolConfig.maxIdle = maxIdle;
     poolConfig.minIdle = minIdle;
     poolConfig.maxWait = maxWait;
     poolConfig.timeBetweenEvictionRunsMillis = timeBetweenEvictionRunsMillis;
     poolConfig.testWhileIdle = testWhileIdle;
+
     HiveConnectionPoolFactory clientFactory = new HiveConnectionPoolFactory();
+
     return new GenericKeyedObjectPool(clientFactory, poolConfig);
   }
 
+  /**
+   * 从连接池获取一个具体的 hive 连接
+   *
+   * @param connectionInfo
+   * @return
+   * @throws Exception
+   */
   public HiveConnection borrowClient(ConnectionInfo connectionInfo) throws Exception {
     return (HiveConnection) pool.borrowObject(connectionInfo);
   }
 
+  /**
+   * 返回一个 hive 连接对象
+   *
+   * @param connectionInfo
+   * @param client
+   */
   public void returnClient(ConnectionInfo connectionInfo, HiveConnection client) {
     if (client != null) {
       try {
         pool.returnObject(connectionInfo, client);
       } catch (Exception e) {
-        LOGGER.warn("HiveConnectionClient returnClient exception:", e);
+        logger.warn("HiveConnectionClient returnClient exception", e);
       }
     }
   }
 
+  /**
+   * 校验连接信息是否合法
+   *
+   * @param connectionInfo
+   * @param client
+   */
   public void invalidateObject(ConnectionInfo connectionInfo, HiveConnection client) {
     try {
       pool.invalidateObject(connectionInfo, client);
     } catch (Exception e) {
-      LOGGER.error("HiveConnectionClient invalidateObject error:", e);
+      logger.error("HiveConnectionClient invalidateObject error", e);
     }
   }
 
+  /**
+   * 清空连接池
+   */
   public void clear() {
     pool.clear();
   }

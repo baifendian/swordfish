@@ -32,9 +32,9 @@ import java.util.Properties;
  */
 public class ConfigurationUtil {
   /**
-   * LOGGER
+   * logger
    */
-  private static final Logger LOGGER = LoggerFactory.getLogger(ConfigurationUtil.class);
+  private static final Logger logger = LoggerFactory.getLogger(ConfigurationUtil.class);
 
   /**
    * {@link Configuration}
@@ -53,7 +53,7 @@ public class ConfigurationUtil {
       is = new FileInputStream(dataSourceFile);
       PROPERTIES.load(is);
     } catch (IOException e) {
-      LOGGER.error(e.getMessage(), e);
+      logger.error(e.getMessage(), e);
     } finally {
       IOUtils.closeQuietly(is);
     }
@@ -73,6 +73,7 @@ public class ConfigurationUtil {
         }
       }
     }
+
     return configuration;
   }
 
@@ -86,6 +87,5 @@ public class ConfigurationUtil {
     configuration.set("yarn.resourcemanager.address", PROPERTIES.getProperty("yarn.resourcemanager.address"));
     configuration.set("yarn.resourcemanager.scheduler.address", PROPERTIES.getProperty("yarn.resourcemanager.scheduler.address"));
     configuration.set("mapreduce.jobhistory.address", PROPERTIES.getProperty("mapreduce.jobhistory.address"));
-
   }
 }

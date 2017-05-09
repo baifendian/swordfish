@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.baifendian.swordfish.common.job.node.mr;
+package com.baifendian.swordfish.common.job.struct.node.spark;
 
-import com.baifendian.swordfish.common.job.node.BaseParam;
-import com.baifendian.swordfish.common.job.resource.ResourceInfo;
+import com.baifendian.swordfish.common.job.struct.node.BaseParam;
+import com.baifendian.swordfish.common.job.struct.resource.ResourceInfo;
 import com.baifendian.swordfish.dao.model.flow.params.Property;
 import org.apache.commons.lang3.StringUtils;
 
@@ -25,54 +25,37 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * MR 节点的参数 <p>
+ * Spark 节点的参数 <p>
  */
-public class MrParam extends BaseParam {
+public class SparkParam extends BaseParam {
 
-  /**
-   * 主jar包资源信息
-   */
   private ResourceInfo mainJar;
 
-  /**
-   * 主程序
-   */
   private String mainClass;
 
-  /**
-   * 参数信息
-   */
+  private String deployMode;
+
   private String args;
 
-  /**
-   * 配置信息列表
-   */
-  private List<Property> properties = new ArrayList<>();
+  private int driverCores;
 
-  /**
-   * 额外的 jar 包，指的是本地的文件，这个可能很长
-   */
+  private String driverMemory;
+
+  private int numExecutors;
+
+  private int executorCores;
+
+  private String executorMemory;
+
+  private List<Property> properties;
+
   private List<ResourceInfo> libJars;
 
-  /**
-   * 额外的文件，指的是本地的文件，可能是多条配置
-   */
   private List<ResourceInfo> files;
 
-  /**
-   * 额外的压缩文件，指的是本地的文件，可能是多条配置
-   */
   private List<ResourceInfo> archives;
 
-  /**
-   * 执行队列
-   */
   private String queue;
-
-  @Override
-  public boolean checkValid() {
-    return mainJar != null && StringUtils.isNotEmpty(mainClass);
-  }
 
   public ResourceInfo getMainJar() {
     return mainJar;
@@ -90,12 +73,60 @@ public class MrParam extends BaseParam {
     this.mainClass = mainClass;
   }
 
+  public String getDeployMode() {
+    return deployMode;
+  }
+
+  public void setDeployMode(String deployMode) {
+    this.deployMode = deployMode;
+  }
+
   public String getArgs() {
     return args;
   }
 
   public void setArgs(String args) {
     this.args = args;
+  }
+
+  public int getDriverCores() {
+    return driverCores;
+  }
+
+  public void setDriverCores(int driverCores) {
+    this.driverCores = driverCores;
+  }
+
+  public String getDriverMemory() {
+    return driverMemory;
+  }
+
+  public void setDriverMemory(String driverMemory) {
+    this.driverMemory = driverMemory;
+  }
+
+  public int getNumExecutors() {
+    return numExecutors;
+  }
+
+  public void setNumExecutors(int numExecutors) {
+    this.numExecutors = numExecutors;
+  }
+
+  public int getExecutorCores() {
+    return executorCores;
+  }
+
+  public void setExecutorCores(int executorCores) {
+    this.executorCores = executorCores;
+  }
+
+  public String getExecutorMemory() {
+    return executorMemory;
+  }
+
+  public void setExecutorMemory(String executorMemory) {
+    this.executorMemory = executorMemory;
   }
 
   public List<Property> getProperties() {
@@ -110,7 +141,7 @@ public class MrParam extends BaseParam {
     return libJars;
   }
 
-  public void setLibJars(List<ResourceInfo> libJars) {
+  public void setJars(List<ResourceInfo> libJjars) {
     this.libJars = libJars;
   }
 
@@ -130,15 +161,6 @@ public class MrParam extends BaseParam {
     this.archives = archives;
   }
 
-  public List<String> getDArgs() {
-    if (properties.isEmpty()) {
-      return new ArrayList<>();
-    } else {
-      return this.properties.stream().map(prop -> prop.getProp() + "=" + prop.getValue())
-              .collect(Collectors.toList());
-    }
-  }
-
   public String getQueue() {
     return queue;
   }
@@ -148,22 +170,22 @@ public class MrParam extends BaseParam {
   }
 
   @Override
-  public List<String> getResourceFiles() {
+  public boolean checkValid() {
+    return mainJar != null && StringUtils.isNotEmpty(mainClass);
+  }
+
+  @Override
+  public List<String> getProjectResourceFiles() {
     List<String> resFiles = new ArrayList<>();
+
     if (mainJar.isProjectScope()) {
       resFiles.add(mainJar.getRes());
     }
-    if (libJars != null && !libJars.isEmpty())
-      resFiles.addAll(libJars.stream().filter(p -> p.isProjectScope())
-              .map(p -> p.getRes()).collect(Collectors.toList()));
-    if (files != null && !files.isEmpty())
-      resFiles.addAll(files.stream().filter(p -> p.isProjectScope())
-              .map(p -> p.getRes()).collect(Collectors.toList()));
-    if (archives != null && !archives.isEmpty())
-      resFiles.addAll(archives.stream().filter(p -> p.isProjectScope())
-              .map(p -> p.getRes()).collect(Collectors.toList()));
+
+    addProjectResourceFiles(libJars, resFiles);
+    addProjectResourceFiles(files, resFiles);
+    addProjectResourceFiles(archives, resFiles);
+
     return resFiles;
   }
 }
-
-

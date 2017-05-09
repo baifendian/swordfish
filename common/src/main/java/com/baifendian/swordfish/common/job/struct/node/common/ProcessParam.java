@@ -13,19 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.baifendian.swordfish.common.job.node.process;
+package com.baifendian.swordfish.common.job.struct.node.common;
 
-import com.baifendian.swordfish.common.job.node.BaseParam;
+import com.baifendian.swordfish.common.job.struct.node.BaseParam;
 
 import java.util.List;
 import java.util.Map;
 
 public class ProcessParam extends BaseParam {
 
+  /**
+   * 具体的脚本
+   */
   private String script;
 
+  /**
+   * 脚本参数
+   */
   private List<String> args;
 
+  /**
+   * 环境变量
+   */
   private Map<String, String> envMap;
 
   public String getScript() {
@@ -53,7 +62,7 @@ public class ProcessParam extends BaseParam {
   }
 
   @Override
-  public List<String> getResourceFiles() {
+  public List<String> getProjectResourceFiles() {
     return null;
   }
 }

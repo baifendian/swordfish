@@ -13,7 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.baifendian.swordfish.common.job.node.adhoc;
+package com.baifendian.swordfish.common.job.struct.node.adhoc;
+
+import com.baifendian.swordfish.common.job.struct.node.common.UdfsInfo;
 
 import java.util.List;
 
