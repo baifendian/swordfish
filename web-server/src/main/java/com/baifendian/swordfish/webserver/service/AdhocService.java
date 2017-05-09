@@ -15,8 +15,6 @@
  */
 package com.baifendian.swordfish.webserver.service;
 
-import com.baifendian.swordfish.common.job.struct.hql.AdHocParam;
-import com.baifendian.swordfish.common.job.struct.hql.UdfsInfo;
 import com.baifendian.swordfish.dao.enums.FlowStatus;
 import com.baifendian.swordfish.dao.mapper.AdHocMapper;
 import com.baifendian.swordfish.dao.mapper.MasterServerMapper;

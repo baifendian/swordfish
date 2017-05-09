@@ -13,13 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.baifendian.swordfish.common.datasource.ftp;
+package com.baifendian.swordfish.common.job.struct.datasource.conn;
 
-import org.junit.Test;
+/**
+ * 数据源测试接口
+ */
+public abstract class TryConn<T> {
 
-public class FtpHandlerTest {
-  @Test
-  public void testIsConnectable(){
+  protected T param;
 
+  public TryConn(T param){
+    this.param = param;
   }
+
+  public abstract void isConnectable() throws Exception;
 }

@@ -13,17 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.baifendian.swordfish.common.datasource.mongodb;
+package com.baifendian.swordfish.common.job.struct.datasource;
 
-import com.baifendian.swordfish.dao.enums.DbType;
-import org.junit.Test;
+public class MongoDBParam {
+  private String address;
 
-public class MongoDBHandlerTest {
+  private String database;
 
-  @Test
-  public void testIsConnectable() {
-    String paramStr = "{ \"address\": \"mongodb://bgsbtsp0006-dqf:27017\", \"database\": \"test\" }\n";
-    MongoDBHandler handler = new MongoDBHandler(DbType.MONGODB, paramStr);
-    handler.isConnectable();
+  public String getAddress() {
+    return address;
+  }
+
+  public void setAddress(String address) {
+    this.address = address;
+  }
+
+  public String getDatabase() {
+    return database;
+  }
+
+  public void setDatabase(String database) {
+    this.database = database;
   }
 }

@@ -13,8 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.baifendian.swordfish.common.datasource.ftp;
+package com.baifendian.swordfish.common.job.struct.datasource;
 
+/**
+ * Ftp参数配置
+ */
 public class FtpParam {
   private String host;
 
