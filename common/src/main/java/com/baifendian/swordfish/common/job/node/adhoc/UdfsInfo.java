@@ -13,44 +13,41 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.baifendian.swordfish.common.job.struct.hql;
+package com.baifendian.swordfish.common.job.node.adhoc;
 
+import com.baifendian.swordfish.common.job.resource.ResourceInfo;
+
+import java.util.ArrayList;
 import java.util.List;
 
-/**
- * sql 节点参数 <p>
- */
-public class AdHocParam {
-  /**
-   * 原始 sql 语句（多条，内部可能包含换行等符号，执行时需要处理）
-   */
-  private String stms;
+public class UdfsInfo {
+  private String func;
 
-  private List<UdfsInfo> udfs;
+  private String className;
 
-  private Integer limit;
+  private List<ResourceInfo> libJars = new ArrayList<>();
 
-  public String getStms() {
-    return stms;
+  public String getFunc() {
+    return func;
   }
 
-  public void setStms(String stms) {
-    this.stms = stms;
+  public void setFunc(String func) {
+    this.func = func;
   }
 
-  public List<UdfsInfo> getUdfs() {
-    return udfs;
+  public String getClassName() {
+    return className;
   }
 
-  public void setUdfs(List<UdfsInfo> udfs) {
-    this.udfs = udfs;
+  public void setClassName(String className) {
+    this.className = className;
   }
 
-  public Integer getLimit() {
-    return limit;
+  public List<ResourceInfo> getLibJars() {
+    return libJars;
   }
 
-  public void setLimit(Integer limit) {
-    this.limit = limit;
+  public void setLibJars(List<ResourceInfo> libJars) {
+    this.libJars = libJars;
   }
 }

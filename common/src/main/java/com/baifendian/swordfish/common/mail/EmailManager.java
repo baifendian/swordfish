@@ -54,7 +54,7 @@ public class EmailManager {
   /**
    * 获取邮件任务
    */
-  private static final String CONTENT_FORMAT = "<b>{0}</b><hr/>Project：{1}<br/>workflow name：{2}<br/> execution flow id: {3}<br/>schedule time：{4}<br/>execution time：{5}<br/><br/><I>Note：execution detail see [maintain center] - [schedule logs]</I>";
+  private static final String CONTENT_FORMAT = "<b>{0}</b><hr/>Project：{1}<br/>WORKFLOW name：{2}<br/> execution flow id: {3}<br/>schedule time：{4}<br/>execution time：{5}<br/><br/><I>Note：execution detail see [maintain center] - [schedule logs]</I>";
 
 
   private static final String CONTENT_NODE_FORMAT = "<br>Long job Node:{0} RUN ERROR";
@@ -62,7 +62,7 @@ public class EmailManager {
   /**
    * 补数据内容头部
    */
-  private static final String ADD_DATA_HEAD_FORMAT = "<b>{0}</b><hr/>Project：{1}<br/>workflow name：{2}<br/><br/><b>Add data detail</b>";
+  private static final String ADD_DATA_HEAD_FORMAT = "<b>{0}</b><hr/>Project：{1}<br/>WORKFLOW name：{2}<br/><br/><b>Add data detail</b>";
 
   /**
    * 补数据的每个元素内容

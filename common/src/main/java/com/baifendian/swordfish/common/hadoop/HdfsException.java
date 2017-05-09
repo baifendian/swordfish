@@ -42,11 +42,4 @@ public class HdfsException extends RuntimeException {
   public HdfsException(String msg, Throwable th) {
     super(msg, th);
   }
-
-  /**
-   * @param th
-   */
-  public HdfsException(Throwable th) {
-    super(th);
-  }
 }

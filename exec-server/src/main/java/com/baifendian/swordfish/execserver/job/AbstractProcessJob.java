@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.baifendian.swordfish.common.job;
+package com.baifendian.swordfish.execserver.job;
 
-import com.baifendian.swordfish.common.job.exception.ExecException;
-import com.baifendian.swordfish.common.job.utils.ProcessUtil;
+import com.baifendian.swordfish.common.job.JobProps;
+import com.baifendian.swordfish.common.hadoop.HdfsExecException;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -112,7 +112,7 @@ public abstract class AbstractProcessJob extends AbstractJob {
       exitCode = -1;
     }
     if (exitCode != 0) {
-      throw new ExecException("Process error. Exit code is " + exitCode);
+      throw new HdfsExecException("Process error. Exit code is " + exitCode);
     }
     complete = true;
 

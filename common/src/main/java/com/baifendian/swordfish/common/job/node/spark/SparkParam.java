@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.baifendian.swordfish.execserver.job.spark;
+package com.baifendian.swordfish.common.job.node.spark;
 
-import com.baifendian.swordfish.common.job.BaseParam;
-import com.baifendian.swordfish.common.job.struct.ResourceInfo;
+import com.baifendian.swordfish.common.job.node.BaseParam;
+import com.baifendian.swordfish.common.job.resource.ResourceInfo;
 import com.baifendian.swordfish.dao.model.flow.params.Property;
 import org.apache.commons.lang3.StringUtils;
 

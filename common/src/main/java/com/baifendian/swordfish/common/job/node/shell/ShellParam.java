@@ -13,23 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.baifendian.swordfish.execserver.job.shell;
+package com.baifendian.swordfish.common.job.node.shell;
 
-import com.baifendian.swordfish.common.job.BaseParam;
-import com.baifendian.swordfish.common.job.struct.ResourceInfo;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.baifendian.swordfish.common.job.node.BaseParam;
+import com.baifendian.swordfish.common.job.resource.ResourceInfo;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class ShellParam extends BaseParam {
-
-  /**
-   * LOGGER
-   */
-  private final Logger LOGGER = LoggerFactory.getLogger(getClass());
-
   /**
    * 原始 shell 语句
    */
@@ -61,8 +53,8 @@ public class ShellParam extends BaseParam {
   @Override
   public List<String> getResourceFiles() {
     if (resources != null) {
-      return resources.stream().filter(p->p.isProjectScope())
-              .map(p -> p.getRes()).collect(Collectors.toList());
+      return resources.stream().filter(p -> p.isProjectScope())
+          .map(p -> p.getRes()).collect(Collectors.toList());
     } else {
       return null;
     }

@@ -56,7 +56,7 @@ public class MailSendService extends BaseDao {
     List<User> users = projectUserMapper.queryForUser(projectId);
 
     if (users == null) {
-      LOGGER.error("Not find project: {}", projectId);
+      LOGGER.error("Not find PROJECT: {}", projectId);
       return false;
     }
 
@@ -70,7 +70,7 @@ public class MailSendService extends BaseDao {
   }
 
   /**
-   * 若 workflow 无邮件组，且指定 sendToUserIfMailsEmpty 为 true 时，则发送邮件给项目组成员
+   * 若 WORKFLOW 无邮件组，且指定 sendToUserIfMailsEmpty 为 true 时，则发送邮件给项目组成员
    *
    * @param flowId                 flowid
    * @param title                  邮件主题
@@ -102,7 +102,7 @@ public class MailSendService extends BaseDao {
     User user = projectFlowMapper.queryFlowOwner(flowId);
 
     if (user == null) {
-      LOGGER.error("Not find workflow: {}", flowId);
+      LOGGER.error("Not find WORKFLOW: {}", flowId);
       return false;
     }
 

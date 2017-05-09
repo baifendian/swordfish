@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.baifendian.swordfish.common.job.struct;
+package com.baifendian.swordfish.common.job.resource;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.apache.commons.lang3.StringUtils;
@@ -53,22 +53,27 @@ public class ResourceInfo {
     this.alias = alias;
   }
 
+  /**
+   * 得到资源的符号连接
+   *
+   * @return
+   */
   @JsonIgnore
   public String getSymbolicRes() {
     if (StringUtils.isNotEmpty(alias)) {
-      return res + "#" + alias;
+      return String.format("%s#%s", res, alias);
     }
 
     return res;
   }
 
   /**
-   * scope 没有值时默认为 project
+   * scope 没有值时默认为 PROJECT
    */
   @JsonIgnore
   public boolean isProjectScope() {
     switch (scope) {
-      case workflow:
+      case WORKFLOW:
         return false;
       default:
         return true;

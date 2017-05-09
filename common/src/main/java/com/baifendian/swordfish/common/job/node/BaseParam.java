@@ -13,29 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.baifendian.swordfish.common.job.exception;
+package com.baifendian.swordfish.common.job.node;
+
+import java.util.List;
 
 /**
- * 执行异常 <p>
+ * 参数基类(需要校验参数和获取资源的子类需要 @Override 对应的方法)
  */
-public class ExecException extends RuntimeException {
-  /**
-   * Serial version UID
-   */
-  private static final long serialVersionUID = 1L;
+public abstract class BaseParam {
 
   /**
-   * @param msg
+   * 校验参数是否合法 (需要校验的子类 @Override 该方法)
+   *
+   * @return 是否合法
    */
-  public ExecException(String msg) {
-    super(msg);
+  public boolean checkValid() {
+    return true;
   }
 
   /**
-   * @param msg
-   * @param cause
+   * 获取 node 需要的项目级资源文件清单
    */
-  public ExecException(String msg, Throwable cause) {
-    super(msg, cause);
-  }
+  public abstract List<String> getResourceFiles();
+
 }

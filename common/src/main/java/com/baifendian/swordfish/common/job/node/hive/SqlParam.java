@@ -13,16 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.baifendian.swordfish.execserver.job.hive;
+package com.baifendian.swordfish.common.job.node.hive;
 
-import com.baifendian.swordfish.common.job.BaseParam;
-import com.baifendian.swordfish.common.job.struct.ResourceInfo;
-import com.baifendian.swordfish.common.job.struct.hql.UdfsInfo;
+import com.baifendian.swordfish.common.job.node.BaseParam;
+import com.baifendian.swordfish.common.job.resource.ResourceInfo;
+import com.baifendian.swordfish.common.job.node.adhoc.UdfsInfo;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.hive.ql.parse.ParseDriver;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,11 +29,6 @@ import java.util.List;
  * sql 节点参数 <p>
  */
 public class SqlParam extends BaseParam {
-
-  /**
-   * LOGGER
-   */
-  private final Logger LOGGER = LoggerFactory.getLogger(getClass());
 
   /**
    * 原始 sql 语句（多条，内部可能包含换行等符号，执行时需要处理）
@@ -59,7 +52,7 @@ public class SqlParam extends BaseParam {
         }
       }
     } catch (Exception e) {
-      LOGGER.error(e.getMessage(), e);
+//      LOGGER.error(e.getMessage(), e);
       return false;
     }
 

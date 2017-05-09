@@ -19,7 +19,7 @@ import com.baifendian.swordfish.common.datasource.ftp.FtpHandler;
 import com.baifendian.swordfish.common.datasource.hbase.HBaseHandler;
 import com.baifendian.swordfish.common.datasource.jdbc.JDBCHandler;
 import com.baifendian.swordfish.common.datasource.mongodb.MongoDBHandler;
-import com.baifendian.swordfish.common.job.exception.ExecException;
+import com.baifendian.swordfish.common.hadoop.HdfsExecException;
 import com.baifendian.swordfish.dao.enums.DbType;
 
 import java.lang.reflect.Constructor;
@@ -43,7 +43,7 @@ public class DataSourceManager {
     DataSourceHandler dataSourceHandler = null;
     Class<? extends DataSourceHandler> dataSourceHandlerClass = dataSourceHandlerMap.get(dbType);
     if(dataSourceHandlerClass == null){
-      throw new ExecException("unsupport datasource type " + dbType.name());
+      throw new HdfsExecException("unsupport datasource type " + dbType.name());
     }
     Constructor<DataSourceHandler> dataSourceHandlerConstructor = (Constructor<DataSourceHandler>) dataSourceHandlerClass.getConstructor(DbType.class, String.class);
     dataSourceHandler = dataSourceHandlerConstructor.newInstance(dbType, paramStr);
