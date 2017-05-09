@@ -15,10 +15,12 @@
  */
 package com.baifendian.swordfish.common.job.struct.datasource;
 
+import org.apache.commons.net.ftp.FTPClient;
+
 /**
  * Ftp参数配置
  */
-public class FtpParam {
+public class FtpDatasource extends Datasource {
   private String host;
 
   private int port;
@@ -57,5 +59,12 @@ public class FtpParam {
 
   public void setPassword(String password) {
     this.password = password;
+  }
+
+  @Override
+  public void isConnectable() throws Exception {
+    FTPClient ftpClient = new FTPClient();
+    ftpClient.connect(this.host, this.port);
+    ftpClient.login(this.user, this.password);
   }
 }

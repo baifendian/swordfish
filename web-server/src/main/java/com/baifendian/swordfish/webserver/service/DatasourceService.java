@@ -123,41 +123,13 @@ public class DatasourceService {
     int status = 0;
     String msg = null;
 
+    Datasource datasource = DatasourceFactory.getDatasource(type, parameter);
+    if (datasource == null) {
+      throw new ParameterException("Parameter \"{0}\" is not valid", parameter);
+    }
+
     try {
-      TryConn tryConn = null;
-      switch (type) {
-        case FTP: {
-          FtpParam ftpParam = JsonUtil.parseObject(parameter, FtpParam.class);
-          tryConn = new FtpTryConn(ftpParam);
-          break;
-        }
-        case HBASE: {
-          HBaseParam hBaseParam = JsonUtil.parseObject(parameter, HBaseParam.class);
-          tryConn = new HBaseTryConn(hBaseParam);
-          break;
-        }
-        case MYSQL: {
-          MysqlParam mysqlParam = JsonUtil.parseObject(parameter, MysqlParam.class);
-          tryConn = new MysqlTryConn(mysqlParam);
-          break;
-        }
-        case ORACLE: {
-          OracleParam oracleParam = JsonUtil.parseObject(parameter, OracleParam.class);
-          tryConn = new OracleTryConn(oracleParam);
-          break;
-        }
-        case MONGODB: {
-          MongoDBParam mongoDBParam = JsonUtil.parseObject(parameter, MongoDBParam.class);
-          tryConn = new MongoDBTryConn(mongoDBParam);
-          break;
-        }
-        default: {
-          throw new ParameterException("db type \"{0}\" is not support", type.name());
-        }
-      }
-      tryConn.isConnectable();
-    } catch (JsonProcessingException jsonProcessingException) {
-      throw new ParameterException("Parameter \"{0}\" is not valid");
+      datasource.isConnectable();
     } catch (Exception e) {
       status = 1;
       msg = e.toString();
@@ -314,4 +286,5 @@ public class DatasourceService {
 
     return dataSourceMapper.getByName(project.getId(), name);
   }
+
 }

@@ -13,18 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.baifendian.swordfish.common.job.struct.datasource.conn;
+package com.baifendian.swordfish.common.job.struct.datasource;
 
 /**
- * 数据源测试接口
+ * 数据源基类
  */
-public abstract class TryConn<T> {
-
-  protected T param;
-
-  public TryConn(T param){
-    this.param = param;
-  }
+public abstract class Datasource {
 
   public abstract void isConnectable() throws Exception;
 }
