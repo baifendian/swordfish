@@ -90,12 +90,8 @@ public class MasterThriftServer {
           jobExecManager.stop();
         }
 
-        try {
-          // 关闭调度
-          QuartzManager.shutdown();
-        } catch (SchedulerException e) {
-          logger.error(e.getMessage(), e);
-        }
+        // 关闭调度
+        QuartzManager.shutdown();
       }));
 
       jobExecManager.run();
@@ -107,7 +103,6 @@ public class MasterThriftServer {
     } catch (Exception e) {
       QuartzManager.shutdown();
       logger.error("Catch an exception", e);
-      throw e;
     }
   }
 

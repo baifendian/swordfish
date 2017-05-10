@@ -15,12 +15,14 @@
  */
 package com.baifendian.swordfish.execserver.job.hql;
 
-import com.baifendian.swordfish.common.job.AbstractJob;
-import com.baifendian.swordfish.common.job.BaseParam;
-import com.baifendian.swordfish.common.job.ExecResult;
-import com.baifendian.swordfish.common.job.JobProps;
+import com.baifendian.swordfish.common.job.struct.node.BaseParam;
+import com.baifendian.swordfish.common.job.struct.node.hql.SqlParam;
 import com.baifendian.swordfish.common.utils.CommonUtil;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
+import com.baifendian.swordfish.execserver.common.ExecResult;
+import com.baifendian.swordfish.execserver.common.FunctionUtil;
+import com.baifendian.swordfish.execserver.job.AbstractJob;
+import com.baifendian.swordfish.execserver.job.JobProps;
 import com.baifendian.swordfish.execserver.parameter.ParamHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,8 +37,8 @@ public class EtlSqlJob extends AbstractJob {
 
   protected List<ExecResult> results;
 
-  public EtlSqlJob(String jobIdLog, JobProps props, Logger logger) throws IOException {
-    super(jobIdLog, props, logger);
+  public EtlSqlJob(String jobId, JobProps props, Logger logger) throws IOException {
+    super(jobId, props, logger);
   }
 
   @Override

@@ -16,40 +16,30 @@
 package com.baifendian.swordfish.execserver.runner.adhoc;
 
 import com.baifendian.swordfish.common.config.BaseConfig;
-import com.baifendian.swordfish.common.job.JobProps;
-import com.baifendian.swordfish.common.job.struct.hql.AdHocParam;
+import com.baifendian.swordfish.common.job.struct.node.adhoc.AdHocParam;
 import com.baifendian.swordfish.common.utils.CommonUtil;
 import com.baifendian.swordfish.dao.AdHocDao;
 import com.baifendian.swordfish.dao.DaoFactory;
 import com.baifendian.swordfish.dao.model.AdHocJsonObject;
 import com.baifendian.swordfish.dao.model.AdHocResult;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
-import com.baifendian.swordfish.execserver.job.hql.FunctionUtil;
+import com.baifendian.swordfish.execserver.job.JobProps;
+import com.baifendian.swordfish.execserver.common.FunctionUtil;
 import com.baifendian.swordfish.execserver.job.hql.HiveSqlExec;
-import com.baifendian.swordfish.execserver.job.hql.ResultCallback;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.baifendian.swordfish.execserver.common.ResultCallback;
+import com.baifendian.swordfish.execserver.utils.JobLogger;
 
 import java.io.IOException;
 import java.util.List;
-
-import static com.baifendian.swordfish.common.utils.StructuredArguments.jobValue;
 
 /**
  * 即席查询作业
  */
 public class AdHocSqlJob {
-  private static Logger logger = LoggerFactory.getLogger(AdHocSqlJob.class.getName());
-
   /**
    * job 通用参数
    */
   private JobProps props;
-
-  /**
-   * 日志记录的唯一 id
-   */
-  private String jobId;
 
   /**
    * 即席的数据库连接参数
@@ -61,12 +51,16 @@ public class AdHocSqlJob {
    */
   private AdHocParam param;
 
-  public AdHocSqlJob(JobProps props) throws IOException {
-    this.props = props;
-    this.jobId = props.getJobId();
+  /**
+   * 记录日志
+   */
+  private JobLogger logger;
 
+  public AdHocSqlJob(JobProps props, JobLogger logger) throws IOException {
+    this.props = props;
     this.adHocDao = DaoFactory.getDaoInstance(AdHocDao.class);
     this.param = JsonUtil.parseObject(props.getJobParams(), AdHocParam.class);
+    this.logger = logger;
   }
 
   /**
@@ -75,7 +69,7 @@ public class AdHocSqlJob {
    * @throws Exception
    */
   public void process() throws Exception {
-    logger.debug("{} {}", jobValue(jobId), props.getJobParams());
+    logger.debug("process job: {}", props.getJobParams());
 
     // 得到查询语句
     String sqls = param.getStms();
@@ -85,9 +79,9 @@ public class AdHocSqlJob {
 
     try {
       // 创建自定义函数
-      List<String> funcs = FunctionUtil.createFuncs(param.getUdfs(), jobId, BaseConfig.getHdfsResourcesDir(props.getProjectId()), true);
+      List<String> funcs = FunctionUtil.createFuncs(param.getUdfs(), logger, BaseConfig.getHdfsResourcesDir(props.getProjectId()), true);
 
-      logger.info("{} exec sql:{}, funcs:{}", jobValue(jobId), sqls, funcs);
+      logger.info("exec sql: {}, funcs: {}", sqls, funcs);
 
       // 查询结果写入数据库
       ResultCallback resultCallback = (execResult, startTime, endTime) -> {
@@ -102,6 +96,7 @@ public class AdHocSqlJob {
         AdHocJsonObject adHocJsonObject = new AdHocJsonObject();
         adHocJsonObject.setTitles(execResult.getTitles());
         adHocJsonObject.setValues(execResult.getValues());
+
         adHocResult.setResult(JsonUtil.toJsonString(adHocJsonObject));
 
         adHocResult.setStartTime(startTime);
@@ -111,9 +106,10 @@ public class AdHocSqlJob {
         adHocDao.updateAdHocResult(adHocResult);
       };
 
+      // 切分 sql
       List<String> execSqls = CommonUtil.sqlSplit(sqls);
 
-      HiveSqlExec hiveSqlExec = new HiveSqlExec(funcs, execSqls, props.getProxyUser(), true, resultCallback, param.getLimit());
+      HiveSqlExec hiveSqlExec = new HiveSqlExec(funcs, execSqls, props.getProxyUser(), true, resultCallback, param.getLimit(), logger);
       hiveSqlExec.run();
     } catch (Exception e) {
       logger.error("ad hoc job run error", e);

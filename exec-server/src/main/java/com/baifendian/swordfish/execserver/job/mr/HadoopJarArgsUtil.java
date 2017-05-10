@@ -15,6 +15,7 @@
  */
 package com.baifendian.swordfish.execserver.job.mr;
 
+import com.baifendian.swordfish.common.job.struct.node.mr.MrParam;
 import org.apache.commons.lang.StringUtils;
 
 import java.util.ArrayList;

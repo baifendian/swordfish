@@ -15,11 +15,12 @@
  */
 package com.baifendian.swordfish.execserver.job.shell;
 
-import com.baifendian.swordfish.common.job.AbstractProcessJob;
-import com.baifendian.swordfish.common.job.BaseParam;
-import com.baifendian.swordfish.common.job.JobProps;
-import com.baifendian.swordfish.common.job.exception.ExecException;
+import com.baifendian.swordfish.common.job.struct.node.BaseParam;
+import com.baifendian.swordfish.common.job.struct.node.shell.ShellParam;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
+import com.baifendian.swordfish.execserver.exception.ExecException;
+import com.baifendian.swordfish.execserver.job.AbstractProcessJob;
+import com.baifendian.swordfish.execserver.job.JobProps;
 import com.baifendian.swordfish.execserver.parameter.ParamHelper;
 import org.slf4j.Logger;
 
@@ -43,8 +44,8 @@ public class ShellJob extends AbstractProcessJob {
    */
   private String currentPath;
 
-  public ShellJob(String jobIdLog, JobProps props, Logger logger) throws IOException {
-    super(jobIdLog, props, logger);
+  public ShellJob(String jobId, JobProps props, Logger logger) throws IOException {
+    super(jobId, props, logger);
 
     this.currentPath = getWorkingDirectory();
   }

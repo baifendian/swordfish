@@ -35,7 +35,7 @@ public class JobProps {
   private String nodeName;
 
   /**
-   * 执行id
+   * 执行 id
    **/
   private long execId;
 
@@ -73,11 +73,6 @@ public class JobProps {
    * 自定义参数
    **/
   private Map<String, String> definedParams;
-
-  /**
-   * 执行的 job id
-   */
-  private String jobId;
 
   public int getProjectId() {
     return projectId;
@@ -165,13 +160,5 @@ public class JobProps {
 
   public void setAdHocId(int adHocId) {
     this.adHocId = adHocId;
-  }
-
-  public String getJobId() {
-    return jobId;
-  }
-
-  public void setJobId(String jobId) {
-    this.jobId = jobId;
   }
 }

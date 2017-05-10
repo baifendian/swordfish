@@ -15,20 +15,15 @@
  */
 package com.baifendian.swordfish.execserver.runner.adhoc;
 
-import com.baifendian.swordfish.common.job.JobProps;
 import com.baifendian.swordfish.dao.AdHocDao;
 import com.baifendian.swordfish.dao.enums.FlowStatus;
 import com.baifendian.swordfish.dao.model.AdHoc;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.baifendian.swordfish.execserver.job.JobProps;
+import com.baifendian.swordfish.execserver.utils.JobLogger;
 
 import java.util.Date;
 
-import static com.baifendian.swordfish.common.utils.StructuredArguments.jobValue;
-
 public class AdHocRunner implements Runnable {
-
-  private Logger logger = LoggerFactory.getLogger(AdHocRunner.class);
 
   /**
    * 即席查询结构
@@ -41,14 +36,14 @@ public class AdHocRunner implements Runnable {
   private AdHocDao adHocDao;
 
   /**
-   * 用于记录日志的 id
+   * 用于记录日志, 会封装 job id
    */
-  private String jobId;
+  private JobLogger logger;
 
-  public AdHocRunner(AdHoc adHoc, AdHocDao adHocDao) {
+  public AdHocRunner(AdHoc adHoc, AdHocDao adHocDao, JobLogger logger) {
     this.adHocDao = adHocDao;
     this.adHoc = adHoc;
-    this.jobId = adHoc.getJobId();
+    this.logger = logger;
   }
 
   @Override
@@ -60,15 +55,14 @@ public class AdHocRunner implements Runnable {
     props.setQueue(adHoc.getQueue());
     props.setProjectId(adHoc.getProjectId());
     props.setAdHocId(adHoc.getId());
-    props.setJobId(adHoc.getJobId());
 
     FlowStatus status = FlowStatus.SUCCESS;
 
     try {
-      AdHocSqlJob job = new AdHocSqlJob(props);
+      AdHocSqlJob job = new AdHocSqlJob(props, logger);
       job.process();
     } catch (Exception e) {
-      logger.error(String.format("%s run adHoc job error", jobValue(jobId)), e);
+      logger.error("run adHoc job error", e);
       status = FlowStatus.FAILED;
     }
 

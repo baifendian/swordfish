@@ -57,10 +57,11 @@ public class HiveJdbcExec extends BaseDao {
       if (command.startsWith("set") || command.startsWith("add")) {
         return false;
       }
+
       command = command.replace("`", ""); // 去除反引号
       ASTNode tree = pd.parse(command);
       tree = ParseUtils.findRootNonNullToken(tree);
-      // System.out.println(tree.toStringTree());
+
       String tokType = tree.getToken().getText();
       if (tokType.equals("TOK_QUERY")) {
         if (command.toLowerCase().contains("insert")) {
@@ -69,7 +70,7 @@ public class HiveJdbcExec extends BaseDao {
         return true;
       }
     } catch (ParseException e) {
-      // tudo for not sql command
+      LOGGER.
     }
     return false;
   }
@@ -87,13 +88,16 @@ public class HiveJdbcExec extends BaseDao {
   /**
    * 获取连接信息 <p>
    *
-   * @return {@link ConnectionInfo}
+   * @param userName
+   * @return
+   * @see {@link ConnectionInfo}
    */
-//  public ConnectionInfo getConnectionInfo(String userName, String dbName) {
+  public ConnectionInfo getConnectionInfo(String userName) {
     ConnectionInfo connectionInfo = new ConnectionInfo();
+
     connectionInfo.setUser(userName);
-    //connectionInfo.setPassword(user.getPassword());
     connectionInfo.setUri(String.format(hiveConfig.getThriftUris()));
+
     return connectionInfo;
   }
 
@@ -145,8 +149,8 @@ public class HiveJdbcExec extends BaseDao {
    * @return
    */
     /*
-    public List<JobExecResult> executeQuerys(List<String> sqls, int userId, String dbName, boolean isContinue, boolean isGetLog) {
-        List<JobExecResult> execResults = new ArrayList<>();
+    public List<ExecResult> executeQuerys(List<String> sqls, int userId, String dbName, boolean isContinue, boolean isGetLog) {
+        List<ExecResult> execResults = new ArrayList<>();
         HiveConnection hiveConnection = null;
         Statement sta = null;
         Thread logThread = null;
@@ -165,7 +169,7 @@ public class HiveJdbcExec extends BaseDao {
                 if (sql.trim().startsWith("#") || sql.trim().startsWith("--")) {
                     continue;
                 }
-                JobExecResult execResult = new JobExecResult();
+                ExecResult execResult = new ExecResult();
                 execResult.setStm(sql);
                 execResults.add(execResult);
                 logs.clear();

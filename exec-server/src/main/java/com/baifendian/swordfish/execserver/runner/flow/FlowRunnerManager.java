@@ -15,7 +15,6 @@
  */
 package com.baifendian.swordfish.execserver.runner.flow;
 
-import com.baifendian.swordfish.common.job.exception.ExecException;
 import com.baifendian.swordfish.dao.DaoFactory;
 import com.baifendian.swordfish.dao.FlowDao;
 import com.baifendian.swordfish.dao.datasource.ConnectionFactory;
@@ -23,6 +22,7 @@ import com.baifendian.swordfish.dao.enums.FailurePolicyType;
 import com.baifendian.swordfish.dao.mapper.ExecutionNodeMapper;
 import com.baifendian.swordfish.dao.model.ExecutionFlow;
 import com.baifendian.swordfish.dao.model.Schedule;
+import com.baifendian.swordfish.execserver.exception.ExecException;
 import com.baifendian.swordfish.execserver.utils.Constants;
 import com.baifendian.swordfish.execserver.parameter.CustomParamManager;
 import com.baifendian.swordfish.execserver.parameter.SystemParamManager;

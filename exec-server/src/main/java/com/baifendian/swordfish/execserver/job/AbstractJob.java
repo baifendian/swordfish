@@ -15,6 +15,7 @@
  */
 package com.baifendian.swordfish.execserver.job;
 
+import com.baifendian.swordfish.execserver.common.ExecResult;
 import org.slf4j.Logger;
 
 import java.io.IOException;
@@ -37,7 +38,9 @@ public abstract class AbstractJob implements Job {
    **/
   protected JobProps props;
 
-  protected String jobPath;
+  protected Map<String, String> definedParamMap;
+
+  protected int projectId;
 
   protected int exitCode;
 
@@ -45,21 +48,18 @@ public abstract class AbstractJob implements Job {
 
   protected boolean canceled = false;
 
-  protected Map<String, Object> jobParams;
-
-  protected Map<String, String> definedParamMap;
-
-  protected int projectId;
+  protected Logger logger;
 
   /**
-   * @param jobId  生成的作业idLog
-   * @param props  作业配置信息,各类作业根据此配置信息生成具体的作业
+   * @param jobId  生成的作业 id
+   * @param props  作业配置信息, 各类作业根据此配置信息生成具体的作业
    * @param logger 日志
    */
   protected AbstractJob(String jobId, JobProps props, Logger logger) throws IOException {
     this.jobId = jobId;
     this.props = props;
     this.logger = logger;
+
     this.definedParamMap = props.getDefinedParams();
     this.projectId = props.getProjectId();
 
@@ -111,6 +111,7 @@ public abstract class AbstractJob implements Job {
 
   public String getWorkingDirectory() {
     String workingDir = props.getWorkDir();
+
     if (workingDir == null) {
       return "";
     }
@@ -128,7 +129,7 @@ public abstract class AbstractJob implements Job {
   }
 
   @Override
-  public List<JobExecResult> getResults() {
+  public List<ExecResult> getResults() {
     return null;
   }
 }

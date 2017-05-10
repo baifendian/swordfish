@@ -16,18 +16,16 @@
 package com.baifendian.swordfish.execserver.job;
 
 import com.baifendian.swordfish.common.config.BaseConfig;
-import com.baifendian.swordfish.common.job.Job;
-import com.baifendian.swordfish.common.job.JobProps;
-import com.baifendian.swordfish.common.job.exception.ExecException;
-import com.baifendian.swordfish.common.job.logger.JobLogger;
 import com.baifendian.swordfish.common.utils.DateUtils;
 import com.baifendian.swordfish.dao.FlowDao;
 import com.baifendian.swordfish.dao.enums.FlowStatus;
 import com.baifendian.swordfish.dao.model.ExecutionFlow;
 import com.baifendian.swordfish.dao.model.ExecutionNode;
 import com.baifendian.swordfish.dao.model.FlowNode;
-import com.baifendian.swordfish.execserver.utils.Constants;
+import com.baifendian.swordfish.execserver.exception.ExecException;
 import com.baifendian.swordfish.execserver.exception.ExecTimeoutException;
+import com.baifendian.swordfish.execserver.utils.Constants;
+import com.baifendian.swordfish.execserver.utils.JobLogger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -15,10 +15,11 @@
  */
 package com.baifendian.swordfish.execserver.job.mr;
 
-import com.baifendian.swordfish.common.job.BaseParam;
-import com.baifendian.swordfish.common.job.JobProps;
-import com.baifendian.swordfish.common.job.yarn.AbstractYarnJob;
+import com.baifendian.swordfish.common.job.struct.node.BaseParam;
+import com.baifendian.swordfish.common.job.struct.node.mr.MrParam;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
+import com.baifendian.swordfish.execserver.job.JobProps;
+import com.baifendian.swordfish.execserver.job.yarn.AbstractYarnJob;
 import com.baifendian.swordfish.execserver.parameter.ParamHelper;
 import org.slf4j.Logger;
 
@@ -40,17 +41,19 @@ public class MrJob extends AbstractYarnJob {
    */
   private static final String HADOOP_JAR = "jar";
 
+  /**
+   * mapreduce param
+   */
   private MrParam mrParam;
 
   /**
-   *
-   * @param jobIdLog
+   * @param jobId
    * @param props
    * @param logger
    * @throws IOException
    */
-  public MrJob(String jobIdLog, JobProps props, Logger logger) throws IOException {
-    super(jobIdLog, props, logger);
+  public MrJob(String jobId, JobProps props, Logger logger) throws IOException {
+    super(jobId, props, logger);
   }
 
   @Override
@@ -64,6 +67,7 @@ public class MrJob extends AbstractYarnJob {
       String args = ParamHelper.resolvePlaceholders(mrParam.getArgs(), definedParamMap);
       mrParam.setArgs(args);
     }
+
     return HadoopJarArgsUtil.buildArgs(mrParam);
   }
 

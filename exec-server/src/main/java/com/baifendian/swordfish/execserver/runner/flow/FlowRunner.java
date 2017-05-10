@@ -17,9 +17,6 @@ package com.baifendian.swordfish.execserver.runner.flow;
 
 import com.baifendian.swordfish.common.config.BaseConfig;
 import com.baifendian.swordfish.common.hadoop.HdfsClient;
-import com.baifendian.swordfish.common.hadoop.HdfsUtil;
-import com.baifendian.swordfish.common.job.Job;
-import com.baifendian.swordfish.common.job.JobProps;
 import com.baifendian.swordfish.common.mail.EmailManager;
 import com.baifendian.swordfish.common.utils.graph.DAGGraph;
 import com.baifendian.swordfish.common.utils.graph.Graph;
@@ -35,7 +32,8 @@ import com.baifendian.swordfish.dao.model.FlowNodeRelation;
 import com.baifendian.swordfish.dao.model.flow.FlowDag;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
 import com.baifendian.swordfish.execserver.exception.ExecTimeoutException;
-import com.baifendian.swordfish.execserver.job.JobTypeManager;
+import com.baifendian.swordfish.execserver.job.Job;
+import com.baifendian.swordfish.execserver.job.JobProps;
 import com.baifendian.swordfish.execserver.runner.node.NodeRunner;
 import com.baifendian.swordfish.execserver.utils.LoggerUtil;
 import com.baifendian.swordfish.execserver.utils.OsUtil;
@@ -191,7 +189,7 @@ public class FlowRunner implements Runnable {
 
     try {
       String execLocalPath = BaseConfig.getFlowExecDir(executionFlow.getProjectId(), executionFlow.getFlowId(),
-              executionFlow.getId());
+          executionFlow.getId());
       LOGGER.info("exec id:{} current execution dir：{}", executionFlow.getId(), execLocalPath);
       File execLocalPathFile = new File(execLocalPath);
       if (execLocalPathFile.exists()) {
@@ -203,9 +201,9 @@ public class FlowRunner implements Runnable {
       // proxyUser用户处理，如果系统不存在该用户，这里自动创建用户
       String proxyUser = executionFlow.getProxyUser();
       List<String> osUserList = OsUtil.getUserList();
-      if(!osUserList.contains(proxyUser)){
+      if (!osUserList.contains(proxyUser)) {
         String userGroup = OsUtil.getGroup();
-        if(StringUtils.isNotEmpty(userGroup)) {
+        if (StringUtils.isNotEmpty(userGroup)) {
           LOGGER.info("create os user:{}", proxyUser);
           String cmd = String.format("sudo useradd -g %s %s", userGroup, proxyUser);
           LOGGER.info("exec cmd {} ", cmd);
@@ -219,8 +217,8 @@ public class FlowRunner implements Runnable {
       String workflowHdfsFile = BaseConfig.getHdfsWorkflowFilename(executionFlow.getProjectId(), executionFlow.getFlowName());
       HdfsClient hdfsClient = HdfsClient.getInstance();
       if (hdfsClient.exists(workflowHdfsFile)) {
-        LOGGER.debug("get hdfs workflow file:{}",workflowHdfsFile);
-        HdfsUtil.GetFile(workflowHdfsFile, execLocalPath);
+        LOGGER.debug("get hdfs workflow file:{}", workflowHdfsFile);
+        HdfsClient.getInstance().copyHdfsToLocal(workflowHdfsFile, execLocalPath, false, true);
         // 资源文件解压缩处理 workflow下的文件为 workflowName.zip
         File zipFile = new File(execLocalPath, executionFlow.getFlowName() + ".zip");
         if (zipFile.exists()) {
@@ -236,7 +234,7 @@ public class FlowRunner implements Runnable {
           LOGGER.error("can't found workflow zip file:" + zipFile.getPath());
         }
       } else {
-        LOGGER.debug("hdfs workflow file:{} not exists",workflowHdfsFile);
+        LOGGER.debug("hdfs workflow file:{} not exists", workflowHdfsFile);
       }
 
       // 解析作业参数获取需要的项目级资源文件清单
@@ -246,7 +244,7 @@ public class FlowRunner implements Runnable {
         if (!resFile.exists()) {
           String resHdfsPath = BaseConfig.getHdfsResourcesFilename(executionFlow.getProjectId(), res);
           LOGGER.info("get project file:{}", resHdfsPath);
-          HdfsUtil.GetFile(resHdfsPath, execLocalPath);
+          HdfsClient.getInstance().copyHdfsToLocal(resHdfsPath, execLocalPath, false, true);
         } else {
           LOGGER.info("file:{} exists, ignore", resFile.getName());
         }
@@ -264,7 +262,7 @@ public class FlowRunner implements Runnable {
       // 超时时，取消所有正在执行的作业
       cancelAllExectingNode();
     } catch (Throwable e) {
-      LOGGER.error("run exec id:"+executionFlow.getId(), e);
+      LOGGER.error("run exec id:" + executionFlow.getId(), e);
     } finally {
       if (status == null) { // 执行失败
         updateExecutionFlow(FlowStatus.FAILED);
@@ -311,8 +309,8 @@ public class FlowRunner implements Runnable {
       String jobId = node.getType() + "_" + node.getName();
 
       Job job = JobTypeManager.newJob(jobId, node.getType(), props, LOGGER);
-      if (job.getParam() != null && job.getParam().getResourceFiles() != null) {
-        projectFiles.addAll(job.getParam().getResourceFiles());
+      if (job.getParam() != null && job.getParam().getProjectResourceFiles() != null) {
+        projectFiles.addAll(job.getParam().getProjectResourceFiles());
       }
     }
     return new ArrayList<>(projectFiles);
@@ -436,7 +434,7 @@ public class FlowRunner implements Runnable {
             executionNode.setStatus(FlowStatus.INIT);
             executionNode.setJobId(LoggerUtil.genJobId(JOB_PREFIX, executionFlow.getId(), node.getName()));
             // 如果是在恢复或者是长作业时，execution_nodes表中会存在记录，这里进行更新处理
-            if(executionNodeLog != null){
+            if (executionNodeLog != null) {
               flowDao.updateExecutionNode(executionNode);
             } else {
               flowDao.insertExecutionNode(executionNode);
@@ -506,7 +504,7 @@ public class FlowRunner implements Runnable {
    */
   private void submitNodeRunner(FlowNode flowNode, ExecutionNode executionNode) {
     int nowTimeout = -1;
-    if(!JobTypeManager.isLongJob(flowNode.getType())) {
+    if (!JobTypeManager.isLongJob(flowNode.getType())) {
       nowTimeout = calcNodeTimeout(); // 重新计算超时时间
     }
     NodeRunner nodeRunner = new NodeRunner(executionFlow, executionNode, flowNode, jobExecutorService, synObject, nowTimeout, systemParamMap, customParamMap);
@@ -543,7 +541,7 @@ public class FlowRunner implements Runnable {
         finishedExecutionNodes.add(executionNode);
       } else if (status.typeIsFinished()) {
         FlowNode node = dagGraph.getVertex(executionNode.getName());
-        if(JobTypeManager.isLongJob(node.getType())){
+        if (JobTypeManager.isLongJob(node.getType())) {
           // 长任务处理
           // 报错发送邮件，避免出现程序问题，一直重复调度
           LOGGER.debug("exec id:{}, node:{} retry", executionNode.getExecId(), executionNode.getName());
@@ -582,7 +580,7 @@ public class FlowRunner implements Runnable {
     return isAllFinished;
   }
 
-  private void reSubmitNodeRunner(FlowNode node, ExecutionNode executionNode){
+  private void reSubmitNodeRunner(FlowNode node, ExecutionNode executionNode) {
     ExecutionNode retryExecutionNode = new ExecutionNode();
     retryExecutionNode.setExecId(executionNode.getExecId());
     retryExecutionNode.setName(executionNode.getName());
@@ -593,7 +591,7 @@ public class FlowRunner implements Runnable {
     flowDao.updateExecutionNode(retryExecutionNode);
     executionNodes.add(retryExecutionNode);
 
-    LOGGER.debug("exec node:{} failed retrys:{}", executionNode.getName(), executionNode.getAttempt()+1);
+    LOGGER.debug("exec node:{} failed retrys:{}", executionNode.getName(), executionNode.getAttempt() + 1);
 
     submitNodeRunner(node, retryExecutionNode);
   }
@@ -776,7 +774,7 @@ public class FlowRunner implements Runnable {
   private void sendEmail() {
     // 发送邮件
     if ((executionFlow.getStatus().typeIsSuccess() && executionFlow.getNotifyType().typeIsSendSuccessMail())
-        || (executionFlow.getStatus().typeIsFailure() && executionFlow.getNotifyType().typeIsSendFailureMail())){
+        || (executionFlow.getStatus().typeIsFailure() && executionFlow.getNotifyType().typeIsSendFailureMail())) {
       EmailManager.sendEmail(executionFlow);
     }
   }

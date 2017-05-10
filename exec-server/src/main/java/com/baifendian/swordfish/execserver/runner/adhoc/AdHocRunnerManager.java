@@ -15,7 +15,7 @@
  */
 package com.baifendian.swordfish.execserver.runner.adhoc;
 
-import com.baifendian.swordfish.common.job.struct.hql.AdHocParam;
+import com.baifendian.swordfish.common.job.struct.node.adhoc.AdHocParam;
 import com.baifendian.swordfish.common.utils.CommonUtil;
 import com.baifendian.swordfish.common.utils.DateUtils;
 import com.baifendian.swordfish.dao.AdHocDao;
@@ -24,6 +24,7 @@ import com.baifendian.swordfish.dao.enums.FlowStatus;
 import com.baifendian.swordfish.dao.model.AdHoc;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
 import com.baifendian.swordfish.execserver.utils.Constants;
+import com.baifendian.swordfish.execserver.utils.JobLogger;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.apache.commons.configuration.Configuration;
 import org.slf4j.Logger;
@@ -35,13 +36,13 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 
 public class AdHocRunnerManager {
-  private static final Logger logger = LoggerFactory.getLogger(AdHocRunnerManager.class);
+  private static Logger logger = LoggerFactory.getLogger(AdHocRunnerManager.class.getName());
 
   private final ExecutorService adHocExecutorService;
   private AdHocDao adHocDao;
 
   public AdHocRunnerManager(Configuration conf) {
-    this.adHocDao = DaoFactory.getDaoInstance(AdHocDao.class);
+    adHocDao = DaoFactory.getDaoInstance(AdHocDao.class);
 
     int threads = conf.getInt(Constants.EXECUTOR_ADHOCRUNNER_THREADS, 20);
 
@@ -78,7 +79,9 @@ public class AdHocRunnerManager {
     }
 
     // 提交执行
-    AdHocRunner adHocRunner = new AdHocRunner(adHoc, adHocDao);
+    JobLogger jobLogger = new JobLogger(jobId, logger);
+
+    AdHocRunner adHocRunner = new AdHocRunner(adHoc, adHocDao, jobLogger);
     adHocExecutorService.submit(adHocRunner);
   }
 

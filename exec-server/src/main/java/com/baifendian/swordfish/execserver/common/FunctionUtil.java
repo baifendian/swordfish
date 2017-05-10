@@ -13,18 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.baifendian.swordfish.execserver.job.hql;
+package com.baifendian.swordfish.execserver.common;
 
 import com.baifendian.swordfish.common.config.BaseConfig;
 import com.baifendian.swordfish.common.hadoop.HdfsClient;
-import com.baifendian.swordfish.common.job.exception.ExecException;
-import com.baifendian.swordfish.common.job.struct.ResourceInfo;
-import com.baifendian.swordfish.common.job.struct.hql.UdfsInfo;
+import com.baifendian.swordfish.common.job.struct.node.common.UdfsInfo;
+import com.baifendian.swordfish.common.job.struct.resource.ResourceInfo;
+import com.baifendian.swordfish.execserver.utils.JobLogger;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -35,11 +33,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static com.baifendian.swordfish.common.utils.StructuredArguments.jobValue;
-
 public class FunctionUtil {
-
-  private static final Logger logger = LoggerFactory.getLogger(FunctionUtil.class);
 
   private static final String CREATE_FUNCTION_FORMAT = "create temporary function {0} as ''{1}''";
 
@@ -49,18 +43,18 @@ public class FunctionUtil {
    * 创建自定义函数, 即 udf
    *
    * @param udfsInfos
-   * @param jobId
+   * @param logger
    * @param srcDir
    * @param isHdfsFile
    * @return
    * @throws IOException
    * @throws InterruptedException
    */
-  public static List<String> createFuncs(List<UdfsInfo> udfsInfos, String jobId, String srcDir, boolean isHdfsFile) throws IOException, InterruptedException {
+  public static List<String> createFuncs(List<UdfsInfo> udfsInfos, JobLogger logger, String srcDir, boolean isHdfsFile) throws IOException, InterruptedException {
     // 是否定义了 udf 的基本目录
     if (StringUtils.isEmpty(hiveUdfJarBasePath)) {
-      logger.error("{} not define hive udf jar path", jobValue(jobId));
-      throw new ExecException("Hive udf jar base path not defined ");
+      logger.error("Not define hive udf jar path");
+      throw new RuntimeException("Hive udf jar base path not defined ");
     }
 
     List<String> funcList = new ArrayList<>();
@@ -87,9 +81,10 @@ public class FunctionUtil {
   }
 
   /**
-   * 获取所有函数的资源 <p>
+   * 获取所有函数的资源
    *
-   * @return 资源  Set
+   * @param udfsInfos
+   * @return
    */
   private static Set<String> getFuncResouces(List<UdfsInfo> udfsInfos) {
     Set<String> resources = new HashSet<>();

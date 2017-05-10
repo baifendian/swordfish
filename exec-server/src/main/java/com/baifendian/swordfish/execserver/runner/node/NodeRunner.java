@@ -15,13 +15,13 @@
  */
 package com.baifendian.swordfish.execserver.runner.node;
 
-import com.baifendian.swordfish.common.job.Job;
 import com.baifendian.swordfish.dao.DaoFactory;
 import com.baifendian.swordfish.dao.FlowDao;
 import com.baifendian.swordfish.dao.enums.FlowStatus;
 import com.baifendian.swordfish.dao.model.ExecutionFlow;
 import com.baifendian.swordfish.dao.model.ExecutionNode;
 import com.baifendian.swordfish.dao.model.FlowNode;
+import com.baifendian.swordfish.execserver.job.Job;
 import com.baifendian.swordfish.execserver.job.JobHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

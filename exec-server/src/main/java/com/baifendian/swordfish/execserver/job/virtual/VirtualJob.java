@@ -15,9 +15,7 @@
  */
 package com.baifendian.swordfish.execserver.job.virtual;
 
-import com.baifendian.swordfish.common.job.AbstractProcessJob;
-import com.baifendian.swordfish.common.job.BaseParam;
-import com.baifendian.swordfish.common.job.JobProps;
+import com.baifendian.swordfish.common.job.struct.node.BaseParam;
 import com.baifendian.swordfish.execserver.job.JobProps;
 import com.baifendian.swordfish.execserver.job.AbstractProcessJob;
 import org.slf4j.Logger;

@@ -15,7 +15,8 @@
  */
 package com.baifendian.swordfish.execserver.job;
 
-import com.baifendian.swordfish.common.job.node.BaseParam;
+import com.baifendian.swordfish.common.job.struct.node.BaseParam;
+import com.baifendian.swordfish.execserver.common.ExecResult;
 
 import java.util.List;
 
@@ -93,7 +94,7 @@ public interface Job {
    *
    * @return
    */
-  List<JobExecResult> getResults();
+  List<ExecResult> getResults();
 
   /**
    * 获取作业的配置参数信息

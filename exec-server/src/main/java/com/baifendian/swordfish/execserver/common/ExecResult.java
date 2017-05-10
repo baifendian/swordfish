@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.baifendian.swordfish.execserver.job;
+package com.baifendian.swordfish.execserver.common;
 
 import com.baifendian.swordfish.dao.enums.FlowStatus;
 
@@ -23,7 +23,7 @@ import java.util.List;
 /**
  * 执行结果 <p>
  */
-public class JobExecResult {
+public class ExecResult {
   /**
    * 执行语句的索引，从0开始
    */
@@ -58,7 +58,7 @@ public class JobExecResult {
    * getter method
    *
    * @return the index
-   * @see JobExecResult#index
+   * @see ExecResult#index
    */
   public int getIndex() {
     return index;
@@ -68,7 +68,7 @@ public class JobExecResult {
    * setter method
    *
    * @param index the index to set
-   * @see JobExecResult#index
+   * @see ExecResult#index
    */
   public void setIndex(int index) {
     this.index = index;
@@ -78,7 +78,7 @@ public class JobExecResult {
    * getter method
    *
    * @return the stm
-   * @see JobExecResult#stm
+   * @see ExecResult#stm
    */
   public String getStm() {
     return stm;
@@ -88,7 +88,7 @@ public class JobExecResult {
    * setter method
    *
    * @param stm the stm to set
-   * @see JobExecResult#stm
+   * @see ExecResult#stm
    */
   public void setStm(String stm) {
     this.stm = stm;
@@ -98,7 +98,7 @@ public class JobExecResult {
    * getter method
    *
    * @return the status
-   * @see JobExecResult#status
+   * @see ExecResult#status
    */
   public FlowStatus getStatus() {
     return status;
@@ -108,7 +108,7 @@ public class JobExecResult {
    * setter method
    *
    * @param status the status to set
-   * @see JobExecResult#status
+   * @see ExecResult#status
    */
   public void setStatus(FlowStatus status) {
     this.status = status;
@@ -118,7 +118,7 @@ public class JobExecResult {
    * getter method
    *
    * @return the titles
-   * @see JobExecResult#titles
+   * @see ExecResult#titles
    */
   public List<String> getTitles() {
     return titles;
@@ -128,7 +128,7 @@ public class JobExecResult {
    * setter method
    *
    * @param titles the titles to set
-   * @see JobExecResult#titles
+   * @see ExecResult#titles
    */
   public void setTitles(List<String> titles) {
     this.titles = titles;
@@ -138,7 +138,7 @@ public class JobExecResult {
    * getter method
    *
    * @return the values
-   * @see JobExecResult#values
+   * @see ExecResult#values
    */
   public List<List<String>> getValues() {
     return values;
@@ -148,7 +148,7 @@ public class JobExecResult {
    * setter method
    *
    * @param values the values to set
-   * @see JobExecResult#values
+   * @see ExecResult#values
    */
   public void setValues(List<List<String>> values) {
     this.values = values;
