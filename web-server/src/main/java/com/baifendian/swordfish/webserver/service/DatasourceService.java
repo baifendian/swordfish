@@ -16,7 +16,6 @@
 package com.baifendian.swordfish.webserver.service;
 
 import com.baifendian.swordfish.common.job.struct.datasource.*;
-import com.baifendian.swordfish.common.job.struct.datasource.conn.*;
 import com.baifendian.swordfish.dao.enums.DbType;
 import com.baifendian.swordfish.dao.mapper.DataSourceMapper;
 import com.baifendian.swordfish.dao.mapper.ProjectMapper;
