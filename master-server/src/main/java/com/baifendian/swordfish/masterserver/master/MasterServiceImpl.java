@@ -214,7 +214,8 @@ public class MasterServiceImpl implements Iface {
 
       // 接收到了, 会更新状态, 在依赖资源中
       if (adHoc.getStatus().typeIsFinished()) {
-        return null;
+        logger.error("ad hoc id {} finished unexpected", adHocId);
+        return ResultHelper.createErrorResult("task finished unexpected");
       }
 
       adHoc.setStatus(FlowStatus.WAITING_RES);

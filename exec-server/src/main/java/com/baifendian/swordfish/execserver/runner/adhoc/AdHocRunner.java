@@ -20,6 +20,7 @@ import com.baifendian.swordfish.dao.enums.FlowStatus;
 import com.baifendian.swordfish.dao.model.AdHoc;
 import com.baifendian.swordfish.execserver.job.JobProps;
 import com.baifendian.swordfish.execserver.utils.JobLogger;
+import org.slf4j.Logger;
 
 import java.util.Date;
 
@@ -38,9 +39,9 @@ public class AdHocRunner implements Runnable {
   /**
    * 用于记录日志, 会封装 job id
    */
-  private JobLogger logger;
+  private Logger logger;
 
-  public AdHocRunner(AdHoc adHoc, AdHocDao adHocDao, JobLogger logger) {
+  public AdHocRunner(AdHoc adHoc, AdHocDao adHocDao, Logger logger) {
     this.adHocDao = adHocDao;
     this.adHoc = adHoc;
     this.logger = logger;

@@ -28,6 +28,7 @@ import com.baifendian.swordfish.execserver.common.FunctionUtil;
 import com.baifendian.swordfish.execserver.job.hql.HiveSqlExec;
 import com.baifendian.swordfish.execserver.common.ResultCallback;
 import com.baifendian.swordfish.execserver.utils.JobLogger;
+import org.slf4j.Logger;
 
 import java.io.IOException;
 import java.util.List;
@@ -54,9 +55,9 @@ public class AdHocSqlJob {
   /**
    * 记录日志
    */
-  private JobLogger logger;
+  private Logger logger;
 
-  public AdHocSqlJob(JobProps props, JobLogger logger) throws IOException {
+  public AdHocSqlJob(JobProps props, Logger logger) throws IOException {
     this.props = props;
     this.adHocDao = DaoFactory.getDaoInstance(AdHocDao.class);
     this.param = JsonUtil.parseObject(props.getJobParams(), AdHocParam.class);

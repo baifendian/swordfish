@@ -152,6 +152,7 @@ public class AdhocService {
         adHocMapper.updateStatus(adHoc);
       }
 
+      logger.error("call master server error");
       throw new ServerErrorException("master server return error");
     }
 

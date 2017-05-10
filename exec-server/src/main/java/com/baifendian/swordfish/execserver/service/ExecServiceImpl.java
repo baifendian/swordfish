@@ -158,11 +158,18 @@ public class ExecServiceImpl implements Iface {
    */
   @Override
   public RetInfo execAdHoc(int adHocId) {
+    logger.info("exec ad hoc: {}", adHocId);
+
     AdHoc adHoc = adHocDao.getAdHoc(adHocId);
 
     if (adHoc == null) {
       logger.error("ad hoc id {} not exists", adHocId);
-      return ResultHelper.createErrorResult("adhoc id not exists");
+      return ResultHelper.createErrorResult("ad hoc id not exists");
+    }
+
+    if (adHoc.getStatus().typeIsFinished()) {
+      logger.error("ad hoc id {} finished unexpected", adHocId);
+      return ResultHelper.createErrorResult("task finished unexpected");
     }
 
     adHocRunnerManager.submitAdHoc(adHoc);
@@ -177,7 +184,7 @@ public class ExecServiceImpl implements Iface {
    * @throws TException
    */
   public RetInfo cancelExecFlow(int execId) throws TException {
-    logger.debug("cancel exec flow {}", execId);
+    logger.info("cancel exec flow {}", execId);
 
     try {
       // 查询 ExecutionFlow

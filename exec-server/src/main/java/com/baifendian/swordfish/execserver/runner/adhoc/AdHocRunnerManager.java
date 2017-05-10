@@ -79,7 +79,7 @@ public class AdHocRunnerManager {
     }
 
     // 提交执行
-    JobLogger jobLogger = new JobLogger(jobId, logger);
+    Logger jobLogger = new JobLogger(jobId, logger);
 
     AdHocRunner adHocRunner = new AdHocRunner(adHoc, adHocDao, jobLogger);
     adHocExecutorService.submit(adHocRunner);

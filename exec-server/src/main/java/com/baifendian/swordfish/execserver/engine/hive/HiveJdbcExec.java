@@ -96,7 +96,7 @@ public class HiveJdbcExec extends BaseDao {
     ConnectionInfo connectionInfo = new ConnectionInfo();
 
     connectionInfo.setUser(userName);
-    connectionInfo.setUri(String.format(hiveConfig.getThriftUris()));
+    connectionInfo.setUri(hiveConfig.getThriftUris());
 
     return connectionInfo;
   }

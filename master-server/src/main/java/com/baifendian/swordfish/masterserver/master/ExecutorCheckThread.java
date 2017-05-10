@@ -56,7 +56,7 @@ public class ExecutorCheckThread implements Runnable {
     try {
       List<ExecutorServerInfo> faultServers = executorServerManager.checkTimeoutServer(timeoutInterval);
 
-      if (faultServers == null) {
+      if (CollectionUtils.isEmpty(faultServers)) {
         return;
       }
 
