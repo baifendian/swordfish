@@ -96,17 +96,17 @@ function file_replace()
 
 function process_check()
 {
-    sleep 2s
+    sleep 3s
 
     pid=`cat *.pid`
     ps -fe|grep ${pid}|grep -v grep
 
     if [ $? -ne 0 ]
     then
-        echo "[pid $pid not exist]"
+        echo "[pid $pid not exist, service is '$1']"
         exit 1
     else
-        echo "[pid $pid start success]"
+        echo "[pid $pid start success, service is '$1']"
     fi
 }
 
@@ -153,14 +153,14 @@ fi
 cd $SWORDFISH_HOME/target/swordfish-all-${version}/swordfish-web-server-${version}/
 sh bin/swordfish-daemon.sh start web-server
 
-process_check
+process_check web-server
 
 cd $SWORDFISH_HOME/target/swordfish-all-${version}/swordfish-master-server-${version}/
 sh bin/swordfish-daemon.sh start master-server
 
-process_check
+process_check master-server
 
 cd $SWORDFISH_HOME/target/swordfish-all-${version}/swordfish-exec-server-${version}/
 sh bin/swordfish-daemon.sh start exec-server
 
-process_check
+process_check exec-server
