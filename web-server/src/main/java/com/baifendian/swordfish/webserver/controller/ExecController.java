@@ -67,7 +67,7 @@ public class ExecController {
                                           @RequestParam(value = "notifyType", required = false) NotifyType notifyType,
                                           @RequestParam(value = "notifyMails", required = false) String notifyMails,
                                           @RequestParam(value = "timeout", required = false, defaultValue = "1800") int timeout) {
-    logger.info("Operator user {}, exec workflow, project name: {}, workflow name: {}, schedule: {}, node name: {}, node dep: {}, notify type: {}," +
+    logger.info("Operator user {}, exec WORKFLOW, PROJECT name: {}, WORKFLOW name: {}, schedule: {}, node name: {}, node dep: {}, notify type: {}," +
             "notify mails: {}, timeout: {}",
         operator.getName(), projectName, workflowName, schedule, nodeName, nodeDep, notifyType, notifyMails, timeout);
 
@@ -87,7 +87,7 @@ public class ExecController {
                                                @RequestParam(value = "notifyMails", required = false) String notifyMails,
                                                @RequestParam(value = "timeout", required = false, defaultValue = "18000") int timeout,
                                                @RequestParam(value = "extras", required = false) String extras) {
-    logger.info("Operator user {}, exec workflow, project name: {}, workflow name: {}, proxy user: {}, queue: {}, data: {}, file: {}," +
+    logger.info("Operator user {}, exec WORKFLOW, PROJECT name: {}, WORKFLOW name: {}, proxy user: {}, queue: {}, data: {}, file: {}," +
         "notify type: {}, notify mails: {}, timeout: {}, extras: {}", operator.getName(), projectName, workflowName, proxyUser, queue, data, file.getName(), notifyType, notifyMails, timeout, extras);
 
     return execService.postExecWorkflowDirect(operator, projectName, workflowName, desc, proxyUser, queue, data, file, notifyType, notifyMails, timeout, extras);
@@ -115,7 +115,7 @@ public class ExecController {
                                      @RequestParam(value = "status", required = false) String status,
                                      @RequestParam(value = "from", required = false, defaultValue = "0") int from,
                                      @RequestParam(value = "size", required = false, defaultValue = "100") int size) {
-    logger.info("Operator user {}, query exec list, start date: {}, end date: {}, project name: {}, workflow name: {}, status: {}, from: {}, size: {}",
+    logger.info("Operator user {}, query exec list, start date: {}, end date: {}, PROJECT name: {}, WORKFLOW name: {}, status: {}, from: {}, size: {}",
         operator.getName(), startDate, endDate, projectName, workflowName, status, from, size);
 
     return execService.getExecWorkflow(operator, projectName, workflowName, new Date(startDate), new Date(endDate), status, from, size);

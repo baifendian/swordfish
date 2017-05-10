@@ -17,11 +17,11 @@ package com.baifendian.swordfish.execserver;
 
 import com.baifendian.swordfish.common.hadoop.ConfigurationUtil;
 import com.baifendian.swordfish.common.hadoop.HdfsClient;
-import com.baifendian.swordfish.common.job.exception.ExecException;
 import com.baifendian.swordfish.dao.DaoFactory;
 import com.baifendian.swordfish.dao.MasterDao;
 import com.baifendian.swordfish.dao.model.MasterServer;
 import com.baifendian.swordfish.execserver.service.ExecServiceImpl;
+import com.baifendian.swordfish.execserver.utils.Constants;
 import com.baifendian.swordfish.execserver.utils.OsUtil;
 import com.baifendian.swordfish.rpc.HeartBeatData;
 import com.baifendian.swordfish.rpc.WorkerService;
@@ -122,7 +122,7 @@ public class ExecThriftServer {
 
     if (masterServer == null) {
       logger.error("Can't found master server");
-      throw new ExecException("can't found master server");
+      throw new RuntimeException("can't found master server");
     }
 
     masterClient = new MasterClient(masterServer.getHost(), masterServer.getPort(), THRIFT_RPC_RETRIES);
@@ -145,7 +145,7 @@ public class ExecThriftServer {
     boolean ret = masterClient.registerExecutor(host, port, System.currentTimeMillis());
     if (!ret) {
       logger.error("register to master {}:{} failed", masterServer.getHost(), masterServer.getPort());
-      throw new ExecException("register executor error");
+      throw new RuntimeException("register executor error");
     }
 
     heartBeatInterval = conf.getInt(Constants.EXECUTOR_HEARTBEAT_INTERVAL, 60);

@@ -15,6 +15,7 @@
  */
 package com.baifendian.swordfish.webserver.controller;
 
+import com.baifendian.swordfish.common.job.struct.node.common.UdfsInfo;
 import com.baifendian.swordfish.dao.model.User;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
 import com.baifendian.swordfish.webserver.dto.AdHocLogDto;
@@ -27,6 +28,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 
 /**
  * 即席查询的服务入口

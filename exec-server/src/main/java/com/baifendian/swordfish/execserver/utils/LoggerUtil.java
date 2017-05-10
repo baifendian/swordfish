@@ -15,26 +15,26 @@
  */
 package com.baifendian.swordfish.execserver.utils;
 
+import org.apache.commons.lang3.StringUtils;
+
 /**
  * 日志记录工具类 <p>
  */
 public class LoggerUtil {
 
   /**
-   * 分隔符
-   */
-  public static final String SEPARATOR = "_";
-
-  /**
-   * 生成 jobId <p>
+   * 生成 jobId 并返回
    *
-   * @return jobId
+   * @param prefix
+   * @param execId
+   * @param nodeName
+   * @return
    */
   public static String genJobId(String prefix, long execId, String nodeName) {
-    if (nodeName == null) {
-      return prefix + SEPARATOR + execId;
+    if (StringUtils.isEmpty(nodeName)) {
+      return String.format("%s_%s", prefix, execId);
     }
-    return prefix + SEPARATOR + execId + SEPARATOR + nodeName;
-  }
 
+    return String.format("%s_%s_%s", prefix, execId, nodeName);
+  }
 }

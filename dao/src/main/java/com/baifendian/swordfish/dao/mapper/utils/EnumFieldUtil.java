@@ -29,14 +29,4 @@ public class EnumFieldUtil {
   public static String genFieldStr(String field, Class<?> enumClass) {
     return "#{" + field + ",javaType=" + enumClass.getName() + ",typeHandler=" + EnumOrdinalTypeHandler.class.getName() + "}";
   }
-
-  /**
-   * 生成enum字段的字符串(MessageFormat特殊字符) <p>
-   *
-   * @return 字段字符串
-   */
-  public static String genFieldSpecialStr(String field, Class<?> enumClass) {
-    return "#'{'" + field + ",javaType=" + enumClass.getName() + ",typeHandler=" + EnumOrdinalTypeHandler.class.getName() + "}";
-  }
-
 }

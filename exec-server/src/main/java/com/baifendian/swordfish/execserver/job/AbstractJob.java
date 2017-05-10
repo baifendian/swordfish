@@ -15,11 +15,10 @@
  */
 package com.baifendian.swordfish.execserver.job;
 
-import com.baifendian.swordfish.common.job.Job;
-import com.baifendian.swordfish.common.job.JobProps;
+import com.baifendian.swordfish.execserver.common.ExecResult;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -39,31 +38,49 @@ public abstract class AbstractJob implements Job {
    **/
   protected JobProps props;
 
-  protected String jobPath;
-
-  protected int exitCode;
-
-  protected boolean complete = false;
-
-  protected boolean canceled = false;
-
-  protected Map<String, Object> jobParams;
-
+  /**
+   * 用户定义参数列表
+   */
   protected Map<String, String> definedParamMap;
 
+  /**
+   * 项目 id
+   */
   protected int projectId;
 
   /**
-   * @param jobId  生成的作业idLog
-   * @param props  作业配置信息,各类作业根据此配置信息生成具体的作业
+   * 退出状态
+   */
+  protected int exitCode = 0;
+
+  /**
+   * 是否完成
+   */
+  protected boolean complete = false;
+
+  /**
+   * 是否取消
+   */
+  protected boolean canceled = false;
+
+  /**
+   * 日志记录
+   */
+  protected Logger logger;
+
+  /**
+   * @param jobId  生成的作业 id
+   * @param props  作业配置信息, 各类作业根据此配置信息生成具体的作业
    * @param logger 日志
    */
-  protected AbstractJob(String jobId, JobProps props, Logger logger) throws IOException {
+  protected AbstractJob(String jobId, JobProps props, Logger logger) {
     this.jobId = jobId;
     this.props = props;
     this.logger = logger;
+
     this.definedParamMap = props.getDefinedParams();
     this.projectId = props.getProjectId();
+
     initJobParams();
   }
 
@@ -86,7 +103,6 @@ public abstract class AbstractJob implements Job {
 
   @Override
   public void cancel() throws Exception {
-    // 暂不支持
   }
 
   @Override
@@ -109,12 +125,13 @@ public abstract class AbstractJob implements Job {
     return props;
   }
 
-  public abstract void initJobParams() throws IOException;
+  public abstract void initJobParams();
 
   public String getWorkingDirectory() {
     String workingDir = props.getWorkDir();
+
     if (workingDir == null) {
-      return "";
+      return StringUtils.EMPTY;
     }
 
     return workingDir;
@@ -133,5 +150,4 @@ public abstract class AbstractJob implements Job {
   public List<ExecResult> getResults() {
     return null;
   }
-
 }

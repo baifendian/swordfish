@@ -22,8 +22,8 @@ import com.baifendian.swordfish.dao.enums.FlowStatus;
 import com.baifendian.swordfish.dao.model.AdHoc;
 import com.baifendian.swordfish.dao.model.ExecutionFlow;
 import com.baifendian.swordfish.dao.model.Schedule;
-import com.baifendian.swordfish.execserver.adhoc.AdHocRunnerManager;
-import com.baifendian.swordfish.execserver.flow.FlowRunnerManager;
+import com.baifendian.swordfish.execserver.runner.adhoc.AdHocRunnerManager;
+import com.baifendian.swordfish.execserver.runner.flow.FlowRunnerManager;
 import com.baifendian.swordfish.execserver.utils.ResultHelper;
 import com.baifendian.swordfish.rpc.RetInfo;
 import com.baifendian.swordfish.rpc.WorkerService.Iface;
@@ -158,11 +158,18 @@ public class ExecServiceImpl implements Iface {
    */
   @Override
   public RetInfo execAdHoc(int adHocId) {
+    logger.info("exec ad hoc: {}", adHocId);
+
     AdHoc adHoc = adHocDao.getAdHoc(adHocId);
 
     if (adHoc == null) {
       logger.error("ad hoc id {} not exists", adHocId);
-      return ResultHelper.createErrorResult("adhoc id not exists");
+      return ResultHelper.createErrorResult("ad hoc id not exists");
+    }
+
+    if (adHoc.getStatus().typeIsFinished()) {
+      logger.error("ad hoc id {} finished unexpected", adHocId);
+      return ResultHelper.createErrorResult("task finished unexpected");
     }
 
     adHocRunnerManager.submitAdHoc(adHoc);
@@ -177,7 +184,7 @@ public class ExecServiceImpl implements Iface {
    * @throws TException
    */
   public RetInfo cancelExecFlow(int execId) throws TException {
-    logger.debug("cancel exec flow {}", execId);
+    logger.info("cancel exec flow {}", execId);
 
     try {
       // 查询 ExecutionFlow

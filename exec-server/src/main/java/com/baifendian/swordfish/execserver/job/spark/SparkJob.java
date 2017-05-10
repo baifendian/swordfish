@@ -15,10 +15,11 @@
  */
 package com.baifendian.swordfish.execserver.job.spark;
 
-import com.baifendian.swordfish.common.job.BaseParam;
-import com.baifendian.swordfish.common.job.JobProps;
-import com.baifendian.swordfish.common.job.yarn.AbstractYarnJob;
+import com.baifendian.swordfish.common.job.struct.node.BaseParam;
+import com.baifendian.swordfish.common.job.struct.node.spark.SparkParam;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
+import com.baifendian.swordfish.execserver.job.JobProps;
+import com.baifendian.swordfish.execserver.job.yarn.AbstractYarnJob;
 import com.baifendian.swordfish.execserver.parameter.ParamHelper;
 import org.slf4j.Logger;
 
@@ -35,8 +36,8 @@ public class SparkJob extends AbstractYarnJob {
    */
   private SparkParam sparkParam;
 
-  public SparkJob(String jobIdLog, JobProps props, Logger logger) throws IllegalAccessException, IOException {
-    super(jobIdLog, props, logger);
+  public SparkJob(String jobId, JobProps props, Logger logger) {
+    super(jobId, props, logger);
   }
 
   @Override

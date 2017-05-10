@@ -15,11 +15,12 @@
  */
 package com.baifendian.swordfish.execserver.job.process;
 
-import com.baifendian.swordfish.common.job.AbstractProcessJob;
-import com.baifendian.swordfish.common.job.BaseParam;
-import com.baifendian.swordfish.common.job.JobProps;
-import com.baifendian.swordfish.common.job.exception.ExecException;
+import com.baifendian.swordfish.common.job.struct.node.BaseParam;
+import com.baifendian.swordfish.common.job.struct.node.common.ProcessParam;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
+import com.baifendian.swordfish.execserver.exception.ExecException;
+import com.baifendian.swordfish.execserver.job.AbstractProcessJob;
+import com.baifendian.swordfish.execserver.job.JobProps;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 
@@ -36,13 +37,12 @@ public class DefaultProcessJob extends AbstractProcessJob {
   private ProcessParam param;
 
   /**
-   *
-   * @param jobIdLog
+   * @param jobId
    * @param props
    * @param logger
    */
-  public DefaultProcessJob(String jobIdLog, JobProps props, Logger logger) throws IOException {
-    super(jobIdLog, props, logger);
+  public DefaultProcessJob(String jobId, JobProps props, Logger logger) throws IOException {
+    super(jobId, props, logger);
 
     if (param.getScript() == null || StringUtils.isEmpty(param.getScript())) {
       throw new ExecException("DefaultProcessJob script param must not null");
@@ -72,5 +72,4 @@ public class DefaultProcessJob extends AbstractProcessJob {
   public BaseParam getParam() {
     return param;
   }
-
 }

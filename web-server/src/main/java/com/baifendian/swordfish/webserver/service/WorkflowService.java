@@ -106,12 +106,12 @@ public class WorkflowService {
 
     if (project == null) {
       logger.error("Project does not exist: {}", projectName);
-      throw new NotFoundException("Not found project \"{0}\"", projectName);
+      throw new NotFoundException("Not found PROJECT \"{0}\"", projectName);
     }
 
     if (!projectService.hasWritePerm(operator.getId(), project)) {
-      logger.error("User {} has no right permission for the project {} to create project flow", operator.getName(), projectName);
-      throw new PermissionException("User \"{0}\" is not has project \"{1}\" write permission", operator.getName(), projectName);
+      logger.error("User {} has no right permission for the PROJECT {} to create PROJECT flow", operator.getName(), projectName);
+      throw new PermissionException("User \"{0}\" is not has PROJECT \"{1}\" write permission", operator.getName(), projectName);
     }
 
     // 对工作流详定义json进行反序列化
@@ -240,12 +240,12 @@ public class WorkflowService {
 
     if (project == null) {
       logger.error("Project does not exist: {}", projectName);
-      throw new NotFoundException("Not found project \"{0}\"", projectName);
+      throw new NotFoundException("Not found PROJECT \"{0}\"", projectName);
     }
 
     if (!projectService.hasWritePerm(operator.getId(), project)) {
-      logger.error("User {} has no right permission for the project {} to patch project flow", operator.getName(), projectName);
-      throw new PermissionException("User \"{0}\" is not has project \"{1}\" write permission", operator.getName(), projectName);
+      logger.error("User {} has no right permission for the PROJECT {} to patch PROJECT flow", operator.getName(), projectName);
+      throw new PermissionException("User \"{0}\" is not has PROJECT \"{1}\" write permission", operator.getName(), projectName);
     }
 
     // 查询工作流信息
@@ -254,7 +254,7 @@ public class WorkflowService {
 
     if (projectFlow == null) {
       logger.error("Workflow does not exist: {}", name);
-      throw new NotFoundException("Not found project \"{0}\"", projectName);
+      throw new NotFoundException("Not found PROJECT \"{0}\"", projectName);
     }
 
     // 解析
@@ -278,7 +278,7 @@ public class WorkflowService {
         for (WorkflowNodeDto workflowNodeDTO : workflowNodeDTOList) {
           // TODO::参数检测存在问题
           if (!flowNodeParamCheck(workflowNodeDTO.getParameter(), workflowNodeDTO.getType())) {
-            throw new BadRequestException("workflow node parameter not valid");
+            throw new BadRequestException("WORKFLOW node parameter not valid");
           }
         }
 
@@ -288,8 +288,8 @@ public class WorkflowService {
           try {
             flowNodeList.add(workflowNodeDTO.convertFlowNode());
           } catch (JsonProcessingException e) {
-            logger.error("workflow node dto convert flowNode error", e);
-            throw new BadRequestException("workflow node parameter not valid");
+            logger.error("WORKFLOW node dto convert flowNode error", e);
+            throw new BadRequestException("WORKFLOW node parameter not valid");
           }
         }
         projectFlow.setFlowsNodes(flowNodeList);
@@ -345,11 +345,11 @@ public class WorkflowService {
     Project project = projectMapper.queryByName(projectName);
 
     if (project == null) {
-      throw new NotFoundException("Not found project \"{0}\"", projectName);
+      throw new NotFoundException("Not found PROJECT \"{0}\"", projectName);
     }
 
     if (!projectService.hasWritePerm(operator.getId(), project)) {
-      throw new PermissionException("User \"{0}\" is not has project \"{1}\" write permission", operator.getName(), projectName);
+      throw new PermissionException("User \"{0}\" is not has PROJECT \"{1}\" write permission", operator.getName(), projectName);
     }
 
     // 获取数据库信息
@@ -357,7 +357,7 @@ public class WorkflowService {
     ProjectFlow srcProjectFlow = flowDao.projectFlowfindByName(project.getId(), srcWorkflowName);
 
     if (srcProjectFlow == null) {
-      throw new NotFoundException("Not found workflow \"{0}\"", srcWorkflowName);
+      throw new NotFoundException("Not found WORKFLOW \"{0}\"", srcWorkflowName);
     }
 
     String data = JsonUtil.toJsonString(new WorkflowData(srcProjectFlow.getFlowsNodes(), srcProjectFlow.getUserDefinedParamList(), FlowNode.class));
@@ -366,12 +366,12 @@ public class WorkflowService {
     String srcHdfsFilename = BaseConfig.getHdfsWorkflowFilename(project.getId(), srcWorkflowName);
     String destHdfsFilename = BaseConfig.getHdfsWorkflowFilename(project.getId(), destWorkflowName);
 
-    logger.info("try copy workflow file {} to workflow file {}", srcHdfsFilename, destHdfsFilename);
+    logger.info("try copy WORKFLOW file {} to WORKFLOW file {}", srcHdfsFilename, destHdfsFilename);
     try {
       if (HdfsClient.getInstance().exists(srcHdfsFilename)) {
         HdfsClient.getInstance().copy(srcHdfsFilename, destHdfsFilename, false, true);
       } else {
-        logger.info("workflow file {} not exists no copy required", srcHdfsFilename);
+        logger.info("WORKFLOW file {} not exists no copy required", srcHdfsFilename);
       }
     } catch (IOException e) {
       logger.error("copy hdfs file error", e);
@@ -394,17 +394,17 @@ public class WorkflowService {
     Project project = projectMapper.queryByName(projectName);
 
     if (project == null) {
-      throw new NotFoundException("Not found project \"{0}\"", projectName);
+      throw new NotFoundException("Not found PROJECT \"{0}\"", projectName);
     }
 
     if (!projectService.hasWritePerm(operator.getId(), project)) {
-      throw new PermissionException("User \"{0}\" is not has project \"{1}\" write permission", operator.getName(), projectName);
+      throw new PermissionException("User \"{0}\" is not has PROJECT \"{1}\" write permission", operator.getName(), projectName);
     }
 
     ProjectFlow projectFlow = flowDao.projectFlowfindByName(project.getId(), name);
 
     if (projectFlow == null) {
-      throw new NotFoundException("Not found workflow \"{0}\"", name);
+      throw new NotFoundException("Not found WORKFLOW \"{0}\"", name);
     }
 
     //删除工作流
@@ -425,11 +425,11 @@ public class WorkflowService {
     Project project = projectMapper.queryByName(projectName);
 
     if (project == null) {
-      throw new NotFoundException("Not found project \"{0}\"", projectName);
+      throw new NotFoundException("Not found PROJECT \"{0}\"", projectName);
     }
 
     if (!projectService.hasWritePerm(operator.getId(), project)) {
-      throw new PermissionException("User \"{0}\" is not has project \"{1}\" write permission", operator.getName(), projectName);
+      throw new PermissionException("User \"{0}\" is not has PROJECT \"{1}\" write permission", operator.getName(), projectName);
     }
 
     projectFlowMapper.updateProjectConf(project.getId(), queue, proxyUser);
@@ -447,11 +447,11 @@ public class WorkflowService {
     Project project = projectMapper.queryByName(projectName);
 
     if (project == null) {
-      throw new NotFoundException("Not found project \"{0}\"", projectName);
+      throw new NotFoundException("Not found PROJECT \"{0}\"", projectName);
     }
 
     if (!projectService.hasReadPerm(operator.getId(), project)) {
-      throw new PermissionException("User \"{0}\" is not has project \"{1}\" read permission", operator.getName(), projectName);
+      throw new PermissionException("User \"{0}\" is not has PROJECT \"{1}\" read permission", operator.getName(), projectName);
     }
 
     return flowDao.projectFlowFindByProject(project.getId());
@@ -470,11 +470,11 @@ public class WorkflowService {
     Project project = projectMapper.queryByName(projectName);
 
     if (project == null) {
-      throw new NotFoundException("Not found project \"{0}\"", projectName);
+      throw new NotFoundException("Not found PROJECT \"{0}\"", projectName);
     }
 
     if (!projectService.hasReadPerm(operator.getId(), project)) {
-      throw new PermissionException("User \"{0}\" is not has project \"{1}\" read permission", operator.getName(), projectName);
+      throw new PermissionException("User \"{0}\" is not has PROJECT \"{1}\" read permission", operator.getName(), projectName);
     }
 
     return flowDao.projectFlowfindByName(project.getId(), name);
@@ -490,15 +490,15 @@ public class WorkflowService {
     Project project = projectMapper.queryByName(projectName);
 
     if (project == null) {
-      throw new NotFoundException("Not found project \"{0}\"", projectName);
+      throw new NotFoundException("Not found PROJECT \"{0}\"", projectName);
     }
 
     if (!projectService.hasReadPerm(operator.getId(), project)) {
-      throw new PermissionException("User \"{0}\" is not has project \"{1}\" read permission", operator.getName(), projectName);
+      throw new PermissionException("User \"{0}\" is not has PROJECT \"{1}\" read permission", operator.getName(), projectName);
     }
 
     // 尝试从hdfs下载
-    logger.info("try download workflow {} file from hdfs", name);
+    logger.info("try download WORKFLOW {} file from hdfs", name);
     String localFilename = BaseConfig.getLocalWorkflowFilename(project.getId(), UUID.randomUUID().toString());
     String hdfsFilename = BaseConfig.getHdfsWorkflowFilename(project.getId(), name);
 
@@ -512,7 +512,7 @@ public class WorkflowService {
     }
 
     // 从数据库中导出
-    logger.info("try download workflow {} file from db", name);
+    logger.info("try download WORKFLOW {} file from db", name);
     ProjectFlow projectFlow = flowDao.projectFlowfindByName(project.getId(), name);
 
     try {
@@ -520,13 +520,13 @@ public class WorkflowService {
       InputStreamResource resource = new InputStreamResource(new FileInputStream(json));
       return resource;
     } catch (Exception e) {
-      logger.error("download workflow file from db error", e);
-      throw new ServerErrorException("download workflow file from db error");
+      logger.error("download WORKFLOW file from db error", e);
+      throw new ServerErrorException("download WORKFLOW file from db error");
     }
   }
 
   /**
-   * project flow data 反序列化
+   * PROJECT flow data 反序列化
    *
    * @param data
    * @param file
@@ -545,7 +545,7 @@ public class WorkflowService {
       String hdfsFilename = BaseConfig.getHdfsWorkflowFilename(project.getId(), workflowName);
       try {
         // 先将文件存放到本地
-        logger.info("save workflow file {} to local {}", workflowName, localFilename);
+        logger.info("save WORKFLOW file {} to local {}", workflowName, localFilename);
         fileSystemStorageService.store(file, localFilename);
         // 解压 并读取workflow.json
         ZipFile zipFile = new ZipFile(localFilename);
@@ -555,17 +555,17 @@ public class WorkflowService {
         workflowData = JsonUtil.parseObject(jsonString, WorkflowData.class);
         // 上传文件到HDFS
         if (workflowData != null) {
-          logger.info("update workflow local file {} to hdfs {}", localFilename, hdfsFilename);
+          logger.info("update WORKFLOW local file {} to hdfs {}", localFilename, hdfsFilename);
           HdfsClient.getInstance().copyLocalToHdfs(localFilename, hdfsFilename, true, true);
         }
       } catch (ZipException e) {
         logger.error("ext file error", e);
         return null;
       } catch (IOException e) {
-        logger.error("read workflow.json error", e);
+        logger.error("read WORKFLOW.json error", e);
         return null;
       } catch (Exception e) {
-        logger.error("workflow file process error", e);
+        logger.error("WORKFLOW file process error", e);
         return null;
       }
 //

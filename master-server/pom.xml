@@ -9,8 +9,6 @@
 
     <artifactId>swordfish-master-server</artifactId>
     <packaging>jar</packaging>
-
-    <name>swordfish-master-server</name>
     <url>http://maven.apache.org</url>
 
     <properties>

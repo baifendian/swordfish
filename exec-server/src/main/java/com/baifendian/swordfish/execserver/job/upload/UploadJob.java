@@ -15,13 +15,15 @@
  */
 package com.baifendian.swordfish.execserver.job.upload;
 
-import com.baifendian.swordfish.common.job.AbstractProcessJob;
-import com.baifendian.swordfish.common.job.BaseParam;
-import com.baifendian.swordfish.common.job.JobProps;
-import com.baifendian.swordfish.common.job.exception.ExecException;
+import com.baifendian.swordfish.common.job.struct.node.BaseParam;
+import com.baifendian.swordfish.common.job.struct.node.upload.MappingRelation;
+import com.baifendian.swordfish.common.job.struct.node.upload.UploadParam;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
-import com.baifendian.swordfish.execserver.utils.hive.HiveConfig;
-import com.baifendian.swordfish.execserver.utils.hive.MyHiveFactoryUtil;
+import com.baifendian.swordfish.execserver.engine.hive.HiveConfig;
+import com.baifendian.swordfish.execserver.engine.hive.MyHiveFactoryUtil;
+import com.baifendian.swordfish.execserver.exception.ExecException;
+import com.baifendian.swordfish.execserver.job.AbstractProcessJob;
+import com.baifendian.swordfish.execserver.job.JobProps;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
@@ -39,8 +41,8 @@ public class UploadJob extends AbstractProcessJob {
 
   private static final String DEFAULT_CHARSET = "UTF-8";
 
-  public UploadJob(String jobIdLog, JobProps props, Logger logger) throws IOException{
-    super(jobIdLog, props, logger);
+  public UploadJob(String jobId, JobProps props, Logger logger) {
+    super(jobId, props, logger);
   }
 
   @Override

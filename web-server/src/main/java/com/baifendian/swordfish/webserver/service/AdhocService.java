@@ -15,6 +15,8 @@
  */
 package com.baifendian.swordfish.webserver.service;
 
+import com.baifendian.swordfish.common.job.struct.node.adhoc.AdHocParam;
+import com.baifendian.swordfish.common.job.struct.node.common.UdfsInfo;
 import com.baifendian.swordfish.dao.enums.FlowStatus;
 import com.baifendian.swordfish.dao.mapper.AdHocMapper;
 import com.baifendian.swordfish.dao.mapper.MasterServerMapper;
@@ -150,6 +152,7 @@ public class AdhocService {
         adHocMapper.updateStatus(adHoc);
       }
 
+      logger.error("call master server error");
       throw new ServerErrorException("master server return error");
     }
 

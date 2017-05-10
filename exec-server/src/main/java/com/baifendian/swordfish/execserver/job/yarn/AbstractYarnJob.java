@@ -15,11 +15,11 @@
  */
 package com.baifendian.swordfish.execserver.job.yarn;
 
-import com.baifendian.swordfish.common.job.AbstractProcessJob;
-import com.baifendian.swordfish.common.job.JobProps;
 import com.baifendian.swordfish.dao.DaoFactory;
 import com.baifendian.swordfish.dao.FlowDao;
 import com.baifendian.swordfish.dao.model.ExecutionNode;
+import com.baifendian.swordfish.execserver.job.AbstractProcessJob;
+import com.baifendian.swordfish.execserver.job.JobProps;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
@@ -33,13 +33,15 @@ public abstract class AbstractYarnJob extends AbstractProcessJob {
   private FlowDao flowDao;
 
   private String logLinks;
+
   /**
    * yarn 的 application id
    */
   private String appid;
 
-  public AbstractYarnJob(String jobIdLog, JobProps props, Logger logger) throws IOException {
+  public AbstractYarnJob(String jobIdLog, JobProps props, Logger logger) {
     super(jobIdLog, props, logger);
+
     flowDao = DaoFactory.getDaoInstance(FlowDao.class);
   }
 
@@ -105,6 +107,7 @@ public abstract class AbstractYarnJob extends AbstractProcessJob {
       if (props.getEnvFile() != null) {
         sb.append("source " + props.getEnvFile() + "\n");
       }
+
       sb.append("\n\n");
       sb.append(cmd);
 

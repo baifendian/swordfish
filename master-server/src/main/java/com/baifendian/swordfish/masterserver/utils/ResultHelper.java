@@ -29,6 +29,7 @@ public class ResultHelper {
   /**
    * 创建一个错误异常的返回包 <p>
    *
+   * @param msg
    * @return {@link RetInfo}
    */
   public static RetInfo createErrorResult(String msg) {

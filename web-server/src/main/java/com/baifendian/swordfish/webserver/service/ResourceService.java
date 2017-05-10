@@ -91,12 +91,12 @@ public class ResourceService {
 
     if (project == null) {
       logger.error("Project does not exist: {}", projectName);
-      throw new NotFoundException("project",projectName);
+      throw new NotFoundException("PROJECT",projectName);
     }
 
     if (!projectService.hasWritePerm(operator.getId(), project)) {
-      logger.error("User {} has no right permission for the project {}", operator.getName(), projectName);
-      throw new PermissionException("project write or project owner",operator.getName());
+      logger.error("User {} has no right permission for the PROJECT {}", operator.getName(), projectName);
+      throw new PermissionException("PROJECT write or PROJECT owner",operator.getName());
     }
 
     // 判断文件是否已经存在
@@ -193,12 +193,12 @@ public class ResourceService {
 
     if (project == null) {
       logger.error("Project does not exist: {}", projectName);
-      throw new NotFoundException("project",projectName);
+      throw new NotFoundException("PROJECT",projectName);
     }
 
     if (!projectService.hasWritePerm(operator.getId(), project)) {
-      logger.error("User {} has no right permission for the project {}", operator.getName(), projectName);
-      throw new PermissionException("project write or project owner",operator.getName());
+      logger.error("User {} has no right permission for the PROJECT {}", operator.getName(), projectName);
+      throw new PermissionException("PROJECT write or PROJECT owner",operator.getName());
     }
 
     // 判断资源是否已经存在, 如果不存在, 直接返回
@@ -300,12 +300,12 @@ public class ResourceService {
 
     if (project == null) {
       logger.error("Project does not exist: {}", projectName);
-      throw new NotFoundException("project",projectName);
+      throw new NotFoundException("PROJECT",projectName);
     }
 
     if (!projectService.hasWritePerm(operator.getId(), project)) {
-      logger.error("User {} has no right permission for the project {}", operator.getName(), projectName);
-      throw new PermissionException("project write or project owner",operator.getName());
+      logger.error("User {} has no right permission for the PROJECT {}", operator.getName(), projectName);
+      throw new PermissionException("PROJECT write or PROJECT owner",operator.getName());
     }
 
     // 判断源是否存在
@@ -379,12 +379,12 @@ public class ResourceService {
 
     if (project == null) {
       logger.error("Project does not exist: {}", projectName);
-      throw new NotFoundException("project",projectName);
+      throw new NotFoundException("PROJECT",projectName);
     }
 
     if (!projectService.hasWritePerm(operator.getId(), project)) {
-      logger.error("User {} has no right permission for the project {}", operator.getName(), projectName);
-      throw new PermissionException("project write or project owner",operator.getName());
+      logger.error("User {} has no right permission for the PROJECT {}", operator.getName(), projectName);
+      throw new PermissionException("PROJECT write or PROJECT owner",operator.getName());
     }
 
     // 查询先
@@ -417,12 +417,12 @@ public class ResourceService {
 
     if (project == null) {
       logger.error("Project does not exist: {}", projectName);
-      throw new NotFoundException("project",projectName);
+      throw new NotFoundException("PROJECT",projectName);
     }
 
     if (!projectService.hasReadPerm(operator.getId(), project)) {
-      logger.error("User {} has no right permission for the project {}", operator.getName(), projectName);
-      throw new PermissionException("project read or project owner",operator.getName());
+      logger.error("User {} has no right permission for the PROJECT {}", operator.getName(), projectName);
+      throw new PermissionException("PROJECT read or PROJECT owner",operator.getName());
     }
 
     // 查询资源
@@ -446,12 +446,12 @@ public class ResourceService {
 
     if (project == null) {
       logger.error("Project does not exist: {}", projectName);
-      throw new NotFoundException("project",projectName);
+      throw new NotFoundException("PROJECT",projectName);
     }
 
     if (!projectService.hasReadPerm(operator.getId(), project)) {
-      logger.error("User {} has no right permission for the project {}", operator.getName(), projectName);
-      throw new PermissionException("project read or project owner",operator.getName());
+      logger.error("User {} has no right permission for the PROJECT {}", operator.getName(), projectName);
+      throw new PermissionException("PROJECT read or PROJECT owner",operator.getName());
     }
 
     // 查询资源
@@ -481,19 +481,19 @@ public class ResourceService {
 
     if (project == null) {
       logger.error("Project does not exist: {}", projectName);
-      throw new NotFoundException("project",projectName);
+      throw new NotFoundException("PROJECT",projectName);
     }
 
     if (!projectService.hasReadPerm(operator.getId(), project)) {
-      logger.error("User {} has no right permission for the project {}", operator.getName(), projectName);
-      throw new PermissionException("project read or project owner",operator.getName());
+      logger.error("User {} has no right permission for the PROJECT {}", operator.getName(), projectName);
+      throw new PermissionException("PROJECT read or PROJECT owner",operator.getName());
     }
 
     // 下载文件
     Resource resource = resourceMapper.queryResource(project.getId(), name);
 
     if (resource == null) {
-      logger.error("Download file not exist, project {}, resource {}", projectName, name);
+      logger.error("Download file not exist, PROJECT {}, resource {}", projectName, name);
       throw new NotFoundException("resource",name);
     }
 

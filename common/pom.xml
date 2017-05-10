@@ -270,9 +270,7 @@
         <dependency>
             <groupId>com.github.noraui</groupId>
             <artifactId>ojdbc7</artifactId>
-            <version>RELEASE</version>
         </dependency>
-
     </dependencies>
 
     <build>
