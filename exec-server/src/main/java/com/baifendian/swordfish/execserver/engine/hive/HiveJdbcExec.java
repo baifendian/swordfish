@@ -17,10 +17,10 @@ package com.baifendian.swordfish.execserver.engine.hive;
 
 import com.baifendian.swordfish.common.hive.ConnectionInfo;
 import com.baifendian.swordfish.common.hive.HiveConnectionClient;
-import com.baifendian.swordfish.common.job.ExecResult;
 import com.baifendian.swordfish.dao.BaseDao;
 import com.baifendian.swordfish.dao.exception.DaoSemanticException;
 import com.baifendian.swordfish.dao.exception.SqlException;
+import com.baifendian.swordfish.execserver.common.ExecResult;
 import org.apache.hadoop.hive.ql.parse.ASTNode;
 import org.apache.hadoop.hive.ql.parse.ParseDriver;
 import org.apache.hadoop.hive.ql.parse.ParseException;
@@ -70,7 +70,7 @@ public class HiveJdbcExec extends BaseDao {
         return true;
       }
     } catch (ParseException e) {
-      LOGGER.
+      LOGGER.error("Parse command exception", e);
     }
     return false;
   }

@@ -36,7 +36,7 @@ public class SparkJob extends AbstractYarnJob {
    */
   private SparkParam sparkParam;
 
-  public SparkJob(String jobId, JobProps props, Logger logger) throws IllegalAccessException, IOException {
+  public SparkJob(String jobId, JobProps props, Logger logger) {
     super(jobId, props, logger);
   }
 

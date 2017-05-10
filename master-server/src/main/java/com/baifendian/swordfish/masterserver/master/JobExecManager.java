@@ -20,6 +20,7 @@ import com.baifendian.swordfish.dao.FlowDao;
 import com.baifendian.swordfish.dao.model.ExecutionFlow;
 import com.baifendian.swordfish.dao.model.ProjectFlow;
 import com.baifendian.swordfish.masterserver.config.MasterConfig;
+import com.baifendian.swordfish.masterserver.exception.ExecException;
 import com.baifendian.swordfish.masterserver.exception.MasterException;
 import com.baifendian.swordfish.masterserver.exec.ExecutorClient;
 import com.baifendian.swordfish.masterserver.exec.ExecutorServerInfo;
@@ -31,6 +32,9 @@ import org.apache.thrift.TException;
 import org.quartz.CronExpression;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.*;
+import java.util.concurrent.*;
 
 /**
  * 任务执行管理器
@@ -164,7 +168,7 @@ public class JobExecManager {
     ExecutorServerInfo executorServerInfo = executorServerManager.getExecutorServer();
 
     if (executorServerInfo == null) {
-      throw new RuntimeException("can't found active executor server");
+      throw new ExecException("can't found active executor server");
     }
 
     logger.info("exec ad hoc {} on server {}:{}", id, executorServerInfo.getHost(), executorServerInfo.getPort());

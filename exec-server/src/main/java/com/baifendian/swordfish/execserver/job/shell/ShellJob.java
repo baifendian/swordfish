@@ -44,7 +44,7 @@ public class ShellJob extends AbstractProcessJob {
    */
   private String currentPath;
 
-  public ShellJob(String jobId, JobProps props, Logger logger) throws IOException {
+  public ShellJob(String jobId, JobProps props, Logger logger) {
     super(jobId, props, logger);
 
     this.currentPath = getWorkingDirectory();

@@ -24,11 +24,10 @@ import com.baifendian.swordfish.dao.exception.SqlException;
 import com.baifendian.swordfish.execserver.common.ExecResult;
 import com.baifendian.swordfish.execserver.common.ResultCallback;
 import com.baifendian.swordfish.execserver.engine.hive.HiveJdbcExec;
-import com.baifendian.swordfish.execserver.utils.JobLogger;
 import org.apache.commons.lang.StringUtils;
 import org.apache.hive.jdbc.HiveConnection;
 import org.apache.hive.jdbc.HiveStatement;
-
+import org.slf4j.Logger;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.Statement;
@@ -83,14 +82,14 @@ public class HiveSqlExec {
   /**
    * 记录日志的实例
    */
-  private JobLogger logger;
+  private Logger logger;
 
   /**
    * 执行的结果
    */
   private List<ExecResult> results;
 
-  public HiveSqlExec(List<String> createFuncs, List<String> sqls, String userName, boolean isContinue, ResultCallback resultCallback, Integer queryLimit, JobLogger logger) {
+  public HiveSqlExec(List<String> createFuncs, List<String> sqls, String userName, boolean isContinue, ResultCallback resultCallback, Integer queryLimit, Logger logger) {
     this.createFuncs = createFuncs;
     this.sqls = sqls;
     this.userName = userName;

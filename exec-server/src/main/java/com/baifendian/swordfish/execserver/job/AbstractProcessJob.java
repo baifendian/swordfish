@@ -15,8 +15,7 @@
  */
 package com.baifendian.swordfish.execserver.job;
 
-import com.baifendian.swordfish.common.job.JobProps;
-import com.baifendian.swordfish.common.hadoop.HdfsExecException;
+import com.baifendian.swordfish.common.hadoop.HdfsException;
 import com.baifendian.swordfish.execserver.utils.ProcessUtil;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
@@ -44,7 +43,7 @@ public abstract class AbstractProcessJob extends AbstractJob {
    * @param props  作业配置信息,各类作业根据此配置信息生成具体的作业
    * @param logger 日志
    */
-  protected AbstractProcessJob(String jobIdLog, JobProps props, Logger logger) throws IOException {
+  protected AbstractProcessJob(String jobIdLog, JobProps props, Logger logger) {
     super(jobIdLog, props, logger);
     completeLatch = new CountDownLatch(1);
   }
@@ -112,9 +111,11 @@ public abstract class AbstractProcessJob extends AbstractJob {
       logger.error(e.getMessage(), e);
       exitCode = -1;
     }
+
     if (exitCode != 0) {
-      throw new HdfsExecException("Process error. Exit code is " + exitCode);
+      throw new HdfsException("Process error. Exit code is " + exitCode);
     }
+
     complete = true;
 
   }

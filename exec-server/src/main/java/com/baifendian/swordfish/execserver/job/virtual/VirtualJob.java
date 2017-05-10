@@ -32,7 +32,7 @@ public class VirtualJob extends AbstractProcessJob {
    * @param props  作业配置信息,各类作业根据此配置信息生成具体的作业
    * @param logger 日志
    */
-  public VirtualJob(String jobId, JobProps props, Logger logger) throws IOException {
+  public VirtualJob(String jobId, JobProps props, Logger logger) {
     super(jobId, props, logger);
   }
 

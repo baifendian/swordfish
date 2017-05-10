@@ -34,6 +34,7 @@ import com.baifendian.swordfish.dao.utils.json.JsonUtil;
 import com.baifendian.swordfish.execserver.exception.ExecTimeoutException;
 import com.baifendian.swordfish.execserver.job.Job;
 import com.baifendian.swordfish.execserver.job.JobProps;
+import com.baifendian.swordfish.execserver.job.JobTypeManager;
 import com.baifendian.swordfish.execserver.runner.node.NodeRunner;
 import com.baifendian.swordfish.execserver.utils.LoggerUtil;
 import com.baifendian.swordfish.execserver.utils.OsUtil;
@@ -46,6 +47,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.Charset;
 import java.util.*;
@@ -296,12 +298,14 @@ public class FlowRunner implements Runnable {
     return dagGraph;
   }
 
-  private List<String> genProjectResFiles(FlowDag flowDag) throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
+  private List<String> genProjectResFiles(FlowDag flowDag) throws IllegalArgumentException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
     List<FlowNode> nodes = flowDag.getNodes();
     Set<String> projectFiles = new HashSet<>();
+
     Map<String, String> allParamMap = new HashMap<>();
     allParamMap.putAll(systemParamMap);
     allParamMap.putAll(customParamMap);
+
     for (FlowNode node : nodes) {
       JobProps props = new JobProps();
       props.setJobParams(node.getParameter());
@@ -313,6 +317,7 @@ public class FlowRunner implements Runnable {
         projectFiles.addAll(job.getParam().getProjectResourceFiles());
       }
     }
+
     return new ArrayList<>(projectFiles);
   }
 

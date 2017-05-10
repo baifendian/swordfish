@@ -19,11 +19,10 @@ import com.baifendian.swordfish.execserver.job.hql.EtlSqlJob;
 import com.baifendian.swordfish.execserver.job.mr.MrJob;
 import com.baifendian.swordfish.execserver.job.shell.ShellJob;
 import com.baifendian.swordfish.execserver.job.spark.SparkJob;
+import com.baifendian.swordfish.execserver.job.upload.UploadJob;
 import com.baifendian.swordfish.execserver.job.virtual.VirtualJob;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
 
 public class JobTypeManager {
 
@@ -37,7 +36,7 @@ public class JobTypeManager {
   private static final String SPARK_STREAMING = "SPARK-STREAMING";
   private static final String UPLOAD = "UPLOAD";
 
-  public static Job newJob(String jobId, String jobTypeStr, JobProps props, Logger logger) throws IOException, IllegalArgumentException {
+  public static Job newJob(String jobId, String jobTypeStr, JobProps props, Logger logger) throws IllegalArgumentException {
     switch (jobTypeStr) {
       case HQL:
         return new EtlSqlJob(jobId, props, logger);
@@ -49,11 +48,10 @@ public class JobTypeManager {
         return new SparkJob(jobId, props, logger);
       case VIRTUAL:
         return new VirtualJob(jobId, props, logger);
-      case
       case SPARK_STREAMING:
-
+        return new SparkJob(jobId, props, logger);
       case UPLOAD:
-
+        return new UploadJob(jobId, props, logger);
       default:
         logger.error("unsupport job type: {}", jobTypeStr);
         throw new IllegalArgumentException("Not support job type");

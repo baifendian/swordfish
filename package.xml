@@ -17,11 +17,11 @@
             <outputDirectory>swordfish-web-server-${project.version}</outputDirectory>
         </fileSet>
         <fileSet>
-            <directory>jobExecManager-server/target/swordfish-jobExecManager-server-${project.version}</directory>
+            <directory>master-server/target/swordfish-master-server-${project.version}</directory>
             <includes>
                 <include>**/*.*</include>
             </includes>
-            <outputDirectory>swordfish-jobExecManager-server-${project.version}</outputDirectory>
+            <outputDirectory>swordfish-master-server-${project.version}</outputDirectory>
         </fileSet>
         <fileSet>
             <directory>exec-server/target/swordfish-exec-server-${project.version}</directory>

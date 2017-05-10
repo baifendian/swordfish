@@ -52,7 +52,7 @@ public class MrJob extends AbstractYarnJob {
    * @param logger
    * @throws IOException
    */
-  public MrJob(String jobId, JobProps props, Logger logger) throws IOException {
+  public MrJob(String jobId, JobProps props, Logger logger) {
     super(jobId, props, logger);
   }
 

@@ -31,8 +31,10 @@ import java.util.Properties;
 
 public class MyHiveFactoryUtil {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(MyHiveFactoryUtil.class);
+  private static final Logger logger = LoggerFactory.getLogger(MyHiveFactoryUtil.class);
+
   private static final Properties PROPERTIES = new Properties();
+
   private static HiveConfig hiveConfig;
 
   static {
@@ -41,15 +43,25 @@ public class MyHiveFactoryUtil {
       InputStream is = new FileInputStream(dataSourceFile);
       PROPERTIES.load(is);
     } catch (IOException e) {
-      LOGGER.error(e.getMessage(), e);
+      logger.error(e.getMessage(), e);
     }
   }
 
+  /**
+   * 构建 hive 配置
+   *
+   * @param hiveConfig
+   */
   public static void buildHiveConfig(HiveConfig hiveConfig) {
     hiveConfig.setMetastoreUris(PROPERTIES.getProperty("hive.metastore.uris"));
     hiveConfig.setThriftUris(PROPERTIES.getProperty("hive.thrift.uris"));
   }
 
+  /**
+   * 得到 hive 配置实例, 单例模式
+   *
+   * @return
+   */
   public static HiveConfig getInstance() {
     if (hiveConfig == null) {
       synchronized (MyHiveFactoryUtil.class) {
@@ -60,7 +72,7 @@ public class MyHiveFactoryUtil {
         }
       }
     }
+
     return hiveConfig;
   }
-
 }

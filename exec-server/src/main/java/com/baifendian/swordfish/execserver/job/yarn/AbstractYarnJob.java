@@ -39,7 +39,7 @@ public abstract class AbstractYarnJob extends AbstractProcessJob {
    */
   private String appid;
 
-  public AbstractYarnJob(String jobIdLog, JobProps props, Logger logger) throws IOException {
+  public AbstractYarnJob(String jobIdLog, JobProps props, Logger logger) {
     super(jobIdLog, props, logger);
 
     flowDao = DaoFactory.getDaoInstance(FlowDao.class);

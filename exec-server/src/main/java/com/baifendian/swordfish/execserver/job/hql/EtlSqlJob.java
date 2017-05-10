@@ -25,19 +25,15 @@ import com.baifendian.swordfish.execserver.job.AbstractJob;
 import com.baifendian.swordfish.execserver.job.JobProps;
 import com.baifendian.swordfish.execserver.parameter.ParamHelper;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.util.List;
 
 public class EtlSqlJob extends AbstractJob {
-  private static final Logger logger = LoggerFactory.getLogger(EtlSqlJob.class);
-
   protected SqlParam param;
 
   protected List<ExecResult> results;
 
-  public EtlSqlJob(String jobId, JobProps props, Logger logger) throws IOException {
+  public EtlSqlJob(String jobId, JobProps props, Logger logger) {
     super(jobId, props, logger);
   }
 
@@ -50,12 +46,12 @@ public class EtlSqlJob extends AbstractJob {
   public void process() throws Exception {
     String sqls = param.getSql();
     sqls = ParamHelper.resolvePlaceholders(sqls, definedParamMap);
-    List<String> funcs = FunctionUtil.createFuncs(param.getUdfs(), jobId, getWorkingDirectory(), false);
+    List<String> funcs = FunctionUtil.createFuncs(param.getUdfs(), props.getExecId(), logger, getWorkingDirectory(), false);
 
     logger.info("exec sql:{}, funcs:{}", sqls, funcs);
 
     List<String> execSqls = CommonUtil.sqlSplit(sqls);
-    HiveSqlExec hiveSqlExec = new HiveSqlExec(funcs, execSqls, getProxyUser(), null, false, null, null, logger);
+    HiveSqlExec hiveSqlExec = new HiveSqlExec(funcs, execSqls, getProxyUser(), false, null, null, logger);
     hiveSqlExec.run();
 
     results = hiveSqlExec.getResults();

@@ -37,7 +37,7 @@ public class JobProps {
   /**
    * 执行 id
    **/
-  private long execId;
+  private int execId;
 
   /**
    * 即席查询时的 adHocId
@@ -138,11 +138,11 @@ public class JobProps {
     this.nodeName = nodeName;
   }
 
-  public long getExecId() {
+  public int getExecId() {
     return execId;
   }
 
-  public void setExecId(long execId) {
+  public void setExecId(int execId) {
     this.execId = execId;
   }
 

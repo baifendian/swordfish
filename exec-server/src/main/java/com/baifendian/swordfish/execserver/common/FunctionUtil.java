@@ -19,10 +19,11 @@ import com.baifendian.swordfish.common.config.BaseConfig;
 import com.baifendian.swordfish.common.hadoop.HdfsClient;
 import com.baifendian.swordfish.common.job.struct.node.common.UdfsInfo;
 import com.baifendian.swordfish.common.job.struct.resource.ResourceInfo;
-import com.baifendian.swordfish.execserver.utils.JobLogger;
+import com.baifendian.swordfish.execserver.exception.ExecException;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
@@ -43,6 +44,7 @@ public class FunctionUtil {
    * 创建自定义函数, 即 udf
    *
    * @param udfsInfos
+   * @param execId
    * @param logger
    * @param srcDir
    * @param isHdfsFile
@@ -50,7 +52,7 @@ public class FunctionUtil {
    * @throws IOException
    * @throws InterruptedException
    */
-  public static List<String> createFuncs(List<UdfsInfo> udfsInfos, JobLogger logger, String srcDir, boolean isHdfsFile) throws IOException, InterruptedException {
+  public static List<String> createFuncs(List<UdfsInfo> udfsInfos, int execId, Logger logger, String srcDir, boolean isHdfsFile) throws IOException, InterruptedException {
     // 是否定义了 udf 的基本目录
     if (StringUtils.isEmpty(hiveUdfJarBasePath)) {
       logger.error("Not define hive udf jar path");
@@ -63,13 +65,13 @@ public class FunctionUtil {
       Set<String> resources = getFuncResouces(udfsInfos);
 
       if (CollectionUtils.isNotEmpty(resources)) {
-        String uploadPath = hiveUdfJarBasePath + File.separator + jobId;
+        String uploadPath = hiveUdfJarBasePath + File.separator + execId;
 
         // adHoc 查询时直接通过复制 hdfs 上文件的方式来处理
         if (isHdfsFile) {
-          copyJars(resources, uploadPath, srcDir);
+          copyJars(resources, uploadPath, srcDir, logger);
         } else {
-          uploadUdfJars(resources, uploadPath, srcDir);
+          uploadUdfJars(resources, uploadPath, srcDir, logger);
         }
 
         addJarSql(funcList, resources, uploadPath);
@@ -109,7 +111,7 @@ public class FunctionUtil {
    * @throws IOException
    * @throws InterruptedException
    */
-  private static void uploadUdfJars(Set<String> resources, String tarDir, String srcDir) throws IOException, InterruptedException {
+  private static void uploadUdfJars(Set<String> resources, String tarDir, String srcDir, Logger logger) throws IOException, InterruptedException {
     HdfsClient hdfsClient = HdfsClient.getInstance();
 
     if (!hdfsClient.exists(tarDir)) {
@@ -144,7 +146,7 @@ public class FunctionUtil {
    * @throws IOException
    * @throws InterruptedException
    */
-  private static void copyJars(Set<String> resources, String tarDir, String srcDir) throws IOException, InterruptedException {
+  private static void copyJars(Set<String> resources, String tarDir, String srcDir, Logger logger) throws IOException, InterruptedException {
     HdfsClient hdfsClient = HdfsClient.getInstance();
 
     if (!hdfsClient.exists(tarDir)) {

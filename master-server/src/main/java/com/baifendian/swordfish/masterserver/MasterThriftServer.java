@@ -91,7 +91,11 @@ public class MasterThriftServer {
         }
 
         // 关闭调度
-        QuartzManager.shutdown();
+        try {
+          QuartzManager.shutdown();
+        } catch (SchedulerException e) {
+          logger.error("Catch an exception when shutdown quartz manager", e);
+        }
       }));
 
       jobExecManager.run();

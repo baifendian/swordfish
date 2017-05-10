@@ -79,7 +79,7 @@ public class AdHocSqlJob {
 
     try {
       // 创建自定义函数
-      List<String> funcs = FunctionUtil.createFuncs(param.getUdfs(), logger, BaseConfig.getHdfsResourcesDir(props.getProjectId()), true);
+      List<String> funcs = FunctionUtil.createFuncs(param.getUdfs(), props.getExecId(), logger, BaseConfig.getHdfsResourcesDir(props.getProjectId()), true);
 
       logger.info("exec sql: {}, funcs: {}", sqls, funcs);
 

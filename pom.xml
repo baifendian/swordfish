@@ -37,7 +37,7 @@
         <module>rpc</module>
         <module>exec-server</module>
         <module>web-server</module>
-        <module>jobExecManager-server</module>
+        <module>master-server</module>
     </modules>
 
     <dependencyManagement>
