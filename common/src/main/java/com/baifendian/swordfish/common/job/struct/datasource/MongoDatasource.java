@@ -15,7 +15,18 @@
  */
 package com.baifendian.swordfish.common.job.struct.datasource;
 
-public class MongoDBParam {
+import com.mongodb.MongoClient;
+import com.mongodb.MongoClientOptions;
+import com.mongodb.MongoClientURI;
+import com.mongodb.client.MongoDatabase;
+import org.bson.Document;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+public class MongoDatasource extends Datasource {
+
+  private static Logger logger = LoggerFactory.getLogger(MongoDatasource.class.getName());
+
   private String address;
 
   private String database;
@@ -34,5 +45,21 @@ public class MongoDBParam {
 
   public void setDatabase(String database) {
     this.database = database;
+  }
+
+  @Override
+  public void isConnectable() throws Exception {
+    MongoClient mongoClient = new MongoClient(new MongoClientURI(this.address));
+    try {
+      MongoClientOptions options = MongoClientOptions.builder().connectTimeout(10)
+              .socketKeepAlive(false).build();
+
+      MongoDatabase db = mongoClient.getDatabase(this.database);
+      for (Document doc : db.listCollections()) {
+        logger.debug("{}", doc);
+      }
+    } finally {
+      mongoClient.close();
+    }
   }
 }

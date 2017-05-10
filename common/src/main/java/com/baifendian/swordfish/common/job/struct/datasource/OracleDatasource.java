@@ -15,13 +15,22 @@
  */
 package com.baifendian.swordfish.common.job.struct.datasource;
 
+import oracle.jdbc.pool.OracleDataSource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.sql.Connection;
+import java.sql.SQLException;
+
 /**
  * Oracle数据源的参数配置
  */
-public class OracleParam {
+public class OracleDatasource extends Datasource {
+
+  private static Logger logger = LoggerFactory.getLogger(OracleDatasource.class.getName());
 
   private String driverType = "oci";
-  private String ServerName;
+  private String serverName;
   private String networkProtocol = "tcp";
   private String databaseName;
   private int portNumber;
@@ -37,11 +46,11 @@ public class OracleParam {
   }
 
   public String getServerName() {
-    return ServerName;
+    return serverName;
   }
 
   public void setServerName(String serverName) {
-    ServerName = serverName;
+    this.serverName = serverName;
   }
 
   public String getNetworkProtocol() {
@@ -82,5 +91,32 @@ public class OracleParam {
 
   public void setPassword(String password) {
     this.password = password;
+  }
+
+  @Override
+  public void isConnectable() throws Exception {
+    Connection con = null;
+    try {
+      OracleDataSource ods = new OracleDataSource();
+
+      ods.setDriverType(this.driverType);
+      ods.setServerName(this.serverName);
+      ods.setNetworkProtocol(this.networkProtocol);
+      ods.setDataSourceName(this.databaseName);
+      ods.setPortNumber(this.portNumber);
+      ods.setUser(this.user);
+      ods.setPassword(this.password);
+
+      con = ods.getConnection();
+    } finally {
+      if (con != null) {
+        try {
+          con.close();
+        } catch (SQLException e) {
+          logger.error("Oracle datasource try conn close conn error", e);
+          throw e;
+        }
+      }
+    }
   }
 }

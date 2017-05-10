@@ -15,10 +15,20 @@
  */
 package com.baifendian.swordfish.common.job.struct.datasource;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+
 /**
  * mysql数据源的配置参数
  */
-public class MysqlParam {
+public class MysqlDatasource extends Datasource {
+
+  private static Logger logger = LoggerFactory.getLogger(MongoDatasource.class.getName());
+
   private String address;
 
   private String database;
@@ -107,5 +117,31 @@ public class MysqlParam {
 
   public void setCharacterEncoding(String characterEncoding) {
     this.characterEncoding = characterEncoding;
+  }
+
+  @Override
+  public void isConnectable() throws Exception {
+    Connection con = null;
+    try {
+      Class.forName("com.mysql.jdbc.Driver");
+
+      String address = this.address;
+      String database = this.database;
+      if (address.lastIndexOf("/") != address.length()) {
+        database += "/";
+      }
+      String url = this.address + database;
+
+      con = DriverManager.getConnection(url, this.user, this.password);
+    } finally {
+      if (con != null) {
+        try {
+          con.close();
+        } catch (SQLException e) {
+          logger.error("Mysql datasource try conn close conn error", e);
+          throw e;
+        }
+      }
+    }
   }
 }
