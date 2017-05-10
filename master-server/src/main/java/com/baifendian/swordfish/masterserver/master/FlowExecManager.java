@@ -33,12 +33,10 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 
 /**
- * workflow 的执行管理 <p>
+ * 工作流的执行管理
  */
 public class FlowExecManager {
-  /**
-   * LOGGER
-   */
+
   private final Logger logger = LoggerFactory.getLogger(getClass());
 
   /**
@@ -49,7 +47,7 @@ public class FlowExecManager {
   /**
    * execution flow queue
    **/
-  private final Master master;
+  private final JobExecManager jobExecManager;
 
   /**
    * {@link FlowDao}
@@ -62,14 +60,14 @@ public class FlowExecManager {
   private static long checkInterval = 30 * 1000;
 
   /**
-   * @param master
+   * @param jobExecManager
    * @param flowDao
    */
-  public FlowExecManager(Master master, FlowDao flowDao) {
-    this.master = master;
+  public FlowExecManager(JobExecManager jobExecManager, FlowDao flowDao) {
+    this.jobExecManager = jobExecManager;
     this.flowDao = flowDao;
 
-    ThreadFactory flowThreadFactory = new ThreadFactoryBuilder().setNameFormat("Scheduler-Master-AddData").build();
+    ThreadFactory flowThreadFactory = new ThreadFactoryBuilder().setNameFormat("Scheduler-JobExecManager-AddData").build();
     appendFlowExecutorService = Executors.newCachedThreadPool(flowThreadFactory);
   }
 
@@ -103,7 +101,7 @@ public class FlowExecManager {
               execFlowInfo.setExecId(executionFlow.getId());
 
               // 发送请求到 executor server 中执行
-              master.addExecFlow(execFlowInfo);
+              jobExecManager.addExecFlow(execFlowInfo);
 
               // 如果当前任务补数据任务失败，后续任务不再执行
               execStatus = checkExecStatus(executionFlow.getId());

@@ -37,9 +37,9 @@ import static org.quartz.TriggerBuilder.newTrigger;
 public class QuartzManager {
 
   /**
-   * LOGGER
+   * logger
    */
-  private static final Logger LOGGER = LoggerFactory.getLogger(QuartzManager.class);
+  private static final Logger logger = LoggerFactory.getLogger(QuartzManager.class);
 
   /**
    * 默认的 Job Group 名称
@@ -70,7 +70,7 @@ public class QuartzManager {
     try {
       scheduler = schedulerFactory.getScheduler();
     } catch (SchedulerException e) {
-      LOGGER.error(e.getMessage(), e);
+      logger.error(e.getMessage(), e);
     }
   }
 
@@ -103,7 +103,7 @@ public class QuartzManager {
     try {
       scheduler.getContext().put(key, object);
     } catch (SchedulerException e) {
-      LOGGER.error(e.getMessage(), e);
+      logger.error(e.getMessage(), e);
       throw new QuartzException("添加对象到上下文失败", e);
     }
   }
@@ -131,7 +131,7 @@ public class QuartzManager {
 
       return jobDetail;
     } catch (Exception e) {
-      LOGGER.error(e.getMessage(), e);
+      logger.error(e.getMessage(), e);
       throw new QuartzException("添加调度 Job 失败", e);
     }
   }
@@ -167,7 +167,7 @@ public class QuartzManager {
       }
       return jobDetail;
     } catch (Exception e) {
-      LOGGER.error(e.getMessage(), e);
+      logger.error(e.getMessage(), e);
       throw new QuartzException("添加调度 Job 失败", e);
     }
   }
@@ -222,7 +222,7 @@ public class QuartzManager {
         }
       }
     } catch (SchedulerException e) {
-      LOGGER.error(e.getMessage(), e);
+      logger.error(e.getMessage(), e);
       throw new QuartzException("添加调度 CronTrigger 失败", e);
     }
   }
@@ -234,7 +234,7 @@ public class QuartzManager {
     try {
       scheduler.deleteJob(new JobKey(jobName, DEFAULT_JOB_GROUP_NAME));// 删除任务
     } catch (SchedulerException e) {
-      LOGGER.error(e.getMessage(), e);
+      logger.error(e.getMessage(), e);
       throw new QuartzException("删除 Job 失败", e);
     }
   }
@@ -246,7 +246,7 @@ public class QuartzManager {
     try {
       scheduler.deleteJob(new JobKey(jobName, jobGroupName));// 删除任务
     } catch (SchedulerException e) {
-      LOGGER.error(e.getMessage(), e);
+      logger.error(e.getMessage(), e);
       throw new QuartzException("删除 Job 失败", e);
     }
   }
@@ -260,7 +260,7 @@ public class QuartzManager {
       jobKeys.addAll(scheduler.getJobKeys(GroupMatcher.groupEndsWith(jobGroupName)));
       scheduler.deleteJobs(jobKeys);
     } catch (SchedulerException e) {
-      LOGGER.error(e.getMessage(), e);
+      logger.error(e.getMessage(), e);
       throw new QuartzException("删除 Job 失败", e);
     }
   }
@@ -274,7 +274,7 @@ public class QuartzManager {
     try {
       scheduler.pauseTrigger(triggerKey);// 终止 trigger
     } catch (SchedulerException e) {
-      LOGGER.error(e.getMessage(), e);
+      logger.error(e.getMessage(), e);
       throw new QuartzException("删除 Job 失败", e);
     }
   }
@@ -288,7 +288,7 @@ public class QuartzManager {
     try {
       scheduler.resumeTrigger(triggerKey);// 终止 trigger
     } catch (SchedulerException e) {
-      LOGGER.error(e.getMessage(), e);
+      logger.error(e.getMessage(), e);
       throw new QuartzException("删除 Job 失败", e);
     }
   }
@@ -303,7 +303,7 @@ public class QuartzManager {
       scheduler.pauseTrigger(triggerKey);// 终止 trigger
       scheduler.unscheduleJob(triggerKey);// 移除 trigger
     } catch (SchedulerException e) {
-      LOGGER.error(e.getMessage(), e);
+      logger.error(e.getMessage(), e);
       throw new QuartzException("删除 Job 失败", e);
     }
   }

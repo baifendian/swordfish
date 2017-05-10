@@ -237,9 +237,9 @@ CREATE TABLE `ad_hoc_results` (
 -- `master_server` table
 DROP TABLE If Exists `master_server`;
 CREATE TABLE `master_server` (
-  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'master id',
-  `host` varchar(20) NOT NULL COMMENT 'ip address of the master',
-  `port` int(11) NOT NULL COMMENT 'port of the master',
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'jobExecManager id',
+  `host` varchar(20) NOT NULL COMMENT 'ip address of the jobExecManager',
+  `port` int(11) NOT NULL COMMENT 'port of the jobExecManager',
   `create_time` datetime NOT NULL COMMENT 'create time of the records',
   `modify_time` datetime NOT NULL COMMENT 'last modify time of the records',
   PRIMARY KEY (`id`),

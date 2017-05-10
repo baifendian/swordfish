@@ -38,7 +38,9 @@ public abstract class BaseParam {
   /**
    * 获取 node 需要的项目级资源文件清单
    */
-  public abstract List<String> getProjectResourceFiles();
+  public List<String> getProjectResourceFiles() {
+    return null;
+  }
 
   /**
    * @param resourceInfos

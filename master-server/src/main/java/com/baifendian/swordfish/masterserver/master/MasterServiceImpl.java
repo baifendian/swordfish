@@ -48,9 +48,9 @@ import java.util.Map;
 public class MasterServiceImpl implements Iface {
 
   /**
-   * LOGGER
+   * logger
    */
-  private final Logger LOGGER = LoggerFactory.getLogger(getClass());
+  private final Logger logger = LoggerFactory.getLogger(getClass());
 
   /**
    * 工作流的数据库接口
@@ -65,10 +65,10 @@ public class MasterServiceImpl implements Iface {
   /**
    * 工作流执行管理器
    */
-  private final Master master;
+  private final JobExecManager jobExecManager;
 
-  public MasterServiceImpl(Master master) {
-    this.master = master;
+  public MasterServiceImpl(JobExecManager jobExecManager) {
+    this.jobExecManager = jobExecManager;
 
     this.flowDao = DaoFactory.getDaoInstance(FlowDao.class);
     this.adHocDao = DaoFactory.getDaoInstance(AdHocDao.class);
@@ -85,7 +85,7 @@ public class MasterServiceImpl implements Iface {
    */
   @Override
   public RetInfo setSchedule(int projectId, int flowId) throws TException {
-    LOGGER.info("set schedule {} {}", projectId, flowId);
+    logger.info("set schedule {} {}", projectId, flowId);
 
     try {
       Schedule schedule = flowDao.querySchedule(flowId);
@@ -102,7 +102,7 @@ public class MasterServiceImpl implements Iface {
       Map<String, Object> dataMap = FlowScheduleJob.genDataMap(projectId, flowId, schedule);
       QuartzManager.addJobAndTrigger(jobName, jobGroupName, FlowScheduleJob.class, startDate, endDate, schedule.getCrontab(), dataMap);
     } catch (Exception e) {
-      LOGGER.error(e.getMessage(), e);
+      logger.error(e.getMessage(), e);
       return ResultHelper.createErrorResult(e.getMessage());
     }
 
@@ -125,7 +125,7 @@ public class MasterServiceImpl implements Iface {
       String jobGroupName = FlowScheduleJob.genJobGroupName(projectId);
       QuartzManager.deleteJob(jobName, jobGroupName);
     } catch (Exception e) {
-      LOGGER.error(e.getMessage(), e);
+      logger.error(e.getMessage(), e);
       return ResultHelper.createErrorResult(e.getMessage());
     }
 
@@ -145,7 +145,7 @@ public class MasterServiceImpl implements Iface {
       String jobGroupName = FlowScheduleJob.genJobGroupName(projectId);
       QuartzManager.deleteJobs(jobGroupName);
     } catch (Exception e) {
-      LOGGER.error(e.getMessage(), e);
+      logger.error(e.getMessage(), e);
       return ResultHelper.createErrorResult(e.getMessage());
     }
 
@@ -163,11 +163,11 @@ public class MasterServiceImpl implements Iface {
   @Override
   public RetResultInfo execFlow(int projectId, int flowId, long scheduleDate, ExecInfo execInfo) throws TException {
     ExecutionFlow executionFlow;
-    LOGGER.debug("exec flow project id:{} flow id:{} schedule date:{} exec info:{}", projectId, flowId, scheduleDate, execInfo);
+    logger.debug("exec flow project id:{} flow id:{} schedule date:{} exec info:{}", projectId, flowId, scheduleDate, execInfo);
     try {
       ProjectFlow flow = flowDao.projectFlowfindById(flowId);
       if (flow == null) {
-        LOGGER.error("flowId is not exists");
+        logger.error("flowId is not exists");
         return new RetResultInfo(ResultHelper.createErrorResult("flowId is not exists"), null);
       }
 
@@ -186,9 +186,9 @@ public class MasterServiceImpl implements Iface {
       ExecFlowInfo execFlowInfo = new ExecFlowInfo();
       execFlowInfo.setExecId(executionFlow.getId());
 
-      master.addExecFlow(execFlowInfo);
+      jobExecManager.addExecFlow(execFlowInfo);
     } catch (Exception e) {
-      LOGGER.error(e.getMessage(), e);
+      logger.error(e.getMessage(), e);
       return new RetResultInfo(ResultHelper.createErrorResult(e.getMessage()), null);
     }
     return new RetResultInfo(ResultHelper.SUCCESS, Arrays.asList(executionFlow.getId()));
@@ -203,12 +203,12 @@ public class MasterServiceImpl implements Iface {
   @Override
   public RetInfo execAdHoc(int adHocId) {
     try {
-      LOGGER.info("receive exec ad hoc request, id: {}", adHocId);
+      logger.info("receive exec ad hoc request, id: {}", adHocId);
 
       AdHoc adHoc = adHocDao.getAdHoc(adHocId);
 
       if (adHoc == null) {
-        LOGGER.error("ad hoc id {} not exists", adHocId);
+        logger.error("ad hoc id {} not exists", adHocId);
         return ResultHelper.createErrorResult("ad hoc id not exists");
       }
 
@@ -220,9 +220,9 @@ public class MasterServiceImpl implements Iface {
       adHoc.setStatus(FlowStatus.WAITING_RES);
       adHocDao.updateAdHocStatus(adHoc);
 
-      master.execAdHoc(adHocId);
+      jobExecManager.execAdHoc(adHocId);
     } catch (Exception e) {
-      LOGGER.error(e.getMessage(), e);
+      logger.error(e.getMessage(), e);
 
       // 如果是依赖资源中的状态, 更新为失败, 因为调用失败了
       AdHoc adHoc = adHocDao.getAdHoc(adHocId);
@@ -249,12 +249,12 @@ public class MasterServiceImpl implements Iface {
    */
   @Override
   public RetResultInfo appendWorkFlow(int projectId, int flowId, ScheduleInfo scheduleInfo) throws TException {
-    LOGGER.debug("append workflow projectId:{}, flowId:{},scheduleMeta:{}", projectId, flowId, scheduleInfo);
+    logger.debug("append workflow projectId:{}, flowId:{},scheduleMeta:{}", projectId, flowId, scheduleInfo);
     try {
       ProjectFlow flow = flowDao.projectFlowfindById(flowId);
       // 若 workflow 被删除
       if (flow == null) {
-        LOGGER.error("projectId:{},flowId:{} workflow not exists", projectId, flowId);
+        logger.error("projectId:{},flowId:{} workflow not exists", projectId, flowId);
         return ResultDetailHelper.createErrorResult("current workflow not exists");
       }
 
@@ -265,9 +265,9 @@ public class MasterServiceImpl implements Iface {
       Date endDateTime = new Date(scheduleInfo.getEndDate());
 
       // 提交补数据任务
-      master.submitAddData(flow, cron, startDateTime, endDateTime);
+      jobExecManager.submitAddData(flow, cron, startDateTime, endDateTime);
     } catch (Exception e) {
-      LOGGER.error(e.getMessage(), e);
+      logger.error(e.getMessage(), e);
       return ResultDetailHelper.createErrorResult(e.getMessage());
     }
 
@@ -282,9 +282,9 @@ public class MasterServiceImpl implements Iface {
   @Override
   public RetInfo cancelExecFlow(int execId) throws TException {
     try {
-      return master.cancelExecFlow(execId);
+      return jobExecManager.cancelExecFlow(execId);
     } catch (Exception e) {
-      LOGGER.warn("executor report error", e);
+      logger.warn("executor report error", e);
       return ResultHelper.createErrorResult(e.getMessage());
     }
   }
@@ -301,9 +301,9 @@ public class MasterServiceImpl implements Iface {
   @Override
   public RetInfo registerExecutor(String host, int port, long registerTime) throws TException {
     try {
-      master.registerExecutor(host, port, registerTime);
+      jobExecManager.registerExecutor(host, port, registerTime);
     } catch (Exception e) {
-      LOGGER.warn("executor register error", e);
+      logger.warn("executor register error", e);
       return ResultHelper.createErrorResult(e.getMessage());
     }
 
@@ -322,9 +322,9 @@ public class MasterServiceImpl implements Iface {
   @Override
   public RetInfo executorReport(String host, int port, HeartBeatData heartBeatData) throws TException {
     try {
-      master.executorReport(host, port, heartBeatData);
+      jobExecManager.executorReport(host, port, heartBeatData);
     } catch (Exception e) {
-      LOGGER.warn("executor report error", e);
+      logger.warn("executor report error", e);
       return ResultHelper.createErrorResult(e.getMessage());
     }
 

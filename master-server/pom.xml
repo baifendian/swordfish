@@ -7,10 +7,10 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>swordfish-master-server</artifactId>
+    <artifactId>swordfish-jobExecManager-server</artifactId>
     <packaging>jar</packaging>
 
-    <name>swordfish-master-server</name>
+    <name>swordfish-jobExecManager-server</name>
     <url>http://maven.apache.org</url>
 
     <properties>

@@ -2,7 +2,7 @@
         xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.0"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.0 http://maven.apache.org/xsd/assembly-1.1.0.xsd">
-    <id>master-server</id>
+    <id>jobExecManager-server</id>
     <formats>
         <format>dir</format>
     </formats>
@@ -46,7 +46,7 @@
         <fileSet>
             <directory>target/</directory>
             <includes>
-                <include>master-server-${project.version}.jar</include>
+                <include>jobExecManager-server-${project.version}.jar</include>
             </includes>
             <outputDirectory>lib</outputDirectory>
         </fileSet>

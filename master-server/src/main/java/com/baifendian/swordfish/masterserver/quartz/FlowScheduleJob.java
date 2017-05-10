@@ -44,9 +44,9 @@ import java.util.concurrent.BlockingQueue;
 public class FlowScheduleJob implements Job {
 
   /**
-   * LOGGER
+   * logger
    */
-  private final Logger LOGGER = LoggerFactory.getLogger(FlowScheduleJob.class);
+  private final Logger logger = LoggerFactory.getLogger(FlowScheduleJob.class);
 
   /**
    * 名称分割符
@@ -103,7 +103,7 @@ public class FlowScheduleJob implements Job {
 
   @Override
   public void execute(JobExecutionContext context) throws JobExecutionException {
-    LOGGER.debug("trigger at:" + context.getFireTime());
+    logger.debug("trigger at:" + context.getFireTime());
     // 1. 获取参数
     JobDataMap dataMap = context.getJobDetail().getJobDataMap();
     int projectId = dataMap.getInt(PARAM_PROJECT_ID);
@@ -119,7 +119,7 @@ public class FlowScheduleJob implements Job {
     // 若 workflow 被删除，那么直接删除当前 job
     if (flow == null) {
       deleteJob(projectId, flowId);
-      LOGGER.warn("workflow 不存在，删除 projectId:{},flowId:{} 的调度作业", projectId, flowId);
+      logger.warn("workflow 不存在，删除 projectId:{},flowId:{} 的调度作业", projectId, flowId);
       return;
     }
 
@@ -127,7 +127,7 @@ public class FlowScheduleJob implements Job {
     Schedule schedule = flowDao.querySchedule(flowId);
     if (schedule == null) {
       deleteJob(projectId, flowId);
-      LOGGER.warn("workflow 的调度信息不存在，删除 projectId:{},flowId:{} 的调度作业", projectId, flowId);
+      logger.warn("workflow 的调度信息不存在，删除 projectId:{},flowId:{} 的调度作业", projectId, flowId);
       return;
     }
 
@@ -159,7 +159,7 @@ public class FlowScheduleJob implements Job {
           executionFlow.setStatus(FlowStatus.DEP_FAILED);
           executionFlow.setEndTime(new Date());
           flowDao.updateExecutionFlow(executionFlow);
-          LOGGER.error("自依赖的上一周期执行失败");
+          logger.error("自依赖的上一周期执行失败");
           // 发送邮件
           if (executionFlow.getNotifyType().typeIsSendFailureMail()) {
             EmailManager.sendEmail(executionFlow);
@@ -183,7 +183,7 @@ public class FlowScheduleJob implements Job {
         executionFlow.setStatus(FlowStatus.DEP_FAILED);
         executionFlow.setEndTime(new Date());
         flowDao.updateExecutionFlow(executionFlow);
-        LOGGER.error("依赖的 workflow 执行失败");
+        logger.error("依赖的 workflow 执行失败");
         // 发送邮件
         if (executionFlow.getNotifyType().typeIsSendFailureMail()) {
           EmailManager.sendEmail(executionFlow);
@@ -233,7 +233,7 @@ public class FlowScheduleJob implements Job {
       if (isNotFinshed) { // 没有结束
         // 如果超时
         if (checkTimeout(startTime, timeout)) {
-          LOGGER.error("等待上一调度周期的任务超时");
+          logger.error("等待上一调度周期的任务超时");
           return false; // 也认为是执行失败
         }
 
@@ -241,7 +241,7 @@ public class FlowScheduleJob implements Job {
         try {
           Thread.sleep(checkInterval);
         } catch (InterruptedException e) {
-          LOGGER.error(e.getMessage(), e);
+          logger.error(e.getMessage(), e);
           return false; // 也认为是执行失败
         }
       } else {
@@ -334,7 +334,7 @@ public class FlowScheduleJob implements Job {
       if (isNotFinshed) { // 没有结束
         // 如果超时
         if (checkTimeout(startTime, timeout)) {
-          LOGGER.error("等待依赖的 workflow 任务超时");
+          logger.error("等待依赖的 workflow 任务超时");
           return false; // 也认为是执行失败
         }
 
@@ -342,7 +342,7 @@ public class FlowScheduleJob implements Job {
         try {
           Thread.sleep(checkInterval);
         } catch (InterruptedException e) {
-          LOGGER.error(e.getMessage(), e);
+          logger.error(e.getMessage(), e);
           return false; // 也认为是执行失败
         }
       } else {

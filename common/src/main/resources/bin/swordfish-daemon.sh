@@ -41,7 +41,7 @@ cd $SWORDFISH_HOME
 if [ "$command" = "web-server" ]; then
   CLASS=com.baifendian.swordfish.webserver.RestfulApiApplication
 elif [ "$command" = "master-server" ]; then
-  CLASS=com.baifendian.swordfish.masterserver.WebThriftServer
+  CLASS=com.baifendian.swordfish.masterserver.MasterThriftServer
 elif [ "$command" = "exec-server" ]; then
   CLASS=com.baifendian.swordfish.execserver.ExecThriftServer
 else

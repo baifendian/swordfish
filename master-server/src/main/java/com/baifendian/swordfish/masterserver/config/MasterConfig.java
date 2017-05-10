@@ -18,11 +18,13 @@ package com.baifendian.swordfish.masterserver.config;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-/**
- * Master 配置信息 <p>
- */
 public class MasterConfig {
+
+  private static final Logger logger = LoggerFactory.getLogger(MasterConfig.class);
+
   /**
    * 失败重试次数, 默认为 2 次, 即失败后还会运行 2 次
    */
@@ -68,7 +70,7 @@ public class MasterConfig {
     try {
       conf = new PropertiesConfiguration("master.properties");
     } catch (ConfigurationException e) {
-      e.printStackTrace();
+      logger.error("Configuration error", e);
     }
 
     failRetryCount = conf.getInt("masterToWorker.failRetry.count", 2);

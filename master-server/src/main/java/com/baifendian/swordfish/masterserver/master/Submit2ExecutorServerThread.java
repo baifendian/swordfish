@@ -18,9 +18,9 @@ package com.baifendian.swordfish.masterserver.master;
 import com.baifendian.swordfish.dao.FlowDao;
 import com.baifendian.swordfish.dao.enums.FlowStatus;
 import com.baifendian.swordfish.dao.model.ExecutionFlow;
-import com.baifendian.swordfish.masterserver.ExecutorClient;
-import com.baifendian.swordfish.masterserver.ExecutorServerInfo;
-import com.baifendian.swordfish.masterserver.ExecutorServerManager;
+import com.baifendian.swordfish.masterserver.exec.ExecutorClient;
+import com.baifendian.swordfish.masterserver.exec.ExecutorServerInfo;
+import com.baifendian.swordfish.masterserver.exec.ExecutorServerManager;
 import com.baifendian.swordfish.masterserver.config.MasterConfig;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.thrift.TException;
@@ -65,7 +65,7 @@ public class Submit2ExecutorServerThread extends Thread {
     this.flowDao = flowDao;
     this.executionFlowQueue = executionFlowQueue;
 
-    this.setName("Master-submitExecFlowToWorker");
+    this.setName("JobExecManager-submitExecFlowToWorker");
   }
 
   @Override

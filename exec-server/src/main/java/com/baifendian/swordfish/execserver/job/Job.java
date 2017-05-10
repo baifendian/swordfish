@@ -93,7 +93,7 @@ public interface Job {
    *
    * @return
    */
-  List<ExecResult> getResults();
+  List<JobExecResult> getResults();
 
   /**
    * 获取作业的配置参数信息

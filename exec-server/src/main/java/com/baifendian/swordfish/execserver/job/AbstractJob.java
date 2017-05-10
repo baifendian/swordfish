@@ -15,8 +15,6 @@
  */
 package com.baifendian.swordfish.execserver.job;
 
-import com.baifendian.swordfish.common.job.Job;
-import com.baifendian.swordfish.common.job.JobProps;
 import org.slf4j.Logger;
 
 import java.io.IOException;
@@ -64,6 +62,7 @@ public abstract class AbstractJob implements Job {
     this.logger = logger;
     this.definedParamMap = props.getDefinedParams();
     this.projectId = props.getProjectId();
+
     initJobParams();
   }
 
@@ -86,7 +85,6 @@ public abstract class AbstractJob implements Job {
 
   @Override
   public void cancel() throws Exception {
-    // 暂不支持
   }
 
   @Override
@@ -130,8 +128,7 @@ public abstract class AbstractJob implements Job {
   }
 
   @Override
-  public List<ExecResult> getResults() {
+  public List<JobExecResult> getResults() {
     return null;
   }
-
 }

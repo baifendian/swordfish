@@ -26,7 +26,7 @@ import com.baifendian.swordfish.dao.enums.FlowStatus;
 import com.baifendian.swordfish.dao.model.ExecutionFlow;
 import com.baifendian.swordfish.dao.model.ExecutionNode;
 import com.baifendian.swordfish.dao.model.FlowNode;
-import com.baifendian.swordfish.execserver.Constants;
+import com.baifendian.swordfish.execserver.utils.Constants;
 import com.baifendian.swordfish.execserver.exception.ExecTimeoutException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

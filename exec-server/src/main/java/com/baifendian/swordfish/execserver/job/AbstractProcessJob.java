@@ -17,6 +17,7 @@ package com.baifendian.swordfish.execserver.job;
 
 import com.baifendian.swordfish.common.job.JobProps;
 import com.baifendian.swordfish.common.hadoop.HdfsExecException;
+import com.baifendian.swordfish.execserver.utils.ProcessUtil;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;

@@ -41,6 +41,7 @@ public class JsonUtil {
   static {
     // 未匹配的属性不解析
     JSON_MAPPER.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+
     // 使用系统默认时区
     JSON_MAPPER.setTimeZone(TimeZone.getDefault());
   }
