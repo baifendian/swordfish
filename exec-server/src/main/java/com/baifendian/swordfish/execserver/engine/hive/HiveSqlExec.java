@@ -24,6 +24,7 @@ import com.baifendian.swordfish.execserver.common.ExecResult;
 import com.baifendian.swordfish.execserver.common.ResultCallback;
 import org.apache.hive.jdbc.HiveConnection;
 import org.apache.hive.jdbc.HiveStatement;
+import org.apache.hive.service.cli.HiveSQLException;
 import org.slf4j.Logger;
 
 import java.sql.ResultSet;
@@ -216,9 +217,9 @@ public class HiveSqlExec {
         }
 
         results.add(execResult);
-      } catch (DaoSemanticException e) {
+      } catch (DaoSemanticException | HiveSQLException e) {
         // 语义异常
-        logger.error("executeQuery DaoSemanticException", e);
+        logger.error("executeQuery exception", e);
 
         if (isContinue) {
           handlerResult(index, sql, FlowStatus.FAILED);
@@ -317,6 +318,10 @@ public class HiveSqlExec {
 
     @Override
     public void run() {
+      if (hiveStatement == null) {
+        return;
+      }
+
       while (true) {
         try {
           for (String log : hiveStatement.getQueryLog()) {
