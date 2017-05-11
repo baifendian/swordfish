@@ -294,6 +294,8 @@ public class ExecService {
    * @return
    */
   public LogResult getEexcWorkflowLog(User operator, String jobId, int from, int size) {
+    //TODO 分页信息需要校验
+
     ExecutionNode executionNode = executionNodeMapper.selectExecNodeByJobId(jobId);
 
     if (executionNode == null) {

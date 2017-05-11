@@ -17,6 +17,8 @@ package com.baifendian.swordfish.webserver.service;
 
 import com.baifendian.swordfish.common.config.BaseConfig;
 import com.baifendian.swordfish.common.hadoop.HdfsClient;
+import com.baifendian.swordfish.common.job.struct.node.BaseParam;
+import com.baifendian.swordfish.common.job.struct.node.BaseParamFactory;
 import com.baifendian.swordfish.common.utils.graph.Graph;
 import com.baifendian.swordfish.dao.FlowDao;
 import com.baifendian.swordfish.dao.mapper.*;
@@ -613,21 +615,10 @@ public class WorkflowService {
    * @return
    */
   private boolean flowNodeParamCheck(String parameter, String type) {
-    /*ObjectMapper mapper = new ObjectMapper();
-
-    try {
-      switch (type) {
-        case "MR":
-        case "mr":
-          mapper.readValue(parameter, NodeParamMR.class);
-          break;
-        default:
-          return false;
-      }
-    } catch (Exception e) {
-      logger.error(e.toString());
+    BaseParam baseParam = BaseParamFactory.getBaseParam(type,parameter);
+    if (baseParam == null){
       return false;
-    }*/
-    return true;
+    }
+    return baseParam.checkValid();
   }
 }

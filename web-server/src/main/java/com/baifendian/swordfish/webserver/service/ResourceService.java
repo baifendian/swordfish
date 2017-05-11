@@ -259,6 +259,8 @@ public class ResourceService {
 
     fileSystemStorageService.store(file, localFilename);
 
+    //TODO 删除是否有前置条件？
+
     // 保存到 hdfs 并删除源文件
     String hdfsFilename = BaseConfig.getHdfsResourcesFilename(project.getId(), name);
     HdfsClient.getInstance().copyLocalToHdfs(localFilename, hdfsFilename, true, true);
