@@ -86,6 +86,8 @@ public class AdHocSqlJob {
     ResultCallback resultCallback = (execResult, startTime, endTime) -> {
       AdHocResult adHocResult = new AdHocResult();
 
+      logger.info("update adhoc result sql: {}, index: {}, status", execResult.getStm(), execResult.getIndex(), execResult.getStatus());
+
       adHocResult.setExecId(props.getAdHocId());
 
       adHocResult.setStm(execResult.getStm());

@@ -166,14 +166,15 @@ public class HiveSqlExec {
     }
 
     // 执行 sql 语句
-    int index = 0;
-    for (String sql : sqls) {
+    for (int index = 0; index < sqls.size(); ++index) {
+      String sql = sqls.get(index);
+
       Date startTime = new Date();
 
       logger.info("hive execute sql : {}", sql);
 
       ExecResult execResult = new ExecResult();
-      execResult.setIndex(index++);
+      execResult.setIndex(index);
       execResult.setStm(sql);
 
       try {
