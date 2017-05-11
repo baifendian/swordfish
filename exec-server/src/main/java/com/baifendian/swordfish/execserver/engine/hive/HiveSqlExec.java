@@ -119,28 +119,121 @@ public class HiveSqlExec {
     results = new ArrayList<>();
 
     try {
-      hiveConnection = hiveConnectionClient.borrowClient(connectionInfo);
-      sta = hiveConnection.createStatement();
+      try {
+        hiveConnection = hiveConnectionClient.borrowClient(connectionInfo);
+        sta = hiveConnection.createStatement();
 
-      // 日志线程
-      logThread = new Thread(new JdbcLogRunnable(sta));
-      logThread.setDaemon(true);
-      logThread.start();
+        // 日志线程
+        logThread = new Thread(new JdbcLogRunnable(sta));
+        logThread.setDaemon(true);
+        logThread.start();
 
-      // 创建临时 function
-      if (createFuncs != null) {
-        for (String createFunc : createFuncs) {
-          logger.info("hive create function sql: {}", createFunc);
-          sta.execute(createFunc);
+        // 创建临时 function
+        if (createFuncs != null) {
+          for (String createFunc : createFuncs) {
+            logger.info("hive create function sql: {}", createFunc);
+            sta.execute(createFunc);
+          }
+        }
+      } catch (Exception e) {
+        logger.error("execute Querys exception", e);
+
+        // 这里就失败了, 会记录下错误记录, 然后返回
+        handlerResults(0, sqls, FlowStatus.FAILED);
+
+        return false;
+      }
+
+      // 执行 sql 语句
+      for (int index = 0; index < sqls.size(); ++index) {
+        String sql = sqls.get(index);
+
+        Date startTime = new Date();
+
+        logger.info("hive execute sql : {}", sql);
+
+        ExecResult execResult = new ExecResult();
+        execResult.setIndex(index);
+        execResult.setStm(sql);
+
+        try {
+          // 只对 query 和 show 语句显示结果
+          if (HiveJdbcExec.isTokQuery(sql) || HiveJdbcExec.isLikeShowStm(sql)) {
+            sta.setMaxRows(queryLimit);
+            ResultSet res = sta.executeQuery(sql);
+
+            ResultSetMetaData resultSetMetaData = res.getMetaData();
+            int count = resultSetMetaData.getColumnCount();
+
+            List<String> colums = new ArrayList<>();
+            for (int i = 1; i <= count; i++) {
+              colums.add(resultSetMetaData.getColumnLabel(i)/*parseColumnName(resultSetMetaData.getColumnLabel(i), colums)*/);
+            }
+
+            execResult.setTitles(colums);
+
+            List<List<String>> datas = new ArrayList<>();
+            while (res.next()) {
+              List<String> values = new ArrayList<>();
+              for (int i = 1; i <= count; i++) {
+                values.add(res.getString(i));
+              }
+
+              datas.add(values);
+            }
+
+            execResult.setValues(datas);
+          } else {
+            sta.execute(sql);
+          }
+
+          // 执行到这里，说明已经执行成功了
+          execResult.setStatus(FlowStatus.SUCCESS);
+
+          // 执行结果回调处理
+          if (resultCallback != null) {
+            Date endTime = new Date();
+            resultCallback.handleResult(execResult, startTime, endTime);
+          }
+
+          results.add(execResult);
+        } catch (DaoSemanticException | HiveSQLException e) {
+          // 语义异常
+          logger.error("executeQuery exception", e);
+
+          if (isContinue) {
+            handlerResult(index, sql, FlowStatus.FAILED);
+          } else {
+            handlerResults(index, sqls, FlowStatus.FAILED);
+            return false;
+          }
+        } catch (Exception e) {
+          // TTransport 异常
+          if (e.toString().contains("TTransportException")) {
+            logger.error("Get TTransportException return a client", e);
+            hiveConnectionClient.invalidateObject(connectionInfo, hiveConnection);
+            handlerResults(index, sqls, FlowStatus.FAILED);
+            return false;
+          }
+
+          // socket 异常
+          if (e.toString().contains("SocketException")) {
+            logger.error("SocketException clear pool", e);
+            hiveConnectionClient.clear();
+            handlerResults(index, sqls, FlowStatus.FAILED);
+            return false;
+          }
+
+          logger.error("executeQuery exception", e);
+
+          if (isContinue) {
+            handlerResult(index, sql, FlowStatus.FAILED);
+          } else {
+            handlerResults(index, sqls, FlowStatus.FAILED);
+            return false;
+          }
         }
       }
-    } catch (Exception e) {
-      logger.error("execute Querys exception", e);
-
-      // 这里就失败了, 会记录下错误记录, 然后返回
-      handlerResults(0, sqls, FlowStatus.FAILED);
-
-      return false;
     } finally {
       try {
         if (logThread != null) {
@@ -162,119 +255,6 @@ public class HiveSqlExec {
       // 返回连接
       if (hiveConnection != null) {
         hiveConnectionClient.returnClient(connectionInfo, hiveConnection);
-      }
-    }
-
-    // 执行 sql 语句
-    for (int index = 0; index < sqls.size(); ++index) {
-      String sql = sqls.get(index);
-
-      Date startTime = new Date();
-
-      logger.info("hive execute sql : {}", sql);
-
-      ExecResult execResult = new ExecResult();
-      execResult.setIndex(index);
-      execResult.setStm(sql);
-
-      try {
-        // 只对 query 和 show 语句显示结果
-        if (HiveJdbcExec.isTokQuery(sql) || HiveJdbcExec.isLikeShowStm(sql)) {
-          sta.setMaxRows(queryLimit);
-          ResultSet res = sta.executeQuery(sql);
-
-          ResultSetMetaData resultSetMetaData = res.getMetaData();
-          int count = resultSetMetaData.getColumnCount();
-
-          List<String> colums = new ArrayList<>();
-          for (int i = 1; i <= count; i++) {
-            colums.add(resultSetMetaData.getColumnLabel(i)/*parseColumnName(resultSetMetaData.getColumnLabel(i), colums)*/);
-          }
-
-          execResult.setTitles(colums);
-
-          List<List<String>> datas = new ArrayList<>();
-          while (res.next()) {
-            List<String> values = new ArrayList<>();
-            for (int i = 1; i <= count; i++) {
-              values.add(res.getString(i));
-            }
-
-            datas.add(values);
-          }
-
-          execResult.setValues(datas);
-        } else {
-          sta.execute(sql);
-        }
-
-        // 执行到这里，说明已经执行成功了
-        execResult.setStatus(FlowStatus.SUCCESS);
-
-        // 执行结果回调处理
-        if (resultCallback != null) {
-          Date endTime = new Date();
-          resultCallback.handleResult(execResult, startTime, endTime);
-        }
-
-        results.add(execResult);
-      } catch (DaoSemanticException | HiveSQLException e) {
-        // 语义异常
-        logger.error("executeQuery exception", e);
-
-        if (isContinue) {
-          handlerResult(index, sql, FlowStatus.FAILED);
-        } else {
-          handlerResults(index, sqls, FlowStatus.FAILED);
-          return false;
-        }
-      } catch (Exception e) {
-        // TTransport 异常
-        if (e.toString().contains("TTransportException")) {
-          logger.error("Get TTransportException return a client", e);
-          hiveConnectionClient.invalidateObject(connectionInfo, hiveConnection);
-          handlerResults(index, sqls, FlowStatus.FAILED);
-          return false;
-        }
-
-        // socket 异常
-        if (e.toString().contains("SocketException")) {
-          logger.error("SocketException clear pool", e);
-          hiveConnectionClient.clear();
-          handlerResults(index, sqls, FlowStatus.FAILED);
-          return false;
-        }
-
-        logger.error("executeQuery exception", e);
-
-        if (isContinue) {
-          handlerResult(index, sql, FlowStatus.FAILED);
-        } else {
-          handlerResults(index, sqls, FlowStatus.FAILED);
-          return false;
-        }
-      } finally {
-        try {
-          if (logThread != null) {
-            logThread.interrupt();
-            logThread.join(HiveJdbcExec.DEFAULT_QUERY_PROGRESS_THREAD_TIMEOUT);
-          }
-        } catch (Exception e) {
-          logger.error("Catch an exception", e);
-        }
-
-        try {
-          if (sta != null) {
-            sta.close();
-          }
-        } catch (Exception e) {
-          logger.error("Catch an exception", e);
-        }
-
-        // 返回连接
-        if (hiveConnection != null) {
-          hiveConnectionClient.returnClient(connectionInfo, hiveConnection);
-        }
       }
     }
 
