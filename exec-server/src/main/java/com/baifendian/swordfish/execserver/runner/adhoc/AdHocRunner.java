@@ -19,7 +19,6 @@ import com.baifendian.swordfish.dao.AdHocDao;
 import com.baifendian.swordfish.dao.enums.FlowStatus;
 import com.baifendian.swordfish.dao.model.AdHoc;
 import com.baifendian.swordfish.execserver.job.JobProps;
-import com.baifendian.swordfish.execserver.utils.JobLogger;
 import org.slf4j.Logger;
 
 import java.util.Date;
@@ -57,11 +56,11 @@ public class AdHocRunner implements Runnable {
     props.setProjectId(adHoc.getProjectId());
     props.setAdHocId(adHoc.getId());
 
-    FlowStatus status = FlowStatus.SUCCESS;
+    FlowStatus status;
 
     try {
       AdHocSqlJob job = new AdHocSqlJob(props, logger);
-      job.process();
+      status = job.process();
     } catch (Exception e) {
       logger.error("run adHoc job error", e);
       status = FlowStatus.FAILED;

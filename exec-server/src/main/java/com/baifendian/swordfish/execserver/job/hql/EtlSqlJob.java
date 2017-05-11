@@ -21,6 +21,7 @@ import com.baifendian.swordfish.common.utils.CommonUtil;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
 import com.baifendian.swordfish.execserver.common.ExecResult;
 import com.baifendian.swordfish.execserver.common.FunctionUtil;
+import com.baifendian.swordfish.execserver.engine.hive.HiveSqlExec;
 import com.baifendian.swordfish.execserver.job.AbstractJob;
 import com.baifendian.swordfish.execserver.job.JobProps;
 import com.baifendian.swordfish.execserver.parameter.ParamHelper;
@@ -52,7 +53,7 @@ public class EtlSqlJob extends AbstractJob {
 
     List<String> execSqls = CommonUtil.sqlSplit(sqls);
     HiveSqlExec hiveSqlExec = new HiveSqlExec(funcs, execSqls, getProxyUser(), false, null, null, logger);
-    hiveSqlExec.run();
+    hiveSqlExec.execute();
 
     results = hiveSqlExec.getResults();
   }

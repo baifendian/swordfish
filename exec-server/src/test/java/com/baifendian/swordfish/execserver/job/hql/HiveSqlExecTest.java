@@ -15,6 +15,7 @@
  */
 package com.baifendian.swordfish.execserver.job.hql;
 
+import com.baifendian.swordfish.execserver.engine.hive.HiveSqlExec;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

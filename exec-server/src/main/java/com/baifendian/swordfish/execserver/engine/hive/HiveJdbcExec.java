@@ -21,10 +21,8 @@ import com.baifendian.swordfish.dao.BaseDao;
 import com.baifendian.swordfish.dao.exception.DaoSemanticException;
 import com.baifendian.swordfish.dao.exception.SqlException;
 import com.baifendian.swordfish.execserver.common.ExecResult;
-import org.apache.hadoop.hive.ql.parse.ASTNode;
+import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.hive.ql.parse.ParseDriver;
-import org.apache.hadoop.hive.ql.parse.ParseException;
-import org.apache.hadoop.hive.ql.parse.ParseUtils;
 import org.apache.hive.jdbc.HiveConnection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,7 +38,8 @@ import java.util.List;
 
 @Component
 public class HiveJdbcExec extends BaseDao {
-  private final Logger LOGGER = LoggerFactory.getLogger(getClass());
+
+  private final Logger logger = LoggerFactory.getLogger(getClass());
 
   public static final int DEFAULT_QUERY_PROGRESS_THREAD_TIMEOUT = 10 * 1000;
 
@@ -52,26 +51,45 @@ public class HiveJdbcExec extends BaseDao {
 
   ParseDriver pd = new ParseDriver();
 
-  public boolean isTokQuery(String command) throws ParseException {
-    try {
-      if (command.startsWith("set") || command.startsWith("add")) {
-        return false;
-      }
-
-      command = command.replace("`", ""); // 去除反引号
-      ASTNode tree = pd.parse(command);
-      tree = ParseUtils.findRootNonNullToken(tree);
-
-      String tokType = tree.getToken().getText();
-      if (tokType.equals("TOK_QUERY")) {
-        if (command.toLowerCase().contains("insert")) {
-          return false;
-        }
-        return true;
-      }
-    } catch (ParseException e) {
-      LOGGER.error("Parse command exception", e);
+  /**
+   * 判断是否是查询请求
+   *
+   * @param sql
+   * @return
+   */
+  public static boolean isTokQuery(String sql) {
+    if (StringUtils.isEmpty(sql)) {
+      return false;
     }
+
+    sql = sql.toLowerCase();
+
+    if (sql.startsWith("select")
+        || sql.startsWith("describe")
+        || sql.startsWith("explain")) {
+      return true;
+    }
+
+    return false;
+  }
+
+  /**
+   * 是否类似于 show 语句的查询（show/desc/describe） <p>
+   *
+   * @param sql
+   * @return 如果是 'show/desc/describe' 语句返回 true, 否则返回 false
+   */
+  public static boolean isLikeShowStm(String sql) {
+    if (StringUtils.isEmpty(sql)) {
+      return false;
+    }
+
+    sql = sql.toLowerCase();
+
+    if (sql.startsWith("show") || sql.startsWith("desc")) {
+      return true;
+    }
+
     return false;
   }
 
@@ -102,7 +120,11 @@ public class HiveJdbcExec extends BaseDao {
   }
 
   /**
-   * 执行一条sql语句 不支持use database <p>
+   * 执行一条 sql 语句 不支持 use database
+   *
+   * @param sql
+   * @param connectionInfo
+   * @throws SqlException
    */
   public void execSql(String sql, ConnectionInfo connectionInfo) throws SqlException {
     HiveConnection hiveConnection = null;
@@ -113,19 +135,22 @@ public class HiveJdbcExec extends BaseDao {
       sta.close();
     } catch (Exception e) {
       if (e.toString().contains("SemanticException")) {
-        LOGGER.error("execSql DaoSemanticException", e);
+        logger.error("execSql DaoSemanticException", e);
         throw (new DaoSemanticException(e.getMessage()));
       }
+
       if (e.toString().contains("TTransportException")) {
-        LOGGER.error("Get TTransportException return a client", e);
+        logger.error("Get TTransportException return a client", e);
         hiveConnectionClient.invalidateObject(connectionInfo, hiveConnection);
         hiveConnection = null;
       }
+
       if (e.toString().contains("SocketException")) {
-        LOGGER.error("SocketException clear pool", e);
+        logger.error("SocketException clear pool", e);
         hiveConnectionClient.clear();
       }
-      LOGGER.error("execSql SqlException", e);
+
+      logger.error("execSql SqlException", e);
       throw (new SqlException(e.getMessage()));
     } finally {
       hiveConnectionClient.returnClient(connectionInfo, hiveConnection);
@@ -149,7 +174,7 @@ public class HiveJdbcExec extends BaseDao {
    * @return
    */
     /*
-    public List<ExecResult> executeQuerys(List<String> sqls, int userId, String dbName, boolean isContinue, boolean isGetLog) {
+    public List<ExecResult> execute(List<String> sqls, int userId, String dbName, boolean isContinue, boolean isGetLog) {
         List<ExecResult> execResults = new ArrayList<>();
         HiveConnection hiveConnection = null;
         Statement sta = null;
@@ -205,23 +230,23 @@ public class HiveJdbcExec extends BaseDao {
                     }
                 } catch (Exception e) {
                     if (e.toString().contains("SemanticException")) {
-                        LOGGER.error("executeQuery DaoSemanticException", e);
+                        logger.error("executeQuery DaoSemanticException", e);
                         if (!isContinue) {
                             throw (new DaoSemanticException(e.getMessage()));
                         }
                     }
                     if (e.toString().contains("TTransportException")) {
-                        LOGGER.error("Get TTransportException return a client", e);
+                        logger.error("Get TTransportException return a client", e);
                         hiveConnectionClient.invalidateObject(connectionInfo, hiveConnection);
                         hiveConnection = null;
                         throw new Exception(e);
                     }
                     if (e.toString().contains("SocketException")) {
-                        LOGGER.error("SocketException clear pool", e);
+                        logger.error("SocketException clear pool", e);
                         hiveConnectionClient.clear();
                         throw new Exception(e);
                     }
-                    LOGGER.error("executeQuery Exception", e);
+                    logger.error("executeQuery Exception", e);
                     if (!isContinue) {
                         throw new Exception(e);
                     }
@@ -242,7 +267,7 @@ public class HiveJdbcExec extends BaseDao {
             sta.close();
             sta = null;
         } catch (Exception e) {
-            LOGGER.error("executeQuerys exception", e);
+            logger.error("execute exception", e);
             throw (new SqlException(e.getMessage()));
         } finally {
             try {
@@ -263,10 +288,16 @@ public class HiveJdbcExec extends BaseDao {
 */
 
   /**
-   * 执行一个sql 语句 并返回查询的语句 <p>
+   * 执行一个sql 语句 并返回查询的语句
+   *
+   * @param sql
+   * @param connectionInfo
+   * @return
+   * @throws SqlException
    */
   public ExecResult executeQuery(String sql, ConnectionInfo connectionInfo) throws SqlException {
     HiveConnection hiveConnection = null;
+
     try {
       hiveConnection = hiveConnectionClient.borrowClient(connectionInfo);
       Statement sta = hiveConnection.createStatement();
@@ -274,6 +305,7 @@ public class HiveJdbcExec extends BaseDao {
       execResult.setStm(sql);
       ResultSet res = sta.executeQuery(sql);
       ResultSetMetaData resultSetMetaData = res.getMetaData();
+
       int count = resultSetMetaData.getColumnCount();
 
       List<String> colums = new ArrayList<>();
@@ -296,23 +328,22 @@ public class HiveJdbcExec extends BaseDao {
       return execResult;
     } catch (Exception e) {
       if (e.toString().contains("SemanticException")) {
-        LOGGER.error("execSql DaoSemanticException", e);
+        logger.error("execSql DaoSemanticException", e);
         throw (new DaoSemanticException(e.getMessage()));
       }
       if (e.toString().contains("TTransportException")) {
-        LOGGER.error("Get TTransportException return a client", e);
+        logger.error("Get TTransportException return a client", e);
         hiveConnectionClient.invalidateObject(connectionInfo, hiveConnection);
         hiveConnection = null;
       }
       if (e.toString().contains("SocketException")) {
-        LOGGER.error("SocketException clear pool", e);
+        logger.error("SocketException clear pool", e);
         hiveConnectionClient.clear();
       }
-      LOGGER.error("execSql SqlException", e);
+      logger.error("execSql SqlException", e);
       throw (new SqlException(e.getMessage()));
     } finally {
       hiveConnectionClient.returnClient(connectionInfo, hiveConnection);
     }
   }
-
 }

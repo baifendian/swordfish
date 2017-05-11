@@ -20,17 +20,16 @@ import com.baifendian.swordfish.common.job.struct.node.adhoc.AdHocParam;
 import com.baifendian.swordfish.common.utils.CommonUtil;
 import com.baifendian.swordfish.dao.AdHocDao;
 import com.baifendian.swordfish.dao.DaoFactory;
+import com.baifendian.swordfish.dao.enums.FlowStatus;
 import com.baifendian.swordfish.dao.model.AdHocJsonObject;
 import com.baifendian.swordfish.dao.model.AdHocResult;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
-import com.baifendian.swordfish.execserver.job.JobProps;
 import com.baifendian.swordfish.execserver.common.FunctionUtil;
-import com.baifendian.swordfish.execserver.job.hql.HiveSqlExec;
 import com.baifendian.swordfish.execserver.common.ResultCallback;
-import com.baifendian.swordfish.execserver.utils.JobLogger;
+import com.baifendian.swordfish.execserver.engine.hive.HiveSqlExec;
+import com.baifendian.swordfish.execserver.job.JobProps;
 import org.slf4j.Logger;
 
-import java.io.IOException;
 import java.util.List;
 
 /**
@@ -57,7 +56,7 @@ public class AdHocSqlJob {
    */
   private Logger logger;
 
-  public AdHocSqlJob(JobProps props, Logger logger) throws IOException {
+  public AdHocSqlJob(JobProps props, Logger logger) {
     this.props = props;
     this.adHocDao = DaoFactory.getDaoInstance(AdHocDao.class);
     this.param = JsonUtil.parseObject(props.getJobParams(), AdHocParam.class);
@@ -69,7 +68,7 @@ public class AdHocSqlJob {
    *
    * @throws Exception
    */
-  public void process() throws Exception {
+  public FlowStatus process() throws Exception {
     logger.debug("process job: {}", props.getJobParams());
 
     // 得到查询语句
@@ -78,43 +77,39 @@ public class AdHocSqlJob {
     // 需要支持变量参数替换, 如 $[yyyyMMdd], TODO::
     // sqls = ParamHelper.resolvePlaceholders(sqls, definedParamMap);
 
-    try {
-      // 创建自定义函数
-      List<String> funcs = FunctionUtil.createFuncs(param.getUdfs(), props.getExecId(), logger, BaseConfig.getHdfsResourcesDir(props.getProjectId()), true);
+    // 创建自定义函数
+    List<String> funcs = FunctionUtil.createFuncs(param.getUdfs(), props.getExecId(), logger, BaseConfig.getHdfsResourcesDir(props.getProjectId()), true);
 
-      logger.info("exec sql: {}, funcs: {}", sqls, funcs);
+    logger.info("exec sql: {}, funcs: {}", sqls, funcs);
 
-      // 查询结果写入数据库
-      ResultCallback resultCallback = (execResult, startTime, endTime) -> {
-        AdHocResult adHocResult = new AdHocResult();
+    // 查询结果写入数据库
+    ResultCallback resultCallback = (execResult, startTime, endTime) -> {
+      AdHocResult adHocResult = new AdHocResult();
 
-        adHocResult.setExecId(props.getAdHocId());
+      adHocResult.setExecId(props.getAdHocId());
 
-        adHocResult.setStm(execResult.getStm());
-        adHocResult.setIndex(execResult.getIndex());
-        adHocResult.setStatus(execResult.getStatus());
+      adHocResult.setStm(execResult.getStm());
+      adHocResult.setIndex(execResult.getIndex());
+      adHocResult.setStatus(execResult.getStatus());
 
-        AdHocJsonObject adHocJsonObject = new AdHocJsonObject();
-        adHocJsonObject.setTitles(execResult.getTitles());
-        adHocJsonObject.setValues(execResult.getValues());
+      AdHocJsonObject adHocJsonObject = new AdHocJsonObject();
+      adHocJsonObject.setTitles(execResult.getTitles());
+      adHocJsonObject.setValues(execResult.getValues());
 
-        adHocResult.setResult(JsonUtil.toJsonString(adHocJsonObject));
+      adHocResult.setResult(JsonUtil.toJsonString(adHocJsonObject));
 
-        adHocResult.setStartTime(startTime);
-        adHocResult.setEndTime(endTime);
+      adHocResult.setStartTime(startTime);
+      adHocResult.setEndTime(endTime);
 
-        // 更新结果到数据库中
-        adHocDao.updateAdHocResult(adHocResult);
-      };
+      // 更新结果到数据库中
+      adHocDao.updateAdHocResult(adHocResult);
+    };
 
-      // 切分 sql
-      List<String> execSqls = CommonUtil.sqlSplit(sqls);
+    // 切分 sql
+    List<String> execSqls = CommonUtil.sqlSplit(sqls);
 
-      HiveSqlExec hiveSqlExec = new HiveSqlExec(funcs, execSqls, props.getProxyUser(), true, resultCallback, param.getLimit(), logger);
-      hiveSqlExec.run();
-    } catch (Exception e) {
-      logger.error("ad hoc job run error", e);
-      throw e;
-    }
+    HiveSqlExec hiveSqlExec = new HiveSqlExec(funcs, execSqls, props.getProxyUser(), true, resultCallback, param.getLimit(), logger);
+
+    return hiveSqlExec.execute() ? FlowStatus.SUCCESS : FlowStatus.FAILED;
   }
 }
