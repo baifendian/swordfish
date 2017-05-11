@@ -49,7 +49,7 @@ public class HiveJdbcExec extends BaseDao {
   @Autowired
   HiveConnectionClient hiveConnectionClient;
 
-  ParseDriver pd = new ParseDriver();
+//  ParseDriver pd = new ParseDriver();
 
   /**
    * 判断是否是查询请求

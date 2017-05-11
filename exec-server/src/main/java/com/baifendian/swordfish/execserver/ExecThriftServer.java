@@ -136,7 +136,7 @@ public class ExecThriftServer {
    * @throws UnknownHostException
    * @throws TTransportException
    */
-  public void run() throws UnknownHostException, TTransportException {
+  public void run() throws UnknownHostException, TTransportException, InterruptedException {
     HdfsClient.init(ConfigurationUtil.getConfiguration());
 
     logger.info("register to master {}:{}", masterServer.getHost(), masterServer.getPort());
@@ -144,8 +144,15 @@ public class ExecThriftServer {
     // 注册到 master
     boolean ret = masterClient.registerExecutor(host, port, System.currentTimeMillis());
     if (!ret) {
-      logger.error("register to master {}:{} failed", masterServer.getHost(), masterServer.getPort());
-      throw new RuntimeException("register executor error");
+      // 休息一会, 再进行注册
+      Thread.sleep(3000);
+
+      ret = masterClient.registerExecutor(host, port, System.currentTimeMillis());
+
+      if (!ret) {
+        logger.error("register to master {}:{} failed", masterServer.getHost(), masterServer.getPort());
+        throw new RuntimeException("register executor error");
+      }
     }
 
     heartBeatInterval = conf.getInt(Constants.EXECUTOR_HEARTBEAT_INTERVAL, 60);
@@ -252,7 +259,7 @@ public class ExecThriftServer {
     }
   }
 
-  public static void main(String[] args) throws TTransportException, UnknownHostException {
+  public static void main(String[] args) throws TTransportException, UnknownHostException, InterruptedException {
     ExecThriftServer execThriftServer = new ExecThriftServer();
     execThriftServer.run();
   }
