@@ -15,6 +15,7 @@
  */
 package com.baifendian.swordfish.webserver.service;
 
+
 import com.baifendian.swordfish.common.job.struct.datasource.Datasource;
 import com.baifendian.swordfish.common.job.struct.datasource.DatasourceFactory;
 import com.baifendian.swordfish.dao.enums.DbType;
@@ -77,7 +78,10 @@ public class DatasourceService {
       throw new PermissionException("User \"{0}\" is not has project \"{1}\" write permission", operator.getName(), projectName);
     }
 
-    //TODO parameter参数检测
+    Datasource datasource = DatasourceFactory.getDatasource(type,parameter);
+    if (datasource == null){
+      throw new PermissionException("Parameter \"{0}\" is not valid",parameter);
+    }
 
     // 构建数据源
     DataSource dataSource = new DataSource();
@@ -168,6 +172,7 @@ public class DatasourceService {
    * @return
    */
   public DataSource modifyDataSource(User operator, String projectName, String name, String desc, String parameter) {
+
     // 查询项目
     Project project = projectMapper.queryByName(projectName);
 
@@ -195,6 +200,10 @@ public class DatasourceService {
     }
 
     if (!StringUtils.isEmpty(parameter)) {
+      Datasource datasource = DatasourceFactory.getDatasource(dataSource.getType(),parameter);
+      if (datasource == null){
+        throw new ParameterException("Parameter \"{0}\" is not valid",parameter);
+      }
       dataSource.setParameter(parameter);
     }
 
@@ -227,6 +236,8 @@ public class DatasourceService {
     if (!projectService.hasWritePerm(operator.getId(), project)) {
       throw new PermissionException("User \"{0}\" is not has project \"{1}\" write permission", operator.getName(), projectName);
     }
+
+    //TODO 删除数据源是否需要前置条件
 
     int count = dataSourceMapper.deleteByProjectAndName(project.getId(), name);
     if (count <= 0) {
