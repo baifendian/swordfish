@@ -140,29 +140,29 @@ public class HiveSqlExec {
       // 这里就失败了, 会记录下错误记录, 然后返回
       handlerResults(0, sqls, FlowStatus.FAILED);
 
+      return false;
+    } finally {
       try {
         if (logThread != null) {
           logThread.interrupt();
           logThread.join(HiveJdbcExec.DEFAULT_QUERY_PROGRESS_THREAD_TIMEOUT);
         }
-      } catch (Exception e2) {
-        logger.error(e.getMessage(), e2);
+      } catch (Exception e) {
+        logger.error("Catch an exception", e);
       }
 
       try {
         if (sta != null) {
           sta.close();
         }
-      } catch (Exception e2) {
-        logger.error(e.getMessage(), e2);
+      } catch (Exception e) {
+        logger.error("Catch an exception", e);
       }
 
       // 返回连接
       if (hiveConnection != null) {
         hiveConnectionClient.returnClient(connectionInfo, hiveConnection);
       }
-
-      return false;
     }
 
     // 执行 sql 语句
@@ -252,6 +252,28 @@ public class HiveSqlExec {
         } else {
           handlerResults(index, sqls, FlowStatus.FAILED);
           return false;
+        }
+      } finally {
+        try {
+          if (logThread != null) {
+            logThread.interrupt();
+            logThread.join(HiveJdbcExec.DEFAULT_QUERY_PROGRESS_THREAD_TIMEOUT);
+          }
+        } catch (Exception e) {
+          logger.error("Catch an exception", e);
+        }
+
+        try {
+          if (sta != null) {
+            sta.close();
+          }
+        } catch (Exception e) {
+          logger.error("Catch an exception", e);
+        }
+
+        // 返回连接
+        if (hiveConnection != null) {
+          hiveConnectionClient.returnClient(connectionInfo, hiveConnection);
         }
       }
     }

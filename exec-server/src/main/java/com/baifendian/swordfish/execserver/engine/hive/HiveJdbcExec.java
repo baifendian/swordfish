@@ -22,7 +22,6 @@ import com.baifendian.swordfish.dao.exception.DaoSemanticException;
 import com.baifendian.swordfish.dao.exception.SqlException;
 import com.baifendian.swordfish.execserver.common.ExecResult;
 import org.apache.commons.lang.StringUtils;
-import org.apache.hadoop.hive.ql.parse.ParseDriver;
 import org.apache.hive.jdbc.HiveConnection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,8 +47,6 @@ public class HiveJdbcExec extends BaseDao {
 
   @Autowired
   HiveConnectionClient hiveConnectionClient;
-
-//  ParseDriver pd = new ParseDriver();
 
   /**
    * 判断是否是查询请求

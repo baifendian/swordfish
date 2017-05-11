@@ -46,8 +46,8 @@ public class FunctionUtil {
    * @param udfsInfos
    * @param execId
    * @param logger
-   * @param srcDir
-   * @param isHdfsFile
+   * @param srcDir     资源目录
+   * @param isHdfsFile 源是否是 hdfs 文件系统
    * @return
    * @throws IOException
    * @throws InterruptedException
@@ -155,7 +155,7 @@ public class FunctionUtil {
 
     for (String res : resources) {
       logger.debug("create symlink {}/{} -> {}/{}", tarDir, res, srcDir, res);
-      hdfsClient.copy(String.format("%s/%s", srcDir, res), String.format("%s/%s", tarDir, res), false, false);
+      hdfsClient.copy(String.format("%s/%s", srcDir, res), String.format("%s/%s", tarDir, res), false, true);
     }
   }
 
