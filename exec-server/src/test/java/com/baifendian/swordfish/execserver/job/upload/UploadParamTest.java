@@ -16,6 +16,7 @@
 
 package com.baifendian.swordfish.execserver.job.upload;
 
+import com.baifendian.swordfish.common.job.struct.node.upload.UploadParam;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
 import org.junit.Test;
 

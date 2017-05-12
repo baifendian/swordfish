@@ -15,6 +15,7 @@
  */
 package com.baifendian.swordfish.execserver.job.hql;
 
+import com.baifendian.swordfish.common.job.struct.node.hql.SqlParam;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
 import org.apache.commons.lang.StringUtils;
 import org.junit.Before;
@@ -24,10 +25,6 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
-/**
- * @author : liujin
- * @date : 2017-03-15 15:23
- */
 public class SqlParamTest {
   private SqlParam param;
 
@@ -39,9 +36,8 @@ public class SqlParamTest {
 
   @Test
   public void testGetResourceFiles() {
-    List<String> resources = param.getResourceFiles();
+    List<String> resources = param.getProjectResourceFiles();
     String result = "udf.jar";
     assertEquals(result, StringUtils.join(resources, ""));
   }
-
 }

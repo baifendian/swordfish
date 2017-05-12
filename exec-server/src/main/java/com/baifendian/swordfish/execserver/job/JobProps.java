@@ -15,6 +15,7 @@
  */
 package com.baifendian.swordfish.execserver.job;
 
+import java.util.Date;
 import java.util.Map;
 
 public class JobProps {
@@ -68,6 +69,11 @@ public class JobProps {
    * 环境变量文件
    **/
   private String envFile;
+
+  /**
+   * cyc time, 基准时间
+   */
+  private Date cycTime;
 
   /**
    * 自定义参数
@@ -160,5 +166,13 @@ public class JobProps {
 
   public void setAdHocId(int adHocId) {
     this.adHocId = adHocId;
+  }
+
+  public Date getCycTime() {
+    return cycTime;
+  }
+
+  public void setCycTime(Date cycTime) {
+    this.cycTime = cycTime;
   }
 }

@@ -15,6 +15,7 @@
  */
 package com.baifendian.swordfish.execserver.job.spark;
 
+import com.baifendian.swordfish.common.job.struct.node.spark.SparkParam;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
 import org.junit.Before;
 import org.junit.Test;
@@ -23,10 +24,6 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
-/**
- * @author : liujin
- * @date : 2017-03-10 14:28
- */
 public class SparkParamTest {
 
   private SparkParam param;
@@ -39,7 +36,7 @@ public class SparkParamTest {
 
   @Test
   public void testGetResourceFiles() {
-    List<String> resFiles = param.getResourceFiles();
+    List<String> resFiles = param.getProjectResourceFiles();
     String result = "[spark-wc-examples.jar, ABC.conf, JOB.zip]";
     assertEquals(result, resFiles.toString());
   }

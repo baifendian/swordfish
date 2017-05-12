@@ -41,27 +41,17 @@ public class SystemParamManager {
   /**
    * 日常调度实例定时的定时时间日期的前一天，格式为 yyyyMMdd
    */
-  private static final String BIZ_DATE = "sf.system.bizdate";
+  public static final String BIZ_DATE = "sf.system.bizdate";
 
   /**
    * 日常调度实例定时的定时时间日期，格式为 yyyymmdd，取值为 ${sf.system.bizdate} + 1
    */
-  private static final String BIZ_CUR_DATE = "sf.system.bizcurdate";
+  public static final String BIZ_CUR_DATE = "sf.system.bizcurdate";
 
   /**
    * 格式 yyyyMMddHHmmss，表示的是日常调度实例定时时间（年月日时分秒）
    */
   public static final String CYC_TIME = "sf.system.cyctime";
-
-  /**
-   * 调度时刻的时间，格式为 yyyyMMddHHmmss
-   */
-  private static final String RUN_TIME = "sf.system.runtime";
-
-  /**
-   * 当前 workflow 的名称
-   */
-  private static final String FLOWNAME = "sf.system.flowname";
 
   /**
    * 构建系统参数值 <p>
@@ -97,25 +87,21 @@ public class SystemParamManager {
     valueMap.put(BIZ_DATE, formatDate(bizDate));
     valueMap.put(BIZ_CUR_DATE, formatDate(bizCurDate));
     valueMap.put(CYC_TIME, formatTime(bizCurDate));
-    valueMap.put(RUN_TIME, formatTime(runTime));
-    valueMap.put(FLOWNAME, executionFlow.getFlowName());
 
     return valueMap;
   }
 
   /**
-   * 格式化日期字符串（格式："yyyyMMdd"） <p>
-   *
-   * @return 日期字符串
+   * @param date
+   * @return
    */
   private static String formatDate(Date date) {
     return DateUtils.format(date, DATE_FORMAT);
   }
 
   /**
-   * 格式化时间字符串（格式："yyyyMMddHHmmss"） <p>
-   *
-   * @return 时间字符串
+   * @param date
+   * @return
    */
   private static String formatTime(Date date) {
     return DateUtils.format(date, TIME_FORMAT);

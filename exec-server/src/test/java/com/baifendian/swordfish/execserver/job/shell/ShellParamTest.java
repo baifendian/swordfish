@@ -15,6 +15,7 @@
  */
 package com.baifendian.swordfish.execserver.job.shell;
 
+import com.baifendian.swordfish.common.job.struct.node.shell.ShellParam;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
 import org.junit.Test;
 

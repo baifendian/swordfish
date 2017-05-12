@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.baifendian.swordfish.common.utils.placeholder;
+package com.baifendian.swordfish.execserver.parameter.placeholder;
 
 import com.baifendian.swordfish.common.utils.DateUtils;
 import org.slf4j.Logger;
@@ -92,17 +92,6 @@ public class TimePlaceholderUtil {
    * timestamp
    */
   private static final String TIMESTAMP = "timestamp";
-
-  /**
-   * 替换文本的占位符 <p>
-   *
-   * @param text 待替换文本
-   * @param date 占位符的数据字典
-   * @return 替换后的字符串
-   */
-  public static String resolvePlaceholders(String text, Date date) {
-    return resolvePlaceholders(text, date, false);
-  }
 
   /**
    * 替换文本的占位符 <p>

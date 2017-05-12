@@ -175,7 +175,7 @@ public class HiveSqlExec {
             List<List<String>> datas = new ArrayList<>();
             while (res.next()) {
               List<String> values = new ArrayList<>();
-              for (int i = 1; i <= count; i++) {
+              for (int i = 1; i <= count; ++i) {
                 values.add(res.getString(i));
               }
 
@@ -348,7 +348,7 @@ public class HiveSqlExec {
         try {
           logsTemp = hiveStatement.getQueryLog();
         } catch (Exception e) {
-          logger.error(e.getMessage(), e);
+          /*logger.error(e.getMessage(), e);*/
           return;
         }
         for (String log : logsTemp) {

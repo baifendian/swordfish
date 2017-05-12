@@ -32,11 +32,13 @@ public class HiveSqlExecTest {
   @Test
   public void testExecuteQueue() throws Exception {
     List<String> sqls = new ArrayList<>();
+
     sqls.add("select count(*) from test");
+
     Logger logger = LoggerFactory.getLogger(HiveSqlExecTest.class);
-    HiveSqlExec hiveSqlExec = new HiveSqlExec(sqls, "hadoop", null, false, logger);
-    hiveSqlExec.run();
+    HiveSqlExec hiveSqlExec = new HiveSqlExec(null, sqls, "hadoop", false, null, 1000, logger);
+    hiveSqlExec.execute();
+
     System.out.println(hiveSqlExec.getResults());
   }
-
 }

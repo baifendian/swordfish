@@ -15,8 +15,6 @@
  */
 package com.baifendian.swordfish.execserver.job;
 
-import com.baifendian.swordfish.common.job.Job;
-import com.baifendian.swordfish.common.job.JobProps;
 import com.baifendian.swordfish.execserver.job.mr.MrJob;
 import com.baifendian.swordfish.execserver.job.shell.ShellJob;
 import org.junit.Test;
@@ -40,7 +38,7 @@ public class JobTypeManagerTest {
   @Test
   public void testMrJob() throws Exception {
     JobProps props = new JobProps();
-    //props.setProperty(AbstractJob.PROJECT_ID, 1);
+
     String param = "{\"mainJar\":\"hadoop-mapreduce-examples-2.7.3.jar\",\"mainClass\":\"org.apache.hadoop.examples.ExampleDriver\",\"args\":[\"3\",\"5\"],\"properties\":[{\"prop\":\"aa\",\"value\":\"11\"},{\"prop\":\"bb\",\"value\":\"55\"}],\"jars\":[\"3\",\"5\"],\"files\":[\"x.conf\"],\"archives\":null,\"queue\":null,\"dargs\":[\"aa=11\",\"bb=55\"]}";
     System.out.println(param);
     props.setJobParams(param);
