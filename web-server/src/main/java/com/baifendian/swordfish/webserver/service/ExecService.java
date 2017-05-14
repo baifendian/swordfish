@@ -102,17 +102,18 @@ public class ExecService {
       throw new ServerErrorException("Master server does not exist.");
     }
 
-    //链接execServer
+    // 连接 execServer
     MasterClient masterClient = new MasterClient(masterServer.getHost(), masterServer.getPort());
 
     try {
-      logger.info("Call master client exec WORKFLOW , PROJECT id: {}, flow id: {},host: {}, port: {}", project.getId(), projectFlow.getId(), masterServer.getHost(), masterServer.getPort());
+      logger.info("Call master client exec WORKFLOW , PROJECT id: {}, flow id: {}, host: {}, port: {}", project.getId(), projectFlow.getId(), masterServer.getHost(), masterServer.getPort());
 
       switch (execType) {
         case DIRECT: {
 
           // 反序列化邮箱列表
-          List<String> notifyMailList = new ArrayList<>();
+          List<String> notifyMailList = null;
+
           try {
             if (StringUtils.isNotEmpty(notifyMails)) {
               notifyMailList = JsonUtil.parseObjectList(notifyMails, String.class);
@@ -124,15 +125,18 @@ public class ExecService {
 
           ExecInfo execInfo = new ExecInfo(nodeName, nodeDep != null ? nodeDep.ordinal() : 0, notifyType != null ? notifyType.ordinal() : 0, notifyMailList, timeout);
           RetResultInfo retInfo = masterClient.execFlow(project.getId(), projectFlow.getId(), new Date().getTime(), execInfo);
+
           if (retInfo == null || retInfo.getRetInfo().getStatus() != 0) {
             logger.error("Call master client exec WORKFLOW false , PROJECT id: {}, flow id: {},host: {}, port: {}", project.getId(), projectFlow.getId(), masterServer.getHost(), masterServer.getPort());
             throw new ServerErrorException("master server return error");
           }
+
           return new ExecutorIdsDto(retInfo.getExecIds());
         }
         case COMPLEMENT_DATA: {
           // 反序列化调度信息
-          ScheduleInfo scheduleInfo = null;
+          ScheduleInfo scheduleInfo;
+
           try {
             scheduleInfo = JsonUtil.parseObject(schedule, ScheduleInfo.class);
           } catch (Exception e) {
@@ -145,6 +149,7 @@ public class ExecService {
             logger.error("Call master client append WORKFLOW data false , PROJECT id: {}, flow id: {},host: {}, port: {}", project.getId(), projectFlow.getId(), masterServer.getHost(), masterServer.getPort());
             throw new ServerErrorException("Call master client append WORKFLOW data false , PROJECT id: {0}, flow id: {1},host: {2}, port: {3}", project.getId(), projectFlow.getId(), masterServer.getHost(), masterServer.getPort());
           }
+
           return new ExecutorIdsDto(retInfo.getExecIds());
         }
         default: {
@@ -152,8 +157,6 @@ public class ExecService {
           throw new ParameterException("Exec type \"{0}\" not valid", execType.name());
         }
       }
-
-
     } catch (Exception e) {
       logger.error("Call master client exec WORKFLOW error", e);
       throw e;
@@ -200,14 +203,14 @@ public class ExecService {
     List<String> workflowList;
 
     if (from < 0) {
-      throw new BadRequestException("From \"{0}\" < 0",from);
+      throw new BadRequestException("From \"{0}\" < 0", from);
     }
 
     try {
       workflowList = JsonUtil.parseObjectList(workflowName, String.class);
     } catch (Exception e) {
       logger.error("des11n WORKFLOW list error", e);
-      throw new ParameterException("Workflow name \"{0}\" not valid",workflowName);
+      throw new ParameterException("Workflow name \"{0}\" not valid", workflowName);
     }
 
     // 查看是否对项目具备相应的权限
@@ -228,7 +231,7 @@ public class ExecService {
       flowStatusList = JsonUtil.parseObjectList(status, FlowStatus.class);
     } catch (Exception e) {
       logger.error("flow status list des11n error", e);
-      throw new ParameterException("Flow status list \"{0}\" not valid",status);
+      throw new ParameterException("Flow status list \"{0}\" not valid", status);
     }
 
     List<ExecutionFlow> executionFlowList = executionFlowMapper.selectByFlowIdAndTimesAndStatusLimit(projectName, workflowList, startDate, endDate, from, size, flowStatusList);

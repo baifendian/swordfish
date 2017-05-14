@@ -86,6 +86,9 @@ public class JobExecManager {
     executionFlowQueue = new LinkedBlockingQueue<>(MasterConfig.executionFlowQueueSize);
   }
 
+  /**
+   * 运行 flow exec
+   */
   public void run() {
     flowExecManager = new FlowExecManager(this, flowDao);
 
@@ -104,6 +107,9 @@ public class JobExecManager {
     recoveryExecFlow();
   }
 
+  /**
+   * 停止 executor 的执行
+   */
   public void stop() {
     if (!executorService.isShutdown()) {
       executorService.shutdownNow();
@@ -113,7 +119,7 @@ public class JobExecManager {
   }
 
   /**
-   * 从调度信息表中恢复在运行的workflow信息
+   * 从调度信息表中恢复在运行的 workflow 信息
    */
   private void recoveryExecFlow() {
     List<ExecutionFlow> executionFlowList = flowDao.queryAllNoFinishFlow();
@@ -138,22 +144,35 @@ public class JobExecManager {
             executorServerInfoMap.put(worker, executorServerInfo);
           }
         } else {
-          // 没有worker信息，提交到executionFlowQueue队列
+          // 没有 worker 信息，提交到 executionFlowQueue 队列
           logger.info("no worker info, add execution flow[execId:{}] to queue", executionFlow.getId());
+
           ExecFlowInfo execFlowInfo = new ExecFlowInfo();
           execFlowInfo.setExecId(executionFlow.getId());
+
           executionFlowQueue.add(execFlowInfo);
         }
       }
+
       executorServerManager.initServers(executorServerInfoMap);
     }
-
   }
 
+  /**
+   * @param execFlowInfo
+   */
   public void addExecFlow(ExecFlowInfo execFlowInfo) {
     executionFlowQueue.add(execFlowInfo);
   }
 
+  /**
+   * 提交补数据任务
+   *
+   * @param flow
+   * @param cron
+   * @param startDateTime
+   * @param endDateTime
+   */
   public void submitAddData(ProjectFlow flow, CronExpression cron, Date startDateTime, Date endDateTime) {
     flowExecManager.submitAddData(flow, cron, startDateTime, endDateTime);
   }
@@ -177,10 +196,19 @@ public class JobExecManager {
     executorClient.execAdHoc(id);
   }
 
+  /**
+   * 注册 executor
+   *
+   * @param host
+   * @param port
+   * @param registerTime
+   */
   public void registerExecutor(String host, int port, long registerTime) {
     logger.info("register executor server[{}:{}]", host, port);
+
     String key = String.format("%s:%d", host, port);
-    /** 时钟差异检查 **/
+
+    // 时钟差异检查
     long nowTime = System.currentTimeMillis();
     if (registerTime > nowTime + 10000) {
       throw new MasterException("executor master clock time diff then 10 seconds");
@@ -196,8 +224,16 @@ public class JobExecManager {
     executorServerManager.addServer(key, executorServerInfo);
   }
 
+  /**
+   * 报告 executor server 信息
+   *
+   * @param host
+   * @param port
+   * @param heartBeatData
+   */
   public void executorReport(String host, int port, HeartBeatData heartBeatData) {
     logger.debug("executor server[{}:{}] report info {}", host, port, heartBeatData);
+
     String key = String.format("%s:%d", host, port);
 
     ExecutorServerInfo executorServerInfo = new ExecutorServerInfo();
@@ -208,22 +244,32 @@ public class JobExecManager {
     executorServerManager.updateServer(key, executorServerInfo);
   }
 
+  /**
+   * 取消工作流执行
+   *
+   * @param execId
+   * @return
+   * @throws TException
+   */
   public RetInfo cancelExecFlow(int execId) throws TException {
     ExecutionFlow executionFlow = flowDao.queryExecutionFlow(execId);
     if (executionFlow == null) {
       throw new MasterException("execId is not exists");
     }
+
     String worker = executionFlow.getWorker();
     if (worker == null) {
       throw new MasterException("worker is not exists");
     }
+
     String[] workerInfo = worker.split(":");
     if (workerInfo.length < 2) {
       throw new MasterException("worker is not validate format " + worker);
     }
+
     logger.info("cancel exec flow {} on worker {}", execId, worker);
+
     ExecutorClient executionClient = new ExecutorClient(workerInfo[0], Integer.valueOf(workerInfo[1]));
     return executionClient.cancelExecFlow(execId);
   }
-
 }

@@ -131,9 +131,7 @@ public class FlowRunnerManager {
    */
   public void submitFlow(ExecutionFlow executionFlow) {
     // 系统参数
-    Date scheduleDate = executionFlow.getScheduleTime();
-    Date addDate = new Date();
-    Map<String, String> systemParamMap = SystemParamManager.buildSystemParam(executionFlow, scheduleDate, addDate);
+    Map<String, String> systemParamMap = SystemParamManager.buildSystemParam(executionFlow.getExecType(), executionFlow.getStartTime());
 
     // 自定义参数ex
     String cycTimeStr = systemParamMap.get(SystemParamManager.CYC_TIME);
@@ -175,7 +173,8 @@ public class FlowRunnerManager {
     FailurePolicyType failurePolicy = schedule.getFailurePolicy() != null ? schedule.getFailurePolicy() : defaultFailurePolicyType;
 
     // 系统参数
-    Map<String, String> systemParamMap = SystemParamManager.buildSystemParam(executionFlow, scheduleDate, scheduleDate);
+    Map<String, String> systemParamMap = SystemParamManager.buildSystemParam(executionFlow.getExecType(), executionFlow.getStartTime());
+
     // 自定义参数
     String cycTimeStr = systemParamMap.get(SystemParamManager.CYC_TIME);
     Map<String, String> customParamMap = CustomParamManager.buildCustomParam(executionFlow, cycTimeStr);

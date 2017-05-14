@@ -15,13 +15,14 @@
  */
 package com.baifendian.swordfish.execserver.parameter;
 
-import com.baifendian.swordfish.common.utils.DateUtils;
 import com.baifendian.swordfish.dao.enums.ExecType;
-import com.baifendian.swordfish.dao.model.ExecutionFlow;
 
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+
+import static com.baifendian.swordfish.common.utils.DateUtils.format;
+import static org.apache.commons.lang.time.DateUtils.addDays;
 
 /**
  * 系统参数管理 <p>
@@ -54,33 +55,26 @@ public class SystemParamManager {
   public static final String CYC_TIME = "sf.system.cyctime";
 
   /**
-   * 构建系统参数值 <p>
+   * 构造系统参数
    *
-   * @return 系统参数
+   * @param execType 执行方式, 比如是直接执行, 还是补数据, 还是调度执行
+   * @param time     对于直接执行, 指的是运行的时间, 对于调度执行, 指的是调度时间, 对于补数据, 指业务补数据的时间
+   * @return
    */
-  public static Map<String, String> buildSystemParam(ExecutionFlow executionFlow, Date scheduleDate, Date addDate) {
-    ExecType runType = executionFlow.getType();
+  public static Map<String, String> buildSystemParam(ExecType execType, Date time) {
     Date bizDate;
-    Date execStartTime = executionFlow.getStartTime();
-    switch (runType) {
-      case DIRECT:
-        bizDate = org.apache.commons.lang.time.DateUtils.addDays(execStartTime, -1); // 运行日期的前一天
-        break;
 
-      case SCHEDULER:
-        bizDate = org.apache.commons.lang.time.DateUtils.addDays(scheduleDate, -1); // 调度日期的前一天
-        break;
-
+    switch (execType) {
       case COMPLEMENT_DATA:
-        bizDate = addDate; // 补数据的当天
+        bizDate = time; // 补数据的当天
         break;
-
+      case DIRECT:
+      case SCHEDULER:
       default:
-        bizDate = org.apache.commons.lang.time.DateUtils.addDays(execStartTime, -1); // 运行日期的前一天
+        bizDate = addDays(time, -1); // 运行日期的前一天
     }
 
-    Date bizCurDate = org.apache.commons.lang.time.DateUtils.addDays(bizDate, 1); // bizDate + 1 天
-    Date runTime = execStartTime;
+    Date bizCurDate = addDays(bizDate, 1); // bizDate + 1 天
 
     Map<String, String> valueMap = new HashMap<>();
 
@@ -96,7 +90,7 @@ public class SystemParamManager {
    * @return
    */
   private static String formatDate(Date date) {
-    return DateUtils.format(date, DATE_FORMAT);
+    return format(date, DATE_FORMAT);
   }
 
   /**
@@ -104,6 +98,6 @@ public class SystemParamManager {
    * @return
    */
   private static String formatTime(Date date) {
-    return DateUtils.format(date, TIME_FORMAT);
+    return format(date, TIME_FORMAT);
   }
 }

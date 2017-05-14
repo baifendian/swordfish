@@ -18,9 +18,9 @@ package com.baifendian.swordfish.execserver.runner.adhoc;
 import com.baifendian.swordfish.common.config.BaseConfig;
 import com.baifendian.swordfish.common.job.struct.node.adhoc.AdHocParam;
 import com.baifendian.swordfish.common.utils.CommonUtil;
-import com.baifendian.swordfish.common.utils.DateUtils;
 import com.baifendian.swordfish.dao.AdHocDao;
 import com.baifendian.swordfish.dao.DaoFactory;
+import com.baifendian.swordfish.dao.enums.ExecType;
 import com.baifendian.swordfish.dao.enums.FlowStatus;
 import com.baifendian.swordfish.dao.model.AdHocJsonObject;
 import com.baifendian.swordfish.dao.model.AdHocResult;
@@ -33,9 +33,7 @@ import com.baifendian.swordfish.execserver.parameter.ParamHelper;
 import com.baifendian.swordfish.execserver.parameter.SystemParamManager;
 import org.slf4j.Logger;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * 即席查询作业
@@ -79,12 +77,8 @@ public class AdHocSqlJob {
     // 得到查询语句
     String sqls = param.getStms();
 
-    // 需要支持变量参数替换, 如 $[yyyyMMdd]
-    Map<String, String> definedParamMap = new HashMap<>();
-    definedParamMap.put(SystemParamManager.CYC_TIME, DateUtils.format(props.getCycTime(), SystemParamManager.TIME_FORMAT));
-
     // 解析参数
-    sqls = ParamHelper.resolvePlaceholders(sqls, definedParamMap);
+    sqls = ParamHelper.resolvePlaceholders(sqls, SystemParamManager.buildSystemParam(ExecType.DIRECT, props.getCycTime()));
 
     // 创建自定义函数
     List<String> funcs = FunctionUtil.createFuncs(param.getUdfs(), props.getExecId(), logger, BaseConfig.getHdfsResourcesDir(props.getProjectId()), true);

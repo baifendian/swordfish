@@ -163,11 +163,14 @@ public class MasterServiceImpl implements Iface {
   @Override
   public RetResultInfo execFlow(int projectId, int flowId, long scheduleDate, ExecInfo execInfo) throws TException {
     ExecutionFlow executionFlow;
-    logger.debug("exec flow project id:{} flow id:{} schedule date:{} exec info:{}", projectId, flowId, scheduleDate, execInfo);
+
+    logger.info("exec flow project id:{} flow id:{} schedule date:{} exec info:{}", projectId, flowId, scheduleDate, execInfo);
+
     try {
       ProjectFlow flow = flowDao.projectFlowfindById(flowId);
+
       if (flow == null) {
-        logger.error("flowId is not exists");
+        logger.error("flow: {} is not exists", flowId);
         return new RetResultInfo(ResultHelper.createErrorResult("flowId is not exists"), null);
       }
 
@@ -191,6 +194,7 @@ public class MasterServiceImpl implements Iface {
       logger.error(e.getMessage(), e);
       return new RetResultInfo(ResultHelper.createErrorResult(e.getMessage()), null);
     }
+
     return new RetResultInfo(ResultHelper.SUCCESS, Arrays.asList(executionFlow.getId()));
   }
 
