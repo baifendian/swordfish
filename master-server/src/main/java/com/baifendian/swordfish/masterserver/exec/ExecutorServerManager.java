@@ -16,26 +16,34 @@
 package com.baifendian.swordfish.masterserver.exec;
 
 import com.baifendian.swordfish.masterserver.exception.MasterException;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * 管理 executor server, 包括添加, 更新, 删除等功能
+ */
 public class ExecutorServerManager {
   private final Logger logger = LoggerFactory.getLogger(getClass());
 
   private Map<String, ExecutorServerInfo> executorServers = new ConcurrentHashMap<>();
 
   /**
-   * @param key
+   * 添加一个 executor server
+   *
    * @param executorServerInfo
    * @return
    * @throws MasterException
    */
-  public synchronized ExecutorServerInfo addServer(String key, ExecutorServerInfo executorServerInfo) throws MasterException {
+  public synchronized ExecutorServerInfo addServer(ExecutorServerInfo executorServerInfo) throws MasterException {
+    String key = getKey(executorServerInfo);
+
     if (executorServers.containsKey(key)) {
       throw new MasterException("executor is register");
     }
@@ -44,15 +52,19 @@ public class ExecutorServerManager {
   }
 
   /**
-   * @param key
+   * 删除具体的 executor server
+   *
    * @param executorServerInfo
    * @return
    * @throws MasterException
    */
-  public synchronized ExecutorServerInfo updateServer(String key, ExecutorServerInfo executorServerInfo) throws MasterException {
+  public synchronized ExecutorServerInfo updateServer(ExecutorServerInfo executorServerInfo) throws MasterException {
+    String key = getKey(executorServerInfo);
+
     if (!executorServers.containsKey(key)) {
       throw new MasterException("executor is not register");
     }
+
     return executorServers.put(key, executorServerInfo);
   }
 
@@ -73,10 +85,8 @@ public class ExecutorServerManager {
 
       if (result == null) {
         result = executorServerInfo;
-      } else {
-        if (result.getHeartBeatData().getExecIdsSize() > executorServerInfo.getHeartBeatData().getExecIdsSize()) {
-          result = executorServerInfo;
-        }
+      } else if (result.getHeartBeatData().getExecIdsSize() > executorServerInfo.getHeartBeatData().getExecIdsSize()) {
+        result = executorServerInfo;
       }
     }
 
@@ -84,6 +94,8 @@ public class ExecutorServerManager {
   }
 
   /**
+   * 检测超时的 executor 并返回
+   *
    * @param timeoutInterval
    * @return
    */
@@ -113,16 +125,33 @@ public class ExecutorServerManager {
    * @return
    */
   public synchronized ExecutorServerInfo removeServer(ExecutorServerInfo executorServerInfo) {
-    String key = executorServerInfo.getHost() + ":" + executorServerInfo.getPort();
+    String key = getKey(executorServerInfo);
+
     return executorServers.remove(key);
   }
 
   /**
-   * @param executorServerInfoMap
+   * 初始化 executor server 信息
+   *
+   * @param executorServerInfos
    */
-  public synchronized void initServers(Map<String, ExecutorServerInfo> executorServerInfoMap) {
-    for (Map.Entry<String, ExecutorServerInfo> entry : executorServerInfoMap.entrySet()) {
-      executorServers.put(entry.getKey(), entry.getValue());
+  public synchronized void initServers(Collection<ExecutorServerInfo> executorServerInfos) {
+    for (ExecutorServerInfo executorServerInfo : executorServerInfos) {
+      executorServers.put(getKey(executorServerInfo), executorServerInfo);
     }
+  }
+
+  /**
+   * 获取 key 信息
+   *
+   * @param executorServerInfo
+   * @return
+   */
+  private String getKey(ExecutorServerInfo executorServerInfo) {
+    if (executorServerInfo == null) {
+      return StringUtils.EMPTY;
+    }
+
+    return executorServerInfo.getHost() + ":" + executorServerInfo.getPort();
   }
 }

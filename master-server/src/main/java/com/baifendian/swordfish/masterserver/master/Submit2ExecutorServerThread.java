@@ -35,9 +35,6 @@ import java.util.concurrent.BlockingQueue;
  */
 public class Submit2ExecutorServerThread extends Thread {
 
-  /**
-   * LOGGER
-   */
   private final Logger logger = LoggerFactory.getLogger(Submit2ExecutorServerThread.class);
 
   /**
@@ -56,6 +53,11 @@ public class Submit2ExecutorServerThread extends Thread {
   private final BlockingQueue<ExecFlowInfo> executionFlowQueue;
 
   /**
+   * 控制是否继续执行
+   */
+  private volatile boolean running;
+
+  /**
    * @param executorServerManager
    * @param flowDao
    * @param executionFlowQueue
@@ -64,25 +66,26 @@ public class Submit2ExecutorServerThread extends Thread {
     this.executorServerManager = executorServerManager;
     this.flowDao = flowDao;
     this.executionFlowQueue = executionFlowQueue;
+    this.running = true;
 
     this.setName("JobExecManager-submitExecFlowToWorker");
   }
 
   @Override
   public void run() {
-    while (true) {
+    while (running) {
       ExecFlowInfo execFlowInfo;
 
       try {
         execFlowInfo = executionFlowQueue.take();
         logger.info("get execution flow from queue, exec info:{}", execFlowInfo);
       } catch (InterruptedException e) {
-        logger.error(e.getMessage(), e);
+        logger.error("Catch interrupt exception", e);
         break;
       }
 
       int execId = execFlowInfo.getExecId();
-      boolean isSucess = false;
+      boolean isSuccess = false;
       boolean isExecutorServerError = false;
 
       ExecutorServerInfo executorServerInfo = executorServerManager.getExecutorServer();
@@ -93,7 +96,8 @@ public class Submit2ExecutorServerThread extends Thread {
         try {
           Thread.sleep(5000);
         } catch (InterruptedException e) {
-          e.printStackTrace();
+          logger.error("Catch interrupt exception", e);
+          break;
         }
 
         executionFlowQueue.add(execFlowInfo);
@@ -107,25 +111,24 @@ public class Submit2ExecutorServerThread extends Thread {
         isExecutorServerError = false;
 
         try {
-          ExecutorClient executorClient = new ExecutorClient(executorServerInfo);
           ExecutionFlow executionFlow = flowDao.queryExecutionFlow(execId);
           executionFlow.setWorker(String.format("%s:%d", executorServerInfo.getHost(), executorServerInfo.getPort()));
 
-          logger.debug("execId:{}", execId);
-          logger.debug("projectId:{}", executionFlow.getProjectId());
-          logger.debug("client:{}", executorClient);
+          ExecutorClient executorClient = new ExecutorClient(executorServerInfo);
+
+          logger.info("exec id:{}, project id:{}, executor client:{}", execId, executionFlow.getProjectId(), executorClient);
 
           executorClient.execFlow(execId);
 
           flowDao.updateExecutionFlow(executionFlow);
 
-          isSucess = true;
+          isSuccess = true;
           break;
         } catch (TException e) {
-          ExecutionFlow temp = flowDao.queryExecutionFlow(execId);
+          ExecutionFlow executionFlow = flowDao.queryExecutionFlow(execId);
 
           // 如果执行被取消，结束重试请求
-          if (temp == null) {
+          if (executionFlow == null) {
             break;
           }
 
@@ -137,9 +140,9 @@ public class Submit2ExecutorServerThread extends Thread {
       }
 
       // 多次重试后仍然失败
-      if (!isSucess) {
+      if (!isSuccess) {
         if (isExecutorServerError) {
-          // executor server error，将执行数据放回队列，将该executor server从executor server列表删除
+          // executor server error，将执行数据放回队列，将该 executor server从executor server 列表删除
           executionFlowQueue.add(execFlowInfo);
 
           logger.info("connect to executor server error, remove {}:{}", executorServerInfo.getHost(), executorServerInfo.getPort());
@@ -147,10 +150,13 @@ public class Submit2ExecutorServerThread extends Thread {
           ExecutorServerInfo removedExecutionServerInfo = executorServerManager.removeServer(executorServerInfo);
           resubmitExecFlow(removedExecutionServerInfo);
         } else {
+          // 失败后需要更新信息
           flowDao.updateExecutionFlowStatus(execId, FlowStatus.FAILED);
         }
       }
     }
+
+    logger.warn("stop execution workflow thread");
   }
 
   /**
@@ -158,12 +164,12 @@ public class Submit2ExecutorServerThread extends Thread {
    *
    * @param executorServerInfo
    */
+
   private void resubmitExecFlow(ExecutorServerInfo executorServerInfo) {
     // 这里使用数据库查询到的数据保证准确性，避免内存数据出现不一致的情况
     List<ExecutionFlow> executionFlows = flowDao.queryNoFinishFlow(executorServerInfo.getHost() + ":" + executorServerInfo.getPort());
 
     if (!CollectionUtils.isEmpty(executionFlows)) {
-
       logger.info("executor server {} fault, execIds size:{} ", executorServerInfo, executionFlows.size());
 
       for (ExecutionFlow execFlow : executionFlows) {
@@ -185,5 +191,12 @@ public class Submit2ExecutorServerThread extends Thread {
         }
       }
     }
+  }
+
+  /**
+   * 取消执行
+   */
+  public void disable() {
+    this.running = false;
   }
 }

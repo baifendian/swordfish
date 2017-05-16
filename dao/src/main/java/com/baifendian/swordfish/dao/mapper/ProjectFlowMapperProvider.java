@@ -37,6 +37,7 @@ public class ProjectFlowMapperProvider {
     return new SQL() {
       {
         INSERT_INTO(TABLE_NAME);
+
         VALUES("`name`", "#{flow.name}");
         VALUES("`desc`", "#{flow.desc}");
         VALUES("`project_id`", "#{flow.projectId}");
@@ -63,13 +64,13 @@ public class ProjectFlowMapperProvider {
         UPDATE(TABLE_NAME);
 
         SET("`desc`=#{flow.desc}");
-        SET("modify_time=#{flow.modifyTime}");
-        SET("create_time=#{flow.createTime}");
-        SET("owner=#{flow.ownerId}");
-        SET("proxy_user=#{flow.proxyUser}");
-        SET("user_defined_params=#{flow.userDefinedParams}");
-        SET("extras=#{flow.extras}");
-        SET("queue=#{flow.queue}");
+        SET("`modify_time`=#{flow.modifyTime}");
+        SET("`create_time`=#{flow.createTime}");
+        SET("`owner`=#{flow.ownerId}");
+        SET("`proxy_user`=#{flow.proxyUser}");
+        SET("`user_defined_params`=#{flow.userDefinedParams}");
+        SET("`extras`=#{flow.extras}");
+        SET("`queue`=#{flow.queue}");
 
         WHERE("id = #{flow.id}");
         WHERE("flag is null");
@@ -86,12 +87,16 @@ public class ProjectFlowMapperProvider {
   public String queryByName(Map<String, Object> parameter) {
     return new SQL() {
       {
-        SELECT("p_f.*,p_f.owner as owner_id");
+        SELECT("p_f.owner as owner_id");
         SELECT("p.name as project_name");
         SELECT("u.name as owner_name");
-        FROM("project_flows p_f");
+        SELECT("p_f.*");
+
+        FROM(TABLE_NAME + " p_f");
+
         JOIN("project p on p_f.project_id = p.id");
         JOIN("user u on p_f.owner = u.id");
+
         WHERE("p_f.project_id = #{projectId}");
         WHERE("p_f.name = #{name}");
       }
@@ -107,12 +112,16 @@ public class ProjectFlowMapperProvider {
   public String queryById(Map<String, Object> parameter) {
     return new SQL() {
       {
-        SELECT("p_f.*,p_f.owner as owner_id");
+        SELECT("p_f.owner as owner_id");
         SELECT("p.name as project_name");
         SELECT("u.name as owner_name");
-        FROM("project_flows p_f");
+        SELECT("p_f.*");
+
+        FROM(TABLE_NAME + " p_f");
+
         JOIN("project p on p_f.project_id = p.id");
         JOIN("user u on p_f.owner = u.id");
+
         WHERE("p_f.id = #{id}");
       }
     }.toString();
@@ -127,12 +136,16 @@ public class ProjectFlowMapperProvider {
   public String findByProjectNameAndName(Map<String, Object> parameter) {
     return new SQL() {
       {
-        SELECT("p_f.*,p_f.owner as owner_id");
+        SELECT("p_f.owner as owner_id");
         SELECT("p.name as project_name");
         SELECT("u.name as owner_name");
-        FROM("project_flows p_f");
+        SELECT("p_f.*");
+
+        FROM(TABLE_NAME + " p_f");
+
         JOIN("project p on p_f.project_id = p.id");
         JOIN("user u on p_f.owner = u.id");
+
         WHERE("p.name = #{projectName}");
         WHERE("p_f.name = #{name}");
       }
@@ -149,7 +162,9 @@ public class ProjectFlowMapperProvider {
     return new SQL() {
       {
         SELECT("*");
+
         FROM(TABLE_NAME);
+
         WHERE("project_id = #{projectId}");
       }
     }.toString();
@@ -165,6 +180,7 @@ public class ProjectFlowMapperProvider {
     return new SQL() {
       {
         DELETE_FROM(TABLE_NAME);
+
         WHERE("id = #{id}");
       }
     }.toString();
@@ -180,8 +196,11 @@ public class ProjectFlowMapperProvider {
     return new SQL() {
       {
         SELECT("u.id, u.name, u.email");
+
         FROM(TABLE_NAME + " as f");
+
         INNER_JOIN("user as u on u.id = f.owner");
+
         WHERE("f.id = #{id}");
       }
     }.toString();
@@ -200,12 +219,15 @@ public class ProjectFlowMapperProvider {
     return new SQL() {
       {
         UPDATE(TABLE_NAME);
+
         if (!StringUtils.isEmpty(queue)) {
           SET("`queue`=#{queue}");
         }
+
         if (!StringUtils.isEmpty(desc)) {
           SET("proxy_user=#{proxyUser}");
         }
+
         WHERE("project_id = #{projectId}");
         WHERE("flag is NULL");
       }

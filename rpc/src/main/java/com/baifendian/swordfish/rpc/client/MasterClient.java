@@ -22,7 +22,6 @@ import org.apache.thrift.protocol.TProtocol;
 import org.apache.thrift.transport.TSocket;
 import org.apache.thrift.transport.TTransport;
 import org.apache.thrift.transport.TTransportException;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -282,18 +281,18 @@ public class MasterClient {
    *
    * @param projectId
    * @param flowId
-   * @param scheduleDate
-   * @param execInfo
+   * @param runTime   工作流的运行时间
+   * @param execInfo  执行的一些 context 信息
    * @return
    */
-  public RetResultInfo execFlow(int projectId, int flowId, long scheduleDate, ExecInfo execInfo) {
+  public RetResultInfo execFlow(int projectId, int flowId, long runTime, ExecInfo execInfo) {
     if (!connect()) {
       close();
       return null;
     }
 
     try {
-      RetResultInfo ret = client.execFlow(projectId, flowId, scheduleDate, execInfo);
+      RetResultInfo ret = client.execFlow(projectId, flowId, runTime, execInfo);
 
       return ret;
     } catch (TException e) {

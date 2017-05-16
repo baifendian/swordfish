@@ -63,7 +63,7 @@ public class MasterServiceImpl implements Iface {
   private final AdHocDao adHocDao;
 
   /**
-   * 工作流执行管理器
+   * 任务执行的主程序
    */
   private final JobExecManager jobExecManager;
 
@@ -157,16 +157,16 @@ public class MasterServiceImpl implements Iface {
    *
    * @param projectId
    * @param flowId
-   * @param scheduleDate
+   * @param runTime   执行该工作流的时刻
    * @param execInfo
    * @return
    * @throws TException
    */
   @Override
-  public RetResultInfo execFlow(int projectId, int flowId, long scheduleDate, ExecInfo execInfo) throws TException {
+  public RetResultInfo execFlow(int projectId, int flowId, long runTime, ExecInfo execInfo) throws TException {
     ExecutionFlow executionFlow;
 
-    logger.info("exec flow project id:{} flow id:{} schedule date:{} exec info:{}", projectId, flowId, scheduleDate, execInfo);
+    logger.info("exec flow project id:{} flow id:{} run time:{} exec info:{}", projectId, flowId, runTime, execInfo);
 
     try {
       ProjectFlow flow = flowDao.projectFlowfindById(flowId);
@@ -180,7 +180,7 @@ public class MasterServiceImpl implements Iface {
       executionFlow = flowDao.scheduleFlowToExecution(projectId,
           flowId,
           flow.getOwnerId(),
-          new Date(scheduleDate),
+          new Date(runTime),
           ExecType.DIRECT,
           1,
           execInfo.getNodeName(),

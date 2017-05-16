@@ -33,15 +33,17 @@ public class DagHelper {
   /**
    * 获取节点依赖(或被依赖)的 DAG <p>
    *
-   * @param flowDag       DAG
-   * @param node
-   * @param isDependentBy 是否被依赖
+   * @param flowDag       整个工作流 DAG
+   * @param node          查询的节点
+   * @param isDependentBy 为 true 表示查询 node 的后续, 为 false 表示前续
    * @return
    */
   public static FlowDag findNodeDepDag(FlowDag flowDag, FlowNode node, boolean isDependentBy) {
     FlowDag dagRequestDep = new FlowDag();
     List<FlowNode> nodesDep = new ArrayList<>();
+
     dagRequestDep.setNodes(nodesDep);
+
     List<FlowNodeRelation> edgesDep = new ArrayList<>();
     dagRequestDep.setEdges(edgesDep);
 
@@ -95,7 +97,7 @@ public class DagHelper {
           }
         }
 
-        // 处理完成的节点加入到“依赖的节点列表中”
+        // 处理完成的节点加入到 “依赖的节点列表中”
         nodesDep.add(flowNode);
       }
 

@@ -18,11 +18,6 @@ package com.baifendian.swordfish.dao.model;
 public class FlowNodeRelation {
 
   /**
-   * 所属的 flow
-   */
-  private int flowId;
-
-  /**
    * 起点名称
    */
   private String startNode;
@@ -35,18 +30,9 @@ public class FlowNodeRelation {
   public FlowNodeRelation() {
   }
 
-  public FlowNodeRelation(int flowId, String startNode, String endNode) {
-    this.flowId = flowId;
+  public FlowNodeRelation(String startNode, String endNode) {
     this.startNode = startNode;
     this.endNode = endNode;
-  }
-
-  public int getFlowId() {
-    return flowId;
-  }
-
-  public void setFlowId(int flowId) {
-    this.flowId = flowId;
   }
 
   public String getStartNode() {

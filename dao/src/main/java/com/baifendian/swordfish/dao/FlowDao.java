@@ -25,7 +25,6 @@ import com.baifendian.swordfish.dao.model.*;
 import com.baifendian.swordfish.dao.model.flow.FlowDag;
 import com.baifendian.swordfish.dao.utils.DagHelper;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -130,9 +129,11 @@ public class FlowDao extends BaseDao {
     executionFlow.setId(execId);
     executionFlow.setStatus(status);
 
-    // add by qifeng.dai, 如果结束了, 则应该设置结束时间
+    // 如果结束了, 则应该设置结束时间
+    Date now = new Date();
+
     if (status.typeIsFinished()) {
-      executionFlow.setEndTime(new Date());
+      executionFlow.setEndTime(now);
     }
 
     return executionFlowMapper.update(executionFlow) > 0;
@@ -152,8 +153,10 @@ public class FlowDao extends BaseDao {
     executionFlow.setStatus(status);
     executionFlow.setWorker(worker);
 
+    Date now = new Date();
+
     if (status.typeIsFinished()) {
-      executionFlow.setEndTime(new Date());
+      executionFlow.setEndTime(now);
     }
 
     return executionFlowMapper.update(executionFlow) > 0;
@@ -186,49 +189,70 @@ public class FlowDao extends BaseDao {
    * @return
    * @throws Exception
    */
-  public ExecutionFlow scheduleFlowToExecution(Integer projectId, Integer workflowId, int submitUser, Date scheduleTime, ExecType runType,
-                                               Integer maxTryTimes, String nodeName, NodeDepType nodeDep, NotifyType notifyType, List<String> mails, int timeout) throws Exception {
-    List<FlowNode> flowNodes = flowNodeMapper.selectByFlowId(workflowId); // 节点信息
+  public ExecutionFlow scheduleFlowToExecution(Integer projectId,
+                                               Integer workflowId,
+                                               int submitUser,
+                                               Date scheduleTime,
+                                               ExecType runType,
+                                               Integer maxTryTimes,
+                                               String nodeName,
+                                               NodeDepType nodeDep,
+                                               NotifyType notifyType,
+                                               List<String> mails,
+                                               int timeout) throws Exception {
+    // 查询工作流的节点信息
+    List<FlowNode> flowNodes = flowNodeMapper.selectByFlowId(workflowId);
+
+    // 结点关系信息
     List<FlowNodeRelation> flowNodeRelations = new ArrayList<>();
 
+    // 遍历节点信息, 构建关系
     for (FlowNode flowNode : flowNodes) {
       String dep = flowNode.getDep();
-      if (StringUtils.isNotEmpty(dep)) {
-        List<String> depList = JsonUtil.parseObjectList(dep, String.class);
+      List<String> depList = JsonUtil.parseObjectList(dep, String.class);
+      // 如果依赖不为空
+      if (depList != null) {
         for (String depNode : depList) {
-          flowNodeRelations.add(new FlowNodeRelation(workflowId, depNode, flowNode.getName()));
+          flowNodeRelations.add(new FlowNodeRelation(depNode, flowNode.getName()));
         }
       }
     }
 
+    // 查询项目的工作流信息
     ProjectFlow projectFlow = projectFlowMapper.findById(workflowId);
+
     FlowDag flowDag = new FlowDag();
     flowDag.setEdges(flowNodeRelations);
     flowDag.setNodes(flowNodes);
 
-    // TODO:: 处理邮件的字段信息, 以及工作流节点的信息
+    // 处理邮件的字段信息, 以及工作流节点的信息
     ExecutionFlow executionFlow = new ExecutionFlow();
+
+    Date now = new Date();
 
     executionFlow.setFlowId(workflowId);
     executionFlow.setSubmitUserId(submitUser);
-    executionFlow.setSubmitTime(new Date());
+    executionFlow.setSubmitTime(now);
     executionFlow.setQueue(projectFlow.getQueue());
     executionFlow.setProxyUser(projectFlow.getProxyUser());
     executionFlow.setScheduleTime(scheduleTime);
-    executionFlow.setStartTime(new Date());
+    executionFlow.setStartTime(now);
 
+    // 如果 node 名称为空, 表示是执行整个节点
     if (nodeName != null) {
       FlowNode flowNode = DagHelper.findNodeByName(flowNodes, nodeName);
       if (flowNode != null) {
         switch (nodeDep) {
+          case NODE_POST:
+            flowDag = DagHelper.findNodeDepDag(flowDag, flowNode, true);
+            break;
+          case NODE_PRE:
+            flowDag = DagHelper.findNodeDepDag(flowDag, flowNode, false);
+            break;
           case NODE_ONLY:
+          default:
             flowDag.setEdges(null);
             flowDag.setNodes(Arrays.asList(flowNode));
-            break;
-          case NODE_POST:  // 当前节点及其后续依赖
-            flowDag = DagHelper.findNodeDepDag(flowDag, flowNode, true);
-          case NODE_PRE:  // 当前节点及其前置依赖
-            flowDag = DagHelper.findNodeDepDag(flowDag, flowNode, false);
         }
       } else {
         throw new Exception(String.format("node %s not found in flow %d", nodeName, workflowId));
@@ -239,11 +263,11 @@ public class FlowDao extends BaseDao {
     executionFlow.setUserDefinedParams(projectFlow.getUserDefinedParams());
     executionFlow.setType(runType);
     executionFlow.setMaxTryTimes(maxTryTimes);
+    executionFlow.setNotifyType(notifyType);
+    executionFlow.setNotifyMailList(mails);
     executionFlow.setTimeout(timeout);
     executionFlow.setStatus(FlowStatus.INIT);
     executionFlow.setExtras(projectFlow.getExtras());
-    executionFlow.setNotifyType(notifyType);
-    executionFlow.setNotifyMailList(mails);
 
     executionFlowMapper.insertAndGetId(executionFlow); // 插入执行信息
 
@@ -431,7 +455,7 @@ public class FlowDao extends BaseDao {
    * @return
    */
   public ExecutionFlow executionFlowPreDate(int flowId, Date date) {
-    return executionFlowMapper.selectPreDate(flowId,date);
+    return executionFlowMapper.selectPreDate(flowId, date);
   }
 
 }

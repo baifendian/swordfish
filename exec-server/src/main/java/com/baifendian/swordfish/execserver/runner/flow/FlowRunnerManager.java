@@ -21,7 +21,6 @@ import com.baifendian.swordfish.dao.enums.FailurePolicyType;
 import com.baifendian.swordfish.dao.model.ExecutionFlow;
 import com.baifendian.swordfish.dao.model.Schedule;
 import com.baifendian.swordfish.execserver.exception.ExecException;
-import com.baifendian.swordfish.execserver.parameter.CustomParamManager;
 import com.baifendian.swordfish.execserver.parameter.SystemParamManager;
 import com.baifendian.swordfish.execserver.utils.Constants;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
@@ -29,7 +28,6 @@ import org.apache.commons.configuration.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Date;
 import java.util.Map;
 import java.util.concurrent.*;
 
@@ -76,15 +74,12 @@ public class FlowRunnerManager {
   private final FailurePolicyType defaultFailurePolicyType = FailurePolicyType.END;
 
   /**
-   * 正在运行的 flows
+   * 正在运行的 flows, key => flow id, value => flow runner 线程
    */
   private final Map<Integer, FlowRunner> runningFlows = new ConcurrentHashMap<>();
 
-  private final Configuration conf;
-
   public FlowRunnerManager(Configuration conf) {
     this.flowDao = DaoFactory.getDaoInstance(FlowDao.class);
-    this.conf = conf;
 
     int flowThreads = conf.getInt(Constants.EXECUTOR_FLOWRUNNER_THREADS, 20);
     ThreadFactory flowThreadFactory = new ThreadFactoryBuilder().setNameFormat("Exec-Worker-FlowRunner").build();
@@ -119,17 +114,16 @@ public class FlowRunnerManager {
    * @param executionFlow
    */
   public void submitFlow(ExecutionFlow executionFlow) {
-    // 系统参数
-    Map<String, String> systemParamMap = SystemParamManager.buildSystemParam(executionFlow.getExecType(), executionFlow.getStartTime());
+    // 系统参数, 注意 schedule time 是真正调度运行的时刻
+    Map<String, String> systemParamMap = SystemParamManager.buildSystemParam(executionFlow.getType(), executionFlow.getScheduleTime());
 
-    // 自定义参数ex
-    String cycTimeStr = systemParamMap.get(SystemParamManager.CYC_TIME);
-    Map<String, String> customParamMap = CustomParamManager.buildCustomParam(executionFlow, cycTimeStr);
+    // 构建自定义参数, 比如定义了 ${abc} = ${sf.system.bizdate}, $[yyyyMMdd] 等情况
+    Map<String, String> customParamMap = executionFlow.getUserDefinedParamMap();
 
     int maxTryTimes = executionFlow.getMaxTryTimes() != null ? executionFlow.getMaxTryTimes() : defaultMaxTryTimes;
     int timeout = executionFlow.getTimeout() != null ? executionFlow.getTimeout() : defaultMaxTimeout;
 
-    // 构造 flow runner
+    // 构造 flow runner 的上下文信息
     FlowRunnerContext context = new FlowRunnerContext();
 
     context.setExecutionFlow(executionFlow);
@@ -142,8 +136,8 @@ public class FlowRunnerManager {
     context.setCustomParamMap(customParamMap);
 
     FlowRunner flowRunner = new FlowRunner(context);
-
     runningFlows.put(executionFlow.getId(), flowRunner);
+
     flowExecutorService.submit(flowRunner);
   }
 
@@ -152,20 +146,18 @@ public class FlowRunnerManager {
    *
    * @param executionFlow
    * @param schedule
-   * @param scheduleDate
    */
-  public void submitFlow(ExecutionFlow executionFlow, Schedule schedule, Date scheduleDate) {
+  public void submitFlow(ExecutionFlow executionFlow, Schedule schedule) {
     //int maxTryTimes = schedule.getMaxTryTimes() != null ? schedule.getMaxTryTimes() : defaultMaxTryTimes;
     int maxTryTimes = schedule.getMaxTryTimes();
     int timeout = schedule.getTimeout() != 0 ? schedule.getTimeout() : defaultMaxTimeout;
     FailurePolicyType failurePolicy = schedule.getFailurePolicy() != null ? schedule.getFailurePolicy() : defaultFailurePolicyType;
 
     // 系统参数
-    Map<String, String> systemParamMap = SystemParamManager.buildSystemParam(executionFlow.getExecType(), executionFlow.getStartTime());
+    Map<String, String> systemParamMap = SystemParamManager.buildSystemParam(executionFlow.getType(), executionFlow.getStartTime());
 
     // 自定义参数
-    String cycTimeStr = systemParamMap.get(SystemParamManager.CYC_TIME);
-    Map<String, String> customParamMap = CustomParamManager.buildCustomParam(executionFlow, cycTimeStr);
+    Map<String, String> customParamMap = executionFlow.getUserDefinedParamMap();
 
     FlowRunnerContext context = new FlowRunnerContext();
     context.setSchedule(schedule);
@@ -189,6 +181,7 @@ public class FlowRunnerManager {
   private void cleanFinishedFlows() {
     for (Map.Entry<Integer, FlowRunner> entry : runningFlows.entrySet()) {
       ExecutionFlow executionFlow = flowDao.queryExecutionFlow(entry.getKey());
+
       if (executionFlow.getStatus().typeIsFinished()) {
         runningFlows.remove(entry.getKey());
       }
@@ -199,44 +192,40 @@ public class FlowRunnerManager {
    * 销毁资源 <p>
    */
   public void destroy() {
-    if (!flowExecutorService.isShutdown()) {
-      try {
-        flowExecutorService.shutdown();
-        flowExecutorService.awaitTermination(3, TimeUnit.SECONDS);
-        flowExecutorService.shutdownNow();
-      } catch (Exception e) {
-        logger.error(e.getMessage(), e);
-      }
-    }
+    // 关闭 flow executor 线程池
+    shutdownExecutorService(flowExecutorService);
 
-    if (!nodeExecutorService.isShutdown()) {
-      try {
-        nodeExecutorService.shutdown();
-        nodeExecutorService.awaitTermination(3, TimeUnit.SECONDS);
-        nodeExecutorService.shutdownNow();
-      } catch (Exception e) {
-        logger.error(e.getMessage(), e);
-      }
-    }
+    // 关闭 node executor 线程池
+    shutdownExecutorService(nodeExecutorService);
 
     for (FlowRunner flowRunner : runningFlows.values()) {
       flowRunner.kill();
     }
 
-    if (!jobExecutorService.isShutdown()) {
-      try {
-        jobExecutorService.shutdown();
-        jobExecutorService.awaitTermination(3, TimeUnit.SECONDS);
-        jobExecutorService.shutdownNow();
-      } catch (Exception e) {
-        logger.error(e.getMessage(), e);
-      }
-    }
+    // 关闭 job executor 线程池
+    shutdownExecutorService(jobExecutorService);
 
     try {
       Thread.sleep(5000);
     } catch (InterruptedException e) {
-      e.printStackTrace();
+      logger.error("Catch an interrupt exception", e);
+    }
+  }
+
+  /**
+   * 关闭 executor service
+   *
+   * @param executorService
+   */
+  private void shutdownExecutorService(ExecutorService executorService) {
+    if (!executorService.isShutdown()) {
+      try {
+        executorService.shutdown();
+        executorService.awaitTermination(3, TimeUnit.SECONDS);
+        executorService.shutdownNow();
+      } catch (Exception e) {
+        logger.error(e.getMessage(), e);
+      }
     }
   }
 

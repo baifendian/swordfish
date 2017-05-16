@@ -36,14 +36,9 @@ import java.util.concurrent.ExecutorService;
 public class NodeRunner implements Runnable {
 
   /**
-   * LOGGER
+   * logger
    */
-  private final Logger LOGGER = LoggerFactory.getLogger(getClass());
-
-  /**
-   * 超时时间
-   */
-  private final int timeout;
+  private final Logger logger = LoggerFactory.getLogger(getClass());
 
   /**
    * {@link FlowDao}
@@ -61,32 +56,13 @@ public class NodeRunner implements Runnable {
   private final ExecutionNode executionNode;
 
   /**
-   * {@link FlowNode}
-   */
-  private final FlowNode node;
-
-  /**
-   * {@link ExecutorService}
-   */
-  private final ExecutorService executorService;
-
-  /**
    * 同步对象
    */
   private final Object synObject;
 
   /**
-   * 系统参数
+   * job 处理器
    */
-  private final Map<String, String> systemParamMap;
-
-  /**
-   * 自定义参数
-   */
-  private final Map<String, String> customParamMap;
-
-  private boolean killed = false;
-
   private JobHandler jobHandler;
 
   /**
@@ -104,13 +80,7 @@ public class NodeRunner implements Runnable {
     this.flowDao = DaoFactory.getDaoInstance(FlowDao.class);
     this.executionFlow = executionFlow;
     this.executionNode = executionNode;
-    this.node = node;
-    this.executorService = executorService;
     this.synObject = synObject;
-    this.timeout = timeout;
-    this.systemParamMap = systemParamMap;
-    this.customParamMap = customParamMap;
-    // 生成具体 handler
     this.jobHandler = new JobHandler(flowDao, executionFlow, executionNode, node, executorService, timeout, systemParamMap, customParamMap);
   }
 
@@ -121,17 +91,17 @@ public class NodeRunner implements Runnable {
       // 具体执行
       status = jobHandler.handle();
 
-      LOGGER.info("run executor:{} node:{} finished, status:{}", executionFlow.getId(), executionNode.getName(), status);
+      logger.info("run executor:{} node:{} finished, status:{}", executionFlow.getId(), executionNode.getName(), status);
 
       // 更新 executionNode 信息
       updateExecutionNode(status);
-
     } catch (Exception e) {
-      LOGGER.error("{}", jobHandler.getJobIdLog() + e.getMessage(), e);
+      logger.error(String.format("job %s error", jobHandler.getJobIdLog()), e);
     } finally {
       if (status == null) {
         updateExecutionNode(FlowStatus.FAILED);
       }
+
       // 唤醒 flow runner 线程
       notifyFlowRunner();
     }
@@ -155,26 +125,28 @@ public class NodeRunner implements Runnable {
     }
   }
 
+  /**
+   * 关闭 node 运行
+   */
   public void kill() {
-    LOGGER.info("kill has been called on node:{} ", executionNode.getName());
+    logger.info("kill has been called on node:{} ", executionNode.getName());
     if (executionNode.getStatus().typeIsFinished()) {
-      LOGGER.debug("node:{} status is {} ignore", executionNode.getName(), executionNode.getStatus().name());
+      logger.debug("node:{} status is {} ignore", executionNode.getName(), executionNode.getStatus().name());
       return;
     }
-    killed = true;
 
     Job job = jobHandler.getJob();
     if (job == null) {
-      LOGGER.info("Job hasn't started");
+      logger.info("Job hasn't started");
       return;
     }
 
     try {
       job.cancel();
     } catch (Exception e) {
-      LOGGER.error("cancel job error", e);
+      logger.error("cancel job error", e);
     }
+
     updateExecutionNode(FlowStatus.KILL);
   }
-
 }

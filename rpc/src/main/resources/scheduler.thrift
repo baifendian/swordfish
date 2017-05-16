@@ -136,10 +136,10 @@ service MasterService {
    *
    * projectId : project id
    * flowId : workflow id
-   * scheduleDate : 调度时间（预期的）
+   * runTime : 执行时间
    * execInfo : 执行信息
    */
-  RetResultInfo execFlow(1:i32 projectId, 2:i32 flowId, 3:i64 scheduleDate, 4:ExecInfo execInfo),
+  RetResultInfo execFlow(1:i32 projectId, 2:i32 flowId, 3:i64 runTime, 4:ExecInfo execInfo),
 
   /**
    * 给一个 workflow 补数据

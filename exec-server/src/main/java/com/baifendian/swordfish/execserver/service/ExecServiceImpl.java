@@ -79,6 +79,7 @@ public class ExecServiceImpl implements Iface {
     this.adHocDao = DaoFactory.getDaoInstance(AdHocDao.class);
     this.flowRunnerManager = new FlowRunnerManager(conf);
     this.adHocRunnerManager = new AdHocRunnerManager(conf);
+
     this.host = host;
     this.port = port;
   }
@@ -141,7 +142,7 @@ public class ExecServiceImpl implements Iface {
       flowDao.updateExecutionFlowStatus(execId, FlowStatus.RUNNING, worker);
 
       // 提交任务运行
-      flowRunnerManager.submitFlow(executionFlow, schedule, new Date(scheduleDate));
+      flowRunnerManager.submitFlow(executionFlow, schedule);
     } catch (Exception e) {
       logger.error(e.getMessage(), e);
       return ResultHelper.createErrorResult(e.getMessage());

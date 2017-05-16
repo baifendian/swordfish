@@ -157,7 +157,7 @@ public class FlowScheduleJob implements Job {
 
     executionFlow.setProjectId(projectId);
     executionFlow.setProjectName(flow.getProjectName());
-    executionFlow.setFlowName(flow.getName());
+    executionFlow.setWorkflowName(flow.getName());
 
     // 自动依赖上一调度周期才能结束
     boolean isNotUpdateWaitingDep = true;

@@ -107,7 +107,7 @@ public class FlowRunner implements Runnable {
   /**
    * 正在运行的 nodeRunner
    */
-  private Set<NodeRunner> activeNodeRunners = Collections.newSetFromMap(new ConcurrentHashMap<NodeRunner, Boolean>());
+  private Set<NodeRunner> activeNodeRunners = Collections.newSetFromMap(new ConcurrentHashMap<>());
 
   /**
    * 一个节点失败后的策略类型
@@ -150,13 +150,6 @@ public class FlowRunner implements Runnable {
   private final Map<String, String> customParamMap;
 
   /**
-   * 节点列表
-   */
-  private List<FlowNode> flowNodes;
-
-  private boolean flowKilled = false;
-
-  /**
    * @param context
    */
   public FlowRunner(FlowRunnerContext context) {
@@ -180,23 +173,27 @@ public class FlowRunner implements Runnable {
     FlowStatus status = null;
 
     try {
+      // 得到执行的目录
       String execLocalPath = BaseConfig.getFlowExecDir(executionFlow.getProjectId(), executionFlow.getFlowId(),
           executionFlow.getId());
 
-      logger.info("exec id:{} current execution dir：{}", executionFlow.getId(), execLocalPath);
+      logger.info("exec id:{} current execution dir:{}", executionFlow.getId(), execLocalPath);
 
+      // 如果存在, 首先清除该目录
       File execLocalPathFile = new File(execLocalPath);
 
       if (execLocalPathFile.exists()) {
         FileUtils.forceDelete(execLocalPathFile);
       }
 
+      // 创建目录
       FileUtils.forceMkdir(execLocalPathFile);
 
-      // proxyUser 用户处理，如果系统不存在该用户，这里自动创建用户
+      // proxyUser 用户处理, 如果系统不存在该用户，这里自动创建用户
       String proxyUser = executionFlow.getProxyUser();
       List<String> osUserList = OsUtil.getUserList();
 
+      // 不存在, 则创建
       if (!osUserList.contains(proxyUser)) {
         String userGroup = OsUtil.getGroup();
         if (StringUtils.isNotEmpty(userGroup)) {
@@ -204,16 +201,17 @@ public class FlowRunner implements Runnable {
 
           String cmd = String.format("sudo useradd -g %s %s", userGroup, proxyUser);
 
-          logger.info("exec cmd {} ", cmd);
+          logger.info("exec cmd: {} ", cmd);
 
           OsUtil.exeCmd(cmd);
         }
       }
 
+      // 解析工作流
       FlowDag flowDag = JsonUtil.parseObject(executionFlow.getWorkflowData(), FlowDag.class);
 
       // 下载 workflow 的资源文件到本地 exec 目录
-      String workflowHdfsFile = BaseConfig.getHdfsWorkflowFilename(executionFlow.getProjectId(), executionFlow.getFlowName());
+      String workflowHdfsFile = BaseConfig.getHdfsWorkflowFilename(executionFlow.getProjectId(), executionFlow.getWorkflowName());
       HdfsClient hdfsClient = HdfsClient.getInstance();
 
       if (hdfsClient.exists(workflowHdfsFile)) {
@@ -221,8 +219,8 @@ public class FlowRunner implements Runnable {
 
         HdfsClient.getInstance().copyHdfsToLocal(workflowHdfsFile, execLocalPath, false, true);
 
-        // 资源文件解压缩处理 workflow下的文件为 workflowName.zip
-        File zipFile = new File(execLocalPath, executionFlow.getFlowName() + ".zip");
+        // 资源文件解压缩处理 workflow 下的文件为 workflowName.zip
+        File zipFile = new File(execLocalPath, executionFlow.getWorkflowName() + ".zip");
         if (zipFile.exists()) {
           String cmd = String.format("unzip -o %s -d %s", zipFile.getPath(), execLocalPath);
 
@@ -247,7 +245,9 @@ public class FlowRunner implements Runnable {
         File resFile = new File(execLocalPath, res);
         if (!resFile.exists()) {
           String resHdfsPath = BaseConfig.getHdfsResourcesFilename(executionFlow.getProjectId(), res);
+
           logger.info("get project file:{}", resHdfsPath);
+
           HdfsClient.getInstance().copyHdfsToLocal(resHdfsPath, execLocalPath, false, true);
         } else {
           logger.info("file:{} exists, ignore", resFile.getName());
@@ -256,6 +256,7 @@ public class FlowRunner implements Runnable {
 
       // 生成具体 Dag
       Graph<String, FlowNode, FlowNodeRelation> dagGraph = genDagGraph(flowDag);
+
       // 执行 flow
       status = runFlow(dagGraph);
 
@@ -263,7 +264,6 @@ public class FlowRunner implements Runnable {
       updateExecutionFlow(status);
     } catch (ExecTimeoutException e) {
       logger.error(e.getMessage(), e);
-
       // 超时时，取消所有正在执行的作业
       cancelAllExectingNode();
     } catch (Throwable e) {
@@ -273,7 +273,6 @@ public class FlowRunner implements Runnable {
       if (status == null) {
         updateExecutionFlow(FlowStatus.FAILED);
       }
-
       // 后置处理
       after();
     }
@@ -288,12 +287,12 @@ public class FlowRunner implements Runnable {
   private Graph<String, FlowNode, FlowNodeRelation> genDagGraph(FlowDag flowDag) {
     Graph<String, FlowNode, FlowNodeRelation> dagGraph = new DAGGraph<>();
 
-    flowNodes = flowDag.getNodes();
     if (CollectionUtils.isNotEmpty(flowDag.getNodes())) {
       for (FlowNode node : flowDag.getNodes()) {
         dagGraph.addVertex(node.getName(), node);
       }
     }
+
     if (CollectionUtils.isNotEmpty(flowDag.getEdges())) {
       for (FlowNodeRelation edge : flowDag.getEdges()) {
         dagGraph.addEdge(edge.getStartNode(), edge.getEndNode());
@@ -416,12 +415,12 @@ public class FlowRunner implements Runnable {
    */
   private FlowStatus runFlow(Graph<String, FlowNode, FlowNodeRelation> dagGraph) {
     // 获取拓扑排序列表
-    List<String> topologicalSort = null;
+    List<String> topologicalSort;
 
     try {
       topologicalSort = dagGraph.topologicalSort();
-    } catch (Exception e) {// DAG 中存在环
-      logger.error(e.getMessage(), e);
+    } catch (Exception e) {
+      logger.error("Graph get topological failed.", e);
       return FlowStatus.FAILED;
     }
 
@@ -456,6 +455,7 @@ public class FlowRunner implements Runnable {
           if (preNodesAllSuccess) {
             // 插入执行节点信息
             FlowNode node = dagGraph.getVertex(nodeName);
+
             ExecutionNode executionNode = new ExecutionNode();
             executionNode.setExecId(executionFlow.getId());
             executionNode.setName(node.getName());
@@ -540,11 +540,14 @@ public class FlowRunner implements Runnable {
    */
   private void submitNodeRunner(FlowNode flowNode, ExecutionNode executionNode) {
     int nowTimeout = -1;
+
     if (!JobTypeManager.isLongJob(flowNode.getType())) {
-      nowTimeout = calcNodeTimeout(); // 重新计算超时时间
+      nowTimeout = calcNodeTimeout();
     }
+
     NodeRunner nodeRunner = new NodeRunner(executionFlow, executionNode, flowNode, jobExecutorService, synObject, nowTimeout, systemParamMap, customParamMap);
     Future<?> future = executorService.submit(nodeRunner);
+
     activeNodeRunners.add(nodeRunner);
   }
 
@@ -554,11 +557,12 @@ public class FlowRunner implements Runnable {
    * @return 超时时间
    */
   private int calcNodeTimeout() {
-
     int usedTime = (int) ((System.currentTimeMillis() - startTime) / 1000);
+
     if (timeout <= usedTime) {
       throw new ExecTimeoutException(" workflow execution fetch time out");
     }
+
     return timeout - usedTime;
   }
 
@@ -828,10 +832,8 @@ public class FlowRunner implements Runnable {
   public void kill() {
     synchronized (synObject) {
       logger.info("Kill has been called on exec:" + executionFlow.getId());
-
-      flowKilled = true;
-
       logger.info("Killing running nodes, num:" + activeNodeRunners.size());
+
       for (NodeRunner nodeRunner : activeNodeRunners) {
         nodeRunner.kill();
       }

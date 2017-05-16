@@ -18,6 +18,7 @@ package com.baifendian.swordfish.masterserver;
 import com.baifendian.swordfish.common.utils.ThriftUtil;
 import com.baifendian.swordfish.dao.DaoFactory;
 import com.baifendian.swordfish.dao.MasterDao;
+import com.baifendian.swordfish.dao.model.MasterServer;
 import com.baifendian.swordfish.masterserver.config.MasterConfig;
 import com.baifendian.swordfish.masterserver.exception.MasterException;
 import com.baifendian.swordfish.masterserver.master.JobExecManager;
@@ -51,12 +52,13 @@ public class MasterThriftServer {
   // 当前服务的 port
   private final int port;
 
-  // jobExecManager 的 dao
+  // master 的数据库接口
   private MasterDao masterDao;
 
-  // jobExecManager service 的具体实现
+  // master 的接口实现
   private MasterServiceImpl masterService;
 
+  //
   private JobExecManager jobExecManager;
 
   public MasterThriftServer() throws UnknownHostException {
@@ -75,12 +77,13 @@ public class MasterThriftServer {
    */
   public void run() throws SchedulerException, TTransportException, MasterException {
     try {
+      // 在数据库中注册 master
       registerMaster();
       init();
 
       // 注册钩子, 进程退出前会调用
       Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-        // 清理数据库
+        // 清理数据库中 master 信息
         masterDao.deleteMasterServer(host, port);
 
         // 关闭 server
@@ -137,7 +140,7 @@ public class MasterThriftServer {
    * @throws MasterException
    */
   public void registerMaster() throws MasterException {
-    com.baifendian.swordfish.dao.model.MasterServer masterServer = masterDao.getMasterServer();
+    MasterServer masterServer = masterDao.getMasterServer();
 
     if (masterServer != null && !(masterServer.getHost().equals(host) && masterServer.getPort() == port)) {
       String msg = String.format("can't register more then one jobExecManager, exist jobExecManager:%s:%d, " +

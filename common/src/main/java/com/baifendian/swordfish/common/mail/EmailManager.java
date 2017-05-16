@@ -81,7 +81,7 @@ public class EmailManager {
    */
   public static void sendEmail(ExecutionFlow executionFlow) {
     String title = genTitle(executionFlow.getType(), executionFlow.getStatus());
-    String content = genContent(executionFlow.getType(), executionFlow.getProjectName(), executionFlow.getFlowName(),
+    String content = genContent(executionFlow.getType(), executionFlow.getProjectName(), executionFlow.getWorkflowName(),
         executionFlow.getId(), executionFlow.getScheduleTime(), executionFlow.getStatus());
 
     mailSendService.sendToFlowMails(executionFlow.getFlowId(), title, content, true, executionFlow.getNotifyMailList());
@@ -96,7 +96,7 @@ public class EmailManager {
   public static void sendEmail(ExecutionFlow executionFlow, ExecutionNode executionNode) {
     try {
       String title = genTitle(executionFlow.getType(), executionNode.getStatus());
-      String content = genContent(executionFlow.getType(), executionFlow.getProjectName(), executionFlow.getFlowName(),
+      String content = genContent(executionFlow.getType(), executionFlow.getProjectName(), executionFlow.getWorkflowName(),
           executionFlow.getId(), executionFlow.getScheduleTime(), executionNode.getStatus());
 
       content += MessageFormat.format(CONTENT_NODE_FORMAT, executionNode.getName());

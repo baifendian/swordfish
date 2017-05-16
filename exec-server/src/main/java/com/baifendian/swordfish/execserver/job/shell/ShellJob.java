@@ -53,7 +53,9 @@ public class ShellJob extends AbstractProcessJob {
   @Override
   public void initJobParams() {
     logger.debug("job params {}", props.getJobParams());
+
     shellParam = JsonUtil.parseObject(props.getJobParams(), ShellParam.class);
+
     if (!shellParam.checkValid()) {
       throw new ExecException("ShellJob script param can't be null");
     }
@@ -63,9 +65,12 @@ public class ShellJob extends AbstractProcessJob {
   public ProcessBuilder createProcessBuilder() throws IOException {
     String script = shellParam.getScript();
     script = ParamHelper.resolvePlaceholders(script, props.getDefinedParams());
+
     shellParam.setScript(script);
+
     logger.info("script:\n{}", shellParam.getScript());
     logger.info("currentPath: {}", currentPath);
+
     String fileName = currentPath + "/" + jobId + "_" + UUID.randomUUID().toString().substring(0, 8) + ".sh";
     Path path = new File(fileName).toPath();
 

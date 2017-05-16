@@ -35,13 +35,14 @@ public class FlowNodeMapperProvider {
     return new SQL() {
       {
         INSERT_INTO(TABLE_NAME);
-        VALUES("name", "#{flowNode.name}");
+
+        VALUES("`name`", "#{flowNode.name}");
         VALUES("`desc`", "#{flowNode.desc}");
-        VALUES("type", "#{flowNode.type}");
-        VALUES("flow_id", "#{flowNode.flowId}");
-        VALUES("parameter", "#{flowNode.parameter}");
-        VALUES("extras", "#{flowNode.extras}");
-        VALUES("dep", "#{flowNode.dep}");
+        VALUES("`type`", "#{flowNode.type}");
+        VALUES("`flow_id`", "#{flowNode.flowId}");
+        VALUES("`parameter`", "#{flowNode.parameter}");
+        VALUES("`extras`", "#{flowNode.extras}");
+        VALUES("`dep`", "#{flowNode.dep}");
       }
     }.toString();
   }
@@ -56,6 +57,7 @@ public class FlowNodeMapperProvider {
     return new SQL() {
       {
         DELETE_FROM(TABLE_NAME);
+
         WHERE("flow_id = #{flowId}");
       }
     }.toString();
@@ -71,7 +73,9 @@ public class FlowNodeMapperProvider {
     return new SQL() {
       {
         SELECT("*");
+
         FROM(TABLE_NAME);
+
         WHERE("flow_id = #{flowId}");
       }
     }.toString();

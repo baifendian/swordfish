@@ -41,25 +41,12 @@ public class ExecutionFlow {
   private int flowId;
 
   /**
-   * 执行 id
-   */
-  private Integer execId;
-
-  /**
-   * workflow 名称
-   * DTO 需要字段
-   **/
-  private String flowName;
-
-  /**
    * worker 的 host
-   * 数据库映射字段/DTO需要字段
    **/
   private String worker;
 
   /**
    * workflow 执行的状态
-   * 数据库映射字段/DTO需要字段
    **/
   private FlowStatus status;
 
@@ -71,43 +58,36 @@ public class ExecutionFlow {
 
   /**
    * 提交用户名称
-   * DTO 需要字段
    **/
   private String submitUser;
 
   /**
    * 代理用户
-   * 数据库映射字段/DTO需要字段 proxy_user
    **/
   private String proxyUser;
 
   /**
    * 提交时间
-   * 数据库映射字段/DTO需要字段 submit_time
    **/
   private Date submitTime;
 
   /**
    * 起始时间
-   * 数据库映射字段/DTO需要字段 start_time
    **/
   private Date startTime;
 
   /**
    * 结束时间
-   * 数据库映射字段/DTO需要字段 end_time
    **/
   private Date endTime;
 
   /**
-   * workflow的数据
-   * 数据库映射字段 workflow_data
+   * workflow 的数据
    **/
   private String workflowData;
 
   /**
    * workflow 等运行的类型
-   * 数据库映射字段/DTO需要字段 type
    **/
   private ExecType type;
 
@@ -118,7 +98,6 @@ public class ExecutionFlow {
 
   /**
    * workflow 所在项目的名称
-   * DTO需要字段
    */
   private String projectName;
 
@@ -129,47 +108,32 @@ public class ExecutionFlow {
   private String workflowName;
 
   /**
-   *
-   */
-  private ExecType execType;
-
-  /**
    * 执行时间
    */
   private Integer duration;
 
   /**
-   * 消耗时间
-   */
-  private int consume;
-
-  /**
    * 调度时间
-   * 数据库映射字段/DTO需要字段
    **/
   private Date scheduleTime;
 
   /**
    * 最大重试次数
-   * 数据库映射字段
    */
   private Integer maxTryTimes;
 
   /**
    * 执行超时
-   * 数据库映射字段
    */
   private Integer timeout;
 
   /**
    * 工作流用户自行参数
-   * 数据库映射字段
    */
   private String userDefinedParams;
 
   /**
    * 用户额外保存信息
-   * 数据库映射字段/DTO需要字段
    */
   private String extras;
 
@@ -186,19 +150,16 @@ public class ExecutionFlow {
 
   /**
    * 报警邮件列表
-   * 数据库映射字段 notify_mails
    */
   private String notifyMails;
 
   /**
    * 数据库映射列表
-   * DTO需要字段
    */
   private List<String> notifyMailList;
 
   /**
    * 工作流责任人名称
-   * DTO需要字段
    */
   private String owner;
 
@@ -211,6 +172,7 @@ public class ExecutionFlow {
     if (startTime != null && endTime != null) {
       return Math.toIntExact((endTime.getTime() - startTime.getTime()) / 1000);
     }
+
     return null;
   }
 
@@ -218,21 +180,11 @@ public class ExecutionFlow {
     this.duration = duration;
   }
 
-  public ExecType getExecType() {
-    return execType;
-  }
-
-  public void setExecType(ExecType execType) {
-    this.type = execType;
-    this.execType = execType;
-  }
-
   public String getWorkflowName() {
     return workflowName;
   }
 
   public void setWorkflowName(String workflowName) {
-    this.flowName = workflowName;
     this.workflowName = workflowName;
   }
 
@@ -241,7 +193,6 @@ public class ExecutionFlow {
   }
 
   public void setId(Integer id) {
-    this.execId = id;
     this.id = id;
   }
 
@@ -251,23 +202,6 @@ public class ExecutionFlow {
 
   public void setFlowId(int flowId) {
     this.flowId = flowId;
-  }
-
-  public String getFlowName() {
-    return flowName;
-  }
-
-  public void setFlowName(String flowName) {
-    this.workflowName = flowName;
-    this.flowName = flowName;
-  }
-
-  public int getConsume() {
-    return consume;
-  }
-
-  public void setConsume(int consume) {
-    this.consume = consume;
   }
 
   public String getWorker() {
@@ -343,7 +277,6 @@ public class ExecutionFlow {
   }
 
   public void setType(ExecType type) {
-    this.execType = type;
     this.type = type;
   }
 
@@ -441,10 +374,6 @@ public class ExecutionFlow {
     this.owner = owner;
   }
 
-  public Integer getExecId() {
-    return execId;
-  }
-
   public String getExtras() {
     return extras;
   }
@@ -453,22 +382,18 @@ public class ExecutionFlow {
     this.extras = extras;
   }
 
-  public void setExecId(Integer execId) {
-    this.id = execId;
-    this.execId = execId;
-  }
-
   public void setUserDefinedParamMap(Map<String, String> userDefinedParamMap) {
     this.userDefinedParamMap = userDefinedParamMap;
   }
 
   public Map<String, String> getUserDefinedParamMap() {
     List<Property> propList;
+
     if (userDefinedParamMap == null && StringUtils.isNotEmpty(userDefinedParams)) {
       propList = JsonUtil.parseObjectList(userDefinedParams, Property.class);
       userDefinedParamMap = propList.stream().collect(Collectors.toMap(Property::getProp, Property::getValue));
     }
+
     return userDefinedParamMap;
   }
-
 }

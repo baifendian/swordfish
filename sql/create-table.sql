@@ -169,7 +169,7 @@ CREATE TABLE `execution_flows` (
   `schedule_time` datetime DEFAULT NULL COMMENT 'real schedule time of this exec',
   `start_time` datetime NOT NULL COMMENT 'real start time of this exec',
   `end_time` datetime DEFAULT NULL COMMENT 'end time of this exec',
-  `workflow_data` text NOT NULL COMMENT 'short desc of the workflow, contain keys: edges, nodes, extras; [{edges: [{"startNode": "xxx", "startNode": "xxx"}, ...], nodes: [{"name": "shelljob1", "desc":"shell", "type":"VIRTUAL", "param": {"script": "echo shelljob1"}, dep: [], "extras": {...}}, ...]',
+  `workflow_data` text NOT NULL COMMENT 'short desc of the workflow, contain keys: edges, nodes, extras; [{edges: [{"startNode": "xxx", "endNode": "xxx"}, ...], nodes: [{"name": "shelljob1", "desc":"shell", "type":"VIRTUAL", "param": {"script": "echo shelljob1"}, dep: [], "extras": {...}}, ...]',
   `user_defined_params` text DEFAULT NULL COMMENT 'user defined parameter of the flows.',
   `type` tinyint(4) NOT NULL COMMENT 'exec ways, schedule, add data or run ad-hoc.',
   `max_try_times` tinyint(4) DEFAULT NULL COMMENT 'max try times of the exec',

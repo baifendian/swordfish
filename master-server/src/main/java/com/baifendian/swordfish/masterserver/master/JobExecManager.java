@@ -76,14 +76,14 @@ public class JobExecManager {
   /**
    * 具备定时调度运行的 executor service
    */
-  private ScheduledExecutorService executorService;
+  private ScheduledExecutorService executorCheckService;
 
   public JobExecManager() {
     flowDao = DaoFactory.getDaoInstance(FlowDao.class);
 
     executorServerManager = new ExecutorServerManager();
-    executorService = Executors.newScheduledThreadPool(5);
     executionFlowQueue = new LinkedBlockingQueue<>(MasterConfig.executionFlowQueueSize);
+    executorCheckService = Executors.newScheduledThreadPool(5);
   }
 
   /**
@@ -100,9 +100,11 @@ public class JobExecManager {
     retryToWorkerThread.setDaemon(true);
     retryToWorkerThread.start();
 
+    // 检测 executor 的线程
     executorCheckThread = new ExecutorCheckThread(executorServerManager, MasterConfig.heartBeatTimeoutInterval,
         executionFlowQueue, flowDao);
-    executorService.scheduleAtFixedRate(executorCheckThread, 10, MasterConfig.heartBeatCheckInterval, TimeUnit.SECONDS);
+    // 固定执行 executor 的检测
+    executorCheckService.scheduleAtFixedRate(executorCheckThread, 10, MasterConfig.heartBeatCheckInterval, TimeUnit.SECONDS);
 
     recoveryExecFlow();
   }
@@ -111,8 +113,15 @@ public class JobExecManager {
    * 停止 executor 的执行
    */
   public void stop() {
-    if (!executorService.isShutdown()) {
-      executorService.shutdownNow();
+    if (!executorCheckService.isShutdown()) {
+      executorCheckService.shutdownNow();
+    }
+
+    retryToWorkerThread.disable();
+    try {
+      retryToWorkerThread.join();
+    } catch (InterruptedException e) {
+      logger.error("join thread exception", e);
     }
 
     flowExecManager.destroy();
@@ -124,11 +133,13 @@ public class JobExecManager {
   private void recoveryExecFlow() {
     List<ExecutionFlow> executionFlowList = flowDao.queryAllNoFinishFlow();
     Map<String, ExecutorServerInfo> executorServerInfoMap = new HashMap<>();
+
     if (executionFlowList != null) {
       for (ExecutionFlow executionFlow : executionFlowList) {
         String worker = executionFlow.getWorker();
         if (worker != null && worker.contains(":")) {
-          logger.info("recovery execId:{} executor server:{}", executionFlow.getId(), executionFlow.getWorker());
+          logger.info("recovery execId:{}, executor server:{}", executionFlow.getId(), executionFlow.getWorker());
+
           String[] workerInfo = worker.split(":");
           if (executorServerInfoMap.containsKey(worker)) {
             executorServerInfoMap.get(worker).getHeartBeatData().getExecIds().add(executionFlow.getId());
@@ -136,11 +147,13 @@ public class JobExecManager {
             ExecutorServerInfo executorServerInfo = new ExecutorServerInfo();
             executorServerInfo.setHost(workerInfo[0]);
             executorServerInfo.setPort(Integer.parseInt(workerInfo[1]));
+
             HeartBeatData heartBeatData = new HeartBeatData();
             heartBeatData.setReportDate(System.currentTimeMillis());
             heartBeatData.setExecIds(new ArrayList<>());
             heartBeatData.getExecIds().add(executionFlow.getId());
             executorServerInfo.setHeartBeatData(heartBeatData);
+
             executorServerInfoMap.put(worker, executorServerInfo);
           }
         } else {
@@ -154,11 +167,13 @@ public class JobExecManager {
         }
       }
 
-      executorServerManager.initServers(executorServerInfoMap);
+      executorServerManager.initServers(executorServerInfoMap.values());
     }
   }
 
   /**
+   * 添加执行的工作流
+   *
    * @param execFlowInfo
    */
   public void addExecFlow(ExecFlowInfo execFlowInfo) {
@@ -206,8 +221,6 @@ public class JobExecManager {
   public void registerExecutor(String host, int port, long registerTime) {
     logger.info("register executor server[{}:{}]", host, port);
 
-    String key = String.format("%s:%d", host, port);
-
     // 时钟差异检查
     long nowTime = System.currentTimeMillis();
     if (registerTime > nowTime + 10000) {
@@ -217,11 +230,12 @@ public class JobExecManager {
     ExecutorServerInfo executorServerInfo = new ExecutorServerInfo();
     executorServerInfo.setHost(host);
     executorServerInfo.setPort(port);
+
     HeartBeatData heartBeatData = new HeartBeatData();
     heartBeatData.setReportDate(registerTime);
     executorServerInfo.setHeartBeatData(heartBeatData);
 
-    executorServerManager.addServer(key, executorServerInfo);
+    executorServerManager.addServer(executorServerInfo);
   }
 
   /**
@@ -234,14 +248,12 @@ public class JobExecManager {
   public void executorReport(String host, int port, HeartBeatData heartBeatData) {
     logger.debug("executor server[{}:{}] report info {}", host, port, heartBeatData);
 
-    String key = String.format("%s:%d", host, port);
-
     ExecutorServerInfo executorServerInfo = new ExecutorServerInfo();
     executorServerInfo.setHost(host);
     executorServerInfo.setPort(port);
     executorServerInfo.setHeartBeatData(heartBeatData);
 
-    executorServerManager.updateServer(key, executorServerInfo);
+    executorServerManager.updateServer(executorServerInfo);
   }
 
   /**

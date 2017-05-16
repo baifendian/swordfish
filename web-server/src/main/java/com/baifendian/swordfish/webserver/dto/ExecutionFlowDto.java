@@ -35,48 +35,60 @@ import java.util.Date;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ExecutionFlowDto {
   private int execId;
+
   private String projectName;
+
   private String workflowName;
+
   private ExecType execType;
+
   private Date submitTime;
+
   private Date startTime;
+
   private Date endTime;
+
   private int duration;
+
   private String submitUser;
+
   private String proxyUser;
+
   private String queue;
+
   @JsonSerialize(using = JsonOrdinalSerializer.class)
   private FlowStatus status;
+
   private String owner;
+
   @JsonRawValue
   @JsonDeserialize(using = JsonObjectDeserializer.class)
   private String extras;
-  private ExecutionFlowData data;
 
+  private ExecutionFlowData data;
 
   public ExecutionFlowDto() {
   }
 
   public ExecutionFlowDto(ExecutionFlow executionFlow) {
-    if (executionFlow != null){
+    if (executionFlow != null) {
       this.execId = executionFlow.getId();
       this.projectName = executionFlow.getProjectName();
       this.workflowName = executionFlow.getWorkflowName();
-      this.execType = executionFlow.getExecType();
+      this.execType = executionFlow.getType();
       this.submitTime = executionFlow.getSubmitTime();
       this.startTime = executionFlow.getStartTime();
       this.endTime = executionFlow.getEndTime();
-      if (this.startTime != null && this.endTime != null) {
-        this.duration = Math.toIntExact((this.endTime.getTime() - this.startTime.getTime()) / 1000);
-      }
+      this.duration = executionFlow.getDuration();
       this.submitUser = executionFlow.getSubmitUser();
       this.proxyUser = executionFlow.getProxyUser();
       this.queue = executionFlow.getQueue();
       this.status = executionFlow.getStatus();
       this.owner = executionFlow.getOwner();
       this.extras = executionFlow.getExtras();
-      if (StringUtils.isNotEmpty(executionFlow.getWorkflowData())){
-        this.data = JsonUtil.parseObject(executionFlow.getWorkflowData(),ExecutionFlowData.class);
+
+      if (StringUtils.isNotEmpty(executionFlow.getWorkflowData())) {
+        this.data = JsonUtil.parseObject(executionFlow.getWorkflowData(), ExecutionFlowData.class);
       }
     }
   }

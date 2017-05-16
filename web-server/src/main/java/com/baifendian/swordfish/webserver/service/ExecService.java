@@ -103,6 +103,7 @@ public class ExecService {
       throw new PermissionException("User \"{0}\" is not has project \"{1}\" exec permission", operator.getName(), projectName);
     }
 
+    // 查询项目下的工作流信息
     ProjectFlow projectFlow = flowDao.projectFlowfindByName(project.getId(), workflowName);
 
     if (projectFlow == null) {
@@ -117,8 +118,11 @@ public class ExecService {
       throw new ServerErrorException("Master server does not exist.");
     }
 
-    // 连接 execServer
+    // 连接 executor server
     MasterClient masterClient = new MasterClient(masterServer.getHost(), masterServer.getPort());
+
+    // 获取当前时间
+    long now = new Date().getTime();
 
     try {
       logger.info("Call master client exec workflow , project id: {}, flow id: {}, host: {}, port: {}", project.getId(), projectFlow.getId(), masterServer.getHost(), masterServer.getPort());
@@ -136,7 +140,7 @@ public class ExecService {
           }
 
           ExecInfo execInfo = new ExecInfo(nodeName, nodeDep != null ? nodeDep.ordinal() : 0, notifyType != null ? notifyType.ordinal() : 0, notifyMailList, timeout);
-          RetResultInfo retInfo = masterClient.execFlow(project.getId(), projectFlow.getId(), new Date().getTime(), execInfo);
+          RetResultInfo retInfo = masterClient.execFlow(project.getId(), projectFlow.getId(), now, execInfo);
 
           if (retInfo == null || retInfo.getRetInfo().getStatus() != 0) {
             logger.error("Call master client exec workflow false , project id: {}, flow id: {},host: {}, port: {}", project.getId(), projectFlow.getId(), masterServer.getHost(), masterServer.getPort());
@@ -385,7 +389,7 @@ public class ExecService {
 
     MasterClient masterClient = new MasterClient(masterServer.getHost(), masterServer.getPort());
     try {
-      logger.info("Call master client kill workflow , project id: {}, flow id: {},host: {}, port: {}", project.getId(), executionFlow.getFlowName(), masterServer.getHost(), masterServer.getPort());
+      logger.info("Call master client kill workflow , project id: {}, flow id: {},host: {}, port: {}", project.getId(), executionFlow.getWorkflowName(), masterServer.getHost(), masterServer.getPort());
       if (!masterClient.cancelExecFlow(execId)) {
         logger.error("Call master client kill workflow false , project id: {}, exec flow id: {},host: {}, port: {}", project.getId(), execId, masterServer.getHost(), masterServer.getPort());
         throw new ServerErrorException("Call master client kill workflow false , project id: \"{0}\", exec flow id: \"{1}\",host: \"{2}\", port: \"{3}\"", project.getId(), execId, masterServer.getHost(), masterServer.getPort());
