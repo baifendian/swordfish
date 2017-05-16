@@ -423,4 +423,15 @@ public class FlowDao extends BaseDao {
 
     return projectFlowList;
   }
+
+  /**
+   * 获取参照时间的前一个调度结果
+   *
+   * @param date
+   * @return
+   */
+  public ExecutionFlow executionFlowPreDate(int flowId, Date date) {
+    return executionFlowMapper.selectPreDate(flowId,date);
+  }
+
 }

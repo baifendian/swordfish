@@ -13,15 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.baifendian.swordfish.dao.enums;
+package com.baifendian.swordfish.masterserver.utils.crontab;
+
+import com.baifendian.swordfish.dao.enums.ScheduleType;
+import com.cronutils.model.Cron;
 
 /**
- * 调度的类型 <p>
+ * 秒周期工具类
  */
-public enum ScheduleType {
-  /**
-   * 0 分钟 ， 1 小时 ，2 天， 3 周， 4 月 5 年
-   */
-  MINUTE, HOUR, DAY, WEEK, MONTH, YEAR;
+public class SecHelper extends CycleHelper {
 
+  public SecHelper(Cron cron) {
+    super(cron);
+  }
+
+  @Override
+  protected ScheduleType getCycle() {
+    //TODO 先忽略秒周期
+    return null;
+  }
 }

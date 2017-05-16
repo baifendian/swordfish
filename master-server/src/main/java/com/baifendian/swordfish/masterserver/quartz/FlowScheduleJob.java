@@ -27,15 +27,17 @@ import com.baifendian.swordfish.dao.model.Schedule;
 import com.baifendian.swordfish.dao.model.flow.DepWorkflow;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
 import com.baifendian.swordfish.masterserver.master.ExecFlowInfo;
+import com.baifendian.swordfish.masterserver.utils.crontab.CrontabUtil;
+import com.cronutils.model.Cron;
+import com.cronutils.model.time.ExecutionTime;
 import org.apache.commons.collections.CollectionUtils;
-import org.quartz.Job;
-import org.quartz.JobDataMap;
-import org.quartz.JobExecutionContext;
-import org.quartz.JobExecutionException;
+import org.quartz.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.text.ParseException;
 import java.util.*;
+import java.util.Calendar;
 import java.util.concurrent.BlockingQueue;
 
 /**
@@ -148,7 +150,7 @@ public class FlowScheduleJob implements Job {
 
     try {
       executionFlow = flowDao.scheduleFlowToExecution(projectId, flowId, flow.getOwnerId(), scheduledFireTime,
-          ExecType.SCHEDULER, schedule.getMaxTryTimes(), null, null, schedule.getNotifyType(), schedule.getNotifyMails(), schedule.getTimeout());
+              ExecType.SCHEDULER, schedule.getMaxTryTimes(), null, null, schedule.getNotifyType(), schedule.getNotifyMails(), schedule.getTimeout());
     } catch (Exception e) {
       throw new JobExecutionException(e);
     }
@@ -312,20 +314,77 @@ public class FlowScheduleJob implements Job {
       int depFlowId = depWorkflow.getWorkflowId();
       Schedule depSchedule = flowDao.querySchedule(depFlowId);
       if (depSchedule != null) {
+
+        //识别周期
+        ScheduleType cycle = CrontabUtil.getCycle(schedule.getCrontab());
+        ScheduleType depCycle = CrontabUtil.getCycle(depSchedule.getCrontab());
+
+        //如果不能识别出周期，那么就直接取前依赖
+        if (cycle == null || depCycle == null) {
+          return !checkDepWorkflowStatus(scheduledFireTime, depFlowId, timeout);
+
+        }
+
         Map.Entry<Date, Date> cycleDate;
-        /*if (depSchedule.getScheduleType().ordinal() > schedule.getScheduleType().ordinal()) {
-          cycleDate = calcCycleDate(scheduledFireTime, depSchedule.getScheduleType());
+        if (cycle.ordinal() > depCycle.ordinal()) {
+          cycleDate = CrontabUtil.getPreCycleDate(scheduledFireTime, depCycle);
         } else {
-          cycleDate = calcCycleDate(scheduledFireTime, schedule.getScheduleType());
+          cycleDate = CrontabUtil.getPreCycleDate(scheduledFireTime, cycle);
         }
 
         // 检测依赖的最新状态
         if (!checkDepWorkflowStatus(scheduledFireTime, depFlowId, cycleDate, startTime, timeout)) {
           return false;
-        }*/
+        }
       }
     }
     return true;
+  }
+
+  /**
+   * 检测非匹配周期模式的依赖workflow是否完成
+   *
+   * @return
+   */
+  private boolean checkDepWorkflowStatus(Date scheduledFireTime, int depFlowId, int timeout) {
+    ExecutionFlow executionFlow = flowDao.executionFlowPreDate(depFlowId, scheduledFireTime);
+
+    while (true) {
+      boolean isNotFinshed = false;
+
+      if (executionFlow == null) {
+        return false;
+      }
+
+      FlowStatus flowStatus = executionFlow.getStatus();
+      if (flowStatus != null && flowStatus.typeIsSuccess()) {
+        return true; // 已经执行成功
+      } else if (flowStatus == null || !flowStatus.typeIsFinished()) {
+        isNotFinshed = true;
+      }
+
+      if (isNotFinshed) {
+
+        //获取基准事件，如果有submit时间就取submit 如果还没有submit就取 正常调度时间
+        Date startTime = executionFlow.getSubmitTime() != null ? executionFlow.getSubmitTime() : executionFlow.getScheduleTime();
+        if (checkTimeout(executionFlow.getSubmitTime().getTime(), timeout)) {
+          logger.error("等待依赖的 workflow 任务超时");
+          return false; // 也认为是执行失败
+        }
+
+        try {
+          Thread.sleep(checkInterval);
+        } catch (InterruptedException e) {
+          logger.error(e.getMessage(), e);
+          return false; // 也认为是执行失败
+        }
+
+        //重新获取 executionFlow
+        executionFlow = flowDao.queryExecutionFlow(executionFlow.getId());
+      } else {
+        return false;
+      }
+    }
   }
 
   /**
@@ -343,7 +402,7 @@ public class FlowScheduleJob implements Job {
     while (true) {
       boolean isFind = false;
       boolean isNotFinshed = false;
-
+      //TODO 这里可以使用crontab分析出执行的时间点，应该改用crontab分析出的时间点，这样更准确。
       // 看当前周期（月、周、天 等）最开始的任务是不是成功的
       List<ExecutionFlow> executionFlows = flowDao.queryFlowLastStatus(depFlowId, cycleDate.getValue(), scheduledFireTime);
       if (CollectionUtils.isNotEmpty(executionFlows)) {
@@ -395,71 +454,6 @@ public class FlowScheduleJob implements Job {
 
       return false;
     }
-  }
-
-  /**
-   * 计算上一个周期的时间起始时间和结束时间（起始时间 <= 有效时间 < 结束时间） <p>
-   *
-   * @param scheduledFireTime
-   * @param scheduleType
-   * @return
-   */
-  private Map.Entry<Date, Date> calcCycleDate(Date scheduledFireTime, ScheduleType scheduleType) {
-    // 起始时间
-    Calendar scheduleStartTime = Calendar.getInstance();
-    scheduleStartTime.setTime(scheduledFireTime);
-
-    // 介绍时间
-    Calendar scheduleEndTime = Calendar.getInstance();
-    scheduleEndTime.setTime(scheduledFireTime);
-    switch (scheduleType) {
-      case MINUTE:
-        // 上一分钟 ~ 当前分钟的开始
-        scheduleStartTime.add(Calendar.MINUTE, -1);
-        scheduleEndTime.set(Calendar.SECOND, 0);
-        break;
-
-      case HOUR:
-        // 上一小时 ~ 当前小时的开始
-        scheduleStartTime.add(Calendar.HOUR_OF_DAY, -1);
-        scheduleEndTime.set(Calendar.MINUTE, 0);
-        scheduleEndTime.set(Calendar.SECOND, 0);
-        break;
-
-      case DAY:
-        // 上一天 ~ 当前天的开始
-        scheduleStartTime.add(Calendar.DAY_OF_MONTH, -1);
-        scheduleEndTime.set(Calendar.HOUR_OF_DAY, 0);
-        scheduleEndTime.set(Calendar.MINUTE, 0);
-        scheduleEndTime.set(Calendar.SECOND, 0);
-        break;
-
-      case WEEK:
-        // 上一周 ~ 当前周的开始(周一)
-        scheduleStartTime.add(Calendar.WEEK_OF_YEAR, -1);
-        scheduleEndTime.setTime(scheduleStartTime.getTime());
-        scheduleEndTime.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
-        scheduleEndTime.set(Calendar.HOUR_OF_DAY, 0);
-        scheduleEndTime.set(Calendar.MINUTE, 0);
-        scheduleEndTime.set(Calendar.SECOND, 0);
-
-        break;
-
-      case MONTH:
-        // 上一月
-        scheduleStartTime.add(Calendar.MONTH, -1);
-        scheduleEndTime.setTime(scheduleStartTime.getTime());
-        scheduleEndTime.set(Calendar.DAY_OF_MONTH, 1);
-        scheduleEndTime.set(Calendar.HOUR_OF_DAY, 0);
-        scheduleEndTime.set(Calendar.MINUTE, 0);
-        scheduleEndTime.set(Calendar.SECOND, 0);
-        break;
-
-      default:
-        break;
-    }
-
-    return new AbstractMap.SimpleImmutableEntry<Date, Date>(scheduleStartTime.getTime(), scheduleEndTime.getTime());
   }
 
   /**
