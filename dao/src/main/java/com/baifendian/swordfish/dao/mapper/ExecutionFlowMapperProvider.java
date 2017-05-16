@@ -351,4 +351,16 @@ public class ExecutionFlowMapperProvider {
       }
     }.toString()+" limit #{top}";
   }
+
+  public String selectPreDate(Map<String,Object> parameter) {
+    return new SQL(){
+      {
+        SELECT("*");
+        FROM("execution_flows");
+        WHERE("schedule_time <= #{date}");
+        WHERE("flow_id = #{flowId}");
+        ORDER_BY("schedule_time DESC");
+      }
+    }.toString()+" limit 1";
+  }
 }

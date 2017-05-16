@@ -392,6 +392,11 @@
                 <artifactId>ojdbc7</artifactId>
                 <version>12.1.0.2</version>
             </dependency>
+            <dependency>
+                <groupId>com.cronutils</groupId>
+                <artifactId>cron-utils</artifactId>
+                <version>5.0.5</version>
+            </dependency>
         </dependencies>
 
     </dependencyManagement>

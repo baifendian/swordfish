@@ -20,8 +20,8 @@ package com.baifendian.swordfish.dao.enums;
  */
 public enum ScheduleType {
   /**
-   * 0 分钟 ， 1 小时 ，2 天， 3 周， 4 月
+   * 0 分钟 ， 1 小时 ，2 天， 3 周， 4 月 5 年
    */
-  MINUTE, HOUR, DAY, WEEK, MONTH;
+  MINUTE, HOUR, DAY, WEEK, MONTH, YEAR;
 
 }
