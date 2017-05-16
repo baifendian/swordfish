@@ -61,7 +61,6 @@ public class ExecutionFlowMapperProvider {
         VALUES("timeout", "#{executionFlow.timeout}");
         VALUES("queue", "#{executionFlow.queue}");
         VALUES("extras", "#{executionFlow.extras}");
-
       }
     }.toString();
   }
@@ -149,15 +148,13 @@ public class ExecutionFlowMapperProvider {
     String resultSql = new SQL() {
       {
         SELECT("u.name as owner_name");
-        SELECT("*");
+        SELECT("t.*");
 
         FROM("(" + sql + ") t");
 
         JOIN("user u on t.owner_id = u.id");
       }
     }.toString();
-
-    logger.info("sql: {}", resultSql);
 
     return resultSql;
   }
@@ -233,6 +230,7 @@ public class ExecutionFlowMapperProvider {
         JOIN("user u on e_f.submit_user = u.id");
       }
     }.toString() + " order by schedule_time DESC limit #{start},#{limit}";
+
     return sql2;
   }
 
@@ -341,10 +339,10 @@ public class ExecutionFlowMapperProvider {
     }.toString();
   }
 
-  public String selectConsumesByProject(Map<String, Object> parameter) {
+  public String selectDurationsByProject(Map<String, Object> parameter) {
     String sql1 = new SQL() {
       {
-        SELECT("timestampdiff(SECOND,start_time,end_time) as consume");
+        SELECT("timestampdiff(SECOND,start_time,end_time) as duration");
         SELECT("p_f.name as flow_name");
         SELECT("u.name as owner_name");
         SELECT("e_f.*");
@@ -357,7 +355,7 @@ public class ExecutionFlowMapperProvider {
         WHERE("str_to_date(DATE_FORMAT(e_f.schedule_time,'%Y%m%d'),'%Y%m%d') = #{date}");
         WHERE("p_f.project_id = #{projectId}");
 
-        ORDER_BY("consume DESC");
+        ORDER_BY("duration DESC");
       }
     }.toString() + " limit #{top}";
 

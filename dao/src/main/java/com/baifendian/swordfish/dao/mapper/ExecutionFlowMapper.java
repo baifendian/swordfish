@@ -60,7 +60,7 @@ public interface ExecutionFlowMapper {
       @Result(property = "projectId", column = "project_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
       @Result(property = "projectName", column = "project_name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
       @Result(property = "status", column = "status", typeHandler = EnumOrdinalTypeHandler.class, javaType = FlowStatus.class, jdbcType = JdbcType.TINYINT),
-      @Result(property = "submitUserId", column = "submit_user_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
+      @Result(property = "submitUserId", column = "submit_user", javaType = int.class, jdbcType = JdbcType.INTEGER),
       @Result(property = "submitUser", column = "submit_user_name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
       @Result(property = "owner", column = "owner_name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
       @Result(property = "proxyUser", column = "proxy_user", javaType = String.class, jdbcType = JdbcType.VARCHAR),
@@ -251,11 +251,11 @@ public interface ExecutionFlowMapper {
       @Result(property = "submitUserId", column = "schedule_user", javaType = int.class, jdbcType = JdbcType.INTEGER),
       @Result(property = "submitUser", column = "submit_user_name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
       @Result(property = "type", column = "type", typeHandler = EnumOrdinalTypeHandler.class, jdbcType = JdbcType.TINYINT),
-      @Result(property = "consume", column = "consume", javaType = int.class, jdbcType = JdbcType.INTEGER),
       @Result(property = "proxyUser", column = "proxy_user", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+      @Result(property = "duration", column = "duration", javaType = int.class, jdbcType = JdbcType.INTEGER)
   })
-  @SelectProvider(type = ExecutionFlowMapperProvider.class, method = "selectConsumesByProject")
-  List<ExecutionFlow> selectConsumesByProject(@Param("projectId") int projectId, @Param("top") int top, @Param("date") Date date);
+  @SelectProvider(type = ExecutionFlowMapperProvider.class, method = "selectDurationsByProject")
+  List<ExecutionFlow> selectDurationsByProject(@Param("projectId") int projectId, @Param("top") int top, @Param("date") Date date);
 
   /**
    * 统计某天的工作流异常数TOP

@@ -146,7 +146,7 @@ public class StatService {
       throw new PermissionException("User \"{0}\" is not has project \"{1}\" exec permission", operator.getName(), projectName);
     }
 
-    return executionFlowMapper.selectConsumesByProject(project.getId(),num,datetime);
+    return executionFlowMapper.selectDurationsByProject(project.getId(),num,datetime);
   }
 
   /**

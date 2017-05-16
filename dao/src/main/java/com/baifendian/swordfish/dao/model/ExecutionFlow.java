@@ -169,11 +169,15 @@ public class ExecutionFlow {
   private String queue;
 
   public Integer getDuration() {
-    if (startTime != null && endTime != null) {
-      return Math.toIntExact((endTime.getTime() - startTime.getTime()) / 1000);
+    if (duration != null) {
+      return duration;
     }
 
-    return null;
+    if (startTime != null && endTime != null) {
+      duration = Math.toIntExact((endTime.getTime() - startTime.getTime()) / 1000);
+    }
+
+    return duration;
   }
 
   public void setDuration(Integer duration) {
