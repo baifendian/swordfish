@@ -22,6 +22,8 @@ import com.baifendian.swordfish.dao.mapper.utils.EnumFieldUtil;
 import com.baifendian.swordfish.dao.model.ExecutionFlow;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.ibatis.jdbc.SQL;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,7 +31,9 @@ import java.util.Map;
 
 public class ExecutionFlowMapperProvider {
 
-  public static final String TABLE_NAME = "execution_flows";
+  private static Logger logger = LoggerFactory.getLogger(ExecutionFlowMapperProvider.class);
+
+  private static final String TABLE_NAME = "execution_flows";
 
   public ExecutionFlowMapperProvider() {
   }
@@ -137,11 +141,12 @@ public class ExecutionFlowMapperProvider {
         INNER_JOIN("project_flows b on a.flow_id = b.id");
         INNER_JOIN("project c on b.project_id = c.id");
         INNER_JOIN("user u on a.submit_user = u.id");
+
         WHERE("a.id = #{execId}");
       }
     }.toString();
 
-    return new SQL() {
+    String resultSql = new SQL() {
       {
         SELECT("u.name as owner_name");
         SELECT("*");
@@ -151,6 +156,10 @@ public class ExecutionFlowMapperProvider {
         JOIN("user u on t.owner_id = u.id");
       }
     }.toString();
+
+    logger.info("sql: {}", resultSql);
+
+    return resultSql;
   }
 
   public String selectByFlowIdAndTimes(Map<String, Object> parameter) {

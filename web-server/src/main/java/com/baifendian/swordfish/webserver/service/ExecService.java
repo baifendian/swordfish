@@ -125,7 +125,7 @@ public class ExecService {
     long now = new Date().getTime();
 
     try {
-      logger.info("Call master client exec workflow , project id: {}, flow id: {}, host: {}, port: {}", project.getId(), projectFlow.getId(), masterServer.getHost(), masterServer.getPort());
+      logger.info("Call master client exec workflow, project id: {}, flow id: {}, host: {}, port: {}", project.getId(), projectFlow.getId(), masterServer.getHost(), masterServer.getPort());
 
       switch (execType) {
         case DIRECT: {

@@ -39,9 +39,6 @@ import java.util.Date;
  */
 public class ExecServiceImpl implements Iface {
 
-  /**
-   * LOGGER
-   */
   private static Logger logger = LoggerFactory.getLogger(ExecServiceImpl.class);
 
   /**
