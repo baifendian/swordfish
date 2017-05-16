@@ -121,7 +121,7 @@ public class ProjectService {
 
     // 需要是项目的 owner
     if (operator.getId() != project.getOwnerId()) {
-      throw new PermissionException("Only PROJECT owner can modify the PROJECT");
+      throw new PermissionException("Only project owner can modify the project");
     }
 
     Date now = new Date();
@@ -157,7 +157,7 @@ public class ProjectService {
 
     // 只有 管理员或 owner 能够删除
     if (operator.getRole() != UserRoleType.ADMIN_USER && operator.getId() != project.getOwnerId()) {
-      throw new PermissionException("User \"{0}\" has no right permission for the PROJECT \"{1}\"", operator.getName(), name);
+      throw new PermissionException("User \"{0}\" has no right permission for the project \"{1}\"", operator.getName(), name);
     }
 
     // 需要判断项目下, 是否有 "工作流/资源/数据源" 存在
@@ -165,7 +165,7 @@ public class ProjectService {
 
     count = projectFlowMapper.countProjectFlows(project.getId());
     if (count > 0) {
-      throw new NotModifiedException("Project's WORKFLOW is not empty");
+      throw new NotModifiedException("Project's workflow is not empty");
     }
 
     count = resourceMapper.countProjectRes(project.getId());
@@ -227,7 +227,7 @@ public class ProjectService {
 
     // 操作用户不是项目的 owner
     if (operator.getId() != project.getOwnerId()) {
-      throw new PermissionException("User \"{0}\" has no right permission for the PROJECT \"{1}\"", operator.getName(), name);
+      throw new PermissionException("User \"{0}\" has no right permission for the project \"{1}\"", operator.getName(), name);
     }
 
     // 查询用户
@@ -285,7 +285,7 @@ public class ProjectService {
 
     // 操作用户不是项目的 owner
     if (operator.getId() != project.getOwnerId()) {
-      throw new PermissionException("Operator must be the PROJECT owner");
+      throw new PermissionException("Operator must be the project owner");
     }
 
     // 查询用户
@@ -337,7 +337,7 @@ public class ProjectService {
 
     // 操作用户不是项目的 owner
     if (operator.getId() != project.getOwnerId()) {
-      throw new PermissionException("Project is not the owner of PROJECT");
+      throw new PermissionException("Project is not the owner of project");
     }
 
     User user = userMapper.queryByName(userName);
@@ -379,7 +379,7 @@ public class ProjectService {
 
     // 操作用户不是项目的 owner
     if (operator.getId() != project.getOwnerId()) {
-      throw new PermissionException("Operator is not the PROJECT owner");
+      throw new PermissionException("Operator is not the project owner");
     }
 
     return projectUserMapper.queryByProject(project.getId());

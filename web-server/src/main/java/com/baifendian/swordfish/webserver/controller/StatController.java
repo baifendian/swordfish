@@ -55,7 +55,7 @@ public class StatController {
                                    @RequestParam(value = "projectName") String projectName,
                                    @RequestParam(value = "startTime") long startTime,
                                    @RequestParam(value = "endTime") long endTime) {
-    logger.info("Operator user {}, get states, PROJECT name: {}, start time: {}, end time: {}",
+    logger.info("Operator user {}, get states, project name: {}, start time: {}, end time: {}",
         operator.getName(), projectName, startTime, endTime);
 
     // 检测时间跨度是否合法
@@ -81,7 +81,7 @@ public class StatController {
   public List<StatDto> queryStatesHour(@RequestAttribute(value = "session.user") User operator,
                                        @RequestParam(value = "projectName") String projectName,
                                        @RequestParam(value = "date") long date) {
-    logger.info("Operator user {}, get states, PROJECT name: {}, date: {}",
+    logger.info("Operator user {}, get states, project name: {}, date: {}",
         operator.getName(), projectName, date);
 
     return statService.queryStatesHour(operator, projectName, date);
@@ -100,7 +100,7 @@ public class StatController {
                                                  @RequestParam(value = "projectName") String projectName,
                                                  @RequestParam(value = "date") long date,
                                                  @RequestParam(value = "num") int num) {
-    logger.info("Operator user {}, get top consumers of WORKFLOW,  PROJECT name: {}, date: {}, num: {}",
+    logger.info("Operator user {}, get top consumers of workflow,  project name: {}, date: {}, num: {}",
         operator.getName(), projectName, date, num);
 
     // 校验返回数目
@@ -132,7 +132,7 @@ public class StatController {
                                                  @RequestParam(value = "projectName") String projectName,
                                                  @RequestParam(value = "date") long date,
                                                  @RequestParam(value = "num") int num) {
-    logger.info("Operator user {}, get top errors of WORKFLOW, PROJECT name: {}, date: {}, num: {}",
+    logger.info("Operator user {}, get top errors of workflow, project name: {}, date: {}, num: {}",
         operator.getName(), projectName, date, num);
 
     // 校验返回数目

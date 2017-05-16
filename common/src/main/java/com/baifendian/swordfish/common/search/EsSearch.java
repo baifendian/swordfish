@@ -146,7 +146,7 @@ public class EsSearch {
         .setTimeout(TimeValue.timeValueMillis(esMaxRetryTimeoutMillis))
         .setFrom(from)
         .setSize(size)
-        .addSort("nanoTime", SortOrder.DESC)
+        .addSort("nanoTime", SortOrder.ASC)
         .setExplain(true)
         .get();
 

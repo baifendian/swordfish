@@ -136,7 +136,7 @@ public class HiveSqlExec {
           }
         }
       } catch (Exception e) {
-        logger.error("execute Querys exception", e);
+        logger.error("execute query exception", e);
 
         // 这里就失败了, 会记录下错误记录, 然后返回
         handlerResults(0, sqls, FlowStatus.FAILED);
@@ -150,7 +150,7 @@ public class HiveSqlExec {
 
         Date startTime = new Date();
 
-        logger.info("hive execute sql : {}", sql);
+        logger.info("hive execute sql: {}", sql);
 
         ExecResult execResult = new ExecResult();
         execResult.setIndex(index);

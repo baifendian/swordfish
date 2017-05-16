@@ -57,7 +57,7 @@ public class ResourceController {
                                     @PathVariable String name,
                                     @RequestParam(value = "desc", required = false) String desc,
                                     @RequestParam("file") MultipartFile file) {
-    logger.info("Operator user {}, create resource, PROJECT name: {}, resource name: {}, desc: {}, file: [{},{}]",
+    logger.info("Operator user {}, create resource, project name: {}, resource name: {}, desc: {}, file: [{},{}]",
         operator.getName(), projectName, name, desc, file.getName(), file.getOriginalFilename());
 
     return new ResourceDto(resourceService.createResource(operator, projectName, name, desc, file));
@@ -79,7 +79,7 @@ public class ResourceController {
                                  @PathVariable String name,
                                  @RequestParam(value = "desc", required = false) String desc,
                                  @RequestParam("file") MultipartFile file) {
-    logger.info("Operator user {}, put resource, PROJECT name: {}, resource name: {}, desc: {}, file: [{},{}]",
+    logger.info("Operator user {}, put resource, project name: {}, resource name: {}, desc: {}, file: [{},{}]",
         operator.getName(), projectName, name, desc, file.getName(), file.getOriginalFilename());
 
     return new ResourceDto(resourceService.putResource(operator, projectName, name, desc, file));
@@ -100,7 +100,7 @@ public class ResourceController {
                                     @PathVariable String name,
                                     @RequestParam(value = "desc", required = false) String desc,
                                     @RequestParam(value = "file", required = false) MultipartFile file) {
-    logger.info("Operator user {}, modify resource, PROJECT name: {}, resource name: {}, desc: {}, file: [{},{}]",
+    logger.info("Operator user {}, modify resource, project name: {}, resource name: {}, desc: {}, file: [{},{}]",
         operator.getName(), projectName, name, desc, (file == null) ? null : file.getName(), (file == null) ? null : file.getOriginalFilename());
 
     return new ResourceDto(resourceService.modifyResource(operator, projectName, name, desc, file));
@@ -117,7 +117,7 @@ public class ResourceController {
   public void deleteResource(@RequestAttribute(value = "session.user") User operator,
                              @PathVariable String projectName,
                              @PathVariable String name) {
-    logger.info("Operator user {}, delete resource, PROJECT name: {}, resource name: {}",
+    logger.info("Operator user {}, delete resource, project name: {}, resource name: {}",
         operator.getName(), projectName, name);
 
     resourceService.deleteResource(operator, projectName, name);
@@ -132,7 +132,7 @@ public class ResourceController {
   @GetMapping(value = "")
   public List<ResourceDto> getResources(@RequestAttribute(value = "session.user") User operator,
                                         @PathVariable String projectName) {
-    logger.info("Operator user {}, get resource list of PROJECT, PROJECT name: {}",
+    logger.info("Operator user {}, get resource list of project, project name: {}",
         operator.getName(), projectName);
 
     List<Resource> resourceList = resourceService.getResources(operator, projectName);
@@ -154,7 +154,7 @@ public class ResourceController {
   public ResourceDto getResource(@RequestAttribute(value = "session.user") User operator,
                                  @PathVariable String projectName,
                                  @PathVariable String name) {
-    logger.info("Operator user {}, get resource detail, PROJECT name: {}, resource name: {}",
+    logger.info("Operator user {}, get resource detail, project name: {}, resource name: {}",
         operator.getName(), projectName, name);
 
     return new ResourceDto(resourceService.getResource(operator, projectName, name));
@@ -172,7 +172,7 @@ public class ResourceController {
   public ResponseEntity<org.springframework.core.io.Resource> downloadResource(@RequestAttribute(value = "session.user") User operator,
                                                                                @PathVariable String projectName,
                                                                                @PathVariable String name) {
-    logger.info("Operator user {}, download resource, PROJECT name: {}, resource name: {}",
+    logger.info("Operator user {}, download resource, project name: {}, resource name: {}",
         operator.getName(), projectName, name);
 
     org.springframework.core.io.Resource file = resourceService.downloadResource(operator, projectName, name);

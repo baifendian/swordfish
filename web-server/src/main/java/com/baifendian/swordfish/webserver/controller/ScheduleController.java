@@ -69,7 +69,7 @@ public class ScheduleController {
                                     @RequestParam(value = "depWorkflows", required = false) String depWorkflows,
                                     @RequestParam(value = "depPolicy", required = false, defaultValue = "NO_DEP_PRE") DepPolicyType depPolicyType,
                                     @RequestParam(value = "timeout", required = false, defaultValue = "18000") int timeout) {
-    logger.info("Operator user {}, exec WORKFLOW, PROJECT name: {}, WORKFLOW name: {}, schedule: {}, notify type: {}, notify mails: {}, max try times: {}," +
+    logger.info("Operator user {}, exec workflow, project name: {}, workflow name: {}, schedule: {}, notify type: {}, notify mails: {}, max try times: {}," +
             "failure policy: {}, dep workflows: {}, dep policy: {}, timeout: {}",
         operator.getName(), projectName, workflowName, schedule, notifyType, notifyMails, maxTryTimes, failurePolicy, depWorkflows, depPolicyType, timeout);
 
@@ -89,7 +89,6 @@ public class ScheduleController {
    * @param depWorkflows
    * @param depPolicyType
    * @param timeout
-   * @param response
    * @return
    */
   @PutMapping("/{workflowName}/schedules")
@@ -104,7 +103,7 @@ public class ScheduleController {
                                              @RequestParam(value = "depWorkflows", required = false) String depWorkflows,
                                              @RequestParam(value = "depPolicy", required = false, defaultValue = "NO_DEP_PRE") DepPolicyType depPolicyType,
                                              @RequestParam(value = "timeout", required = false, defaultValue = "18000") int timeout) {
-    logger.info("Operator user {}, exec WORKFLOW, PROJECT name: {}, WORKFLOW name: {}, schedule: {}, notify type: {}, notify mails: {}, max try times: {}," +
+    logger.info("Operator user {}, exec workflow, project name: {}, workflow name: {}, schedule: {}, notify type: {}, notify mails: {}, max try times: {}," +
             "failure policy: {}, dep workflows: {}, dep policy: {}, timeout: {}",
         operator.getName(), projectName, workflowName, schedule, notifyType, notifyMails, maxTryTimes, failurePolicy, depWorkflows, depPolicyType, timeout);
 
@@ -138,7 +137,7 @@ public class ScheduleController {
                                    @RequestParam(value = "depWorkflows", required = false) String depWorkflows,
                                    @RequestParam(value = "depPolicy", required = false, defaultValue = "NO_DEP_PRE") DepPolicyType depPolicyType,
                                    @RequestParam(value = "timeout", required = false, defaultValue = "18000") int timeout) {
-    logger.info("Operator user {}, exec WORKFLOW, PROJECT name: {}, WORKFLOW name: {}, schedule: {}, notify type: {}, notify mails: {}, max try times: {}," +
+    logger.info("Operator user {}, exec workflow, project name: {}, workflow name: {}, schedule: {}, notify type: {}, notify mails: {}, max try times: {}," +
             "failure policy: {}, dep workflows: {}, dep policy: {}, timeout: {}",
         operator.getName(), projectName, workflowName, schedule, notifyType, notifyMails, maxTryTimes, failurePolicy, depWorkflows, depPolicyType, timeout);
 

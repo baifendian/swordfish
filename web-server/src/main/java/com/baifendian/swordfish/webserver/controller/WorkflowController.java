@@ -66,7 +66,7 @@ public class WorkflowController {
                                     @RequestParam(value = "data", required = false) String data,
                                     @RequestParam(value = "file", required = false) MultipartFile file,
                                     @RequestParam(value = "extras", required = false) String extras) {
-    logger.info("Operator user {}, create WORKFLOW, PROJECT name: {}, WORKFLOW name: {}, desc: {}, proxyUser: {}, queue: {}, data: {}, file: [{},{}]",
+    logger.info("Operator user {}, create workflow, project name: {}, workflow name: {}, desc: {}, proxyUser: {}, queue: {}, data: {}, file: [{},{}]",
         operator.getName(), projectName, name, desc, proxyUser, queue, data, (file == null) ? null : file.getName(), (file == null) ? null : file.getOriginalFilename());
 
     return new WorkflowDto(workflowService.createWorkflow(operator, projectName, name, desc, proxyUser, queue, data, file, extras, null));
@@ -94,7 +94,7 @@ public class WorkflowController {
                                  @RequestParam(value = "data", required = false) String data,
                                  @RequestParam(value = "file", required = false) MultipartFile file,
                                  @RequestParam(value = "extras", required = false) String extras) {
-    logger.info("Operator user {}, put WORKFLOW, PROJECT name: {}, WORKFLOW name: {}, desc: {}, proxyUser: {}, queue: {}, data: {}, file: [{},{}]",
+    logger.info("Operator user {}, put workflow, project name: {}, workflow name: {}, desc: {}, proxyUser: {}, queue: {}, data: {}, file: [{},{}]",
         operator.getName(), projectName, name, desc, proxyUser, queue, data, (file == null) ? null : file.getName(), (file == null) ? null : file.getOriginalFilename());
 
     return new WorkflowDto(workflowService.putWorkflow(operator, projectName, name, desc, proxyUser, queue, data, file, extras));
@@ -122,7 +122,7 @@ public class WorkflowController {
                                    @RequestParam(value = "data", required = false) String data,
                                    @RequestParam(value = "file", required = false) MultipartFile file,
                                    @RequestParam(value = "extras", required = false) String extras) {
-    logger.info("Operator user {}, modify WORKFLOW, PROJECT name: {}, WORKFLOW name: {}, desc: {}, proxyUser: {}, queue: {}, data: {}, file: [{},{}]",
+    logger.info("Operator user {}, modify workflow, project name: {}, workflow name: {}, desc: {}, proxyUser: {}, queue: {}, data: {}, file: [{},{}]",
         operator.getName(), projectName, name, desc, proxyUser, queue, data, (file == null) ? null : file.getName(), (file == null) ? null : file.getOriginalFilename());
 
     return new WorkflowDto(workflowService.patchWorkflow(operator, projectName, name, desc, proxyUser, queue, data, file, extras));
@@ -138,12 +138,12 @@ public class WorkflowController {
    * @param destWorkflowName
    * @return
    */
-  @PostMapping(value = "WORKFLOW-copy")
+  @PostMapping(value = "workflow-copy")
   public WorkflowDto postWorkflowCopy(@RequestAttribute(value = "session.user") User operator,
                                       @PathVariable String projectName,
                                       @RequestParam(value = "srcWorkflowName") String srcWorkflowName,
                                       @RequestParam(value = "destWorkflowName") String destWorkflowName) {
-    logger.info("Operator user {},PROJECT name: {} , source WORKFLOW: {}, dest WORKFLOW: {}", operator.getName(), projectName, srcWorkflowName, destWorkflowName);
+    logger.info("Operator user {}, project name: {} , source workflow: {}, dest workflow: {}", operator.getName(), projectName, srcWorkflowName, destWorkflowName);
 
     return new WorkflowDto(workflowService.postWorkflowCopy(operator, projectName, srcWorkflowName, destWorkflowName));
   }
@@ -159,7 +159,7 @@ public class WorkflowController {
   public void deleteWorkflow(@RequestAttribute(value = "session.user") User operator,
                              @PathVariable String projectName,
                              @PathVariable String name) {
-    logger.info("Operator user {}, delete WORKFLOW, PROJECT name: {}, WORKFLOW name: {}",
+    logger.info("Operator user {}, delete workflow, project name: {}, workflow name: {}",
         operator.getName(), projectName, name);
 
     workflowService.deleteProjectFlow(operator, projectName, name);
@@ -178,7 +178,7 @@ public class WorkflowController {
                                  @PathVariable String projectName,
                                  @RequestParam(value = "queue", required = false) String queue,
                                  @RequestParam(value = "proxyUser", required = false) String proxyUser) {
-    logger.info("Operator user {}, modify WORKFLOW conf, PROJECT name: {}, proxyUser: {}, queue: {}",
+    logger.info("Operator user {}, modify workflow conf, project name: {}, proxyUser: {}, queue: {}",
         operator.getName(), projectName, proxyUser, queue);
 
     workflowService.modifyWorkflowConf(operator, projectName, queue, proxyUser);
@@ -194,7 +194,7 @@ public class WorkflowController {
   @GetMapping(value = "")
   public List<WorkflowDto> queryWorkflow(@RequestAttribute(value = "session.user") User operator,
                                          @PathVariable String projectName) {
-    logger.info("Operator user {}, query WORKFLOW list of PROJECT, PROJECT name: {}",
+    logger.info("Operator user {}, query workflow list of project, project name: {}",
         operator.getName(), projectName);
 
     List<ProjectFlow> projectFlowList = workflowService.queryAllProjectFlow(operator, projectName);
@@ -219,7 +219,7 @@ public class WorkflowController {
   public WorkflowDto queryWorkflowDetail(@RequestAttribute(value = "session.user") User operator,
                                          @PathVariable String projectName,
                                          @PathVariable String name) {
-    logger.info("Operator user {}, query WORKFLOW detail, PROJECT name: {}, WORKFLOW name: {}",
+    logger.info("Operator user {}, query workflow detail, project name: {}, workflow name: {}",
         operator.getName(), projectName, name);
 
     return new WorkflowDto(workflowService.queryProjectFlow(operator, projectName, name));
@@ -237,7 +237,7 @@ public class WorkflowController {
   public ResponseEntity<Resource> downloadWorkflowDetail(@RequestAttribute(value = "session.user") User operator,
                                                          @PathVariable String projectName,
                                                          @PathVariable String name) {
-    logger.info("Operator user {}, download WORKFLOW, PROJECT name: {}, WORKFLOW name: {}",
+    logger.info("Operator user {}, download workflow, project name: {}, workflow name: {}",
         operator.getName(), projectName, name);
 
     org.springframework.core.io.Resource file = workflowService.downloadProjectFlowFile(operator, projectName, name);
