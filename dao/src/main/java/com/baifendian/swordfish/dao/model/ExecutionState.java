@@ -26,6 +26,7 @@ public class ExecutionState {
 
   @JsonInclude(JsonInclude.Include.NON_NULL)
   private Integer hour;
+
   @JsonInclude(JsonInclude.Include.NON_NULL)
   private Date day;
 

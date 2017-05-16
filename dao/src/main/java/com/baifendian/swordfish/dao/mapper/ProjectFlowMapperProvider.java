@@ -30,22 +30,23 @@ public class ProjectFlowMapperProvider {
   /**
    * 插入 <p>
    *
+   * @param parameter
    * @return sql 语句
    */
   public String insert(Map<String, Object> parameter) {
     return new SQL() {
       {
         INSERT_INTO(TABLE_NAME);
-        VALUES("name", "#{flow.name}");
+        VALUES("`name`", "#{flow.name}");
         VALUES("`desc`", "#{flow.desc}");
-        VALUES("project_id", "#{flow.projectId}");
-        VALUES("modify_time", "#{flow.modifyTime}");
-        VALUES("create_time", "#{flow.createTime}");
-        VALUES("owner", "#{flow.ownerId}");
-        VALUES("proxy_user", "#{flow.proxyUser}");
-        VALUES("user_defined_params", "#{flow.userDefinedParams}");
-        VALUES("extras", "#{flow.extras}");
-        VALUES("queue", "#{flow.queue}");
+        VALUES("`project_id`", "#{flow.projectId}");
+        VALUES("`modify_time`", "#{flow.modifyTime}");
+        VALUES("`create_time`", "#{flow.createTime}");
+        VALUES("`owner`", "#{flow.ownerId}");
+        VALUES("`proxy_user`", "#{flow.proxyUser}");
+        VALUES("`user_defined_params`", "#{flow.userDefinedParams}");
+        VALUES("`extras`", "#{flow.extras}");
+        VALUES("`queue`", "#{flow.queue}");
       }
     }.toString();
   }
@@ -53,12 +54,14 @@ public class ProjectFlowMapperProvider {
   /**
    * 通过 id 更新(用于重命名) <p>
    *
+   * @param parameter
    * @return sql 语句
    */
   public String updateById(Map<String, Object> parameter) {
     return new SQL() {
       {
         UPDATE(TABLE_NAME);
+
         SET("`desc`=#{flow.desc}");
         SET("modify_time=#{flow.modifyTime}");
         SET("create_time=#{flow.createTime}");
@@ -67,12 +70,19 @@ public class ProjectFlowMapperProvider {
         SET("user_defined_params=#{flow.userDefinedParams}");
         SET("extras=#{flow.extras}");
         SET("queue=#{flow.queue}");
+
         WHERE("id = #{flow.id}");
         WHERE("flag is null");
       }
     }.toString();
   }
 
+  /**
+   * 查询工作流信息
+   *
+   * @param parameter
+   * @return
+   */
   public String queryByName(Map<String, Object> parameter) {
     return new SQL() {
       {
@@ -88,6 +98,12 @@ public class ProjectFlowMapperProvider {
     }.toString();
   }
 
+  /**
+   * 查询工作流信息
+   *
+   * @param parameter
+   * @return
+   */
   public String queryById(Map<String, Object> parameter) {
     return new SQL() {
       {
@@ -102,6 +118,12 @@ public class ProjectFlowMapperProvider {
     }.toString();
   }
 
+  /**
+   * 查询工作流信息
+   *
+   * @param parameter
+   * @return
+   */
   public String findByProjectNameAndName(Map<String, Object> parameter) {
     return new SQL() {
       {
@@ -117,6 +139,12 @@ public class ProjectFlowMapperProvider {
     }.toString();
   }
 
+  /**
+   * 查询工作流信息
+   *
+   * @param parameter
+   * @return
+   */
   public String findByProject(Map<String, Object> parameter) {
     return new SQL() {
       {
@@ -130,6 +158,7 @@ public class ProjectFlowMapperProvider {
   /**
    * 删除某个workflow <p>
    *
+   * @param parameter
    * @return sql 语句
    */
   public String deleteById(Map<String, Object> parameter) {
@@ -141,6 +170,12 @@ public class ProjectFlowMapperProvider {
     }.toString();
   }
 
+  /**
+   * 查询工作流的 owner 信息
+   *
+   * @param parameter
+   * @return
+   */
   public String queryFlowOwner(Map<String, Object> parameter) {
     return new SQL() {
       {
@@ -152,9 +187,16 @@ public class ProjectFlowMapperProvider {
     }.toString();
   }
 
+  /**
+   * 更新工作流的配置
+   *
+   * @param parameter
+   * @return
+   */
   public String updateProjectConf(Map<String, Object> parameter) {
     String queue = parameter.get("queue").toString();
     String desc = parameter.get("proxyUser").toString();
+
     return new SQL() {
       {
         UPDATE(TABLE_NAME);

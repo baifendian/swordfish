@@ -73,6 +73,21 @@ public class ExecService {
   @Autowired
   private FlowDao flowDao;
 
+  /**
+   * 执行已经发布过的工作流
+   *
+   * @param operator
+   * @param projectName
+   * @param workflowName
+   * @param schedule
+   * @param execType
+   * @param nodeName
+   * @param nodeDep
+   * @param notifyType
+   * @param notifyMails
+   * @param timeout
+   * @return
+   */
   public ExecutorIdsDto postExecWorkflow(User operator, String projectName, String workflowName, String schedule, ExecType execType, String nodeName, NodeDepType nodeDep, NotifyType notifyType, String notifyMails, int timeout) {
 
     // 查看是否对项目具备相应的权限
@@ -110,14 +125,11 @@ public class ExecService {
 
       switch (execType) {
         case DIRECT: {
-
           // 反序列化邮箱列表
-          List<String> notifyMailList = null;
+          List<String> notifyMailList;
 
           try {
-            if (StringUtils.isNotEmpty(notifyMails)) {
-              notifyMailList = JsonUtil.parseObjectList(notifyMails, String.class);
-            }
+            notifyMailList = JsonUtil.parseObjectList(notifyMails, String.class);
           } catch (Exception e) {
             logger.error("notify mail list des11n error", e);
             throw new ParameterException("Notify mail \"{0}\" not valid", notifyMails);
@@ -181,21 +193,33 @@ public class ExecService {
    */
   public ExecutorIdDto postExecWorkflowDirect(User operator, String projectName, String workflowName, String desc, String proxyUser, String queue, String data, MultipartFile file, NotifyType notifyType, String notifyMails, int timeout, String extras) {
     logger.info("step1. create temp WORKFLOW");
+
     ProjectFlow projectFlow = workflowService.createWorkflow(operator, projectName, workflowName, desc, proxyUser, queue, data, file, extras, 1);
     if (projectFlow == null) {
       throw new ServerErrorException("PROJECT WORKFLOW create return is null");
     }
+
     logger.info("step2. exec temp WORKFLOW");
+
     ExecutorIdsDto executorIdsDto = postExecWorkflow(operator, projectName, workflowName, null, ExecType.DIRECT, null, null, notifyType, notifyMails, timeout);
     if (CollectionUtils.isEmpty(executorIdsDto.getExecIds())) {
       throw new ServerErrorException("PROJECT WORKFLOW exec return is null");
     }
+
     return new ExecutorIdDto(executorIdsDto.getExecIds().get(0));
   }
 
   /**
    * 查询任务运行情况
    *
+   * @param operator
+   * @param projectName
+   * @param workflowName
+   * @param startDate
+   * @param endDate
+   * @param status
+   * @param from
+   * @param size
    * @return
    */
   public ExecWorkflowsDto getExecWorkflow(User operator, String projectName, String workflowName, Date startDate, Date endDate, String status, int from, int size) {
@@ -297,8 +321,6 @@ public class ExecService {
    * @return
    */
   public LogResult getEexcWorkflowLog(User operator, String jobId, int from, int size) {
-    //TODO 分页信息需要校验
-
     ExecutionNode executionNode = executionNodeMapper.selectExecNodeByJobId(jobId);
 
     if (executionNode == null) {
@@ -372,6 +394,5 @@ public class ExecService {
       logger.error("Call master client set schedule error", e);
       throw e;
     }
-
   }
 }

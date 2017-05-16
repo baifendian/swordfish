@@ -24,10 +24,6 @@ import org.apache.ibatis.type.JdbcType;
 import java.util.Date;
 import java.util.List;
 
-/**
- * workflow 执行的节点信息操作 <p>
- *
- */
 public interface ExecutionNodeMapper {
 
   /**

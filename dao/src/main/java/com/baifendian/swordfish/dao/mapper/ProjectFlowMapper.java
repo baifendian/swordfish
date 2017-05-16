@@ -19,18 +19,17 @@ import com.baifendian.swordfish.dao.model.ProjectFlow;
 import com.baifendian.swordfish.dao.model.User;
 import org.apache.ibatis.annotations.*;
 import org.apache.ibatis.type.JdbcType;
-import org.mybatis.spring.annotation.MapperScan;
 
 import java.sql.Timestamp;
 import java.util.List;
 
-@MapperScan
 public interface ProjectFlowMapper {
 
   /**
    * 插入记录并获取记录 id <p>
    *
-   * @return 修改记录数
+   * @param flow
+   * @return 插入记录数
    */
   @InsertProvider(type = ProjectFlowMapperProvider.class, method = "insert")
   @SelectKey(statement = "SELECT LAST_INSERT_ID() AS id", keyProperty = "flow.id", resultType = int.class, before = false)
@@ -38,6 +37,9 @@ public interface ProjectFlowMapper {
 
   /**
    * 通过 id 更新记录 <p>
+   *
+   * @param flow
+   * @return 修改记录数
    */
   @UpdateProvider(type = ProjectFlowMapperProvider.class, method = "updateById")
   int updateById(@Param("flow") ProjectFlow flow);
@@ -45,6 +47,7 @@ public interface ProjectFlowMapper {
   /**
    * 删除一个 workflow <p>
    *
+   * @param flowId
    * @return 删除记录数
    */
   @DeleteProvider(type = ProjectFlowMapperProvider.class, method = "deleteById")
@@ -53,6 +56,8 @@ public interface ProjectFlowMapper {
   /**
    * 查询一个 workflow (by name) <p>
    *
+   * @param projectId
+   * @param name
    * @return {@link ProjectFlow}
    */
   @Results(value = {@Result(property = "id", column = "id", id = true, javaType = int.class, jdbcType = JdbcType.INTEGER),
@@ -97,6 +102,7 @@ public interface ProjectFlowMapper {
 
   /**
    * 根据项目名和工作流名称，查询一个工作流
+   *
    * @param projectName
    * @param name
    * @return
@@ -120,6 +126,7 @@ public interface ProjectFlowMapper {
 
   /**
    * 根据工作流ID查询一个工作流
+   *
    * @param projectId
    * @return
    */

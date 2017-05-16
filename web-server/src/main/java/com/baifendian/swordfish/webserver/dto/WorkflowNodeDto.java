@@ -28,12 +28,17 @@ import java.util.List;
  */
 public class WorkflowNodeDto {
   private String name;
+
   private String desc;
+
   private String type;
+
   @JsonRawValue
   @JsonDeserialize(using = JsonObjectDeserializer.class)
   private String parameter;
+
   private List<String> dep;
+
   @JsonRawValue
   @JsonDeserialize(using = JsonObjectDeserializer.class)
   private String extras;
@@ -42,11 +47,12 @@ public class WorkflowNodeDto {
   }
 
   /**
-   * 通过一个数据实体实例化DTO
+   * 通过一个数据实体实例化 DTO
+   *
    * @param flowNode
    */
   public WorkflowNodeDto(FlowNode flowNode) {
-    if (flowNode != null){
+    if (flowNode != null) {
       this.name = flowNode.getName();
       this.desc = flowNode.getDesc();
       this.type = flowNode.getType();
@@ -57,18 +63,21 @@ public class WorkflowNodeDto {
   }
 
   /**
-   * 把DTO转化为一个数据库实体
+   * 把 DTO 转化为一个数据库实体
+   *
    * @return
    * @throws JsonProcessingException
    */
   public FlowNode convertFlowNode() throws JsonProcessingException {
     FlowNode flowNode = new FlowNode();
+
     flowNode.setName(this.name);
     flowNode.setDesc(this.desc);
     flowNode.setDepList(this.dep);
     flowNode.setType(this.type);
     flowNode.setParameter(this.parameter);
     flowNode.setExtras(this.extras);
+
     return flowNode;
   }
 

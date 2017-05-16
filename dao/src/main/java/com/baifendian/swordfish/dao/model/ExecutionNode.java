@@ -25,7 +25,7 @@ import java.util.List;
 public class ExecutionNode {
 
   /**
-   * 具体workflow执行的 id
+   * 具体 workflow 执行的 id
    **/
   private Integer execId;
 

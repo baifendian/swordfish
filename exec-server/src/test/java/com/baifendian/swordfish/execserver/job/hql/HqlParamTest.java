@@ -15,7 +15,7 @@
  */
 package com.baifendian.swordfish.execserver.job.hql;
 
-import com.baifendian.swordfish.common.job.struct.node.hql.SqlParam;
+import com.baifendian.swordfish.common.job.struct.node.hql.HqlParam;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
 import org.apache.commons.lang.StringUtils;
 import org.junit.Before;
@@ -25,13 +25,13 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
-public class SqlParamTest {
-  private SqlParam param;
+public class HqlParamTest {
+  private HqlParam param;
 
   @Before
   public void before() {
     String paramStr = "{\"sql\":\"select count(*) from bfd_test.test;\", \"udfs\":[{ \"func\": \"md5\", \"className\": \"com.baifendian.hive.udf.Md5\", \"libJars\": [{ \"scope\": \"project\", \"res\": \"udf.jar\" }] }]}";
-    param = JsonUtil.parseObject(paramStr, SqlParam.class);
+    param = JsonUtil.parseObject(paramStr, HqlParam.class);
   }
 
   @Test

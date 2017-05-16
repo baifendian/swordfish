@@ -20,6 +20,7 @@ import com.baifendian.swordfish.dao.enums.NodeDepType;
 import com.baifendian.swordfish.dao.enums.NotifyType;
 import com.baifendian.swordfish.dao.model.User;
 import com.baifendian.swordfish.webserver.dto.*;
+import com.baifendian.swordfish.webserver.exception.BadRequestException;
 import com.baifendian.swordfish.webserver.service.ExecService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,7 +28,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.http.HttpServletResponse;
 import java.util.Date;
 
 /**
@@ -74,19 +74,36 @@ public class ExecController {
     return execService.postExecWorkflow(operator, projectName, workflowName, schedule, execType, nodeName, nodeDep, notifyType, notifyMails, timeout);
   }
 
+  /**
+   * 直接执行一个工作流, 必须是不存在的
+   *
+   * @param operator
+   * @param projectName
+   * @param workflowName
+   * @param proxyUser
+   * @param queue
+   * @param desc
+   * @param data
+   * @param file
+   * @param notifyType
+   * @param notifyMails
+   * @param timeout
+   * @param extras
+   * @return
+   */
   @PostMapping(value = "/direct")
-  public ExecutorIdDto execExistWorkflowDirect(@RequestAttribute(value = "session.user") User operator,
-                                               @RequestParam(value = "projectName") String projectName,
-                                               @RequestParam(value = "workflowName") String workflowName,
-                                               @RequestParam(value = "proxyUser") String proxyUser,
-                                               @RequestParam(value = "queue") String queue,
-                                               @RequestParam(value = "desc", required = false) String desc,
-                                               @RequestParam(value = "data", required = false) String data,
-                                               @RequestParam(value = "file", required = false) MultipartFile file,
-                                               @RequestParam(value = "notifyType", required = false, defaultValue = "None") NotifyType notifyType,
-                                               @RequestParam(value = "notifyMails", required = false) String notifyMails,
-                                               @RequestParam(value = "timeout", required = false, defaultValue = "18000") int timeout,
-                                               @RequestParam(value = "extras", required = false) String extras) {
+  public ExecutorIdDto execWorkflowDirect(@RequestAttribute(value = "session.user") User operator,
+                                          @RequestParam(value = "projectName") String projectName,
+                                          @RequestParam(value = "workflowName") String workflowName,
+                                          @RequestParam(value = "proxyUser") String proxyUser,
+                                          @RequestParam(value = "queue") String queue,
+                                          @RequestParam(value = "desc", required = false) String desc,
+                                          @RequestParam(value = "data", required = false) String data,
+                                          @RequestParam(value = "file", required = false) MultipartFile file,
+                                          @RequestParam(value = "notifyType", required = false, defaultValue = "None") NotifyType notifyType,
+                                          @RequestParam(value = "notifyMails", required = false) String notifyMails,
+                                          @RequestParam(value = "timeout", required = false, defaultValue = "18000") int timeout,
+                                          @RequestParam(value = "extras", required = false) String extras) {
     logger.info("Operator user {}, exec WORKFLOW, PROJECT name: {}, WORKFLOW name: {}, proxy user: {}, queue: {}, data: {}, file: {}," +
         "notify type: {}, notify mails: {}, timeout: {}, extras: {}", operator.getName(), projectName, workflowName, proxyUser, queue, data, file.getName(), notifyType, notifyMails, timeout, extras);
 
@@ -154,6 +171,15 @@ public class ExecController {
     logger.info("Operator user {}, query log, job id: {}, from: {}, size: {}",
         operator.getName(), jobId, from, size);
 
+    // from 的限制
+    if (from < 0) {
+      throw new BadRequestException("Argument is not valid, from must be equal or more than zero");
+    }
+
+    // size 的限制
+    if (size <= 0 || size > 1000) {
+      throw new BadRequestException("Argument is not valid, size must be between (0, 1000]");
+    }
     return execService.getEexcWorkflowLog(operator, jobId, from, size);
   }
 

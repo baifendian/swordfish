@@ -21,7 +21,8 @@ import com.baifendian.swordfish.common.job.struct.node.BaseParam;
 import com.baifendian.swordfish.common.job.struct.node.BaseParamFactory;
 import com.baifendian.swordfish.common.utils.graph.Graph;
 import com.baifendian.swordfish.dao.FlowDao;
-import com.baifendian.swordfish.dao.mapper.*;
+import com.baifendian.swordfish.dao.mapper.ProjectFlowMapper;
+import com.baifendian.swordfish.dao.mapper.ProjectMapper;
 import com.baifendian.swordfish.dao.model.FlowNode;
 import com.baifendian.swordfish.dao.model.Project;
 import com.baifendian.swordfish.dao.model.ProjectFlow;
@@ -42,7 +43,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.FileInputStream;
@@ -52,19 +52,17 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
-import static com.baifendian.swordfish.webserver.utils.ParamVerify.verifyDesc;
-import static com.baifendian.swordfish.webserver.utils.ParamVerify.verifyWorkflowName;
+import static com.baifendian.swordfish.webserver.utils.ParamVerify.*;
 
 @Service
 public class WorkflowService {
 
   private static Logger logger = LoggerFactory.getLogger(WorkflowService.class.getName());
 
-  @Autowired
-  private ProjectFlowMapper projectFlowMapper;
+  private static final String WorkflowJson = "workflow.json";
 
   @Autowired
-  private FlowNodeMapper flowNodeMapper;
+  private ProjectFlowMapper projectFlowMapper;
 
   @Autowired
   private ProjectMapper projectMapper;
@@ -73,16 +71,10 @@ public class WorkflowService {
   private ProjectService projectService;
 
   @Autowired
-  private ResourceMapper resourceMapper;
-
-  @Autowired
   private FileSystemStorageService fileSystemStorageService;
 
   @Autowired
   private FlowDao flowDao;
-
-  @Autowired
-  private ScheduleMapper scheduleMapper;
 
   /**
    * 创建一个工作流, 需要具备项目的 \"w\" 权限。
@@ -95,6 +87,8 @@ public class WorkflowService {
    * @param queue       工作流所在队列名称
    * @param data        工作流定义json
    * @param file        工作流定义文件
+   * @param extras      工作流的额外参数
+   * @param flag        工作流的标示, 0 表示正常途径创建的, 1 表示是临时的工作流, 后期可能根据一定规则清理
    * @return 已经创建的工作流实体
    */
   public ProjectFlow createWorkflow(User operator, String projectName, String name, String desc, String proxyUser, String queue, String data, MultipartFile file, String extras, Integer flag) {
@@ -102,6 +96,7 @@ public class WorkflowService {
     // 校验变量
     verifyWorkflowName(name);
     verifyDesc(desc);
+    verifyExtras(extras);
 
     // 查看是否对项目具备相应的权限
     Project project = projectMapper.queryByName(projectName);
@@ -116,7 +111,10 @@ public class WorkflowService {
       throw new PermissionException("User \"{0}\" is not has PROJECT \"{1}\" write permission", operator.getName(), projectName);
     }
 
-    // 对工作流详定义json进行反序列化
+    // 判断 proxyUser 是否合理的
+    verifyProxyUser(operator.getProxyUserList(), proxyUser);
+
+    // 对工作流详定义 json 进行反序列化
     WorkflowData workflowData = workflowDataDes(data, file, name, project);
 
     if (workflowData == null) {
@@ -140,13 +138,14 @@ public class WorkflowService {
 
     // 检测工作流节点定义json是否正常
     for (WorkflowNodeDto flowNode : flowNodes) {
-      // TODO:: 这个检测不是很合理, 需要修改, 不太完备
       if (!flowNodeParamCheck(flowNode.getParameter(), flowNode.getType())) {
         logger.error("Flow node {} parameter invalid", flowNode.getName());
         throw new ParameterException("Flow node parameter not valid");
       }
-    }
 
+      // 校验节点的额外参数
+      verifyExtras(flowNode.getExtras());
+    }
 
     ProjectFlow projectFlow = new ProjectFlow();
     Date now = new Date();
@@ -159,9 +158,6 @@ public class WorkflowService {
         flowNodeList.add(flowNode.convertFlowNode());
       }
 
-      projectFlow.setExtras(extras);
-      projectFlow.setFlowsNodes(flowNodeList);
-      projectFlow.setUserDefinedParamList(workflowData.getUserDefParams());
       projectFlow.setName(name);
       projectFlow.setProjectId(project.getId());
       projectFlow.setProjectName(projectName);
@@ -172,6 +168,9 @@ public class WorkflowService {
       projectFlow.setQueue(queue);
       projectFlow.setOwnerId(operator.getId());
       projectFlow.setOwner(operator.getName());
+      projectFlow.setExtras(extras);
+      projectFlow.setFlowsNodes(flowNodeList);
+      projectFlow.setUserDefinedParamList(workflowData.getUserDefParams());
       projectFlow.setFlag(flag);
     } catch (Exception e) {
       logger.error("Project flow set value error", e);
@@ -236,6 +235,7 @@ public class WorkflowService {
   public ProjectFlow patchWorkflow(User operator, String projectName, String name, String desc, String proxyUser, String queue, String data, MultipartFile file, String extras) {
 
     verifyDesc(desc);
+    verifyExtras(extras);
 
     // 查询项目是否存在以及是否具备相应权限
     Project project = projectMapper.queryByName(projectName);
@@ -248,6 +248,11 @@ public class WorkflowService {
     if (!projectService.hasWritePerm(operator.getId(), project)) {
       logger.error("User {} has no right permission for the PROJECT {} to patch PROJECT flow", operator.getName(), projectName);
       throw new PermissionException("User \"{0}\" is not has PROJECT \"{1}\" write permission", operator.getName(), projectName);
+    }
+
+    // 判断 proxyUser 是否合理的
+    if (StringUtils.isNotEmpty(proxyUser)) {
+      verifyProxyUser(operator.getProxyUserList(), proxyUser);
     }
 
     // 查询工作流信息
@@ -263,7 +268,6 @@ public class WorkflowService {
     WorkflowData workflowData = workflowDataDes(data, file, name, project);
 
     if (workflowData != null) {
-
       if (!CollectionUtils.isEmpty(workflowData.getUserDefParams())) {
         projectFlow.setUserDefinedParamList(workflowData.getUserDefParams());
       }
@@ -278,13 +282,15 @@ public class WorkflowService {
 
         // parameter 检测
         for (WorkflowNodeDto workflowNodeDTO : workflowNodeDTOList) {
-          // TODO::参数检测存在问题
           if (!flowNodeParamCheck(workflowNodeDTO.getParameter(), workflowNodeDTO.getType())) {
             throw new BadRequestException("WORKFLOW node parameter not valid");
           }
+
+          // 校验节点的额外参数
+          verifyExtras(workflowNodeDTO.getExtras());
         }
 
-        //拼装flowNode
+        // 拼装 flowNode
         List<FlowNode> flowNodeList = new ArrayList<>();
         for (WorkflowNodeDto workflowNodeDTO : workflowNodeDTOList) {
           try {
@@ -294,8 +300,8 @@ public class WorkflowService {
             throw new BadRequestException("WORKFLOW node parameter not valid");
           }
         }
-        projectFlow.setFlowsNodes(flowNodeList);
 
+        projectFlow.setFlowsNodes(flowNodeList);
       }
     }
 
@@ -355,7 +361,6 @@ public class WorkflowService {
     }
 
     // 获取数据库信息
-
     ProjectFlow srcProjectFlow = flowDao.projectFlowfindByName(project.getId(), srcWorkflowName);
 
     if (srcProjectFlow == null) {
@@ -409,8 +414,12 @@ public class WorkflowService {
       throw new NotFoundException("Not found WORKFLOW \"{0}\"", name);
     }
 
-    //删除工作流
+    // 删除工作流
     flowDao.deleteWorkflow(projectFlow.getId());
+
+    // 删除工作流相关的资源信息
+    String hdfsFilename = BaseConfig.getHdfsWorkflowFilename(project.getId(), name);
+    HdfsClient.getInstance().delete(hdfsFilename, true);
 
     return;
   }
@@ -528,34 +537,41 @@ public class WorkflowService {
   }
 
   /**
-   * PROJECT flow data 反序列化
+   * 工作流 data 反序列化
    *
    * @param data
    * @param file
+   * @param workflowName
+   * @param project
    * @return
    */
   private WorkflowData workflowDataDes(String data, MultipartFile file, String workflowName, Project project) {
     WorkflowData workflowData = null;
 
     if (file != null && !file.isEmpty()) {
-      //生成路径
+      // 生成路径
       String filename = UUID.randomUUID().toString();
-      String localFilename = BaseConfig.getLocalWorkflowFilename(project.getId(), filename); // 随机的一个文件名称
-      String localExtDir = BaseConfig.getLocalWorkflowExtractDir(project.getId(), filename);
-      String workflowJson = null;
-
+      // 下载到本地的路径, 带 ".zip"
+      String localFilename = BaseConfig.getLocalWorkflowFilename(project.getId(), filename);
+      // 解压出来的文件目录
+      String localExtractDir = BaseConfig.getLocalWorkflowExtractDir(project.getId(), filename);
+      // hdfs 的路径
       String hdfsFilename = BaseConfig.getHdfsWorkflowFilename(project.getId(), workflowName);
+
       try {
         // 先将文件存放到本地
         logger.info("save WORKFLOW file {} to local {}", workflowName, localFilename);
         fileSystemStorageService.store(file, localFilename);
-        // 解压 并读取workflow.json
+
+        // 解压 并读取
         ZipFile zipFile = new ZipFile(localFilename);
-        logger.info("ext file {} to {}", localFilename, localExtDir);
-        zipFile.extractAll(localExtDir);
-        String jsonString = fileSystemStorageService.readFileToString(workflowJson);
+        logger.info("ext file {} to {}", localFilename, localExtractDir);
+        zipFile.extractAll(localExtractDir);
+
+        String jsonString = fileSystemStorageService.readFileToString(WorkflowJson);
         workflowData = JsonUtil.parseObject(jsonString, WorkflowData.class);
-        // 上传文件到HDFS
+
+        // 上传文件到 HDFS
         if (workflowData != null) {
           logger.info("update WORKFLOW local file {} to hdfs {}", localFilename, hdfsFilename);
           HdfsClient.getInstance().copyLocalToHdfs(localFilename, hdfsFilename, true, true);
@@ -570,10 +586,6 @@ public class WorkflowService {
         logger.error("WORKFLOW file process error", e);
         return null;
       }
-//
-//        ByteArrayInputStream stream = new ByteArrayInputStream(file.getBytes());
-//        String jsonString = IOUtils.toString(stream, "UTF-8");
-
     } else if (data != null) {
       workflowData = JsonUtil.parseObject(data, WorkflowData.class);
     }
@@ -615,10 +627,12 @@ public class WorkflowService {
    * @return
    */
   private boolean flowNodeParamCheck(String parameter, String type) {
-    BaseParam baseParam = BaseParamFactory.getBaseParam(type,parameter);
-    if (baseParam == null){
+    BaseParam baseParam = BaseParamFactory.getBaseParam(type, parameter);
+
+    if (baseParam == null) {
       return false;
     }
+
     return baseParam.checkValid();
   }
 }

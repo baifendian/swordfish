@@ -16,7 +16,7 @@
 package com.baifendian.swordfish.execserver.job.hql;
 
 import com.baifendian.swordfish.common.job.struct.node.BaseParam;
-import com.baifendian.swordfish.common.job.struct.node.hql.SqlParam;
+import com.baifendian.swordfish.common.job.struct.node.hql.HqlParam;
 import com.baifendian.swordfish.common.utils.CommonUtil;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
 import com.baifendian.swordfish.execserver.common.ExecResult;
@@ -30,7 +30,7 @@ import org.slf4j.Logger;
 import java.util.List;
 
 public class EtlSqlJob extends AbstractJob {
-  protected SqlParam param;
+  protected HqlParam param;
 
   protected List<ExecResult> results;
 
@@ -40,7 +40,7 @@ public class EtlSqlJob extends AbstractJob {
 
   @Override
   public void initJobParams() {
-    this.param = JsonUtil.parseObject(props.getJobParams(), SqlParam.class);
+    this.param = JsonUtil.parseObject(props.getJobParams(), HqlParam.class);
   }
 
   @Override

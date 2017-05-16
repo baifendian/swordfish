@@ -163,6 +163,20 @@ public class JsonUtil {
   }
 
   /**
+   * 判断是否是一个 json object
+   *
+   * @param json
+   * @return
+   */
+  public static boolean isJsonNode(String json) {
+    if (json == null) {
+      return true;
+    }
+
+    return readTree(json) != null;
+  }
+
+  /**
    * 获取字段的值（支持深度搜索）<br/>
    * 多个相同字段的情况下，获取节点顺序的第一个 <p>
    *

@@ -28,12 +28,6 @@ import org.apache.ibatis.type.JdbcType;
 import java.util.Date;
 import java.util.List;
 
-/**
- * workflow 执行的信息操作 <p>
- *
- * @author : wenting.wang
- * @date : 2016年8月30日
- */
 public interface ExecutionFlowMapper {
 
   /**
