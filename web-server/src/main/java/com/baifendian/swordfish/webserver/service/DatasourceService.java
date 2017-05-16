@@ -237,8 +237,6 @@ public class DatasourceService {
       throw new PermissionException("User \"{0}\" is not has project \"{1}\" write permission", operator.getName(), projectName);
     }
 
-    //TODO 删除数据源是否需要前置条件
-
     int count = dataSourceMapper.deleteByProjectAndName(project.getId(), name);
     if (count <= 0) {
       throw new NotModifiedException("Not delete project count");

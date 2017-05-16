@@ -17,10 +17,7 @@ package com.baifendian.swordfish.masterserver.utils.crontab;
 
 import com.baifendian.swordfish.dao.enums.ScheduleType;
 import com.cronutils.model.Cron;
-import com.cronutils.model.field.expression.Always;
-import com.cronutils.model.field.expression.Between;
-import com.cronutils.model.field.expression.On;
-import com.cronutils.model.field.expression.QuestionMark;
+import com.cronutils.model.field.expression.*;
 
 /**
  * 月周期判断工具类
@@ -36,9 +33,9 @@ public class MonthHelper extends CycleHelper {
     //根据UDP的月周期特征进行匹配
     if (minField.getExpression() instanceof On
             && hourField.getExpression() instanceof On
-            && (dayOfMonthField.getExpression() instanceof On || dayOfMonthField.getExpression() instanceof Between)
+            && (dayOfMonthField.getExpression() instanceof On || dayOfMonthField.getExpression() instanceof And)
             && dayOfWeekField.getExpression() instanceof QuestionMark
-            && minField.getExpression() instanceof Always) {
+            && monthField.getExpression() instanceof Always) {
       return ScheduleType.MONTH;
     }
     return null;
