@@ -15,7 +15,6 @@
  */
 package com.baifendian.swordfish.dao.model;
 
-
 import com.baifendian.swordfish.dao.enums.DepPolicyType;
 import com.baifendian.swordfish.dao.enums.FailurePolicyType;
 import com.baifendian.swordfish.dao.enums.NotifyType;

@@ -84,5 +84,4 @@ public class ShellJob extends AbstractProcessJob {
   public BaseParam getParam() {
     return shellParam;
   }
-
 }

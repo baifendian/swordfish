@@ -17,7 +17,7 @@ package com.baifendian.swordfish.common.job.struct.node.mr;
 
 import com.baifendian.swordfish.common.job.struct.node.BaseParam;
 import com.baifendian.swordfish.common.job.struct.resource.ResourceInfo;
-import com.baifendian.swordfish.dao.model.flow.params.Property;
+import com.baifendian.swordfish.dao.model.flow.Property;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.ListUtils;
 import org.apache.commons.lang3.StringUtils;

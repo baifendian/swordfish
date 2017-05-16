@@ -17,13 +17,13 @@ package com.baifendian.swordfish.webserver.dto;
 
 import com.baifendian.swordfish.dao.mapper.utils.EqualUtils;
 import com.baifendian.swordfish.dao.model.FlowNode;
-import com.baifendian.swordfish.dao.model.flow.params.Property;
+import com.baifendian.swordfish.dao.model.flow.Property;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * workflowData节点
+ * workflowData 节点
  */
 public class WorkflowData {
   /**
@@ -41,20 +41,24 @@ public class WorkflowData {
 
   /**
    * 支持通过数据库flowNode实体 或 DTO workflowNodeDTO 的方式构建
+   *
    * @param nodes
    * @param userDefParams
    * @param clazz
    */
-  public WorkflowData(List<?> nodes, List<Property> userDefParams,Class<?> clazz) {
-    if (clazz == WorkflowNodeDto.class){
+  public WorkflowData(List<?> nodes, List<Property> userDefParams, Class<?> clazz) {
+    if (clazz == WorkflowNodeDto.class) {
       this.nodes = (List<WorkflowNodeDto>) nodes;
-    }else if(clazz == FlowNode.class){
+    } else if (clazz == FlowNode.class) {
       List<WorkflowNodeDto> workflowNodeDTOList = new ArrayList<>();
-      for (Object node:nodes){
+
+      for (Object node : nodes) {
         workflowNodeDTOList.add(new WorkflowNodeDto((FlowNode) node));
       }
+
       this.nodes = workflowNodeDTOList;
     }
+
     this.userDefParams = userDefParams;
   }
 
@@ -63,16 +67,23 @@ public class WorkflowData {
    * @param userDefParams
    */
   public WorkflowData(List<WorkflowNodeDto> nodes, List<Property> userDefParams) {
-    this(nodes,userDefParams,WorkflowNodeDto.class);
+    this(nodes, userDefParams, WorkflowNodeDto.class);
   }
 
   @Override
   public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
+    if (this == o) {
+      return true;
+    }
+
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+
     WorkflowData that = (WorkflowData) o;
+
     return EqualUtils.equalLists(nodes, that.nodes) &&
-            EqualUtils.equalLists(userDefParams, that.userDefParams);
+        EqualUtils.equalLists(userDefParams, that.userDefParams);
   }
 
   public List<WorkflowNodeDto> getNodes() {

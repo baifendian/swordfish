@@ -19,18 +19,18 @@ import org.apache.ibatis.jdbc.SQL;
 
 import java.util.Map;
 
-/**
- * workflow 节点表的 sql 生成器 <p>
- *
- * @author : dsfan
- * @date : 2016年8月27日
- */
 public class FlowNodeMapperProvider {
   /**
    * 表名
    */
   public static final String TABLE_NAME = "flows_nodes";
 
+  /**
+   * 插入工作流节点
+   *
+   * @param parameter
+   * @return
+   */
   public String insert(Map<String, Object> parameter) {
     return new SQL() {
       {
@@ -46,6 +46,12 @@ public class FlowNodeMapperProvider {
     }.toString();
   }
 
+  /**
+   * 删除工作流节点
+   *
+   * @param parameter
+   * @return
+   */
   public String deleteByFlowId(Map<String, Object> parameter) {
     return new SQL() {
       {
@@ -55,6 +61,12 @@ public class FlowNodeMapperProvider {
     }.toString();
   }
 
+  /**
+   * 根据 flow id 查询
+   *
+   * @param parameter
+   * @return
+   */
   public String selectByFlowId(Map<String, Object> parameter) {
     return new SQL() {
       {

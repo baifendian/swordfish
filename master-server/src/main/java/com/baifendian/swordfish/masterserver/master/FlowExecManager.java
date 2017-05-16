@@ -72,52 +72,60 @@ public class FlowExecManager {
   }
 
   /**
-   * 提交补数据任务 <p>
+   * 提交补数据任务
+   *
+   * @param flow
+   * @param cron
+   * @param startDateTime
+   * @param endDateTime
    */
   public void submitAddData(ProjectFlow flow, CronExpression cron, Date startDateTime, Date endDateTime) {
     // 提交任务去执行
-    appendFlowExecutorService.submit(new Runnable() {
-      @Override
-      public void run() {
-        Date scheduleDate = cron.getTimeAfter(DateUtils.addSeconds(startDateTime, -1));
-        try {
-          boolean isFailed = false; // 是否已经失败
-          List<Map.Entry<Date, Boolean>> resultList = new ArrayList<>();
-          while (scheduleDate.before(endDateTime) || scheduleDate.equals(endDateTime)) {
-            Boolean execStatus = null;
-            if (!isFailed) {
-              // 插入 ExecutionFlow
-              Schedule schedule = flowDao.querySchedule(flow.getId());
-              Integer maxTryTimes = 3;
-              Integer timeout = 10 * 3600;
-              if (schedule != null) {
-                maxTryTimes = schedule.getMaxTryTimes();
-                timeout = schedule.getTimeout();
-              }
-              ExecutionFlow executionFlow = flowDao.scheduleFlowToExecution(flow.getProjectId(), flow.getId(),
-                  flow.getOwnerId(), scheduleDate, ExecType.COMPLEMENT_DATA, maxTryTimes, null, null, schedule.getNotifyType(), schedule.getNotifyMails(), timeout);
-              executionFlow.setProjectId(flow.getProjectId());
-              ExecFlowInfo execFlowInfo = new ExecFlowInfo();
-              execFlowInfo.setExecId(executionFlow.getId());
+    appendFlowExecutorService.submit(() -> {
+      Date scheduleDate = cron.getTimeAfter(DateUtils.addSeconds(startDateTime, -1));
 
-              // 发送请求到 executor server 中执行
-              jobExecManager.addExecFlow(execFlowInfo);
+      try {
+        boolean isFailed = false; // 是否已经失败
+        List<Map.Entry<Date, Boolean>> resultList = new ArrayList<>();
 
-              // 如果当前任务补数据任务失败，后续任务不再执行
-              execStatus = checkExecStatus(executionFlow.getId());
-              if (!execStatus) {
-                isFailed = true;
-              }
+        while (scheduleDate.before(endDateTime) || scheduleDate.equals(endDateTime)) {
+          Boolean execStatus = null;
+
+          if (!isFailed) {
+            // 插入 ExecutionFlow
+            Schedule schedule = flowDao.querySchedule(flow.getId());
+            Integer maxTryTimes = 3;
+            Integer timeout = 10 * 3600;
+
+            if (schedule != null) {
+              maxTryTimes = schedule.getMaxTryTimes();
+              timeout = schedule.getTimeout();
             }
-            resultList.add(new AbstractMap.SimpleImmutableEntry<Date, Boolean>(new Date(scheduleDate.getTime()), execStatus));
-            scheduleDate = cron.getTimeAfter(scheduleDate);
+
+            ExecutionFlow executionFlow = flowDao.scheduleFlowToExecution(flow.getProjectId(), flow.getId(),
+                flow.getOwnerId(), scheduleDate, ExecType.COMPLEMENT_DATA, maxTryTimes, null, null, schedule.getNotifyType(), schedule.getNotifyMails(), timeout);
+            executionFlow.setProjectId(flow.getProjectId());
+            ExecFlowInfo execFlowInfo = new ExecFlowInfo();
+            execFlowInfo.setExecId(executionFlow.getId());
+
+            // 发送请求到 executor server 中执行
+            jobExecManager.addExecFlow(execFlowInfo);
+
+            // 如果当前任务补数据任务失败，后续任务不再执行
+            execStatus = checkExecStatus(executionFlow.getId());
+            if (!execStatus) {
+              isFailed = true;
+            }
           }
-          // 发送邮件
-          EmailManager.sendAddDataEmail(flow, !isFailed, resultList);
-        } catch (Exception e) {
-          logger.error(e.getMessage(), e);
+
+          resultList.add(new AbstractMap.SimpleImmutableEntry<Date, Boolean>(new Date(scheduleDate.getTime()), execStatus));
+          scheduleDate = cron.getTimeAfter(scheduleDate);
         }
 
+        // 发送邮件
+        EmailManager.sendAddDataEmail(flow, !isFailed, resultList);
+      } catch (Exception e) {
+        logger.error(e.getMessage(), e);
       }
     });
   }
@@ -125,6 +133,7 @@ public class FlowExecManager {
   /**
    * 检测 workflow 的执行状态 <p>
    *
+   * @param execId
    * @return 是否成功
    */
   private boolean checkExecStatus(int execId) {

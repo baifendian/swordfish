@@ -15,7 +15,7 @@
  */
 package com.baifendian.swordfish.webserver.dto;
 
-import com.baifendian.swordfish.dao.model.flow.params.Property;
+import com.baifendian.swordfish.dao.model.flow.Property;
 
 import java.util.List;
 

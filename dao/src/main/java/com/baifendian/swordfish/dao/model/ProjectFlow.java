@@ -16,11 +16,10 @@
 package com.baifendian.swordfish.dao.model;
 
 import com.baifendian.swordfish.dao.mapper.utils.EqualUtils;
-import com.baifendian.swordfish.dao.model.flow.params.Property;
+import com.baifendian.swordfish.dao.model.flow.Property;
 import com.baifendian.swordfish.dao.utils.json.JsonObjectDeserializer;
 import com.baifendian.swordfish.dao.utils.json.JsonObjectSerializer;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.apache.commons.lang3.StringUtils;

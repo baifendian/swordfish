@@ -26,7 +26,7 @@ import java.util.List;
 /**
  * sql 节点参数 <p>
  */
-public class SqlParam extends BaseParam {
+public class HqlParam extends BaseParam {
 
   /**
    * 原始 sql 语句（多条，内部可能包含换行等符号，执行时需要处理）

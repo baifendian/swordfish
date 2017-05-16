@@ -17,12 +17,11 @@ package com.baifendian.swordfish.common.job.struct.node.spark;
 
 import com.baifendian.swordfish.common.job.struct.node.BaseParam;
 import com.baifendian.swordfish.common.job.struct.resource.ResourceInfo;
-import com.baifendian.swordfish.dao.model.flow.params.Property;
+import com.baifendian.swordfish.dao.model.flow.Property;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Spark 节点的参数 <p>

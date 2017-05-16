@@ -24,17 +24,11 @@ import com.baifendian.swordfish.execserver.job.virtual.VirtualJob;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static com.baifendian.swordfish.common.job.struct.node.JobType.*;
+
 public class JobTypeManager {
 
   private static final Logger logger = LoggerFactory.getLogger(JobTypeManager.class);
-
-  private static final String HQL = "HQL";
-  private static final String MR = "MR";
-  private static final String SHELL = "SHELL";
-  private static final String SPARK = "SPARK";
-  private static final String VIRTUAL = "VIRTUAL";
-  private static final String SPARK_STREAMING = "SPARK-STREAMING";
-  private static final String UPLOAD = "UPLOAD";
 
   public static Job newJob(String jobId, String jobTypeStr, JobProps props, Logger logger) throws IllegalArgumentException {
     switch (jobTypeStr) {

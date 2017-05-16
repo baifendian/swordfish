@@ -27,13 +27,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-/**
- * workflow 执行的信息操作 <p>
- *
- * @author : wenting.wang
- * @date : 2016年8月30日
- */
-
 public class ExecutionFlowMapperProvider {
 
   public static final String TABLE_NAME = "execution_flows";

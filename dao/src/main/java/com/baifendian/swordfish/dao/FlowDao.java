@@ -16,7 +16,10 @@
 package com.baifendian.swordfish.dao;
 
 import com.baifendian.swordfish.dao.datasource.ConnectionFactory;
-import com.baifendian.swordfish.dao.enums.*;
+import com.baifendian.swordfish.dao.enums.ExecType;
+import com.baifendian.swordfish.dao.enums.FlowStatus;
+import com.baifendian.swordfish.dao.enums.NodeDepType;
+import com.baifendian.swordfish.dao.enums.NotifyType;
 import com.baifendian.swordfish.dao.mapper.*;
 import com.baifendian.swordfish.dao.model.*;
 import com.baifendian.swordfish.dao.model.flow.FlowDag;
@@ -61,7 +64,9 @@ public class FlowDao extends BaseDao {
   /**
    * 获取 flow 执行详情 <p>
    *
-   * @return {@link ExecutionFlow}
+   * @param execId
+   * @return
+   * @see ExecutionFlow
    */
   public ExecutionFlow queryExecutionFlow(int execId) {
     return executionFlowMapper.selectByExecId(execId);
@@ -69,13 +74,20 @@ public class FlowDao extends BaseDao {
 
   /**
    * 获取所有未完成的 flow 列表 <p>
+   *
+   * @return
+   * @see ExecutionFlow
    */
   public List<ExecutionFlow> queryAllNoFinishFlow() {
     return executionFlowMapper.selectAllNoFinishFlow();
   }
 
   /**
-   * 获取execserver没有运行完成的workflow
+   * 获取 exec server 没有运行完成的 workflow
+   *
+   * @param worker
+   * @return
+   * @see ExecutionFlow
    */
   public List<ExecutionFlow> queryNoFinishFlow(String worker) {
     return executionFlowMapper.selectNoFinishFlow(worker);
@@ -84,7 +96,11 @@ public class FlowDao extends BaseDao {
   /**
    * 按时间段查询 flow 的调度的最新运行状态(调度或者补数据) <p>
    *
-   * @return List<{@link ExecutionFlow}>
+   * @param flowId
+   * @param startDate
+   * @param endDate
+   * @return
+   * @see ExecutionFlow
    */
   public List<ExecutionFlow> queryFlowLastStatus(Integer flowId, Date startDate, Date endDate) {
     return executionFlowMapper.selectByFlowIdAndTimes(flowId, startDate, endDate);
@@ -93,7 +109,10 @@ public class FlowDao extends BaseDao {
   /**
    * 按时间查询 flow 的调度的最新运行状态(调度或者补数据) <p>
    *
-   * @return List<{@link ExecutionFlow}>
+   * @param flowId
+   * @param scheduleTime
+   * @return
+   * @see ExecutionFlow
    */
   public List<ExecutionFlow> queryFlowLastStatus(int flowId, Date scheduleTime) {
     return executionFlowMapper.selectByFlowIdAndTime(flowId, scheduleTime);
@@ -102,6 +121,8 @@ public class FlowDao extends BaseDao {
   /**
    * 更新 flow 执行状态 <p>
    *
+   * @param execId
+   * @param status
    * @return 是否成功
    */
   public boolean updateExecutionFlowStatus(int execId, FlowStatus status) {
@@ -117,6 +138,14 @@ public class FlowDao extends BaseDao {
     return executionFlowMapper.update(executionFlow) > 0;
   }
 
+  /**
+   * 更新执行工作流的状态
+   *
+   * @param execId
+   * @param status
+   * @param worker
+   * @return
+   */
   public boolean updateExecutionFlowStatus(int execId, FlowStatus status, String worker) {
     ExecutionFlow executionFlow = new ExecutionFlow();
     executionFlow.setId(execId);
@@ -133,6 +162,7 @@ public class FlowDao extends BaseDao {
   /**
    * 更新 flow 执行详情 <p>
    *
+   * @param executionFlow
    * @return 是否成功
    */
   public boolean updateExecutionFlow(ExecutionFlow executionFlow) {
@@ -142,7 +172,19 @@ public class FlowDao extends BaseDao {
   /**
    * 调度 workflow 时，插入执行信息（调度或者补数据） <p>
    *
-   * @return {@link ExecutionFlow}
+   * @param projectId
+   * @param workflowId
+   * @param submitUser
+   * @param scheduleTime
+   * @param runType
+   * @param maxTryTimes
+   * @param nodeName
+   * @param nodeDep
+   * @param notifyType
+   * @param mails
+   * @param timeout
+   * @return
+   * @throws Exception
    */
   public ExecutionFlow scheduleFlowToExecution(Integer projectId, Integer workflowId, int submitUser, Date scheduleTime, ExecType runType,
                                                Integer maxTryTimes, String nodeName, NodeDepType nodeDep, NotifyType notifyType, List<String> mails, int timeout) throws Exception {
@@ -192,6 +234,7 @@ public class FlowDao extends BaseDao {
         throw new Exception(String.format("node %s not found in flow %d", nodeName, workflowId));
       }
     }
+
     executionFlow.setWorkflowData(JsonUtil.toJsonString(flowDag));
     executionFlow.setUserDefinedParams(projectFlow.getUserDefinedParams());
     executionFlow.setType(runType);
@@ -208,81 +251,19 @@ public class FlowDao extends BaseDao {
   }
 
   /**
-   * 删除工作流、及其节点、和调度配置
+   * 删除工作流、会自动级联删除 "工作流节点/调度配置/日志级联信息"
+   *
+   * @param workflowId
    */
   @Transactional(value = "TransactionManager")
   public void deleteWorkflow(int workflowId) {
     projectFlowMapper.deleteById(workflowId);
-    flowNodeMapper.deleteByFlowId(workflowId);
-    // flowNodePubMapper.deleteByFlowId(workflowId);
-    // scheduleMapper.deleteByFlowId(workflowId);
   }
-
-  /**
-   * 查询工作流已发布的节点
-   */
-  public List<FlowNode> queryWorkflowNodes(int workflowId) {
-    List<FlowNode> flowNodes = flowNodeMapper.selectByFlowId(workflowId);
-    return flowNodes;
-  }
-
-
-  /**
-   * 配置调度信息
-   */
-  /*
-  public void configSchedule(int workflowId, int userId, String time) throws Exception {
-    Schedule schedule = scheduleMapper.selectByFlowId(workflowId);
-    if (schedule == null) {
-      // 插入调度信息
-      schedule = new Schedule();
-
-      schedule.setFlowId(workflowId);
-      schedule.setTimeout(10);
-      schedule.setPubStatus(PubStatus.END);
-      schedule.setScheduleStatus(ScheduleStatus.ONLINE);
-      schedule.setLastModifyBy(userId);
-      schedule.setFailureEmails(Boolean.TRUE);
-      schedule.setSuccessEmails(Boolean.FALSE);
-      schedule.setMaxTryTimes(2);
-      schedule.setFailurePolicy(FailurePolicyType.CONTINUE);
-
-      Date now = new Date();
-      schedule.setCreateTime(now);
-      schedule.setModifyTime(now);
-
-      // 调度时间
-      ScheduleMeta meta = new ScheduleMeta();
-      meta.setType(ScheduleType.DAY);
-      meta.setStartDate(now);
-      schedule.setStartDate(now);
-      Date endDate = BFDDateUtils.parse("2099-12-31 00:00:00");
-      meta.setEndDate(endDate);
-      schedule.setEndDate(endDate);
-      schedule.setCrontabStr(JsonUtil.toJsonString(meta));
-
-      int count = scheduleMapper.insert(schedule);
-      if (count <= 0) {
-        throw new Exception("插入失败");
-      }
-
-    } else {
-      // 更新调度信息
-      ScheduleMeta meta = JsonUtil.parseObject(schedule.getCrontabStr(), ScheduleMeta.class);
-      schedule.setCrontabStr(JsonUtil.toJsonString(meta));
-
-      schedule.setLastModifyBy(userId);
-      schedule.setModifyTime(new Date());
-      int count = scheduleMapper.update(schedule);
-      if (count <= 0) {
-        throw new Exception("更新失败");
-      }
-    }
-  }
-  */
 
   /**
    * 插入 ExecutionNode <p>
+   *
+   * @param executionNode
    */
   public void insertExecutionNode(ExecutionNode executionNode) {
     // 插入执行节点信息
@@ -291,12 +272,20 @@ public class FlowDao extends BaseDao {
 
   /**
    * 更新 ExecutionNode <p>
+   *
+   * @param executionNode
    */
   public void updateExecutionNode(ExecutionNode executionNode) {
-    // 更新执行节点信息
     executionNodeMapper.update(executionNode);
   }
 
+  /**
+   * 查询执行节点信息
+   *
+   * @param execId
+   * @param nodeName
+   * @return
+   */
   public ExecutionNode queryExecutionNode(long execId, String nodeName) {
     return executionNodeMapper.selectExecNode(execId, nodeName);
   }
@@ -304,7 +293,9 @@ public class FlowDao extends BaseDao {
   /**
    * 查询 Schedule <p>
    *
-   * @return {@link Schedule}
+   * @param flowId
+   * @return
+   * @see Schedule
    */
   public Schedule querySchedule(int flowId) {
     // 插入执行节点信息
@@ -312,44 +303,54 @@ public class FlowDao extends BaseDao {
   }
 
   /**
-   * 根据name获取一个工作流的信息
+   * 根据 name 获取一个工作流的信息
    *
    * @param projectId
    * @param name
    * @return
+   * @see ProjectFlow
    */
   public ProjectFlow projectFlowfindByName(int projectId, String name) {
     ProjectFlow projectFlow = projectFlowMapper.findByName(projectId, name);
+
     if (projectFlow != null) {
       List<FlowNode> flowNodeList = flowNodeMapper.selectByFlowId(projectFlow.getId());
       projectFlow.setFlowsNodes(flowNodeList);
     }
+
     return projectFlow;
   }
 
   /**
-   * 根据Id获取一个workflow
+   * 根据 Id 获取一个 workflow
    *
    * @param id
    * @return
+   * @see ProjectFlow
    */
   public ProjectFlow projectFlowfindById(int id) {
     ProjectFlow projectFlow = projectFlowMapper.findById(id);
+
     if (projectFlow != null) {
       List<FlowNode> flowNodeList = flowNodeMapper.selectByFlowId(projectFlow.getId());
       projectFlow.setFlowsNodes(flowNodeList);
     }
+
     return projectFlow;
   }
 
   /**
-   * 创建一个projectFlow
+   * 创建一个 projectFlow, 会操作 project_flows 和 flows_nodes 表
    *
+   * @param projectFlow
    * @return
    */
   @Transactional(value = "TransactionManager", rollbackFor = Exception.class)
   public void createProjectFlow(ProjectFlow projectFlow) {
+    // 插入项目的工作流表
     projectFlowMapper.insertAndGetId(projectFlow);
+
+    // 插入工作流的节点表
     for (FlowNode flowNode : projectFlow.getFlowsNodes()) {
       flowNode.setFlowId(projectFlow.getId());
       flowNodeMapper.insert(flowNode);
@@ -364,11 +365,13 @@ public class FlowDao extends BaseDao {
   @Transactional(value = "TransactionManager", rollbackFor = Exception.class)
   public void modifyProjectFlow(ProjectFlow projectFlow) {
     flowNodeMapper.deleteByFlowId(projectFlow.getId());
+
     for (FlowNode flowNode : projectFlow.getFlowsNodes()) {
-      //重新设置id保证唯一性
+      // 重新设置 id 保证唯一性
       flowNode.setFlowId(projectFlow.getId());
       flowNodeMapper.insert(flowNode);
     }
+
     projectFlowMapper.updateById(projectFlow);
   }
 
@@ -378,13 +381,16 @@ public class FlowDao extends BaseDao {
    * @param projectName
    * @param name
    * @return
+   * @see ProjectFlow
    */
   public ProjectFlow projectFlowFindByPorjectNameAndName(String projectName, String name) {
     ProjectFlow projectFlow = projectFlowMapper.findByProjectNameAndName(projectName, name);
+
     if (projectFlow != null) {
       List<FlowNode> flowNodeList = flowNodeMapper.selectByFlowId(projectFlow.getId());
       projectFlow.setFlowsNodes(flowNodeList);
     }
+
     return projectFlow;
   }
 
@@ -393,13 +399,16 @@ public class FlowDao extends BaseDao {
    *
    * @param projectId
    * @return
+   * @see ProjectFlow
    */
   public List<ProjectFlow> projectFlowFindByProject(int projectId) {
     List<ProjectFlow> projectFlowList = projectFlowMapper.findByProject(projectId);
     List<Integer> flowIds = new ArrayList<>();
+
     for (ProjectFlow projectFlow : projectFlowList) {
       flowIds.add(projectFlow.getId());
     }
+
     List<FlowNode> flowNodeList = flowNodeMapper.selectByFlowIds(flowIds);
     for (ProjectFlow projectFlow : projectFlowList) {
       List<FlowNode> flowNodes = new ArrayList<>();
@@ -408,9 +417,10 @@ public class FlowDao extends BaseDao {
           flowNodes.add(flowNode);
         }
       }
+
       projectFlow.setFlowsNodes(flowNodes);
     }
+
     return projectFlowList;
   }
-
 }

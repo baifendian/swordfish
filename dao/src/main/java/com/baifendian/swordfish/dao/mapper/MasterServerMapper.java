@@ -22,7 +22,6 @@ import org.mybatis.spring.annotation.MapperScan;
 
 import java.util.Date;
 
-@MapperScan
 public interface MasterServerMapper {
   /**
    * 查询 master

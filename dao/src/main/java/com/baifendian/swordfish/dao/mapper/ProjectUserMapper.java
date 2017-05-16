@@ -27,7 +27,6 @@ import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
 
-@MapperScan
 public interface ProjectUserMapper {
   /**
    * 查询项目下的用户

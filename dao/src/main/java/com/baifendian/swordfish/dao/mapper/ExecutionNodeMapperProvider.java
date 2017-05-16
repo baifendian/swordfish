@@ -24,18 +24,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-/**
- * workflow 执行的节点信息操作 <p>
- *
- * @author : wenting.wang
- * @date : 2016年8月30日
- */
 public class ExecutionNodeMapperProvider {
 
   public static final String TABLE_NAME = "execution_nodes";
-
-  public ExecutionNodeMapperProvider() {
-  }
 
   public String insert(Map<String, Object> parameter) {
     return new SQL() {
@@ -107,5 +98,4 @@ public class ExecutionNodeMapperProvider {
       }
     }.toString();
   }
-
 }

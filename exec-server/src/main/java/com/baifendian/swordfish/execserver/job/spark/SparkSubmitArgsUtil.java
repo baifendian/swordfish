@@ -17,7 +17,7 @@ package com.baifendian.swordfish.execserver.job.spark;
 
 import com.baifendian.swordfish.common.job.struct.node.spark.SparkParam;
 import com.baifendian.swordfish.common.job.struct.resource.ResourceInfo;
-import com.baifendian.swordfish.dao.model.flow.params.Property;
+import com.baifendian.swordfish.dao.model.flow.Property;
 import org.apache.commons.lang.StringUtils;
 
 import java.util.ArrayList;

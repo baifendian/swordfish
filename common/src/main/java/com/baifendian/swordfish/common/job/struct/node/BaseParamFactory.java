@@ -16,14 +16,17 @@
 package com.baifendian.swordfish.common.job.struct.node;
 
 import com.baifendian.swordfish.common.job.struct.datasource.DatasourceFactory;
-import com.baifendian.swordfish.common.job.struct.node.hql.SqlParam;
+import com.baifendian.swordfish.common.job.struct.node.hql.HqlParam;
 import com.baifendian.swordfish.common.job.struct.node.mr.MrParam;
 import com.baifendian.swordfish.common.job.struct.node.shell.ShellParam;
 import com.baifendian.swordfish.common.job.struct.node.spark.SparkParam;
+import com.baifendian.swordfish.common.job.struct.node.upload.UploadParam;
+import com.baifendian.swordfish.common.job.struct.node.virtual.VirtualParam;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
-import org.apache.avro.data.Json;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static com.baifendian.swordfish.common.job.struct.node.JobType.*;
 
 /**
  * 节点参数工厂
@@ -35,14 +38,18 @@ public class BaseParamFactory {
   public static BaseParam getBaseParam(String type, String parameter) {
     try {
       switch (type) {
-        case "MR":
+        case MR:
           return JsonUtil.parseObject(parameter, MrParam.class);
-        case "SHELL":
+        case SHELL:
           return JsonUtil.parseObject(parameter, ShellParam.class);
-        case "HQL":
-          return JsonUtil.parseObject(parameter, SqlParam.class);
-        case "SPARK_STREAMING":
-        case "SPARK":
+        case HQL:
+          return JsonUtil.parseObject(parameter, HqlParam.class);
+        case VIRTUAL:
+          return VirtualParam.getInstance();
+        case UPLOAD:
+          return JsonUtil.parseObject(parameter, UploadParam.class);
+        case SPARK_STREAMING:
+        case SPARK:
           return JsonUtil.parseObject(parameter, SparkParam.class);
         default:
           return null;

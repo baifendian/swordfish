@@ -16,6 +16,7 @@
 package com.baifendian.swordfish.webserver.utils;
 
 import com.baifendian.swordfish.common.config.BaseConfig;
+import com.baifendian.swordfish.dao.utils.json.JsonUtil;
 import com.baifendian.swordfish.webserver.exception.BadRequestException;
 import com.baifendian.swordfish.webserver.exception.ParameterException;
 import com.baifendian.swordfish.webserver.exception.ServerErrorException;
@@ -104,6 +105,17 @@ public class ParamVerify {
   public static void verifyDesc(String desc) {
     if (StringUtils.isNotEmpty(desc) && desc.length() > 256) {
       throw new ParameterException("Desc name \"{0}\" not valid", desc);
+    }
+  }
+
+  /**
+   * 校验额外参数是否符合规范
+   *
+   * @param extras
+   */
+  public static void verifyExtras(String extras) {
+    if (extras != null && !JsonUtil.isJsonNode(extras)) {
+      throw new ParameterException("Extra parameter \"{0}\" not valid", extras);
     }
   }
 

@@ -31,6 +31,7 @@ public class DaoFactory {
   /**
    * 获取 Dao 实例 （单例） <p>
    *
+   * @param clazz
    * @return Dao实例
    */
   @SuppressWarnings("unchecked")

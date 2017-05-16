@@ -17,15 +17,13 @@ package com.baifendian.swordfish.execserver.runner.flow;
 
 import com.baifendian.swordfish.dao.DaoFactory;
 import com.baifendian.swordfish.dao.FlowDao;
-import com.baifendian.swordfish.dao.datasource.ConnectionFactory;
 import com.baifendian.swordfish.dao.enums.FailurePolicyType;
-import com.baifendian.swordfish.dao.mapper.ExecutionNodeMapper;
 import com.baifendian.swordfish.dao.model.ExecutionFlow;
 import com.baifendian.swordfish.dao.model.Schedule;
 import com.baifendian.swordfish.execserver.exception.ExecException;
-import com.baifendian.swordfish.execserver.utils.Constants;
 import com.baifendian.swordfish.execserver.parameter.CustomParamManager;
 import com.baifendian.swordfish.execserver.parameter.SystemParamManager;
+import com.baifendian.swordfish.execserver.utils.Constants;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.apache.commons.configuration.Configuration;
 import org.slf4j.Logger;
@@ -40,20 +38,12 @@ import java.util.concurrent.*;
  */
 public class FlowRunnerManager {
 
-  /**
-   * LOGGER
-   */
-  private final Logger LOGGER = LoggerFactory.getLogger(getClass());
+  private final Logger logger = LoggerFactory.getLogger(getClass());
 
   /**
    * {@link FlowDao}
    */
   private final FlowDao flowDao;
-
-  /**
-   * {@link ExecutionNodeMapper}
-   */
-  private final ExecutionNodeMapper executionNodeMapper;
 
   /**
    * {@link ExecutorService}
@@ -85,16 +75,15 @@ public class FlowRunnerManager {
    */
   private final FailurePolicyType defaultFailurePolicyType = FailurePolicyType.END;
 
+  /**
+   * 正在运行的 flows
+   */
   private final Map<Integer, FlowRunner> runningFlows = new ConcurrentHashMap<>();
 
   private final Configuration conf;
 
-  /**
-   * constructor
-   */
   public FlowRunnerManager(Configuration conf) {
     this.flowDao = DaoFactory.getDaoInstance(FlowDao.class);
-    this.executionNodeMapper = ConnectionFactory.getSqlSession().getMapper(ExecutionNodeMapper.class);
     this.conf = conf;
 
     int flowThreads = conf.getInt(Constants.EXECUTOR_FLOWRUNNER_THREADS, 20);
@@ -108,19 +97,17 @@ public class FlowRunnerManager {
     ThreadFactory jobThreadFactory = new ThreadFactoryBuilder().setNameFormat("Exec-Worker-Job").build();
     jobExecutorService = Executors.newCachedThreadPool(jobThreadFactory);
 
-    Thread cleanThread = new Thread(new Runnable() {
-      @Override
-      public void run() {
-        while(true) {
-          try {
-            cleanFinishedFlows();
-            Thread.sleep(5000);
-          } catch (Exception e){
-            LOGGER.error("clean thread error ", e);
-          }
+    Thread cleanThread = new Thread(() -> {
+      while (true) {
+        try {
+          cleanFinishedFlows();
+          Thread.sleep(5000);
+        } catch (Exception e) {
+          logger.error("clean thread error ", e);
         }
       }
     });
+
     cleanThread.setDaemon(true);
     cleanThread.setName("finishedFlowClean");
     cleanThread.start();
@@ -128,6 +115,8 @@ public class FlowRunnerManager {
 
   /**
    * 提交 workflow 执行 <p>
+   *
+   * @param executionFlow
    */
   public void submitFlow(ExecutionFlow executionFlow) {
     // 系统参数
@@ -158,13 +147,12 @@ public class FlowRunnerManager {
     flowExecutorService.submit(flowRunner);
   }
 
-  public void submitFlow(int execId) {
-    ExecutionFlow executionFlow = flowDao.queryExecutionFlow(execId);
-    submitFlow(executionFlow);
-  }
-
   /**
    * 提交调度的 workflow 执行 <p>
+   *
+   * @param executionFlow
+   * @param schedule
+   * @param scheduleDate
    */
   public void submitFlow(ExecutionFlow executionFlow, Schedule schedule, Date scheduleDate) {
     //int maxTryTimes = schedule.getMaxTryTimes() != null ? schedule.getMaxTryTimes() : defaultMaxTryTimes;
@@ -195,10 +183,13 @@ public class FlowRunnerManager {
     flowExecutorService.submit(flowRunner);
   }
 
-  private void cleanFinishedFlows(){
-    for(Map.Entry<Integer, FlowRunner> entry: runningFlows.entrySet()){
+  /**
+   * 清理完成的 flows
+   */
+  private void cleanFinishedFlows() {
+    for (Map.Entry<Integer, FlowRunner> entry : runningFlows.entrySet()) {
       ExecutionFlow executionFlow = flowDao.queryExecutionFlow(entry.getKey());
-      if(executionFlow.getStatus().typeIsFinished()){
+      if (executionFlow.getStatus().typeIsFinished()) {
         runningFlows.remove(entry.getKey());
       }
     }
@@ -208,14 +199,13 @@ public class FlowRunnerManager {
    * 销毁资源 <p>
    */
   public void destroy() {
-
     if (!flowExecutorService.isShutdown()) {
       try {
         flowExecutorService.shutdown();
         flowExecutorService.awaitTermination(3, TimeUnit.SECONDS);
         flowExecutorService.shutdownNow();
       } catch (Exception e) {
-        LOGGER.error(e.getMessage(), e);
+        logger.error(e.getMessage(), e);
       }
     }
 
@@ -225,7 +215,7 @@ public class FlowRunnerManager {
         nodeExecutorService.awaitTermination(3, TimeUnit.SECONDS);
         nodeExecutorService.shutdownNow();
       } catch (Exception e) {
-        LOGGER.error(e.getMessage(), e);
+        logger.error(e.getMessage(), e);
       }
     }
 
@@ -239,7 +229,7 @@ public class FlowRunnerManager {
         jobExecutorService.awaitTermination(3, TimeUnit.SECONDS);
         jobExecutorService.shutdownNow();
       } catch (Exception e) {
-        LOGGER.error(e.getMessage(), e);
+        logger.error(e.getMessage(), e);
       }
     }
 
@@ -248,9 +238,14 @@ public class FlowRunnerManager {
     } catch (InterruptedException e) {
       e.printStackTrace();
     }
-
   }
 
+  /**
+   * 取消执行的 flow
+   *
+   * @param execId
+   * @param user
+   */
   public void cancelFlow(int execId, String user) {
     FlowRunner flowRunner = runningFlows.get(execId);
 
@@ -261,16 +256,4 @@ public class FlowRunnerManager {
     flowRunner.kill(user);
     runningFlows.remove(execId);
   }
-
-  public void cancelFlow(int execId) {
-    FlowRunner flowRunner = runningFlows.get(execId);
-
-    if (flowRunner == null) {
-      throw new ExecException("Execution " + execId + "is not running");
-    }
-
-    flowRunner.kill();
-    runningFlows.remove(execId);
-  }
-
 }

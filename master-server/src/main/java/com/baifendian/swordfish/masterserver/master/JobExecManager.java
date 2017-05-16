@@ -74,7 +74,7 @@ public class JobExecManager {
   private ExecutorCheckThread executorCheckThread;
 
   /**
-   *
+   * 具备定时调度运行的 executor service
    */
   private ScheduledExecutorService executorService;
 

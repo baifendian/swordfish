@@ -21,16 +21,11 @@ import org.apache.ibatis.type.JdbcType;
 
 import java.util.List;
 
-/**
- * workflow 节点的相关操作 <p>
- *
- * @author : dsfan
- * @date : 2016年8月27日
- */
 public interface FlowNodeMapper {
   /**
    * 插入记录 <p>
    *
+   * @param flowNode
    * @return 插入记录数
    */
   @InsertProvider(type = FlowNodeMapperProvider.class, method = "insert")
@@ -40,6 +35,7 @@ public interface FlowNodeMapper {
   /**
    * 删除 workflow <p>
    *
+   * @param flowId
    * @return 删除记录数
    */
   @DeleteProvider(type = FlowNodeMapperProvider.class, method = "deleteByFlowId")
@@ -48,35 +44,36 @@ public interface FlowNodeMapper {
   /**
    * 查询记录 <p>
    *
+   * @param flowId
    * @return workflow 节点列表
    */
   @Results(value = {@Result(property = "id", column = "id", id = true, javaType = int.class, jdbcType = JdbcType.INTEGER),
-          @Result(property = "name", column = "name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-          @Result(property = "type", column = "type", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-          @Result(property = "desc", column = "desc", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-          @Result(property = "extras", column = "extras", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-          @Result(property = "dep", column = "dep", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-          @Result(property = "flowId", column = "flow_id", id = true, javaType = int.class, jdbcType = JdbcType.INTEGER),
-          @Result(property = "parameter", column = "parameter", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-          })
+      @Result(property = "name", column = "name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+      @Result(property = "type", column = "type", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+      @Result(property = "desc", column = "desc", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+      @Result(property = "extras", column = "extras", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+      @Result(property = "dep", column = "dep", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+      @Result(property = "flowId", column = "flow_id", id = true, javaType = int.class, jdbcType = JdbcType.INTEGER),
+      @Result(property = "parameter", column = "parameter", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+  })
   @SelectProvider(type = FlowNodeMapperProvider.class, method = "selectByFlowId")
   List<FlowNode> selectByFlowId(@Param("flowId") int flowId);
 
   /**
-   * 根据多个ID查看flowNode
+   * 根据多个 ID 查看 flowNode
+   *
    * @param flowIds
    * @return
    */
   @Results(value = {@Result(property = "id", column = "id", id = true, javaType = int.class, jdbcType = JdbcType.INTEGER),
-          @Result(property = "name", column = "name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-          @Result(property = "type", column = "type", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-          @Result(property = "desc", column = "desc", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-          @Result(property = "extras", column = "extras", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-          @Result(property = "dep", column = "dep", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-          @Result(property = "flowId", column = "flow_id", id = true, javaType = int.class, jdbcType = JdbcType.INTEGER),
-          @Result(property = "parameter", column = "parameter", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+      @Result(property = "name", column = "name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+      @Result(property = "type", column = "type", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+      @Result(property = "desc", column = "desc", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+      @Result(property = "extras", column = "extras", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+      @Result(property = "dep", column = "dep", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+      @Result(property = "flowId", column = "flow_id", id = true, javaType = int.class, jdbcType = JdbcType.INTEGER),
+      @Result(property = "parameter", column = "parameter", javaType = String.class, jdbcType = JdbcType.VARCHAR),
   })
   @Select("<script> select * from flows_nodes where flow_id in  <foreach item=\"flowId\" index=\"index\" collection=\"flowIds\" open=\"(\" separator=\",\" close=\")\"> #{flowId} </foreach> </script>")
   List<FlowNode> selectByFlowIds(@Param("flowIds") List<Integer> flowIds);
-
 }

@@ -153,6 +153,8 @@ public class MasterServiceImpl implements Iface {
   }
 
   /**
+   * 运行一个工作流, 是指直接运行的方式
+   *
    * @param projectId
    * @param flowId
    * @param scheduleDate
@@ -174,12 +176,13 @@ public class MasterServiceImpl implements Iface {
         return new RetResultInfo(ResultHelper.createErrorResult("flowId is not exists"), null);
       }
 
+      // 构建一个用于执行的工作流
       executionFlow = flowDao.scheduleFlowToExecution(projectId,
           flowId,
           flow.getOwnerId(),
           new Date(scheduleDate),
           ExecType.DIRECT,
-          1, // 仅仅执行 1 次
+          1,
           execInfo.getNodeName(),
           NodeDepType.valueOfType(execInfo.getNodeDep()),
           NotifyType.valueOfType(execInfo.getNotifyType()),
@@ -196,6 +199,59 @@ public class MasterServiceImpl implements Iface {
     }
 
     return new RetResultInfo(ResultHelper.SUCCESS, Arrays.asList(executionFlow.getId()));
+  }
+
+  /**
+   * 补数据
+   *
+   * @param projectId
+   * @param flowId
+   * @param scheduleInfo
+   * @return
+   * @throws TException
+   */
+  @Override
+  public RetResultInfo appendWorkFlow(int projectId, int flowId, ScheduleInfo scheduleInfo) throws TException {
+    logger.info("append workflow projectId:{}, flowId:{}, scheduleMeta:{}", projectId, flowId, scheduleInfo);
+
+    try {
+      ProjectFlow flow = flowDao.projectFlowfindById(flowId);
+
+      // 若 workflow 被删除
+      if (flow == null) {
+        logger.error("projectId:{}, flowId:{} workflow not exists", projectId, flowId);
+        return ResultDetailHelper.createErrorResult("current workflow not exists");
+      }
+
+      String crontabStr = scheduleInfo.getCronExpression();
+      CronExpression cron = new CronExpression(crontabStr);
+
+      Date startDateTime = new Date(scheduleInfo.getStartDate());
+      Date endDateTime = new Date(scheduleInfo.getEndDate());
+
+      // 提交补数据任务
+      jobExecManager.submitAddData(flow, cron, startDateTime, endDateTime);
+    } catch (Exception e) {
+      logger.error(e.getMessage(), e);
+      return ResultDetailHelper.createErrorResult(e.getMessage());
+    }
+
+    return ResultDetailHelper.createSuccessResult(Collections.emptyList());
+  }
+
+  /**
+   * @param execId
+   * @return
+   * @throws TException
+   */
+  @Override
+  public RetInfo cancelExecFlow(int execId) throws TException {
+    try {
+      return jobExecManager.cancelExecFlow(execId);
+    } catch (Exception e) {
+      logger.warn("executor report error", e);
+      return ResultHelper.createErrorResult(e.getMessage());
+    }
   }
 
   /**
@@ -241,57 +297,6 @@ public class MasterServiceImpl implements Iface {
     }
 
     return ResultHelper.SUCCESS;
-  }
-
-  /**
-   * 补数据
-   *
-   * @param projectId
-   * @param flowId
-   * @param scheduleInfo
-   * @return
-   * @throws TException
-   */
-  @Override
-  public RetResultInfo appendWorkFlow(int projectId, int flowId, ScheduleInfo scheduleInfo) throws TException {
-    logger.debug("append workflow projectId:{}, flowId:{},scheduleMeta:{}", projectId, flowId, scheduleInfo);
-    try {
-      ProjectFlow flow = flowDao.projectFlowfindById(flowId);
-      // 若 workflow 被删除
-      if (flow == null) {
-        logger.error("projectId:{},flowId:{} workflow not exists", projectId, flowId);
-        return ResultDetailHelper.createErrorResult("current workflow not exists");
-      }
-
-      String crontabStr = scheduleInfo.getCronExpression();
-      CronExpression cron = new CronExpression(crontabStr);
-
-      Date startDateTime = new Date(scheduleInfo.getStartDate());
-      Date endDateTime = new Date(scheduleInfo.getEndDate());
-
-      // 提交补数据任务
-      jobExecManager.submitAddData(flow, cron, startDateTime, endDateTime);
-    } catch (Exception e) {
-      logger.error(e.getMessage(), e);
-      return ResultDetailHelper.createErrorResult(e.getMessage());
-    }
-
-    return ResultDetailHelper.createSuccessResult(Collections.emptyList());
-  }
-
-  /**
-   * @param execId
-   * @return
-   * @throws TException
-   */
-  @Override
-  public RetInfo cancelExecFlow(int execId) throws TException {
-    try {
-      return jobExecManager.cancelExecFlow(execId);
-    } catch (Exception e) {
-      logger.warn("executor report error", e);
-      return ResultHelper.createErrorResult(e.getMessage());
-    }
   }
 
   /**

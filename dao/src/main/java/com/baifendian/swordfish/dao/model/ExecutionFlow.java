@@ -18,7 +18,7 @@ package com.baifendian.swordfish.dao.model;
 import com.baifendian.swordfish.dao.enums.ExecType;
 import com.baifendian.swordfish.dao.enums.FlowStatus;
 import com.baifendian.swordfish.dao.enums.NotifyType;
-import com.baifendian.swordfish.dao.model.flow.params.Property;
+import com.baifendian.swordfish.dao.model.flow.Property;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
 import org.apache.commons.lang.StringUtils;
 
@@ -29,13 +29,13 @@ import java.util.stream.Collectors;
 
 public class ExecutionFlow {
   /**
-   * 具体执行的id
+   * 具体执行的 id
    * 数据库映射字段
    **/
   private Integer id;
 
   /**
-   * workflow的id
+   * workflow 的 id
    * 数据库映射字段 flow_id
    **/
   private int flowId;
@@ -52,13 +52,13 @@ public class ExecutionFlow {
   private String flowName;
 
   /**
-   * worker的host
+   * worker 的 host
    * 数据库映射字段/DTO需要字段
    **/
   private String worker;
 
   /**
-   * workflow执行的状态
+   * workflow 执行的状态
    * 数据库映射字段/DTO需要字段
    **/
   private FlowStatus status;
@@ -71,7 +71,7 @@ public class ExecutionFlow {
 
   /**
    * 提交用户名称
-   * DTO需要字段
+   * DTO 需要字段
    **/
   private String submitUser;
 
@@ -112,7 +112,7 @@ public class ExecutionFlow {
   private ExecType type;
 
   /**
-   * workflow 所在项目的id
+   * workflow 所在项目的 id
    */
   private Integer projectId;
 
