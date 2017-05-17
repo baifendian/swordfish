@@ -129,38 +129,22 @@ public class UserMapperProvider {
   /**
    * 更新用户信息
    *
-   * @param user
+   * @param parameter
    * @return
    */
-  public String update(final User user) {
+  public String update(Map<String, Object> parameter) {
     return new SQL() {
       {
         UPDATE(TABLE_NAME);
 
-        if (StringUtils.isNotEmpty(user.getEmail())) {
-          SET("`email`=#{user.email}");
-        }
-
-        if (StringUtils.isNotEmpty(user.getDesc())) {
-          SET("`desc`=#{user.desc}");
-        }
-
-        if (StringUtils.isNotEmpty(user.getPhone())) {
-          SET("`phone`=#{user.phone}");
-        }
-
-        if (StringUtils.isNotEmpty(user.getPassword())) {
-          SET("`password`=#{user.password}");
-        }
-
+        SET("`email`=#{user.email}");
+        SET("`desc`=#{user.desc}");
+        SET("`phone`=#{user.phone}");
+        SET("`password`=#{user.password}");
 //        if (user.getRole() != null) {
 //          SET("`role`=" + EnumFieldUtil.genFieldStr("user.role", UserRoleType.class));
 //        }
-
-        if (StringUtils.isNotEmpty(user.getProxyUsers())) {
-          SET("`proxy_users`=#{user.proxyUsers}");
-        }
-
+        SET("`proxy_users`=#{user.proxyUsers}");
         SET("`modify_time`=#{user.modifyTime}");
 
         WHERE("`name`=#{user.name}");
@@ -179,7 +163,7 @@ public class UserMapperProvider {
       {
         DELETE_FROM(TABLE_NAME);
 
-        WHERE("`name`=#{user.name}");
+        WHERE("`name`=#{name}");
       }
     }.toString();
   }

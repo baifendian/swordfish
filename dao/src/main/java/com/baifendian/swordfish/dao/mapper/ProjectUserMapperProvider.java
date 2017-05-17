@@ -69,9 +69,9 @@ public class ProjectUserMapperProvider {
    * @return
    */
   public String queryByProject(Map<String, Object> parameter) {
-    return new SQL() {{
+    String sql = new SQL() {{
       SELECT("p_u.*");
-      SELECT("u.name as user_name, p.name as project_name");
+      SELECT("u.name as user_name, p.name as project_name, p.owner as owner_id");
 
       FROM(TABLE_NAME + " p_u");
 
@@ -79,6 +79,15 @@ public class ProjectUserMapperProvider {
       JOIN("project p on p_u.project_id = p.id");
 
       WHERE("p_u.project_id = #{projectId}");
+    }}.toString();
+
+    return new SQL() {{
+      SELECT("t.*");
+      SELECT("u.name as owner_name");
+
+      FROM("("+sql+") t");
+
+      JOIN("user u on t.owner_id = u.id");
     }}.toString();
   }
 
@@ -95,8 +104,8 @@ public class ProjectUserMapperProvider {
       SET("`perm`=#{projectUser.perm}");
       SET("`modify_time`=#{projectUser.modifyTime}");
 
-      WHERE("`project_id` = #{projectId}");
-      WHERE("`user_id` = #{userId}");
+      WHERE("`project_id` = #{projectUser.projectId}");
+      WHERE("`user_id` = #{projectUser.userId}");
     }}.toString();
   }
 

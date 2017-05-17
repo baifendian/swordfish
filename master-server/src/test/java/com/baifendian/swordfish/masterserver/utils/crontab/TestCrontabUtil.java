@@ -1,3 +1,18 @@
+/*
+ * Copyright (C) 2017 Baifendian Corporation
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *          http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.baifendian.swordfish.masterserver.utils.crontab;
 
 import com.baifendian.swordfish.dao.enums.ScheduleType;
@@ -13,7 +28,7 @@ import static junit.framework.TestCase.assertEquals;
  */
 public class TestCrontabUtil {
   @Test
-  public void testGetCycle(){
+  public void testGetCycle() {
     //准备数据
     String minCrontab = "0 0/2 0-23 * * ? *";
     String hourCrontab = "0 0 2-22/2 * * ? *";
@@ -39,12 +54,12 @@ public class TestCrontabUtil {
     ScheduleType monthType1 = getCycle(monthCron1);
     ScheduleType monthType2 = getCycle(monthCron2);
 
-    assertEquals(minType,ScheduleType.MINUTE);
-    assertEquals(hourType,ScheduleType.HOUR);
-    assertEquals(dayType,ScheduleType.DAY);
-    assertEquals(weekType1,ScheduleType.WEEK);
-    assertEquals(weekType2,ScheduleType.WEEK);
-    assertEquals(monthType1,ScheduleType.MONTH);
-    assertEquals(monthType2,ScheduleType.MONTH);
+    assertEquals(minType, ScheduleType.MINUTE);
+    assertEquals(hourType, ScheduleType.HOUR);
+    assertEquals(dayType, ScheduleType.DAY);
+    assertEquals(weekType1, ScheduleType.WEEK);
+    assertEquals(weekType2, ScheduleType.WEEK);
+    assertEquals(monthType1, ScheduleType.MONTH);
+    assertEquals(monthType2, ScheduleType.MONTH);
   }
 }

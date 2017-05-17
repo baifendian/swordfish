@@ -160,6 +160,10 @@ public class UserService {
     Date now = new Date();
 
     if (email != null) {
+      //邮箱不能重复
+      if (userMapper.queryByEmail(email) != null) {
+        throw new ParameterException("Email has exist, can't modify again.");
+      }
       user.setEmail(email);
     }
 
