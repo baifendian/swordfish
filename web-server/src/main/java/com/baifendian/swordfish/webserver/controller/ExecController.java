@@ -135,6 +135,16 @@ public class ExecController {
     logger.info("Operator user {}, query exec list, start date: {}, end date: {}, project name: {}, workflow name: {}, status: {}, from: {}, size: {}",
         operator.getName(), startDate, endDate, projectName, workflowName, status, from, size);
 
+    // from 的限制
+    if (from < 0) {
+      throw new BadRequestException("Argument is not valid, from must be equal or more than zero");
+    }
+
+    // size 的限制
+    if (size <= 0 || size > 1000) {
+      throw new BadRequestException("Argument is not valid, size must be between (0, 1000]");
+    }
+
     return execService.getExecWorkflow(operator, projectName, workflowName, new Date(startDate), new Date(endDate), status, from, size);
   }
 
@@ -180,6 +190,7 @@ public class ExecController {
     if (size <= 0 || size > 1000) {
       throw new BadRequestException("Argument is not valid, size must be between (0, 1000]");
     }
+
     return execService.getEexcWorkflowLog(operator, jobId, from, size);
   }
 

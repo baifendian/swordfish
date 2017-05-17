@@ -29,9 +29,6 @@ import org.apache.commons.lang.StringUtils;
 
 import java.util.Date;
 
-/**
- * 执行flow返回response
- */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ExecutionFlowDto {
   private int execId;
@@ -48,7 +45,7 @@ public class ExecutionFlowDto {
 
   private Date endTime;
 
-  private int duration;
+  private Integer duration;
 
   private String submitUser;
 
@@ -149,11 +146,11 @@ public class ExecutionFlowDto {
     this.endTime = endTime;
   }
 
-  public int getDuration() {
+  public Integer getDuration() {
     return duration;
   }
 
-  public void setDuration(int duration) {
+  public void setDuration(Integer duration) {
     this.duration = duration;
   }
 

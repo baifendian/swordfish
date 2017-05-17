@@ -230,10 +230,6 @@ public class ExecService {
 
     List<String> workflowList;
 
-    if (from < 0) {
-      throw new BadRequestException("From \"{0}\" < 0", from);
-    }
-
     try {
       workflowList = JsonUtil.parseObjectList(workflowName, String.class);
     } catch (Exception e) {
