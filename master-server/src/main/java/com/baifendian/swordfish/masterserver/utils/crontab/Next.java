@@ -39,9 +39,9 @@ public class Next extends CycleHelper {
   @Override
   protected ScheduleType getCycle() {
     for (CycleHelper cycleHelper : cycleHelperList) {
-      ScheduleType level = cycleHelper.getCycle();
-      if (level != null) {
-        return level;
+      ScheduleType cycle = cycleHelper.getCycle();
+      if (cycle != null) {
+        return cycle;
       }
     }
     return null;

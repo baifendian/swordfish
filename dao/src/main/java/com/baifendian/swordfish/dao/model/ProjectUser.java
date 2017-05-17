@@ -56,6 +56,11 @@ public class ProjectUser {
    */
   private int perm;
 
+  /**
+   * project的责任人
+   */
+  private String owner;
+
   public String getProjectName() {
     return projectName;
   }
@@ -110,5 +115,13 @@ public class ProjectUser {
 
   public void setCreateTime(Date createTime) {
     this.createTime = createTime;
+  }
+
+  public String getOwner() {
+    return owner;
+  }
+
+  public void setOwner(String owner) {
+    this.owner = owner;
   }
 }

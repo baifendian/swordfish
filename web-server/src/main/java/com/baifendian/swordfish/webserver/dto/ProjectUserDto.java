@@ -28,6 +28,7 @@ public class ProjectUserDto {
   private int perm;
   private Date createTime;
   private Date modifyTime;
+  private String owner;
 
   public ProjectUserDto() {
   }
@@ -39,6 +40,7 @@ public class ProjectUserDto {
       this.perm = projectUser.getPerm();
       this.createTime = projectUser.getCreateTime();
       this.modifyTime = projectUser.getModifyTime();
+      this.owner = projectUser.getOwner();
     }
   }
 
@@ -82,4 +84,11 @@ public class ProjectUserDto {
     this.modifyTime = modifyTime;
   }
 
+  public String getOwner() {
+    return owner;
+  }
+
+  public void setOwner(String owner) {
+    this.owner = owner;
+  }
 }

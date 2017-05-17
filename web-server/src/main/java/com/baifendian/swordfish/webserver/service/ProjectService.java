@@ -78,7 +78,7 @@ public class ProjectService {
 
     // 管理员不能创建项目
     if (operator.getRole() == UserRoleType.ADMIN_USER) {
-      throw new PermissionException("User \"{0}\" is not admin", operator.getName());
+      throw new PermissionException("User \"{0}\" must not be admin", operator.getName());
     }
 
     Project project = new Project();

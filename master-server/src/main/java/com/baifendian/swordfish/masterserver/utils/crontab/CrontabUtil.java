@@ -79,7 +79,7 @@ public class CrontabUtil {
   }
 
   /**
-   * 获取某个时间段的
+   * 获取某个时间段的调度时间节点
    *
    * @param startTime
    * @param endTime
