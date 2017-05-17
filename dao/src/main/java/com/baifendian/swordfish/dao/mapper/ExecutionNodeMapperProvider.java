@@ -20,14 +20,16 @@ import com.baifendian.swordfish.dao.mapper.utils.EnumFieldUtil;
 import com.baifendian.swordfish.dao.model.ExecutionNode;
 import org.apache.ibatis.jdbc.SQL;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 public class ExecutionNodeMapperProvider {
 
   public static final String TABLE_NAME = "execution_nodes";
 
+  /**
+   * @param parameter
+   * @return
+   */
   public String insert(Map<String, Object> parameter) {
     return new SQL() {
       {
@@ -44,6 +46,10 @@ public class ExecutionNodeMapperProvider {
     }.toString();
   }
 
+  /**
+   * @param parameter
+   * @return
+   */
   public String update(Map<String, Object> parameter) {
     ExecutionNode executionNode = (ExecutionNode) parameter.get("executionNode");
     return new SQL() {
@@ -67,7 +73,10 @@ public class ExecutionNodeMapperProvider {
     }.toString();
   }
 
-
+  /**
+   * @param parameter
+   * @return
+   */
   public String selectExecNode(Map<String, Object> parameter) {
     return new SQL() {
       {
@@ -79,6 +88,10 @@ public class ExecutionNodeMapperProvider {
     }.toString();
   }
 
+  /**
+   * @param parameter
+   * @return
+   */
   public String selectExecNodeById(Map<String, Object> parameter) {
     return new SQL() {
       {
@@ -89,6 +102,10 @@ public class ExecutionNodeMapperProvider {
     }.toString();
   }
 
+  /**
+   * @param parameter
+   * @return
+   */
   public String selectExecNodeByJobId(Map<String, Object> parameter) {
     return new SQL() {
       {

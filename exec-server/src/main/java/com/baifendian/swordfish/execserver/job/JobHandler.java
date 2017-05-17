@@ -76,18 +76,18 @@ public class JobHandler {
     this.startTime = System.currentTimeMillis();
     this.jobIdLog = String.format("%s_%s", executionNode.getJobId(), DateUtils.now(Constants.DATETIME_FORMAT));
 
-    // custom参数会覆盖system参数
+    // custom 参数会覆盖 system 参数
     allParamMap = new HashMap<>();
     allParamMap.putAll(systemParamMap);
     allParamMap.putAll(customParamMap);
-
   }
 
   public FlowStatus handle() throws IOException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException, InterruptedException {
     String flowLocalPath = BaseConfig.getFlowExecDir(executionFlow.getProjectId(), executionFlow.getFlowId(), executionFlow.getId());
     String jobScriptPath = flowLocalPath;
-    //FileUtils.forceMkdir(new File(jobScriptPath));
-    logger.info("job:{} script path:{}", jobIdLog, jobScriptPath);
+
+    // FileUtils.forceMkdir(new File(jobScriptPath));
+    logger.info("job:{}, script path:{}", jobIdLog, jobScriptPath);
 
     // 作业参数配置
     JobProps props = new JobProps();
@@ -103,21 +103,26 @@ public class JobHandler {
     props.setQueue(executionFlow.getQueue());
 
     JobLogger jobLogger = new JobLogger(executionNode.getJobId(), logger);
-    //logger.info("props:{}", props);
+
     job = JobTypeManager.newJob(jobIdLog, node.getType(), props, jobLogger);
+
     Boolean result;
+
     try {
       result = submitJob(job);
     } catch (Exception e) {
       result = false;
       logger.error("run job error, job:" + jobIdLog, e);
     }
+
     FlowStatus status;
+
     if (result) {
       status = FlowStatus.SUCCESS;
     } else {
       status = FlowStatus.FAILED;
     }
+
     return status;
   }
 
@@ -128,35 +133,34 @@ public class JobHandler {
    */
   protected boolean submitJob(Job job) {
     // 异步提交 job
-    Future<Boolean> future = executorService.submit(new Callable<Boolean>() {
+    Future<Boolean> future = executorService.submit(() -> {
+      boolean isSuccess = true;
 
-      @Override
-      public Boolean call() throws Exception {
-        boolean isSuccess = true;
-        try {
-          job.before();
-          job.process();
-          job.after();
-          if (job.getExitCode() != 0) {
-            isSuccess = false;
-          }
-        } finally {
-          // insertLogToDb(job.getContext().getExecLogger()); //
-          // 插入日志到数据库中
+      try {
+        job.before();
+        job.process();
+        job.after();
+
+        if (job.getExitCode() != 0) {
+          isSuccess = false;
         }
-        return isSuccess;
+      } finally {
       }
+
+      return isSuccess;
     });
 
-    boolean isSuccess = false;
+    boolean isSuccess;
 
     // 短任务，需要设置超时时间
     if (!JobTypeManager.isLongJob(node.getType())) {
       try {
         isSuccess = future.get(calcNodeTimeout(), TimeUnit.SECONDS);
       } catch (TimeoutException e) {
+        logger.error("get result timeout", e);
         throw new ExecTimeoutException("execute task time out", e);
       } catch (InterruptedException | ExecutionException e) {
+        logger.error("get result exception", e);
         throw new ExecException("execute task get error", e);
       }
     } else { // 长任务定时检查作业是否有报错，如果报错就返回
@@ -164,10 +168,10 @@ public class JobHandler {
         try {
           future.get(60, TimeUnit.SECONDS);
         } catch (InterruptedException | ExecutionException e) {
-          isSuccess = false;
+          logger.error("get result exception", e);
           throw new ExecException("execute task get error", e);
         } catch (TimeoutException e) {
-
+          logger.error("get result timeout", e);
         }
       }
     }
@@ -182,9 +186,11 @@ public class JobHandler {
    */
   private int calcNodeTimeout() {
     int usedTime = (int) ((System.currentTimeMillis() - startTime) / 1000);
+
     if (timeout <= usedTime) {
       throw new ExecTimeoutException("current workflow execution fetch time out");
     }
+
     return timeout - usedTime;
   }
 

@@ -92,9 +92,6 @@ public class NodeRunner implements Runnable {
       status = jobHandler.handle();
 
       logger.info("run executor:{} node:{} finished, status:{}", executionFlow.getId(), executionNode.getName(), status);
-
-      // 更新 executionNode 信息
-      updateExecutionNode(status);
     } catch (Exception e) {
       logger.error(String.format("job %s error", jobHandler.getJobIdLog()), e);
     } finally {
@@ -111,8 +108,10 @@ public class NodeRunner implements Runnable {
    * 更新数据库中的 ExecutionNode 信息 <p>
    */
   private void updateExecutionNode(FlowStatus flowStatus) {
+    Date now = new Date();
+
     executionNode.setStatus(flowStatus);
-    executionNode.setEndTime(new Date());
+    executionNode.setEndTime(now);
     flowDao.updateExecutionNode(executionNode);
   }
 

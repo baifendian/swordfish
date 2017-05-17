@@ -17,14 +17,16 @@ package com.baifendian.swordfish.execserver.runner.flow;
 
 import com.baifendian.swordfish.common.config.BaseConfig;
 import com.baifendian.swordfish.common.hadoop.HdfsClient;
+import com.baifendian.swordfish.common.job.struct.node.BaseParam;
+import com.baifendian.swordfish.common.job.struct.node.BaseParamFactory;
 import com.baifendian.swordfish.common.mail.EmailManager;
 import com.baifendian.swordfish.common.utils.graph.DAGGraph;
 import com.baifendian.swordfish.common.utils.graph.Graph;
 import com.baifendian.swordfish.dao.DaoFactory;
 import com.baifendian.swordfish.dao.FlowDao;
-import com.baifendian.swordfish.dao.enums.ExecType;
 import com.baifendian.swordfish.dao.enums.FailurePolicyType;
 import com.baifendian.swordfish.dao.enums.FlowStatus;
+import com.baifendian.swordfish.dao.enums.NotifyType;
 import com.baifendian.swordfish.dao.model.ExecutionFlow;
 import com.baifendian.swordfish.dao.model.ExecutionNode;
 import com.baifendian.swordfish.dao.model.FlowNode;
@@ -32,8 +34,6 @@ import com.baifendian.swordfish.dao.model.FlowNodeRelation;
 import com.baifendian.swordfish.dao.model.flow.FlowDag;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
 import com.baifendian.swordfish.execserver.exception.ExecTimeoutException;
-import com.baifendian.swordfish.execserver.job.Job;
-import com.baifendian.swordfish.execserver.job.JobProps;
 import com.baifendian.swordfish.execserver.job.JobTypeManager;
 import com.baifendian.swordfish.execserver.runner.node.NodeRunner;
 import com.baifendian.swordfish.execserver.utils.LoggerUtil;
@@ -68,11 +68,6 @@ public class FlowRunner implements Runnable {
    * {@link FlowDao}
    */
   private final FlowDao flowDao;
-
-  /**
-   * {@link FlowRunnerContext}
-   */
-  private final FlowRunnerContext context;
 
   /**
    * {@link ExecutionFlow}
@@ -120,7 +115,7 @@ public class FlowRunner implements Runnable {
   private final int maxTryTimes;
 
   /**
-   * 节点最大的超时时间 (2)
+   * 节点最大的超时时间
    */
   private final int timeout;
 
@@ -128,11 +123,6 @@ public class FlowRunner implements Runnable {
    * 起始时间 (ms)
    */
   private final long startTime = System.currentTimeMillis();
-
-  /**
-   * 同步对象
-   */
-  private final Object synObject = new Object();
 
   /**
    * workflow 是否执行成功
@@ -154,7 +144,6 @@ public class FlowRunner implements Runnable {
    */
   public FlowRunner(FlowRunnerContext context) {
     this.flowDao = DaoFactory.getDaoInstance(FlowDao.class);
-    this.context = context;
     this.executionFlow = context.getExecutionFlow();
     this.executorService = context.getExecutorService();
     this.jobExecutorService = context.getJobExecutorService();
@@ -201,7 +190,7 @@ public class FlowRunner implements Runnable {
 
           String cmd = String.format("sudo useradd -g %s %s", userGroup, proxyUser);
 
-          logger.info("exec cmd: {} ", cmd);
+          logger.info("exec cmd: {}", cmd);
 
           OsUtil.exeCmd(cmd);
         }
@@ -224,22 +213,22 @@ public class FlowRunner implements Runnable {
         if (zipFile.exists()) {
           String cmd = String.format("unzip -o %s -d %s", zipFile.getPath(), execLocalPath);
 
-          logger.info("call cmd:" + cmd);
+          logger.info("call cmd:{}", cmd);
 
           Process process = Runtime.getRuntime().exec(cmd);
           int ret = process.waitFor();
           if (ret != 0) {
-            logger.error("run cmd:" + cmd + " error");
+            logger.error("run cmd error:{}", cmd);
             logger.error(IOUtils.toString(process.getErrorStream(), Charset.forName("UTF-8")));
           }
         } else {
-          logger.error("can't found workflow zip file:" + zipFile.getPath());
+          logger.error("can't found workflow zip file:{}", zipFile.getPath());
         }
       } else {
         logger.debug("hdfs workflow file:{} not exists", workflowHdfsFile);
       }
 
-      // 解析作业参数获取需要的项目级资源文件清单
+      // 解析作业参数获取需要的 "项目级资源文件" 清单
       List<String> projectRes = genProjectResFiles(flowDag);
       for (String res : projectRes) {
         File resFile = new File(execLocalPath, res);
@@ -254,7 +243,7 @@ public class FlowRunner implements Runnable {
         }
       }
 
-      // 生成具体 Dag
+      // 生成具体 Dag, 待执行
       Graph<String, FlowNode, FlowNodeRelation> dagGraph = genDagGraph(flowDag);
 
       // 执行 flow
@@ -263,7 +252,7 @@ public class FlowRunner implements Runnable {
       // 更新 ExecutionFlow
       updateExecutionFlow(status);
     } catch (ExecTimeoutException e) {
-      logger.error(e.getMessage(), e);
+      logger.error("Exec flow timeout", e);
       // 超时时，取消所有正在执行的作业
       cancelAllExectingNode();
     } catch (Throwable e) {
@@ -273,6 +262,7 @@ public class FlowRunner implements Runnable {
       if (status == null) {
         updateExecutionFlow(FlowStatus.FAILED);
       }
+
       // 后置处理
       after();
     }
@@ -317,19 +307,16 @@ public class FlowRunner implements Runnable {
     List<FlowNode> nodes = flowDag.getNodes();
     Set<String> projectFiles = new HashSet<>();
 
-    Map<String, String> allParamMap = new HashMap<>();
-    allParamMap.putAll(systemParamMap);
-    allParamMap.putAll(customParamMap);
-
     for (FlowNode node : nodes) {
-      JobProps props = new JobProps();
-      props.setJobParams(node.getParameter());
-      props.setDefinedParams(allParamMap);
-      String jobId = node.getType() + "_" + node.getName();
+      // 得到结点参数信息
+      BaseParam baseParam = BaseParamFactory.getBaseParam(node.getType(), node.getParameter());
 
-      Job job = JobTypeManager.newJob(jobId, node.getType(), props, logger);
-      if (job.getParam() != null && job.getParam().getProjectResourceFiles() != null) {
-        projectFiles.addAll(job.getParam().getProjectResourceFiles());
+      // 结点参数中获取资源文件
+      if (baseParam != null) {
+        List<String> projectResourceFiles = baseParam.getProjectResourceFiles();
+        if (projectResourceFiles != null) {
+          projectFiles.addAll(projectResourceFiles);
+        }
       }
     }
 
@@ -352,7 +339,7 @@ public class FlowRunner implements Runnable {
     // 是否全部执行完成
     boolean isAllFinished = false;
 
-    synchronized (synObject) {
+    synchronized (this) {
       // 插入执行节点信息
       ExecutionNode executionNode = new ExecutionNode();
       executionNode.setExecId(executionFlow.getId());
@@ -391,7 +378,7 @@ public class FlowRunner implements Runnable {
         // 如果没有执行完成，等待
         if (!isAllFinished) {
           try {
-            synObject.wait(); // 等待执行完成
+            wait();
           } catch (InterruptedException e) {
             logger.error(e.getMessage(), e);
           }
@@ -429,7 +416,7 @@ public class FlowRunner implements Runnable {
 
     // 是否全部执行完成
     boolean isAllFinished = false;
-    synchronized (synObject) {
+    synchronized (this) {
       // 当存在节点未提交或者没有全部执行完成时，循环检测
       while (!topologicalSort.isEmpty() || !isAllFinished) {
         // 遍历一遍节点，找出可执行节点
@@ -438,12 +425,14 @@ public class FlowRunner implements Runnable {
           String nodeName = iterator.next();
 
           // 支持恢复处理，
-          // 当在恢复处理时该节点有可能已经运行成功了,此时跳过该节点处理
+          // 当在恢复处理时该节点有可能已经运行成功了, 此时跳过该节点处理
           // 其他情况，重新调度
-          ExecutionNode executionNodeLog = flowDao.queryExecutionNode(executionFlow.getId(), nodeName);
-          if (executionNodeLog != null && executionNodeLog.getStatus().typeIsSuccess()) {
+          ExecutionNode executionNode = flowDao.queryExecutionNode(executionFlow.getId(), nodeName);
+
+          // 如果已经成功运行
+          if (executionNode != null && executionNode.getStatus().typeIsSuccess()) {
             iterator.remove();
-            finishedExecutionNodes.add(executionNodeLog);
+            finishedExecutionNodes.add(executionNode);
             continue;
           }
 
@@ -455,35 +444,37 @@ public class FlowRunner implements Runnable {
           if (preNodesAllSuccess) {
             // 插入执行节点信息
             FlowNode node = dagGraph.getVertex(nodeName);
+            Date now = new Date();
 
-            ExecutionNode executionNode = new ExecutionNode();
-            executionNode.setExecId(executionFlow.getId());
-            executionNode.setName(node.getName());
-            executionNode.setAttempt(0);
-            executionNode.setStartTime(new Date());
-            executionNode.setStatus(FlowStatus.INIT);
-            executionNode.setJobId(LoggerUtil.genJobId(JOB_PREFIX, executionFlow.getId(), node.getName()));
+            ExecutionNode newExecutionNode = new ExecutionNode();
+            newExecutionNode.setExecId(executionFlow.getId());
+            newExecutionNode.setName(node.getName());
+            newExecutionNode.setAttempt(0);
+            newExecutionNode.setStartTime(now);
+            newExecutionNode.setStatus(FlowStatus.INIT);
+            newExecutionNode.setJobId(LoggerUtil.genJobId(JOB_PREFIX, executionFlow.getId(), node.getName()));
 
-            // 如果是在恢复或者是长作业时，execution_nodes表中会存在记录，这里进行更新处理
-            if (executionNodeLog != null) {
-              flowDao.updateExecutionNode(executionNode);
+            // 如果是在恢复或者是长作业时，execution_nodes 表中会存在记录，这里进行更新处理
+            if (executionNode != null) {
+              flowDao.updateExecutionNode(newExecutionNode);
             } else {
-              flowDao.insertExecutionNode(executionNode);
+              flowDao.insertExecutionNode(newExecutionNode);
             }
 
             // 插入执行队列
-            executionNodes.add(executionNode);
+            executionNodes.add(newExecutionNode);
 
-            // 提交 jobrunner
-            submitNodeRunner(node, executionNode);
+            // 提交 job runner
+            submitNodeRunner(node, newExecutionNode);
 
             // 删除当前元素
             iterator.remove();
           } else { // 没有全部成功，看看是否已经有前驱节点失败（这里是指重试后仍失败）或者跳过
             boolean preNodesHasFailed = isPreNodesHasFailed(preNodes);
+
             // 如果前驱节点已经失败
             if (preNodesHasFailed) {
-              // 如果失败的测试是结束 DAG ,那么设置状态是失败，并跳出当前循环
+              // 如果失败的测试是结束 DAG, 那么设置状态是失败，并跳出当前循环
               if (failurePolicyType == FailurePolicyType.END) {
                 isSuccess = false;
                 break;
@@ -516,7 +507,8 @@ public class FlowRunner implements Runnable {
         // 如果没有执行完成，等待
         if (!isAllFinished) {
           try {
-            synObject.wait(); // 等待执行完成
+            // 等待 notify
+            wait();
           } catch (InterruptedException e) {
             logger.error(e.getMessage(), e);
           }
@@ -541,11 +533,13 @@ public class FlowRunner implements Runnable {
   private void submitNodeRunner(FlowNode flowNode, ExecutionNode executionNode) {
     int nowTimeout = -1;
 
+    // 如果是长任务
     if (!JobTypeManager.isLongJob(flowNode.getType())) {
       nowTimeout = calcNodeTimeout();
     }
 
-    NodeRunner nodeRunner = new NodeRunner(executionFlow, executionNode, flowNode, jobExecutorService, synObject, nowTimeout, systemParamMap, customParamMap);
+    // 构建 node runner
+    NodeRunner nodeRunner = new NodeRunner(executionFlow, executionNode, flowNode, jobExecutorService, this, nowTimeout, systemParamMap, customParamMap);
     Future<?> future = executorService.submit(nodeRunner);
 
     activeNodeRunners.add(nodeRunner);
@@ -729,6 +723,7 @@ public class FlowRunner implements Runnable {
     if (CollectionUtils.isEmpty(preNodes)) {
       return true;
     }
+
     for (String nodeName : preNodes) {
       ExecutionNode preFinishedNode = retrieveFinishedExecutionNode(nodeName);
       // 未执行完成或者执行失败的情况
@@ -761,8 +756,11 @@ public class FlowRunner implements Runnable {
    * @param status
    */
   private void updateExecutionFlow(FlowStatus status) {
-    executionFlow.setEndTime(new Date());
+    Date now = new Date();
+
+    executionFlow.setEndTime(now);
     executionFlow.setStatus(status);
+
     flowDao.updateExecutionFlow(executionFlow);
   }
 
@@ -770,8 +768,10 @@ public class FlowRunner implements Runnable {
    * 取消所有没有执行完成的作业 <p>
    */
   private void cancelAllExectingNode() {
+    Date now = new Date();
+
     for (ExecutionNode executionNode : executionNodes) {
-      if (!executionNode.getStatus().typeIsFinished()) {
+      if (executionNode.getStatus().typeIsNotFinished()) {
         // 异步线程本身有超时设置，这里不再取消
         /*
          * if (nodeFutureMap.containsKey(executionNode)) { Future<?>
@@ -780,36 +780,33 @@ public class FlowRunner implements Runnable {
          */
         // 修改执行节点的状态
         executionNode.setStatus(FlowStatus.KILL);
-        executionNode.setEndTime(new Date());
+        executionNode.setEndTime(now);
+
         flowDao.updateExecutionNode(executionNode);
       }
     }
   }
 
   /**
-   * flow执行完的后置处理 <p>
+   * flow 执行完的后置处理 <p>
    */
   private void after() {
-    ExecType flowRunType = executionFlow.getType();
-    // 调度任务的发邮件处理
-    if (flowRunType == ExecType.SCHEDULER) {
-      // 发送邮件
-      try {
-        sendEmail();
-      } catch (Exception e) {
-        logger.error(e.getMessage(), e);
-      }
-    }
-  }
+    NotifyType notifyType = executionFlow.getNotifyType();
 
-  /**
-   * 发送邮件 <p>
-   */
-  private void sendEmail() {
-    // 发送邮件
-    if ((executionFlow.getStatus().typeIsSuccess() && executionFlow.getNotifyType().typeIsSendSuccessMail())
-        || (executionFlow.getStatus().typeIsFailure() && executionFlow.getNotifyType().typeIsSendFailureMail())) {
-      EmailManager.sendEmail(executionFlow);
+    switch (notifyType) {
+      case SUCCESS:
+        if (executionFlow.getStatus().typeIsSuccess()) {
+          EmailManager.sendEmail(executionFlow);
+        }
+      case FAILURE:
+        if (executionFlow.getStatus().typeIsFailure()) {
+          EmailManager.sendEmail(executionFlow);
+        }
+      case ALL:
+        if (executionFlow.getStatus().typeIsFinished()) {
+          EmailManager.sendEmail(executionFlow);
+        }
+      default:
     }
   }
 
@@ -819,7 +816,7 @@ public class FlowRunner implements Runnable {
    * @param user
    */
   public void kill(String user) {
-    synchronized (synObject) {
+    synchronized (this) {
       logger.info("Flow killed by " + user);
       kill();
       updateExecutionFlow(FlowStatus.KILL);
@@ -830,7 +827,7 @@ public class FlowRunner implements Runnable {
    * kill 执行
    */
   public void kill() {
-    synchronized (synObject) {
+    synchronized (this) {
       logger.info("Kill has been called on exec:" + executionFlow.getId());
       logger.info("Killing running nodes, num:" + activeNodeRunners.size());
 

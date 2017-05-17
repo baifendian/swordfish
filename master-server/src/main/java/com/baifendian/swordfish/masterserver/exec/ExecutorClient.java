@@ -40,30 +40,19 @@ public class ExecutorClient {
   // 超时设置
   private int timeout = 3000;
 
-  // rpc 失败的重试次数
-  private static final int RPC_RETRIES = 3;
-
   private TTransport tTransport;
 
+  // executor worker 的 client
   private WorkerService.Client client;
 
-  // 重试次数
-  private int retries;
-
-  public ExecutorClient(String host, int port, int retries) {
+  public ExecutorClient(String host, int port) {
     this.host = host;
     this.port = port;
-    this.retries = retries;
-  }
-
-  public ExecutorClient(String host, int port) {
-    this(host, port, ExecutorClient.RPC_RETRIES);
   }
 
   public ExecutorClient(ExecutorServerInfo executorServerInfo) {
     this.host = executorServerInfo.getHost();
     this.port = executorServerInfo.getPort();
-    this.retries = RPC_RETRIES;
   }
 
   private void connect() {
@@ -123,43 +112,19 @@ public class ExecutorClient {
   }
 
   /**
-   * 执行工作流
-   *
-   * @param execId
-   * @return
-   * @throws TException
-   */
-  public boolean execFlow(int execId) throws TException {
-    boolean result = false;
-
-    for (int i = 0; i < retries; i++) {
-      result = execFlowOnce(execId);
-      if (result) {
-        break;
-      }
-      try {
-        Thread.sleep(1000);
-      } catch (InterruptedException e) {
-        logger.error("Catch an exception", e);
-      }
-    }
-
-    return result;
-  }
-
-  /**
    * 执行一次
    *
    * @param execId
    * @return
    * @throws TException
    */
-  public boolean execFlowOnce(int execId) throws TException {
+  public boolean execFlow(int execId) throws TException {
     connect();
 
     try {
       RetInfo retInfo = client.execFlow(execId);
       if (retInfo.getStatus() != ResultHelper.SUCCESS.getStatus()) {
+        // 运行时异常信息
         throw new RuntimeException(retInfo.getMsg());
       }
     } catch (TException e) {

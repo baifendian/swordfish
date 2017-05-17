@@ -92,6 +92,7 @@ public class FlowRunnerManager {
     ThreadFactory jobThreadFactory = new ThreadFactoryBuilder().setNameFormat("Exec-Worker-Job").build();
     jobExecutorService = Executors.newCachedThreadPool(jobThreadFactory);
 
+    // 主要指清理 runningFlows 中运行完成的任务
     Thread cleanThread = new Thread(() -> {
       while (true) {
         try {
@@ -148,9 +149,9 @@ public class FlowRunnerManager {
    * @param schedule
    */
   public void submitFlow(ExecutionFlow executionFlow, Schedule schedule) {
-    //int maxTryTimes = schedule.getMaxTryTimes() != null ? schedule.getMaxTryTimes() : defaultMaxTryTimes;
     int maxTryTimes = schedule.getMaxTryTimes();
     int timeout = schedule.getTimeout() != 0 ? schedule.getTimeout() : defaultMaxTimeout;
+
     FailurePolicyType failurePolicy = schedule.getFailurePolicy() != null ? schedule.getFailurePolicy() : defaultFailurePolicyType;
 
     // 系统参数

@@ -39,12 +39,13 @@ public abstract class AbstractProcessJob extends AbstractJob {
   protected final long KILL_TIME_MS = 5000;
 
   /**
-   * @param jobIdLog  生成的作业idLog
+   * @param jobId  生成的作业 id
    * @param props  作业配置信息,各类作业根据此配置信息生成具体的作业
    * @param logger 日志
    */
-  protected AbstractProcessJob(String jobIdLog, JobProps props, Logger logger) {
-    super(jobIdLog, props, logger);
+  protected AbstractProcessJob(String jobId, JobProps props, Logger logger) {
+    super(jobId, props, logger);
+
     completeLatch = new CountDownLatch(1);
   }
 
@@ -71,17 +72,23 @@ public abstract class AbstractProcessJob extends AbstractJob {
 
       String proxyUser = getProxyUser();
       String workDir = getWorkingDirectory();
+
       logger.info("jobId:{} proxyUser:{} workDir:{}", jobId, proxyUser, workDir);
+
       if (proxyUser != null) {
         String commandFile = workDir + File.separator + jobId + ".command";
+
         logger.info("generate command file:{}", commandFile);
+
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("#!/bin/sh\n");
         stringBuilder.append("BASEDIR=$(cd `dirname $0`; pwd)\n");
         stringBuilder.append("cd $BASEDIR\n");
+
         if (props.getEnvFile() != null) {
           stringBuilder.append("source " + props.getEnvFile() + "\n");
         }
+
         stringBuilder.append("\n\n");
         stringBuilder.append(StringUtils.join(processBuilder.command(), " "));
         FileUtils.writeStringToFile(new File(commandFile), stringBuilder.toString());
@@ -91,15 +98,18 @@ public abstract class AbstractProcessJob extends AbstractJob {
         processBuilder.command("sh", "-c");
         processBuilder.command().addAll(commands);
       }
+
       logger.info("run command:{}", processBuilder.command());
+
       processBuilder.directory(new File(workDir));
+
       // 将 error 信息 merge 到标准输出流
       processBuilder.redirectErrorStream(true);
       process = processBuilder.start();
 
       started = true;
 
-      // 打印 进程的启动命令行
+      // 打印进程的启动命令行
       printCommand(processBuilder);
 
       readProcessOutput();
@@ -107,7 +117,6 @@ public abstract class AbstractProcessJob extends AbstractJob {
 
       completeLatch.countDown();
     } catch (Exception e) {
-      // jobContext.getExecLogger().appendLog(e);
       logger.error(e.getMessage(), e);
       exitCode = -1;
     }
@@ -117,7 +126,6 @@ public abstract class AbstractProcessJob extends AbstractJob {
     }
 
     complete = true;
-
   }
 
   @Override
@@ -125,6 +133,7 @@ public abstract class AbstractProcessJob extends AbstractJob {
     if (process == null) {
       throw new IllegalStateException("not started.");
     }
+
     int processId = getProcessId(process);
     logger.info("job:{} cancel job. kill process:{}", jobId, processId);
 
@@ -133,7 +142,6 @@ public abstract class AbstractProcessJob extends AbstractJob {
       logger.warn("Kill with signal TERM failed. Killing with KILL signal.");
       hardKill(processId);
     }
-
   }
 
   private boolean isStarted() {
@@ -150,8 +158,16 @@ public abstract class AbstractProcessJob extends AbstractJob {
     }
   }
 
+  /**
+   * @param processId
+   * @param time
+   * @param unit
+   * @return
+   * @throws InterruptedException
+   */
   private boolean softKill(int processId, final long time, final TimeUnit unit) throws InterruptedException {
     checkStarted();
+
     if (processId != 0 && isStarted()) {
       try {
         String cmd;
@@ -160,16 +176,24 @@ public abstract class AbstractProcessJob extends AbstractJob {
         } else {
           cmd = String.format("kill %d", processId);
         }
+
         Runtime.getRuntime().exec(cmd);
         return completeLatch.await(time, unit);
       } catch (IOException e) {
         logger.info("kill attempt failed.", e);
       }
+
       return false;
     }
+
     return false;
   }
 
+  /**
+   * 直接 kill
+   *
+   * @param processId
+   */
   public void hardKill(int processId) {
     checkStarted();
     if (isRunning()) {
@@ -190,6 +214,11 @@ public abstract class AbstractProcessJob extends AbstractJob {
     }
   }
 
+  /**
+   * 打印命令
+   *
+   * @param processBuilder
+   */
   private void printCommand(ProcessBuilder processBuilder) {
     String cmdStr;
     try {
@@ -200,6 +229,12 @@ public abstract class AbstractProcessJob extends AbstractJob {
     }
   }
 
+  /**
+   * 得到进程 id
+   *
+   * @param process
+   * @return
+   */
   private int getProcessId(Process process) {
     int processId = 0;
     try {
@@ -220,30 +255,24 @@ public abstract class AbstractProcessJob extends AbstractJob {
   protected void readProcessOutput() {
     String threadLoggerInfoName = "LoggerInfo-" + jobId;
 
-    Thread loggerInfoThread = new Thread(new Runnable() {
-      @Override
-      public void run() {
-        BufferedReader reader = null;
-        try {
-          reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-          String line;
-          while ((line = reader.readLine()) != null) {
-            logger.info("{}", line);
-          }
-        } catch (Exception e) {
-          logger.error("{}", e.getMessage(), e);
+    Thread loggerInfoThread = new Thread(() -> {
+      BufferedReader reader;
+      try {
+        reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+        String line;
+        while ((line = reader.readLine()) != null) {
+          logger.info("{}", line);
         }
+      } catch (Exception e) {
+        logger.error("{}", e.getMessage(), e);
       }
     }, threadLoggerInfoName);
 
     try {
       loggerInfoThread.setDaemon(true);
       loggerInfoThread.start();
-      // loggerErrorThread.start();
-      // loggerErrorThread.join();
     } catch (Exception e) {
       logger.error(e.getMessage(), e);
     }
   }
-
 }

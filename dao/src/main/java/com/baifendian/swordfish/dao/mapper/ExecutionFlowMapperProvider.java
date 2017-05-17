@@ -38,6 +38,10 @@ public class ExecutionFlowMapperProvider {
   public ExecutionFlowMapperProvider() {
   }
 
+  /**
+   * @param parameter
+   * @return
+   */
   public String insert(Map<String, Object> parameter) {
     return new SQL() {
       {
@@ -65,6 +69,10 @@ public class ExecutionFlowMapperProvider {
     }.toString();
   }
 
+  /**
+   * @param parameter
+   * @return
+   */
   public String update(Map<String, Object> parameter) {
     ExecutionFlow executionFlow = (ExecutionFlow) parameter.get("executionFlow");
     return new SQL() {
@@ -100,6 +108,11 @@ public class ExecutionFlowMapperProvider {
     }.toString();
   }
 
+  /**
+   * 查询所有没有完成的任务
+   *
+   * @return
+   */
   public String selectAllNoFinishFlow() {
     return new SQL() {
       {
@@ -112,6 +125,12 @@ public class ExecutionFlowMapperProvider {
     }.toString();
   }
 
+  /**
+   * 查询某台 executor server 上没有完成的任务
+   *
+   * @param paramter
+   * @return
+   */
   public String selectNoFinishFlow(Map<String, Object> paramter) {
     return new SQL() {
       {
@@ -125,6 +144,12 @@ public class ExecutionFlowMapperProvider {
     }.toString();
   }
 
+  /**
+   * 根据执行 id 查询执行的工作流信息
+   *
+   * @param parameter
+   * @return
+   */
   public String selectByExecId(Map<String, Object> parameter) {
     String sql = new SQL() {
       {
@@ -159,6 +184,12 @@ public class ExecutionFlowMapperProvider {
     return resultSql;
   }
 
+  /**
+   * 查询一定时间范围的工作流信息
+   *
+   * @param parameter
+   * @return
+   */
   public String selectByFlowIdAndTimes(Map<String, Object> parameter) {
     StringBuilder sb = new StringBuilder();
     String inExpr = "(" + ExecType.DIRECT.ordinal() + "," + ExecType.COMPLEMENT_DATA.ordinal() + ")";
@@ -170,6 +201,12 @@ public class ExecutionFlowMapperProvider {
     return sb.toString();
   }
 
+  /**
+   * 查询一定时间范围内, 特定状态的工作流信息
+   *
+   * @param parameter
+   * @return
+   */
   public String selectByFlowIdAndTimesAndStatusLimit(Map<String, Object> parameter) {
     List<FlowStatus> flowStatuses = (List<FlowStatus>) parameter.get("status");
 
@@ -234,6 +271,12 @@ public class ExecutionFlowMapperProvider {
     return sql2;
   }
 
+  /**
+   * 根据时间和状态进行汇总查询
+   *
+   * @param parameter
+   * @return
+   */
   public String sumByFlowIdAndTimesAndStatus(Map<String, Object> parameter) {
     List<FlowStatus> flowStatuses = (List<FlowStatus>) parameter.get("status");
     List<String> workflowList = (List<String>) parameter.get("workflowList");
@@ -279,6 +322,10 @@ public class ExecutionFlowMapperProvider {
     }.toString();
   }
 
+  /**
+   * @param parameter
+   * @return
+   */
   public String selectByFlowIdAndTime(Map<String, Object> parameter) {
     StringBuilder sb = new StringBuilder();
     String inExpr = "(" + ExecType.DIRECT.ordinal() + "," + ExecType.COMPLEMENT_DATA.ordinal() + ")";
@@ -289,6 +336,10 @@ public class ExecutionFlowMapperProvider {
     return sb.toString();
   }
 
+  /**
+   * @param parameter
+   * @return
+   */
   public String selectStateByProject(Map<String, Object> parameter) {
     String sql = new SQL() {
       {
@@ -314,6 +365,10 @@ public class ExecutionFlowMapperProvider {
     return sql;
   }
 
+  /**
+   * @param parameter
+   * @return
+   */
   public String selectStateHourByProject(Map<String, Object> parameter) {
     return new SQL() {
       {
@@ -339,6 +394,10 @@ public class ExecutionFlowMapperProvider {
     }.toString();
   }
 
+  /**
+   * @param parameter
+   * @return
+   */
   public String selectDurationsByProject(Map<String, Object> parameter) {
     String sql1 = new SQL() {
       {
@@ -369,6 +428,10 @@ public class ExecutionFlowMapperProvider {
     }}.toString();
   }
 
+  /**
+   * @param parameter
+   * @return
+   */
   public String selectErrorsByProject(Map<String, Object> parameter) {
     return new SQL() {
       {
@@ -394,6 +457,10 @@ public class ExecutionFlowMapperProvider {
     }.toString() + " limit #{top}";
   }
 
+  /**
+   * @param parameter
+   * @return
+   */
   public String selectPreDate(Map<String, Object> parameter) {
     return new SQL() {
       {

@@ -195,7 +195,8 @@ public class OsUtil {
     try {
       inputs = new InputStreamReader(new FileInputStream("/etc/passwd"));
       buffer = new BufferedReader(inputs);
-      String line = "";
+      String line;
+
       while (true) {
         line = buffer.readLine();
         if (line == null) {

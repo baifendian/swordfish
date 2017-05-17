@@ -58,6 +58,5 @@ public class BaseParamFactory {
       logger.error("Get BaseParam object error", e);
       return null;
     }
-
   }
 }
