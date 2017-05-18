@@ -18,6 +18,7 @@ package com.baifendian.swordfish.webserver.utils;
 import com.baifendian.swordfish.common.config.BaseConfig;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
 import com.baifendian.swordfish.webserver.exception.BadRequestException;
+import com.baifendian.swordfish.webserver.exception.NotFoundException;
 import com.baifendian.swordfish.webserver.exception.ParameterException;
 import com.baifendian.swordfish.webserver.exception.ServerErrorException;
 import org.apache.commons.collections.CollectionUtils;
@@ -31,6 +32,22 @@ import static com.baifendian.swordfish.common.utils.VerifyUtil.*;
  * server校验工具
  */
 public class ParamVerify {
+
+  /**
+   * 校验一个对象是否存在并抛出异常
+   *
+   * @param object
+   * @param msg
+   * @param parameter
+   * @param <T>
+   * @return
+   */
+  public static <T> void notNull(T object, String msg, Object... parameter) {
+    if (object == null) {
+      throw new NotFoundException(msg, parameter);
+    }
+  }
+
   /**
    * 校验项目名并抛出异常
    *

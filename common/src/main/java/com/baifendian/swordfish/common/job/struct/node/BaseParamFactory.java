@@ -49,6 +49,7 @@ public class BaseParamFactory {
         case UPLOAD:
           return JsonUtil.parseObject(parameter, UploadParam.class);
         case SPARK_STREAMING:
+          return JsonUtil.parseObject(parameter, SparkParam.class);
         case SPARK:
           return JsonUtil.parseObject(parameter, SparkParam.class);
         default:

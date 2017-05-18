@@ -37,9 +37,6 @@ public class StatService {
   private static Logger logger = LoggerFactory.getLogger(StatService.class.getName());
 
   @Autowired
-  private ProjectMapper projectMapper;
-
-  @Autowired
   private ProjectService projectService;
 
   @Autowired
@@ -55,8 +52,8 @@ public class StatService {
    */
   public List<StatDto> queryStates(User operator, String projectName, long startTime, long endTime) {
 
-    long timeInt = (endTime - startTime)/86400000;
-    if (timeInt > 30){
+    long timeInt = (endTime - startTime) / 86400000;
+    if (timeInt > 30) {
       logger.error("time interval > 30: {}", timeInt);
       throw new ParameterException("time \"{0}\" > 30", timeInt);
     }
@@ -64,24 +61,16 @@ public class StatService {
     Date startDate = new Date(startTime);
     Date endDate = new Date(endTime);
 
-    // 查看是否对项目具备相应的权限
-    Project project = projectMapper.queryByName(projectName);
+    Project project = projectService.existProjectName(projectName);
 
-    if (project == null) {
-      logger.error("Project does not exist: {}", projectName);
-      throw new NotFoundException("Not found project \"{0}\"", projectName);
-    }
+    //需要有project 执行权限
+    projectService.hasExecPerm(operator, project);
 
-    if (!projectService.hasExecPerm(operator.getId(), project)) {
-      logger.error("User {} has no right permission for the project {} to query exec states", operator.getName(), projectName);
-      throw new PermissionException("User \"{0}\" is not has project \"{1}\" exec permission", operator.getName(), projectName);
-    }
-
-    List<ExecutionState> executionStateList = executionFlowMapper.selectStateByProject(project.getId(),startDate,endDate);
+    List<ExecutionState> executionStateList = executionFlowMapper.selectStateByProject(project.getId(), startDate, endDate);
 
     List<StatDto> statResponseList = new ArrayList<>();
 
-    for (ExecutionState executionState:executionStateList){
+    for (ExecutionState executionState : executionStateList) {
       statResponseList.add(new StatDto(executionState));
     }
 
@@ -90,31 +79,24 @@ public class StatService {
 
   /**
    * 小时维度的查询状态信息
+   *
    * @param operator
    * @param projectName
    * @param day
    * @return
    */
-  public List<StatDto> queryStatesHour(User operator, String projectName, long day){
+  public List<StatDto> queryStatesHour(User operator, String projectName, long day) {
     Date date = new Date(day);
     // 查看是否对项目具备相应的权限
-    Project project = projectMapper.queryByName(projectName);
+    Project project = projectService.existProjectName(projectName);
 
-    if (project == null) {
-      logger.error("Project does not exist: {}", projectName);
-      throw new NotFoundException("Not found project \"{0}\"", projectName);
-    }
+    projectService.hasExecPerm(operator, project);
 
-    if (!projectService.hasExecPerm(operator.getId(), project)) {
-      logger.error("User {} has no right permission for the project {} to query exec states", operator.getName(), projectName);
-      throw new PermissionException("User \"{0}\" is not has project \"{1}\" exec permission", operator.getName(), projectName);
-    }
-
-    List<ExecutionState> executionStateList = executionFlowMapper.selectStateHourByProject(project.getId(),date);
+    List<ExecutionState> executionStateList = executionFlowMapper.selectStateHourByProject(project.getId(), date);
 
     List<StatDto> statResponseList = new ArrayList<>();
 
-    for (ExecutionState executionState:executionStateList){
+    for (ExecutionState executionState : executionStateList) {
       statResponseList.add(new StatDto(executionState));
     }
 
@@ -133,20 +115,10 @@ public class StatService {
 
     Date datetime = new Date(date);
 
-    // 查看是否对项目具备相应的权限
-    Project project = projectMapper.queryByName(projectName);
-
-    if (project == null) {
-      logger.error("Project does not exist: {}", projectName);
-      throw new NotFoundException("Not found project \"{0}\"", projectName);
-    }
-
-    if (!projectService.hasExecPerm(operator.getId(), project)) {
-      logger.error("User {} has no right permission for the project {} to create project flow", operator.getName(), projectName);
-      throw new PermissionException("User \"{0}\" is not has project \"{1}\" exec permission", operator.getName(), projectName);
-    }
-
-    return executionFlowMapper.selectDurationsByProject(project.getId(),num,datetime);
+    Project project = projectService.existProjectName(projectName);
+    //必须要有project 执行权限
+    projectService.hasExecPerm(operator, project);
+    return executionFlowMapper.selectDurationsByProject(project.getId(), num, datetime);
   }
 
   /**
@@ -160,19 +132,9 @@ public class StatService {
   public List<ExecutionFlowError> queryErrors(User operator, String projectName, long date, int num) {
     Date datetime = new Date(date);
 
-    // 查看是否对项目具备相应的权限
-    Project project = projectMapper.queryByName(projectName);
-
-    if (project == null) {
-      logger.error("Project does not exist: {}", projectName);
-      throw new NotFoundException("Not found project \"{0}\"", projectName);
-    }
-
-    if (!projectService.hasExecPerm(operator.getId(), project)) {
-      logger.error("User {} has no right permission for the project {} to create project flow", operator.getName(), projectName);
-      throw new PermissionException("User \"{0}\" is not has project \"{1}\" exec permission", operator.getName(), projectName);
-    }
-
-    return executionFlowMapper.selectErrorsByProject(project.getId(),num,datetime);
+    Project project = projectService.existProjectName(projectName);
+    //必须有project执行权限
+    projectService.hasExecPerm(operator, project);
+    return executionFlowMapper.selectErrorsByProject(project.getId(), num, datetime);
   }
 }

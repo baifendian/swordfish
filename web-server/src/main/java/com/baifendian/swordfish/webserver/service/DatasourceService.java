@@ -48,9 +48,6 @@ public class DatasourceService {
   private DataSourceMapper dataSourceMapper;
 
   @Autowired
-  private ProjectMapper projectMapper;
-
-  @Autowired
   private ProjectService projectService;
 
   /**
@@ -65,22 +62,16 @@ public class DatasourceService {
    * @return
    */
   public DataSource createDataSource(User operator, String projectName, String name, String desc, DbType type, String parameter) {
-    // 查询项目
-    Project project = projectMapper.queryByName(projectName);
 
-    // 不存在的项目名
-    if (project == null) {
-      throw new NotFoundException("Not found project \"{0}\"", projectName);
-    }
+    Project project = projectService.existProjectName(projectName);
 
-    // 没有权限
-    if (!projectService.hasWritePerm(operator.getId(), project)) {
-      throw new PermissionException("User \"{0}\" is not has project \"{1}\" write permission", operator.getName(), projectName);
-    }
+    // 必须要有用户写权限
+    projectService.hasWritePerm(operator, project);
 
-    Datasource datasource = DatasourceFactory.getDatasource(type,parameter);
-    if (datasource == null){
-      throw new PermissionException("Parameter \"{0}\" is not valid",parameter);
+    // 序列化数据源参数对象
+    Datasource datasource = DatasourceFactory.getDatasource(type, parameter);
+    if (datasource == null) {
+      throw new PermissionException("Parameter \"{0}\" is not valid", parameter);
     }
 
     // 构建数据源
@@ -103,7 +94,6 @@ public class DatasourceService {
       throw new ParameterException("Datasource set value error ");
     }
 
-
     try {
       dataSourceMapper.insert(dataSource);
     } catch (DuplicateKeyException e) {
@@ -125,6 +115,7 @@ public class DatasourceService {
     int status = 0;
     String msg = null;
 
+    // 序列化数据源参数对象
     Datasource datasource = DatasourceFactory.getDatasource(type, parameter);
     if (datasource == null) {
       throw new ParameterException("Parameter \"{0}\" is not valid", parameter);
@@ -173,36 +164,23 @@ public class DatasourceService {
    */
   public DataSource modifyDataSource(User operator, String projectName, String name, String desc, String parameter) {
 
-    // 查询项目
-    Project project = projectMapper.queryByName(projectName);
+    Project project = projectService.existProjectName(projectName);
 
-    // 不存在的项目名
-    if (project == null) {
-      throw new NotFoundException("Not found project \"{0}\"", projectName);
-    }
-
-    // 没有权限
-    if (!projectService.hasWritePerm(operator.getId(), project)) {
-      throw new PermissionException("User \"{0}\" is not has project \"{1}\" write permission", operator.getName(), projectName);
-    }
+    //必须要有project写权限
+    projectService.hasWritePerm(operator, project);
 
     // 查找指定数据源
-
-    DataSource dataSource = dataSourceMapper.getByName(project.getId(), name);
+    DataSource dataSource = exitDatasourceName(project, name);
     Date now = new Date();
-
-    if (dataSource == null) {
-      throw new NotFoundException("Not found datasource \"{0}\"", name);
-    }
 
     if (!StringUtils.isEmpty(desc)) {
       dataSource.setDesc(desc);
     }
 
     if (!StringUtils.isEmpty(parameter)) {
-      Datasource datasource = DatasourceFactory.getDatasource(dataSource.getType(),parameter);
-      if (datasource == null){
-        throw new ParameterException("Parameter \"{0}\" is not valid",parameter);
+      Datasource datasource = DatasourceFactory.getDatasource(dataSource.getType(), parameter);
+      if (datasource == null) {
+        throw new ParameterException("Parameter \"{0}\" is not valid", parameter);
       }
       dataSource.setParameter(parameter);
     }
@@ -224,18 +202,11 @@ public class DatasourceService {
    * @param name
    */
   public void deleteDataSource(User operator, String projectName, String name) {
-    // 查询项目
-    Project project = projectMapper.queryByName(projectName);
 
-    //不存在的项目名
-    if (project == null) {
-      throw new NotFoundException("Not found project \"{0}\"", projectName);
-    }
+    Project project = projectService.existProjectName(projectName);
 
-    //没有权限
-    if (!projectService.hasWritePerm(operator.getId(), project)) {
-      throw new PermissionException("User \"{0}\" is not has project \"{1}\" write permission", operator.getName(), projectName);
-    }
+    //必须有project写权限
+    projectService.hasWritePerm(operator, project);
 
     int count = dataSourceMapper.deleteByProjectAndName(project.getId(), name);
     if (count <= 0) {
@@ -253,18 +224,10 @@ public class DatasourceService {
    * @return
    */
   public List<DataSource> query(User operator, String projectName) {
-    // 查询项目
-    Project project = projectMapper.queryByName(projectName);
 
-    // 不存在的项目名
-    if (project == null) {
-      throw new NotFoundException("Not found project \"{0}\"", projectName);
-    }
-
-    // 没有权限
-    if (!projectService.hasReadPerm(operator.getId(), project)) {
-      throw new PermissionException("User \"{0}\" is not has project \"{1}\" read permission", operator.getName(), projectName);
-    }
+    Project project = projectService.existProjectName(projectName);
+    //必须有project读权限
+    projectService.hasReadPerm(operator, project);
 
     return dataSourceMapper.getByProjectId(project.getId());
   }
@@ -278,20 +241,27 @@ public class DatasourceService {
    * @return
    */
   public DataSource queryByName(User operator, String projectName, String name) {
-    // 查询项目信息
-    Project project = projectMapper.queryByName(projectName);
 
-    // 不存在的项目名
-    if (project == null) {
-      throw new NotFoundException("Not found project \"{0}\"", projectName);
-    }
+    Project project = projectService.existProjectName(projectName);
 
-    // 没有权限
-    if (!projectService.hasReadPerm(operator.getId(), project)) {
-      throw new PermissionException("User \"{0}\" is not has project \"{1}\" read permission", operator.getName(), projectName);
-    }
+    //必须要有project读权限
+    projectService.hasReadPerm(operator, project);
 
     return dataSourceMapper.getByName(project.getId(), name);
+  }
+
+  /**
+   * 校验一个数据源名称是否存在，如果不存在则抛出异常，存在就返回该数据源实体
+   *
+   * @param name
+   * @return
+   */
+  public DataSource exitDatasourceName(Project project, String name) {
+    DataSource dataSource = dataSourceMapper.getByName(project.getId(), name);
+    if (dataSource == null) {
+      throw new NotFoundException("Not found datasource \"{0}\" in project \"{1}\"", name, project.getName());
+    }
+    return dataSource;
   }
 
 }

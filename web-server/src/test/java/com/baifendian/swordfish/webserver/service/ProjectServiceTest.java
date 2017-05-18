@@ -172,7 +172,7 @@ public class ProjectServiceTest {
     {
       //普通查询一个用户下所有项目
       MockHttpServletResponse mockHttpServletResponse = new MockHttpServletResponse();
-      List<Project> projectList = projectService.queryProject(user);
+      List<Project> projectList = projectService.existProjectName(user);
       assertEquals(mockHttpServletResponse.getStatus(),HttpStatus.SC_OK);
       assertTrue(projectList != null);
       assertTrue(projectList.size() > 0);
@@ -182,7 +182,7 @@ public class ProjectServiceTest {
       User user2 = mockDataService.createGeneralUser();
       Project project1 = mockDataService.createProject(user2);
       MockHttpServletResponse mockHttpServletResponse = new MockHttpServletResponse();
-      List<Project> projectList = projectService.queryProject(userAdmin);
+      List<Project> projectList = projectService.existProjectName(userAdmin);
       assertEquals(mockHttpServletResponse.getStatus(),HttpStatus.SC_OK);
       assertTrue(projectList != null);
       assertTrue(projectList.size() >= 2);

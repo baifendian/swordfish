@@ -81,11 +81,8 @@ public class UserService {
     ParamVerify.verifyPassword(password);
     ParamVerify.verifyPhone(phone);
 
-    // 如果不是管理员, 返回错误
-    if (operator.getRole() != UserRoleType.ADMIN_USER) {
-      throw new PermissionException("User \"{0}\" is not admin user", operator.getName());
-    }
-
+    //只有管理员可以操作
+    isAdmin(operator);
     // 校验代理用户格式是否正确以及是否包含正常代理的内容
     proxyUsers = checkProxyUser(proxyUsers);
 
@@ -207,17 +204,14 @@ public class UserService {
    */
   public void deleteUser(User operator,
                          String name) {
-
-    if (operator.getRole() != UserRoleType.ADMIN_USER) {
-      throw new PermissionException("User \"{0}\" is not admin user", operator.getName());
-    }
-
     // 删除, 是不能删除自己的
     if (StringUtils.equals(operator.getName(), name)) {
       logger.error("Can't delete user self");
       throw new ParameterException("Can't not delete user self");
     }
 
+    //只有管理员可以操作
+    isAdmin(operator);
     // 删除用户的时候, 必须保证用户没有参与到任何的项目开发之中
     List<Project> projects = projectMapper.queryProjectByUser(operator.getId());
 
@@ -274,7 +268,6 @@ public class UserService {
    */
   public User queryUser(String name, String email, String password) {
     String md5 = HttpUtil.getMd5(password);
-
     return userMapper.queryForCheck(name, email, md5);
   }
 
@@ -304,6 +297,43 @@ public class UserService {
     }
 
     return proxyUsers;
+  }
+
+  /**
+   * 校验一个用户名否存在，不存在就抛出异常
+   *
+   * @param name
+   */
+  public User existUserName(String name) {
+    User user = userMapper.queryByName(name);
+    if (user == null) {
+      logger.error("User {} not found", name);
+      throw new NotFoundException("User \"{0}\" not found", name);
+    }
+    return user;
+  }
+
+
+  /**
+   * 判断一个用户是不是超级管理员，如果不是就抛出异常
+   *
+   * @param user
+   */
+  public void isAdmin(User user) {
+    if (user.getRole() != UserRoleType.ADMIN_USER) {
+      throw new PermissionException("User \"{0}\" is not admin user", user.getName());
+    }
+  }
+
+  /**
+   * 判断一个用户是不是普通用户，如果不是就抛出异常
+   *
+   * @param user
+   */
+  public void isGeneral(User user) {
+    if (user.getRole() == UserRoleType.ADMIN_USER) {
+      throw new PermissionException("User \"{0}\" is not general user", user.getName());
+    }
   }
 
 }
