@@ -23,6 +23,7 @@ import com.baifendian.swordfish.dao.enums.NotifyType;
 import com.baifendian.swordfish.dao.mapper.ExecutionFlowMapper;
 import com.baifendian.swordfish.dao.mapper.ExecutionNodeMapper;
 import com.baifendian.swordfish.dao.mapper.MasterServerMapper;
+import com.baifendian.swordfish.dao.mapper.ProjectMapper;
 import com.baifendian.swordfish.dao.model.*;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
 import com.baifendian.swordfish.rpc.ExecInfo;
@@ -47,6 +48,9 @@ import java.util.List;
 public class ExecService {
 
   private static Logger logger = LoggerFactory.getLogger(ExecService.class.getName());
+
+  @Autowired
+  private ProjectMapper projectMapper;
 
   @Autowired
   private ProjectService projectService;
@@ -86,12 +90,24 @@ public class ExecService {
    */
   public ExecutorIdsDto postExecWorkflow(User operator, String projectName, String workflowName, String schedule, ExecType execType, String nodeName, NodeDepType nodeDep, NotifyType notifyType, String notifyMails, int timeout) {
 
-    Project project = projectService.existProjectName(projectName);
+    Project project = projectMapper.queryByName(projectName);
+    if (project == null) {
+      logger.error("Project does not exist: {}", projectName);
+      throw new NotFoundException("Not found project \"{0}\"", projectName);
+    }
 
     //必须有project 写权限
-    projectService.hasWritePerm(operator, project);
+    if (!projectService.hasWritePerm(operator.getId(), project)) {
+      logger.error("User {} has no right permission for the project {}", operator.getName(), project.getName());
+      throw new PermissionException("User \"{0}\" is not has project \"{1}\" write permission", operator.getName(), project.getName());
+    }
 
-    ProjectFlow projectFlow = workflowService.existProjectFlow(project, workflowName);
+    ProjectFlow projectFlow = flowDao.projectFlowfindByName(project.getId(), workflowName);
+
+    if (projectFlow == null) {
+      logger.error("Not found project flow {} in project {}", workflowName, project.getName());
+      throw new NotFoundException("Not found project flow \"{0}\" in project \"{1}\"", workflowName, project.getName());
+    }
 
     // 查看 master 是否存在
     MasterServer masterServer = masterServerMapper.query();
@@ -219,9 +235,16 @@ public class ExecService {
       throw new ParameterException("Workflow name \"{0}\" not valid", workflowName);
     }
 
-    Project project = projectService.existProjectName(projectName);
+    Project project = projectMapper.queryByName(projectName);
+    if (project == null) {
+      logger.error("Project does not exist: {}", projectName);
+      throw new NotFoundException("Not found project \"{0}\"", projectName);
+    }
     //project 必须有执行权限
-    projectService.hasExecPerm(operator, project);
+    if (!projectService.hasExecPerm(operator.getId(), project)) {
+      logger.error("User {} has no right permission for the project {}", operator.getName(), project.getName());
+      throw new PermissionException("User \"{0}\" is not has project \"{1}\" exec permission", operator.getName(), project.getName());
+    }
 
     List<FlowStatus> flowStatusList;
     try {
@@ -250,11 +273,23 @@ public class ExecService {
    */
   public ExecutionFlowDto getExecWorkflow(User operator, int execId) {
 
-    ExecutionFlow executionFlow = existExecId(execId);
+    ExecutionFlow executionFlow = executionFlowMapper.selectByExecId(execId);
 
-    Project project = projectService.existProjectName(executionFlow.getProjectName());
+    if (executionFlow == null) {
+      logger.error("exec flow does not exist: {}", execId);
+      throw new NotFoundException("Not found execId \"{0}\"", execId);
+    }
+
+    Project project = projectMapper.queryByName(executionFlow.getProjectName());
+    if (project == null) {
+      logger.error("Project does not exist: {}", executionFlow.getProjectName());
+      throw new NotFoundException("Not found project \"{0}\"", executionFlow.getProjectName());
+    }
     //必须有project 执行权限
-    projectService.hasExecPerm(operator, project);
+    if (!projectService.hasExecPerm(operator.getId(), project)) {
+      logger.error("User {} has no right permission for the project {}", operator.getName(), project.getName());
+      throw new PermissionException("User \"{0}\" is not has project \"{1}\" exec permission", operator.getName(), project.getName());
+    }
 
     ExecutionFlowDto executionFlowDto = new ExecutionFlowDto(executionFlow);
     List<ExecutionNode> executionNodeList = executionNodeMapper.selectExecNodeById(execId);
@@ -280,11 +315,29 @@ public class ExecService {
    * @return
    */
   public LogResult getEexcWorkflowLog(User operator, String jobId, int from, int size) {
-    ExecutionNode executionNode = existJobId(jobId);
-    ExecutionFlow executionFlow = existExecId(executionNode.getExecId());
-    Project project = projectService.existProjectName(executionFlow.getProjectName());
+    ExecutionNode executionNode = executionNodeMapper.selectExecNodeByJobId(jobId);
+
+    if (executionNode == null) {
+      logger.error("job id does not exist: {}", jobId);
+      throw new NotFoundException("Not found jobId \"{0}\"", jobId);
+    }
+    ExecutionFlow executionFlow = executionFlowMapper.selectByExecId(executionNode.getExecId());
+
+    if (executionFlow == null) {
+      logger.error("exec flow does not exist: {}", executionNode.getExecId());
+      throw new NotFoundException("Not found execId \"{0}\"", executionNode.getExecId());
+    }
+    Project project = projectMapper.queryByName(executionFlow.getProjectName());
+    if (project == null) {
+      logger.error("Project does not exist: {}", executionFlow.getProjectName());
+      throw new NotFoundException("Not found project \"{0}\"", executionFlow.getProjectName());
+    }
+
     //必须有project 执行权限
-    projectService.hasExecPerm(operator, project);
+    if (!projectService.hasExecPerm(operator.getId(), project)) {
+      logger.error("User {} has no right permission for the project {}", operator.getName(), project.getName());
+      throw new PermissionException("User \"{0}\" is not has project \"{1}\" exec permission", operator.getName(), project.getName());
+    }
 
     return logHelper.getLog(from, size, jobId);
   }
@@ -297,11 +350,23 @@ public class ExecService {
    */
   public void postKillWorkflow(User operator, int execId) {
 
-    ExecutionFlow executionFlow = existExecId(execId);
+    ExecutionFlow executionFlow = executionFlowMapper.selectByExecId(execId);
 
-    Project project = projectService.existProjectName(executionFlow.getProjectName());
+    if (executionFlow == null) {
+      logger.error("exec flow does not exist: {}", execId);
+      throw new NotFoundException("Not found execId \"{0}\"", execId);
+    }
+
+    Project project = projectMapper.queryByName(executionFlow.getProjectName());
+    if (project == null) {
+      logger.error("Project does not exist: {}", executionFlow.getProjectName());
+      throw new NotFoundException("Not found project \"{0}\"", executionFlow.getProjectName());
+    }
     //必须有project 执行权限
-    projectService.hasExecPerm(operator, project);
+    if (!projectService.hasExecPerm(operator.getId(), project)) {
+      logger.error("User {} has no right permission for the project {}", operator.getName(), project.getName());
+      throw new PermissionException("User \"{0}\" is not has project \"{1}\" exec permission", operator.getName(), project.getName());
+    }
 
     MasterServer masterServer = masterServerMapper.query();
     if (masterServer == null) {
@@ -320,38 +385,5 @@ public class ExecService {
       logger.error("Call master client set schedule error", e);
       throw e;
     }
-  }
-
-  /**
-   * 是否存在execId对应的ExecutionFlow ,如果不存在就抛出异常，如果存在就返回实体
-   *
-   * @param execId
-   * @return
-   */
-  public ExecutionFlow existExecId(int execId) {
-    ExecutionFlow executionFlow = executionFlowMapper.selectByExecId(execId);
-
-    if (executionFlow == null) {
-      logger.error("exec flow does not exist: {}", execId);
-      throw new NotFoundException("Not found execId \"{0}\"", execId);
-    }
-    return executionFlow;
-  }
-
-  /**
-   * 是否存在jobId对应的ExecutionNode, 如果不存在就抛出异常，如果存在就返回实体。
-   *
-   * @param jobId
-   * @return
-   */
-  public ExecutionNode existJobId(String jobId) {
-    ExecutionNode executionNode = executionNodeMapper.selectExecNodeByJobId(jobId);
-
-    if (executionNode == null) {
-      logger.error("job id does not exist: {}", jobId);
-      throw new NotFoundException("Not found jobId \"{0}\"", jobId);
-    }
-
-    return executionNode;
   }
 }

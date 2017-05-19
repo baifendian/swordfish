@@ -45,6 +45,9 @@ public class DatasourceService {
   private static Logger logger = LoggerFactory.getLogger(DatasourceService.class.getName());
 
   @Autowired
+  private ProjectMapper projectMapper;
+
+  @Autowired
   private DataSourceMapper dataSourceMapper;
 
   @Autowired
@@ -63,10 +66,17 @@ public class DatasourceService {
    */
   public DataSource createDataSource(User operator, String projectName, String name, String desc, DbType type, String parameter) {
 
-    Project project = projectService.existProjectName(projectName);
+    Project project = projectMapper.queryByName(projectName);
+    if (project == null) {
+      logger.error("Project does not exist: {}", projectName);
+      throw new NotFoundException("Not found project \"{0}\"", projectName);
+    }
 
     // 必须要有用户写权限
-    projectService.hasWritePerm(operator, project);
+    if (!projectService.hasWritePerm(operator.getId(), project)) {
+      logger.error("User {} has no right permission for the project {}", operator.getName(), project.getName());
+      throw new PermissionException("User \"{0}\" is not has project \"{1}\" write permission", operator.getName(), project.getName());
+    }
 
     // 序列化数据源参数对象
     Datasource datasource = DatasourceFactory.getDatasource(type, parameter);
@@ -164,13 +174,24 @@ public class DatasourceService {
    */
   public DataSource modifyDataSource(User operator, String projectName, String name, String desc, String parameter) {
 
-    Project project = projectService.existProjectName(projectName);
+    Project project = projectMapper.queryByName(projectName);
+    if (project == null) {
+      logger.error("Project does not exist: {}", projectName);
+      throw new NotFoundException("Not found project \"{0}\"", projectName);
+    }
 
     //必须要有project写权限
-    projectService.hasWritePerm(operator, project);
+    if (!projectService.hasWritePerm(operator.getId(), project)) {
+      logger.error("User {} has no right permission for the project {}", operator.getName(), project.getName());
+      throw new PermissionException("User \"{0}\" is not has project \"{1}\" write permission", operator.getName(), project.getName());
+    }
 
     // 查找指定数据源
-    DataSource dataSource = exitDatasourceName(project, name);
+    DataSource dataSource = dataSourceMapper.getByName(project.getId(), name);
+    if (dataSource == null) {
+      throw new NotFoundException("Not found datasource \"{0}\" in project \"{1}\"", name, project.getName());
+    }
+
     Date now = new Date();
 
     if (!StringUtils.isEmpty(desc)) {
@@ -203,10 +224,18 @@ public class DatasourceService {
    */
   public void deleteDataSource(User operator, String projectName, String name) {
 
-    Project project = projectService.existProjectName(projectName);
+    Project project = projectMapper.queryByName(projectName);
+    if (project == null) {
+      logger.error("Project does not exist: {}", projectName);
+      throw new NotFoundException("Not found project \"{0}\"", projectName);
+    }
+
 
     //必须有project写权限
-    projectService.hasWritePerm(operator, project);
+    if (!projectService.hasWritePerm(operator.getId(), project)) {
+      logger.error("User {} has no right permission for the project {}", operator.getName(), project.getName());
+      throw new PermissionException("User \"{0}\" is not has project \"{1}\" write permission", operator.getName(), project.getName());
+    }
 
     int count = dataSourceMapper.deleteByProjectAndName(project.getId(), name);
     if (count <= 0) {
@@ -225,9 +254,16 @@ public class DatasourceService {
    */
   public List<DataSource> query(User operator, String projectName) {
 
-    Project project = projectService.existProjectName(projectName);
+    Project project = projectMapper.queryByName(projectName);
+    if (project == null) {
+      logger.error("Project does not exist: {}", projectName);
+      throw new NotFoundException("Not found project \"{0}\"", projectName);
+    }
     //必须有project读权限
-    projectService.hasReadPerm(operator, project);
+    if (!projectService.hasReadPerm(operator.getId(), project)) {
+      logger.error("User {} has no right permission for the project {}", operator.getName(), project.getName());
+      throw new PermissionException("User \"{0}\" is not has project \"{1}\" read permission", operator.getName(), project.getName());
+    }
 
     return dataSourceMapper.getByProjectId(project.getId());
   }
@@ -242,26 +278,19 @@ public class DatasourceService {
    */
   public DataSource queryByName(User operator, String projectName, String name) {
 
-    Project project = projectService.existProjectName(projectName);
+    Project project = projectMapper.queryByName(projectName);
+    if (project == null) {
+      logger.error("Project does not exist: {}", projectName);
+      throw new NotFoundException("Not found project \"{0}\"", projectName);
+    }
 
     //必须要有project读权限
-    projectService.hasReadPerm(operator, project);
+    if (!projectService.hasReadPerm(operator.getId(), project)) {
+      logger.error("User {} has no right permission for the project {}", operator.getName(), project.getName());
+      throw new PermissionException("User \"{0}\" is not has project \"{1}\" read permission", operator.getName(), project.getName());
+    }
 
     return dataSourceMapper.getByName(project.getId(), name);
-  }
-
-  /**
-   * 校验一个数据源名称是否存在，如果不存在则抛出异常，存在就返回该数据源实体
-   *
-   * @param name
-   * @return
-   */
-  public DataSource exitDatasourceName(Project project, String name) {
-    DataSource dataSource = dataSourceMapper.getByName(project.getId(), name);
-    if (dataSource == null) {
-      throw new NotFoundException("Not found datasource \"{0}\" in project \"{1}\"", name, project.getName());
-    }
-    return dataSource;
   }
 
 }

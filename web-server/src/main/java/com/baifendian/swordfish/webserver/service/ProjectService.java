@@ -80,7 +80,9 @@ public class ProjectService {
     verifyDesc(desc);
 
     //只有普通用户才可以创建项目
-    userService.isGeneral(operator);
+    if (!userService.isGeneral(operator)) {
+      throw new PermissionException("User \"{0}\" is not general user", operator.getName());
+    }
 
     Project project = new Project();
     Date now = new Date();
@@ -113,9 +115,17 @@ public class ProjectService {
   public Project modifyProject(User operator, String name, String desc) {
 
     verifyDesc(desc);
-    Project project = existProjectName(name);
+
+    Project project = projectMapper.queryByName(name);
+    if (project == null) {
+      logger.error("Project does not exist: {}", name);
+      throw new NotFoundException("Not found project \"{0}\"", name);
+    }
     //只有项目owner才能操作
-    isProjectOwner(operator, project);
+    if (!isProjectOwner(operator.getId(), project)) {
+      logger.error("User {} owner for the project {}", operator.getName(), name);
+      throw new PermissionException("User \"{0}\" not owner for the project \"{1}\"", operator.getName(), project.getName());
+    }
 
     Date now = new Date();
 
@@ -143,9 +153,16 @@ public class ProjectService {
   @Transactional(value = "TransactionManager")
   public void deleteProject(User operator, String name) {
 
-    Project project = existProjectName(name);
+    Project project = projectMapper.queryByName(name);
+    if (project == null) {
+      logger.error("Project does not exist: {}", name);
+      throw new NotFoundException("Not found project \"{0}\"", name);
+    }
     //只有管理员或者owner 可以删除
-    isProjectOwnerOrAdmin(operator, project);
+    if (operator.getId() != project.getOwnerId() && operator.getRole() != UserRoleType.ADMIN_USER) {
+      logger.error("User \"{}\" owner for the project \"{}\"", operator.getName(), name);
+      throw new PermissionException("User \"{0}\" not owner for the project \"{1}\"", operator.getName(), name);
+    }
 
     // 需要判断项目下, 是否有 "工作流/资源/数据源" 存在
     int count;
@@ -184,7 +201,7 @@ public class ProjectService {
    * @param operator
    * @return
    */
-  public List<Project> existProjectName(User operator) {
+  public List<Project> queryProject(User operator) {
     switch (operator.getRole()) {
       case ADMIN_USER:
         return projectMapper.queryAllProject();
@@ -211,10 +228,21 @@ public class ProjectService {
       throw new BadRequestException("Can't add myself");
     }
 
-    Project project = existProjectName(name);
+    Project project = projectMapper.queryByName(name);
+    if (project == null) {
+      logger.error("Project does not exist: {}", name);
+      throw new NotFoundException("Not found project \"{0}\"", name);
+    }
     //只有owner可以操作
-    isProjectOwner(operator, project);
-    User user = userService.existUserName(userName);
+    if (!isProjectOwner(operator.getId(), project)) {
+      logger.error("User \"{}\" owner for the project \"{}\"", operator.getName(), project.getName());
+      throw new PermissionException("User \"{0}\" not owner for the project \"{1}\"", operator.getName(), project.getName());
+    }
+    User user = userMapper.queryByName(userName);
+    if (user == null) {
+      logger.error("User {} not found", userName);
+      throw new NotFoundException("User \"{0}\" not found", userName);
+    }
 
     //TODO 是否会有并发问题？
     ProjectUser projectUser = projectUserMapper.query(project.getId(), user.getId());
@@ -250,14 +278,28 @@ public class ProjectService {
    * @param perm
    */
   public ProjectUser modifyProjectUser(User operator, String name, String userName, int perm) {
-    Project project = existProjectName(name);
+    Project project = projectMapper.queryByName(name);
+    if (project == null) {
+      logger.error("Project does not exist: {}", name);
+      throw new NotFoundException("Not found project \"{0}\"", name);
+    }
     //必须是项目owner
-    isProjectOwner(operator, project);
+    if (!isProjectOwner(operator.getId(), project)) {
+      logger.error("User \"{}\" owner for the project \"{}\"", operator.getName(), project.getName());
+      throw new PermissionException("User \"{0}\" not owner for the project \"{1}\"", operator.getName(), project.getName());
+    }
 
     //查询用户信息，如果查询不到抛出异常
-    User user = userService.existUserName(name);
+    User user = userMapper.queryByName(userName);
+    if (user == null) {
+      logger.error("User {} not found", userName);
+      throw new NotFoundException("User \"{0}\" not found", userName);
+    }
 
-    ProjectUser projectUser = existProjectUser(user, project);
+    ProjectUser projectUser = projectUserMapper.query(project.getId(), user.getId());
+    if (projectUser == null) {
+      throw new NotFoundException("Project \"{0}\" don't has user \"{1}\"", user.getName(), project.getName());
+    }
 
     // 构建信息, 插入
     Date now = new Date();
@@ -286,11 +328,22 @@ public class ProjectService {
       throw new BadRequestException("Can't delete myself");
     }
 
-    Project project = existProjectName(name);
+    Project project = projectMapper.queryByName(name);
+    if (project == null) {
+      logger.error("Project does not exist: {}", name);
+      throw new NotFoundException("Not found project \"{0}\"", name);
+    }
     //必须是项目owner
-    isProjectOwner(operator, project);
+    if (!isProjectOwner(operator.getId(), project)) {
+      logger.error("User \"{}\" owner for the project \"{}\"", operator.getName(), project.getName());
+      throw new PermissionException("User \"{0}\" not owner for the project \"{1}\"", operator.getName(), project.getName());
+    }
 
-    User user = userService.existUserName(userName);
+    User user = userMapper.queryByName(userName);
+    if (user == null) {
+      logger.error("User {} not found", userName);
+      throw new NotFoundException("User \"{0}\" not found", userName);
+    }
 
     int count = projectUserMapper.delete(project.getId(), user.getId());
 
@@ -309,9 +362,16 @@ public class ProjectService {
    * @return
    */
   public List<ProjectUser> queryUser(User operator, String name) {
-    Project project = existProjectName(name);
+    Project project = projectMapper.queryByName(name);
+    if (project == null) {
+      logger.error("Project does not exist: {}", name);
+      throw new NotFoundException("Not found project \"{0}\"", name);
+    }
     //只有owner可以操作
-    isProjectOwner(operator,project);
+    if (!isProjectOwner(operator.getId(), project)) {
+      logger.error("User \"{}\" owner for the project \"{}\"", operator.getName(), project.getName());
+      throw new PermissionException("User \"{0}\" not owner for the project \"{1}\"", operator.getName(), project.getName());
+    }
 
     return projectUserMapper.queryByProject(project.getId());
   }
@@ -338,106 +398,18 @@ public class ProjectService {
   }
 
   /**
-   * 校验一个项目名,如果找不到则抛出异常
+   * 判断一个用户师傅是项目owner
    *
-   * @param projectName
-   * @return
-   */
-  public Project existProjectName(String projectName) {
-    Project project = projectMapper.queryByName(projectName);
-    if (project == null) {
-      logger.error("Project does not exist: {}", projectName);
-      throw new NotFoundException("Not found project \"{0}\"", projectName);
-    }
-    return project;
-  }
-
-  /**
-   * 寻找用户关系，如果用关系找不到则抛出异常
-   *
-   * @param user
+   * @param userId
    * @param project
    * @return
    */
-  public ProjectUser existProjectUser(User user, Project project) {
-    ProjectUser projectUser = projectUserMapper.query(project.getId(), user.getId());
-    if (projectUser == null) {
-      throw new NotFoundException("Project \"{0}\" don't has user \"{1}\"", user.getName(), project.getName());
-    }
-    return projectUser;
+  public boolean isProjectOwner(int userId, Project project) {
+    return userId == project.getOwnerId();
   }
 
   /**
-   * 是否具备写权限
-   *
-   * @param user
-   * @param project
-   * @return
-   */
-  public void hasWritePerm(User user, Project project) {
-    if (!PermUtil.hasWritePerm(queryPerm(user.getId(), project))) {
-      logger.error("User {} has no right permission for the project {}", user.getName(), project.getName());
-      throw new PermissionException("User \"{0}\" is not has project \"{1}\" write permission", user.getName(), project.getName());
-    }
-  }
-
-  /**
-   * 是否具备读权限
-   *
-   * @param user
-   * @param project
-   * @return
-   */
-  public void hasReadPerm(User user, Project project) {
-    if (!PermUtil.hasReadPerm(queryPerm(user.getId(), project))) {
-      logger.error("User {} has no right permission for the project {}", user.getName(), project.getName());
-      throw new PermissionException("User \"{0}\" is not has project \"{1}\" read permission", user.getName(), project.getName());
-    }
-  }
-
-  /**
-   * 是否具备执行权限
-   *
-   * @param user
-   * @param project
-   * @return
-   */
-  public void hasExecPerm(User user, Project project) {
-    if (!PermUtil.hasExecPerm(queryPerm(user.getId(), project))) {
-      logger.error("User {} has no right permission for the project {}", user.getName(), project.getName());
-      throw new PermissionException("User \"{0}\" is not has project \"{1}\" exec permission", user.getName(), project.getName());
-    }
-  }
-
-  /**
-   * 是否是项目owner，如果不是就抛出异常
-   *
-   * @param user
-   * @param project
-   */
-  public void isProjectOwner(User user, Project project) {
-    if (user.getId() != project.getOwnerId()) {
-      logger.error("User \"{}\" owner for the project \"{}\"", user.getName(), project.getName());
-      throw new PermissionException("User \"{0}\" not owner for the project \"{1}\"", user.getName(), project.getName());
-    }
-  }
-
-  /**
-   * 既不是项目owner，也不是管理员
-   *
-   * @param user
-   * @param project
-   */
-  public void isProjectOwnerOrAdmin(User user, Project project) {
-    if (user.getId() != project.getOwnerId() && user.getRole() != UserRoleType.ADMIN_USER) {
-      logger.error("User \"{}\" not owner for the project \"{}\" and not admin", user.getName(), project.getName());
-      throw new PermissionException("User \"{0}\" not owner for the project \"{1}\" and not admin", user.getName(), project.getName());
-    }
-  }
-
-
-  /**
-   * 是否具备写权限
+   * 判断一个用户是否有project 写权限
    *
    * @param userId
    * @param project
@@ -448,7 +420,7 @@ public class ProjectService {
   }
 
   /**
-   * 是否具备读权限
+   * 判断一个用户是否有project 读权限
    *
    * @param userId
    * @param project
@@ -459,7 +431,7 @@ public class ProjectService {
   }
 
   /**
-   * 是否具备执行权限
+   * 是否有项目执行权限
    *
    * @param userId
    * @param project
@@ -468,4 +440,6 @@ public class ProjectService {
   public boolean hasExecPerm(int userId, Project project) {
     return PermUtil.hasExecPerm(queryPerm(userId, project));
   }
+
+
 }

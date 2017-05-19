@@ -37,6 +37,9 @@ public class StatService {
   private static Logger logger = LoggerFactory.getLogger(StatService.class.getName());
 
   @Autowired
+  private ProjectMapper projectMapper;
+
+  @Autowired
   private ProjectService projectService;
 
   @Autowired
@@ -61,10 +64,17 @@ public class StatService {
     Date startDate = new Date(startTime);
     Date endDate = new Date(endTime);
 
-    Project project = projectService.existProjectName(projectName);
+    Project project = projectMapper.queryByName(projectName);
+    if (project == null) {
+      logger.error("Project does not exist: {}", projectName);
+      throw new NotFoundException("Not found project \"{0}\"", projectName);
+    }
 
     //需要有project 执行权限
-    projectService.hasExecPerm(operator, project);
+    if (!projectService.hasExecPerm(operator.getId(), project)) {
+      logger.error("User {} has no right permission for the project {}", operator.getName(), project.getName());
+      throw new PermissionException("User \"{0}\" is not has project \"{1}\" exec permission", operator.getName(), project.getName());
+    }
 
     List<ExecutionState> executionStateList = executionFlowMapper.selectStateByProject(project.getId(), startDate, endDate);
 
@@ -88,9 +98,16 @@ public class StatService {
   public List<StatDto> queryStatesHour(User operator, String projectName, long day) {
     Date date = new Date(day);
     // 查看是否对项目具备相应的权限
-    Project project = projectService.existProjectName(projectName);
+    Project project = projectMapper.queryByName(projectName);
+    if (project == null) {
+      logger.error("Project does not exist: {}", projectName);
+      throw new NotFoundException("Not found project \"{0}\"", projectName);
+    }
 
-    projectService.hasExecPerm(operator, project);
+    if (!projectService.hasExecPerm(operator.getId(), project)) {
+      logger.error("User {} has no right permission for the project {}", operator.getName(), project.getName());
+      throw new PermissionException("User \"{0}\" is not has project \"{1}\" exec permission", operator.getName(), project.getName());
+    }
 
     List<ExecutionState> executionStateList = executionFlowMapper.selectStateHourByProject(project.getId(), date);
 
@@ -115,9 +132,16 @@ public class StatService {
 
     Date datetime = new Date(date);
 
-    Project project = projectService.existProjectName(projectName);
+    Project project = projectMapper.queryByName(projectName);
+    if (project == null) {
+      logger.error("Project does not exist: {}", projectName);
+      throw new NotFoundException("Not found project \"{0}\"", projectName);
+    }
     //必须要有project 执行权限
-    projectService.hasExecPerm(operator, project);
+    if (!projectService.hasExecPerm(operator.getId(), project)) {
+      logger.error("User {} has no right permission for the project {}", operator.getName(), project.getName());
+      throw new PermissionException("User \"{0}\" is not has project \"{1}\" exec permission", operator.getName(), project.getName());
+    }
     return executionFlowMapper.selectDurationsByProject(project.getId(), num, datetime);
   }
 
@@ -132,9 +156,16 @@ public class StatService {
   public List<ExecutionFlowError> queryErrors(User operator, String projectName, long date, int num) {
     Date datetime = new Date(date);
 
-    Project project = projectService.existProjectName(projectName);
+    Project project = projectMapper.queryByName(projectName);
+    if (project == null) {
+      logger.error("Project does not exist: {}", projectName);
+      throw new NotFoundException("Not found project \"{0}\"", projectName);
+    }
     //必须有project执行权限
-    projectService.hasExecPerm(operator, project);
+    if (!projectService.hasExecPerm(operator.getId(), project)) {
+      logger.error("User {} has no right permission for the project {}", operator.getName(), project.getName());
+      throw new PermissionException("User \"{0}\" is not has project \"{1}\" exec permission", operator.getName(), project.getName());
+    }
     return executionFlowMapper.selectErrorsByProject(project.getId(), num, datetime);
   }
 }

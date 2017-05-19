@@ -82,7 +82,9 @@ public class UserService {
     ParamVerify.verifyPhone(phone);
 
     //只有管理员可以操作
-    isAdmin(operator);
+    if (!isAdmin(operator)) {
+      throw new PermissionException("User \"{0}\" is not admin user", operator.getName());
+    }
     // 校验代理用户格式是否正确以及是否包含正常代理的内容
     proxyUsers = checkProxyUser(proxyUsers);
 
@@ -136,7 +138,7 @@ public class UserService {
     ParamVerify.verifyPassword(password);
     ParamVerify.verifyPhone(phone);
 
-    if (operator.getRole() != UserRoleType.ADMIN_USER) {
+    if (isGeneral(operator)) {
       // 非管理员, 只能修改自身信息
       if (!StringUtils.equals(operator.getName(), name)) {
         throw new PermissionException("User \"{0}\" has no permission modify \"{1}\" information", operator.getName(), name);
@@ -211,7 +213,9 @@ public class UserService {
     }
 
     //只有管理员可以操作
-    isAdmin(operator);
+    if (!isAdmin(operator)) {
+      throw new PermissionException("User \"{0}\" is not admin user", operator.getName());
+    }
     // 删除用户的时候, 必须保证用户没有参与到任何的项目开发之中
     List<Project> projects = projectMapper.queryProjectByUser(operator.getId());
 
@@ -249,7 +253,7 @@ public class UserService {
     List<User> userList = new ArrayList<>();
 
     // 只查询自己
-    if ((operator.getRole() != UserRoleType.ADMIN_USER) || !allUser) {
+    if (isGeneral(operator) || !allUser) {
       userList.add(operator);
 
       return userList;
@@ -299,41 +303,24 @@ public class UserService {
     return proxyUsers;
   }
 
-  /**
-   * 校验一个用户名否存在，不存在就抛出异常
-   *
-   * @param name
-   */
-  public User existUserName(String name) {
-    User user = userMapper.queryByName(name);
-    if (user == null) {
-      logger.error("User {} not found", name);
-      throw new NotFoundException("User \"{0}\" not found", name);
-    }
-    return user;
-  }
 
 
   /**
-   * 判断一个用户是不是超级管理员，如果不是就抛出异常
-   *
+   * 判断一个用户说还是不是admin
    * @param user
+   * @return
    */
-  public void isAdmin(User user) {
-    if (user.getRole() != UserRoleType.ADMIN_USER) {
-      throw new PermissionException("User \"{0}\" is not admin user", user.getName());
-    }
+  public boolean isAdmin(User user){
+    return user.getRole() == UserRoleType.ADMIN_USER;
   }
 
   /**
-   * 判断一个用户是不是普通用户，如果不是就抛出异常
-   *
+   * 判断一个用户是不是普通用户
    * @param user
+   * @return
    */
-  public void isGeneral(User user) {
-    if (user.getRole() == UserRoleType.ADMIN_USER) {
-      throw new PermissionException("User \"{0}\" is not general user", user.getName());
-    }
+  public boolean isGeneral(User user){
+    return user.getRole() == UserRoleType.GENERAL_USER;
   }
 
 }

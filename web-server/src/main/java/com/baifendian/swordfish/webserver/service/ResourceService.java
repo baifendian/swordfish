@@ -47,6 +47,9 @@ public class ResourceService {
   private static Logger logger = LoggerFactory.getLogger(ResourceService.class.getName());
 
   @Autowired
+  private ProjectMapper projectMapper;
+
+  @Autowired
   private ResourceMapper resourceMapper;
 
   @Autowired
@@ -83,10 +86,17 @@ public class ResourceService {
       throw new ParameterException("file");
     }
 
-    Project project = projectService.existProjectName(projectName);
+    Project project = projectMapper.queryByName(projectName);
+    if (project == null) {
+      logger.error("Project does not exist: {}", projectName);
+      throw new NotFoundException("Not found project \"{0}\"", projectName);
+    }
 
     // 必须有项目写权限
-    projectService.hasWritePerm(operator, project);
+    if (!projectService.hasWritePerm(operator.getId(), project)) {
+      logger.error("User {} has no right permission for the project {}", operator.getName(), project.getName());
+      throw new PermissionException("User \"{0}\" is not has project \"{1}\" write permission", operator.getName(), project.getName());
+    }
 
     // 判断文件是否已经存在
 //    Resource resource = resourceMapper.queryResource(project.getId(), name);
@@ -177,12 +187,24 @@ public class ResourceService {
       throw new ParameterException("file");
     }
 
-    Project project = projectService.existProjectName(projectName);
+    Project project = projectMapper.queryByName(projectName);
+    if (project == null) {
+      logger.error("Project does not exist: {}", projectName);
+      throw new NotFoundException("Not found project \"{0}\"", projectName);
+    }
 
     //必须要有project的写权限
-    projectService.hasWritePerm(operator, project);
+    if (!projectService.hasWritePerm(operator.getId(), project)) {
+      logger.error("User {} has no right permission for the project {}", operator.getName(), project.getName());
+      throw new PermissionException("User \"{0}\" is not has project \"{1}\" write permission", operator.getName(), project.getName());
+    }
 
-    Resource resource = existResourceName(project, name);
+    Resource resource = resourceMapper.queryResource(project.getId(), name);
+
+    if (resource == null) {
+      logger.error("Download file not exist, project {}, resource {}", project.getName(), name);
+      throw new NotFoundException("Download file not exist, project {0}, resource {1}", project.getName(), name);
+    }
 
     Date now = new Date();
 
@@ -270,12 +292,24 @@ public class ResourceService {
       throw new ParameterException("destResName");
     }
 
-    Project project = projectService.existProjectName(projectName);
+    Project project = projectMapper.queryByName(projectName);
+    if (project == null) {
+      logger.error("Project does not exist: {}", projectName);
+      throw new NotFoundException("Not found project \"{0}\"", projectName);
+    }
     // 必须有project写权限
-    projectService.hasWritePerm(operator, project);
+    if (!projectService.hasWritePerm(operator.getId(), project)) {
+      logger.error("User {} has no right permission for the project {}", operator.getName(), project.getName());
+      throw new PermissionException("User \"{0}\" is not has project \"{1}\" write permission", operator.getName(), project.getName());
+    }
 
     //检测原资源是否存在
-    Resource srcResource = existResourceName(project, srcResName);
+    Resource srcResource = resourceMapper.queryResource(project.getId(), srcResName);
+
+    if (srcResource == null) {
+      logger.error("Download file not exist, project {}, resource {}", project.getName(), srcResName);
+      throw new NotFoundException("Download file not exist, project {0}, resource {1}", project.getName(), srcResName);
+    }
 
     // 判断目标是否存在, 不存在则需要创建
     Resource destResource = resourceMapper.queryResource(project.getId(), destResName);
@@ -334,10 +368,22 @@ public class ResourceService {
   public void deleteResource(User operator,
                              String projectName,
                              String name) {
-    Project project = projectService.existProjectName(projectName);
+    Project project = projectMapper.queryByName(projectName);
+    if (project == null) {
+      logger.error("Project does not exist: {}", projectName);
+      throw new NotFoundException("Not found project \"{0}\"", projectName);
+    }
     //必须有project 写权限
-    projectService.hasWritePerm(operator, project);
-    Resource resource = existResourceName(project, name);
+    if (!projectService.hasWritePerm(operator.getId(), project)) {
+      logger.error("User {} has no right permission for the project {}", operator.getName(), project.getName());
+      throw new PermissionException("User \"{0}\" is not has project \"{1}\" write permission", operator.getName(), project.getName());
+    }
+    Resource resource = resourceMapper.queryResource(project.getId(), name);
+
+    if (resource == null) {
+      logger.error("Download file not exist, project {}, resource {}", project.getName(), name);
+      throw new NotFoundException("Download file not exist, project {0}, resource {1}", project.getName(), name);
+    }
 
     // 删除数据库
     resourceMapper.delete(resource.getId());
@@ -357,9 +403,17 @@ public class ResourceService {
    */
   public List<Resource> getResources(User operator, String projectName) {
 
-    Project project = projectService.existProjectName(projectName);
+    Project project = projectMapper.queryByName(projectName);
+    if (project == null) {
+      logger.error("Project does not exist: {}", projectName);
+      throw new NotFoundException("Not found project \"{0}\"", projectName);
+    }
+
     //必须有project 读权限
-    projectService.hasReadPerm(operator, project);
+    if (!projectService.hasReadPerm(operator.getId(), project)) {
+      logger.error("User {} has no right permission for the project {}", operator.getName(), project.getName());
+      throw new PermissionException("User \"{0}\" is not has project \"{1}\" read permission", operator.getName(), project.getName());
+    }
 
     // 查询资源
     List<Resource> resources = resourceMapper.queryResourceDetails(project.getId());
@@ -377,10 +431,23 @@ public class ResourceService {
    */
   public Resource getResource(User operator, String projectName, String name) {
 
-    Project project = projectService.existProjectName(projectName);
+    Project project = projectMapper.queryByName(projectName);
+    if (project == null) {
+      logger.error("Project does not exist: {}", projectName);
+      throw new NotFoundException("Not found project \"{0}\"", projectName);
+    }
     //必须有project 读权限
-    projectService.hasReadPerm(operator, project);
-    return existResourceName(project, name);
+    if (!projectService.hasReadPerm(operator.getId(), project)) {
+      logger.error("User {} has no right permission for the project {}", operator.getName(), project.getName());
+      throw new PermissionException("User \"{0}\" is not has project \"{1}\" read permission", operator.getName(), project.getName());
+    }
+    Resource resource = resourceMapper.queryResource(project.getId(), name);
+
+    if (resource == null) {
+      logger.error("Download file not exist, project {}, resource {}", project.getName(), name);
+      throw new NotFoundException("Download file not exist, project {0}, resource {1}", project.getName(), name);
+    }
+    return resource;
   }
 
   /**
@@ -394,11 +461,23 @@ public class ResourceService {
   public org.springframework.core.io.Resource downloadResource(User operator,
                                                                String projectName,
                                                                String name) {
-    Project project = projectService.existProjectName(projectName);
+    Project project = projectMapper.queryByName(projectName);
+    if (project == null) {
+      logger.error("Project does not exist: {}", projectName);
+      throw new NotFoundException("Not found project \"{0}\"", projectName);
+    }
     //必须有project 读权限
-    projectService.hasReadPerm(operator, project);
+    if (!projectService.hasReadPerm(operator.getId(), project)) {
+      logger.error("User {} has no right permission for the project {}", operator.getName(), project.getName());
+      throw new PermissionException("User \"{0}\" is not has project \"{1}\" read permission", operator.getName(), project.getName());
+    }
     //校验资源是否存在
-    existResourceName(project, name);
+    Resource resource = resourceMapper.queryResource(project.getId(), name);
+
+    if (resource == null) {
+      logger.error("Download file not exist, project {}, resource {}", project.getName(), name);
+      throw new NotFoundException("Download file not exist, project {0}, resource {1}", project.getName(), name);
+    }
 
     String localFilename = BaseConfig.getLocalDownloadFilename(project.getId(), name);
     String hdfsFilename = BaseConfig.getHdfsResourcesFilename(project.getId(), name);
@@ -410,20 +489,4 @@ public class ResourceService {
     return file;
   }
 
-  /**
-   * 检测资源名称是否存在，如果不存在就抛出异常
-   *
-   * @param project
-   * @param name
-   * @return
-   */
-  public Resource existResourceName(Project project, String name) {
-    Resource resource = resourceMapper.queryResource(project.getId(), name);
-
-    if (resource == null) {
-      logger.error("Download file not exist, project {}, resource {}", project.getName(), name);
-      throw new NotFoundException("Download file not exist, project {0}, resource {1}", project.getName(), name);
-    }
-    return resource;
-  }
 }

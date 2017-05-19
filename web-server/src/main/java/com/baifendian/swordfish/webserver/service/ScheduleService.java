@@ -84,12 +84,24 @@ public class ScheduleService {
   @Transactional(value = "TransactionManager", rollbackFor = Exception.class)
   public Schedule createSchedule(User operator, String projectName, String workflowName, String schedule, NotifyType notifyType, String notifyMails, int maxTryTimes, FailurePolicyType failurePolicy, String depWorkflows, DepPolicyType depPolicyType, int timeout) {
 
-    Project project = projectService.existProjectName(projectName);
+    Project project = projectMapper.queryByName(projectName);
+    if (project == null) {
+      logger.error("Project does not exist: {}", projectName);
+      throw new NotFoundException("Not found project \"{0}\"", projectName);
+    }
 
     //必须有 project 执行权限
-    projectService.hasExecPerm(operator, project);
+    if (!projectService.hasExecPerm(operator.getId(), project)) {
+      logger.error("User {} has no right permission for the project {}", operator.getName(), project.getName());
+      throw new PermissionException("User \"{0}\" is not has project \"{1}\" exec permission", operator.getName(), project.getName());
+    }
 
-    ProjectFlow projectFlow = workflowService.existProjectFlow(project, workflowName);
+    ProjectFlow projectFlow = flowDao.projectFlowfindByName(project.getId(), workflowName);
+
+    if (projectFlow == null) {
+      logger.error("Not found project flow {} in project {}", workflowName, project.getName());
+      throw new NotFoundException("Not found project flow \"{0}\" in project \"{1}\"", workflowName, project.getName());
+    }
 
     Schedule scheduleObj = new Schedule();
     Date now = new Date();
@@ -148,15 +160,32 @@ public class ScheduleService {
    */
   @Transactional(value = "TransactionManager", rollbackFor = Exception.class)
   public Schedule patchSchedule(User operator, String projectName, String workflowName, String schedule, NotifyType notifyType, String notifyMails, Integer maxTryTimes, FailurePolicyType failurePolicy, String depWorkflows, DepPolicyType depPolicyType, Integer timeout, ScheduleStatus scheduleStatus) {
-    Project project = projectService.existProjectName(projectName);
+    Project project = projectMapper.queryByName(projectName);
+    if (project == null) {
+      logger.error("Project does not exist: {}", projectName);
+      throw new NotFoundException("Not found project \"{0}\"", projectName);
+    }
+
     //必须有project执行权限
-    projectService.hasExecPerm(operator, project);
+    if (!projectService.hasExecPerm(operator.getId(), project)) {
+      logger.error("User {} has no right permission for the project {}", operator.getName(), project.getName());
+      throw new PermissionException("User \"{0}\" is not has project \"{1}\" exec permission", operator.getName(), project.getName());
+    }
 
-    ProjectFlow projectFlow = workflowService.existProjectFlow(project, workflowName);
+    ProjectFlow projectFlow = flowDao.projectFlowfindByName(project.getId(), workflowName);
 
+    if (projectFlow == null) {
+      logger.error("Not found project flow {} in project {}", workflowName, project.getName());
+      throw new NotFoundException("Not found project flow \"{0}\" in project \"{1}\"", workflowName, project.getName());
+    }
 
     //检查调度是否存在
-    Schedule scheduleObj = existSchedule(projectFlow.getId());
+    Schedule scheduleObj = scheduleMapper.selectByFlowId(projectFlow.getId());
+
+    if (scheduleObj == null) {
+      logger.error("Not found schedule for workflow {}", projectFlow.getId());
+      throw new NotFoundException("Not found schedule for workflow \"{0}\"", projectFlow.getId());
+    }
 
     Date now = new Date();
 
@@ -227,12 +256,24 @@ public class ScheduleService {
    * 设置一个调度的上下线
    */
   public void postScheduleStatus(User operator, String projectName, String workflowName, String scheduleStatus) throws Exception {
-    Project project = projectService.existProjectName(projectName);
+    Project project = projectMapper.queryByName(projectName);
+    if (project == null) {
+      logger.error("Project does not exist: {}", projectName);
+      throw new NotFoundException("Not found project \"{0}\"", projectName);
+    }
 
     //必须有project 执行权限
-    projectService.hasExecPerm(operator, project);
+    if (!projectService.hasExecPerm(operator.getId(), project)) {
+      logger.error("User {} has no right permission for the project {}", operator.getName(), project.getName());
+      throw new PermissionException("User \"{0}\" is not has project \"{1}\" exec permission", operator.getName(), project.getName());
+    }
 
-    ProjectFlow projectFlow = workflowService.existProjectFlow(project, workflowName);
+    ProjectFlow projectFlow = flowDao.projectFlowfindByName(project.getId(), workflowName);
+
+    if (projectFlow == null) {
+      logger.error("Not found project flow {} in project {}", workflowName, project.getName());
+      throw new NotFoundException("Not found project flow \"{0}\" in project \"{1}\"", workflowName, project.getName());
+    }
 
     // 查看 master 是否存在
     MasterServer masterServer = masterServerMapper.query();
@@ -242,8 +283,12 @@ public class ScheduleService {
     }
 
     //检查调度是否存在
-    Schedule scheduleObj = existSchedule(projectFlow.getId());
-    Date now = new Date();
+    Schedule scheduleObj = scheduleMapper.selectByFlowId(projectFlow.getId());
+
+    if (scheduleObj == null) {
+      logger.error("Not found schedule for workflow {}", projectFlow.getId());
+      throw new NotFoundException("Not found schedule for workflow \"{0}\"", projectFlow.getId());
+    }
 
     switch (scheduleStatus) {
       case "online":
@@ -307,11 +352,23 @@ public class ScheduleService {
    */
   public Schedule querySchedule(User operator, String projectName, String workflowName) {
 
-    Project project = projectService.existProjectName(projectName);
+    Project project = projectMapper.queryByName(projectName);
+    if (project == null) {
+      logger.error("Project does not exist: {}", projectName);
+      throw new NotFoundException("Not found project \"{0}\"", projectName);
+    }
 
     //必须有project 读权限
-    projectService.hasReadPerm(operator, project);
-    ProjectFlow projectFlow = workflowService.existProjectFlow(project, workflowName);
+    if (!projectService.hasReadPerm(operator.getId(), project)) {
+      logger.error("User {} has no right permission for the project {}", operator.getName(), project.getName());
+      throw new PermissionException("User \"{0}\" is not has project \"{1}\" read permission", operator.getName(), project.getName());
+    }
+    ProjectFlow projectFlow = flowDao.projectFlowfindByName(project.getId(), workflowName);
+
+    if (projectFlow == null) {
+      logger.error("Not found project flow {} in project {}", workflowName, project.getName());
+      throw new NotFoundException("Not found project flow \"{0}\" in project \"{1}\"", workflowName, project.getName());
+    }
 
     return scheduleMapper.selectByFlowId(projectFlow.getId());
   }
@@ -325,26 +382,17 @@ public class ScheduleService {
    */
   public List<Schedule> queryAllSchedule(User operator, String projectName) {
 
-    Project project = projectService.existProjectName(projectName);
+    Project project = projectMapper.queryByName(projectName);
+    if (project == null) {
+      logger.error("Project does not exist: {}", projectName);
+      throw new NotFoundException("Not found project \"{0}\"", projectName);
+    }
     //必须有project 读权限
-    projectService.hasReadPerm(operator, project);
+    if (!projectService.hasReadPerm(operator.getId(), project)) {
+      logger.error("User {} has no right permission for the project {}", operator.getName(), project.getName());
+      throw new PermissionException("User \"{0}\" is not has project \"{1}\" read permission", operator.getName(), project.getName());
+    }
 
     return scheduleMapper.selectByProject(projectName);
-  }
-
-  /**
-   * 判断一个调度是否存在，如果不存在就抛出异常，如果存在就返回调度实体。
-   *
-   * @param flowId
-   * @return
-   */
-  public Schedule existSchedule(int flowId) {
-    Schedule scheduleObj = scheduleMapper.selectByFlowId(flowId);
-
-    if (scheduleObj == null) {
-      logger.error("Not found schedule for workflow {}", flowId);
-      throw new NotFoundException("Not found schedule for workflow \"{0}\"", flowId);
-    }
-    return scheduleObj;
   }
 }
