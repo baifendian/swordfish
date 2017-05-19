@@ -60,9 +60,11 @@ public class ExecutionNodeDto {
     if (executionNode != null) {
       this.startTime = executionNode.getStartTime();
       this.endTime = executionNode.getEndTime();
+
       if (this.startTime != null && this.endTime != null) {
         this.duration = Math.toIntExact((this.endTime.getTime() - this.startTime.getTime()) / 1000);
       }
+
       this.status = executionNode.getStatus();
       this.logLinks = executionNode.getLogLinkList();
       this.jobId = executionNode.getJobId();

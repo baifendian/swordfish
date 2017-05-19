@@ -44,19 +44,14 @@ public class FlowRunnerManager {
   private final FlowDao flowDao;
 
   /**
-   * {@link ExecutorService}
+   * flow 的调度执行管理线程池
    */
   private final ExecutorService flowExecutorService;
 
   /**
-   * {@link ExecutorService}
+   * 任务结点调度执行管理线程池
    */
   private final ExecutorService nodeExecutorService;
-
-  /**
-   * {@link ExecutorService}
-   */
-  private final ExecutorService jobExecutorService;
 
   /**
    * 默认的最大重试次数为 0 次
@@ -88,9 +83,6 @@ public class FlowRunnerManager {
     int nodeThreads = conf.getInt(Constants.EXECUTOR_NODERUNNER_THREADS, 100);
     ThreadFactory nodeThreadFactory = new ThreadFactoryBuilder().setNameFormat("Exec-Worker-NodeRunner").build();
     nodeExecutorService = Executors.newFixedThreadPool(nodeThreads, nodeThreadFactory);
-
-    ThreadFactory jobThreadFactory = new ThreadFactoryBuilder().setNameFormat("Exec-Worker-Job").build();
-    jobExecutorService = Executors.newCachedThreadPool(jobThreadFactory);
 
     // 主要指清理 runningFlows 中运行完成的任务
     Thread cleanThread = new Thread(() -> {
@@ -128,8 +120,7 @@ public class FlowRunnerManager {
     FlowRunnerContext context = new FlowRunnerContext();
 
     context.setExecutionFlow(executionFlow);
-    context.setExecutorService(nodeExecutorService);
-    context.setJobExecutorService(jobExecutorService);
+    context.setNodeExecutorService(nodeExecutorService);
     context.setMaxTryTimes(maxTryTimes);
     context.setTimeout(timeout);
     context.setFailurePolicyType(defaultFailurePolicyType);
@@ -138,6 +129,9 @@ public class FlowRunnerManager {
 
     FlowRunner flowRunner = new FlowRunner(context);
     runningFlows.put(executionFlow.getId(), flowRunner);
+
+    logger.info("submit flow, exec id: {}, project name: {}, workflow name: {}, max try times: {}, timeout: {}",
+        executionFlow.getId(), executionFlow.getProjectName(), executionFlow.getWorkflowName(), maxTryTimes, timeout);
 
     flowExecutorService.submit(flowRunner);
   }
@@ -163,8 +157,7 @@ public class FlowRunnerManager {
     FlowRunnerContext context = new FlowRunnerContext();
     context.setSchedule(schedule);
     context.setExecutionFlow(executionFlow);
-    context.setExecutorService(nodeExecutorService);
-    context.setJobExecutorService(jobExecutorService);
+    context.setNodeExecutorService(nodeExecutorService);
     context.setMaxTryTimes(maxTryTimes);
     context.setTimeout(timeout);
     context.setFailurePolicyType(failurePolicy);
@@ -202,9 +195,6 @@ public class FlowRunnerManager {
     for (FlowRunner flowRunner : runningFlows.values()) {
       flowRunner.kill();
     }
-
-    // 关闭 job executor 线程池
-    shutdownExecutorService(jobExecutorService);
 
     try {
       Thread.sleep(5000);

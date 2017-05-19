@@ -16,9 +16,9 @@
 package com.baifendian.swordfish.dao.model;
 
 import com.baifendian.swordfish.dao.enums.FlowStatus;
+import com.baifendian.swordfish.dao.utils.json.JsonUtil;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -64,6 +64,9 @@ public class ExecutionNode {
    */
   private String logLinks;
 
+  /**
+   * 得到日志链接
+   */
   private List<String> logLinkList = new ArrayList<>();
 
   public Integer getExecId() {
@@ -116,6 +119,9 @@ public class ExecutionNode {
 
   public void setLogLinkList(List<String> logLinkList) {
     this.logLinkList = logLinkList;
+    if (logLinkList != null) {
+      this.logLinks = JsonUtil.toJsonString(logLinkList);
+    }
   }
 
   public void setJobId(String jobId) {
@@ -135,9 +141,7 @@ public class ExecutionNode {
   }
 
   public void setLogLinks(String logLinks) {
-    this.logLinkList = Arrays.asList(new String[] {logLinks});
+    this.logLinkList = JsonUtil.parseObjectList(logLinks, String.class);
     this.logLinks = logLinks;
   }
-
-
 }

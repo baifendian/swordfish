@@ -15,6 +15,8 @@
  */
 package com.baifendian.swordfish.common.job.struct.node;
 
+import org.apache.commons.lang.StringUtils;
+
 public class JobType {
 
   public static final String HQL = "HQL";
@@ -22,7 +24,17 @@ public class JobType {
   public static final String SHELL = "SHELL";
   public static final String SPARK = "SPARK";
   public static final String VIRTUAL = "VIRTUAL";
-  public static final String SPARK_STREAMING = "SPARK-STREAMING";
+  public static final String SPARK_STREAMING = "SPARK_STREAMING"; // 长任务类型
   public static final String UPLOAD = "UPLOAD";
 
+  /**
+   * 判断是否是长任务
+   */
+  public static boolean isLongJob(String job) {
+    if (StringUtils.equals(job, SPARK_STREAMING)) {
+      return true;
+    }
+
+    return false;
+  }
 }

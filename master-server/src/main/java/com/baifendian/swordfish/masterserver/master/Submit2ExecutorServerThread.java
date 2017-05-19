@@ -134,7 +134,7 @@ public class Submit2ExecutorServerThread extends Thread {
         } catch (TException e) {
           logger.error("run executor get error", e);
           isExecutorServerError = true;
-        } catch (Exception e) {
+        } catch (Exception e) { // 如果返回结果为 false, 这里会抛出 runtime 异常
           logger.error("inner error", e);
           break;
         }

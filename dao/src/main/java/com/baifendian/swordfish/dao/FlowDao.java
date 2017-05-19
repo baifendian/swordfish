@@ -451,11 +451,11 @@ public class FlowDao extends BaseDao {
   /**
    * 获取参照时间的前一个调度结果
    *
+   * @param flowId
    * @param date
    * @return
    */
   public ExecutionFlow executionFlowPreDate(int flowId, Date date) {
     return executionFlowMapper.selectPreDate(flowId, date);
   }
-
 }

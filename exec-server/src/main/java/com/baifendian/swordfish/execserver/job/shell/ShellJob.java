@@ -17,6 +17,7 @@ package com.baifendian.swordfish.execserver.job.shell;
 
 import com.baifendian.swordfish.common.job.struct.node.BaseParam;
 import com.baifendian.swordfish.common.job.struct.node.shell.ShellParam;
+import com.baifendian.swordfish.common.utils.http.HttpUtil;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
 import com.baifendian.swordfish.execserver.exception.ExecException;
 import com.baifendian.swordfish.execserver.job.AbstractProcessJob;
@@ -25,7 +26,6 @@ import com.baifendian.swordfish.execserver.parameter.ParamHelper;
 import org.slf4j.Logger;
 
 import java.io.File;
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
@@ -33,7 +33,6 @@ import java.nio.file.attribute.FileAttribute;
 import java.nio.file.attribute.PosixFilePermission;
 import java.nio.file.attribute.PosixFilePermissions;
 import java.util.Set;
-import java.util.UUID;
 
 public class ShellJob extends AbstractProcessJob {
 
@@ -44,14 +43,14 @@ public class ShellJob extends AbstractProcessJob {
    */
   private String currentPath;
 
-  public ShellJob(String jobId, JobProps props, Logger logger) {
-    super(jobId, props, logger);
+  public ShellJob(JobProps props, Logger logger) {
+    super(props, logger);
 
     this.currentPath = getWorkingDirectory();
   }
 
   @Override
-  public void initJobParams() {
+  public void initJob() {
     logger.debug("job params {}", props.getJobParams());
 
     shellParam = JsonUtil.parseObject(props.getJobParams(), ShellParam.class);
@@ -62,16 +61,18 @@ public class ShellJob extends AbstractProcessJob {
   }
 
   @Override
-  public ProcessBuilder createProcessBuilder() throws IOException {
+  public String createCommand() throws Exception {
     String script = shellParam.getScript();
     script = ParamHelper.resolvePlaceholders(script, props.getDefinedParams());
 
     shellParam.setScript(script);
 
     logger.info("script:\n{}", shellParam.getScript());
-    logger.info("currentPath: {}", currentPath);
+    logger.info("currentPath:{}", currentPath);
 
-    String fileName = currentPath + "/" + jobId + "_" + UUID.randomUUID().toString().substring(0, 8) + ".sh";
+    // 生成的脚本文件
+    String fileName = String.format("%s/%s_%s_node.sh", currentPath, props.getJobAppId(), HttpUtil.getMd5(props.getNodeName()).substring(0, 8));
+
     Path path = new File(fileName).toPath();
 
     Set<PosixFilePermission> perms = PosixFilePermissions.fromString("rwxr-xr-x");
@@ -80,9 +81,8 @@ public class ShellJob extends AbstractProcessJob {
     Files.createFile(path, attr);
 
     Files.write(path, shellParam.getScript().getBytes(), StandardOpenOption.APPEND);
-    ProcessBuilder processBuilder = new ProcessBuilder(fileName);
 
-    return processBuilder;
+    return fileName;
   }
 
   @Override

@@ -24,39 +24,23 @@ import java.util.List;
  * 执行的 Job (用于执行某个具体任务，如 MR/Spark 等) <p>
  */
 public interface Job {
-
-  /**
-   * 获取 生成的作业ID Log
-   *
-   * @return 执行 id
-   */
-  String getJobId();
-
   /**
    * 作业前处理
-   *
-   * @throws Exception
    */
   void before() throws Exception;
 
   /**
    * 作业处理
-   *
-   * @throws Exception
    */
   void process() throws Exception;
 
   /**
    * 作业后处理
-   *
-   * @throws Exception
    */
   void after() throws Exception;
 
   /**
    * 取消执行
-   *
-   * @throws Exception
    */
   void cancel() throws Exception;
 
@@ -71,11 +55,6 @@ public interface Job {
    * 作业是否被取消了
    */
   boolean isCanceled();
-
-  /**
-   * 获取作业的全局参数信息
-   */
-  JobProps getJobProps();
 
   /**
    * 获取返回码
@@ -97,7 +76,9 @@ public interface Job {
   List<ExecResult> getResults();
 
   /**
-   * 获取作业的配置参数信息
+   * 获取 job 参数
+   *
+   * @return
    */
   BaseParam getParam();
 }

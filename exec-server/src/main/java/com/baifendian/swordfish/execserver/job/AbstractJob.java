@@ -20,33 +20,12 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 
 import java.util.List;
-import java.util.Map;
 
 public abstract class AbstractJob implements Job {
-  /**
-   * jobId
-   **/
-  protected final String jobId;
-
-  /**
-   * {@link Process}
-   */
-  protected Process process;
-
   /**
    * 配置参数
    **/
   protected JobProps props;
-
-  /**
-   * 用户定义参数列表
-   */
-  protected Map<String, String> definedParamMap;
-
-  /**
-   * 项目 id
-   */
-  protected int projectId;
 
   /**
    * 退出状态
@@ -59,6 +38,11 @@ public abstract class AbstractJob implements Job {
   protected boolean complete = false;
 
   /**
+   * 是否已经启动
+   */
+  protected boolean started = false;
+
+  /**
    * 是否取消
    */
   protected boolean canceled = false;
@@ -69,23 +53,14 @@ public abstract class AbstractJob implements Job {
   protected Logger logger;
 
   /**
-   * @param jobId  生成的作业 id
    * @param props  作业配置信息, 各类作业根据此配置信息生成具体的作业
    * @param logger 日志
    */
-  protected AbstractJob(String jobId, JobProps props, Logger logger) {
-    this.jobId = jobId;
+  protected AbstractJob(JobProps props, Logger logger) {
     this.props = props;
     this.logger = logger;
 
-    this.definedParamMap = props.getDefinedParams();
-    this.projectId = props.getProjectId();
-
-    initJobParams();
-  }
-
-  public String getJobId() {
-    return jobId;
+    initJob();
   }
 
   @Override
@@ -121,12 +96,25 @@ public abstract class AbstractJob implements Job {
   }
 
   @Override
-  public JobProps getJobProps() {
-    return props;
+  public boolean hasResults() {
+    return false;
   }
 
-  public abstract void initJobParams();
+  @Override
+  public List<ExecResult> getResults() {
+    return null;
+  }
 
+  /**
+   * 初始化 job
+   */
+  public abstract void initJob();
+
+  /**
+   * 得到工作multiple
+   *
+   * @return
+   */
   public String getWorkingDirectory() {
     String workingDir = props.getWorkDir();
 
@@ -135,19 +123,5 @@ public abstract class AbstractJob implements Job {
     }
 
     return workingDir;
-  }
-
-  public String getProxyUser() {
-    return props.getProxyUser();
-  }
-
-  @Override
-  public boolean hasResults() {
-    return false;
-  }
-
-  @Override
-  public List<ExecResult> getResults() {
-    return null;
   }
 }

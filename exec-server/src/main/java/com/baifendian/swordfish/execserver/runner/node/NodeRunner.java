@@ -15,137 +15,130 @@
  */
 package com.baifendian.swordfish.execserver.runner.node;
 
-import com.baifendian.swordfish.dao.DaoFactory;
-import com.baifendian.swordfish.dao.FlowDao;
-import com.baifendian.swordfish.dao.enums.FlowStatus;
+import com.baifendian.swordfish.common.config.BaseConfig;
+import com.baifendian.swordfish.common.utils.http.HttpUtil;
 import com.baifendian.swordfish.dao.model.ExecutionFlow;
 import com.baifendian.swordfish.dao.model.ExecutionNode;
 import com.baifendian.swordfish.dao.model.FlowNode;
 import com.baifendian.swordfish.execserver.job.Job;
-import com.baifendian.swordfish.execserver.job.JobHandler;
+import com.baifendian.swordfish.execserver.job.JobContext;
+import com.baifendian.swordfish.execserver.job.JobManager;
+import com.baifendian.swordfish.execserver.job.JobProps;
+import com.baifendian.swordfish.execserver.utils.JobLogger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Callable;
 
 /**
  * 节点执行器 <p>
  */
-public class NodeRunner implements Runnable {
+public class NodeRunner implements Callable<Boolean> {
 
   /**
    * logger
    */
   private final Logger logger = LoggerFactory.getLogger(getClass());
 
-  /**
-   * {@link FlowDao}
-   */
-  private final FlowDao flowDao;
-
-  /**
-   * {@link ExecutionFlow}
-   */
   private final ExecutionFlow executionFlow;
 
-  /**
-   * {@link ExecutionNode}
-   */
   private final ExecutionNode executionNode;
 
-  /**
-   * 同步对象
-   */
-  private final Object synObject;
+  private final FlowNode flowNode;
 
-  /**
-   * job 处理器
-   */
-  private JobHandler jobHandler;
+  private final Map<String, String> systemParamMap;
 
-  /**
-   * @param executionFlow
-   * @param executionNode
-   * @param node
-   * @param executorService
-   * @param synObject
-   * @param timeout
-   * @param customParamMap
-   * @param systemParamMap
-   */
-  public NodeRunner(ExecutionFlow executionFlow, ExecutionNode executionNode, FlowNode node, ExecutorService executorService, Object synObject, int timeout,
-                    Map<String, String> systemParamMap, Map<String, String> customParamMap) {
-    this.flowDao = DaoFactory.getDaoInstance(FlowDao.class);
-    this.executionFlow = executionFlow;
-    this.executionNode = executionNode;
-    this.synObject = synObject;
-    this.jobHandler = new JobHandler(flowDao, executionFlow, executionNode, node, executorService, timeout, systemParamMap, customParamMap);
+  private final Map<String, String> customParamMap;
+
+  private Job job;
+
+  public NodeRunner(JobContext jobContext) {
+    this.executionFlow = jobContext.getExecutionFlow();
+    this.executionNode = jobContext.getExecutionNode();
+    this.flowNode = jobContext.getFlowNode();
+    this.systemParamMap = jobContext.getSystemParamMap();
+    this.customParamMap = jobContext.getCustomParamMap();
   }
 
   @Override
-  public void run() {
-    FlowStatus status = null;
+  public Boolean call() {
+    // "项目id/flowId/执行id"
+    String jobScriptPath = BaseConfig.getFlowExecDir(executionFlow.getProjectId(), executionFlow.getFlowId(), executionFlow.getId());
+
+    logger.info("exec id:{}, node:{} script path:{}", executionFlow.getId(), executionNode.getName(), jobScriptPath);
+
+    // 作业参数配置
+    Map<String, String> allParamMap = new HashMap<>();
+
+    if (systemParamMap != null) {
+      allParamMap.putAll(systemParamMap);
+    }
+
+    if (customParamMap != null) {
+      allParamMap.putAll(customParamMap);
+    }
+
+    JobProps props = new JobProps();
+    props.setJobParams(flowNode.getParameter());
+    props.setWorkDir(jobScriptPath);
+    props.setProxyUser(executionFlow.getProxyUser());
+    props.setDefinedParams(allParamMap);
+    props.setProjectId(executionFlow.getProjectId());
+    props.setWorkflowId(executionFlow.getFlowId());
+    props.setNodeName(flowNode.getName());
+    props.setExecId(executionFlow.getId());
+    props.setEnvFile(BaseConfig.getSystemEnvPath());
+    props.setQueue(executionFlow.getQueue());
+    props.setFlowStartTime(executionFlow.getStartTime());
+    props.setFlowTimeout(executionFlow.getTimeout());
+
+    props.setJobAppId(String.format("%s_%s", executionNode.getJobId(), HttpUtil.getMd5(executionNode.getName()).substring(0, 8)));
+
+    JobLogger jobLogger = new JobLogger(executionNode.getJobId(), logger);
+
+    boolean success;
+
     try {
-      // 具体执行
-      status = jobHandler.handle();
+      job = JobManager.newJob(flowNode.getType(), props, jobLogger);
 
-      logger.info("run executor:{} node:{} finished, status:{}", executionFlow.getId(), executionNode.getName(), status);
+      // job 的前处理
+      job.before();
+
+      // job 的处理过程
+      job.process();
+
+      // job 的后处理过程
+      job.after();
+
+      success = job.getExitCode() == 0;
     } catch (Exception e) {
-      logger.error(String.format("job %s error", jobHandler.getJobIdLog()), e);
+      logger.error(String.format("job process exception, exec id: {}, node: {}", executionFlow.getId(), executionNode.getName()), e);
+      success = false;
     } finally {
-      if (status == null) {
-        updateExecutionNode(FlowStatus.FAILED);
+      if (job != null) {
+        try {
+          job.cancel();
+        } catch (Exception e) {
+          logger.error("cancel job exception", e);
+        }
       }
-
-      // 唤醒 flow runner 线程
-      notifyFlowRunner();
     }
+
+    return success;
   }
 
   /**
-   * 更新数据库中的 ExecutionNode 信息 <p>
-   */
-  private void updateExecutionNode(FlowStatus flowStatus) {
-    Date now = new Date();
-
-    executionNode.setStatus(flowStatus);
-    executionNode.setEndTime(now);
-    flowDao.updateExecutionNode(executionNode);
-  }
-
-  /**
-   * 唤醒 flow runner 线程 <p>
-   */
-  private void notifyFlowRunner() {
-    synchronized (synObject) {
-      synObject.notifyAll();
-    }
-  }
-
-  /**
-   * 关闭 node 运行
+   * 关闭任务
    */
   public void kill() {
-    logger.info("kill has been called on node:{} ", executionNode.getName());
-    if (executionNode.getStatus().typeIsFinished()) {
-      logger.debug("node:{} status is {} ignore", executionNode.getName(), executionNode.getStatus().name());
-      return;
+    if (job != null) {
+      try {
+        job.cancel();
+      } catch (Exception e) {
+        logger.error(e.getMessage(), e);
+      }
     }
-
-    Job job = jobHandler.getJob();
-    if (job == null) {
-      logger.info("Job hasn't started");
-      return;
-    }
-
-    try {
-      job.cancel();
-    } catch (Exception e) {
-      logger.error("cancel job error", e);
-    }
-
-    updateExecutionNode(FlowStatus.KILL);
   }
 }

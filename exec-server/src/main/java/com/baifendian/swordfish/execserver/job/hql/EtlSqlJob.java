@@ -34,25 +34,27 @@ public class EtlSqlJob extends AbstractJob {
 
   protected List<ExecResult> results;
 
-  public EtlSqlJob(String jobId, JobProps props, Logger logger) {
-    super(jobId, props, logger);
+  public EtlSqlJob(JobProps props, Logger logger) {
+    super(props, logger);
   }
 
   @Override
-  public void initJobParams() {
+  public void initJob() {
     this.param = JsonUtil.parseObject(props.getJobParams(), HqlParam.class);
   }
 
   @Override
   public void process() throws Exception {
     String sqls = param.getSql();
-    sqls = ParamHelper.resolvePlaceholders(sqls, definedParamMap);
+
+    // 解析其中的变量
+    sqls = ParamHelper.resolvePlaceholders(sqls, props.getDefinedParams());
     List<String> funcs = FunctionUtil.createFuncs(param.getUdfs(), props.getExecId(), logger, getWorkingDirectory(), false);
 
-    logger.info("exec sql:{}, funcs:{}", sqls, funcs);
+    logger.info("\nhql:\n{}\nfuncs:\n{}", sqls, funcs);
 
     List<String> execSqls = CommonUtil.sqlSplit(sqls);
-    HiveSqlExec hiveSqlExec = new HiveSqlExec(funcs, execSqls, getProxyUser(), false, null, null, logger);
+    HiveSqlExec hiveSqlExec = new HiveSqlExec(funcs, execSqls, props.getProxyUser(), false, null, null, logger);
     hiveSqlExec.execute();
 
     results = hiveSqlExec.getResults();
