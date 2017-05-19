@@ -81,9 +81,16 @@ public class AdhocService {
   public ExecutorIdDto execAdhoc(User operator, String projectName, String stms, int limit, String proxyUser, String queue, List<UdfsInfo> udfs, int timeout) {
 
     // 查看用户对项目是否具备相应权限
-    Project project = projectService.existProjectName(projectName);
+    Project project = projectMapper.queryByName(projectName);
+    if (project == null) {
+      logger.error("Project does not exist: {}", projectName);
+      throw new NotFoundException("Not found project \"{0}\"", projectName);
+    }
     // 必须要有project执行权限
-    projectService.hasExecPerm(operator, project);
+    if (!projectService.hasWritePerm(operator.getId(), project)) {
+      logger.error("User {} has no right permission for the project {}", operator.getName(), project.getName());
+      throw new PermissionException("User \"{0}\" is not has project \"{1}\" write permission", operator.getName(), project.getName());
+    }
 
     // 判断 proxyUser 是否合理的
     verifyProxyUser(operator.getProxyUserList(), proxyUser);
@@ -172,7 +179,10 @@ public class AdhocService {
     }
 
     //必须要有project执行权限
-    projectService.hasExecPerm(operator, project);
+    if (!projectService.hasExecPerm(operator.getId(), project)) {
+      logger.error("User {} has no right permission for the project {}", operator.getName(), project.getName());
+      throw new PermissionException("User \"{0}\" is not has project \"{1}\" exec permission", operator.getName(), project.getName());
+    }
 
     // 返回日志信息
     // 1. 得到日志 id
@@ -242,7 +252,10 @@ public class AdhocService {
     }
 
     //如果有项目的执行去哪先才可以kill
-    projectService.hasExecPerm(operator, project);
+    if (!projectService.hasWritePerm(operator.getId(), project)) {
+      logger.error("User {} has no right permission for the project {}", operator.getName(), project.getName());
+      throw new PermissionException("User \"{0}\" is not has project \"{1}\" write permission", operator.getName(), project.getName());
+    }
 
     // 返回结果
     AdHocResult adHocResult = adHocMapper.selectResultByIdAndIndex(execId, index);
@@ -274,7 +287,10 @@ public class AdhocService {
     }
 
     //如果有项目的执行去哪先才可以kill
-    projectService.hasExecPerm(operator, project);
+    if (!projectService.hasWritePerm(operator.getId(), project)) {
+      logger.error("User {} has no right permission for the project {}", operator.getName(), project.getName());
+      throw new PermissionException("User \"{0}\" is not has project \"{1}\" write permission", operator.getName(), project.getName());
+    }
 
     // kill 即席, 通过数据库来做到
     AdHoc adhoc = adHocMapper.selectById(execId);

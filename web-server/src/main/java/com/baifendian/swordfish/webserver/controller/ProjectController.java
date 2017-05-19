@@ -100,7 +100,7 @@ public class ProjectController {
   public List<ProjectDto> queryProjects(@RequestAttribute(value = "session.user") User operator) {
     logger.info("Operator user {}, get project list", operator.getName());
 
-    List<Project> projectList = projectService.existProjectName(operator);
+    List<Project> projectList = projectService.queryProject(operator);
     List<ProjectDto> projectDtoList = new ArrayList<>();
 
     for (Project project : projectList) {
