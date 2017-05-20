@@ -89,7 +89,7 @@ public class NodeRunner implements Callable<Boolean> {
     // "项目id/flowId/执行id"
     String jobScriptPath = BaseConfig.getFlowExecDir(executionFlow.getProjectId(), executionFlow.getFlowId(), executionFlow.getId());
 
-    logger.info("exec id:{}, node:{} script path:{}", executionFlow.getId(), executionNode.getName(), jobScriptPath);
+    logger.info("exec id:{}, node:{}, script path:{}", executionFlow.getId(), executionNode.getName(), jobScriptPath);
 
     // 作业参数配置
     Map<String, String> allParamMap = new HashMap<>();

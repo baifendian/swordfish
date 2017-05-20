@@ -213,7 +213,7 @@ public class FlowRunner implements Runnable {
 
           logger.info("get project file:{}", resHdfsPath);
 
-          HdfsClient.getInstance().copyHdfsToLocal(resHdfsPath, execLocalPath, false, true);
+          HdfsClient.getInstance().copyHdfsToLocal(resHdfsPath, execLocalPath + File.separator + res, false, true);
         } else {
           logger.info("file:{} exists, ignore", resFile.getName());
         }
