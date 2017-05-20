@@ -137,17 +137,12 @@ public class NodeRunner implements Callable<Boolean> {
 
       success = job.getExitCode() == 0;
     } catch (Exception e) {
-      logger.error(String.format("job process exception, exec id: {}, node: {}", executionFlow.getId(), executionNode.getName()), e);
       success = false;
-    } finally {
-      if (job != null) {
-        try {
-          job.cancel();
-        } catch (Exception e) {
-          logger.error("cancel job exception", e);
-        }
-      }
 
+      logger.error(String.format("job process exception, exec id: {}, node: {}", executionFlow.getId(), executionNode.getName()), e);
+
+      kill();
+    } finally {
       semaphore.release();
     }
 
