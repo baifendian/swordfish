@@ -297,4 +297,29 @@ public interface ExecutionFlowMapper {
   })
   @SelectProvider(type = ExecutionFlowMapperProvider.class, method = "selectPreDate")
   ExecutionFlow selectPreDate(@Param("flowId") int flowId, @Param("date") Date date);
+
+  /**
+   * 根据scheduleTime 和 flowId 查询一个ExecutionFlow信息
+   * @param flowId
+   * @param scheduleTime
+   * @return
+   */
+  @Results(value = {
+          @Result(property = "id", column = "id", id = true, javaType = int.class, jdbcType = JdbcType.INTEGER),
+          @Result(property = "flowId", column = "flow_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
+          @Result(property = "workflowName", column = "flow_name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+          @Result(property = "projectName", column = "project_name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+          @Result(property = "status", column = "status", typeHandler = EnumOrdinalTypeHandler.class, jdbcType = JdbcType.TINYINT),
+          @Result(property = "worker", column = "worker", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+          @Result(property = "status", column = "status", typeHandler = EnumOrdinalTypeHandler.class, jdbcType = JdbcType.TINYINT),
+          @Result(property = "scheduleTime", column = "schedule_time", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP),
+          @Result(property = "submitTime", column = "submit_time", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP),
+          @Result(property = "startTime", column = "start_time", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP),
+          @Result(property = "endTime", column = "end_time", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP),
+          @Result(property = "submitUserId", column = "schedule_user", javaType = int.class, jdbcType = JdbcType.INTEGER),
+          @Result(property = "submitUser", column = "submit_user_name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+          @Result(property = "proxyUser", column = "proxy_user", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+          @Result(property = "type", column = "type", typeHandler = EnumOrdinalTypeHandler.class, jdbcType = JdbcType.TINYINT),})
+  @SelectProvider(type = ExecutionFlowMapperProvider.class, method = "selectExecutionFlowByScheduleTime")
+  ExecutionFlow selectExecutionFlowByScheduleTime(@Param("flowId") int flowId,@Param("scheduleTime") Date scheduleTime);
 }

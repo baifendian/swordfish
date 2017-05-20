@@ -86,7 +86,7 @@ public class CrontabUtil {
    * @param crontab
    * @return
    */
-  public static List<Date> getTimeZoneFireDate(Date startTime, Date endTime, String crontab) throws ParseException {
+  public static List<Date> getCycleFireDate(Date startTime, Date endTime, String crontab) throws ParseException {
     List<Date> dateList = new ArrayList<>();
 
     CronExpression cronExpression = new CronExpression(crontab);

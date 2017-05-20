@@ -397,12 +397,23 @@ public class FlowScheduleJob implements Job {
    * @param timeout
    * @return
    */
-  private boolean checkDepWorkflowStatus(Date scheduledFireTime, int depFlowId, Map.Entry<Date, Date> cycleDate, long startTime, Integer timeout) {
+  private boolean checkDepWorkflowStatus(Date scheduledFireTime, int depFlowId, Schedule depSchedule, Map.Entry<Date, Date> cycleDate, long startTime, Integer timeout) throws ParseException {
     // 循环检测，直到检测到依赖是否成功
     while (true) {
       boolean isFind = false;
       boolean isNotFinshed = false;
-      //TODO 这里可以使用crontab分析出执行的时间点，应该改用crontab分析出的时间点，这样更准确。
+      //TODO 应该改用crontab分析出的时间点，这样更准确。
+
+      //获取本周内最后一个应该触发依赖调度的时间节点
+      List<Date> dateList = CrontabUtil.getCycleFireDate(cycleDate.getValue(), scheduledFireTime, depSchedule.getCrontab());
+      Date thisCycleLastDate = dateList.get(dateList.size() - 1);
+
+      //获取上一个周期内最后一个应该触发依赖调度的时间节点
+      dateList = CrontabUtil.getCycleFireDate(cycleDate.getKey(),cycleDate.getValue(),depSchedule.getCrontab());
+      Date preCycleLastDate = dateList.get(dateList.size() - 1);
+
+      ExecutionFlow thisFlow = flowDao
+
       // 看当前周期（月、周、天 等）最开始的任务是不是成功的
       List<ExecutionFlow> executionFlows = flowDao.queryFlowLastStatus(depFlowId, cycleDate.getValue(), scheduledFireTime);
       if (CollectionUtils.isNotEmpty(executionFlows)) {

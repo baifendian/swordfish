@@ -196,7 +196,7 @@ public class ExecutionFlowMapperProvider {
 
     sb.append("SELECT id, flow_id, worker, type, status, schedule_time FROM execution_flows WHERE flow_id = #{flowId} AND type IN " + inExpr + " AND ");
     sb.append("schedule_time = (SELECT MIN(schedule_time) FROM execution_flows WHERE flow_id = #{flowId} AND type IN" + inExpr
-        + " AND schedule_time >= #{startDate} AND schedule_time < #{endDate})");
+            + " AND schedule_time >= #{startDate} AND schedule_time < #{endDate})");
 
     return sb.toString();
   }
@@ -344,14 +344,14 @@ public class ExecutionFlowMapperProvider {
     String sql = new SQL() {
       {
         SELECT("str_to_date(DATE_FORMAT(e_f.schedule_time,'%Y%m%d'),'%Y%m%d') as day,\n" +
-            "SUM(case e_f.status when 0 then 1 else 0 end) as INIT,\n" +
-            "SUM(case e_f.status when 1 then 1 else 0 end) as WAITING_DEP,\n" +
-            "SUM(case e_f.status when 2 then 1 else 0 end) as WAITING_RES,\n" +
-            "SUM(case e_f.status when 3 then 1 else 0 end) as RUNNING,\n" +
-            "SUM(case e_f.status when 4 then 1 else 0 end) as SUCCESS,\n" +
-            "SUM(case e_f.status when 5 then 1 else 0 end) as `KILL`,\n" +
-            "SUM(case e_f.status when 6 then 1 else 0 end) as `FAILED`,\n" +
-            "SUM(case e_f.status when 7 then 1 else 0 end) as `DEP_FAILED`");
+                "SUM(case e_f.status when 0 then 1 else 0 end) as INIT,\n" +
+                "SUM(case e_f.status when 1 then 1 else 0 end) as WAITING_DEP,\n" +
+                "SUM(case e_f.status when 2 then 1 else 0 end) as WAITING_RES,\n" +
+                "SUM(case e_f.status when 3 then 1 else 0 end) as RUNNING,\n" +
+                "SUM(case e_f.status when 4 then 1 else 0 end) as SUCCESS,\n" +
+                "SUM(case e_f.status when 5 then 1 else 0 end) as `KILL`,\n" +
+                "SUM(case e_f.status when 6 then 1 else 0 end) as `FAILED`,\n" +
+                "SUM(case e_f.status when 7 then 1 else 0 end) as `DEP_FAILED`");
 
         FROM(TABLE_NAME + " e_f");
 
@@ -373,14 +373,14 @@ public class ExecutionFlowMapperProvider {
     return new SQL() {
       {
         SELECT("CONVERT(DATE_FORMAT(e_f.schedule_time,'%H'),SIGNED) as hour,\n" +
-            "SUM(case e_f.status when 0 then 1 else 0 end) as INIT,\n" +
-            "SUM(case e_f.status when 1 then 1 else 0 end) as WAITING_DEP,\n" +
-            "SUM(case e_f.status when 2 then 1 else 0 end) as WAITING_RES,\n" +
-            "SUM(case e_f.status when 3 then 1 else 0 end) as RUNNING,\n" +
-            "SUM(case e_f.status when 4 then 1 else 0 end) as SUCCESS,\n" +
-            "SUM(case e_f.status when 5 then 1 else 0 end) as `KILL`,\n" +
-            "SUM(case e_f.status when 6 then 1 else 0 end) as `FAILED`,\n" +
-            "SUM(case e_f.status when 7 then 1 else 0 end) as `DEP_FAILED`");
+                "SUM(case e_f.status when 0 then 1 else 0 end) as INIT,\n" +
+                "SUM(case e_f.status when 1 then 1 else 0 end) as WAITING_DEP,\n" +
+                "SUM(case e_f.status when 2 then 1 else 0 end) as WAITING_RES,\n" +
+                "SUM(case e_f.status when 3 then 1 else 0 end) as RUNNING,\n" +
+                "SUM(case e_f.status when 4 then 1 else 0 end) as SUCCESS,\n" +
+                "SUM(case e_f.status when 5 then 1 else 0 end) as `KILL`,\n" +
+                "SUM(case e_f.status when 6 then 1 else 0 end) as `FAILED`,\n" +
+                "SUM(case e_f.status when 7 then 1 else 0 end) as `DEP_FAILED`");
 
         FROM(TABLE_NAME + " e_f");
 
@@ -474,5 +474,19 @@ public class ExecutionFlowMapperProvider {
         ORDER_BY("schedule_time DESC");
       }
     }.toString() + " limit 1";
+  }
+
+  /**
+   * 根据flowId和ScheduleTime查询一个ExecutionFlow
+   * @param parameter
+   * @return
+   */
+  public String selectExecutionFlowByScheduleTime(Map<String, Object> parameter) {
+    return new SQL() {{
+      SELECT("*");
+      FROM(TABLE_NAME);
+      WHERE("flow_id = #{flowId}");
+      WHERE("schedule_time = #{scheduleTime}");
+    }}.toString();
   }
 }

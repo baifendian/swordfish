@@ -106,6 +106,15 @@ public class FlowDao extends BaseDao {
   }
 
   /**
+   * 根据具体的scheduleTime获取一个执行记录
+   * @param scheduleTime
+   * @return
+   */
+  public ExecutionFlow queryExecutionFlowByScheduleTime(Date scheduleTime){
+    return
+  }
+
+  /**
    * 按时间查询 flow 的调度的最新运行状态(调度或者补数据) <p>
    *
    * @param flowId

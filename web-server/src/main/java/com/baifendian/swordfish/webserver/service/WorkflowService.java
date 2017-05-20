@@ -138,7 +138,7 @@ public class WorkflowService {
     for (WorkflowNodeDto flowNode : flowNodes) {
       if (!flowNodeParamCheck(flowNode.getParameter(), flowNode.getType())) {
         logger.error("Flow node {} parameter invalid", flowNode.getName());
-        throw new ParameterException("Flow node parameter not valid");
+        throw new ParameterException("Flow node \"{0}\" parameter invalid ",flowNode.getName());
       }
 
       // 校验节点的额外参数
@@ -277,6 +277,7 @@ public class WorkflowService {
         // parameter 检测
         for (WorkflowNodeDto workflowNodeDTO : workflowNodeDTOList) {
           if (!flowNodeParamCheck(workflowNodeDTO.getParameter(), workflowNodeDTO.getType())) {
+            logger.error("Flow node {} parameter invalid", workflowNodeDTO.getName());
             throw new BadRequestException("workflow node parameter not valid");
           }
 
