@@ -142,7 +142,7 @@ public class FlowRunner implements Runnable {
       String execLocalPath = BaseConfig.getFlowExecDir(executionFlow.getProjectId(), executionFlow.getFlowId(),
           executionFlow.getId());
 
-      logger.info("exec id:{} current execution dir:{}", executionFlow.getId(), execLocalPath);
+      logger.info("exec id:{}, current execution dir:{}, max try times:{}, timeout:{}, failure policy type:{}", executionFlow.getId(), execLocalPath, maxTryTimes, timeout, failurePolicyType);
 
       // 如果存在, 首先清除该目录
       File execLocalPathFile = new File(execLocalPath);
@@ -409,8 +409,8 @@ public class FlowRunner implements Runnable {
               // 如果没有达到重试次数, 重试即可
               ExecutionNode executionNode = executionNodeMap.get(nodeRunner.getNodename());
 
-              // 比如, 次数是 2, 则可以尝试 3 次
-              if (executionNode.getAttempt() <= maxTryTimes) {
+              // 比如, 次数是 2, 则可以尝试 2 次
+              if (executionNode.getAttempt() < maxTryTimes) {
                 executionNode.incAttempt();
 
                 // 更新结点状态

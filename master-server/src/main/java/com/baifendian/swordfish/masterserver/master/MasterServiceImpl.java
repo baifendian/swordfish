@@ -182,7 +182,7 @@ public class MasterServiceImpl implements Iface {
           flow.getOwnerId(),
           new Date(runTime),
           ExecType.DIRECT,
-          1,
+          0, // 默认不重复执行
           execInfo.getNodeName(),
           NodeDepType.valueOfType(execInfo.getNodeDep()),
           NotifyType.valueOfType(execInfo.getNotifyType()),
