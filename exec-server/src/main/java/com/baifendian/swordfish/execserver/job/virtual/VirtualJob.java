@@ -16,11 +16,9 @@
 package com.baifendian.swordfish.execserver.job.virtual;
 
 import com.baifendian.swordfish.common.job.struct.node.BaseParam;
-import com.baifendian.swordfish.execserver.job.JobProps;
 import com.baifendian.swordfish.execserver.job.AbstractProcessJob;
+import com.baifendian.swordfish.execserver.job.JobProps;
 import org.slf4j.Logger;
-
-import java.io.IOException;
 
 /**
  * 空操作的作业 <p>
@@ -28,27 +26,24 @@ import java.io.IOException;
 public class VirtualJob extends AbstractProcessJob {
 
   /**
-   * @param jobId  生成的作业id
    * @param props  作业配置信息,各类作业根据此配置信息生成具体的作业
    * @param logger 日志
    */
-  public VirtualJob(String jobId, JobProps props, Logger logger) {
-    super(jobId, props, logger);
+  public VirtualJob(JobProps props, Logger logger) {
+    super(props, logger);
   }
 
   @Override
-  public ProcessBuilder createProcessBuilder() {
+  public String createCommand() throws Exception {
     return null;
   }
 
   @Override
-  public void initJobParams() {
+  public void initJob() {
   }
 
   @Override
   public BaseParam getParam() {
     return null;
   }
-
-
 }

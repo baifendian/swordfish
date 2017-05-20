@@ -23,15 +23,15 @@ import org.slf4j.LoggerFactory;
 
 import static org.junit.Assert.assertTrue;
 
-public class JobTypeManagerTest {
+public class JobManagerTest {
 
   @Test
   public void testShellJob() throws Exception {
     JobProps props = new JobProps();
     props.setProjectId(1);
     props.setJobParams("{\"value\":\"ls -l\"}");
-    Logger logger = LoggerFactory.getLogger(JobTypeManager.class);
-    Job job = JobTypeManager.newJob("JOB_1", "SHELL", props, logger);
+    Logger logger = LoggerFactory.getLogger(JobManager.class);
+    Job job = JobManager.newJob("SHELL", props, logger);
     assertTrue(ShellJob.class.isInstance(job));
   }
 
@@ -42,8 +42,8 @@ public class JobTypeManagerTest {
     String param = "{\"mainJar\":\"hadoop-mapreduce-examples-2.7.3.jar\",\"mainClass\":\"org.apache.hadoop.examples.ExampleDriver\",\"args\":[\"3\",\"5\"],\"properties\":[{\"prop\":\"aa\",\"value\":\"11\"},{\"prop\":\"bb\",\"value\":\"55\"}],\"jars\":[\"3\",\"5\"],\"files\":[\"x.conf\"],\"archives\":null,\"queue\":null,\"dargs\":[\"aa=11\",\"bb=55\"]}";
     System.out.println(param);
     props.setJobParams(param);
-    Logger logger = LoggerFactory.getLogger(JobTypeManager.class);
-    Job job = JobTypeManager.newJob("JOB_2", "MR", props, logger);
+    Logger logger = LoggerFactory.getLogger(JobManager.class);
+    Job job = JobManager.newJob("MR", props, logger);
     assertTrue(MrJob.class.isInstance(job));
   }
 }

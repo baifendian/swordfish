@@ -31,9 +31,9 @@ public class HadoopJarArgsConst {
   public static final String JARS = "-libjars";
 
   /**
-   * --files files
+   * -files
    */
-  public static final String FILES = "--files";
+  public static final String FILES = "-files";
 
   /**
    * -archives
@@ -41,7 +41,7 @@ public class HadoopJarArgsConst {
   public static final String ARCHIVES = "-archives";
 
   /**
-   * -D mapreduce.job.queuename=XXX
+   * -Dmapreduce.job.queuename={queue}
    */
   public static final String QUEUE = "mapreduce.job.queuename";
 }

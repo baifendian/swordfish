@@ -15,10 +15,11 @@
  */
 package com.baifendian.swordfish.execserver.job;
 
-import com.baifendian.swordfish.common.hadoop.HdfsException;
+import com.baifendian.swordfish.execserver.exception.ExecException;
+import com.baifendian.swordfish.execserver.exception.ExecTimeoutException;
 import com.baifendian.swordfish.execserver.utils.ProcessUtil;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 
 import java.io.BufferedReader;
@@ -26,81 +27,111 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.reflect.Field;
-import java.util.List;
-import java.util.concurrent.CountDownLatch;
+import java.nio.charset.Charset;
 import java.util.concurrent.TimeUnit;
 
 public abstract class AbstractProcessJob extends AbstractJob {
 
-  protected boolean started = false;
-
-  protected final CountDownLatch completeLatch;
-
-  protected final long KILL_TIME_MS = 5000;
+  /**
+   * 构建 process 工具
+   */
+  private ProcessBuilder processBuilder;
 
   /**
-   * @param jobId  生成的作业 id
-   * @param props  作业配置信息,各类作业根据此配置信息生成具体的作业
-   * @param logger 日志
+   * 具体的进程
    */
-  protected AbstractProcessJob(String jobId, JobProps props, Logger logger) {
-    super(jobId, props, logger);
+  protected Process process;
 
-    completeLatch = new CountDownLatch(1);
+  public AbstractProcessJob(JobProps props, Logger logger) {
+    super(props, logger);
   }
 
   /**
-   * 创建 ProcessBuilder <p>
+   * 创建命令语句
    *
-   * @return {@link ProcessBuilder}
+   * @return
+   * @throws Exception
    */
-  public abstract ProcessBuilder createProcessBuilder() throws Exception;
+  public abstract String createCommand() throws Exception;
+
+  /**
+   * 日志处理
+   *
+   * @param log
+   */
+  protected void logProcess(String log) {
+    logger.info("(stdout, stderr) -> \n{}", log);
+  }
 
   @Override
   public void before() throws Exception {
   }
 
+  /**
+   * 计算节点的超时时间（s） <p>
+   *
+   * @return 超时时间
+   */
+  private long calcNodeTimeout() {
+    long usedTime = (System.currentTimeMillis() - props.getFlowStartTime().getTime()) / 1000;
+
+    long remainTime = props.getFlowTimeout() - usedTime;
+
+    if (remainTime <= 0) {
+      throw new ExecTimeoutException("workflow execution time out");
+    }
+
+    return remainTime;
+  }
+
   @Override
   public void process() throws Exception {
+    // 如果超时, 直接退出
+    long remainTime = calcNodeTimeout();
+
     try {
-      ProcessBuilder processBuilder = createProcessBuilder();
-      if (processBuilder == null) {
+      // 初始化
+      processBuilder = new ProcessBuilder();
+
+      // 得到每个具体 job 的具体构建方式
+      String command = createCommand();
+
+      if (StringUtils.isEmpty(command)) {
         exitCode = 0;
         complete = true;
         return;
       }
 
-      String proxyUser = getProxyUser();
+      // 得到代理执行用户和工作目录
+      String proxyUser = props.getProxyUser();
       String workDir = getWorkingDirectory();
 
-      logger.info("jobId:{} proxyUser:{} workDir:{}", jobId, proxyUser, workDir);
+      logger.info("proxyUser:{}, workDir:{}", proxyUser, workDir);
 
-      if (proxyUser != null) {
-        String commandFile = workDir + File.separator + jobId + ".command";
+      // 命令语句
+      String commandFile = String.format("%s/%s.command", workDir, props.getJobAppId());
 
-        logger.info("generate command file:{}", commandFile);
+      logger.info("generate command file:{}", commandFile);
 
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("#!/bin/sh\n");
-        stringBuilder.append("BASEDIR=$(cd `dirname $0`; pwd)\n");
-        stringBuilder.append("cd $BASEDIR\n");
+      StringBuilder stringBuilder = new StringBuilder();
+      stringBuilder.append("#!/bin/sh\n");
+      stringBuilder.append("BASEDIR=$(cd `dirname $0`; pwd)\n");
+      stringBuilder.append("cd $BASEDIR\n");
 
-        if (props.getEnvFile() != null) {
-          stringBuilder.append("source " + props.getEnvFile() + "\n");
-        }
-
-        stringBuilder.append("\n\n");
-        stringBuilder.append(StringUtils.join(processBuilder.command(), " "));
-        FileUtils.writeStringToFile(new File(commandFile), stringBuilder.toString());
-        processBuilder.command("sudo", "-u", proxyUser, "sh", commandFile);
-      } else {
-        List<String> commands = processBuilder.command();
-        processBuilder.command("sh", "-c");
-        processBuilder.command().addAll(commands);
+      if (props.getEnvFile() != null) {
+        stringBuilder.append("source " + props.getEnvFile() + "\n");
       }
 
-      logger.info("run command:{}", processBuilder.command());
+      stringBuilder.append("\n\n");
+      stringBuilder.append(command);
 
+      // 写数据到文件
+      FileUtils.writeStringToFile(new File(commandFile), stringBuilder.toString(), Charset.forName("UTF-8"));
+
+      // 设置运行命令
+      processBuilder.command("sudo", "-u", proxyUser, "sh", commandFile);
+
+      // 设置工作目录
       processBuilder.directory(new File(workDir));
 
       // 将 error 信息 merge 到标准输出流
@@ -112,20 +143,25 @@ public abstract class AbstractProcessJob extends AbstractJob {
       // 打印进程的启动命令行
       printCommand(processBuilder);
 
+      // 读取控制台输出
       readProcessOutput();
-      exitCode = process.waitFor();
 
-      completeLatch.countDown();
+      // 等待运行完毕
+      exitCode = (process.waitFor(remainTime, TimeUnit.SECONDS)) ? 0 : 1;
     } catch (Exception e) {
       logger.error(e.getMessage(), e);
       exitCode = -1;
+    } finally {
+      complete = true;
     }
 
     if (exitCode != 0) {
-      throw new HdfsException("Process error. Exit code is " + exitCode);
+      throw new ExecException("Process error. Exit code is " + exitCode);
     }
+  }
 
-    complete = true;
+  @Override
+  public void after() throws Exception {
   }
 
   @Override
@@ -135,23 +171,39 @@ public abstract class AbstractProcessJob extends AbstractJob {
     }
 
     int processId = getProcessId(process);
-    logger.info("job:{} cancel job. kill process:{}", jobId, processId);
 
-    boolean killed = softKill(processId, KILL_TIME_MS, TimeUnit.MILLISECONDS);
+    logger.info("cancel job:{}, kill process:{}", props.getJobAppId(), processId);
+
+    // kill, 等待完成
+    boolean killed = softKill(processId, 500, TimeUnit.MILLISECONDS);
+
     if (!killed) {
       logger.warn("Kill with signal TERM failed. Killing with KILL signal.");
       hardKill(processId);
     }
   }
 
+  /**
+   * 是否启动
+   *
+   * @return
+   */
   private boolean isStarted() {
     return started;
   }
 
+  /**
+   * 是否还在运行
+   *
+   * @return
+   */
   private boolean isRunning() {
     return isStarted() && !isCompleted();
   }
 
+  /**
+   * 检测是否启动过了
+   */
   private void checkStarted() {
     if (!isStarted()) {
       throw new IllegalStateException("process has not yet started.");
@@ -168,7 +220,7 @@ public abstract class AbstractProcessJob extends AbstractJob {
   private boolean softKill(int processId, final long time, final TimeUnit unit) throws InterruptedException {
     checkStarted();
 
-    if (processId != 0 && isStarted()) {
+    if (processId != 0 && isRunning()) {
       try {
         String cmd;
         if (props.getProxyUser() != null) {
@@ -178,7 +230,6 @@ public abstract class AbstractProcessJob extends AbstractJob {
         }
 
         Runtime.getRuntime().exec(cmd);
-        return completeLatch.await(time, unit);
       } catch (IOException e) {
         logger.info("kill attempt failed.", e);
       }
@@ -196,20 +247,22 @@ public abstract class AbstractProcessJob extends AbstractJob {
    */
   public void hardKill(int processId) {
     checkStarted();
-    if (isRunning()) {
-      if (processId != 0) {
-        try {
-          String cmd;
-          if (props.getProxyUser() != null) {
-            cmd = String.format("sudo -u %s kill -9 %d", props.getProxyUser(), processId);
-          } else {
-            cmd = String.format("kill -9 %d", processId);
-          }
-          Runtime.getRuntime().exec(cmd);
-        } catch (IOException e) {
-          logger.error("Kill attempt failed.", e);
+
+    if (processId != 0 && isRunning()) {
+      try {
+        String cmd;
+
+        if (props.getProxyUser() != null) {
+          cmd = String.format("sudo -u %s kill -9 %d", props.getProxyUser(), processId);
+        } else {
+          cmd = String.format("kill -9 %d", processId);
         }
+
+        Runtime.getRuntime().exec(cmd);
+      } catch (IOException e) {
+        logger.error("Kill attempt failed.", e);
       }
+
       process.destroy();
     }
   }
@@ -221,9 +274,10 @@ public abstract class AbstractProcessJob extends AbstractJob {
    */
   private void printCommand(ProcessBuilder processBuilder) {
     String cmdStr;
+
     try {
       cmdStr = ProcessUtil.genCmdStr(processBuilder.command());
-      logger.info("job run command：{}", cmdStr);
+      logger.info("job run command:\n{}", cmdStr);
     } catch (IOException e) {
       logger.error(e.getMessage(), e);
     }
@@ -237,34 +291,36 @@ public abstract class AbstractProcessJob extends AbstractJob {
    */
   private int getProcessId(Process process) {
     int processId = 0;
+
     try {
       Field f = process.getClass().getDeclaredField("pid");
       f.setAccessible(true);
 
       processId = f.getInt(process);
     } catch (Throwable e) {
-      e.printStackTrace();
+      logger.error(e.getMessage(), e);
     }
 
     return processId;
   }
 
   /**
-   * 获取进程的标准输出 <p>
+   * 获取进程的标准输出, 并进行处理
    */
-  protected void readProcessOutput() {
-    String threadLoggerInfoName = "LoggerInfo-" + jobId;
+  private void readProcessOutput() {
+    String threadLoggerInfoName = String.format("LoggerInfo-%s", props.getJobAppId());
 
     Thread loggerInfoThread = new Thread(() -> {
       BufferedReader reader;
+
       try {
         reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
         String line;
         while ((line = reader.readLine()) != null) {
-          logger.info("{}", line);
+          logProcess(line);
         }
       } catch (Exception e) {
-        logger.error("{}", e.getMessage(), e);
+        logger.error(e.getMessage(), e);
       }
     }, threadLoggerInfoName);
 

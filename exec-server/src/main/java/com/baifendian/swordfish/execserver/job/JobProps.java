@@ -80,6 +80,21 @@ public class JobProps {
    **/
   private Map<String, String> definedParams;
 
+  /**
+   * 每个 job 有个具体的应用 id, job 是动态的任务
+   */
+  private String jobAppId;
+
+  /**
+   * 工作流的启动时间
+   */
+  private Date flowStartTime;
+
+  /**
+   * 工作流超时时间
+   */
+  private int flowTimeout;
+
   public int getProjectId() {
     return projectId;
   }
@@ -174,5 +189,29 @@ public class JobProps {
 
   public void setCycTime(Date cycTime) {
     this.cycTime = cycTime;
+  }
+
+  public String getJobAppId() {
+    return jobAppId;
+  }
+
+  public void setJobAppId(String jobAppId) {
+    this.jobAppId = jobAppId;
+  }
+
+  public Date getFlowStartTime() {
+    return flowStartTime;
+  }
+
+  public void setFlowStartTime(Date flowStartTime) {
+    this.flowStartTime = flowStartTime;
+  }
+
+  public int getFlowTimeout() {
+    return flowTimeout;
+  }
+
+  public void setFlowTimeout(int flowTimeout) {
+    this.flowTimeout = flowTimeout;
   }
 }

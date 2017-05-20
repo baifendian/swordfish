@@ -20,56 +20,48 @@ import com.baifendian.swordfish.dao.FlowDao;
 import com.baifendian.swordfish.dao.model.ExecutionNode;
 import com.baifendian.swordfish.execserver.job.AbstractProcessJob;
 import com.baifendian.swordfish.execserver.job.JobProps;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 
-import java.io.*;
+import java.io.File;
 import java.nio.charset.Charset;
-import java.util.concurrent.TimeUnit;
+import java.util.ArrayList;
+import java.util.List;
 
 public abstract class AbstractYarnJob extends AbstractProcessJob {
 
+  /**
+   * 数据库接口
+   */
   private FlowDao flowDao;
 
-  private String logLinks;
-
   /**
-   * yarn 的 application id
+   * 日志 links
    */
-  private String appid;
+  private List<String> logLinks;
 
-  public AbstractYarnJob(String jobIdLog, JobProps props, Logger logger) {
-    super(jobIdLog, props, logger);
+  public AbstractYarnJob(JobProps props, Logger logger) {
+    super(props, logger);
 
     flowDao = DaoFactory.getDaoInstance(FlowDao.class);
+    logLinks = new ArrayList<>();
   }
 
   @Override
-  protected void readProcessOutput() {
-    InputStream inputStream = process.getInputStream();
-    try {
-      BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
-      String line;
-      while ((line = reader.readLine()) != null) {
-        if (appid == null) {
-          appid = findAppid(line);
-        }
-        if(logLinks == null){
-          logLinks = findLogLinks(line);
-          if(logLinks != null){
-            ExecutionNode executionNode = flowDao.queryExecutionNode(props.getExecId(), props.getNodeName());
-            executionNode.setLogLinks(logLinks);
-            flowDao.updateExecutionNode(executionNode);
-          }
-        }
-        // jobContext.appendLog(line);
-        logger.info(line);
-      }
-    } catch (IOException e) {
-      logger.error(e.getMessage(), e);
-    } finally {
-      IOUtils.closeQuietly(inputStream);
+  protected void logProcess(String log) {
+    super.logProcess(log);
+
+    // 分析日志
+    String appid = findAppid(log);
+
+    if (appid != null && !logLinks.contains(appid)) {
+      logLinks.add(appid);
+
+      ExecutionNode executionNode = flowDao.queryExecutionNode(props.getExecId(), props.getNodeName());
+      executionNode.setLogLinkList(logLinks);
+
+      flowDao.updateExecutionNode(executionNode);
     }
   }
 
@@ -82,45 +74,53 @@ public abstract class AbstractYarnJob extends AbstractProcessJob {
     if (line.contains("YarnClientImpl: Submitted application")) {
       return line.substring(line.indexOf("application") + "application".length() + 1);
     }
+
     return null;
   }
 
+  @Deprecated
   protected String findLogLinks(String line) {
     if (line.contains("The url to track the job:")) {
       return line.substring(line.indexOf("job:") + "job:".length() + 1);
     }
+
     return null;
   }
 
   @Override
   public void cancel() throws Exception {
+    // 先停止任务
     super.cancel();
 
-    if (appid != null) {
-      String commandFile = "/tmp/" + jobId + ".kill";
-      String cmd = "yarn application -kill " + appid;
+    // 然后 kill application
+    if (CollectionUtils.isNotEmpty(logLinks)) {
+      for (String appid : logLinks) {
+        String commandFile = "/tmp/" + props.getJobAppId() + ".kill";
+        String cmd = "yarn application -kill " + appid;
 
-      StringBuilder sb = new StringBuilder();
-      sb.append("#!/bin/sh\n");
-      sb.append("BASEDIR=$(cd `dirname $0`; pwd)\n");
-      sb.append("cd $BASEDIR\n");
-      if (props.getEnvFile() != null) {
-        sb.append("source " + props.getEnvFile() + "\n");
+        StringBuilder sb = new StringBuilder();
+        sb.append("#!/bin/sh\n");
+        sb.append("BASEDIR=$(cd `dirname $0`; pwd)\n");
+        sb.append("cd $BASEDIR\n");
+
+        if (props.getEnvFile() != null) {
+          sb.append("source " + props.getEnvFile() + "\n");
+        }
+
+        sb.append("\n\n");
+        sb.append(cmd);
+
+        FileUtils.writeStringToFile(new File(commandFile), sb.toString(), Charset.forName("UTF-8"));
+
+        String runCmd = "sh " + commandFile;
+        if (props.getProxyUser() != null) {
+          runCmd = "sudo -u " + props.getProxyUser() + " " + runCmd;
+        }
+
+        logger.info("kill cmd:{}", runCmd);
+
+        Runtime.getRuntime().exec(runCmd);
       }
-
-      sb.append("\n\n");
-      sb.append(cmd);
-
-      FileUtils.writeStringToFile(new File(commandFile), sb.toString(), Charset.forName("UTF-8"));
-      String runCmd = "sh " + commandFile;
-      if (props.getProxyUser() != null) {
-        runCmd = "sudo -u " + props.getProxyUser() + " " + runCmd;
-      }
-      logger.info("run cmd:{}", runCmd);
-      Runtime.getRuntime().exec(runCmd);
-
-      completeLatch.await(KILL_TIME_MS, TimeUnit.MILLISECONDS);
     }
-
   }
 }

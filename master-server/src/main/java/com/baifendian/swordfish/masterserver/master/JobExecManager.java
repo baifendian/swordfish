@@ -64,9 +64,9 @@ public class JobExecManager {
   private final FlowDao flowDao;
 
   /**
-   * {@link Submit2ExecutorServerThread}
+   * 执行具体的任务的线程, 会从任务队列获取任务, 然后调用 executor 执行
    */
-  private Submit2ExecutorServerThread retryToWorkerThread;
+  private Submit2ExecutorServerThread flowSubmit2ExecutorThread;
 
   /**
    * executor server 服务检查线程
@@ -96,9 +96,9 @@ public class JobExecManager {
     FlowScheduleJob.init(executionFlowQueue, flowDao);
 
     // 启动请求 executor server 的处理线程
-    retryToWorkerThread = new Submit2ExecutorServerThread(executorServerManager, flowDao, executionFlowQueue);
-    retryToWorkerThread.setDaemon(true);
-    retryToWorkerThread.start();
+    flowSubmit2ExecutorThread = new Submit2ExecutorServerThread(executorServerManager, flowDao, executionFlowQueue);
+    flowSubmit2ExecutorThread.setDaemon(true);
+    flowSubmit2ExecutorThread.start();
 
     // 检测 executor 的线程
     executorCheckThread = new ExecutorCheckThread(executorServerManager, MasterConfig.heartBeatTimeoutInterval,
@@ -117,9 +117,9 @@ public class JobExecManager {
       executorCheckService.shutdownNow();
     }
 
-    retryToWorkerThread.disable();
+    flowSubmit2ExecutorThread.disable();
     try {
-      retryToWorkerThread.join();
+      flowSubmit2ExecutorThread.join();
     } catch (InterruptedException e) {
       logger.error("join thread exception", e);
     }

@@ -126,6 +126,11 @@
             </exclusions>
         </dependency>
 
+        <!-- common exec -->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-exec</artifactId>
+        </dependency>
     </dependencies>
 
     <build>

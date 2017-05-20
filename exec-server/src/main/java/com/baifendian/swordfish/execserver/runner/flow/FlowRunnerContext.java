@@ -34,12 +34,7 @@ public class FlowRunnerContext {
   /**
    * {@link ExecutorService}
    */
-  private ExecutorService executorService;
-
-  /**
-   * {@link ExecutorService}
-   */
-  private ExecutorService jobExecutorService;
+  private ExecutorService nodeExecutorService;
 
   /**
    * 调度信息
@@ -47,7 +42,7 @@ public class FlowRunnerContext {
   private Schedule schedule;
 
   /**
-   * 一个节点失败后的策略类型
+   * 一个节点失败后的策略类型, 比如是停止还是继续
    */
   private FailurePolicyType failurePolicyType;
 
@@ -57,7 +52,7 @@ public class FlowRunnerContext {
   private int maxTryTimes;
 
   /**
-   * 节点最大的超时时间 (2)
+   * 节点最大的超时时间
    */
   private int timeout;
 
@@ -94,41 +89,21 @@ public class FlowRunnerContext {
   /**
    * getter method
    *
-   * @return the executorService
-   * @see FlowRunnerContext#executorService
+   * @return the nodeExecutorService
+   * @see FlowRunnerContext#nodeExecutorService
    */
-  public ExecutorService getExecutorService() {
-    return executorService;
+  public ExecutorService getNodeExecutorService() {
+    return nodeExecutorService;
   }
 
   /**
    * setter method
    *
-   * @param executorService the executorService to set
-   * @see FlowRunnerContext#executorService
+   * @param nodeExecutorService the nodeExecutorService to set
+   * @see FlowRunnerContext#nodeExecutorService
    */
-  public void setExecutorService(ExecutorService executorService) {
-    this.executorService = executorService;
-  }
-
-  /**
-   * getter method
-   *
-   * @return the jobExecutorService
-   * @see FlowRunnerContext#jobExecutorService
-   */
-  public ExecutorService getJobExecutorService() {
-    return jobExecutorService;
-  }
-
-  /**
-   * setter method
-   *
-   * @param jobExecutorService the jobExecutorService to set
-   * @see FlowRunnerContext#jobExecutorService
-   */
-  public void setJobExecutorService(ExecutorService jobExecutorService) {
-    this.jobExecutorService = jobExecutorService;
+  public void setNodeExecutorService(ExecutorService nodeExecutorService) {
+    this.nodeExecutorService = nodeExecutorService;
   }
 
   /**

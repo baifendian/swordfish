@@ -24,6 +24,7 @@ import com.baifendian.swordfish.execserver.parameter.ParamHelper;
 import org.slf4j.Logger;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -47,45 +48,47 @@ public class MrJob extends AbstractYarnJob {
   private MrParam mrParam;
 
   /**
-   * @param jobId
    * @param props
    * @param logger
    * @throws IOException
    */
-  public MrJob(String jobId, JobProps props, Logger logger) {
-    super(jobId, props, logger);
+  public MrJob(JobProps props, Logger logger) {
+    super(props, logger);
   }
 
   @Override
-  public void initJobParams() {
+  public void initJob() {
     mrParam = JsonUtil.parseObject(props.getJobParams(), MrParam.class);
     mrParam.setQueue(props.getQueue());
   }
 
-  public List<String> buildCommand() {
-    if (mrParam.getArgs() != null) {
-      String args = ParamHelper.resolvePlaceholders(mrParam.getArgs(), definedParamMap);
-      mrParam.setArgs(args);
-    }
-
-    return HadoopJarArgsUtil.buildArgs(mrParam);
-  }
-
+  /**
+   * hadoop 命令示例为:
+   * hadoop jar hadoop-mapreduce-examples-<ver>.jar wordcount \
+   * -files dir1/dict.txt#dict1,dir2/dict.txt#dict2 \
+   * -archives mytar.tgz#tgzdir \
+   * -Dwordcount.case.sensitive=true \
+   * input output
+   */
   @Override
-  public ProcessBuilder createProcessBuilder() {
-    ProcessBuilder processBuilder = new ProcessBuilder(HADOOP_COMMAND);
-    processBuilder.command().add(HADOOP_JAR);
-    List<String> args = buildCommand();
-    if (args != null) {
-      processBuilder.command().addAll(args);
-    }
+  public String createCommand() throws Exception {
+    List<String> args = new ArrayList<>();
 
-    return processBuilder;
+    args.add(HADOOP_COMMAND);
+    args.add(HADOOP_JAR);
+
+    // 添加其它参数
+    args.addAll(HadoopJarArgsUtil.buildArgs(mrParam));
+
+    String command = ParamHelper.resolvePlaceholders(String.join(" \\\n", args), props.getDefinedParams());
+
+    logger.info("mr job command:\n{}", command);
+
+    return command;
   }
 
   @Override
   public BaseParam getParam() {
     return mrParam;
   }
-
 }

@@ -34,46 +34,51 @@ public class HadoopJarArgsUtil {
   public static List<String> buildArgs(MrParam param) {
     List<String> args = new ArrayList<>();
 
+    // 添加 jar 包
     if (StringUtils.isNotEmpty(param.getMainJar().getRes())) {
       args.add(param.getMainJar().getRes());
     }
 
+    // 添加 class
     if (StringUtils.isNotEmpty(param.getMainClass())) {
       args.add(param.getMainClass());
     }
 
+    // 添加 -D
     if (param.getDArgs() != null && !param.getDArgs().isEmpty()) {
       for (String darg : param.getDArgs()) {
-        args.add(HadoopJarArgsConst.D);
-        args.add(darg);
+        args.add(String.format("%s%s", HadoopJarArgsConst.D, darg));
       }
     }
 
+    // 添加 -libjars
     if (param.getLibJars() != null && !param.getLibJars().isEmpty()) {
       args.add(HadoopJarArgsConst.JARS);
       args.add(StringUtils.join(param.getLibJars().stream().map(p -> p.getRes()).toArray(), ","));
     }
 
+    // 添加 -files
     if (param.getFiles() != null && !param.getFiles().isEmpty()) {
       args.add(HadoopJarArgsConst.FILES);
       args.add(StringUtils.join(param.getFiles().stream().map(p -> p.getSymbolicRes()).toArray(), ","));
     }
 
+    // 添加 -archives
     if (param.getArchives() != null && !param.getArchives().isEmpty()) {
       args.add(HadoopJarArgsConst.ARCHIVES);
       args.add(StringUtils.join(param.getArchives().stream().map(p -> p.getSymbolicRes()).toArray(), ","));
     }
 
+    // 添加队列
     if (StringUtils.isNotEmpty(param.getQueue())) {
-      args.add(HadoopJarArgsConst.D);
-      args.add(HadoopJarArgsConst.QUEUE + "=" + param.getQueue());
+      args.add(String.format("%s%s=%s", HadoopJarArgsConst.D, HadoopJarArgsConst.QUEUE, param.getQueue()));
     }
 
+    // 添加参数
     if (StringUtils.isNotEmpty(param.getArgs())) {
       args.add(param.getArgs());
     }
+
     return args;
   }
-
 }
-
