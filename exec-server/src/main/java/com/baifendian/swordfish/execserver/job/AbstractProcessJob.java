@@ -190,15 +190,6 @@ public abstract class AbstractProcessJob extends AbstractJob {
   }
 
   /**
-   * 是否启动
-   *
-   * @return
-   */
-  private boolean isStarted() {
-    return started;
-  }
-
-  /**
    * 是否还在运行
    *
    * @return

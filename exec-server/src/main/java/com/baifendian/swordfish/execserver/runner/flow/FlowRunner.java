@@ -630,7 +630,11 @@ public class FlowRunner implements Runnable {
         Future<Boolean> future = entry.getValue();
 
         if (!future.isDone()) {
+          // 结点运行
           nodeRunner.kill();
+
+          // 强制进行关闭
+          future.cancel(true);
         }
       }
     }

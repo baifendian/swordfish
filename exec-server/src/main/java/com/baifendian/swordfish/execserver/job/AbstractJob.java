@@ -30,7 +30,7 @@ public abstract class AbstractJob implements Job {
   /**
    * 退出状态
    */
-  protected int exitCode = 0;
+  protected int exitCode = -1;
 
   /**
    * 是否完成
@@ -41,11 +41,6 @@ public abstract class AbstractJob implements Job {
    * 是否已经启动
    */
   protected boolean started = false;
-
-  /**
-   * 是否取消
-   */
-  protected boolean canceled = false;
 
   /**
    * 日志记录
@@ -69,7 +64,6 @@ public abstract class AbstractJob implements Job {
 
   @Override
   public void process() throws Exception {
-
   }
 
   @Override
@@ -77,12 +71,8 @@ public abstract class AbstractJob implements Job {
   }
 
   @Override
-  public void cancel() throws Exception {
-  }
-
-  @Override
-  public boolean isCanceled() {
-    return canceled;
+  public boolean isStarted() {
+    return started;
   }
 
   @Override
@@ -111,7 +101,7 @@ public abstract class AbstractJob implements Job {
   public abstract void initJob();
 
   /**
-   * 得到工作multiple
+   * 得到工作
    *
    * @return
    */

@@ -95,6 +95,7 @@ public class SparkJob extends AbstractYarnJob {
    * @param line
    * @return
    */
+  @Override
   public String findLogLinks(String line) {
     if (line.contains("tracking URL:")) {
       return line.substring(line.indexOf("URL:") + "URL:".length() + 1);
