@@ -485,7 +485,7 @@ public class FlowRunner implements Runnable {
     executionNode.setAttempt(0);
     executionNode.setStartTime(now);
     executionNode.setStatus(FlowStatus.INIT);
-    executionNode.setJobId(LoggerUtil.genJobId(JOB_PREFIX, executionFlow.getId(), HttpUtil.getMd5(nodeName).substring(0, 8)));
+    executionNode.setJobId(LoggerUtil.genJobId(JOB_PREFIX, executionFlow.getId(), nodeName));
 
     logger.info("insert execution node, id: {}, name: {}, start time: {}, status: {}, job id: {}",
         executionNode.getExecId(),
