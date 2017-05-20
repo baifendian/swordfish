@@ -22,6 +22,7 @@ import com.baifendian.swordfish.common.job.struct.node.BaseParamFactory;
 import com.baifendian.swordfish.common.mail.EmailManager;
 import com.baifendian.swordfish.common.utils.graph.DAGGraph;
 import com.baifendian.swordfish.common.utils.graph.Graph;
+import com.baifendian.swordfish.common.utils.http.HttpUtil;
 import com.baifendian.swordfish.dao.DaoFactory;
 import com.baifendian.swordfish.dao.FlowDao;
 import com.baifendian.swordfish.dao.enums.FailurePolicyType;
@@ -484,7 +485,7 @@ public class FlowRunner implements Runnable {
     executionNode.setAttempt(0);
     executionNode.setStartTime(now);
     executionNode.setStatus(FlowStatus.INIT);
-    executionNode.setJobId(LoggerUtil.genJobId(JOB_PREFIX, executionFlow.getId(), nodeName));
+    executionNode.setJobId(LoggerUtil.genJobId(JOB_PREFIX, executionFlow.getId(), HttpUtil.getMd5(nodeName).substring(0, 8)));
 
     logger.info("insert execution node, id: {}, name: {}, start time: {}, status: {}, job id: {}",
         executionNode.getExecId(),
