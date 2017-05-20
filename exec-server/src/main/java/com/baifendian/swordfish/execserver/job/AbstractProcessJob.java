@@ -28,6 +28,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.reflect.Field;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.concurrent.TimeUnit;
 
 public abstract class AbstractProcessJob extends AbstractJob {
@@ -102,31 +104,36 @@ public abstract class AbstractProcessJob extends AbstractJob {
         return;
       }
 
-      // 得到代理执行用户和工作目录
-      String proxyUser = props.getProxyUser();
+      // 工作目录
       String workDir = getWorkingDirectory();
-
-      logger.info("proxyUser:{}, workDir:{}", proxyUser, workDir);
 
       // 命令语句
       String commandFile = String.format("%s/%s.command", workDir, props.getJobAppId());
 
-      logger.info("generate command file:{}", commandFile);
+      // 得到代理执行用户和工作目录
+      String proxyUser = props.getProxyUser();
 
-      StringBuilder stringBuilder = new StringBuilder();
-      stringBuilder.append("#!/bin/sh\n");
-      stringBuilder.append("BASEDIR=$(cd `dirname $0`; pwd)\n");
-      stringBuilder.append("cd $BASEDIR\n");
+      logger.info("proxyUser:{}, workDir:{}", proxyUser, workDir);
 
-      if (props.getEnvFile() != null) {
-        stringBuilder.append("source " + props.getEnvFile() + "\n");
+      // 不存在则创建, 因为可能重试任务
+      if (!Files.exists(Paths.get(commandFile))) {
+        logger.info("generate command file:{}", commandFile);
+
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("#!/bin/sh\n");
+        stringBuilder.append("BASEDIR=$(cd `dirname $0`; pwd)\n");
+        stringBuilder.append("cd $BASEDIR\n");
+
+        if (props.getEnvFile() != null) {
+          stringBuilder.append("source " + props.getEnvFile() + "\n");
+        }
+
+        stringBuilder.append("\n\n");
+        stringBuilder.append(command);
+
+        // 写数据到文件
+        FileUtils.writeStringToFile(new File(commandFile), stringBuilder.toString(), Charset.forName("UTF-8"));
       }
-
-      stringBuilder.append("\n\n");
-      stringBuilder.append(command);
-
-      // 写数据到文件
-      FileUtils.writeStringToFile(new File(commandFile), stringBuilder.toString(), Charset.forName("UTF-8"));
 
       // 设置运行命令
       processBuilder.command("sudo", "-u", proxyUser, "sh", commandFile);

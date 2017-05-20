@@ -419,19 +419,18 @@ public class FlowRunner implements Runnable {
                 // 重新提交
                 submitNodeRunner(dagGraph.getVertex(nodeRunner.getNodename()), executionNode, semaphore);
               } else {
+                // 不能继续尝试了
+                status = FlowStatus.FAILED;
 
                 executionNode.setEndTime(now);
-                executionNode.setStatus(FlowStatus.SUCCESS);
+                executionNode.setStatus(status);
 
                 // 更新结点状态
                 flowDao.updateExecutionNode(executionNode);
 
-                // 不能继续尝试了
                 if (failurePolicyType == FailurePolicyType.END) {
                   clean();
-                  return FlowStatus.FAILED;
-                } else {
-                  status = FlowStatus.FAILED;
+                  return status;
                 }
               }
             } else { // 如果成功

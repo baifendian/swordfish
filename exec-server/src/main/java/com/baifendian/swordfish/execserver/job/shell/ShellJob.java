@@ -61,6 +61,14 @@ public class ShellJob extends AbstractProcessJob {
 
   @Override
   public String createCommand() throws Exception {
+    // 生成的脚本文件
+    String fileName = String.format("%s/%s_node.sh", currentPath, props.getJobAppId());
+    Path path = new File(fileName).toPath();
+
+    if (Files.exists(path)) {
+      return fileName;
+    }
+
     String script = shellParam.getScript();
     script = ParamHelper.resolvePlaceholders(script, props.getDefinedParams());
 
@@ -68,11 +76,6 @@ public class ShellJob extends AbstractProcessJob {
 
     logger.info("script:\n{}", shellParam.getScript());
     logger.info("currentPath:{}", currentPath);
-
-    // 生成的脚本文件
-    String fileName = String.format("%s/%s_node.sh", currentPath, props.getJobAppId());
-
-    Path path = new File(fileName).toPath();
 
     Set<PosixFilePermission> perms = PosixFilePermissions.fromString("rwxr-xr-x");
     FileAttribute<Set<PosixFilePermission>> attr = PosixFilePermissions.asFileAttribute(perms);

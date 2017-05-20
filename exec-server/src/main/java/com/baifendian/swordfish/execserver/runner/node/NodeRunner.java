@@ -121,7 +121,7 @@ public class NodeRunner implements Callable<Boolean> {
 
     JobLogger jobLogger = new JobLogger(executionNode.getJobId(), logger);
 
-    boolean success;
+    boolean success = false;
 
     try {
       job = JobManager.newJob(flowNode.getType(), props, jobLogger);
@@ -135,7 +135,7 @@ public class NodeRunner implements Callable<Boolean> {
       // job 的后处理过程
       job.after();
 
-      success = job.getExitCode() == 0;
+      success = (job.getExitCode() == 0);
     } catch (Exception e) {
       success = false;
 
@@ -145,7 +145,7 @@ public class NodeRunner implements Callable<Boolean> {
     } finally {
       semaphore.release();
 
-      logger.info("job process done, exec id: {}, node: {}", executionFlow.getId(), executionNode.getName());
+      logger.info("job process done, exec id: {}, node: {}, success: {}", executionFlow.getId(), executionNode.getName(), success);
     }
 
     return success;
