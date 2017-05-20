@@ -54,7 +54,7 @@ public class HadoopJarArgsUtil {
     // 添加 -libjars
     if (param.getLibJars() != null && !param.getLibJars().isEmpty()) {
       args.add(HadoopJarArgsConst.JARS);
-      args.add(StringUtils.join(param.getLibJars().stream().map(p -> p.getRes()).toArray(), ","));
+      args.add(StringUtils.join(param.getLibJars().stream().map(p -> p.getSymbolicRes()).toArray(), ","));
     }
 
     // 添加 -files
