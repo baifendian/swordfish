@@ -144,6 +144,8 @@ public class NodeRunner implements Callable<Boolean> {
       kill();
     } finally {
       semaphore.release();
+
+      logger.info("job process done, exec id: {}, node: {}", executionFlow.getId(), executionNode.getName());
     }
 
     return success;

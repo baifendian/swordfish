@@ -369,75 +369,90 @@ public class FlowRunner implements Runnable {
       }
 
       // 查看是哪个任务成功了, 只能更新一个
-      for (Map.Entry<NodeRunner, Future<Boolean>> entry : activeNodeRunners.entrySet()) {
-        NodeRunner nodeRunner = entry.getKey();
-        Future<Boolean> future = entry.getValue();
+      boolean done = false;
 
-        // 如果完成了
-        if (future.isDone()) {
-          // 删除, 认为只需完毕
-          activeNodeRunners.remove(nodeRunner);
+      while (!done) {
+        // 等待一会再检测
+        try {
+          Thread.sleep(50);
+        } catch (InterruptedException e) {
+          logger.error(e.getMessage(), e);
+        }
 
-          Boolean value = false;
+        // 遍历, 得到一个可以执行的信息
+        for (Map.Entry<NodeRunner, Future<Boolean>> entry : activeNodeRunners.entrySet()) {
+          NodeRunner nodeRunner = entry.getKey();
+          Future<Boolean> future = entry.getValue();
 
-          Date now = new Date();
+          // 如果完成了
+          if (future.isDone()) {
+            // 完成了
+            done = true;
 
-          try {
-            value = future.get();
-          } catch (InterruptedException e) {
-            logger.error(e.getMessage(), e);
-          } catch (ExecutionException e) {
-            logger.error(e.getMessage(), e);
-          }
+            // 删除, 认为只需完毕
+            activeNodeRunners.remove(nodeRunner);
 
-          // 如果失败
-          if (!value) {
-            // 如果没有达到重试次数, 重试即可
-            ExecutionNode executionNode = executionNodeMap.get(nodeRunner.getNodename());
+            Boolean value = false;
 
-            // 比如, 次数是 2, 则可以尝试 3 次
-            if (executionNode.getAttempt() <= maxTryTimes) {
-              executionNode.incAttempt();
+            Date now = new Date();
 
-              // 更新结点状态
+            try {
+              value = future.get();
+            } catch (InterruptedException e) {
+              logger.error(e.getMessage(), e);
+            } catch (ExecutionException e) {
+              logger.error(e.getMessage(), e);
+            }
+
+            // 如果失败
+            if (!value) {
+              // 如果没有达到重试次数, 重试即可
+              ExecutionNode executionNode = executionNodeMap.get(nodeRunner.getNodename());
+
+              // 比如, 次数是 2, 则可以尝试 3 次
+              if (executionNode.getAttempt() <= maxTryTimes) {
+                executionNode.incAttempt();
+
+                // 更新结点状态
+                flowDao.updateExecutionNode(executionNode);
+
+                // 重新提交
+                submitNodeRunner(dagGraph.getVertex(nodeRunner.getNodename()), executionNode, semaphore);
+              } else {
+                // 不能继续尝试了
+                if (failurePolicyType == FailurePolicyType.END) {
+                  clean();
+                  return FlowStatus.FAILED;
+                } else {
+                  status = FlowStatus.FAILED;
+                }
+              }
+            } else { // 如果成功
+              // 更新一下状态
+              ExecutionNode executionNode = executionNodeMap.get(nodeRunner.getNodename());
+
+              executionNode.setEndTime(now);
+              executionNode.setStatus(FlowStatus.SUCCESS);
+
               flowDao.updateExecutionNode(executionNode);
 
-              // 重新提交
-              submitNodeRunner(dagGraph.getVertex(nodeRunner.getNodename()), executionNode, semaphore);
-            } else {
-              // 不能继续尝试了
-              if (failurePolicyType == FailurePolicyType.END) {
-                clean();
-                return FlowStatus.FAILED;
-              } else {
-                status = FlowStatus.FAILED;
+              // 成功, 看后继, 提交后继
+              for (String nodeName : dagGraph.getPostNode(nodeRunner.getNodename())) {
+                if (!executionNodeMap.containsKey(nodeName) && isPreNodesAllSuccess(dagGraph.getPreNode(nodeName))) {
+                  // 插入一个结点
+                  ExecutionNode newExecutionNode = insertExecutionNode(executionFlow, nodeName);
+
+                  // 添加任务
+                  executionNodeMap.put(nodeName, newExecutionNode);
+
+                  // 提交任务
+                  submitNodeRunner(dagGraph.getVertex(nodeName), newExecutionNode, semaphore);
+                }
               }
             }
-          } else { // 如果成功
-            // 更新一下状态
-            ExecutionNode executionNode = executionNodeMap.get(nodeRunner.getNodename());
 
-            executionNode.setEndTime(now);
-            executionNode.setStatus(FlowStatus.SUCCESS);
-
-            flowDao.updateExecutionNode(executionNode);
-
-            // 成功, 看后继, 提交后继
-            for (String nodeName : dagGraph.getPostNode(nodeRunner.getNodename())) {
-              if (!executionNodeMap.containsKey(nodeName) && isPreNodesAllSuccess(dagGraph.getPreNode(nodeName))) {
-                // 插入一个结点
-                ExecutionNode newExecutionNode = insertExecutionNode(executionFlow, nodeName);
-
-                // 添加任务
-                executionNodeMap.put(nodeName, newExecutionNode);
-
-                // 提交任务
-                submitNodeRunner(dagGraph.getVertex(nodeName), newExecutionNode, semaphore);
-              }
-            }
+            break;
           }
-
-          break;
         }
       }
     }
