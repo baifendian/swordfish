@@ -317,7 +317,7 @@ public abstract class AbstractProcessJob extends AbstractJob {
           logProcess(line);
         }
       } catch (Exception e) {
-        logger.error(e.getMessage(), e);
+//        logger.error(e.getMessage(), e);
       }
     }, threadLoggerInfoName);
 
