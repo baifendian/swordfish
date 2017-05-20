@@ -22,7 +22,6 @@ import com.baifendian.swordfish.common.job.struct.node.BaseParamFactory;
 import com.baifendian.swordfish.common.mail.EmailManager;
 import com.baifendian.swordfish.common.utils.graph.DAGGraph;
 import com.baifendian.swordfish.common.utils.graph.Graph;
-import com.baifendian.swordfish.common.utils.http.HttpUtil;
 import com.baifendian.swordfish.dao.DaoFactory;
 import com.baifendian.swordfish.dao.FlowDao;
 import com.baifendian.swordfish.dao.enums.FailurePolicyType;
@@ -622,8 +621,11 @@ public class FlowRunner implements Runnable {
    */
   public void kill() {
     synchronized (this) {
-      logger.info("Kill has been called on exec: {}", executionFlow.getId());
-      logger.info("Killing running nodes, num: {}", activeNodeRunners.size());
+      if (activeNodeRunners.isEmpty()) {
+        return;
+      }
+
+      logger.info("Kill has been called on exec: {}, num: {}", executionFlow.getId(), activeNodeRunners.size());
 
       // 正在运行中的
       for (Map.Entry<NodeRunner, Future<Boolean>> entry : activeNodeRunners.entrySet()) {
@@ -631,6 +633,9 @@ public class FlowRunner implements Runnable {
         Future<Boolean> future = entry.getValue();
 
         if (!future.isDone()) {
+          // 记录 kill 的信息
+          logger.info("kill exec, id: {}, node: {}", executionFlow.getId(), nodeRunner.getNodename());
+
           // 结点运行
           nodeRunner.kill();
 
