@@ -163,9 +163,11 @@ public class FlowRunnerManager {
     context.setFailurePolicyType(failurePolicy);
     context.setSystemParamMap(systemParamMap);
     context.setCustomParamMap(customParamMap);
+
     FlowRunner flowRunner = new FlowRunner(context);
 
     runningFlows.put(executionFlow.getId(), flowRunner);
+
     flowExecutorService.submit(flowRunner);
   }
 

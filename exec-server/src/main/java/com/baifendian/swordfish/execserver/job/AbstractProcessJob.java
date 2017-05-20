@@ -147,16 +147,15 @@ public abstract class AbstractProcessJob extends AbstractJob {
       readProcessOutput();
 
       // 等待运行完毕
-      exitCode = (process.waitFor(remainTime, TimeUnit.SECONDS)) ? 0 : 1;
+      process.waitFor(remainTime, TimeUnit.SECONDS);
+
+      exitCode = process.exitValue();
     } catch (Exception e) {
       logger.error(e.getMessage(), e);
       exitCode = -1;
+      throw new ExecException("Process error. Exit code is " + exitCode);
     } finally {
       complete = true;
-    }
-
-    if (exitCode != 0) {
-      throw new ExecException("Process error. Exit code is " + exitCode);
     }
   }
 
