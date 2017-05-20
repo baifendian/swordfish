@@ -352,7 +352,7 @@ public class FlowDao extends BaseDao {
    * @return
    * @see ProjectFlow
    */
-  public ProjectFlow projectFlowfindById(int id) {
+  public ProjectFlow projectFlowFindById(int id) {
     ProjectFlow projectFlow = projectFlowMapper.findById(id);
 
     if (projectFlow != null) {

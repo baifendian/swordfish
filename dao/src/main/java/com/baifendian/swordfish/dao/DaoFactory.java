@@ -24,7 +24,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class DaoFactory {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(DaoFactory.class);
+  private static final Logger logger = LoggerFactory.getLogger(DaoFactory.class);
 
   private static Map<String, BaseDao> daoMap = new ConcurrentHashMap<>();
 
@@ -45,7 +45,7 @@ public class DaoFactory {
           t.init();
           daoMap.put(className, t);
         } catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException e) {
-          LOGGER.error(e.getMessage(), e);
+          logger.error(e.getMessage(), e);
         }
       }
     }

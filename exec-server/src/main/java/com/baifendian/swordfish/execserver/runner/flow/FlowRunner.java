@@ -465,6 +465,13 @@ public class FlowRunner implements Runnable {
     executionNode.setStatus(FlowStatus.INIT);
     executionNode.setJobId(LoggerUtil.genJobId(JOB_PREFIX, executionFlow.getId(), nodeName));
 
+    logger.info("insert execution node, id: {}, name: {}, start time: {}, status: {}, job id: {}",
+        executionNode.getExecId(),
+        nodeName,
+        now,
+        FlowStatus.INIT,
+        LoggerUtil.genJobId(JOB_PREFIX, executionFlow.getId(), nodeName));
+
     // 更新数据库
     flowDao.insertExecutionNode(executionNode);
 

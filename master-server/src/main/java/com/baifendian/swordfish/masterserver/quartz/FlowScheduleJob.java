@@ -28,16 +28,12 @@ import com.baifendian.swordfish.dao.model.flow.DepWorkflow;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
 import com.baifendian.swordfish.masterserver.master.ExecFlowInfo;
 import com.baifendian.swordfish.masterserver.utils.crontab.CrontabUtil;
-import com.cronutils.model.Cron;
-import com.cronutils.model.time.ExecutionTime;
 import org.apache.commons.collections.CollectionUtils;
 import org.quartz.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.text.ParseException;
 import java.util.*;
-import java.util.Calendar;
 import java.util.concurrent.BlockingQueue;
 
 /**
@@ -128,7 +124,7 @@ public class FlowScheduleJob implements Job {
     // 起始时间 (ms)
     long startTime = System.currentTimeMillis();
 
-    ProjectFlow flow = flowDao.projectFlowfindById(flowId);
+    ProjectFlow flow = flowDao.projectFlowFindById(flowId);
 
     // 若 workflow 被删除，那么直接删除当前 job
     if (flow == null) {
