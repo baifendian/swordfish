@@ -31,6 +31,7 @@ import org.slf4j.LoggerFactory;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Callable;
+import java.util.concurrent.Semaphore;
 
 /**
  * 节点执行器 <p>
@@ -54,12 +55,33 @@ public class NodeRunner implements Callable<Boolean> {
 
   private Job job;
 
+  private Semaphore semaphore;
+
   public NodeRunner(JobContext jobContext) {
     this.executionFlow = jobContext.getExecutionFlow();
     this.executionNode = jobContext.getExecutionNode();
     this.flowNode = jobContext.getFlowNode();
     this.systemParamMap = jobContext.getSystemParamMap();
     this.customParamMap = jobContext.getCustomParamMap();
+    this.semaphore = jobContext.getSemaphore();
+  }
+
+  /**
+   * 得到执行的结点
+   *
+   * @return
+   */
+  public ExecutionNode getExecutionNode() {
+    return executionNode;
+  }
+
+  /**
+   * 返回结点名称
+   *
+   * @return
+   */
+  public String getNodename() {
+    return flowNode.getName();
   }
 
   @Override
@@ -81,6 +103,7 @@ public class NodeRunner implements Callable<Boolean> {
     }
 
     JobProps props = new JobProps();
+
     props.setJobParams(flowNode.getParameter());
     props.setWorkDir(jobScriptPath);
     props.setProxyUser(executionFlow.getProxyUser());
@@ -124,6 +147,8 @@ public class NodeRunner implements Callable<Boolean> {
           logger.error("cancel job exception", e);
         }
       }
+
+      semaphore.release();
     }
 
     return success;

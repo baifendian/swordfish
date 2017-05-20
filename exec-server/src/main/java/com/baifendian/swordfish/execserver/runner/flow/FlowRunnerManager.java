@@ -224,16 +224,15 @@ public class FlowRunnerManager {
    * 取消执行的 flow
    *
    * @param execId
-   * @param user
    */
-  public void cancelFlow(int execId, String user) {
+  public void cancelFlow(int execId) {
     FlowRunner flowRunner = runningFlows.get(execId);
 
     if (flowRunner == null) {
       throw new ExecException("Execution " + execId + "is not running");
     }
 
-    flowRunner.kill(user);
+    flowRunner.kill();
     runningFlows.remove(execId);
   }
 }

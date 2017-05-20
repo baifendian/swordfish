@@ -109,6 +109,14 @@ public class ExecutionNode {
     this.attempt = attempt;
   }
 
+  public void incAttempt() {
+    if (attempt == null) {
+      attempt = 0;
+    }
+
+    attempt += 1;
+  }
+
   public String getJobId() {
     return jobId;
   }
