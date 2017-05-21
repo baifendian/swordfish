@@ -194,14 +194,6 @@ service WorkerService {
   RetInfo execFlow(1:i32 execId),
 
   /**
-   * 调度执行某个 workflow
-   *
-   * execId : 执行 id
-   * scheduleDate : 调度时间（预期的）
-   */
-  RetInfo scheduleExecFlow(1:i32 execId, 2:i64 scheduleDate),
-
-  /**
    * 取消在执行的指定workflow
    *
    * execId : 执行 id

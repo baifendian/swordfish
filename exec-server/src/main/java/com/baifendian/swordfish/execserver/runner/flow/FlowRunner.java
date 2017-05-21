@@ -558,7 +558,7 @@ public class FlowRunner implements Runnable {
   /**
    * 关闭正在执行的任务, 以及更新节点状态
    */
-  private void clean() {
+  public void clean() {
     // kill 正在运行的任务
     kill();
 
@@ -619,7 +619,7 @@ public class FlowRunner implements Runnable {
   /**
    * kill 执行
    */
-  public void kill() {
+  private void kill() {
     synchronized (this) {
       if (activeNodeRunners.isEmpty()) {
         return;

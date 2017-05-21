@@ -31,7 +31,10 @@ import com.baifendian.swordfish.rpc.RetResultInfo;
 import com.baifendian.swordfish.rpc.ScheduleInfo;
 import com.baifendian.swordfish.rpc.client.MasterClient;
 import com.baifendian.swordfish.webserver.dto.*;
-import com.baifendian.swordfish.webserver.exception.*;
+import com.baifendian.swordfish.webserver.exception.NotFoundException;
+import com.baifendian.swordfish.webserver.exception.ParameterException;
+import com.baifendian.swordfish.webserver.exception.PermissionException;
+import com.baifendian.swordfish.webserver.exception.ServerErrorException;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -91,12 +94,13 @@ public class ExecService {
   public ExecutorIdsDto postExecWorkflow(User operator, String projectName, String workflowName, String schedule, ExecType execType, String nodeName, NodeDepType nodeDep, NotifyType notifyType, String notifyMails, int timeout) {
 
     Project project = projectMapper.queryByName(projectName);
+
     if (project == null) {
       logger.error("Project does not exist: {}", projectName);
       throw new NotFoundException("Not found project \"{0}\"", projectName);
     }
 
-    //必须有project 写权限
+    // 必须有 project 写权限
     if (!projectService.hasWritePerm(operator.getId(), project)) {
       logger.error("User {} has no right permission for the project {}", operator.getName(), project.getName());
       throw new PermissionException("User \"{0}\" is not has project \"{1}\" write permission", operator.getName(), project.getName());
@@ -285,7 +289,8 @@ public class ExecService {
       logger.error("Project does not exist: {}", executionFlow.getProjectName());
       throw new NotFoundException("Not found project \"{0}\"", executionFlow.getProjectName());
     }
-    //必须有project 执行权限
+
+    // 必须有 project 执行权限
     if (!projectService.hasExecPerm(operator.getId(), project)) {
       logger.error("User {} has no right permission for the project {}", operator.getName(), project.getName());
       throw new PermissionException("User \"{0}\" is not has project \"{1}\" exec permission", operator.getName(), project.getName());
@@ -321,19 +326,22 @@ public class ExecService {
       logger.error("job id does not exist: {}", jobId);
       throw new NotFoundException("Not found jobId \"{0}\"", jobId);
     }
+
     ExecutionFlow executionFlow = executionFlowMapper.selectByExecId(executionNode.getExecId());
 
     if (executionFlow == null) {
       logger.error("exec flow does not exist: {}", executionNode.getExecId());
       throw new NotFoundException("Not found execId \"{0}\"", executionNode.getExecId());
     }
+
     Project project = projectMapper.queryByName(executionFlow.getProjectName());
+
     if (project == null) {
       logger.error("Project does not exist: {}", executionFlow.getProjectName());
       throw new NotFoundException("Not found project \"{0}\"", executionFlow.getProjectName());
     }
 
-    //必须有project 执行权限
+    // 必须有 project 执行权限
     if (!projectService.hasExecPerm(operator.getId(), project)) {
       logger.error("User {} has no right permission for the project {}", operator.getName(), project.getName());
       throw new PermissionException("User \"{0}\" is not has project \"{1}\" exec permission", operator.getName(), project.getName());
@@ -362,7 +370,8 @@ public class ExecService {
       logger.error("Project does not exist: {}", executionFlow.getProjectName());
       throw new NotFoundException("Not found project \"{0}\"", executionFlow.getProjectName());
     }
-    //必须有project 执行权限
+
+    // 必须有project 执行权限
     if (!projectService.hasExecPerm(operator.getId(), project)) {
       logger.error("User {} has no right permission for the project {}", operator.getName(), project.getName());
       throw new PermissionException("User \"{0}\" is not has project \"{1}\" exec permission", operator.getName(), project.getName());

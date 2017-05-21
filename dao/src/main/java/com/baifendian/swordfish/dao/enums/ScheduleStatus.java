@@ -21,7 +21,5 @@ import com.fasterxml.jackson.annotation.JsonValue;
  * 调度状态 <p>
  */
 public enum ScheduleStatus {
-
   OFFLINE, ONLINE;
-
 }

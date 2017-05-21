@@ -137,41 +137,6 @@ public class FlowRunnerManager {
   }
 
   /**
-   * 提交调度的 workflow 执行 <p>
-   *
-   * @param executionFlow
-   * @param schedule
-   */
-  public void submitFlow(ExecutionFlow executionFlow, Schedule schedule) {
-    int maxTryTimes = schedule.getMaxTryTimes();
-    int timeout = schedule.getTimeout() != 0 ? schedule.getTimeout() : defaultMaxTimeout;
-
-    FailurePolicyType failurePolicy = schedule.getFailurePolicy() != null ? schedule.getFailurePolicy() : defaultFailurePolicyType;
-
-    // 系统参数
-    Map<String, String> systemParamMap = SystemParamManager.buildSystemParam(executionFlow.getType(), executionFlow.getStartTime());
-
-    // 自定义参数
-    Map<String, String> customParamMap = executionFlow.getUserDefinedParamMap();
-
-    FlowRunnerContext context = new FlowRunnerContext();
-    context.setSchedule(schedule);
-    context.setExecutionFlow(executionFlow);
-    context.setNodeExecutorService(nodeExecutorService);
-    context.setMaxTryTimes(maxTryTimes);
-    context.setTimeout(timeout);
-    context.setFailurePolicyType(failurePolicy);
-    context.setSystemParamMap(systemParamMap);
-    context.setCustomParamMap(customParamMap);
-
-    FlowRunner flowRunner = new FlowRunner(context);
-
-    runningFlows.put(executionFlow.getId(), flowRunner);
-
-    flowExecutorService.submit(flowRunner);
-  }
-
-  /**
    * 清理完成的 flows
    */
   private void cleanFinishedFlows() {
@@ -195,7 +160,7 @@ public class FlowRunnerManager {
     shutdownExecutorService(nodeExecutorService);
 
     for (FlowRunner flowRunner : runningFlows.values()) {
-      flowRunner.kill();
+      flowRunner.clean();
     }
 
     try {
@@ -234,7 +199,7 @@ public class FlowRunnerManager {
       throw new ExecException("Execution " + execId + "is not running");
     }
 
-    flowRunner.kill();
+    flowRunner.clean();
     runningFlows.remove(execId);
   }
 }

@@ -18,6 +18,7 @@ package com.baifendian.swordfish.webserver.controller;
 import com.baifendian.swordfish.dao.enums.DepPolicyType;
 import com.baifendian.swordfish.dao.enums.FailurePolicyType;
 import com.baifendian.swordfish.dao.enums.NotifyType;
+import com.baifendian.swordfish.dao.enums.ScheduleStatus;
 import com.baifendian.swordfish.dao.model.Schedule;
 import com.baifendian.swordfish.dao.model.User;
 import com.baifendian.swordfish.webserver.dto.ScheduleDto;
@@ -145,23 +146,44 @@ public class ScheduleController {
   }
 
   /**
-   * 设置一个调度的状态
+   * 下线一个调度
    *
    * @param operator
    * @param projectName
    * @param workflowName
    */
-  @PostMapping("/{workflowName}/schedules/{scheduleStatus}")
-  public void postScheduleStatus(@RequestAttribute(value = "session.user") User operator,
-                                 @PathVariable String projectName,
-                                 @PathVariable String workflowName,
-                                 @PathVariable String scheduleStatus) {
-    // TODO:: logger
+  @PostMapping("/{workflowName}/schedules/online")
+  public void scheduleOnline(@RequestAttribute(value = "session.user") User operator,
+                             @PathVariable String projectName,
+                             @PathVariable String workflowName) {
+    logger.info("Operator user {}, schedule online, project name: {}, workflow name: {}",
+        operator.getName(), projectName, workflowName);
 
     try {
-      scheduleService.postScheduleStatus(operator, projectName, workflowName, scheduleStatus);
+      scheduleService.postScheduleStatus(operator, projectName, workflowName, ScheduleStatus.ONLINE);
     } catch (Exception e) {
-      logger.error("Post schedule status error", e);
+      logger.error("Schedule online error", e);
+    }
+  }
+
+  /**
+   * 下线一个调度
+   *
+   * @param operator
+   * @param projectName
+   * @param workflowName
+   */
+  @PostMapping("/{workflowName}/schedules/offline")
+  public void scheduleOffline(@RequestAttribute(value = "session.user") User operator,
+                              @PathVariable String projectName,
+                              @PathVariable String workflowName) {
+    logger.info("Operator user {}, schedule offline, project name: {}, workflow name: {}",
+        operator.getName(), projectName, workflowName);
+
+    try {
+      scheduleService.postScheduleStatus(operator, projectName, workflowName, ScheduleStatus.OFFLINE);
+    } catch (Exception e) {
+      logger.error("Schedule offline error", e);
     }
   }
 
@@ -177,7 +199,8 @@ public class ScheduleController {
   public ScheduleDto querySchedule(@RequestAttribute(value = "session.user") User operator,
                                    @PathVariable String projectName,
                                    @PathVariable String workflowName) {
-    // TODO:: logger
+    logger.info("Operator user {}, query schedule, project name: {}, workflow name: {}",
+        operator.getName(), projectName, workflowName);
 
     return new ScheduleDto(scheduleService.querySchedule(operator, projectName, workflowName));
   }
@@ -191,9 +214,9 @@ public class ScheduleController {
    */
   @GetMapping("/schedules")
   public List<ScheduleDto> queryAllSchedule(@RequestAttribute(value = "session.user") User operator,
-                                            @PathVariable String projectName
-  ) {
-    // TODO:: logger
+                                            @PathVariable String projectName) {
+    logger.info("Operator user {}, query schedules, project name: {}",
+        operator.getName(), projectName);
 
     List<Schedule> scheduleList = scheduleService.queryAllSchedule(operator, projectName);
     List<ScheduleDto> scheduleDtoList = new ArrayList<>();

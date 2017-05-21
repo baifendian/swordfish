@@ -59,6 +59,7 @@ public class FlowExecManager {
    */
   private static long checkInterval = 30 * 1000;
 
+
   /**
    * @param jobExecManager
    * @param flowDao
@@ -85,7 +86,8 @@ public class FlowExecManager {
       Date scheduleDate = cron.getTimeAfter(DateUtils.addSeconds(startDateTime, -1));
 
       try {
-        boolean isFailed = false; // 是否已经失败
+        // 是否已经失败
+        boolean isFailed = false;
         List<Map.Entry<Date, Boolean>> resultList = new ArrayList<>();
 
         while (scheduleDate.before(endDateTime) || scheduleDate.equals(endDateTime)) {
@@ -94,7 +96,9 @@ public class FlowExecManager {
           if (!isFailed) {
             // 插入 ExecutionFlow
             Schedule schedule = flowDao.querySchedule(flow.getId());
-            Integer maxTryTimes = 3;
+
+            // 默认最大重试 2 次, 即最多运行 3 次
+            Integer maxTryTimes = 2;
             Integer timeout = 10 * 3600;
 
             if (schedule != null) {
@@ -105,6 +109,7 @@ public class FlowExecManager {
             ExecutionFlow executionFlow = flowDao.scheduleFlowToExecution(flow.getProjectId(), flow.getId(),
                 flow.getOwnerId(), scheduleDate, ExecType.COMPLEMENT_DATA, maxTryTimes, null, null, schedule.getNotifyType(), schedule.getNotifyMails(), timeout);
             executionFlow.setProjectId(flow.getProjectId());
+
             ExecFlowInfo execFlowInfo = new ExecFlowInfo();
             execFlowInfo.setExecId(executionFlow.getId());
 
@@ -118,7 +123,7 @@ public class FlowExecManager {
             }
           }
 
-          resultList.add(new AbstractMap.SimpleImmutableEntry<Date, Boolean>(new Date(scheduleDate.getTime()), execStatus));
+          resultList.add(new AbstractMap.SimpleImmutableEntry<>(new Date(scheduleDate.getTime()), execStatus));
           scheduleDate = cron.getTimeAfter(scheduleDate);
         }
 

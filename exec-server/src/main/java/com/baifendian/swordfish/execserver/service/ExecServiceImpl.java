@@ -112,43 +112,6 @@ public class ExecServiceImpl implements Iface {
   }
 
   /**
-   * 调度执行一个工作流
-   *
-   * @param execId
-   * @param scheduleDate
-   * @return
-   * @throws TException
-   */
-  @Override
-  public RetInfo scheduleExecFlow(int execId, long scheduleDate) throws TException {
-    try {
-      // 查询 ExecutionFlow
-      ExecutionFlow executionFlow = flowDao.queryExecutionFlow(execId);
-      if (executionFlow == null) {
-        return ResultHelper.createErrorResult("execId not find");
-      }
-
-      // 查询 Schedule
-      Schedule schedule = flowDao.querySchedule(executionFlow.getFlowId());
-      if (schedule == null) {
-        return ResultHelper.createErrorResult("schedule information not find");
-      }
-
-      // 更新状态为 RUNNING
-      String worker = String.format("%s:%d", host, port);
-      flowDao.updateExecutionFlowStatus(execId, FlowStatus.RUNNING, worker);
-
-      // 提交任务运行
-      flowRunnerManager.submitFlow(executionFlow, schedule);
-    } catch (Exception e) {
-      logger.error(e.getMessage(), e);
-      return ResultHelper.createErrorResult(e.getMessage());
-    }
-
-    return ResultHelper.SUCCESS;
-  }
-
-  /**
    * 执行即席查询
    *
    * @param adHocId

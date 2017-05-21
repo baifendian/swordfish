@@ -31,22 +31,22 @@ public class ScheduleMapperProvider {
   public String insert(Map<String, Object> parameter) {
     return new SQL() {{
       INSERT_INTO(DB_NAME);
-      VALUES("flow_id", "#{schedule.flowId}");
-      VALUES("start_date", "#{schedule.startDate}");
-      VALUES("end_date", "#{schedule.endDate}");
-      VALUES("crontab", "#{schedule.crontab}");
-      VALUES("dep_workflows", "#{schedule.depWorkflowsStr}");
-      VALUES("dep_policy", EnumFieldUtil.genFieldStr("schedule.depPolicy", DepPolicyType.class));
-      VALUES("failure_policy", EnumFieldUtil.genFieldStr("schedule.failurePolicy", FailurePolicyType.class));
-      VALUES("max_try_times", "#{schedule.maxTryTimes}");
-      VALUES("notify_type", EnumFieldUtil.genFieldStr("schedule.notifyType", NotifyType.class));
-      VALUES("notify_mails", "#{schedule.notifyMailsStr}");
-      VALUES("timeout", "#{schedule.timeout}");
-      VALUES("create_time", "#{schedule.createTime}");
-      VALUES("modify_time", "#{schedule.modifyTime}");
-      VALUES("owner", "#{schedule.ownerId}");
-      VALUES("schedule_status", EnumFieldUtil.genFieldStr("schedule.scheduleStatus", ScheduleStatus.class));
 
+      VALUES("`flow_id`", "#{schedule.flowId}");
+      VALUES("`start_date`", "#{schedule.startDate}");
+      VALUES("`end_date`", "#{schedule.endDate}");
+      VALUES("`crontab`", "#{schedule.crontab}");
+      VALUES("`dep_workflows`", "#{schedule.depWorkflowsStr}");
+      VALUES("`dep_policy`", EnumFieldUtil.genFieldStr("schedule.depPolicy", DepPolicyType.class));
+      VALUES("`failure_policy`", EnumFieldUtil.genFieldStr("schedule.failurePolicy", FailurePolicyType.class));
+      VALUES("`max_try_times`", "#{schedule.maxTryTimes}");
+      VALUES("`notify_type`", EnumFieldUtil.genFieldStr("schedule.notifyType", NotifyType.class));
+      VALUES("`notify_mails`", "#{schedule.notifyMailsStr}");
+      VALUES("`timeout`", "#{schedule.timeout}");
+      VALUES("`create_time`", "#{schedule.createTime}");
+      VALUES("`modify_time`", "#{schedule.modifyTime}");
+      VALUES("`owner`", "#{schedule.ownerId}");
+      VALUES("`schedule_status`", EnumFieldUtil.genFieldStr("schedule.scheduleStatus", ScheduleStatus.class));
     }}.toString();
   }
 
@@ -54,20 +54,22 @@ public class ScheduleMapperProvider {
     return new SQL() {
       {
         UPDATE(DB_NAME);
-        SET("start_date = #{schedule.startDate}");
-        SET("end_date = #{schedule.endDate}");
-        SET("crontab=#{schedule.crontab}");
-        SET("dep_workflows=#{schedule.depWorkflowsStr}");
-        SET("dep_policy=" + EnumFieldUtil.genFieldStr("schedule.depPolicy", DepPolicyType.class));
-        SET("failure_policy=" + EnumFieldUtil.genFieldStr("schedule.failurePolicy", FailurePolicyType.class));
-        SET("max_try_times=#{schedule.maxTryTimes}");
-        SET("notify_type=" + EnumFieldUtil.genFieldStr("schedule.notifyType", NotifyType.class));
-        SET("notify_mails=#{schedule.notifyMailsStr}");
-        SET("timeout=#{schedule.timeout}");
-        SET("create_time=#{schedule.createTime}");
-        SET("modify_time=#{schedule.modifyTime}");
-        SET("owner=#{schedule.ownerId}");
-        SET("schedule_status=" + EnumFieldUtil.genFieldStr("schedule.scheduleStatus", ScheduleStatus.class));
+
+        SET("`start_date`=#{schedule.startDate}");
+        SET("`end_date`=#{schedule.endDate}");
+        SET("`crontab`=#{schedule.crontab}");
+        SET("`dep_workflows`=#{schedule.depWorkflowsStr}");
+        SET("`dep_policy`=" + EnumFieldUtil.genFieldStr("schedule.depPolicy", DepPolicyType.class));
+        SET("`failure_policy`=" + EnumFieldUtil.genFieldStr("schedule.failurePolicy", FailurePolicyType.class));
+        SET("`max_try_times`=#{schedule.maxTryTimes}");
+        SET("`notify_type`=" + EnumFieldUtil.genFieldStr("schedule.notifyType", NotifyType.class));
+        SET("`notify_mails`=#{schedule.notifyMailsStr}");
+        SET("`timeout`=#{schedule.timeout}");
+        SET("`create_time`=#{schedule.createTime}");
+        SET("`modify_time`=#{schedule.modifyTime}");
+        SET("`owner`=#{schedule.ownerId}");
+        SET("`schedule_status`=" + EnumFieldUtil.genFieldStr("schedule.scheduleStatus", ScheduleStatus.class));
+
         WHERE("flow_id = #{schedule.flowId}");
       }
     }.toString();
@@ -75,45 +77,53 @@ public class ScheduleMapperProvider {
 
   public String selectByFlowId(Map<String, Object> parameter) {
     return new SQL() {{
-      SELECT("*");
       SELECT("p_f.name as project_flow_name");
       SELECT("p.name as project_name");
       SELECT("u.name as owner_name");
+      SELECT("*");
+
       FROM(DB_NAME + " as s");
+
       JOIN("project_flows as p_f on s.flow_id = p_f.id");
       JOIN("project as p on p_f.project_id = p.id");
       JOIN("user as u on s.owner = u.id");
+
       WHERE("s.flow_id = #{flowId}");
     }}.toString();
   }
 
   public String selectByProject(Map<String, Object> parameter) {
     return new SQL() {{
-      SELECT("*");
       SELECT("p_f.name as project_flow_name");
       SELECT("p.name as project_name");
       SELECT("u.name as owner_name");
+      SELECT("*");
+
       FROM(DB_NAME + " as s");
+
       JOIN("project_flows as p_f on s.flow_id = p_f.id");
       JOIN("project as p on p_f.project_id = p.id");
       JOIN("user as u on s.owner = u.id");
+
       WHERE("p.name = #{projectName}");
     }}.toString();
   }
 
   public String selectByFlowName(Map<String, Object> parameter) {
     return new SQL() {{
-      SELECT("*");
       SELECT("p_f.name as project_flow_name");
       SELECT("p.name as project_name");
       SELECT("u.name as owner_name");
+      SELECT("*");
+
       FROM(DB_NAME + " as s");
+
       JOIN("project_flows as p_f on s.flow_id = p_f.id");
       JOIN("project as p on p_f.project_id = p.id");
       JOIN("user as u on s.owner = u.id");
+
       WHERE("p.name = #{projectName}");
       WHERE("p_f.name = #{name}");
     }}.toString();
   }
-
 }

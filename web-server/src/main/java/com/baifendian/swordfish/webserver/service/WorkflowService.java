@@ -99,11 +99,13 @@ public class WorkflowService {
     verifyExtras(extras);
 
     Project project = projectMapper.queryByName(projectName);
+
     if (project == null) {
       logger.error("Project does not exist: {}", projectName);
       throw new NotFoundException("Not found project \"{0}\"", projectName);
     }
-    //project 是否存在写权限
+
+    // project 是否存在写权限
     if (!projectService.hasWritePerm(operator.getId(), project)) {
       logger.error("User {} has no right permission for the project {}", operator.getName(), project.getName());
       throw new PermissionException("User \"{0}\" is not has project \"{1}\" write permission", operator.getName(), project.getName());
@@ -138,7 +140,7 @@ public class WorkflowService {
     for (WorkflowNodeDto flowNode : flowNodes) {
       if (!flowNodeParamCheck(flowNode.getParameter(), flowNode.getType())) {
         logger.error("Flow node {} parameter invalid", flowNode.getName());
-        throw new ParameterException("Flow node \"{0}\" parameter invalid ",flowNode.getName());
+        throw new ParameterException("Flow node \"{0}\" parameter invalid ", flowNode.getName());
       }
 
       // 校验节点的额外参数
@@ -236,15 +238,18 @@ public class WorkflowService {
     verifyExtras(extras);
 
     Project project = projectMapper.queryByName(projectName);
+
     if (project == null) {
       logger.error("Project does not exist: {}", projectName);
       throw new NotFoundException("Not found project \"{0}\"", projectName);
     }
+
     //必须有project 写权限
     if (!projectService.hasWritePerm(operator.getId(), project)) {
       logger.error("User {} has no right permission for the project {}", operator.getName(), project.getName());
       throw new PermissionException("User \"{0}\" is not has project \"{1}\" write permission", operator.getName(), project.getName());
     }
+
     // 判断 proxyUser 是否合理的
     if (StringUtils.isNotEmpty(proxyUser)) {
       verifyProxyUser(operator.getProxyUserList(), proxyUser);
@@ -347,11 +352,13 @@ public class WorkflowService {
   public ProjectFlow postWorkflowCopy(User operator, String projectName, String srcWorkflowName, String destWorkflowName) {
 
     Project project = projectMapper.queryByName(projectName);
+
     if (project == null) {
       logger.error("Project does not exist: {}", projectName);
       throw new NotFoundException("Not found project \"{0}\"", projectName);
     }
-    //必须有project 写权限
+
+    // 必须有 project 写权限
     if (!projectService.hasWritePerm(operator.getId(), project)) {
       logger.error("User {} has no right permission for the project {}", operator.getName(), project.getName());
       throw new PermissionException("User \"{0}\" is not has project \"{1}\" write permission", operator.getName(), project.getName());
@@ -363,6 +370,7 @@ public class WorkflowService {
       logger.error("Not found project flow {} in project {}", srcWorkflowName, project.getName());
       throw new NotFoundException("Not found project flow \"{0}\" in project \"{1}\"", srcWorkflowName, project.getName());
     }
+
     String data = JsonUtil.toJsonString(new WorkflowData(srcProjectFlow.getFlowsNodes(), srcProjectFlow.getUserDefinedParamList(), FlowNode.class));
 
     // 尝试拷贝文件
@@ -394,11 +402,13 @@ public class WorkflowService {
   public void deleteProjectFlow(User operator, String projectName, String name) {
 
     Project project = projectMapper.queryByName(projectName);
+
     if (project == null) {
       logger.error("Project does not exist: {}", projectName);
       throw new NotFoundException("Not found project \"{0}\"", projectName);
     }
-    //应该有项目写权限
+
+    // 应该有项目写权限
     if (!projectService.hasWritePerm(operator.getId(), project)) {
       logger.error("User {} has no right permission for the project {}", operator.getName(), project.getName());
       throw new PermissionException("User \"{0}\" is not has project \"{1}\" write permission", operator.getName(), project.getName());
@@ -418,7 +428,7 @@ public class WorkflowService {
     String hdfsFilename = BaseConfig.getHdfsWorkflowFilename(project.getId(), name);
     HdfsClient.getInstance().delete(hdfsFilename, true);
 
-    return;
+    //
   }
 
   /**
@@ -431,15 +441,18 @@ public class WorkflowService {
    */
   public void modifyWorkflowConf(User operator, String projectName, String queue, String proxyUser) {
     Project project = projectMapper.queryByName(projectName);
+
     if (project == null) {
       logger.error("Project does not exist: {}", projectName);
       throw new NotFoundException("Not found project \"{0}\"", projectName);
     }
-    //必须有project 写权限
+
+    // 必须有project 写权限
     if (!projectService.hasWritePerm(operator.getId(), project)) {
       logger.error("User {} has no right permission for the project {}", operator.getName(), project.getName());
       throw new PermissionException("User \"{0}\" is not has project \"{1}\" write permission", operator.getName(), project.getName());
     }
+
     projectFlowMapper.updateProjectConf(project.getId(), queue, proxyUser);
   }
 
@@ -453,11 +466,13 @@ public class WorkflowService {
   public List<ProjectFlow> queryAllProjectFlow(User operator, String projectName) {
 
     Project project = projectMapper.queryByName(projectName);
+
     if (project == null) {
       logger.error("Project does not exist: {}", projectName);
       throw new NotFoundException("Not found project \"{0}\"", projectName);
     }
-    //必须有project 读权限
+
+    // 必须有project 读权限
     if (!projectService.hasReadPerm(operator.getId(), project)) {
       logger.error("User {} has no right permission for the project {}", operator.getName(), project.getName());
       throw new PermissionException("User \"{0}\" is not has project \"{1}\" read permission", operator.getName(), project.getName());
@@ -477,11 +492,13 @@ public class WorkflowService {
   public ProjectFlow queryProjectFlow(User operator, String projectName, String name) {
 
     Project project = projectMapper.queryByName(projectName);
+
     if (project == null) {
       logger.error("Project does not exist: {}", projectName);
       throw new NotFoundException("Not found project \"{0}\"", projectName);
     }
-    //必须有project 读权限
+
+    // 必须有project 读权限
     if (!projectService.hasReadPerm(operator.getId(), project)) {
       logger.error("User {} has no right permission for the project {}", operator.getName(), project.getName());
       throw new PermissionException("User \"{0}\" is not has project \"{1}\" read permission", operator.getName(), project.getName());
@@ -499,25 +516,27 @@ public class WorkflowService {
   public org.springframework.core.io.Resource downloadProjectFlowFile(User operator, String projectName, String name) {
 
     Project project = projectMapper.queryByName(projectName);
+
     if (project == null) {
       logger.error("Project does not exist: {}", projectName);
       throw new NotFoundException("Not found project \"{0}\"", projectName);
     }
 
-    //必须有project 读权限
+    // 必须有 project 读权限
     if (!projectService.hasReadPerm(operator.getId(), project)) {
       logger.error("User {} has no right permission for the project {}", operator.getName(), project.getName());
       throw new PermissionException("User \"{0}\" is not has project \"{1}\" read permission", operator.getName(), project.getName());
     }
 
-    // 尝试从hdfs下载
+    // 尝试从 hdfs 下载
     logger.info("try download workflow {} file from hdfs", name);
+
     String localFilename = BaseConfig.getLocalWorkflowFilename(project.getId(), UUID.randomUUID().toString());
     String hdfsFilename = BaseConfig.getHdfsWorkflowFilename(project.getId(), name);
 
     logger.info("download hdfs {} to local {}", hdfsFilename, localFilename);
+
     try {
-      //TODO 如果拷贝到本地是本地的目录不存在会报错，需要解决
       HdfsClient.getInstance().copyHdfsToLocal(hdfsFilename, localFilename, false, true);
     } catch (Exception e) {
       logger.error("try download workflow {} file error", e);

@@ -30,23 +30,28 @@ import java.util.List;
 public interface ScheduleMapper {
 
   /**
-   * 插入记录 <p>
+   * 插入记录
    *
-   * @return 插入记录数
+   * @param schedule
+   * @return 插入的记录数
    */
   @InsertProvider(type = ScheduleMapperProvider.class, method = "insert")
   int insert(@Param("schedule") Schedule schedule);
 
   /**
-   * 任务的调度设置 <p>
+   * 任务的调度设置
    *
+   * @param schedule
    * @return 更新记录数
    */
   @UpdateProvider(type = ScheduleMapperProvider.class, method = "update")
   int update(@Param("schedule") Schedule schedule);
 
   /**
-   * workflow 发布任务的调度查询(单个任务) <p>
+   * workflow 发布任务的调度查询(单个任务)
+   *
+   * @param flowId
+   * @return
    */
   @Results(value = {
       @Result(property = "flowId", column = "flow_id", id = true, javaType = int.class, jdbcType = JdbcType.INTEGER),
@@ -97,7 +102,11 @@ public interface ScheduleMapper {
   List<Schedule> selectByProject(@Param("projectName") String projectName);
 
   /**
-   * workflow 发布任务的调度查询(单个任务) <p>
+   * workflow 发布任务的调度查询(单个任务)
+   *
+   * @param projectName
+   * @param name
+   * @return
    */
   @Results(value = {
       @Result(property = "flowId", column = "flow_id", id = true, javaType = int.class, jdbcType = JdbcType.INTEGER),

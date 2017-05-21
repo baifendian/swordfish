@@ -95,7 +95,7 @@ public class QuartzManager {
   }
 
   /**
-   * 添加对象到上下文中（若已存在相同key，则覆盖）
+   * 添加对象到上下文中（若已存在相同 key，则覆盖）
    *
    * @param key
    * @param object
@@ -104,6 +104,7 @@ public class QuartzManager {
     if (scheduler == null) {
       throw new QuartzException("Scheduler init failed, please init again!");
     }
+
     try {
       scheduler.getContext().put(key, object);
     } catch (SchedulerException e) {
@@ -135,6 +136,7 @@ public class QuartzManager {
 
     try {
       JobDetail jobDetail = addJob(jobName, jobGroupName, jobClass, dataMap);
+
       // 这里触发器名和任务名一致，保证唯一性
       addCronTrigger(jobDetail, DEFAULT_TRIGGER_GROUP_NAME, jobName, startDate, endDate, cronExpression, true);
 
@@ -350,14 +352,17 @@ public class QuartzManager {
    */
   private static void checkStatus() {
     if (scheduler == null) {
+      logger.error("Scheduler init failed, please init again!");
       throw new QuartzException("Scheduler init failed, please init again!");
     }
 
     try {
       if (scheduler.isShutdown()) {
+        logger.error("Scheduler had shutdown!");
         throw new QuartzException("Scheduler had shutdown!");
       }
     } catch (SchedulerException e) {
+      logger.error("Schedule exception!", e);
       throw new QuartzException("Schedule exception!", e);
     }
   }

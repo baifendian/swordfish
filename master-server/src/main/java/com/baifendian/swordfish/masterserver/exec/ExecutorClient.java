@@ -74,28 +74,6 @@ public class ExecutorClient {
   }
 
   /**
-   * 调度执行
-   *
-   * @param execId
-   * @param scheduleDate
-   * @return
-   */
-  public boolean scheduleExecFlow(int execId, long scheduleDate) {
-    connect();
-
-    try {
-      client.scheduleExecFlow(execId, scheduleDate);
-    } catch (TException e) {
-      logger.error("report info error", e);
-      return false;
-    } finally {
-      close();
-    }
-
-    return true;
-  }
-
-  /**
    * 执行即席查询
    *
    * @param id

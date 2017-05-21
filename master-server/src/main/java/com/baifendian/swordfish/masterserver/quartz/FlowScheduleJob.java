@@ -29,11 +29,17 @@ import com.baifendian.swordfish.dao.utils.json.JsonUtil;
 import com.baifendian.swordfish.masterserver.master.ExecFlowInfo;
 import com.baifendian.swordfish.masterserver.utils.crontab.CrontabUtil;
 import org.apache.commons.collections.CollectionUtils;
-import org.quartz.*;
+import org.quartz.Job;
+import org.quartz.JobDataMap;
+import org.quartz.JobExecutionContext;
+import org.quartz.JobExecutionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 
 /**
@@ -103,12 +109,16 @@ public class FlowScheduleJob implements Job {
   }
 
   /**
+   * 具体执行一个工作
+   *
    * @param context
    * @throws JobExecutionException
    */
   @Override
   public void execute(JobExecutionContext context) throws JobExecutionException {
     logger.info("trigger at:" + context.getFireTime());
+
+    Date now = new Date();
 
     // 1. 获取参数
     JobDataMap dataMap = context.getJobDetail().getJobDataMap();
@@ -146,7 +156,7 @@ public class FlowScheduleJob implements Job {
 
     try {
       executionFlow = flowDao.scheduleFlowToExecution(projectId, flowId, flow.getOwnerId(), scheduledFireTime,
-              ExecType.SCHEDULER, schedule.getMaxTryTimes(), null, null, schedule.getNotifyType(), schedule.getNotifyMails(), schedule.getTimeout());
+          ExecType.SCHEDULER, schedule.getMaxTryTimes(), null, null, schedule.getNotifyType(), schedule.getNotifyMails(), schedule.getTimeout());
     } catch (Exception e) {
       logger.error("insert execution flow error", e);
       throw new JobExecutionException(e);
@@ -165,7 +175,8 @@ public class FlowScheduleJob implements Job {
 
       // 存在上一调度周期
       if (previousFireTime != null) {
-        logger.info("previousFireTime is {}", previousFireTime);
+        logger.info("previous fire time is {}", previousFireTime);
+
         // 需要更新状态为 WAITING_DEP
         if (isNotUpdateWaitingDep) {
           updateWaitingDepFlowStatus(executionFlow, FlowStatus.WAITING_DEP);
@@ -175,24 +186,28 @@ public class FlowScheduleJob implements Job {
         // 如果自依赖的上一个调度周期失败，那么本次也失败
         if (!checkWorkflowStatus(flowId, previousFireTime, startTime, schedule.getTimeout())) {
           executionFlow.setStatus(FlowStatus.DEP_FAILED);
-          executionFlow.setEndTime(new Date());
+          executionFlow.setEndTime(now);
+
           flowDao.updateExecutionFlow(executionFlow);
+
           logger.error("Self dependence last cycle execution failed!");
+
           // 发送邮件
           if (executionFlow.getNotifyType().typeIsSendFailureMail()) {
             EmailManager.sendEmail(executionFlow);
           }
+
           return;
         }
       }
     }
 
     List<DepWorkflow> deps = JsonUtil.parseObjectList(schedule.getDepWorkflowsStr(), DepWorkflow.class);
+
     if (deps != null) {
       // 需要更新状态为 WAITING_DEP
       if (isNotUpdateWaitingDep) {
         updateWaitingDepFlowStatus(executionFlow, FlowStatus.WAITING_DEP);
-        isNotUpdateWaitingDep = false;
       }
 
       // 检测依赖
@@ -201,7 +216,7 @@ public class FlowScheduleJob implements Job {
       // 依赖失败，则当前任务也失败
       if (!isSuccess) {
         executionFlow.setStatus(FlowStatus.DEP_FAILED);
-        executionFlow.setEndTime(new Date());
+        executionFlow.setEndTime(now);
 
         flowDao.updateExecutionFlow(executionFlow);
 
@@ -224,6 +239,7 @@ public class FlowScheduleJob implements Job {
    * 更新 workflow 的执行状态
    *
    * @param executionFlow
+   * @param flowStatus
    */
   private void updateWaitingDepFlowStatus(ExecutionFlow executionFlow, FlowStatus flowStatus) {
     executionFlow.setStatus(flowStatus);
@@ -268,10 +284,10 @@ public class FlowScheduleJob implements Job {
           Thread.sleep(checkInterval);
         } catch (InterruptedException e) {
           logger.error(e.getMessage(), e);
-          return false; // 也认为是执行失败
+          return false;
         }
       } else {
-        return false; //如果已经完成了，也没有成功，那么直接返回失败。
+        return false;
       }
 
     }
@@ -339,8 +355,6 @@ public class FlowScheduleJob implements Job {
    * @return
    */
   private boolean checkDepWorkflowStatus(Date scheduledFireTime, int depFlowId, long startTime, int timeout) {
-
-
     while (true) {
       //是否没有完成
       boolean isNotFinshed = false;
@@ -370,7 +384,7 @@ public class FlowScheduleJob implements Job {
           Thread.sleep(checkInterval);
         } catch (InterruptedException e) {
           logger.error(e.getMessage(), e);
-          return false; // 也认为是执行失败
+          return false;
         }
       } else {
         return false;
@@ -476,6 +490,7 @@ public class FlowScheduleJob implements Job {
   private void sendToExecution(ExecutionFlow executionFlow, Date scheduleDate) {
     ExecFlowInfo execFlowInfo = new ExecFlowInfo();
     execFlowInfo.setExecId(executionFlow.getId());
+
     executionFlowQueue.add(execFlowInfo);
   }
 

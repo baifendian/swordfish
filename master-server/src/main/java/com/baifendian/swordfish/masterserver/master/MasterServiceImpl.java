@@ -85,7 +85,7 @@ public class MasterServiceImpl implements Iface {
    */
   @Override
   public RetInfo setSchedule(int projectId, int flowId) throws TException {
-    logger.info("set schedule {} {}", projectId, flowId);
+    logger.info("set schedule, project id: {}, flow id: {}", projectId, flowId);
 
     try {
       Schedule schedule = flowDao.querySchedule(flowId);
