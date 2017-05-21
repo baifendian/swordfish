@@ -17,7 +17,6 @@ package com.baifendian.swordfish.execserver.job.shell;
 
 import com.baifendian.swordfish.common.job.struct.node.BaseParam;
 import com.baifendian.swordfish.common.job.struct.node.shell.ShellParam;
-import com.baifendian.swordfish.common.utils.http.HttpUtil;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
 import com.baifendian.swordfish.execserver.exception.ExecException;
 import com.baifendian.swordfish.execserver.job.AbstractProcessJob;
@@ -62,6 +61,14 @@ public class ShellJob extends AbstractProcessJob {
 
   @Override
   public String createCommand() throws Exception {
+    // 生成的脚本文件
+    String fileName = String.format("%s/%s_node.sh", currentPath, props.getJobAppId());
+    Path path = new File(fileName).toPath();
+
+    if (Files.exists(path)) {
+      return fileName;
+    }
+
     String script = shellParam.getScript();
     script = ParamHelper.resolvePlaceholders(script, props.getDefinedParams());
 
@@ -69,11 +76,6 @@ public class ShellJob extends AbstractProcessJob {
 
     logger.info("script:\n{}", shellParam.getScript());
     logger.info("currentPath:{}", currentPath);
-
-    // 生成的脚本文件
-    String fileName = String.format("%s/%s_%s_node.sh", currentPath, props.getJobAppId(), HttpUtil.getMd5(props.getNodeName()).substring(0, 8));
-
-    Path path = new File(fileName).toPath();
 
     Set<PosixFilePermission> perms = PosixFilePermissions.fromString("rwxr-xr-x");
     FileAttribute<Set<PosixFilePermission>> attr = PosixFilePermissions.asFileAttribute(perms);

@@ -20,6 +20,7 @@ import com.baifendian.swordfish.dao.model.ExecutionNode;
 import com.baifendian.swordfish.dao.model.FlowNode;
 
 import java.util.Map;
+import java.util.concurrent.Semaphore;
 
 public class JobContext {
   /**
@@ -46,6 +47,11 @@ public class JobContext {
    * 自定义参数
    */
   private Map<String, String> customParamMap;
+
+  /**
+   * 信号量
+   */
+  private Semaphore semaphore;
 
   public ExecutionFlow getExecutionFlow() {
     return executionFlow;
@@ -85,5 +91,13 @@ public class JobContext {
 
   public void setCustomParamMap(Map<String, String> customParamMap) {
     this.customParamMap = customParamMap;
+  }
+
+  public Semaphore getSemaphore() {
+    return semaphore;
+  }
+
+  public void setSemaphore(Semaphore semaphore) {
+    this.semaphore = semaphore;
   }
 }

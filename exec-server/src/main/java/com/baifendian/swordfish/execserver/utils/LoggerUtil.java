@@ -15,6 +15,7 @@
  */
 package com.baifendian.swordfish.execserver.utils;
 
+import com.baifendian.swordfish.common.utils.http.HttpUtil;
 import org.apache.commons.lang3.StringUtils;
 
 /**
@@ -35,6 +36,8 @@ public class LoggerUtil {
       return String.format("%s_%s", prefix, execId);
     }
 
-    return String.format("%s_%s_%s", prefix, execId, nodeName);
+    String postfix = HttpUtil.getMd5(nodeName).substring(0, 8);
+
+    return String.format("%s_%s_%s", prefix, execId, postfix);
   }
 }

@@ -163,9 +163,11 @@ public class FlowRunnerManager {
     context.setFailurePolicyType(failurePolicy);
     context.setSystemParamMap(systemParamMap);
     context.setCustomParamMap(customParamMap);
+
     FlowRunner flowRunner = new FlowRunner(context);
 
     runningFlows.put(executionFlow.getId(), flowRunner);
+
     flowExecutorService.submit(flowRunner);
   }
 
@@ -224,16 +226,15 @@ public class FlowRunnerManager {
    * 取消执行的 flow
    *
    * @param execId
-   * @param user
    */
-  public void cancelFlow(int execId, String user) {
+  public void cancelFlow(int execId) {
     FlowRunner flowRunner = runningFlows.get(execId);
 
     if (flowRunner == null) {
       throw new ExecException("Execution " + execId + "is not running");
     }
 
-    flowRunner.kill(user);
+    flowRunner.kill();
     runningFlows.remove(execId);
   }
 }

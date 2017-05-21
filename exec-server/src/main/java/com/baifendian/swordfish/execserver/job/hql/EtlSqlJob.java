@@ -45,19 +45,31 @@ public class EtlSqlJob extends AbstractJob {
 
   @Override
   public void process() throws Exception {
-    String sqls = param.getSql();
+    try {
+      String sqls = param.getSql();
 
-    // 解析其中的变量
-    sqls = ParamHelper.resolvePlaceholders(sqls, props.getDefinedParams());
-    List<String> funcs = FunctionUtil.createFuncs(param.getUdfs(), props.getExecId(), logger, getWorkingDirectory(), false);
+      // 解析其中的变量
+      sqls = ParamHelper.resolvePlaceholders(sqls, props.getDefinedParams());
+      List<String> funcs = FunctionUtil.createFuncs(param.getUdfs(), props.getExecId(), logger, getWorkingDirectory(), false);
 
-    logger.info("\nhql:\n{}\nfuncs:\n{}", sqls, funcs);
+      logger.info("\nhql:\n{}\nfuncs:\n{}", sqls, funcs);
 
-    List<String> execSqls = CommonUtil.sqlSplit(sqls);
-    HiveSqlExec hiveSqlExec = new HiveSqlExec(funcs, execSqls, props.getProxyUser(), false, null, null, logger);
-    hiveSqlExec.execute();
+      List<String> execSqls = CommonUtil.sqlSplit(sqls);
+      HiveSqlExec hiveSqlExec = new HiveSqlExec(funcs, execSqls, props.getProxyUser(), false, null, null, logger);
 
-    results = hiveSqlExec.getResults();
+      started = true;
+
+      exitCode = (hiveSqlExec.execute()) ? 0 : -1;
+    } catch (Exception e) {
+      logger.error(String.format("hql process exception, sql: %s", param.getSql()), e);
+      exitCode = -1;
+    } finally {
+      complete = true;
+    }
+  }
+
+  @Override
+  public void cancel() throws Exception {
   }
 
   @Override

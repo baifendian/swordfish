@@ -34,6 +34,7 @@ public class ExecutionNodeMapperProvider {
     return new SQL() {
       {
         INSERT_INTO(TABLE_NAME);
+
         VALUES("exec_id", "#{executionNode.execId}");
         VALUES("name", "#{executionNode.name}");
         VALUES("start_time", "#{executionNode.startTime}");
@@ -55,6 +56,7 @@ public class ExecutionNodeMapperProvider {
     return new SQL() {
       {
         UPDATE(TABLE_NAME);
+
         if (executionNode.getAttempt() != null) {
           SET("attempt = #{executionNode.attempt}");
         }
@@ -67,6 +69,7 @@ public class ExecutionNodeMapperProvider {
         if (executionNode.getLogLinks() != null) {
           SET("log_links = #{executionNode.logLinks}");
         }
+
         WHERE("exec_id = #{executionNode.execId}");
         WHERE("name = #{executionNode.name}");
       }
@@ -81,7 +84,9 @@ public class ExecutionNodeMapperProvider {
     return new SQL() {
       {
         SELECT("*");
+
         FROM(TABLE_NAME);
+
         WHERE("exec_id = #{execId}");
         WHERE("name = #{name}");
       }
@@ -96,7 +101,9 @@ public class ExecutionNodeMapperProvider {
     return new SQL() {
       {
         SELECT("*");
+
         FROM(TABLE_NAME);
+
         WHERE("exec_id = #{execId}");
       }
     }.toString();
@@ -110,7 +117,9 @@ public class ExecutionNodeMapperProvider {
     return new SQL() {
       {
         SELECT("*");
+
         FROM(TABLE_NAME);
+
         WHERE("job_id = #{jobId}");
       }
     }.toString();

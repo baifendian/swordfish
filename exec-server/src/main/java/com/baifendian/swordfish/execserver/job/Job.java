@@ -45,16 +45,18 @@ public interface Job {
   void cancel() throws Exception;
 
   /**
+   * 作业是否已经启动
+   *
+   * @return
+   */
+  boolean isStarted();
+
+  /**
    * 作业是否执行完成
    *
    * @return 是否已完成
    */
   boolean isCompleted();
-
-  /**
-   * 作业是否被取消了
-   */
-  boolean isCanceled();
 
   /**
    * 获取返回码

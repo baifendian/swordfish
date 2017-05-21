@@ -55,7 +55,7 @@ public class ExecutorCheckThread implements Runnable {
 
   @Override
   public void run() {
-    logger.info("execution flow queue size:{}", executionFlowQueue.size());
+    logger.debug("execution flow queue size:{}", executionFlowQueue.size());
 
     try {
       // 得到超时的工作流列表

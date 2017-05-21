@@ -74,7 +74,7 @@ public class FlowDaoTest {
 
   @Test
   public void testProjectFlowfindById() {
-    ProjectFlow flow = flowDao.projectFlowfindById(2);
+    ProjectFlow flow = flowDao.projectFlowFindById(2);
     System.out.println(flow);
   }
 

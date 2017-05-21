@@ -82,7 +82,7 @@ public class SparkJob extends AbstractYarnJob {
     // 添加其它参数
     args.addAll(SparkSubmitArgsUtil.buildArgs(sparkParam));
 
-    String command = ParamHelper.resolvePlaceholders(String.join(" \\\n", args), props.getDefinedParams());
+    String command = ParamHelper.resolvePlaceholders(String.join(" ", args), props.getDefinedParams());
 
     logger.info("spark job command:\n{}", command);
 
@@ -95,6 +95,7 @@ public class SparkJob extends AbstractYarnJob {
    * @param line
    * @return
    */
+  @Override
   public String findLogLinks(String line) {
     if (line.contains("tracking URL:")) {
       return line.substring(line.indexOf("URL:") + "URL:".length() + 1);

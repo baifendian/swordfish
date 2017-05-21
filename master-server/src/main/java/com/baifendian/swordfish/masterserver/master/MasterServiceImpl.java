@@ -169,7 +169,7 @@ public class MasterServiceImpl implements Iface {
     logger.info("exec flow project id:{} flow id:{} run time:{} exec info:{}", projectId, flowId, runTime, execInfo);
 
     try {
-      ProjectFlow flow = flowDao.projectFlowfindById(flowId);
+      ProjectFlow flow = flowDao.projectFlowFindById(flowId);
 
       if (flow == null) {
         logger.error("flow: {} is not exists", flowId);
@@ -182,7 +182,7 @@ public class MasterServiceImpl implements Iface {
           flow.getOwnerId(),
           new Date(runTime),
           ExecType.DIRECT,
-          1,
+          0, // 默认不重复执行
           execInfo.getNodeName(),
           NodeDepType.valueOfType(execInfo.getNodeDep()),
           NotifyType.valueOfType(execInfo.getNotifyType()),
@@ -215,7 +215,7 @@ public class MasterServiceImpl implements Iface {
     logger.info("append workflow projectId:{}, flowId:{}, scheduleMeta:{}", projectId, flowId, scheduleInfo);
 
     try {
-      ProjectFlow flow = flowDao.projectFlowfindById(flowId);
+      ProjectFlow flow = flowDao.projectFlowFindById(flowId);
 
       // 若 workflow 被删除
       if (flow == null) {

@@ -80,7 +80,7 @@ public class MrJob extends AbstractYarnJob {
     // 添加其它参数
     args.addAll(HadoopJarArgsUtil.buildArgs(mrParam));
 
-    String command = ParamHelper.resolvePlaceholders(String.join(" \\\n", args), props.getDefinedParams());
+    String command = ParamHelper.resolvePlaceholders(String.join(" ", args), props.getDefinedParams());
 
     logger.info("mr job command:\n{}", command);
 
