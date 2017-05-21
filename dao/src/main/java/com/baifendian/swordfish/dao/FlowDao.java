@@ -106,12 +106,13 @@ public class FlowDao extends BaseDao {
   }
 
   /**
-   * 根据具体的scheduleTime获取一个执行记录
+   * 根据具体的scheduleTime获取一个调度的执行记录
+   *
    * @param scheduleTime
    * @return
    */
-  public ExecutionFlow queryExecutionFlowByScheduleTime(Date scheduleTime){
-    return
+  public ExecutionFlow queryExecutionFlowByScheduleTime(int flowId, Date scheduleTime) {
+    return executionFlowMapper.selectExecutionFlowByScheduleTime(flowId, scheduleTime);
   }
 
   /**

@@ -321,8 +321,9 @@ public class FlowScheduleJob implements Job {
 
         //如果不能识别出周期，那么就直接取前依赖
         if (cycle == null || depCycle == null) {
-          return !checkDepWorkflowStatus(scheduledFireTime, depFlowId, timeout);
-
+          if (!checkDepWorkflowStatus(scheduledFireTime, depFlowId, startTime, timeout)) {
+            return false;
+          }
         }
 
         Map.Entry<Date, Date> cycleDate;
@@ -333,7 +334,7 @@ public class FlowScheduleJob implements Job {
         }
 
         // 检测依赖的最新状态
-        if (!checkDepWorkflowStatus(scheduledFireTime, depFlowId, cycleDate, startTime, timeout)) {
+        if (!checkDepWorkflowStatus(scheduledFireTime, depFlowId, depSchedule, cycleDate, startTime, timeout)) {
           return false;
         }
       }
@@ -346,12 +347,15 @@ public class FlowScheduleJob implements Job {
    *
    * @return
    */
-  private boolean checkDepWorkflowStatus(Date scheduledFireTime, int depFlowId, int timeout) {
-    ExecutionFlow executionFlow = flowDao.executionFlowPreDate(depFlowId, scheduledFireTime);
+  private boolean checkDepWorkflowStatus(Date scheduledFireTime, int depFlowId, long startTime, int timeout) {
+
 
     while (true) {
+      //是否没有完成
       boolean isNotFinshed = false;
+      ExecutionFlow executionFlow = flowDao.executionFlowPreDate(depFlowId, scheduledFireTime);
 
+      //系统没有触发调度直接认为依赖失败
       if (executionFlow == null) {
         return false;
       }
@@ -365,9 +369,8 @@ public class FlowScheduleJob implements Job {
 
       if (isNotFinshed) {
 
-        //获取基准事件，如果有submit时间就取submit 如果还没有submit就取 正常调度时间
-        Date startTime = executionFlow.getSubmitTime() != null ? executionFlow.getSubmitTime() : executionFlow.getScheduleTime();
-        if (checkTimeout(executionFlow.getSubmitTime().getTime(), timeout)) {
+        //如果没有启动时间,也没有调度真实时间，直接算超时，如果有就计算超时
+        if (checkTimeout(startTime, timeout)) {
           logger.error("等待依赖的 workflow 任务超时");
           return false; // 也认为是执行失败
         }
@@ -378,17 +381,13 @@ public class FlowScheduleJob implements Job {
           logger.error(e.getMessage(), e);
           return false; // 也认为是执行失败
         }
-
-        //重新获取 executionFlow
-        executionFlow = flowDao.queryExecutionFlow(executionFlow.getId());
-      } else {
-        return false;
       }
+      return false;
     }
   }
 
   /**
-   * 检测依赖的 workflow 的状态 <p>
+   * 检测周期依赖的 workflow 的状态 <p>
    *
    * @param scheduledFireTime
    * @param depFlowId
@@ -397,58 +396,52 @@ public class FlowScheduleJob implements Job {
    * @param timeout
    * @return
    */
-  private boolean checkDepWorkflowStatus(Date scheduledFireTime, int depFlowId, Schedule depSchedule, Map.Entry<Date, Date> cycleDate, long startTime, Integer timeout) throws ParseException {
+  private boolean checkDepWorkflowStatus(Date scheduledFireTime, int depFlowId, Schedule depSchedule, Map.Entry<Date, Date> cycleDate, long startTime, Integer timeout) {
+    //先计算周期时间
+    Map.Entry<Date, Date> cycleDate;
+    if (cycle.ordinal() > depCycle.ordinal()) {
+      cycleDate = CrontabUtil.getPreCycleDate(scheduledFireTime, depCycle);
+    } else {
+      cycleDate = CrontabUtil.getPreCycleDate(scheduledFireTime, cycle);
+    }
+
     // 循环检测，直到检测到依赖是否成功
     while (true) {
-      boolean isFind = false;
       boolean isNotFinshed = false;
-      //TODO 应该改用crontab分析出的时间点，这样更准确。
+      //step1.我们尝试取周期内依赖任务最后一次的触发时间
+      Date depFireTime = null;
+      try {
+        List<Date> dateList = CrontabUtil.getCycleFireDate(cycleDate.getKey(), cycleDate.getValue(), depSchedule.getCrontab());
+        if (CollectionUtils.isNotEmpty(dateList)) {
+          depFireTime = dateList.get(dateList.size() - 1);
+        }
+      } catch (Exception e) {
+        logger.error("get dep flow: {} statTime: {} - endTime: {} fire data error", depFlowId, cycleDate.getKey(), cycleDate.getValue());
+        return false; // 对于出现了解析异常我们认为失败了
+      }
 
-      //获取本周内最后一个应该触发依赖调度的时间节点
-      List<Date> dateList = CrontabUtil.getCycleFireDate(cycleDate.getValue(), scheduledFireTime, depSchedule.getCrontab());
-      Date thisCycleLastDate = dateList.get(dateList.size() - 1);
+      //step2.如果依赖任务更本不应该在上一个周期执行，那么很明显依赖关系配置不正确，不予执行。
+      if (depFireTime == null) {
+        return false;
+      }
 
-      //获取上一个周期内最后一个应该触发依赖调度的时间节点
-      dateList = CrontabUtil.getCycleFireDate(cycleDate.getKey(),cycleDate.getValue(),depSchedule.getCrontab());
-      Date preCycleLastDate = dateList.get(dateList.size() - 1);
+      //寻找调度执行记录
+      ExecutionFlow executionFlow = flowDao.queryExecutionFlowByScheduleTime(depFlowId, scheduledFireTime);
 
-      ExecutionFlow thisFlow = flowDao
-
-      // 看当前周期（月、周、天 等）最开始的任务是不是成功的
-      List<ExecutionFlow> executionFlows = flowDao.queryFlowLastStatus(depFlowId, cycleDate.getValue(), scheduledFireTime);
-      if (CollectionUtils.isNotEmpty(executionFlows)) {
-        isFind = true;
-        for (ExecutionFlow executionFlow : executionFlows) {
-          FlowStatus flowStatus = executionFlow.getStatus();
-          if (flowStatus != null && flowStatus.typeIsSuccess()) {
-            return true;
-          } else if (flowStatus == null || !flowStatus.typeIsFinished()) {
-            isNotFinshed = true;
-          }
+      //根本没有执行,等待执行。
+      if (executionFlow == null) {
+        isNotFinshed = true;
+      } else {
+        FlowStatus flowStatus = executionFlow.getStatus();
+        if (flowStatus != null && flowStatus.typeIsSuccess()) {
+          return true;
+        } else if (flowStatus == null || !flowStatus.typeIsFinished()) {
+          isNotFinshed = true;
         }
       }
 
-      // 看上一个周期（月、周、天 等）最后的任务是不是成功的
-      executionFlows = flowDao.queryFlowLastStatus(depFlowId, cycleDate.getKey(), cycleDate.getValue());
-      if (CollectionUtils.isNotEmpty(executionFlows)) {
-        isFind = true;
-        for (ExecutionFlow executionFlow : executionFlows) {
-          FlowStatus flowStatus = executionFlow.getStatus();
-          if (flowStatus != null && flowStatus.typeIsSuccess()) {
-            return true;
-          } else if (flowStatus == null || !flowStatus.typeIsFinished()) {
-            isNotFinshed = true;
-          }
-        }
-      }
-
-      // 没有找到依赖的 workflow 的执行，那么可能是当前 workflow 的调度已经停止，姑且认为是成功
-      if (!isFind) {
-        return true;
-      }
-
-      if (isNotFinshed) { // 没有结束
-        // 如果超时
+      if (isNotFinshed) { // 如果依赖的任务没有完成
+        // 如果等待超时
         if (checkTimeout(startTime, timeout)) {
           logger.error("Wait for last cycle timeout");
           return false;
@@ -462,7 +455,6 @@ public class FlowScheduleJob implements Job {
           return false; // 也认为是执行失败
         }
       }
-
       return false;
     }
   }
