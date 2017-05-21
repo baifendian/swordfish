@@ -166,8 +166,6 @@ sh bin/swordfish-daemon.sh start exec-server
 process_check exec-server
 
 # 查看进程是否存在
-sleep 3s
-
+sleep 1s
 echo "process information:"
-
 jps -lm
