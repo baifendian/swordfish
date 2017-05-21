@@ -164,3 +164,10 @@ cd $SWORDFISH_HOME/target/swordfish-all-${version}/swordfish-exec-server-${versi
 sh bin/swordfish-daemon.sh start exec-server
 
 process_check exec-server
+
+# 查看进程是否存在
+sleep 3s
+
+echo "process information:"
+
+jps -lm
