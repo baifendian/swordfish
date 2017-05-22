@@ -124,4 +124,21 @@ public class ExecutionNodeMapperProvider {
       }
     }.toString();
   }
+
+
+  /**
+   * 删除结点
+   *
+   * @param parameter
+   * @return
+   */
+  public String deleteExecutionNodes(Map<String, Object> parameter) {
+    return new SQL() {
+      {
+        DELETE_FROM(TABLE_NAME);
+
+        WHERE("exec_id = #{execId}");
+      }
+    }.toString();
+  }
 }

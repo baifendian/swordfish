@@ -79,6 +79,15 @@ public interface ExecutionNodeMapper {
   List<ExecutionNode> selectExecNodeById(@Param("execId") int execId);
 
   /**
+   * 删除执行的所有结点
+   *
+   * @param execId
+   * @return
+   */
+  @DeleteProvider(type = ExecutionNodeMapperProvider.class, method = "deleteExecutionNodes")
+  int deleteExecutionNodes(@Param("execId") Integer execId);
+
+  /**
    * 根据jobId查询
    * @param jobId
    * @return

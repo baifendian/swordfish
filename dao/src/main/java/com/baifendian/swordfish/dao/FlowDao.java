@@ -72,22 +72,12 @@ public class FlowDao extends BaseDao {
   }
 
   /**
-   * 查询结点数
-   *
-   * @param execId
-   * @return
-   */
-  public int queryExecutionNodeSize(int execId) {
-    return executionFlowMapper.selectNodeSizeByExecId(execId);
-  }
-
-  /**
    * 删除执行的结点
    *
    * @param execId
    */
   public int deleteExecutionNodes(int execId) {
-    return executionFlowMapper.deleteExecutionNodes(execId);
+    return executionNodeMapper.deleteExecutionNodes(execId);
   }
 
   /**

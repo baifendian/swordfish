@@ -166,7 +166,7 @@ public class MasterServiceImpl implements Iface {
   public RetResultInfo execFlow(int projectId, int flowId, long runTime, ExecInfo execInfo) throws TException {
     ExecutionFlow executionFlow;
 
-    logger.info("exec flow project id:{} flow id:{} run time:{} exec info:{}", projectId, flowId, runTime, execInfo);
+    logger.info("exec flow project id:{}, flow id:{}, run time:{}, exec info:{}", projectId, flowId, runTime, execInfo);
 
     try {
       ProjectFlow flow = flowDao.projectFlowFindById(flowId);
@@ -191,6 +191,8 @@ public class MasterServiceImpl implements Iface {
 
       ExecFlowInfo execFlowInfo = new ExecFlowInfo();
       execFlowInfo.setExecId(executionFlow.getId());
+
+      logger.info("insert a flow to execution, exec id:{}, flow id:{}", executionFlow.getId(), flowId);
 
       jobExecManager.addExecFlow(execFlowInfo);
     } catch (Exception e) {
