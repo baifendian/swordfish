@@ -191,7 +191,7 @@ public class WorkflowController {
    * @param projectName
    * @return
    */
-  @GetMapping(value = "")
+  @GetMapping(value = "/workflows")
   public List<WorkflowDto> queryWorkflow(@RequestAttribute(value = "session.user") User operator,
                                          @PathVariable String projectName) {
     logger.info("Operator user {}, query workflow list of project, project name: {}",
