@@ -86,10 +86,11 @@ public class FileSystemStorageService implements StorageService {
 
   /**
    * 读取文件
+   *
    * @param filename
    */
   public String readFileToString(String filename) throws IOException {
-    return FileUtils.readFileToString(new File(filename),"utf-8");
+    return FileUtils.readFileToString(new File(filename), "utf-8");
   }
 
   /**
@@ -101,7 +102,4 @@ public class FileSystemStorageService implements StorageService {
   public void deleteFile(String filename) throws IOException {
     FileUtils.forceDelete(new File(filename));
   }
-
-
-
 }

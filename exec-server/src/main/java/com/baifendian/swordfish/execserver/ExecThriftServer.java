@@ -86,9 +86,9 @@ public class ExecThriftServer {
   private InetSocketAddress inetSocketAddress;
 
   /**
-   * exec service
+   * 发送心跳的线程
    */
-  private ScheduledExecutorService executorService;
+  private ScheduledExecutorService heartbeatExecutorService;
 
   /**
    * 运行状态
@@ -99,8 +99,6 @@ public class ExecThriftServer {
    * exec 服务的实现
    */
   private ExecServiceImpl workerService;
-
-  private final int THRIFT_RPC_RETRIES = 3;
 
   /**
    * 心跳时间间隔，单位秒
@@ -125,7 +123,7 @@ public class ExecThriftServer {
       throw new RuntimeException("can't found master server");
     }
 
-    masterClient = new MasterClient(masterServer.getHost(), masterServer.getPort(), THRIFT_RPC_RETRIES);
+    masterClient = new MasterClient(masterServer.getHost(), masterServer.getPort(), Constants.defaultThriftRpcRetrites);
 
     // executor 的地址, 端口信息
     host = InetAddress.getLocalHost().getHostAddress();
@@ -155,14 +153,14 @@ public class ExecThriftServer {
       }
     }
 
-    heartBeatInterval = conf.getInt(Constants.EXECUTOR_HEARTBEAT_INTERVAL, 60);
+    heartBeatInterval = conf.getInt(Constants.EXECUTOR_HEARTBEAT_INTERVAL, Constants.defaultExecutorHeartbeatInterval);
 
     // 执行启动
-    executorService = Executors.newScheduledThreadPool(5);
+    heartbeatExecutorService = Executors.newScheduledThreadPool(Constants.defaultExecutorThreadNum);
 
     // 心跳任务启动
     Runnable heartBeatThread = getHeartBeatThread();
-    executorService.scheduleAtFixedRate(heartBeatThread, 10, heartBeatInterval, TimeUnit.SECONDS);
+    heartbeatExecutorService.scheduleAtFixedRate(heartBeatThread, 10, heartBeatInterval, TimeUnit.SECONDS);
 
     // 启动实际的 worker service
     TProtocolFactory protocolFactory = new TBinaryProtocol.Factory();
@@ -172,7 +170,7 @@ public class ExecThriftServer {
 
     TProcessor tProcessor = new WorkerService.Processor(workerService);
     inetSocketAddress = new InetSocketAddress(host, port);
-    server = getTThreadPoolServer(protocolFactory, tProcessor, tTransportFactory, inetSocketAddress, 50, 200);
+    server = getTThreadPoolServer(protocolFactory, tProcessor, tTransportFactory, inetSocketAddress, Constants.defaultServerMinNum, Constants.defaultServerMaxNum);
 
     logger.info("start thrift server on port:{}", port);
 
@@ -183,8 +181,8 @@ public class ExecThriftServer {
 
     // 注册钩子
     Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-      if (executorService != null) {
-        executorService.shutdownNow();
+      if (heartbeatExecutorService != null) {
+        heartbeatExecutorService.shutdownNow();
       }
 
       if (workerService != null) {
@@ -207,7 +205,7 @@ public class ExecThriftServer {
         }
       }
 
-      executorService.shutdownNow();
+      heartbeatExecutorService.shutdownNow();
       workerService.destory();
       server.stop();
 
