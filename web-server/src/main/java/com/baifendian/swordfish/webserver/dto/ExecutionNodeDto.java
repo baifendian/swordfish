@@ -15,6 +15,7 @@
  */
 package com.baifendian.swordfish.webserver.dto;
 
+import com.baifendian.swordfish.common.hadoop.ConfigurationUtil;
 import com.baifendian.swordfish.common.json.JsonOrdinalSerializer;
 import com.baifendian.swordfish.dao.enums.FlowStatus;
 import com.baifendian.swordfish.dao.model.ExecutionNode;
@@ -22,7 +23,9 @@ import com.baifendian.swordfish.dao.utils.json.JsonObjectDeserializer;
 import com.fasterxml.jackson.annotation.JsonRawValue;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import org.apache.commons.collections.CollectionUtils;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -66,7 +69,17 @@ public class ExecutionNodeDto {
       }
 
       this.status = executionNode.getStatus();
-      this.logLinks = executionNode.getLogLinkList();
+
+      // link 需要添加前缀
+      List<String> links = executionNode.getLogLinkList();
+      if (CollectionUtils.isNotEmpty(links)) {
+        this.logLinks = new ArrayList<>();
+
+        for (String link : links) {
+          this.logLinks.add(String.format("%s/cluster/app/%s", ConfigurationUtil.getWebappAddress(), link));
+        }
+      }
+
       this.jobId = executionNode.getJobId();
     }
   }
