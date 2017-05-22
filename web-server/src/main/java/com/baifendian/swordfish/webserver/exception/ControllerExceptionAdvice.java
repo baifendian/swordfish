@@ -22,6 +22,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import static org.springframework.http.HttpStatus.*;
+
 import javax.servlet.http.HttpServletRequest;
 
 /**
@@ -46,6 +48,20 @@ public class ControllerExceptionAdvice extends ResponseEntityExceptionHandler {
   }
 
   /**
+   * 处理 controller 异常
+   *
+   * @param request
+   * @param ex
+   * @return
+   */
+  @ExceptionHandler(NotModifiedException.class)
+  @ResponseBody
+  ResponseEntity<?> handleControllerNotModifiedException(HttpServletRequest request, NotModifiedException ex) {
+    logger.error("controller catch some error", ex);
+    return new ResponseEntity<Object>(new CustomErrorType(NOT_MODIFIED, ex.getMessage()), NOT_MODIFIED);
+  }
+
+  /**
    * 返回状态
    *
    * @param request
@@ -54,9 +70,9 @@ public class ControllerExceptionAdvice extends ResponseEntityExceptionHandler {
   private HttpStatus getStatus(HttpServletRequest request) {
     Integer statusCode = (Integer) request.getAttribute("javax.servlet.error.status_code");
     if (statusCode == null) {
-      return HttpStatus.INTERNAL_SERVER_ERROR;
+      return INTERNAL_SERVER_ERROR;
     }
 
-    return HttpStatus.valueOf(statusCode);
+    return valueOf(statusCode);
   }
 }

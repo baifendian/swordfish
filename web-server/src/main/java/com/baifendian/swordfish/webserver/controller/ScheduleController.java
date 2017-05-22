@@ -26,6 +26,7 @@ import com.baifendian.swordfish.webserver.service.ScheduleService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -59,6 +60,7 @@ public class ScheduleController {
    * @return
    */
   @PostMapping("/{workflowName}/schedules")
+  @ResponseStatus(HttpStatus.CREATED)
   public ScheduleDto createSchedule(@RequestAttribute(value = "session.user") User operator,
                                     @PathVariable String projectName,
                                     @PathVariable String workflowName,
