@@ -27,6 +27,8 @@ import org.apache.commons.configuration.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.*;
 
@@ -78,9 +80,13 @@ public class FlowRunnerManager {
       while (true) {
         try {
           cleanFinishedFlows();
-          Thread.sleep(5000);
         } catch (Exception e) {
           logger.error("clean thread error ", e);
+        } finally {
+          try {
+            Thread.sleep(Constants.defaultCleanFinishFlowInterval);
+          } catch (InterruptedException e) {
+          }
         }
       }
     });
@@ -122,7 +128,10 @@ public class FlowRunnerManager {
     context.setCustomParamMap(customParamMap);
 
     FlowRunner flowRunner = new FlowRunner(context);
-    runningFlows.put(executionFlow.getId(), flowRunner);
+
+    synchronized (this) {
+      runningFlows.putIfAbsent(executionFlow.getId(), flowRunner);
+    }
 
     logger.info("submit flow, exec id: {}, project name: {}, workflow name: {}, max try times: {}, timeout: {}",
         executionFlow.getId(), executionFlow.getProjectName(), executionFlow.getWorkflowName(), maxTryTimes, timeout);
@@ -134,12 +143,20 @@ public class FlowRunnerManager {
    * 清理完成的 flows
    */
   private void cleanFinishedFlows() {
-    for (Map.Entry<Integer, FlowRunner> entry : runningFlows.entrySet()) {
-      ExecutionFlow executionFlow = flowDao.queryExecutionFlow(entry.getKey());
+    List<Integer> finishFlows = new ArrayList<>();
 
-      if (executionFlow.getStatus().typeIsFinished()) {
-        runningFlows.remove(entry.getKey());
+    synchronized (this) {
+      for (Map.Entry<Integer, FlowRunner> entry : runningFlows.entrySet()) {
+        ExecutionFlow executionFlow = flowDao.queryExecutionFlow(entry.getKey());
+
+        if (executionFlow.getStatus().typeIsFinished()) {
+          finishFlows.add(entry.getKey());
+        }
       }
+    }
+
+    for (Integer id : finishFlows) {
+      runningFlows.remove(id);
     }
   }
 

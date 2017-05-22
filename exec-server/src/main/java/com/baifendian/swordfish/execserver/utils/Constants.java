@@ -82,4 +82,9 @@ public class Constants {
    * 日志刷新周期
    */
   public static final int defaultLogFlushInterval = 3000;
+
+  /**
+   * 默认的清理 flow 数
+   */
+  public static final int defaultCleanFinishFlowInterval = 10000;
 }
