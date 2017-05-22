@@ -51,7 +51,7 @@ public class Constants {
   /**
    * 心跳线程数
    */
-  public static final int defaultExecutorThreadNum = 5;
+  public static final int defaultExecutorHeartbeatThreadNum = 5;
 
   /**
    * server 最小线程处理数

@@ -156,7 +156,7 @@ public class ExecThriftServer {
     heartBeatInterval = conf.getInt(Constants.EXECUTOR_HEARTBEAT_INTERVAL, Constants.defaultExecutorHeartbeatInterval);
 
     // 执行启动
-    heartbeatExecutorService = Executors.newScheduledThreadPool(Constants.defaultExecutorThreadNum);
+    heartbeatExecutorService = Executors.newScheduledThreadPool(Constants.defaultExecutorHeartbeatThreadNum);
 
     // 心跳任务启动
     Runnable heartBeatThread = getHeartBeatThread();
