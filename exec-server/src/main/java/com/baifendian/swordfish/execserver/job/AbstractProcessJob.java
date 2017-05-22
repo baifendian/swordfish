@@ -312,11 +312,11 @@ public abstract class AbstractProcessJob extends AbstractJob {
     Thread loggerInfoThread = new Thread(() -> {
       BufferedReader reader = null;
 
+      List<String> logs = new ArrayList<>();
+
       try {
         reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
         String line;
-
-        List<String> logs = new ArrayList<>();
 
         while ((line = reader.readLine()) != null) {
           logs.add(line);
@@ -328,8 +328,14 @@ public abstract class AbstractProcessJob extends AbstractJob {
           }
         }
       } catch (Exception e) {
-//        logger.error(e.getMessage(), e);
+        // Do Nothing
       } finally {
+        // 还有日志, 继续输出
+        if (!logs.isEmpty()) {
+          logProcess(logs);
+          logs.clear();
+        }
+
         if (reader != null) {
           try {
             reader.close();
