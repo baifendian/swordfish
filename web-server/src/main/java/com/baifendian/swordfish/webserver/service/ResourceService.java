@@ -323,6 +323,8 @@ public class ResourceService {
       destResource.setName(destResName);
       destResource.setOriginFilename(srcResource.getOriginFilename());
       destResource.setDesc(desc);
+      destResource.setProjectName(srcResource.getProjectName());
+      destResource.setOwner(srcResource.getOwner());
       destResource.setOwnerId(operator.getId());
       destResource.setOwner(operator.getName());
       destResource.setProjectId(project.getId());

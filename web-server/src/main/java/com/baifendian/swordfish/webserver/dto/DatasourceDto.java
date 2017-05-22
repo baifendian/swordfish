@@ -17,6 +17,9 @@ package com.baifendian.swordfish.webserver.dto;
 
 import com.baifendian.swordfish.dao.enums.DbType;
 import com.baifendian.swordfish.dao.model.DataSource;
+import com.baifendian.swordfish.dao.utils.json.JsonObjectDeserializer;
+import com.fasterxml.jackson.annotation.JsonRawValue;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 import java.util.Date;
 
@@ -27,6 +30,8 @@ public class DatasourceDto {
   private String name;
   private DbType type;
   private String desc;
+  @JsonRawValue
+  @JsonDeserialize(using = JsonObjectDeserializer.class)
   private String parameter;
   private Date createTime;
   private Date modifyTime;
@@ -37,7 +42,7 @@ public class DatasourceDto {
   }
 
   public DatasourceDto(DataSource dataSource) {
-    if (dataSource != null){
+    if (dataSource != null) {
       this.name = dataSource.getName();
       this.type = dataSource.getType();
       this.desc = dataSource.getDesc();

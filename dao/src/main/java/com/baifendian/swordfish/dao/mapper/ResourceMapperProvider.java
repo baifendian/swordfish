@@ -97,6 +97,7 @@ public class ResourceMapperProvider {
       SET("`origin_filename` = #{resource.originFilename}");
       SET("`desc` = #{resource.desc}");
       SET("`owner` = #{resource.ownerId}");
+      SET("`origin_filename` = #{resource.originFilename}");
       SET("`modify_time` = #{resource.modifyTime}");
 
       WHERE("`id` = #{resource.id}");
