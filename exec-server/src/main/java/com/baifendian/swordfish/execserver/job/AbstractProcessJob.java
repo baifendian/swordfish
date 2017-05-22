@@ -30,6 +30,8 @@ import java.lang.reflect.Field;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 public abstract class AbstractProcessJob extends AbstractJob {
@@ -59,10 +61,10 @@ public abstract class AbstractProcessJob extends AbstractJob {
   /**
    * 日志处理
    *
-   * @param log
+   * @param logs
    */
-  protected void logProcess(String log) {
-    logger.info("(stdout, stderr) -> \n{}", log);
+  protected void logProcess(List<String> logs) {
+    logger.info("(stdout, stderr) -> \n{}", String.join("\n", logs));
   }
 
   @Override
@@ -308,16 +310,39 @@ public abstract class AbstractProcessJob extends AbstractJob {
     String threadLoggerInfoName = String.format("LoggerInfo-%s", props.getJobAppId());
 
     Thread loggerInfoThread = new Thread(() -> {
-      BufferedReader reader;
+      BufferedReader reader = null;
+
+      List<String> logs = new ArrayList<>();
 
       try {
         reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
         String line;
+
         while ((line = reader.readLine()) != null) {
-          logProcess(line);
+          logs.add(line);
+
+          // 到一定日志量就输出处理
+          if (logs.size() >= 16) {
+            logProcess(logs);
+            logs.clear();
+          }
         }
       } catch (Exception e) {
-//        logger.error(e.getMessage(), e);
+        // Do Nothing
+      } finally {
+        // 还有日志, 继续输出
+        if (!logs.isEmpty()) {
+          logProcess(logs);
+          logs.clear();
+        }
+
+        if (reader != null) {
+          try {
+            reader.close();
+          } catch (IOException e) {
+            logger.error(e.getMessage(), e);
+          }
+        }
       }
     }, threadLoggerInfoName);
 

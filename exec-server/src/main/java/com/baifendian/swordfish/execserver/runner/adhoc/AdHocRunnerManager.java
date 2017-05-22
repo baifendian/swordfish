@@ -39,6 +39,7 @@ public class AdHocRunnerManager {
   private static Logger logger = LoggerFactory.getLogger(AdHocRunnerManager.class.getName());
 
   private final ExecutorService adHocExecutorService;
+
   private AdHocDao adHocDao;
 
   public AdHocRunnerManager(Configuration conf) {

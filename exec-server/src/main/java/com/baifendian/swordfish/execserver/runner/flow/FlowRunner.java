@@ -556,6 +556,22 @@ public class FlowRunner implements Runnable {
   }
 
   /**
+   * 更新 ExecutionFlow <p>
+   */
+  public void updateExecutionFlowToKillStatus() {
+    ExecutionFlow queryExecutionFlow = flowDao.queryExecutionFlow(executionFlow.getId());
+
+    if (queryExecutionFlow.getStatus().typeIsNotFinished()) {
+      Date now = new Date();
+
+      executionFlow.setEndTime(now);
+      executionFlow.setStatus(FlowStatus.KILL);
+
+      flowDao.updateExecutionFlow(executionFlow);
+    }
+  }
+
+  /**
    * 关闭正在执行的任务, 以及更新节点状态
    */
   public void clean() {

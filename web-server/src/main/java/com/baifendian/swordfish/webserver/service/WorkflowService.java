@@ -136,7 +136,7 @@ public class WorkflowService {
       throw new ParameterException("Flow node has cycle");
     }
 
-    // 检测工作流节点定义json是否正常
+    // 检测工作流节点定义 json 是否正常
     for (WorkflowNodeDto flowNode : flowNodes) {
       if (!flowNodeParamCheck(flowNode.getParameter(), flowNode.getType())) {
         logger.error("Flow node {} parameter invalid", flowNode.getName());
@@ -244,7 +244,7 @@ public class WorkflowService {
       throw new NotFoundException("Not found project \"{0}\"", projectName);
     }
 
-    //必须有project 写权限
+    // 必须有 project 写权限
     if (!projectService.hasWritePerm(operator.getId(), project)) {
       logger.error("User {} has no right permission for the project {}", operator.getName(), project.getName());
       throw new PermissionException("User \"{0}\" is not has project \"{1}\" write permission", operator.getName(), project.getName());
@@ -261,6 +261,7 @@ public class WorkflowService {
       logger.error("Not found project flow {} in project {}", name, project.getName());
       throw new NotFoundException("Not found project flow \"{0}\" in project \"{1}\"", name, project.getName());
     }
+
     Date now = new Date();
 
     // 解析
@@ -427,8 +428,6 @@ public class WorkflowService {
     // 删除工作流相关的资源信息
     String hdfsFilename = BaseConfig.getHdfsWorkflowFilename(project.getId(), name);
     HdfsClient.getInstance().delete(hdfsFilename, true);
-
-    //
   }
 
   /**
@@ -447,7 +446,7 @@ public class WorkflowService {
       throw new NotFoundException("Not found project \"{0}\"", projectName);
     }
 
-    // 必须有project 写权限
+    // 必须有 project 写权限
     if (!projectService.hasWritePerm(operator.getId(), project)) {
       logger.error("User {} has no right permission for the project {}", operator.getName(), project.getName());
       throw new PermissionException("User \"{0}\" is not has project \"{1}\" write permission", operator.getName(), project.getName());
@@ -472,7 +471,7 @@ public class WorkflowService {
       throw new NotFoundException("Not found project \"{0}\"", projectName);
     }
 
-    // 必须有project 读权限
+    // 必须有 project 读权限
     if (!projectService.hasReadPerm(operator.getId(), project)) {
       logger.error("User {} has no right permission for the project {}", operator.getName(), project.getName());
       throw new PermissionException("User \"{0}\" is not has project \"{1}\" read permission", operator.getName(), project.getName());
@@ -498,7 +497,7 @@ public class WorkflowService {
       throw new NotFoundException("Not found project \"{0}\"", projectName);
     }
 
-    // 必须有project 读权限
+    // 必须有 project 读权限
     if (!projectService.hasReadPerm(operator.getId(), project)) {
       logger.error("User {} has no right permission for the project {}", operator.getName(), project.getName());
       throw new PermissionException("User \"{0}\" is not has project \"{1}\" read permission", operator.getName(), project.getName());

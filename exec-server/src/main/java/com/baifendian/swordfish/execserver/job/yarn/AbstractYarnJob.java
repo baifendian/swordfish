@@ -49,15 +49,22 @@ public abstract class AbstractYarnJob extends AbstractProcessJob {
   }
 
   @Override
-  protected void logProcess(String log) {
-    super.logProcess(log);
+  protected void logProcess(List<String> logs) {
+    super.logProcess(logs);
+
+    boolean captureLogLinks = false;
 
     // 分析日志
-    String appid = findAppid(log);
+    for (String log : logs) {
+      String appid = findAppid(log);
 
-    if (appid != null && !logLinks.contains(appid)) {
-      logLinks.add(appid);
+      if (appid != null && !logLinks.contains(appid)) {
+        logLinks.add(appid);
+        captureLogLinks = true;
+      }
+    }
 
+    if (captureLogLinks) {
       ExecutionNode executionNode = flowDao.queryExecutionNode(props.getExecId(), props.getNodeName());
       executionNode.setLogLinkList(logLinks);
 

@@ -96,11 +96,10 @@ public class BaseConfig {
   /**
    * 得到下载到本地的文件名称, 能保证区分开来名称
    *
-   * @param projectId
    * @param filename
    * @return
    */
-  public static String getLocalDownloadFilename(int projectId, String filename) {
+  public static String getLocalDownloadFilename( String filename) {
     return MessageFormat.format("{0}/{1}/{2}", localDownloadBasePath, UUID.randomUUID().toString(), filename);
   }
 

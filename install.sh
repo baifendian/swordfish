@@ -34,7 +34,7 @@ hadoopNamenodeAddress="172.24.5.149"
 hadoopYarnAddress="172.24.5.149"
 
 # env config file
-envFile="/home/swordfish/.sf_env.sh"
+envFile="/home/baseline/.sf_env.sh"
 
 # 使用示例
 function usage() {

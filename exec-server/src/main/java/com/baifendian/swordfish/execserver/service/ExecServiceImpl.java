@@ -21,7 +21,6 @@ import com.baifendian.swordfish.dao.FlowDao;
 import com.baifendian.swordfish.dao.enums.FlowStatus;
 import com.baifendian.swordfish.dao.model.AdHoc;
 import com.baifendian.swordfish.dao.model.ExecutionFlow;
-import com.baifendian.swordfish.dao.model.Schedule;
 import com.baifendian.swordfish.execserver.runner.adhoc.AdHocRunnerManager;
 import com.baifendian.swordfish.execserver.runner.flow.FlowRunnerManager;
 import com.baifendian.swordfish.execserver.utils.ResultHelper;
@@ -31,8 +30,6 @@ import org.apache.commons.configuration.Configuration;
 import org.apache.thrift.TException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.Date;
 
 /**
  * ExecService 实现 <p>

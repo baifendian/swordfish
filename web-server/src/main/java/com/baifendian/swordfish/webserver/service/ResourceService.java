@@ -25,7 +25,6 @@ import com.baifendian.swordfish.dao.model.Resource;
 import com.baifendian.swordfish.dao.model.User;
 import com.baifendian.swordfish.webserver.exception.*;
 import com.baifendian.swordfish.webserver.service.storage.FileSystemStorageService;
-import com.baifendian.swordfish.webserver.utils.ParamVerify;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,7 +38,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
-import static com.baifendian.swordfish.webserver.utils.ParamVerify.*;
+import static com.baifendian.swordfish.webserver.utils.ParamVerify.verifyDesc;
+import static com.baifendian.swordfish.webserver.utils.ParamVerify.verifyResName;
 
 @Service
 public class ResourceService {
@@ -99,15 +99,15 @@ public class ResourceService {
     }
 
     // 判断文件是否已经存在
-//    Resource resource = resourceMapper.queryResource(project.getId(), name);
-//
-//    if (resource != null) {
-//      logger.error("Resource {} does not empty", name);
-//      throw new NotModifiedException("Resource has exist, can't create again.");
-//    }
+    Resource resource = resourceMapper.queryResource(project.getId(), name);
+
+    if (resource != null) {
+      logger.error("Resource {} does not empty", name);
+      throw new NotModifiedException("Resource has exist, can't create again.");
+    }
 
     // 插入数据
-    Resource resource = new Resource();
+    resource = new Resource();
     Date now = new Date();
 
     resource.setName(name);
@@ -193,7 +193,7 @@ public class ResourceService {
       throw new NotFoundException("Not found project \"{0}\"", projectName);
     }
 
-    //必须要有project的写权限
+    // 必须要有 project 的写权限
     if (!projectService.hasWritePerm(operator.getId(), project)) {
       logger.error("User {} has no right permission for the project {}", operator.getName(), project.getName());
       throw new PermissionException("User \"{0}\" is not has project \"{1}\" write permission", operator.getName(), project.getName());
@@ -297,13 +297,14 @@ public class ResourceService {
       logger.error("Project does not exist: {}", projectName);
       throw new NotFoundException("Not found project \"{0}\"", projectName);
     }
-    // 必须有project写权限
+
+    // 必须有 project 写权限
     if (!projectService.hasWritePerm(operator.getId(), project)) {
       logger.error("User {} has no right permission for the project {}", operator.getName(), project.getName());
       throw new PermissionException("User \"{0}\" is not has project \"{1}\" write permission", operator.getName(), project.getName());
     }
 
-    //检测原资源是否存在
+    // 检测原资源是否存在
     Resource srcResource = resourceMapper.queryResource(project.getId(), srcResName);
 
     if (srcResource == null) {
@@ -375,11 +376,13 @@ public class ResourceService {
       logger.error("Project does not exist: {}", projectName);
       throw new NotFoundException("Not found project \"{0}\"", projectName);
     }
-    //必须有project 写权限
+
+    // 必须有 project 写权限
     if (!projectService.hasWritePerm(operator.getId(), project)) {
       logger.error("User {} has no right permission for the project {}", operator.getName(), project.getName());
       throw new PermissionException("User \"{0}\" is not has project \"{1}\" write permission", operator.getName(), project.getName());
     }
+
     Resource resource = resourceMapper.queryResource(project.getId(), name);
 
     if (resource == null) {
@@ -411,7 +414,7 @@ public class ResourceService {
       throw new NotFoundException("Not found project \"{0}\"", projectName);
     }
 
-    //必须有project 读权限
+    // 必须有 project 读权限
     if (!projectService.hasReadPerm(operator.getId(), project)) {
       logger.error("User {} has no right permission for the project {}", operator.getName(), project.getName());
       throw new PermissionException("User \"{0}\" is not has project \"{1}\" read permission", operator.getName(), project.getName());
@@ -438,17 +441,20 @@ public class ResourceService {
       logger.error("Project does not exist: {}", projectName);
       throw new NotFoundException("Not found project \"{0}\"", projectName);
     }
-    //必须有project 读权限
+
+    // 必须有 project 读权限
     if (!projectService.hasReadPerm(operator.getId(), project)) {
       logger.error("User {} has no right permission for the project {}", operator.getName(), project.getName());
       throw new PermissionException("User \"{0}\" is not has project \"{1}\" read permission", operator.getName(), project.getName());
     }
+
     Resource resource = resourceMapper.queryResource(project.getId(), name);
 
     if (resource == null) {
       logger.error("Download file not exist, project {}, resource {}", project.getName(), name);
       throw new NotFoundException("Download file not exist, project {0}, resource {1}", project.getName(), name);
     }
+
     return resource;
   }
 
@@ -468,12 +474,14 @@ public class ResourceService {
       logger.error("Project does not exist: {}", projectName);
       throw new NotFoundException("Not found project \"{0}\"", projectName);
     }
-    //必须有project 读权限
+
+    // 必须有 project 读权限
     if (!projectService.hasReadPerm(operator.getId(), project)) {
       logger.error("User {} has no right permission for the project {}", operator.getName(), project.getName());
       throw new PermissionException("User \"{0}\" is not has project \"{1}\" read permission", operator.getName(), project.getName());
     }
-    //校验资源是否存在
+
+    // 校验资源是否存在
     Resource resource = resourceMapper.queryResource(project.getId(), name);
 
     if (resource == null) {
@@ -481,7 +489,7 @@ public class ResourceService {
       throw new NotFoundException("Download file not exist, project {0}, resource {1}", project.getName(), name);
     }
 
-    String localFilename = BaseConfig.getLocalDownloadFilename(project.getId(), name);
+    String localFilename = BaseConfig.getLocalDownloadFilename(name);
     String hdfsFilename = BaseConfig.getHdfsResourcesFilename(project.getId(), name);
 
     HdfsClient.getInstance().copyHdfsToLocal(hdfsFilename, localFilename, false, true);
@@ -490,5 +498,4 @@ public class ResourceService {
 
     return file;
   }
-
 }
