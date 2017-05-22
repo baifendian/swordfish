@@ -155,7 +155,7 @@ public class NodeRunner implements Callable<Boolean> {
    * 关闭任务
    */
   public void kill() {
-    if (job != null) {
+    if (job != null && job.isStarted()) {
       try {
         job.cancel();
       } catch (Exception e) {
