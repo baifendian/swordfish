@@ -202,6 +202,22 @@ public class ExecutionFlowMapperProvider {
   }
 
   /**
+   * 删除结点
+   *
+   * @param parameter
+   * @return
+   */
+  public String deleteExecutionNodes(Map<String, Object> parameter) {
+    return new SQL() {
+      {
+        DELETE_FROM(TABLE_NAME);
+
+        WHERE("id = #{execId}");
+      }
+    }.toString();
+  }
+
+  /**
    * 查询一定时间范围的工作流信息
    *
    * @param parameter

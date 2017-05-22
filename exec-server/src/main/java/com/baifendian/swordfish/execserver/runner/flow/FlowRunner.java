@@ -136,10 +136,17 @@ public class FlowRunner implements Runnable {
   @Override
   public void run() {
     // 查看是否已经完成
-    int size = flowDao.queryExecutionNodeSize(executionFlow.getId());
-    if (size > 0) {
-      logger.info("flow is done or running: {}", executionFlow.getId());
-      return;
+    ExecutionFlow newExecutionFlow = flowDao.queryExecutionFlow(executionFlow.getId());
+
+    if (newExecutionFlow != null) {
+      if (newExecutionFlow.getStatus().typeIsFinished()) {
+        logger.info("flow is done: {}", executionFlow.getId());
+        return;
+      }
+
+      flowDao.deleteExecutionNodes(executionFlow.getId());
+    } else {
+      logger.info("flow is not exist: {}", executionFlow.getId());
     }
 
     FlowStatus status = null;
@@ -286,7 +293,8 @@ public class FlowRunner implements Runnable {
    * @throws InstantiationException
    * @throws IllegalAccessException
    */
-  private List<String> genProjectResFiles(FlowDag flowDag) throws IllegalArgumentException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
+  private List<String> genProjectResFiles(FlowDag flowDag) throws
+      IllegalArgumentException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
     List<FlowNode> nodes = flowDag.getNodes();
     Set<String> projectFiles = new HashSet<>();
 
@@ -320,6 +328,7 @@ public class FlowRunner implements Runnable {
    * @param dagGraph
    * @return
    */
+
   private FlowStatus runFlow(Graph<String, FlowNode, FlowNodeRelation> dagGraph) {
     // 信号量控制, 是否有线程结束了
     Semaphore semaphore = new Semaphore(0);

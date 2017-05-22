@@ -82,6 +82,15 @@ public class FlowDao extends BaseDao {
   }
 
   /**
+   * 删除执行的结点
+   *
+   * @param execId
+   */
+  public int deleteExecutionNodes(int execId) {
+    return executionFlowMapper.deleteExecutionNodes(execId);
+  }
+
+  /**
    * 获取所有未完成的 flow 列表 <p>
    *
    * @return
