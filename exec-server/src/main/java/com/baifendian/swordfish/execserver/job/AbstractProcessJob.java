@@ -319,11 +319,16 @@ public abstract class AbstractProcessJob extends AbstractJob {
         reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
         String line;
 
+        long preFlushTime = System.currentTimeMillis();
+
         while ((line = reader.readLine()) != null) {
           logs.add(line);
 
+          long now = System.currentTimeMillis();
+
           // 到一定日志量就输出处理
-          if (logs.size() >= Constants.defaultLogBufferSize) {
+          if (logs.size() >= Constants.defaultLogBufferSize || now - preFlushTime > Constants.defaultLogFlushInterval) {
+            preFlushTime = now;
             logProcess(logs);
             logs.clear();
           }

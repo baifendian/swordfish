@@ -77,4 +77,9 @@ public class Constants {
    * 日志累计到一定数目才进行输出
    */
   public static final int defaultLogBufferSize = 4 * 16;
+
+  /**
+   * 日志刷新周期
+   */
+  public static final int defaultLogFlushInterval = 3000;
 }
