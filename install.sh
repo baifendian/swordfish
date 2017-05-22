@@ -77,7 +77,7 @@ function file_replace()
     sed -i "s#yarn.resourcemanager.address.*#yarn.resourcemanager.address = ${hadoopYarnAddress}:8032#g" conf/common/hadoop/hadoop.properties
     sed -i "s#yarn.resourcemanager.scheduler.address.*#yarn.resourcemanager.scheduler.address = ${hadoopYarnAddress}:8030#g" conf/common/hadoop/hadoop.properties
     sed -i "s#mapreduce.jobhistory.address.*#mapreduce.jobhistory.address = ${hadoopYarnAddress}:10020#g" conf/common/hadoop/hadoop.properties
-    sed -i "s#yarn.resourcemanager.webapp.address.*#yarn.resourcemanager.webapp.address = ${hadoopYarnAddress}:8088#g" conf/common/hadoop/hadoop.properties
+    sed -i "s#yarn.resourcemanager.webapp.address.*#yarn.resourcemanager.webapp.address = http://${hadoopYarnAddress}:8088#g" conf/common/hadoop/hadoop.properties
 
     # 4. quartz
     if [ "$1" = "master-server" ]; then
