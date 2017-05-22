@@ -92,7 +92,7 @@ public class SparkSubmitArgsUtil {
       args.add(param.getQueue());
     }
 
-    if (!param.getProperties().isEmpty()) {
+    if (param.getProperties() != null && !param.getProperties().isEmpty()) {
       for (Property property : param.getProperties()) {
         args.add(SparkSubmitArgsConst.CONF);
         args.add(property.getProp() + "=" + property.getValue());

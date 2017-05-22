@@ -135,6 +135,13 @@ public class FlowRunner implements Runnable {
    */
   @Override
   public void run() {
+    // 查看是否已经完成
+    int size = flowDao.queryExecutionNodeSize(executionFlow.getId());
+    if (size > 0) {
+      logger.info("flow is done or running: {}", executionFlow.getId());
+      return;
+    }
+
     FlowStatus status = null;
 
     try {
@@ -230,7 +237,7 @@ public class FlowRunner implements Runnable {
     } catch (ExecTimeoutException e) {
       logger.error("Exec flow timeout", e);
       clean();
-    } catch (Throwable e) {
+    } catch (Exception e) {
       logger.error(String.format("run exec id: %s", executionFlow.getId()), e);
       clean();
     } finally {
@@ -319,7 +326,7 @@ public class FlowRunner implements Runnable {
 
     // 如果图有环, 直接返回
     if (dagGraph.hasCycle()) {
-      logger.error("flow has no start nodes, maybe has cycle");
+      logger.error("flow has cycle");
       return FlowStatus.FAILED;
     }
 

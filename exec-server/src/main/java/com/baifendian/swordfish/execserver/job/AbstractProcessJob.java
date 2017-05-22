@@ -17,6 +17,7 @@ package com.baifendian.swordfish.execserver.job;
 
 import com.baifendian.swordfish.execserver.exception.ExecException;
 import com.baifendian.swordfish.execserver.exception.ExecTimeoutException;
+import com.baifendian.swordfish.execserver.utils.Constants;
 import com.baifendian.swordfish.execserver.utils.ProcessUtil;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -322,7 +323,7 @@ public abstract class AbstractProcessJob extends AbstractJob {
           logs.add(line);
 
           // 到一定日志量就输出处理
-          if (logs.size() >= 16) {
+          if (logs.size() >= Constants.defaultLogBufferSize) {
             logProcess(logs);
             logs.clear();
           }

@@ -72,6 +72,16 @@ public class FlowDao extends BaseDao {
   }
 
   /**
+   * 查询结点数
+   *
+   * @param execId
+   * @return
+   */
+  public int queryExecutionNodeSize(int execId) {
+    return executionFlowMapper.selectNodeSizeByExecId(execId);
+  }
+
+  /**
    * 获取所有未完成的 flow 列表 <p>
    *
    * @return

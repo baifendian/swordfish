@@ -72,4 +72,9 @@ public class Constants {
    * node runner 线程数
    */
   public static final int defaultNodeRunnerThreadNum = 100;
+
+  /**
+   * 日志累计到一定数目才进行输出
+   */
+  public static final int defaultLogBufferSize = 4 * 16;
 }

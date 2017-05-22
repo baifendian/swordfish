@@ -83,6 +83,14 @@ public interface ExecutionFlowMapper {
   ExecutionFlow selectByExecId(@Param("execId") Integer execId);
 
   /**
+   * 查询节点数
+   * @param execId
+   * @return
+   */
+  @SelectProvider(type = ExecutionFlowMapperProvider.class, method = "selectNodeSizeByExecId")
+  int selectNodeSizeByExecId(@Param("execId") Integer execId);
+
+  /**
    * 获取所有未完成的工作流
    *
    * @return

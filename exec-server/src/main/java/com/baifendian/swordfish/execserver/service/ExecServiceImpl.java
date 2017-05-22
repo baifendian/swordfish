@@ -94,6 +94,11 @@ public class ExecServiceImpl implements Iface {
         return ResultHelper.createErrorResult("execId not find");
       }
 
+      // 必须是初始化状态才接受
+      if (executionFlow.getStatus() != FlowStatus.INIT) {
+        return ResultHelper.createErrorResult("execId has finish");
+      }
+
       // 更新状态为 RUNNING
       String worker = String.format("%s:%d", host, port);
       flowDao.updateExecutionFlowStatus(execId, FlowStatus.RUNNING, worker);

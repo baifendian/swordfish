@@ -96,6 +96,11 @@ public class FlowRunnerManager {
    * @param executionFlow
    */
   public void submitFlow(ExecutionFlow executionFlow) {
+    if (runningFlows.containsKey(executionFlow.getId())) {
+      logger.info("flow is in running: {}", executionFlow.getId());
+      return;
+    }
+
     // 系统参数, 注意 schedule time 是真正调度运行的时刻
     Map<String, String> systemParamMap = SystemParamManager.buildSystemParam(executionFlow.getType(), executionFlow.getScheduleTime());
 
