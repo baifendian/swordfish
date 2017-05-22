@@ -149,7 +149,7 @@ public class FlowRunnerManager {
       for (Map.Entry<Integer, FlowRunner> entry : runningFlows.entrySet()) {
         ExecutionFlow executionFlow = flowDao.queryExecutionFlow(entry.getKey());
 
-        if (executionFlow.getStatus().typeIsFinished()) {
+        if (executionFlow != null && executionFlow.getStatus().typeIsFinished()) {
           finishFlows.add(entry.getKey());
         }
       }
