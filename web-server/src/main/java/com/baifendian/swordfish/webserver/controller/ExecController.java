@@ -25,6 +25,7 @@ import com.baifendian.swordfish.webserver.service.ExecService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -57,6 +58,7 @@ public class ExecController {
    * @return
    */
   @PostMapping(value = "")
+  @ResponseStatus(HttpStatus.CREATED)
   public ExecutorIdsDto execExistWorkflow(@RequestAttribute(value = "session.user") User operator,
                                           @RequestParam(value = "projectName") String projectName,
                                           @RequestParam(value = "workflowName") String workflowName,

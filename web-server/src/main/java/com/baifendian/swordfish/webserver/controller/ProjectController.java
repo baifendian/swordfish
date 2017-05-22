@@ -24,6 +24,7 @@ import com.baifendian.swordfish.webserver.service.ProjectService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -50,6 +51,7 @@ public class ProjectController {
    * @return
    */
   @PostMapping(value = "/{name}")
+  @ResponseStatus(HttpStatus.CREATED)
   public ProjectDto createProject(@RequestAttribute(value = "session.user") User operator,
                                   @PathVariable("name") String name,
                                   @RequestParam(value = "desc", required = false) String desc) {

@@ -23,12 +23,15 @@ import com.baifendian.swordfish.webserver.dto.AdHocResultDto;
 import com.baifendian.swordfish.webserver.dto.ExecutorIdDto;
 import com.baifendian.swordfish.webserver.exception.BadRequestException;
 import com.baifendian.swordfish.webserver.service.AdhocService;
+import org.springframework.http.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+
+import static org.apache.commons.httpclient.HttpStatus.SC_CREATED;
 
 /**
  * 即席查询的服务入口
@@ -56,6 +59,7 @@ public class AdhocController {
    * @return
    */
   @PostMapping(value = "/projects/{projectName}/adHoc")
+  @ResponseStatus(HttpStatus.CREATED)
   public ExecutorIdDto execAdhoc(@RequestAttribute(value = "session.user") User operator,
                                  @PathVariable String projectName,
                                  @RequestParam(value = "stms") String stms,
@@ -63,9 +67,10 @@ public class AdhocController {
                                  @RequestParam(value = "proxyUser") String proxyUser,
                                  @RequestParam(value = "queue") String queue,
                                  @RequestParam(value = "udfs", required = false) String udfs,
-                                 @RequestParam(value = "timeout", required = false, defaultValue = "1800") int timeout) {
+                                 @RequestParam(value = "timeout", required = false, defaultValue = "1800") int timeout
+                                 ) {
     logger.info("Operator user {}, exec adhoc, project name: {}, stms: {}, limit: {}, proxyUser: {}, queue: {}, udfs: {}, timeout: {}",
-        operator.getName(), projectName, stms, limit, proxyUser, queue, udfs, timeout);
+            operator.getName(), projectName, stms, limit, proxyUser, queue, udfs, timeout);
 
     // limit 的限制
     if (limit <= 0 || limit > 5000) {
@@ -87,6 +92,7 @@ public class AdhocController {
       throw new BadRequestException("Argument is not valid, udfs format is invalid.");
     }
 
+
     return adhocService.execAdhoc(operator, projectName, stms, limit, proxyUser, queue, udfsInfos, timeout);
   }
 
@@ -107,7 +113,7 @@ public class AdhocController {
                                @RequestParam(value = "from", required = false, defaultValue = "0") int from,
                                @RequestParam(value = "size", required = false, defaultValue = "100") int size) {
     logger.info("Operator user {}, get adhoc logs, exec id: {}, index: {}, from: {}, size: {}",
-        operator.getName(), execId, index, from, size);
+            operator.getName(), execId, index, from, size);
 
     // index & from 的限制
     if (index < 0 || from < 0) {
@@ -135,7 +141,7 @@ public class AdhocController {
                                     @PathVariable int execId,
                                     @RequestParam(value = "index") int index) {
     logger.info("Operator user {}, get adhoc result, exec id: {}, index: {}",
-        operator.getName(), execId, index);
+            operator.getName(), execId, index);
 
     // index 的限制
     if (index < 0) {
@@ -155,7 +161,7 @@ public class AdhocController {
   public void killAdhoc(@RequestAttribute(value = "session.user") User operator,
                         @PathVariable int execId) {
     logger.info("Operator user {}, kill adhoc result, exec id: {}",
-        operator.getName(), execId);
+            operator.getName(), execId);
 
     adhocService.killAdhoc(operator, execId);
   }

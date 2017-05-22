@@ -23,6 +23,7 @@ import com.baifendian.swordfish.webserver.service.DatasourceService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -52,6 +53,7 @@ public class DatasourceController {
    * @return
    */
   @PostMapping(value = "/{name}")
+  @ResponseStatus(HttpStatus.CREATED)
   public DatasourceDto createDataSource(@RequestAttribute(value = "session.user") User operator,
                                         @PathVariable("projectName") String projectName,
                                         @PathVariable("name") String name,
