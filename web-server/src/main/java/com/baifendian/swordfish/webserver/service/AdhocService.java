@@ -15,8 +15,8 @@
  */
 package com.baifendian.swordfish.webserver.service;
 
-import com.baifendian.swordfish.common.adhoc.AdHocParam;
-import com.baifendian.swordfish.common.job.UdfsInfo;
+import com.baifendian.swordfish.common.job.struct.node.adhoc.AdHocParam;
+import com.baifendian.swordfish.common.job.struct.node.common.UdfsInfo;
 import com.baifendian.swordfish.dao.enums.FlowStatus;
 import com.baifendian.swordfish.dao.mapper.AdHocMapper;
 import com.baifendian.swordfish.dao.mapper.MasterServerMapper;
@@ -25,11 +25,13 @@ import com.baifendian.swordfish.dao.model.*;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
 import com.baifendian.swordfish.rpc.RetInfo;
 import com.baifendian.swordfish.rpc.client.MasterClient;
-import com.baifendian.swordfish.webserver.dto.AdHocLogData;
-import com.baifendian.swordfish.webserver.dto.AdHocResultData;
-import com.baifendian.swordfish.webserver.dto.ExecutorId;
+import com.baifendian.swordfish.webserver.dto.AdHocLogDto;
+import com.baifendian.swordfish.webserver.dto.AdHocResultDto;
+import com.baifendian.swordfish.webserver.dto.ExecutorIdDto;
 import com.baifendian.swordfish.webserver.dto.LogResult;
-import org.apache.commons.httpclient.HttpStatus;
+import com.baifendian.swordfish.webserver.exception.NotFoundException;
+import com.baifendian.swordfish.webserver.exception.PermissionException;
+import com.baifendian.swordfish.webserver.exception.ServerErrorException;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,9 +39,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 
-import javax.servlet.http.HttpServletResponse;
 import java.util.Date;
 import java.util.List;
+
+import static com.baifendian.swordfish.webserver.utils.ParamVerify.verifyProxyUser;
 
 @Service
 public class AdhocService {
@@ -72,33 +75,30 @@ public class AdhocService {
    * @param queue
    * @param udfs
    * @param timeout
-   * @param response
    * @return
    */
-  // @Transactional(value = "TransactionManager")
-  public ExecutorId execAdhoc(User operator, String projectName, String stms, int limit, String proxyUser, String queue, List<UdfsInfo> udfs, int timeout, HttpServletResponse response) {
+  public ExecutorIdDto execAdhoc(User operator, String projectName, String stms, int limit, String proxyUser, String queue, List<UdfsInfo> udfs, int timeout) {
 
     // 查看用户对项目是否具备相应权限
     Project project = projectMapper.queryByName(projectName);
-
     if (project == null) {
       logger.error("Project does not exist: {}", projectName);
-      response.setStatus(HttpStatus.SC_NOT_MODIFIED);
-      return null;
+      throw new NotFoundException("Not found project \"{0}\"", projectName);
+    }
+    // 必须要有project执行权限
+    if (!projectService.hasWritePerm(operator.getId(), project)) {
+      logger.error("User {} has no right permission for the project {}", operator.getName(), project.getName());
+      throw new PermissionException("User \"{0}\" is not has project \"{1}\" write permission", operator.getName(), project.getName());
     }
 
-    if (!projectService.hasExecPerm(operator.getId(), project)) {
-      logger.error("User {} has no right permission for the project {}", operator.getName(), projectName);
-      response.setStatus(HttpStatus.SC_UNAUTHORIZED);
-      return null;
-    }
+    // 判断 proxyUser 是否合理的
+    verifyProxyUser(operator.getProxyUserList(), proxyUser);
 
     // 查看 master 是否存在
     MasterServer masterServer = masterServerMapper.query();
     if (masterServer == null) {
       logger.error("Master server does not exist.");
-      response.setStatus(HttpStatus.SC_NOT_MODIFIED);
-      return null;
+      throw new ServerErrorException("Master server does not exist.");
     }
 
     // 插入数据库记录, 得到 exec id
@@ -131,28 +131,30 @@ public class AdhocService {
       adHocMapper.insert(adhoc);
     } catch (DuplicateKeyException e) {
       logger.error("Adhoc has exist, can't create again.", e);
-      response.setStatus(HttpStatus.SC_CONFLICT);
-      return null;
+      throw new ServerErrorException("Adhoc has exist, can't create again.");
     }
 
     // 连接
     MasterClient masterClient = new MasterClient(masterServer.getHost(), masterServer.getPort());
-    try {
-      logger.info("Call master client, exec id: {}, host: {}, port: {}", adhoc.getId(), masterServer.getHost(), masterServer.getPort());
 
-      RetInfo retInfo = masterClient.execAdHoc(adhoc.getId());
+    logger.info("Call master client, exec id: {}, host: {}, port: {}", adhoc.getId(), masterServer.getHost(), masterServer.getPort());
 
-      if (retInfo.getStatus() != 0) {
-        response.setStatus(HttpStatus.SC_INTERNAL_SERVER_ERROR);
-        return null;
+    RetInfo retInfo = masterClient.execAdHoc(adhoc.getId());
+
+    if (retInfo == null || retInfo.getStatus() != 0) {
+      // 查询状态, 如果还是 INIT, 则需要更新为 FAILED
+      AdHoc adHoc = adHocMapper.selectById(adhoc.getId());
+
+      if (adHoc != null && adHoc.getStatus() == FlowStatus.INIT) {
+        adHoc.setStatus(FlowStatus.FAILED);
+        adHocMapper.updateStatus(adHoc);
       }
-    } catch (Exception e) {
-      logger.error("Adhoc exec exception.", e);
-      response.setStatus(HttpStatus.SC_NOT_MODIFIED);
-      return null;
+
+      logger.error("call master server error");
+      throw new ServerErrorException("master server return error");
     }
 
-    return new ExecutorId(adhoc.getId());
+    return new ExecutorIdDto(adhoc.getId());
   }
 
   /**
@@ -163,24 +165,22 @@ public class AdhocService {
    * @param index
    * @param from
    * @param size
-   * @param response
    * @return
    */
-  public AdHocLogData queryLogs(User operator, int execId, int index, int from, int size, HttpServletResponse response) {
+  public AdHocLogDto queryLogs(User operator, int execId, int index, int from, int size) {
 
     // 查看用户对项目是否具备相应权限
     Project project = adHocMapper.queryProjectByExecId(execId);
 
     if (project == null) {
       logger.error("Exec id: {} has no correspond project", execId);
-      response.setStatus(HttpStatus.SC_BAD_REQUEST);
-      return null;
+      throw new NotFoundException("Exec id \"{0}\" has no correspond project", execId);
     }
 
+    // 必须要有 project 执行权限
     if (!projectService.hasExecPerm(operator.getId(), project)) {
-      logger.error("User [{},{}] has no right permission for the project [{}], execId: {}", operator.getId(), operator.getName(), project.getName(), execId);
-      response.setStatus(HttpStatus.SC_UNAUTHORIZED);
-      return null;
+      logger.error("User {} has no right permission for the project {}", operator.getName(), project.getName());
+      throw new PermissionException("User \"{0}\" is not has project \"{1}\" exec permission", operator.getName(), project.getName());
     }
 
     // 返回日志信息
@@ -188,15 +188,15 @@ public class AdhocService {
     AdHoc adhoc = adHocMapper.selectById(execId);
     if (adhoc == null) {
       logger.error("Exec id not exist: {}", execId);
-      response.setStatus(HttpStatus.SC_BAD_REQUEST);
-      return null;
+      throw new NotFoundException("Exec id \"{0}\" not exist", execId);
     }
 
+    // 查看是否分配了 jobId
     String jobId = adhoc.getJobId();
 
     if (StringUtils.isEmpty(jobId)) {
       logger.warn("Job id of exec: {} is null", execId);
-      return null;
+      throw new ServerErrorException("Job id of exec \"{0}\" is null", execId);
     }
 
     // 2. 先判断有多少个语句, index 如果超过了, 返回异常
@@ -205,8 +205,7 @@ public class AdhocService {
     // 3. 得到需要的 index
     if (results == null || index >= results.size()) {
       logger.error("Result is empty or index equal or more than results size");
-      response.setStatus(HttpStatus.SC_BAD_REQUEST);
-      return null;
+      throw new ServerErrorException("Result is empty or index equal or more than results size");
     }
 
     // 3. 查看结果
@@ -216,14 +215,21 @@ public class AdhocService {
     LogResult logResult = logHelper.getLog(from, size, jobId);
 
     // 构造结果返回
-    AdHocLogData adHocLogData = new AdHocLogData();
+    AdHocLogDto adHocLogDto = new AdHocLogDto();
 
-    adHocLogData.setStatus(adHocResult.getStatus());
-    adHocLogData.setHasResult(adHocResult.getStatus().typeIsFinished());
-    adHocLogData.setLastSql(index == results.size() - 1);
-    adHocLogData.setLogContent(logResult);
+    // 如果任务被 kill 了或者是某些异常导致失败
+    if (adHocResult.getStatus().typeIsNotFinished() && adhoc.getStatus().typeIsFinished()) {
+      adHocLogDto.setStatus(adhoc.getStatus());
+      adHocLogDto.setHasResult(true);
+    } else {
+      adHocLogDto.setStatus(adHocResult.getStatus());
+      adHocLogDto.setHasResult(adHocResult.getStatus().typeIsFinished());
+    }
 
-    return adHocLogData;
+    adHocLogDto.setLastSql(index == results.size() - 1);
+    adHocLogDto.setLogContent(logResult);
+
+    return adHocLogDto;
   }
 
   /**
@@ -232,36 +238,70 @@ public class AdhocService {
    * @param operator
    * @param execId
    * @param index
-   * @param response
    * @return
    */
-  public AdHocResultData queryResult(User operator, int execId, int index, HttpServletResponse response) {
+  public AdHocResultDto queryResult(User operator, int execId, int index) {
 
     // 查看用户对项目是否具备相应权限
     Project project = adHocMapper.queryProjectByExecId(execId);
 
     if (project == null) {
       logger.error("Exec id: {} has no correspond project", execId);
-      response.setStatus(HttpStatus.SC_BAD_REQUEST);
-      return null;
+      throw new NotFoundException("Exec id \"{0}\" has no correspond project", execId);
     }
 
-    if (!projectService.hasExecPerm(operator.getId(), project)) {
+    // 如果有项目的执行去哪先才可以 kill
+    if (!projectService.hasWritePerm(operator.getId(), project)) {
       logger.error("User {} has no right permission for the project {}", operator.getName(), project.getName());
-      response.setStatus(HttpStatus.SC_UNAUTHORIZED);
-      return null;
+      throw new PermissionException("User \"{0}\" is not has project \"{1}\" write permission", operator.getName(), project.getName());
     }
 
     // 返回结果
     AdHocResult adHocResult = adHocMapper.selectResultByIdAndIndex(execId, index);
 
-    AdHocResultData adHocResultData = new AdHocResultData();
+    AdHocResultDto adHocResultDto = new AdHocResultDto();
 
-    adHocResultData.setStartTime(adHocResult.getStartTime());
-    adHocResultData.setEndTime(adHocResult.getEndTime());
-    adHocResultData.setStm(adHocResult.getStm());
-    adHocResultData.setResults(JsonUtil.parseObject(adHocResult.getResult(), AdHocJsonObject.class));
+    adHocResultDto.setStartTime(adHocResult.getStartTime());
+    adHocResultDto.setEndTime(adHocResult.getEndTime());
+    adHocResultDto.setStm(adHocResult.getStm());
+    adHocResultDto.setResults(JsonUtil.parseObject(adHocResult.getResult(), AdHocJsonObject.class));
 
-    return adHocResultData;
+    return adHocResultDto;
+  }
+
+  /**
+   * kill 即席查询任务, 只有在没有运行完的任务才可以 kill
+   *
+   * @param operator
+   * @param execId
+   */
+  public void killAdhoc(User operator, int execId) {
+
+    // 查看用户对项目是否具备相应权限
+    Project project = adHocMapper.queryProjectByExecId(execId);
+
+    if (project == null) {
+      logger.error("Exec id: {} has no correspond project", execId);
+      throw new NotFoundException("Exec id \"{0}\" has no correspond project", execId);
+    }
+
+    // 如果有项目的执行去哪先才可以 kill
+    if (!projectService.hasWritePerm(operator.getId(), project)) {
+      logger.error("User {} has no right permission for the project {}", operator.getName(), project.getName());
+      throw new PermissionException("User \"{0}\" is not has project \"{1}\" write permission", operator.getName(), project.getName());
+    }
+
+    // kill 即席, 通过数据库来做到
+    AdHoc adhoc = adHocMapper.selectById(execId);
+    if (adhoc == null) {
+      logger.error("Exec id not exist: {}", execId);
+      throw new NotFoundException("Exec id \"{0}\" not exist", execId);
+    }
+
+    // 如果没有完成, 则更新为 kill
+    if (adhoc.getStatus().typeIsNotFinished()) {
+      adhoc.setStatus(FlowStatus.KILL);
+      adHocMapper.updateStatus(adhoc);
+    }
   }
 }

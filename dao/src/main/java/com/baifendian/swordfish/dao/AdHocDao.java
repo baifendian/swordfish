@@ -21,12 +21,10 @@ import com.baifendian.swordfish.dao.mapper.AdHocMapper;
 import com.baifendian.swordfish.dao.mapper.AdHocResultMapper;
 import com.baifendian.swordfish.dao.model.AdHoc;
 import com.baifendian.swordfish.dao.model.AdHocResult;
-
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
 
@@ -43,34 +41,69 @@ public class AdHocDao extends BaseDao {
     adHocResultMapper = ConnectionFactory.getSqlSession().getMapper(AdHocResultMapper.class);
   }
 
+  /**
+   * 更新即席信息
+   *
+   * @param adHoc
+   * @return
+   */
   public boolean updateAdHoc(AdHoc adHoc) {
     return adHocMapper.update(adHoc) > 0;
   }
 
-  public int insertAdHoc(AdHoc adHoc) {
-    return adHocMapper.insert(adHoc);
+  /**
+   * 更新即席查询的状态
+   *
+   * @param adHoc
+   * @return
+   */
+  public boolean updateAdHocStatus(AdHoc adHoc) {
+    return adHocMapper.updateStatus(adHoc) > 0;
   }
 
-  public AdHoc getAdHoc(int id){
+  /**
+   * 查询信息
+   *
+   * @param id
+   * @return
+   */
+  public AdHoc getAdHoc(int id) {
     return adHocMapper.selectById(id);
   }
 
+  /**
+   * 更新结果
+   *
+   * @param adHocResult
+   * @return
+   */
   public boolean updateAdHocResult(AdHocResult adHocResult) {
     return adHocResultMapper.update(adHocResult) > 0;
   }
 
+  /**
+   * 初始化结果
+   *
+   * @param execId
+   * @param execSqls
+   */
   @Transactional(value = "TransactionManager")
-  public void initAdHocResult(int execId, List<String> execSqls){
-    if(CollectionUtils.isNotEmpty(execSqls)){
+  public void initAdHocResult(int execId, List<String> execSqls) {
+    if (CollectionUtils.isNotEmpty(execSqls)) {
       adHocResultMapper.delete(execId);
-      int index=0;
-      for(String stm: execSqls){
+
+      int index = 0;
+
+      for (String stm : execSqls) {
         AdHocResult adHocResult = new AdHocResult();
         adHocResult.setExecId(execId);
         adHocResult.setStm(stm);
-        adHocResult.setIndex(index++);
+        adHocResult.setIndex(index);
         adHocResult.setStatus(FlowStatus.INIT);
         adHocResult.setCreateTime(new Date());
+
+        ++index;
+
         adHocResultMapper.insert(adHocResult);
       }
     }

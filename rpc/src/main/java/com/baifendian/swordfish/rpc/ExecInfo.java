@@ -49,15 +49,15 @@ public class ExecInfo implements org.apache.thrift.TBase<ExecInfo, ExecInfo._Fie
   }
 
   /**
-   * 表示执行的节点名称
+   * 表示执行的节点名称, 传 空或 null 表示执行工作流
    */
   public String nodeName; // required
   /**
-   * 节点依赖类型
+   * 节点依赖类型, 默认仅执行节点
    */
   public int nodeDep; // required
   /**
-   * 报警类型
+   * 报警类型, 默认不报警
    */
   public int notifyType; // required
   /**
@@ -72,15 +72,15 @@ public class ExecInfo implements org.apache.thrift.TBase<ExecInfo, ExecInfo._Fie
   /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
   public enum _Fields implements org.apache.thrift.TFieldIdEnum {
     /**
-     * 表示执行的节点名称
+     * 表示执行的节点名称, 传 空或 null 表示执行工作流
      */
     NODE_NAME((short)1, "nodeName"),
     /**
-     * 节点依赖类型
+     * 节点依赖类型, 默认仅执行节点
      */
     NODE_DEP((short)2, "nodeDep"),
     /**
-     * 报警类型
+     * 报警类型, 默认不报警
      */
     NOTIFY_TYPE((short)3, "notifyType"),
     /**
@@ -178,6 +178,12 @@ public class ExecInfo implements org.apache.thrift.TBase<ExecInfo, ExecInfo._Fie
   }
 
   public ExecInfo() {
+    this.nodeDep = 0;
+
+    this.notifyType = 0;
+
+    this.timeout = 1800;
+
   }
 
   public ExecInfo(
@@ -225,24 +231,24 @@ public class ExecInfo implements org.apache.thrift.TBase<ExecInfo, ExecInfo._Fie
   @Override
   public void clear() {
     this.nodeName = null;
-    setNodeDepIsSet(false);
     this.nodeDep = 0;
-    setNotifyTypeIsSet(false);
+
     this.notifyType = 0;
+
     this.notifyMails = null;
-    setTimeoutIsSet(false);
-    this.timeout = 0;
+    this.timeout = 1800;
+
   }
 
   /**
-   * 表示执行的节点名称
+   * 表示执行的节点名称, 传 空或 null 表示执行工作流
    */
   public String getNodeName() {
     return this.nodeName;
   }
 
   /**
-   * 表示执行的节点名称
+   * 表示执行的节点名称, 传 空或 null 表示执行工作流
    */
   public ExecInfo setNodeName(String nodeName) {
     this.nodeName = nodeName;
@@ -265,14 +271,14 @@ public class ExecInfo implements org.apache.thrift.TBase<ExecInfo, ExecInfo._Fie
   }
 
   /**
-   * 节点依赖类型
+   * 节点依赖类型, 默认仅执行节点
    */
   public int getNodeDep() {
     return this.nodeDep;
   }
 
   /**
-   * 节点依赖类型
+   * 节点依赖类型, 默认仅执行节点
    */
   public ExecInfo setNodeDep(int nodeDep) {
     this.nodeDep = nodeDep;
@@ -294,14 +300,14 @@ public class ExecInfo implements org.apache.thrift.TBase<ExecInfo, ExecInfo._Fie
   }
 
   /**
-   * 报警类型
+   * 报警类型, 默认不报警
    */
   public int getNotifyType() {
     return this.notifyType;
   }
 
   /**
-   * 报警类型
+   * 报警类型, 默认不报警
    */
   public ExecInfo setNotifyType(int notifyType) {
     this.notifyType = notifyType;

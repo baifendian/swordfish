@@ -4,7 +4,7 @@ CREATE TABLE `user` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'user id',
   `name` varchar(64) NOT NULL COMMENT 'user name',
   `email` varchar(64) NOT NULL COMMENT 'user email',
-  `desc` varchar(64) DEFAULT NULL COMMENT 'description information of user',
+  `desc` varchar(256) DEFAULT NULL COMMENT 'description information of user',
   `phone` varchar(20) DEFAULT NULL COMMENT 'user phone number',
   `password` varchar(32) NOT NULL COMMENT 'user password for login, md5-value',
   `role` tinyint(4) NOT NULL COMMENT '0 means administrator, others means normal user',
@@ -110,6 +110,7 @@ CREATE TABLE `project_flows` (
   `user_defined_params` text DEFAULT NULL COMMENT 'user defined parameter of the project flows.',
   `extras` text DEFAULT NULL COMMENT 'extends of the project flows',
   `queue` varchar(64) DEFAULT NULL COMMENT 'queue of the project flows',
+  `flag` tinyint(4) DEFAULT NULL COMMENT 'flow flag, 1 means a tmp flow, will be delete.',
   PRIMARY KEY (`id`),
   UNIQUE KEY `project_flowname` (`project_id`, `name`),
   FOREIGN KEY (`project_id`) REFERENCES `project`(`id`),
@@ -122,7 +123,7 @@ CREATE TABLE `flows_nodes` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'flow nodes id',
   `name` varchar(64) NOT NULL COMMENT 'flow nodes name',
   `flow_id` int(11) NOT NULL COMMENT 'project flow id of the flow nodes',
-  `desc` VARCHAR(256) NOT NULL COMMENT 'create time of the flow nodes',
+  `desc` VARCHAR(256) DEFAULT NULL COMMENT 'create time of the flow nodes',
   `type` varchar(32) NOT NULL COMMENT 'type of the flow nodes, string type',
   `parameter` text DEFAULT NULL COMMENT 'parameter of the flow nodes.',
   `extras` text DEFAULT NULL COMMENT 'extends of the flow nodes',
@@ -168,7 +169,7 @@ CREATE TABLE `execution_flows` (
   `schedule_time` datetime DEFAULT NULL COMMENT 'real schedule time of this exec',
   `start_time` datetime NOT NULL COMMENT 'real start time of this exec',
   `end_time` datetime DEFAULT NULL COMMENT 'end time of this exec',
-  `workflow_data` text NOT NULL COMMENT 'short desc of the workflow, contain keys: edges, nodes, extras; [{edges: [{"startNode": "xxx", "startNode": "xxx"}, ...], nodes: [{"name": "shelljob1", "desc":"shell", "type":"VIRTUAL", "param": {"script": "echo shelljob1"}, dep: [], "extras": {...}}, ...]',
+  `workflow_data` text NOT NULL COMMENT 'short desc of the workflow, contain keys: edges, nodes, extras; [{edges: [{"startNode": "xxx", "endNode": "xxx"}, ...], nodes: [{"name": "shelljob1", "desc":"shell", "type":"VIRTUAL", "param": {"script": "echo shelljob1"}, dep: [], "extras": {...}}, ...]',
   `user_defined_params` text DEFAULT NULL COMMENT 'user defined parameter of the flows.',
   `type` tinyint(4) NOT NULL COMMENT 'exec ways, schedule, add data or run ad-hoc.',
   `max_try_times` tinyint(4) DEFAULT NULL COMMENT 'max try times of the exec',
@@ -180,6 +181,8 @@ CREATE TABLE `execution_flows` (
   PRIMARY KEY (`id`),
   FOREIGN KEY (`flow_id`) REFERENCES `project_flows`(`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE INDEX proxy_user_index ON `execution_flows`(`proxy_user`);
 
 -- `execution_nodes` table
 DROP TABLE IF EXISTS `execution_nodes`;
@@ -213,7 +216,7 @@ CREATE TABLE `ad_hocs` (
   `end_time` datetime DEFAULT NULL COMMENT 'end time of this exec',
   PRIMARY KEY (`id`),
   FOREIGN KEY (`project_id`) REFERENCES `project`(`id`) ON DELETE CASCADE,
-  FOREIGN KEY (`owner`) REFERENCES `user`(`id`)
+  FOREIGN KEY (`owner`) REFERENCES `user`(`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- `ad_hoc_results` table
@@ -222,7 +225,7 @@ CREATE TABLE `ad_hoc_results` (
   `exec_id` int(11) NOT NULL COMMENT 'exec id of ad hoc query',
   `index` int(11) NOT NULL COMMENT 'index of the stm',
   `stm` text NOT NULL COMMENT 'sql clause',
-  `result` text DEFAULT NULL COMMENT 'result of this exec',
+  `result` mediumText DEFAULT NULL COMMENT 'result of this exec',
   `status` tinyint(4) NOT NULL COMMENT 'status of this exec',
   `create_time` datetime NOT NULL COMMENT 'create time of the records',
   `start_time` datetime DEFAULT NULL COMMENT 'start time of this exec',
@@ -234,9 +237,9 @@ CREATE TABLE `ad_hoc_results` (
 -- `master_server` table
 DROP TABLE If Exists `master_server`;
 CREATE TABLE `master_server` (
-  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'master id',
-  `host` varchar(20) NOT NULL COMMENT 'ip address of the master',
-  `port` int(11) NOT NULL COMMENT 'port of the master',
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'jobExecManager id',
+  `host` varchar(20) NOT NULL COMMENT 'ip address of the jobExecManager',
+  `port` int(11) NOT NULL COMMENT 'port of the jobExecManager',
   `create_time` datetime NOT NULL COMMENT 'create time of the records',
   `modify_time` datetime NOT NULL COMMENT 'last modify time of the records',
   PRIMARY KEY (`id`),

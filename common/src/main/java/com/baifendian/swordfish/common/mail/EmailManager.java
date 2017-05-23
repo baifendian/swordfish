@@ -22,7 +22,6 @@ import com.baifendian.swordfish.dao.enums.FlowStatus;
 import com.baifendian.swordfish.dao.model.ExecutionFlow;
 import com.baifendian.swordfish.dao.model.ExecutionNode;
 import com.baifendian.swordfish.dao.model.ProjectFlow;
-import com.baifendian.swordfish.dao.model.Schedule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,7 +54,7 @@ public class EmailManager {
   /**
    * 获取邮件任务
    */
-  private static final String CONTENT_FORMAT = "<b>{0}</b><hr/>Project：{1}<br/>workflow name：{2}<br/> execution flow id: {3}<br/>schedule time：{4}<br/>execution time：{5}<br/><br/><I>Note：execution detail see [maintain center] - [schedule logs]</I>";
+  private static final String CONTENT_FORMAT = "<b>{0}</b><hr/>Project：{1}<br/>WORKFLOW name：{2}<br/> execution flow id: {3}<br/>schedule time：{4}<br/>execution time：{5}<br/><br/><I>Note：execution detail see [maintain center] - [schedule logs]</I>";
 
 
   private static final String CONTENT_NODE_FORMAT = "<br>Long job Node:{0} RUN ERROR";
@@ -63,7 +62,7 @@ public class EmailManager {
   /**
    * 补数据内容头部
    */
-  private static final String ADD_DATA_HEAD_FORMAT = "<b>{0}</b><hr/>Project：{1}<br/>workflow name：{2}<br/><br/><b>Add data detail</b>";
+  private static final String ADD_DATA_HEAD_FORMAT = "<b>{0}</b><hr/>Project：{1}<br/>WORKFLOW name：{2}<br/><br/><b>Add data detail</b>";
 
   /**
    * 补数据的每个元素内容
@@ -82,7 +81,7 @@ public class EmailManager {
    */
   public static void sendEmail(ExecutionFlow executionFlow) {
     String title = genTitle(executionFlow.getType(), executionFlow.getStatus());
-    String content = genContent(executionFlow.getType(), executionFlow.getProjectName(), executionFlow.getFlowName(),
+    String content = genContent(executionFlow.getType(), executionFlow.getProjectName(), executionFlow.getWorkflowName(),
         executionFlow.getId(), executionFlow.getScheduleTime(), executionFlow.getStatus());
 
     mailSendService.sendToFlowMails(executionFlow.getFlowId(), title, content, true, executionFlow.getNotifyMailList());
@@ -97,7 +96,7 @@ public class EmailManager {
   public static void sendEmail(ExecutionFlow executionFlow, ExecutionNode executionNode) {
     try {
       String title = genTitle(executionFlow.getType(), executionNode.getStatus());
-      String content = genContent(executionFlow.getType(), executionFlow.getProjectName(), executionFlow.getFlowName(),
+      String content = genContent(executionFlow.getType(), executionFlow.getProjectName(), executionFlow.getWorkflowName(),
           executionFlow.getId(), executionFlow.getScheduleTime(), executionNode.getStatus());
 
       content += MessageFormat.format(CONTENT_NODE_FORMAT, executionNode.getName());

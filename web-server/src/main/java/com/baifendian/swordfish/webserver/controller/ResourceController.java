@@ -17,16 +17,18 @@ package com.baifendian.swordfish.webserver.controller;
 
 import com.baifendian.swordfish.dao.model.Resource;
 import com.baifendian.swordfish.dao.model.User;
+import com.baifendian.swordfish.webserver.dto.ResourceDto;
 import com.baifendian.swordfish.webserver.service.ResourceService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -49,19 +51,18 @@ public class ResourceController {
    * @param name
    * @param desc
    * @param file
-   * @param response
    */
   @PostMapping(value = "/{name:.+}")
-  public Resource createResource(@RequestAttribute(value = "session.user") User operator,
-                                 @PathVariable String projectName,
-                                 @PathVariable String name,
-                                 @RequestParam(value = "desc", required = false) String desc,
-                                 @RequestParam("file") MultipartFile file,
-                                 HttpServletResponse response) {
+  @ResponseStatus(HttpStatus.CREATED)
+  public ResourceDto createResource(@RequestAttribute(value = "session.user") User operator,
+                                    @PathVariable String projectName,
+                                    @PathVariable String name,
+                                    @RequestParam(value = "desc", required = false) String desc,
+                                    @RequestParam("file") MultipartFile file) {
     logger.info("Operator user {}, create resource, project name: {}, resource name: {}, desc: {}, file: [{},{}]",
         operator.getName(), projectName, name, desc, file.getName(), file.getOriginalFilename());
 
-    return resourceService.createResource(operator, projectName, name, desc, file, response);
+    return new ResourceDto(resourceService.createResource(operator, projectName, name, desc, file));
   }
 
   /**
@@ -72,20 +73,18 @@ public class ResourceController {
    * @param name
    * @param desc
    * @param file
-   * @param response
    * @return
    */
   @PutMapping(value = "/{name:.+}")
-  public Resource putResource(@RequestAttribute(value = "session.user") User operator,
-                              @PathVariable String projectName,
-                              @PathVariable String name,
-                              @RequestParam(value = "desc", required = false) String desc,
-                              @RequestParam("file") MultipartFile file,
-                              HttpServletResponse response) {
+  public ResourceDto putResource(@RequestAttribute(value = "session.user") User operator,
+                                 @PathVariable String projectName,
+                                 @PathVariable String name,
+                                 @RequestParam(value = "desc", required = false) String desc,
+                                 @RequestParam("file") MultipartFile file) {
     logger.info("Operator user {}, put resource, project name: {}, resource name: {}, desc: {}, file: [{},{}]",
         operator.getName(), projectName, name, desc, file.getName(), file.getOriginalFilename());
 
-    return resourceService.putResource(operator, projectName, name, desc, file, response);
+    return new ResourceDto(resourceService.putResource(operator, projectName, name, desc, file));
   }
 
   /**
@@ -96,19 +95,17 @@ public class ResourceController {
    * @param name
    * @param desc
    * @param file
-   * @param response
    */
   @PatchMapping(value = "/{name:.+}")
-  public Resource modifyResource(@RequestAttribute(value = "session.user") User operator,
-                                 @PathVariable String projectName,
-                                 @PathVariable String name,
-                                 @RequestParam(value = "desc", required = false) String desc,
-                                 @RequestParam(value = "file", required = false) MultipartFile file,
-                                 HttpServletResponse response) {
+  public ResourceDto modifyResource(@RequestAttribute(value = "session.user") User operator,
+                                    @PathVariable String projectName,
+                                    @PathVariable String name,
+                                    @RequestParam(value = "desc", required = false) String desc,
+                                    @RequestParam(value = "file", required = false) MultipartFile file) {
     logger.info("Operator user {}, modify resource, project name: {}, resource name: {}, desc: {}, file: [{},{}]",
         operator.getName(), projectName, name, desc, (file == null) ? null : file.getName(), (file == null) ? null : file.getOriginalFilename());
 
-    return resourceService.modifyResource(operator, projectName, name, desc, file, response);
+    return new ResourceDto(resourceService.modifyResource(operator, projectName, name, desc, file));
   }
 
   /**
@@ -117,17 +114,15 @@ public class ResourceController {
    * @param operator
    * @param projectName
    * @param name
-   * @param response
    */
   @DeleteMapping(value = "/{name:.+}")
   public void deleteResource(@RequestAttribute(value = "session.user") User operator,
                              @PathVariable String projectName,
-                             @PathVariable String name,
-                             HttpServletResponse response) {
+                             @PathVariable String name) {
     logger.info("Operator user {}, delete resource, project name: {}, resource name: {}",
         operator.getName(), projectName, name);
 
-    resourceService.deleteResource(operator, projectName, name, response);
+    resourceService.deleteResource(operator, projectName, name);
   }
 
   /**
@@ -135,16 +130,19 @@ public class ResourceController {
    *
    * @param operator
    * @param projectName
-   * @param response
    */
   @GetMapping(value = "")
-  public List<Resource> getResources(@RequestAttribute(value = "session.user") User operator,
-                                     @PathVariable String projectName,
-                                     HttpServletResponse response) {
+  public List<ResourceDto> getResources(@RequestAttribute(value = "session.user") User operator,
+                                        @PathVariable String projectName) {
     logger.info("Operator user {}, get resource list of project, project name: {}",
         operator.getName(), projectName);
 
-    return resourceService.getResources(operator, projectName, response);
+    List<Resource> resourceList = resourceService.getResources(operator, projectName);
+    List<ResourceDto> resourceDtoList = new ArrayList<>();
+    for (Resource resource : resourceList) {
+      resourceDtoList.add(new ResourceDto(resource));
+    }
+    return resourceDtoList;
   }
 
   /**
@@ -153,17 +151,15 @@ public class ResourceController {
    * @param operator
    * @param projectName
    * @param name
-   * @param response
    */
   @GetMapping(value = "/{name:.+}")
-  public Resource getResource(@RequestAttribute(value = "session.user") User operator,
-                              @PathVariable String projectName,
-                              @PathVariable String name,
-                              HttpServletResponse response) {
+  public ResourceDto getResource(@RequestAttribute(value = "session.user") User operator,
+                                 @PathVariable String projectName,
+                                 @PathVariable String name) {
     logger.info("Operator user {}, get resource detail, project name: {}, resource name: {}",
         operator.getName(), projectName, name);
 
-    return resourceService.getResource(operator, projectName, name, response);
+    return new ResourceDto(resourceService.getResource(operator, projectName, name));
   }
 
   /**
@@ -172,18 +168,16 @@ public class ResourceController {
    * @param operator
    * @param projectName
    * @param name
-   * @param response
    */
   @GetMapping(value = "/{name:.+}/file")
   @ResponseBody
   public ResponseEntity<org.springframework.core.io.Resource> downloadResource(@RequestAttribute(value = "session.user") User operator,
                                                                                @PathVariable String projectName,
-                                                                               @PathVariable String name,
-                                                                               HttpServletResponse response) {
+                                                                               @PathVariable String name) {
     logger.info("Operator user {}, download resource, project name: {}, resource name: {}",
         operator.getName(), projectName, name);
 
-    org.springframework.core.io.Resource file = resourceService.downloadResource(operator, projectName, name, response);
+    org.springframework.core.io.Resource file = resourceService.downloadResource(operator, projectName, name);
 
     if (file == null) {
       return ResponseEntity

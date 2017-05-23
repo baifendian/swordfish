@@ -15,37 +15,14 @@
  */
 package com.baifendian.swordfish.dao.enums;
 
-import com.fasterxml.jackson.annotation.JsonValue;
-
 /**
- * 描述一个 workflow和node的运行状态 <p>
+ * 描述一个 workflow 和 node 的运行状态 <p>
  */
 public enum FlowStatus {
   /**
    * 0(初始化) 1(调度依赖任务中) 2(调度依赖资源中) 3(正在运行) 4(运行成功) 5(kill掉) 6(运行失败) 7(依赖失败)
    **/
   INIT, WAITING_DEP, WAITING_RES, RUNNING, SUCCESS, KILL, FAILED, DEP_FAILED;
-
-  @JsonValue
-  public Integer getType() {
-    return ordinal();
-  }
-
-  /**
-   * 通过 type 获取枚举对象 <p>
-   *
-   * @return {@link FlowStatus}
-   */
-  public static FlowStatus valueOfType(Integer type) throws IllegalArgumentException {
-    if (type == null) {
-      return null;
-    }
-    try {
-      return FlowStatus.values()[type];
-    } catch (Exception ex) {
-      throw new IllegalArgumentException("Cannot convert " + type + " to " + FlowStatus.class.getSimpleName() + " .", ex);
-    }
-  }
 
   /**
    * 判断是否成功状态 <p>
@@ -72,5 +49,14 @@ public enum FlowStatus {
    */
   public boolean typeIsFinished() {
     return typeIsSuccess() || typeIsFailure();
+  }
+
+  /**
+   * 判断是否非终止状态
+   *
+   * @return
+   */
+  public boolean typeIsNotFinished() {
+    return !typeIsFinished();
   }
 }

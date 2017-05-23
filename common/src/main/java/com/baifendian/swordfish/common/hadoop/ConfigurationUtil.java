@@ -32,9 +32,9 @@ import java.util.Properties;
  */
 public class ConfigurationUtil {
   /**
-   * LOGGER
+   * logger
    */
-  private static final Logger LOGGER = LoggerFactory.getLogger(ConfigurationUtil.class);
+  private static final Logger logger = LoggerFactory.getLogger(ConfigurationUtil.class);
 
   /**
    * {@link Configuration}
@@ -53,7 +53,7 @@ public class ConfigurationUtil {
       is = new FileInputStream(dataSourceFile);
       PROPERTIES.load(is);
     } catch (IOException e) {
-      LOGGER.error(e.getMessage(), e);
+      logger.error(e.getMessage(), e);
     } finally {
       IOUtils.closeQuietly(is);
     }
@@ -65,6 +65,24 @@ public class ConfigurationUtil {
    * @return {@link Configuration}
    */
   public static Configuration getConfiguration() {
+    init();
+    return configuration;
+  }
+
+  /**
+   * 获取 web app 地址
+   *
+   * @return
+   */
+  public static String getWebappAddress() {
+    init();
+    return configuration.get("yarn.resourcemanager.webapp.address");
+  }
+
+  /**
+   * 初始化配置
+   */
+  private static void init() {
     if (configuration == null) {
       synchronized (ConfigurationUtil.class) {
         if (configuration == null) {
@@ -73,7 +91,6 @@ public class ConfigurationUtil {
         }
       }
     }
-    return configuration;
   }
 
   /**
@@ -86,6 +103,6 @@ public class ConfigurationUtil {
     configuration.set("yarn.resourcemanager.address", PROPERTIES.getProperty("yarn.resourcemanager.address"));
     configuration.set("yarn.resourcemanager.scheduler.address", PROPERTIES.getProperty("yarn.resourcemanager.scheduler.address"));
     configuration.set("mapreduce.jobhistory.address", PROPERTIES.getProperty("mapreduce.jobhistory.address"));
-
+    configuration.set("yarn.resourcemanager.webapp.address", PROPERTIES.getProperty("yarn.resourcemanager.webapp.address"));
   }
 }

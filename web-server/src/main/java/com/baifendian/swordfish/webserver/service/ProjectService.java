@@ -15,25 +15,30 @@
  */
 package com.baifendian.swordfish.webserver.service;
 
+import com.baifendian.swordfish.common.config.BaseConfig;
 import com.baifendian.swordfish.common.consts.Constants;
+import com.baifendian.swordfish.common.hadoop.HdfsClient;
 import com.baifendian.swordfish.common.utils.PermUtil;
 import com.baifendian.swordfish.dao.enums.UserRoleType;
-import com.baifendian.swordfish.dao.mapper.ProjectMapper;
-import com.baifendian.swordfish.dao.mapper.ProjectUserMapper;
-import com.baifendian.swordfish.dao.mapper.UserMapper;
+import com.baifendian.swordfish.dao.mapper.*;
 import com.baifendian.swordfish.dao.model.Project;
 import com.baifendian.swordfish.dao.model.ProjectUser;
 import com.baifendian.swordfish.dao.model.User;
-import org.apache.commons.httpclient.HttpStatus;
+import com.baifendian.swordfish.webserver.exception.*;
+import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.servlet.http.HttpServletResponse;
+import java.io.File;
 import java.util.Date;
 import java.util.List;
+
+import static com.baifendian.swordfish.webserver.utils.ParamVerify.verifyDesc;
+import static com.baifendian.swordfish.webserver.utils.ParamVerify.verifyProjectName;
 
 @Service
 public class ProjectService {
@@ -44,10 +49,22 @@ public class ProjectService {
   private UserMapper userMapper;
 
   @Autowired
+  private UserService userService;
+
+  @Autowired
   private ProjectMapper projectMapper;
 
   @Autowired
   private ProjectUserMapper projectUserMapper;
+
+  @Autowired
+  private ProjectFlowMapper projectFlowMapper;
+
+  @Autowired
+  private ResourceMapper resourceMapper;
+
+  @Autowired
+  private DataSourceMapper dataSourceMapper;
 
   /**
    * 创建一个项目
@@ -55,14 +72,16 @@ public class ProjectService {
    * @param operator
    * @param name
    * @param desc
-   * @param response
    * @return
    */
-  public Project createProject(User operator, String name, String desc, HttpServletResponse response) {
-    // 管理员不能创建项目
-    if (operator.getRole() == UserRoleType.ADMIN_USER) {
-      response.setStatus(HttpStatus.SC_UNAUTHORIZED);
-      return null;
+  public Project createProject(User operator, String name, String desc) {
+
+    verifyProjectName(name);
+    verifyDesc(desc);
+
+    //只有普通用户才可以创建项目
+    if (!userService.isGeneral(operator)) {
+      throw new PermissionException("User \"{0}\" is not general user", operator.getName());
     }
 
     Project project = new Project();
@@ -79,8 +98,7 @@ public class ProjectService {
       projectMapper.insert(project);
     } catch (DuplicateKeyException e) {
       logger.error("Project has exist, can't create again.", e);
-      response.setStatus(HttpStatus.SC_CONFLICT);
-      return null;
+      throw new ServerErrorException("Project has exist, can't create again.");
     }
 
     return project;
@@ -92,26 +110,27 @@ public class ProjectService {
    * @param operator
    * @param name
    * @param desc
-   * @param response
    * @return
    */
-  public Project modifyProject(User operator, String name, String desc, HttpServletResponse response) {
-    Project project = projectMapper.queryByName(name);
+  public Project modifyProject(User operator, String name, String desc) {
 
+    verifyDesc(desc);
+
+    Project project = projectMapper.queryByName(name);
     if (project == null) {
-      response.setStatus(HttpStatus.SC_NOT_MODIFIED);
-      return null;
+      logger.error("Project does not exist: {}", name);
+      throw new NotFoundException("Not found project \"{0}\"", name);
     }
 
-    // 需要是项目的 owner
-    if (operator.getId() != project.getOwnerId()) {
-      response.setStatus(HttpStatus.SC_UNAUTHORIZED);
-      return null;
+    // 只有项目 owner 才能操作
+    if (!isProjectOwner(operator.getId(), project)) {
+      logger.error("User {} owner for the project {}", operator.getName(), name);
+      throw new PermissionException("User \"{0}\" not owner for the project \"{1}\"", operator.getName(), project.getName());
     }
 
     Date now = new Date();
 
-    if(desc != null) {
+    if (desc != null) {
       project.setDesc(desc);
     }
 
@@ -120,8 +139,7 @@ public class ProjectService {
     int count = projectMapper.updateById(project);
 
     if (count <= 0) {
-      response.setStatus(HttpStatus.SC_NOT_MODIFIED);
-      return null;
+      throw new ServerErrorException("Not update count");
     }
 
     return project;
@@ -132,32 +150,49 @@ public class ProjectService {
    *
    * @param operator
    * @param name
-   * @param response
    */
-  public void deleteProject(User operator, String name, HttpServletResponse response) {
+  @Transactional(value = "TransactionManager")
+  public void deleteProject(User operator, String name) {
+
     Project project = projectMapper.queryByName(name);
-
     if (project == null) {
-      response.setStatus(HttpStatus.SC_NOT_MODIFIED);
-      return;
+      logger.error("Project does not exist: {}", name);
+      throw new NotFoundException("Not found project \"{0}\"", name);
     }
 
-    // 只有 管理员或 owner 能够删除
-    if (operator.getRole() != UserRoleType.ADMIN_USER && operator.getId() != project.getOwnerId()) {
-      response.setStatus(HttpStatus.SC_UNAUTHORIZED);
-      return;
+    // 只有管理员或者 owner 可以删除
+    if (operator.getId() != project.getOwnerId() && operator.getRole() != UserRoleType.ADMIN_USER) {
+      logger.error("User \"{}\" owner for the project \"{}\"", operator.getName(), name);
+      throw new PermissionException("User \"{0}\" not owner for the project \"{1}\"", operator.getName(), name);
     }
 
-    // TODO:: 需要判断项目下, 是否有 "工作流/资源/数据源" 存在
+    // 需要判断项目下, 是否有 "工作流/资源/数据源" 存在
+    int count;
 
-    // TODO:: 严格来说, 应该清理 Local/HDFS 上的相关目录
+    count = projectFlowMapper.countProjectFlows(project.getId());
+    if (count > 0) {
+      throw new PreFailedException("Project's workflow is not empty");
+    }
 
-    int count = projectMapper.deleteById(project.getId());
+    count = resourceMapper.countProjectRes(project.getId());
+    if (count > 0) {
+      throw new PreFailedException("Project's resource is not empty");
+    }
+
+    count = dataSourceMapper.countProjectDatasource(project.getId());
+    if (count > 0) {
+      throw new PreFailedException("Project's data source is not empty");
+    }
+
+    count = projectMapper.deleteById(project.getId());
 
     if (count <= 0) {
-      response.setStatus(HttpStatus.SC_NOT_MODIFIED);
-      return;
+      throw new ServerErrorException("Not delete count");
     }
+
+    // 应该清理 Local/HDFS 上的相关目录
+    HdfsClient.getInstance().delete(BaseConfig.getHdfsProjectDir(project.getId()), true);
+    FileUtils.deleteQuietly(new File(BaseConfig.getLocalProjectDir(project.getId())));
 
     return;
   }
@@ -166,10 +201,9 @@ public class ProjectService {
    * 查询项目列表
    *
    * @param operator
-   * @param response
    * @return
    */
-  public List<Project> queryProject(User operator, HttpServletResponse response) {
+  public List<Project> queryProject(User operator) {
     switch (operator.getRole()) {
       case ADMIN_USER:
         return projectMapper.queryAllProject();
@@ -187,45 +221,38 @@ public class ProjectService {
    * @param name
    * @param userName
    * @param perm
-   * @param response
    * @return
    */
-  public ProjectUser addProjectUser(User operator, String name, String userName, int perm, HttpServletResponse response) {
+  public ProjectUser addProjectUser(User operator, String name, String userName, int perm) {
+
+    // 不能添加自己
+    if (operator.getName().equals(name)) {
+      throw new BadRequestException("Can't add myself");
+    }
+
     Project project = projectMapper.queryByName(name);
-
-    // 不存在的项目名
     if (project == null) {
-      response.setStatus(HttpStatus.SC_NOT_MODIFIED);
-      return null;
+      logger.error("Project does not exist: {}", name);
+      throw new NotFoundException("Not found project \"{0}\"", name);
     }
 
-    // 操作用户不是项目的 owner
-    if (operator.getId() != project.getOwnerId()) {
-      response.setStatus(HttpStatus.SC_UNAUTHORIZED);
-      return null;
+    // 只有 owner 可以操作
+    if (!isProjectOwner(operator.getId(), project)) {
+      logger.error("User \"{}\" owner for the project \"{}\"", operator.getName(), project.getName());
+      throw new PermissionException("User \"{0}\" not owner for the project \"{1}\"", operator.getName(), project.getName());
     }
 
-    // 查询用户
     User user = userMapper.queryByName(userName);
-
-    // 增加的用户不存在
     if (user == null) {
-      response.setStatus(HttpStatus.SC_NOT_MODIFIED);
-      return null;
-    }
-
-    // 不能增加自己
-    if (operator.getId() == user.getId()) {
-      response.setStatus(HttpStatus.SC_NOT_MODIFIED);
-      return null;
+      logger.error("User {} not found", userName);
+      throw new NotFoundException("User \"{0}\" not found", userName);
     }
 
     ProjectUser projectUser = projectUserMapper.query(project.getId(), user.getId());
 
     // 增加用户已经存在
     if (projectUser != null) {
-      response.setStatus(HttpStatus.SC_NOT_MODIFIED);
-      return null;
+      throw new ServerErrorException("User has exist, can't add again.");
     }
 
     // 构建信息, 插入
@@ -252,47 +279,36 @@ public class ProjectService {
    * @param name
    * @param userName
    * @param perm
-   * @param response
    */
-  public ProjectUser modifyProjectUser(User operator, String name, String userName, int perm, HttpServletResponse response) {
+  public ProjectUser modifyProjectUser(User operator, String name, String userName, int perm) {
     Project project = projectMapper.queryByName(name);
-
-    // 不存在的项目名
     if (project == null) {
-      response.setStatus(HttpStatus.SC_NOT_MODIFIED);
-      return null;
+      logger.error("Project does not exist: {}", name);
+      throw new NotFoundException("Not found project \"{0}\"", name);
     }
 
-    // 操作用户不是项目的 owner
-    if (operator.getId() != project.getOwnerId()) {
-      response.setStatus(HttpStatus.SC_UNAUTHORIZED);
-      return null;
+    // 必须是项目owner
+    if (!isProjectOwner(operator.getId(), project)) {
+      logger.error("User \"{}\" owner for the project \"{}\"", operator.getName(), project.getName());
+      throw new PermissionException("User \"{0}\" not owner for the project \"{1}\"", operator.getName(), project.getName());
     }
 
-    // 查询用户
+    // 查询用户信息，如果查询不到抛出异常
     User user = userMapper.queryByName(userName);
-
-    // 增加的用户不存在
     if (user == null) {
-      response.setStatus(HttpStatus.SC_NOT_MODIFIED);
-      return null;
+      logger.error("User {} not found", userName);
+      throw new NotFoundException("User \"{0}\" not found", userName);
     }
 
     ProjectUser projectUser = projectUserMapper.query(project.getId(), user.getId());
-
-    // 修改的信息不存在
     if (projectUser == null) {
-      response.setStatus(HttpStatus.SC_NOT_MODIFIED);
-      return null;
+      throw new NotFoundException("Project \"{0}\" don't has user \"{1}\"", user.getName(), project.getName());
     }
 
     // 构建信息, 插入
-    projectUser = new ProjectUser();
     Date now = new Date();
 
-    projectUser.setProjectId(project.getId());
     projectUser.setProjectName(project.getName());
-    projectUser.setUserId(user.getId());
     projectUser.setUserName(userName);
     projectUser.setPerm(perm);
     projectUser.setModifyTime(now);
@@ -308,43 +324,36 @@ public class ProjectService {
    * @param operator
    * @param name
    * @param userName
-   * @param response
    */
-  public void deleteProjectUser(User operator, String name, String userName, HttpServletResponse response) {
-    // 查询项目
-    Project project = projectMapper.queryByName(name);
+  public void deleteProjectUser(User operator, String name, String userName) {
 
-    // 不存在的项目名
-    if (project == null) {
-      response.setStatus(HttpStatus.SC_NOT_MODIFIED);
-      return;
+    // 不能删除自己
+    if (operator.getName().equals(name)) {
+      throw new BadRequestException("Can't delete myself");
     }
 
-    // 操作用户不是项目的 owner
-    if (operator.getId() != project.getOwnerId()) {
-      response.setStatus(HttpStatus.SC_UNAUTHORIZED);
-      return;
+    Project project = projectMapper.queryByName(name);
+    if (project == null) {
+      logger.error("Project does not exist: {}", name);
+      throw new NotFoundException("Not found project \"{0}\"", name);
+    }
+
+    // 必须是项目owner
+    if (!isProjectOwner(operator.getId(), project)) {
+      logger.error("User \"{}\" owner for the project \"{}\"", operator.getName(), project.getName());
+      throw new PermissionException("User \"{0}\" not owner for the project \"{1}\"", operator.getName(), project.getName());
     }
 
     User user = userMapper.queryByName(userName);
-
-    // 删除的用户不存在
     if (user == null) {
-      response.setStatus(HttpStatus.SC_NOT_MODIFIED);
-      return;
-    }
-
-    // 不能删除自己
-    if (operator.getId() == user.getId()) {
-      response.setStatus(HttpStatus.SC_NOT_MODIFIED);
-      return;
+      logger.error("User {} not found", userName);
+      throw new NotFoundException("User \"{0}\" not found", userName);
     }
 
     int count = projectUserMapper.delete(project.getId(), user.getId());
 
     if (count <= 0) {
-      response.setStatus(HttpStatus.SC_NOT_MODIFIED);
-      return;
+      throw new ServerErrorException("Not delete count");
     }
 
     return;
@@ -355,23 +364,20 @@ public class ProjectService {
    *
    * @param operator
    * @param name
-   * @param response
    * @return
    */
-  public List<ProjectUser> queryUser(User operator, String name, HttpServletResponse response) {
-    // 查询项目
+  public List<ProjectUser> queryUser(User operator, String name) {
     Project project = projectMapper.queryByName(name);
 
-    // 不存在的项目名
     if (project == null) {
-      response.setStatus(HttpStatus.SC_NOT_MODIFIED);
-      return null;
+      logger.error("Project does not exist: {}", name);
+      throw new NotFoundException("Not found project \"{0}\"", name);
     }
 
-    // 操作用户不是项目的 owner
-    if (operator.getId() != project.getOwnerId()) {
-      response.setStatus(HttpStatus.SC_UNAUTHORIZED);
-      return null;
+    // 只有 owner 可以操作
+    if (!isProjectOwner(operator.getId(), project)) {
+      logger.error("User \"{}\" owner for the project \"{}\"", operator.getName(), project.getName());
+      throw new PermissionException("User \"{0}\" not owner for the project \"{1}\"", operator.getName(), project.getName());
     }
 
     return projectUserMapper.queryByProject(project.getId());
@@ -399,7 +405,18 @@ public class ProjectService {
   }
 
   /**
-   * 是否具备写权限
+   * 判断一个用户师傅是项目owner
+   *
+   * @param userId
+   * @param project
+   * @return
+   */
+  public boolean isProjectOwner(int userId, Project project) {
+    return userId == project.getOwnerId();
+  }
+
+  /**
+   * 判断一个用户是否有project 写权限
    *
    * @param userId
    * @param project
@@ -410,7 +427,7 @@ public class ProjectService {
   }
 
   /**
-   * 是否具备读权限
+   * 判断一个用户是否有project 读权限
    *
    * @param userId
    * @param project
@@ -421,7 +438,7 @@ public class ProjectService {
   }
 
   /**
-   * 是否具备执行权限
+   * 是否有项目执行权限
    *
    * @param userId
    * @param project
@@ -430,4 +447,6 @@ public class ProjectService {
   public boolean hasExecPerm(int userId, Project project) {
     return PermUtil.hasExecPerm(queryPerm(userId, project));
   }
+
+
 }

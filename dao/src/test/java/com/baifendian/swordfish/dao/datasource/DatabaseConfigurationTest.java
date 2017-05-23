@@ -17,7 +17,6 @@ package com.baifendian.swordfish.dao.datasource;
 
 import com.baifendian.swordfish.dao.mapper.SessionMapper;
 import com.baifendian.swordfish.dao.model.Session;
-
 import org.apache.ibatis.session.SqlSession;
 import org.junit.BeforeClass;
 import org.junit.Test;

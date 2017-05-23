@@ -21,30 +21,4 @@ public enum FailurePolicyType {
    * 0.结束  1.继续
    **/
   END, CONTINUE;
-
-  /**
-   * getter method
-   *
-   * @return the type
-   * @see FailurePolicyType
-   */
-  public Integer getType() {
-    return ordinal();
-  }
-
-  /**
-   * 通过 type 获取枚举对象 <p>
-   *
-   * @return {@link FailurePolicyType}
-   */
-  public static FailurePolicyType valueOfType(Integer type) throws IllegalArgumentException {
-    if (type == null) {
-      return null;
-    }
-    try {
-      return FailurePolicyType.values()[type];
-    } catch (Exception ex) {
-      throw new IllegalArgumentException("Cannot convert " + type + " to " + FailurePolicyType.class.getSimpleName() + " .", ex);
-    }
-  }
 }

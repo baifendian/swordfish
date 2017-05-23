@@ -15,8 +15,6 @@
  */
 package com.baifendian.swordfish.dao.enums;
 
-import org.apache.commons.lang.StringUtils;
-
 public enum DepPolicyType {
 
   /**
@@ -24,50 +22,4 @@ public enum DepPolicyType {
    * 1.自动依赖等待上一周期结束才能继续
    **/
   NO_DEP_PRE, DEP_PRE;
-
-  /**
-   * getter method
-   *
-   * @return the type
-   * @see DepPolicyType
-   */
-  public Integer getType() {
-    return ordinal();
-  }
-
-  /**
-   * 通过 type 获取枚举对象 <p>
-   *
-   * @return {@link DepPolicyType}
-   */
-  public static DepPolicyType valueOfType(Integer type) throws IllegalArgumentException {
-    if (type == null) {
-      return null;
-    }
-
-    try {
-      return DepPolicyType.values()[type];
-    } catch (Exception ex) {
-      throw new IllegalArgumentException("Cannot convert " + type + " to " + DepPolicyType.class.getSimpleName() + " .", ex);
-    }
-  }
-
-  /**
-   * 返回依赖策略类型
-   *
-   * @param type
-   * @return
-   * @throws IllegalArgumentException
-   */
-  public static DepPolicyType valueOfType(String type) throws IllegalArgumentException {
-    if (StringUtils.isEmpty(type)) {
-      return null;
-    }
-
-    try {
-      return DepPolicyType.valueOf(type.toUpperCase());
-    } catch (Exception ex) {
-      throw new IllegalArgumentException("Cannot convert " + type + " to " + DepPolicyType.class.getSimpleName() + " .", ex);
-    }
-  }
 }

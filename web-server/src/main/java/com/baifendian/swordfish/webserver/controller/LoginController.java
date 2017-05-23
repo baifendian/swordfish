@@ -17,7 +17,9 @@ package com.baifendian.swordfish.webserver.controller;
 
 import com.baifendian.swordfish.common.utils.http.HttpUtil;
 import com.baifendian.swordfish.dao.model.User;
-import com.baifendian.swordfish.webserver.dto.UserSessionData;
+import com.baifendian.swordfish.webserver.dto.UserSessionDto;
+import com.baifendian.swordfish.webserver.exception.ParameterException;
+import com.baifendian.swordfish.webserver.exception.UnAuthorizedException;
 import com.baifendian.swordfish.webserver.service.SessionService;
 import com.baifendian.swordfish.webserver.service.UserService;
 import org.apache.commons.httpclient.HttpStatus;
@@ -58,46 +60,41 @@ public class LoginController {
    * @return
    */
   @RequestMapping(value = "", method = {RequestMethod.POST, RequestMethod.GET})
-  public UserSessionData login(@RequestParam(value = "name", required = false) String name,
-                               @RequestParam(value = "email", required = false) String email,
-                               @RequestParam(value = "password") String password,
-                               HttpServletRequest request,
-                               HttpServletResponse response) {
+  public UserSessionDto login(@RequestParam(value = "name", required = false) String name,
+                              @RequestParam(value = "email", required = false) String email,
+                              @RequestParam(value = "password") String password,
+                              HttpServletRequest request,
+                              HttpServletResponse response) {
     logger.info("Login, user name: {}, email: {}, password: {}", name, email, "******");
 
     // 必须存在一个
     if (StringUtils.isEmpty(name) && StringUtils.isEmpty(email)) {
-      response.setStatus(HttpStatus.SC_BAD_REQUEST);
-      return null;
+      throw new ParameterException("name or email");
     }
 
     // 且必须存在一个
     if (StringUtils.isNotEmpty(name) && StringUtils.isNotEmpty(email)) {
-      response.setStatus(HttpStatus.SC_BAD_REQUEST);
-      return null;
+      throw new ParameterException("name or email");
     }
 
     // 得到用户 ip 信息
     String ip = HttpUtil.getClientIpAddress(request);
     if (StringUtils.isEmpty(ip)) {
-      response.setStatus(HttpStatus.SC_BAD_REQUEST);
-      return null;
+      throw new ParameterException("ip");
     }
 
     // 验证用户名和密码是否正确
     User user = userService.queryUser(name, email, password);
 
     if (user == null) {
-      response.setStatus(HttpStatus.SC_UNAUTHORIZED);
-      return null;
+      throw new UnAuthorizedException("User password error");
     }
 
     // 创建 session
-    UserSessionData data = sessionService.createSession(user, ip);
+    UserSessionDto data = sessionService.createSession(user, ip);
 
     if (data == null) {
-      response.setStatus(HttpStatus.SC_UNAUTHORIZED);
-      return null;
+      throw new UnAuthorizedException("Create session error");
     }
 
     response.setStatus(HttpStatus.SC_OK);

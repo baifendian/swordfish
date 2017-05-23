@@ -17,7 +17,6 @@ package com.baifendian.swordfish.dao.mapper;
 
 import com.baifendian.swordfish.dao.enums.FlowStatus;
 import com.baifendian.swordfish.dao.model.ExecutionNode;
-
 import org.apache.ibatis.annotations.*;
 import org.apache.ibatis.type.EnumOrdinalTypeHandler;
 import org.apache.ibatis.type.JdbcType;
@@ -25,10 +24,6 @@ import org.apache.ibatis.type.JdbcType;
 import java.util.Date;
 import java.util.List;
 
-/**
- * workflow 执行的节点信息操作 <p>
- *
- */
 public interface ExecutionNodeMapper {
 
   /**
@@ -65,6 +60,11 @@ public interface ExecutionNodeMapper {
   @SelectProvider(type = ExecutionNodeMapperProvider.class, method = "selectExecNode")
   ExecutionNode selectExecNode(@Param("execId") Long execId, @Param("name") String name);
 
+  /**
+   * 查询某个exec下所有的node信息
+   * @param execId
+   * @return
+   */
   @Results(value = {
           @Result(property = "execId", column = "exec_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
           @Result(property = "name", column = "name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
@@ -77,6 +77,15 @@ public interface ExecutionNodeMapper {
   })
   @SelectProvider(type = ExecutionNodeMapperProvider.class, method = "selectExecNodeById")
   List<ExecutionNode> selectExecNodeById(@Param("execId") int execId);
+
+  /**
+   * 删除执行的所有结点
+   *
+   * @param execId
+   * @return
+   */
+  @DeleteProvider(type = ExecutionNodeMapperProvider.class, method = "deleteExecutionNodes")
+  int deleteExecutionNodes(@Param("execId") Integer execId);
 
   /**
    * 根据jobId查询
@@ -95,7 +104,4 @@ public interface ExecutionNodeMapper {
   })
   @SelectProvider(type = ExecutionNodeMapperProvider.class, method = "selectExecNodeByJobId")
   ExecutionNode selectExecNodeByJobId(@Param("jobId") String jobId);
-
-  @DeleteProvider(type = ExecutionNodeMapperProvider.class, method = "deleteByExecId")
-  int deleteByExecId(@Param("execId") Long execId);
 }

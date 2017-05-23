@@ -25,8 +25,12 @@ import com.baifendian.swordfish.dao.model.ProjectFlow;
 import com.baifendian.swordfish.dao.model.Schedule;
 import com.baifendian.swordfish.dao.model.User;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
+import com.baifendian.swordfish.mock.MockDataService;
 import com.baifendian.swordfish.webserver.RestfulApiApplication;
-import com.baifendian.swordfish.webserver.service.mock.MockDataService;
+import com.baifendian.swordfish.webserver.dto.ScheduleParam;
+import com.baifendian.swordfish.webserver.exception.NotFoundException;
+import com.baifendian.swordfish.webserver.exception.PermissionException;
+import com.baifendian.swordfish.webserver.exception.ServerErrorException;
 import org.apache.http.HttpStatus;
 import org.junit.Before;
 import org.junit.Test;
@@ -79,7 +83,7 @@ public class ScheduleServiceTest {
       //正常创建一个调度
       ProjectFlow projectFlow = mockDataService.mocProjectFlow(project,user);
       Date now = new Date();
-      Schedule.ScheduleParam scheduleParam = new Schedule.ScheduleParam();
+      ScheduleParam scheduleParam = new ScheduleParam();
       scheduleParam.setStartDate(now);
       scheduleParam.setEndDate(now);
       scheduleParam.setCrontab("0 8 * * * * ?");
@@ -92,7 +96,7 @@ public class ScheduleServiceTest {
       DepPolicyType depPolicyType = DepPolicyType.NO_DEP_PRE;
       Integer timeout = 3600;
       MockHttpServletResponse mockHttpServletRespon = new MockHttpServletResponse();
-      Schedule scheduleObj = scheduleService.createSchedule(user,project.getName(),projectFlow.getName(),schedule,notifyType,notifyMails,maxTryTimes,failurePolicyType,depWorkflows,depPolicyType,timeout,mockHttpServletRespon);
+      Schedule scheduleObj = scheduleService.createSchedule(user,project.getName(),projectFlow.getName(),schedule,notifyType,notifyMails,maxTryTimes,failurePolicyType,depWorkflows,depPolicyType,timeout);
       assertEquals(mockHttpServletRespon.getStatus(), HttpStatus.SC_OK);
       assertTrue(scheduleObj!=null);
       logger.info(JsonUtil.toJsonString(scheduleObj));
@@ -100,7 +104,7 @@ public class ScheduleServiceTest {
     {
       //创建一个不存在的projectFlow的调度
       Date now = new Date();
-      Schedule.ScheduleParam scheduleParam = new Schedule.ScheduleParam();
+      ScheduleParam scheduleParam = new ScheduleParam();
       scheduleParam.setStartDate(now);
       scheduleParam.setEndDate(now);
       scheduleParam.setCrontab("0 8 * * * * ?");
@@ -112,17 +116,20 @@ public class ScheduleServiceTest {
       String depWorkflows = JsonUtil.toJsonString(Arrays.asList(new Schedule.DepWorkflow[]{new Schedule.DepWorkflow(project.getName(),mockDataService.getRandomString())}));
       DepPolicyType depPolicyType = DepPolicyType.NO_DEP_PRE;
       Integer timeout = 3600;
-      MockHttpServletResponse mockHttpServletRespon = new MockHttpServletResponse();
-      Schedule scheduleObj = scheduleService.createSchedule(user,project.getName(),mockDataService.getRandomString(),schedule,notifyType,notifyMails,maxTryTimes,failurePolicyType,depWorkflows,depPolicyType,timeout,mockHttpServletRespon);
-      assertEquals(mockHttpServletRespon.getStatus(), HttpStatus.SC_NOT_MODIFIED);
-      assertEquals(scheduleObj,null);
+      boolean thrown = false;
+      try{
+        scheduleService.createSchedule(user,project.getName(),mockDataService.getRandomString(),schedule,notifyType,notifyMails,maxTryTimes,failurePolicyType,depWorkflows,depPolicyType,timeout);
+      }catch (ServerErrorException e){
+        thrown = true;
+      }
+      assertTrue(thrown);
     }
     {
       //创建一个已经存在的调度
       ProjectFlow projectFlow = mockDataService.mocProjectFlow(project,user);
       mockDataService.mockSchedule(project.getName(),projectFlow.getId(),user.getId());
       Date now = new Date();
-      Schedule.ScheduleParam scheduleParam = new Schedule.ScheduleParam();
+      ScheduleParam scheduleParam = new ScheduleParam();
       scheduleParam.setStartDate(now);
       scheduleParam.setEndDate(now);
       scheduleParam.setCrontab("0 8 * * * * ?");
@@ -134,10 +141,13 @@ public class ScheduleServiceTest {
       String depWorkflows = JsonUtil.toJsonString(Arrays.asList(new Schedule.DepWorkflow[]{new Schedule.DepWorkflow(project.getName(),mockDataService.getRandomString())}));
       DepPolicyType depPolicyType = DepPolicyType.NO_DEP_PRE;
       Integer timeout = 3600;
-      MockHttpServletResponse mockHttpServletRespon = new MockHttpServletResponse();
-      Schedule scheduleObj = scheduleService.createSchedule(user,project.getName(),projectFlow.getName(),schedule,notifyType,notifyMails,maxTryTimes,failurePolicyType,depWorkflows,depPolicyType,timeout,mockHttpServletRespon);
-      assertEquals(mockHttpServletRespon.getStatus(), HttpStatus.SC_CONFLICT);
-      assertEquals(scheduleObj,null);
+      boolean thrown = false;
+      try{
+        scheduleService.createSchedule(user,project.getName(),projectFlow.getName(),schedule,notifyType,notifyMails,maxTryTimes,failurePolicyType,depWorkflows,depPolicyType,timeout);
+      }catch (ServerErrorException e){
+        thrown = true;
+      }
+      assertTrue(thrown);
     }
     {
       //无权限创建一个调度
@@ -145,7 +155,7 @@ public class ScheduleServiceTest {
       mockDataService.createProjectUser(project.getId(),user1.getId(), Constants.PROJECT_USER_PERM_READ);
       ProjectFlow projectFlow = mockDataService.mocProjectFlow(project,user);
       Date now = new Date();
-      Schedule.ScheduleParam scheduleParam = new Schedule.ScheduleParam();
+      ScheduleParam scheduleParam = new ScheduleParam();
       scheduleParam.setStartDate(now);
       scheduleParam.setEndDate(now);
       scheduleParam.setCrontab("0 8 * * * * ?");
@@ -157,10 +167,13 @@ public class ScheduleServiceTest {
       String depWorkflows = JsonUtil.toJsonString(Arrays.asList(new Schedule.DepWorkflow[]{new Schedule.DepWorkflow(project.getName(),mockDataService.getRandomString())}));
       DepPolicyType depPolicyType = DepPolicyType.NO_DEP_PRE;
       Integer timeout = 3600;
-      MockHttpServletResponse mockHttpServletRespon = new MockHttpServletResponse();
-      Schedule scheduleObj = scheduleService.createSchedule(user1,project.getName(),projectFlow.getName(),schedule,notifyType,notifyMails,maxTryTimes,failurePolicyType,depWorkflows,depPolicyType,timeout,mockHttpServletRespon);
-      assertEquals(mockHttpServletRespon.getStatus(), HttpStatus.SC_UNAUTHORIZED);
-      assertEquals(scheduleObj,null);
+      boolean thrown = false;
+      try{
+        Schedule scheduleObj = scheduleService.createSchedule(user1,project.getName(),projectFlow.getName(),schedule,notifyType,notifyMails,maxTryTimes,failurePolicyType,depWorkflows,depPolicyType,timeout);
+      }catch (PermissionException e){
+        thrown = true;
+      }
+      assertTrue(thrown);
     }
   }
 
@@ -169,13 +182,15 @@ public class ScheduleServiceTest {
     {
       //正常修改一个调度
       ProjectFlow projectFlow = mockDataService.mocProjectFlow(project,user);
-      mockDataService.mockSchedule(project.getName(),projectFlow.getId(),user.getId());
+      Schedule schedule = mockDataService.mockSchedule(project.getName(),projectFlow.getId(),user.getId());
       Date now = new Date();
-      Schedule.ScheduleParam scheduleParam = new Schedule.ScheduleParam();
+      ScheduleParam scheduleParam = new ScheduleParam();
       scheduleParam.setStartDate(now);
       scheduleParam.setEndDate(now);
       scheduleParam.setCrontab("0 8 * * * * ?");
-      String schedule = JsonUtil.toJsonString(scheduleParam);
+      String scheduleStr = JsonUtil.toJsonString(scheduleParam);
+      schedule.setStartDate(scheduleParam.getStartDate());
+      schedule.setEndDate(scheduleParam.getEndDate());
       NotifyType notifyType = NotifyType.FAILURE;
       String notifyMails = JsonUtil.toJsonString(Arrays.asList(new String[]{"ABC@baifendian.com"}));
       Integer maxTryTimes = 2;
@@ -184,15 +199,13 @@ public class ScheduleServiceTest {
       DepPolicyType depPolicyType = DepPolicyType.NO_DEP_PRE;
       ScheduleStatus scheduleStatus = ScheduleStatus.ONLINE;
       Integer timeout = 3600;
-      MockHttpServletResponse mockHttpServletRespon = new MockHttpServletResponse();
-      Schedule scheduleObj = scheduleService.patchSchedule(user,project.getName(),projectFlow.getName(),schedule,notifyType,notifyMails,maxTryTimes,failurePolicyType,depWorkflows,depPolicyType,timeout,scheduleStatus,mockHttpServletRespon);
-      assertEquals(mockHttpServletRespon.getStatus(), HttpStatus.SC_OK);
+      Schedule scheduleObj = scheduleService.patchSchedule(user,project.getName(),projectFlow.getName(),scheduleStr,notifyType,notifyMails,maxTryTimes,failurePolicyType,depWorkflows,depPolicyType,timeout,scheduleStatus);
       assertTrue(scheduleObj!=null);
     }
     {
       //修改一个不存在的调度
       Date now = new Date();
-      Schedule.ScheduleParam scheduleParam = new Schedule.ScheduleParam();
+      ScheduleParam scheduleParam = new ScheduleParam();
       scheduleParam.setStartDate(now);
       scheduleParam.setEndDate(now);
       scheduleParam.setCrontab("0 8 * * * * ?");
@@ -205,10 +218,13 @@ public class ScheduleServiceTest {
       DepPolicyType depPolicyType = DepPolicyType.NO_DEP_PRE;
       ScheduleStatus scheduleStatus = ScheduleStatus.ONLINE;
       Integer timeout = 3600;
-      MockHttpServletResponse mockHttpServletRespon = new MockHttpServletResponse();
-      Schedule scheduleObj = scheduleService.patchSchedule(user,project.getName(),mockDataService.getRandomString(),schedule,notifyType,notifyMails,maxTryTimes,failurePolicyType,depWorkflows,depPolicyType,timeout,scheduleStatus,mockHttpServletRespon);
-      assertEquals(mockHttpServletRespon.getStatus(), HttpStatus.SC_NOT_MODIFIED);
-      assertEquals(scheduleObj,null);
+      boolean thrown = false;
+      try{
+        Schedule scheduleObj = scheduleService.patchSchedule(user,project.getName(),mockDataService.getRandomString(),schedule,notifyType,notifyMails,maxTryTimes,failurePolicyType,depWorkflows,depPolicyType,timeout,scheduleStatus);
+      }catch (NotFoundException e){
+        thrown = true;
+      }
+      assertTrue(thrown);
     }
     {
       //无权限修改
@@ -217,7 +233,7 @@ public class ScheduleServiceTest {
       User user1 = mockDataService.createGeneralUser();
       mockDataService.createProjectUser(project.getId(),user1.getId(), Constants.PROJECT_USER_PERM_READ);
       Date now = new Date();
-      Schedule.ScheduleParam scheduleParam = new Schedule.ScheduleParam();
+      ScheduleParam scheduleParam = new ScheduleParam();
       scheduleParam.setStartDate(now);
       scheduleParam.setEndDate(now);
       scheduleParam.setCrontab("0 8 * * * * ?");
@@ -230,10 +246,13 @@ public class ScheduleServiceTest {
       DepPolicyType depPolicyType = DepPolicyType.NO_DEP_PRE;
       ScheduleStatus scheduleStatus = ScheduleStatus.ONLINE;
       Integer timeout = 3600;
-      MockHttpServletResponse mockHttpServletRespon = new MockHttpServletResponse();
-      Schedule scheduleObj = scheduleService.patchSchedule(user1,project.getName(),projectFlow.getName(),schedule,notifyType,notifyMails,maxTryTimes,failurePolicyType,depWorkflows,depPolicyType,timeout,scheduleStatus,mockHttpServletRespon);
-      assertEquals(mockHttpServletRespon.getStatus(), HttpStatus.SC_UNAUTHORIZED);
-      assertEquals(scheduleObj,null);
+      boolean thrown = false;
+      try{
+        Schedule scheduleObj = scheduleService.patchSchedule(user1,project.getName(),projectFlow.getName(),schedule,notifyType,notifyMails,maxTryTimes,failurePolicyType,depWorkflows,depPolicyType,timeout,scheduleStatus);
+      }catch (PermissionException e){
+        thrown = true;
+      }
+      assertTrue(thrown);
     }
   }
 
@@ -244,7 +263,7 @@ public class ScheduleServiceTest {
       ProjectFlow projectFlow = mockDataService.mocProjectFlow(project,user);
       mockDataService.mockSchedule(project.getName(),projectFlow.getId(),user.getId());
       Date now = new Date();
-      Schedule.ScheduleParam scheduleParam = new Schedule.ScheduleParam();
+      ScheduleParam scheduleParam = new ScheduleParam();
       scheduleParam.setStartDate(now);
       scheduleParam.setEndDate(now);
       scheduleParam.setCrontab("0 8 * * * * ?");
@@ -256,16 +275,14 @@ public class ScheduleServiceTest {
       String depWorkflows = JsonUtil.toJsonString(Arrays.asList(new Schedule.DepWorkflow[]{new Schedule.DepWorkflow(project.getName(),mockDataService.getRandomString())}));
       DepPolicyType depPolicyType = DepPolicyType.NO_DEP_PRE;
       Integer timeout = 3600;
-      MockHttpServletResponse mockHttpServletRespon = new MockHttpServletResponse();
-      Schedule scheduleObj = scheduleService.putSchedule(user,project.getName(),projectFlow.getName(),schedule,notifyType,notifyMails,maxTryTimes,failurePolicyType,depWorkflows,depPolicyType,timeout,mockHttpServletRespon);
-      assertEquals(mockHttpServletRespon.getStatus(), HttpStatus.SC_OK);
+      Schedule scheduleObj = scheduleService.putSchedule(user,project.getName(),projectFlow.getName(),schedule,notifyType,notifyMails,maxTryTimes,failurePolicyType,depWorkflows,depPolicyType,timeout);
       assertTrue(scheduleObj!=null);
     }
     {
       //修改一个不存在的调度
       ProjectFlow projectFlow = mockDataService.mocProjectFlow(project,user);
       Date now = new Date();
-      Schedule.ScheduleParam scheduleParam = new Schedule.ScheduleParam();
+      ScheduleParam scheduleParam = new ScheduleParam();
       scheduleParam.setStartDate(now);
       scheduleParam.setEndDate(now);
       scheduleParam.setCrontab("0 8 * * * * ?");
@@ -277,9 +294,7 @@ public class ScheduleServiceTest {
       String depWorkflows = JsonUtil.toJsonString(Arrays.asList(new Schedule.DepWorkflow[]{new Schedule.DepWorkflow(project.getName(),mockDataService.getRandomString())}));
       DepPolicyType depPolicyType = DepPolicyType.NO_DEP_PRE;
       Integer timeout = 3600;
-      MockHttpServletResponse mockHttpServletRespon = new MockHttpServletResponse();
-      Schedule scheduleObj = scheduleService.putSchedule(user,project.getName(),projectFlow.getName(),schedule,notifyType,notifyMails,maxTryTimes,failurePolicyType,depWorkflows,depPolicyType,timeout,mockHttpServletRespon);
-      assertEquals(mockHttpServletRespon.getStatus(), HttpStatus.SC_OK);
+      Schedule scheduleObj = scheduleService.putSchedule(user,project.getName(),projectFlow.getName(),schedule,notifyType,notifyMails,maxTryTimes,failurePolicyType,depWorkflows,depPolicyType,timeout);
       assertTrue(scheduleObj!=null);
     }
   }
@@ -291,7 +306,7 @@ public class ScheduleServiceTest {
       ProjectFlow projectFlow = mockDataService.mocProjectFlow(project,user);
       mockDataService.mockSchedule(project.getName(),projectFlow.getId(),user.getId());
       MockHttpServletResponse mockHttpServletRespon = new MockHttpServletResponse();
-      Schedule schedule = scheduleService.querySchedule(user,project.getName(),projectFlow.getName(),mockHttpServletRespon);
+      Schedule schedule = scheduleService.querySchedule(user,project.getName(),projectFlow.getName());
       assertEquals(mockHttpServletRespon.getStatus(), HttpStatus.SC_OK);
       assertTrue(schedule!=null);
     }

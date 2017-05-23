@@ -16,39 +16,25 @@
 package com.baifendian.swordfish.dao.mapper;
 
 import com.baifendian.swordfish.dao.enums.FlowStatus;
-import com.baifendian.swordfish.dao.enums.FlowType;
 import com.baifendian.swordfish.dao.mapper.utils.EnumFieldUtil;
 import com.baifendian.swordfish.dao.model.ExecutionNode;
-
-import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.jdbc.SQL;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
-/**
- * workflow 执行的节点信息操作 <p>
- *
- * @author : wenting.wang
- * @date : 2016年8月30日
- */
 public class ExecutionNodeMapperProvider {
 
   public static final String TABLE_NAME = "execution_nodes";
 
-  List<Integer> flowTypes = new ArrayList<>();
-
-  public ExecutionNodeMapperProvider() {
-    flowTypes.add(FlowType.LONG.getType());
-    flowTypes.add(FlowType.SHORT.getType());
-    flowTypes.add(FlowType.ETL.getType());
-  }
-
+  /**
+   * @param parameter
+   * @return
+   */
   public String insert(Map<String, Object> parameter) {
     return new SQL() {
       {
         INSERT_INTO(TABLE_NAME);
+
         VALUES("exec_id", "#{executionNode.execId}");
         VALUES("name", "#{executionNode.name}");
         VALUES("start_time", "#{executionNode.startTime}");
@@ -61,11 +47,16 @@ public class ExecutionNodeMapperProvider {
     }.toString();
   }
 
+  /**
+   * @param parameter
+   * @return
+   */
   public String update(Map<String, Object> parameter) {
     ExecutionNode executionNode = (ExecutionNode) parameter.get("executionNode");
     return new SQL() {
       {
         UPDATE(TABLE_NAME);
+
         if (executionNode.getAttempt() != null) {
           SET("attempt = #{executionNode.attempt}");
         }
@@ -78,62 +69,76 @@ public class ExecutionNodeMapperProvider {
         if (executionNode.getLogLinks() != null) {
           SET("log_links = #{executionNode.logLinks}");
         }
+
         WHERE("exec_id = #{executionNode.execId}");
         WHERE("name = #{executionNode.name}");
       }
     }.toString();
   }
 
-
+  /**
+   * @param parameter
+   * @return
+   */
   public String selectExecNode(Map<String, Object> parameter) {
     return new SQL() {
       {
         SELECT("*");
+
         FROM(TABLE_NAME);
+
         WHERE("exec_id = #{execId}");
         WHERE("name = #{name}");
       }
     }.toString();
   }
 
-  public String selectExecNodeById(Map<String, Object> parameter){
+  /**
+   * @param parameter
+   * @return
+   */
+  public String selectExecNodeById(Map<String, Object> parameter) {
     return new SQL() {
       {
         SELECT("*");
+
         FROM(TABLE_NAME);
+
         WHERE("exec_id = #{execId}");
       }
     }.toString();
   }
 
-  public String selectExecNodeByJobId(Map<String, Object> parameter){
+  /**
+   * @param parameter
+   * @return
+   */
+  public String selectExecNodeByJobId(Map<String, Object> parameter) {
     return new SQL() {
       {
         SELECT("*");
+
         FROM(TABLE_NAME);
+
         WHERE("job_id = #{jobId}");
       }
     }.toString();
   }
 
-  public String selectStatusByFlowId(Map<String, Object> parameter) {
-    return new SQL() {
-      {
-        SELECT("flow_id, node_id, status, attempt");
-        FROM(TABLE_NAME);
-        WHERE("exec_id = #{execId}");
-        WHERE("flow_id = #{flowId}");
-      }
-    }.toString();
-  }
 
-  public String deleteByExecId(Map<String, Object> parameter) {
+  /**
+   * 删除结点
+   *
+   * @param parameter
+   * @return
+   */
+  public String deleteExecutionNodes(Map<String, Object> parameter) {
     return new SQL() {
       {
         DELETE_FROM(TABLE_NAME);
+
         WHERE("exec_id = #{execId}");
       }
     }.toString();
   }
-
 }

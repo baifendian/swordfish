@@ -18,10 +18,10 @@ package com.baifendian.swordfish.masterserver.master;
 import com.baifendian.swordfish.dao.FlowDao;
 import com.baifendian.swordfish.dao.enums.FlowStatus;
 import com.baifendian.swordfish.dao.model.ExecutionFlow;
-import com.baifendian.swordfish.masterserver.ExecutorClient;
-import com.baifendian.swordfish.masterserver.ExecutorServerInfo;
-import com.baifendian.swordfish.masterserver.ExecutorServerManager;
 import com.baifendian.swordfish.masterserver.config.MasterConfig;
+import com.baifendian.swordfish.masterserver.exec.ExecutorClient;
+import com.baifendian.swordfish.masterserver.exec.ExecutorServerInfo;
+import com.baifendian.swordfish.masterserver.exec.ExecutorServerManager;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.thrift.TException;
 import org.slf4j.Logger;
@@ -35,9 +35,6 @@ import java.util.concurrent.BlockingQueue;
  */
 public class Submit2ExecutorServerThread extends Thread {
 
-  /**
-   * LOGGER
-   */
   private final Logger logger = LoggerFactory.getLogger(Submit2ExecutorServerThread.class);
 
   /**
@@ -56,6 +53,11 @@ public class Submit2ExecutorServerThread extends Thread {
   private final BlockingQueue<ExecFlowInfo> executionFlowQueue;
 
   /**
+   * 控制是否继续执行
+   */
+  private volatile boolean running;
+
+  /**
    * @param executorServerManager
    * @param flowDao
    * @param executionFlowQueue
@@ -64,91 +66,126 @@ public class Submit2ExecutorServerThread extends Thread {
     this.executorServerManager = executorServerManager;
     this.flowDao = flowDao;
     this.executionFlowQueue = executionFlowQueue;
+    this.running = true;
 
-    this.setName("Master-submitExecFlowToWorker");
+    this.setName("JobExecManager-submitExecFlowToWorker");
   }
 
   @Override
   public void run() {
-    while (true) {
+    while (running) {
       ExecFlowInfo execFlowInfo;
+
+      // 得到要执行的 executor flow 信息
       try {
         execFlowInfo = executionFlowQueue.take();
         logger.info("get execution flow from queue, exec info:{}", execFlowInfo);
       } catch (InterruptedException e) {
-        logger.error(e.getMessage(), e);
-        break; // 中断则退出
+        logger.error("Catch interrupt exception", e);
+        break;
       }
 
       int execId = execFlowInfo.getExecId();
-      boolean isSucess = false; // 是否请求成功
-      boolean isExecutorServerError = false;
+
+      // 获取相应的 executor server 来执行任务
       ExecutorServerInfo executorServerInfo = executorServerManager.getExecutorServer();
+
+      // 如果没有 executor server 来运行该任务, 则会重新放回
       if (executorServerInfo == null) {
         logger.error("can't found active executor server wait 5 seconds...");
+
         try {
           Thread.sleep(5000);
         } catch (InterruptedException e) {
-          e.printStackTrace();
+          logger.error("Catch interrupt exception", e);
+          break;
         }
+
         executionFlowQueue.add(execFlowInfo);
         continue;
       }
+
       logger.info("get execution flow from queue, execId:{} submit to exec {}:{}",
-              execId, executorServerInfo.getHost(), executorServerInfo.getPort());
-      for (int i = 0; i < MasterConfig.failRetryCount; i++) {
+          execId, executorServerInfo.getHost(), executorServerInfo.getPort());
+
+      boolean isSuccess = false;
+      boolean isExecutorServerError = false;
+
+      // 更新执行该任务的 worker 信息
+      ExecutionFlow executionFlow = flowDao.queryExecutionFlow(execId);
+      executionFlow.setWorker(String.format("%s:%d", executorServerInfo.getHost(), executorServerInfo.getPort()));
+
+      flowDao.updateExecutionFlow(executionFlow);
+
+      // 得到了要执行的任务, 以及要执行的 executor server, 则需要开始执行
+      for (int i = 0; i < MasterConfig.failRetryCount; ++i) {
         isExecutorServerError = false;
+
         try {
           ExecutorClient executorClient = new ExecutorClient(executorServerInfo);
-          ExecutionFlow executionFlow = flowDao.queryExecutionFlow(execId);
-          executionFlow.setWorker(String.format("%s:%d", executorServerInfo.getHost(), executorServerInfo.getPort()));
-          logger.debug("execId:{}", execId);
-          logger.debug("projectId:{}", executionFlow.getProjectId());
-          logger.debug("client:{}", executorClient);
+
+          logger.info("exec id:{}, project id:{}, executor client:{}:{}, try count:{}", execId, executionFlow.getProjectId(),
+              executorServerInfo.getHost(), executorServerInfo.getPort(), i);
+
+          // 可能抛出运行时异常, 或者是 TException 异常
           executorClient.execFlow(execId);
-          flowDao.updateExecutionFlow(executionFlow);
-          isSucess = true;
-          break; // 请求成功，结束重试请求
+
+          isSuccess = true;
+          break;
         } catch (TException e) {
-          ExecutionFlow temp = flowDao.queryExecutionFlow(execId);
-          // 如果执行被取消，结束重试请求
-          if (temp == null) {
-            break;
-          }
           logger.error("run executor get error", e);
           isExecutorServerError = true;
-        } catch (Exception e) { // 内部错误
+        } catch (Exception e) { // 如果返回结果为 false, 这里会抛出 runtime 异常
           logger.error("inner error", e);
+          break;
         }
       }
 
       // 多次重试后仍然失败
-      if (!isSucess) {
+      if (!isSuccess) {
+        // 并且是 executor server 失败
         if (isExecutorServerError) {
-          /** executor server error，将执行数据放回队列，将该executor server从executor server列表删除 */
+          // executor server error，将执行数据放回队列，将该 executor server 从 executor server 列表删除
           executionFlowQueue.add(execFlowInfo);
+
           logger.info("connect to executor server error, remove {}:{}", executorServerInfo.getHost(), executorServerInfo.getPort());
+
+          // 如果是 executor server 有问题, 对有问题的 executor server 进行重新提交
+          // 如果是 executor server 异常了, 可以重新对其上面的任务进行提交
           ExecutorServerInfo removedExecutionServerInfo = executorServerManager.removeServer(executorServerInfo);
           resubmitExecFlow(removedExecutionServerInfo);
         } else {
+          // 如果是其它的异常情况, 直接更新状态即可
           flowDao.updateExecutionFlowStatus(execId, FlowStatus.FAILED);
         }
       }
     }
+
+    logger.warn("stop execution workflow thread");
   }
 
+  /**
+   * 重新提交工作流执行
+   *
+   * @param executorServerInfo
+   */
   private void resubmitExecFlow(ExecutorServerInfo executorServerInfo) {
     // 这里使用数据库查询到的数据保证准确性，避免内存数据出现不一致的情况
-    List<ExecutionFlow> executionFlows = flowDao.queryNoFinishFlow(executorServerInfo.getHost()+":"+executorServerInfo.getPort());
+    List<ExecutionFlow> executionFlows = flowDao.queryNoFinishFlow(executorServerInfo.getHost() + ":" + executorServerInfo.getPort());
+
     if (!CollectionUtils.isEmpty(executionFlows)) {
       logger.info("executor server {} fault, execIds size:{} ", executorServerInfo, executionFlows.size());
+
       for (ExecutionFlow execFlow : executionFlows) {
         Integer execId = execFlow.getId();
+
         logger.info("reschedule workflow execId:{} ", execId);
+
         ExecutionFlow executionFlow = flowDao.queryExecutionFlow(execId);
         if (executionFlow != null) {
           if (!executionFlow.getStatus().typeIsFinished()) {
             logger.info("executor server fault reschedule workflow execId:{}", execId);
+
             ExecFlowInfo execFlowInfo = new ExecFlowInfo();
             execFlowInfo.setExecId(executionFlow.getId());
             executionFlowQueue.add(execFlowInfo);
@@ -160,4 +197,10 @@ public class Submit2ExecutorServerThread extends Thread {
     }
   }
 
+  /**
+   * 取消执行
+   */
+  public void disable() {
+    this.running = false;
+  }
 }

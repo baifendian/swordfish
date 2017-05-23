@@ -25,7 +25,7 @@
         </rollingPolicy>
 
         <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
-            <level>TRACE</level>
+            <level>INFO</level>
         </filter>
         <!-- Safely log to the same file from multiple JVMs. Degrades performance! -->
         <prudent>true</prudent>
@@ -42,7 +42,7 @@
         </encoder>
         <!-- Only log level WARN and above -->
         <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
-            <level>INFO</level>
+            <level>DEBUG</level>
         </filter>
     </appender>
 
@@ -51,12 +51,12 @@
              desired discriminator type is
              ch.qos.logback.classic.sift.MDCBasedDiscriminator -->
         <discriminator>
-            <key>jobId</key>
+            <key>jobAppId</key>
             <defaultValue>unknown</defaultValue>
         </discriminator>
         <sift>
-            <appender name="FILE-${jobId}" class="ch.qos.logback.core.FileAppender">
-                <file>%d{yyyy-MM-dd}/${jobId}.log</file>
+            <appender name="FILE-${jobAppId}" class="ch.qos.logback.core.FileAppender">
+                <file>%d{yyyy-MM-dd}/${jobAppId}.log</file>
                 <append>false</append>
                 <layout class="ch.qos.logback.classic.PatternLayout">
                     <pattern>%d [%thread] %level %mdc %logger{35} - %msg%n</pattern>

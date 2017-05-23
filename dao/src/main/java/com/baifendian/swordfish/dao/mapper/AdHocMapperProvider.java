@@ -98,6 +98,22 @@ public class AdHocMapperProvider {
   }
 
   /**
+   * @param parameter
+   * @return
+   */
+  public String updateStatus(Map<String, Object> parameter) {
+    return new SQL() {
+      {
+        UPDATE(TABLE_NAME);
+
+        SET("`status` = " + EnumFieldUtil.genFieldStr("adHoc.status", FlowStatus.class));
+
+        WHERE("`id` = #{adHoc.id}");
+      }
+    }.toString();
+  }
+
+  /**
    * 查询, 根据 id 查询
    *
    * @param parameter

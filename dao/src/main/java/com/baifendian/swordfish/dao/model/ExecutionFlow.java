@@ -18,10 +18,8 @@ package com.baifendian.swordfish.dao.model;
 import com.baifendian.swordfish.dao.enums.ExecType;
 import com.baifendian.swordfish.dao.enums.FlowStatus;
 import com.baifendian.swordfish.dao.enums.NotifyType;
-import com.baifendian.swordfish.dao.model.flow.params.Property;
+import com.baifendian.swordfish.dao.model.flow.Property;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import org.apache.commons.lang.StringUtils;
 
 import java.util.Date;
@@ -31,40 +29,35 @@ import java.util.stream.Collectors;
 
 public class ExecutionFlow {
   /**
-   * 具体执行的id
+   * 具体执行的 id
+   * 数据库映射字段
    **/
   private Integer id;
 
   /**
-   * workflow的id
+   * workflow 的 id
+   * 数据库映射字段 flow_id
    **/
-  @JsonIgnore
   private int flowId;
 
-  private Integer execId;
-
   /**
-   * workflow名称
-   **/
-  private String flowName;
-
-  /**
-   * worker的host
+   * worker 的 host
    **/
   private String worker;
 
   /**
-   * workflow执行的状态
+   * workflow 执行的状态
    **/
   private FlowStatus status;
 
   /**
    * 提交用户id
+   * 数据库映射字段 submit_user
    **/
   private int submitUserId;
 
   /**
-   * 提交用户
+   * 提交用户名称
    **/
   private String submitUser;
 
@@ -89,7 +82,7 @@ public class ExecutionFlow {
   private Date endTime;
 
   /**
-   * workflow的数据
+   * workflow 的数据
    **/
   private String workflowData;
 
@@ -99,7 +92,7 @@ public class ExecutionFlow {
   private ExecType type;
 
   /**
-   * workflow 所在项目的id
+   * workflow 所在项目的 id
    */
   private Integer projectId;
 
@@ -108,39 +101,67 @@ public class ExecutionFlow {
    */
   private String projectName;
 
+  /**
+   * 工作流名称
+   * DTO需要字段
+   */
   private String workflowName;
 
-  private ExecType execType;
-
+  /**
+   * 执行时间
+   */
   private Integer duration;
-
-  private int consume;
 
   /**
    * 调度时间
    **/
   private Date scheduleTime;
 
+  /**
+   * 最大重试次数
+   */
   private Integer maxTryTimes;
 
+  /**
+   * 执行超时
+   */
   private Integer timeout;
 
+  /**
+   * 工作流用户自行参数
+   */
   private String userDefinedParams;
 
+  /**
+   * 用户额外保存信息
+   */
   private String extras;
 
-  @JsonIgnore
+  /**
+   * 用户定义参数
+   */
   private Map<String, String> userDefinedParamMap;
 
+  /**
+   * 报警类型
+   * 数据库映射字段 notify_type
+   */
   private NotifyType notifyType;
 
+  /**
+   * 报警邮件列表
+   */
   private String notifyMails;
 
+  /**
+   * 数据库映射列表
+   */
   private List<String> notifyMailList;
 
+  /**
+   * 工作流责任人名称
+   */
   private String owner;
-
-  private ExecutionFlowData data = new ExecutionFlowData();
 
   /**
    * 作业提交队列
@@ -148,23 +169,19 @@ public class ExecutionFlow {
   private String queue;
 
   public Integer getDuration() {
-    if (startTime!=null && endTime !=null){
-      return Math.toIntExact((endTime.getTime() - startTime.getTime()) / 1000);
+    if (duration != null) {
+      return duration;
     }
-    return null;
+
+    if (startTime != null && endTime != null) {
+      duration = Math.toIntExact((endTime.getTime() - startTime.getTime()) / 1000);
+    }
+
+    return duration;
   }
 
   public void setDuration(Integer duration) {
     this.duration = duration;
-  }
-
-  public ExecType getExecType() {
-    return execType;
-  }
-
-  public void setExecType(ExecType execType) {
-    this.type = execType;
-    this.execType = execType;
   }
 
   public String getWorkflowName() {
@@ -172,7 +189,6 @@ public class ExecutionFlow {
   }
 
   public void setWorkflowName(String workflowName) {
-    this.flowName = workflowName;
     this.workflowName = workflowName;
   }
 
@@ -181,7 +197,6 @@ public class ExecutionFlow {
   }
 
   public void setId(Integer id) {
-    this.execId = id;
     this.id = id;
   }
 
@@ -191,23 +206,6 @@ public class ExecutionFlow {
 
   public void setFlowId(int flowId) {
     this.flowId = flowId;
-  }
-
-  public String getFlowName() {
-    return flowName;
-  }
-
-  public void setFlowName(String flowName) {
-    this.workflowName = flowName;
-    this.flowName = flowName;
-  }
-
-  public int getConsume() {
-    return consume;
-  }
-
-  public void setConsume(int consume) {
-    this.consume = consume;
   }
 
   public String getWorker() {
@@ -283,7 +281,6 @@ public class ExecutionFlow {
   }
 
   public void setType(ExecType type) {
-    this.execType = type;
     this.type = type;
   }
 
@@ -347,14 +344,6 @@ public class ExecutionFlow {
     this.userDefinedParams = userDefinedParams;
   }
 
-  public String getExtras() {
-    return extras;
-  }
-
-  public void setExtras(String extras) {
-    this.extras = extras;
-  }
-
   public NotifyType getNotifyType() {
     return notifyType;
   }
@@ -389,21 +378,12 @@ public class ExecutionFlow {
     this.owner = owner;
   }
 
-  public ExecutionFlowData getData() {
-    return data;
+  public String getExtras() {
+    return extras;
   }
 
-  public void setData(ExecutionFlowData data) {
-    this.data = data;
-  }
-
-  public Integer getExecId() {
-    return execId;
-  }
-
-  public void setExecId(Integer execId) {
-    this.id = execId;
-    this.execId = execId;
+  public void setExtras(String extras) {
+    this.extras = extras;
   }
 
   public void setUserDefinedParamMap(Map<String, String> userDefinedParamMap) {
@@ -412,33 +392,12 @@ public class ExecutionFlow {
 
   public Map<String, String> getUserDefinedParamMap() {
     List<Property> propList;
+
     if (userDefinedParamMap == null && StringUtils.isNotEmpty(userDefinedParams)) {
       propList = JsonUtil.parseObjectList(userDefinedParams, Property.class);
       userDefinedParamMap = propList.stream().collect(Collectors.toMap(Property::getProp, Property::getValue));
     }
+
     return userDefinedParamMap;
-  }
-
-  public static class ExecutionFlowData{
-
-    private List<ExecutionNode> nodes;
-
-    private List<Property> userDefParams;
-
-    public List<ExecutionNode> getNodes() {
-      return nodes;
-    }
-
-    public void setNodes(List<ExecutionNode> nodes) {
-      this.nodes = nodes;
-    }
-
-    public List<Property> getUserDefParams() {
-      return userDefParams;
-    }
-
-    public void setUserDefParams(List<Property> userDefParams) {
-      this.userDefParams = userDefParams;
-    }
   }
 }

@@ -15,8 +15,8 @@
  */
 package com.baifendian.swordfish.execserver.job.spark;
 
+import com.baifendian.swordfish.common.job.struct.node.spark.SparkParam;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
-
 import org.junit.Before;
 import org.junit.Test;
 
@@ -24,10 +24,6 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
-/**
- * @author : liujin
- * @date : 2017-03-10 13:26
- */
 public class SparkSubmitArgsUtilTest {
   private SparkParam param;
 

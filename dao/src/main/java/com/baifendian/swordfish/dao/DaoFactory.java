@@ -24,13 +24,14 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class DaoFactory {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(DaoFactory.class);
+  private static final Logger logger = LoggerFactory.getLogger(DaoFactory.class);
 
   private static Map<String, BaseDao> daoMap = new ConcurrentHashMap<>();
 
   /**
    * 获取 Dao 实例 （单例） <p>
    *
+   * @param clazz
    * @return Dao实例
    */
   @SuppressWarnings("unchecked")
@@ -40,16 +41,15 @@ public class DaoFactory {
       if (!daoMap.containsKey(className)) {
         try {
           T t = clazz.getConstructor().newInstance();
-          t.init(); // 实例初始化
+          // 实例初始化
+          t.init();
           daoMap.put(className, t);
         } catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException e) {
-          LOGGER.error(e.getMessage(), e);
+          logger.error(e.getMessage(), e);
         }
       }
     }
 
     return (T) daoMap.get(className);
   }
-
-
 }

@@ -15,15 +15,14 @@
  */
 package com.baifendian.swordfish.webserver.controller;
 
-import com.baifendian.swordfish.dao.model.Resource;
 import com.baifendian.swordfish.dao.model.User;
+import com.baifendian.swordfish.webserver.dto.ResourceDto;
 import com.baifendian.swordfish.webserver.service.ResourceService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-
-import javax.servlet.http.HttpServletResponse;
 
 @RestController
 @RequestMapping("/projects/{projectName}/resource-copy")
@@ -42,18 +41,17 @@ public class ResourceCopyController {
    * @param srcResName
    * @param destResName
    * @param desc
-   * @param response
    */
   @PostMapping(value = "")
-  public Resource copyResource(@RequestAttribute(value = "session.user") User operator,
-                               @PathVariable String projectName,
-                               @RequestParam(value = "srcResName") String srcResName,
-                               @RequestParam(value = "destResName") String destResName,
-                               @RequestParam(value = "desc", required = false) String desc,
-                               HttpServletResponse response) {
+  @ResponseStatus(HttpStatus.CREATED)
+  public ResourceDto copyResource(@RequestAttribute(value = "session.user") User operator,
+                                  @PathVariable String projectName,
+                                  @RequestParam(value = "srcResName") String srcResName,
+                                  @RequestParam(value = "destResName") String destResName,
+                                  @RequestParam(value = "desc", required = false) String desc) {
     logger.info("Operator user {}, copy resource, project name: {}, source resource name: {}, dest resource name: {}, desc: {}",
         operator.getName(), projectName, srcResName, destResName, desc);
 
-    return resourceService.copyResource(operator, projectName, srcResName, destResName, desc, response);
+    return new ResourceDto(resourceService.copyResource(operator, projectName, srcResName, destResName, desc));
   }
 }

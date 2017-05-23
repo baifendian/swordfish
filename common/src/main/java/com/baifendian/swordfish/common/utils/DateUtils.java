@@ -28,26 +28,20 @@ import java.util.TimeZone;
  * 时间操作工具类 <p>
  */
 public class DateUtils {
-
   /**
-   * 日期格式
-   */
-  private static final FastDateFormat DATE_FORMAT = FastDateFormat.getInstance(Constants.BASE_DATETIME_FORMAT);
-
-  /**
-   * 获取系统默认时区 <p>
+   * 获取系统默认时区
    */
   public static String getDefaultTimeZome() {
     return TimeZone.getDefault().getID();
   }
 
   /**
-   * 获取当前时刻的格式化的日期字符串 <p>
+   * 获取当前时刻的格式化的日期字符串
    *
    * @return 日期字符串
    */
   public static String now() {
-    return DATE_FORMAT.format(new Date());
+    return now(Constants.BASE_DATETIME_FORMAT);
   }
 
   /**
@@ -58,6 +52,7 @@ public class DateUtils {
    */
   public static String now(String format) {
     SimpleDateFormat dateFormat = new SimpleDateFormat(format);
+
     return dateFormat.format(new Date());
   }
 
@@ -68,7 +63,7 @@ public class DateUtils {
    * @return 日期字符串
    */
   public static String defaultFormat(Date date) {
-    return DATE_FORMAT.format(date);
+    return format(date, Constants.BASE_DATETIME_FORMAT);
   }
 
   /**
@@ -76,7 +71,7 @@ public class DateUtils {
    *
    * @param date
    * @param formatString
-   * @return 日期字符串
+   * @return
    */
   public static String format(Date date, String formatString) {
     FastDateFormat format = FastDateFormat.getInstance(formatString);
@@ -87,27 +82,9 @@ public class DateUtils {
    * 通过字符串获取日期
    *
    * @param dateStr
-   * @return 日期
-   */
-
-  public static Date parse(String dateStr) {
-    try {
-      DateFormat formatter = new SimpleDateFormat(Constants.BASE_DATETIME_FORMAT);
-
-      return formatter.parse(dateStr);
-    } catch (ParseException e) {
-      throw new RuntimeException("Time parse failed exception", e);
-    }
-  }
-
-  /**
-   * 通过字符串获取日期
-   *
-   * @param dateStr
    * @param formatString
-   * @return 日期
+   * @return
    */
-
   public static Date parse(String dateStr, String formatString) {
     try {
       DateFormat formatter = new SimpleDateFormat(formatString);
@@ -116,5 +93,71 @@ public class DateUtils {
     } catch (ParseException e) {
       throw new RuntimeException("Time parse failed exception", e);
     }
+  }
+
+  /**
+   * 获取两个日期相差多少天
+   *
+   * @param d1
+   * @param d2
+   * @return
+   */
+  public static long diffDays(Date d1, Date d2) {
+    return (long) Math.ceil(diffHours(d1, d2) / 24.0);
+  }
+
+  /**
+   * 获取两个日期相差多少小时
+   *
+   * @param d1
+   * @param d2
+   * @return
+   */
+  public static long diffHours(Date d1, Date d2) {
+    return (long) Math.ceil(diffMin(d1, d2) / 60.0);
+  }
+
+  /**
+   * 获取两个日期相差多少分钟
+   *
+   * @param d1
+   * @param d2
+   * @return
+   */
+  public static long diffMin(Date d1, Date d2) {
+    return (long) Math.ceil(diffSec(d1, d2) / 60.0);
+  }
+
+  /**
+   * 获取两个日期之间相差多少秒
+   *
+   * @param d1
+   * @param d2
+   * @return
+   */
+  public static long diffSec(Date d1, Date d2) {
+    return (long) Math.ceil(diffMs(d1, d2) / 1000.0);
+  }
+
+  /**
+   * 获取两个日期之间相差多少毫秒
+   *
+   * @param d1
+   * @param d2
+   * @return
+   */
+  public static long diffMs(Date d1, Date d2) {
+    return Math.abs(d1.getTime() - d2.getTime());
+  }
+
+  /**
+   * 比较两个日期大小
+   *
+   * @param future
+   * @param old
+   * @return
+   */
+  public static boolean compare(Date future, Date old) {
+    return future.getTime() > old.getTime();
   }
 }

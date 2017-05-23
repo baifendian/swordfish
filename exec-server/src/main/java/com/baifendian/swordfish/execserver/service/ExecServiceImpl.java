@@ -21,36 +21,31 @@ import com.baifendian.swordfish.dao.FlowDao;
 import com.baifendian.swordfish.dao.enums.FlowStatus;
 import com.baifendian.swordfish.dao.model.AdHoc;
 import com.baifendian.swordfish.dao.model.ExecutionFlow;
-import com.baifendian.swordfish.dao.model.Schedule;
-import com.baifendian.swordfish.execserver.adhoc.AdHocRunnerManager;
-import com.baifendian.swordfish.execserver.flow.FlowRunnerManager;
+import com.baifendian.swordfish.execserver.runner.adhoc.AdHocRunnerManager;
+import com.baifendian.swordfish.execserver.runner.flow.FlowRunnerManager;
 import com.baifendian.swordfish.execserver.utils.ResultHelper;
-import com.baifendian.swordfish.rpc.WorkerService.Iface;
 import com.baifendian.swordfish.rpc.RetInfo;
-
+import com.baifendian.swordfish.rpc.WorkerService.Iface;
 import org.apache.commons.configuration.Configuration;
-import org.apache.commons.lang.StringUtils;
 import org.apache.thrift.TException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.Date;
 
 /**
  * ExecService 实现 <p>
  */
 public class ExecServiceImpl implements Iface {
 
-  /**
-   * LOGGER
-   */
-  private final Logger LOGGER = LoggerFactory.getLogger(getClass());
+  private static Logger logger = LoggerFactory.getLogger(ExecServiceImpl.class);
 
   /**
    * {@link FlowDao}
    */
   private final FlowDao flowDao;
 
+  /**
+   * {@link AdHocDao}
+   */
   private final AdHocDao adHocDao;
 
   /**
@@ -58,34 +53,52 @@ public class ExecServiceImpl implements Iface {
    */
   private final FlowRunnerManager flowRunnerManager;
 
+  /**
+   * {@link AdHocRunnerManager}
+   */
   private final AdHocRunnerManager adHocRunnerManager;
 
+  /**
+   * 当前 executor 的 host
+   */
   private String host;
 
+  /**
+   * 当前 executor 的 port
+   */
   private int port;
 
-  private Configuration conf;
-
-  /**
-   * constructor
-   */
   public ExecServiceImpl(String host, int port, Configuration conf) {
     this.flowDao = DaoFactory.getDaoInstance(FlowDao.class);
     this.adHocDao = DaoFactory.getDaoInstance(AdHocDao.class);
     this.flowRunnerManager = new FlowRunnerManager(conf);
     this.adHocRunnerManager = new AdHocRunnerManager(conf);
+
     this.host = host;
     this.port = port;
-    this.conf = conf;
   }
 
+  /**
+   * 执行指定的工作流
+   *
+   * @param execId
+   * @return
+   * @throws TException
+   */
   @Override
   public RetInfo execFlow(int execId) throws TException {
     try {
+      logger.info("exec flow, exec id:{}", execId);
+
       // 查询 ExecutionFlow
       ExecutionFlow executionFlow = flowDao.queryExecutionFlow(execId);
       if (executionFlow == null) {
-        return ResultHelper.createErrorResult("execId 对应的记录不存在");
+        return ResultHelper.createErrorResult("execId not find");
+      }
+
+      // 必须是初始化状态才接受
+      if (executionFlow.getStatus().typeIsFinished()) {
+        return ResultHelper.createErrorResult("execId has finish");
       }
 
       // 更新状态为 RUNNING
@@ -95,61 +108,49 @@ public class ExecServiceImpl implements Iface {
       // 提交任务运行
       flowRunnerManager.submitFlow(executionFlow);
     } catch (Exception e) {
-      LOGGER.error(e.getMessage(), e);
+      logger.error(e.getMessage(), e);
       return ResultHelper.createErrorResult(e.getMessage());
     }
+
     return ResultHelper.SUCCESS;
   }
 
+  /**
+   * 执行即席查询
+   *
+   * @param adHocId
+   * @return
+   */
   @Override
-  public RetInfo scheduleExecFlow(int execId, long scheduleDate) throws TException {
-    try {
-      // 查询 ExecutionFlow
-      ExecutionFlow executionFlow = flowDao.queryExecutionFlow(execId);
-      if (executionFlow == null) {
-        return ResultHelper.createErrorResult("execId 对应的记录不存在");
-      }
+  public RetInfo execAdHoc(int adHocId) {
+    logger.info("exec ad hoc: {}", adHocId);
 
-      // 查询 Schedule
-      Schedule schedule = flowDao.querySchedule(executionFlow.getFlowId());
-      if (schedule == null) {
-        return ResultHelper.createErrorResult("对应的调度信息不存在");
-      }
-
-      // 更新状态为 RUNNING
-      String worker = String.format("%s:%d", host, port);
-      flowDao.updateExecutionFlowStatus(execId, FlowStatus.RUNNING, worker);
-
-      // 提交任务运行
-      flowRunnerManager.submitFlow(executionFlow, schedule, new Date(scheduleDate));
-    } catch (Exception e) {
-      LOGGER.error(e.getMessage(), e);
-      return ResultHelper.createErrorResult(e.getMessage());
-    }
-    return ResultHelper.SUCCESS;
-  }
-
-  @Override
-  public RetInfo execAdHoc(int adHocId){
     AdHoc adHoc = adHocDao.getAdHoc(adHocId);
-    if(adHoc == null){
-      LOGGER.error("adhoc id {} not exists", adHocId);
-      return ResultHelper.createErrorResult("adhoc id not exists");
+
+    if (adHoc == null) {
+      logger.error("ad hoc id {} not exists", adHocId);
+      return ResultHelper.createErrorResult("ad hoc id not exists");
     }
+
+    if (adHoc.getStatus().typeIsFinished()) {
+      logger.error("ad hoc id {} finished unexpected", adHocId);
+      return ResultHelper.createErrorResult("task finished unexpected");
+    }
+
     adHocRunnerManager.submitAdHoc(adHoc);
     return ResultHelper.SUCCESS;
   }
 
   /**
-   * 销毁资源 <p>
+   * 取消工作流的执行
+   *
+   * @param execId
+   * @return
+   * @throws TException
    */
-  public void destory() {
-    flowRunnerManager.destroy();
-    adHocRunnerManager.destory();
-  }
+  public RetInfo cancelExecFlow(int execId) throws TException {
+    logger.info("cancel exec flow {}", execId);
 
-  public RetInfo cancelExecFlow(int execId)  throws TException {
-    LOGGER.debug("cancel exec flow {}", execId);
     try {
       // 查询 ExecutionFlow
       ExecutionFlow executionFlow = flowDao.queryExecutionFlow(execId);
@@ -161,12 +162,20 @@ public class ExecServiceImpl implements Iface {
         return ResultHelper.createErrorResult("execId run finished");
       }
 
-      flowRunnerManager.cancelFlow(execId, "master");
+      flowRunnerManager.cancelFlow(execId);
     } catch (Exception e) {
-      LOGGER.error(e.getMessage(), e);
+      logger.error(e.getMessage(), e);
       return ResultHelper.createErrorResult(e.getMessage());
     }
-    return ResultHelper.SUCCESS;
 
+    return ResultHelper.SUCCESS;
+  }
+
+  /**
+   * 销毁资源 <p>
+   */
+  public void destory() {
+    flowRunnerManager.destroy();
+    adHocRunnerManager.destory();
   }
 }

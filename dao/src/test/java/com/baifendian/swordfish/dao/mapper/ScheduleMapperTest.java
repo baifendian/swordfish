@@ -22,7 +22,6 @@ import com.baifendian.swordfish.dao.enums.NotifyType;
 import com.baifendian.swordfish.dao.enums.ScheduleStatus;
 import com.baifendian.swordfish.dao.model.Schedule;
 import com.fasterxml.jackson.core.JsonProcessingException;
-
 import org.junit.Test;
 
 import java.util.Arrays;

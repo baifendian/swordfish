@@ -15,19 +15,20 @@
  */
 package com.baifendian.swordfish.dao.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import org.apache.commons.lang3.ObjectUtils;
-
 import java.util.Date;
 
 /**
  * 项目实体
  */
 public class Project {
-  @JsonIgnore
+  /**
+   * 项目 id
+   */
   private int id;
 
-  @JsonIgnore
+  /**
+   * owner id
+   */
   private int ownerId;
 
   /**

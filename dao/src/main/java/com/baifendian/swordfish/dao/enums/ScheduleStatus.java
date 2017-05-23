@@ -21,33 +21,5 @@ import com.fasterxml.jackson.annotation.JsonValue;
  * 调度状态 <p>
  */
 public enum ScheduleStatus {
-
   OFFLINE, ONLINE;
-
-  /**
-   * getter method
-   *
-   * @return the type
-   * @see ScheduleStatus
-   */
-  @JsonValue
-  public Integer getType() {
-    return ordinal();
-  }
-
-  /**
-   * 通过 type 获取枚举对象 <p>
-   *
-   * @return {@link ScheduleStatus}
-   */
-  public static ScheduleStatus valueOfType(Integer type) throws IllegalArgumentException {
-    if (type == null) {
-      return null;
-    }
-    try {
-      return ScheduleStatus.values()[type];
-    } catch (Exception ex) {
-      throw new IllegalArgumentException("Cannot convert " + type + " to " + ScheduleStatus.class.getSimpleName() + " .", ex);
-    }
-  }
 }

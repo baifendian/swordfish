@@ -15,12 +15,19 @@
  */
 package com.baifendian.swordfish.dao.model;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 import java.util.Date;
 
 /**
  * 运行统计结果实体
  */
 public class ExecutionState {
+
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  private Integer hour;
+
+  @JsonInclude(JsonInclude.Include.NON_NULL)
   private Date day;
 
   /**
@@ -132,5 +139,13 @@ public class ExecutionState {
 
   public void setDepFailed(int depFailed) {
     this.depFailed = depFailed;
+  }
+
+  public Integer getHour() {
+    return hour;
+  }
+
+  public void setHour(Integer hour) {
+    this.hour = hour;
   }
 }

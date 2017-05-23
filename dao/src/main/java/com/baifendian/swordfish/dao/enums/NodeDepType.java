@@ -27,19 +27,9 @@ public enum NodeDepType {
   NODE_ONLY, NODE_POST, NODE_PRE;
 
   /**
-   * getter method
-   *
-   * @return the type
-   * @see NodeDepType#type
-   */
-  @JsonValue
-  public Integer getType() {
-    return ordinal();
-  }
-
-  /**
    * 通过 type 获取枚举对象 <p>
    *
+   * @param type
    * @return {@link NodeDepType}
    */
   public static NodeDepType valueOfType(Integer type) throws IllegalArgumentException {

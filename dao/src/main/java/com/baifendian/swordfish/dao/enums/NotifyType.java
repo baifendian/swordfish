@@ -21,23 +21,21 @@ package com.baifendian.swordfish.dao.enums;
  */
 public enum NotifyType {
   /**
-   *  0-NONE-都不发 1-SUCCESS-成功发，2-FAILURE-失败发，3-ALL-成功或失败都发
+   * 0-NONE-都不发 1-SUCCESS-成功发，2-FAILURE-失败发，3-ALL-成功或失败都发
    */
-  NONE,SUCCESS,FAILURE,ALL;
-
-  public Integer getType() {
-    return ordinal();
-  }
+  NONE, SUCCESS, FAILURE, ALL;
 
   /**
    * 通过 type 获取枚举对象 <p>
    *
+   * @param type
    * @return {@link NotifyType}
    */
   public static NotifyType valueOfType(Integer type) throws IllegalArgumentException {
     if (type == null) {
       return null;
     }
+
     try {
       return NotifyType.values()[type];
     } catch (Exception ex) {
@@ -45,15 +43,11 @@ public enum NotifyType {
     }
   }
 
-  public boolean typeIsSendMail(){
-    return this == SUCCESS || this == FAILURE || this == ALL;
-  }
-
-  public boolean typeIsSendFailureMail(){
+  public boolean typeIsSendFailureMail() {
     return this == FAILURE || this == ALL;
   }
 
-  public boolean typeIsSendSuccessMail(){
+  public boolean typeIsSendSuccessMail() {
     return this == SUCCESS || this == ALL;
   }
 }

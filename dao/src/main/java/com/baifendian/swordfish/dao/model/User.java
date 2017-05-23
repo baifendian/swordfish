@@ -16,15 +16,16 @@
 package com.baifendian.swordfish.dao.model;
 
 import com.baifendian.swordfish.dao.enums.UserRoleType;
+import com.baifendian.swordfish.dao.utils.json.JsonUtil;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.util.Date;
+import java.util.List;
 
 public class User {
   /**
    * 用户 ID
    */
-  @JsonIgnore
   private int id;
 
   /**
@@ -45,7 +46,6 @@ public class User {
   /**
    * 用户密码
    */
-  @JsonIgnore
   private String password;
 
   /**
@@ -56,13 +56,17 @@ public class User {
   /**
    * 角色
    */
-  @JsonIgnore
   private UserRoleType role;
 
   /**
-   * 代理用户
+   * 代理用户，对应数据库中的字段
    */
   private String proxyUsers;
+
+  /**
+   * 反序列化后的代理用户
+   */
+  private List<String> proxyUserList;
 
   /**
    * 用户创建时间
@@ -135,6 +139,7 @@ public class User {
   }
 
   public void setProxyUsers(String proxyUsers) {
+    this.proxyUserList = JsonUtil.parseObjectList(proxyUsers, String.class);
     this.proxyUsers = proxyUsers;
   }
 
@@ -152,6 +157,15 @@ public class User {
 
   public void setModifyTime(Date modifyTime) {
     this.modifyTime = modifyTime;
+  }
+
+  public List<String> getProxyUserList() {
+    return proxyUserList;
+  }
+
+  public void setProxyUserList(List<String> proxyUserList) {
+    this.proxyUsers = JsonUtil.toJsonString(proxyUserList);
+    this.proxyUserList = proxyUserList;
   }
 
   @Override

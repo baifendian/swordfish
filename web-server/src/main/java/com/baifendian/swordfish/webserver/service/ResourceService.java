@@ -23,8 +23,8 @@ import com.baifendian.swordfish.dao.mapper.ResourceMapper;
 import com.baifendian.swordfish.dao.model.Project;
 import com.baifendian.swordfish.dao.model.Resource;
 import com.baifendian.swordfish.dao.model.User;
+import com.baifendian.swordfish.webserver.exception.*;
 import com.baifendian.swordfish.webserver.service.storage.FileSystemStorageService;
-import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,10 +34,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.http.HttpServletResponse;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
+
+import static com.baifendian.swordfish.webserver.utils.ParamVerify.verifyDesc;
+import static com.baifendian.swordfish.webserver.utils.ParamVerify.verifyResName;
 
 @Service
 public class ResourceService {
@@ -45,13 +47,13 @@ public class ResourceService {
   private static Logger logger = LoggerFactory.getLogger(ResourceService.class.getName());
 
   @Autowired
+  private ProjectMapper projectMapper;
+
+  @Autowired
   private ResourceMapper resourceMapper;
 
   @Autowired
   private ProjectService projectService;
-
-  @Autowired
-  private ProjectMapper projectMapper;
 
   @Autowired
   private FileSystemStorageService fileSystemStorageService;
@@ -66,7 +68,6 @@ public class ResourceService {
    * @param name
    * @param desc
    * @param file
-   * @param response
    * @return
    */
   @Transactional(value = "TransactionManager")
@@ -74,29 +75,27 @@ public class ResourceService {
                                  String projectName,
                                  String name,
                                  String desc,
-                                 MultipartFile file,
-                                 HttpServletResponse response) {
+                                 MultipartFile file) {
+
+    verifyResName(name);
+    verifyDesc(desc);
 
     // 文件为空
     if (file.isEmpty()) {
       logger.error("File is empty: {}", file.getOriginalFilename());
-      response.setStatus(HttpStatus.SC_BAD_REQUEST);
-      return null;
+      throw new ParameterException("file");
     }
 
-    // 判断是否具备相应的权限, 必须具备写权限
     Project project = projectMapper.queryByName(projectName);
-
     if (project == null) {
       logger.error("Project does not exist: {}", projectName);
-      response.setStatus(HttpStatus.SC_BAD_REQUEST);
-      return null;
+      throw new NotFoundException("Not found project \"{0}\"", projectName);
     }
 
+    // 必须有项目写权限
     if (!projectService.hasWritePerm(operator.getId(), project)) {
-      logger.error("User {} has no right permission for the project {}", operator.getName(), projectName);
-      response.setStatus(HttpStatus.SC_UNAUTHORIZED);
-      return null;
+      logger.error("User {} has no right permission for the project {}", operator.getName(), project.getName());
+      throw new PermissionException("User \"{0}\" is not has project \"{1}\" write permission", operator.getName(), project.getName());
     }
 
     // 判断文件是否已经存在
@@ -104,8 +103,7 @@ public class ResourceService {
 
     if (resource != null) {
       logger.error("Resource {} does not empty", name);
-      response.setStatus(HttpStatus.SC_CONFLICT);
-      return null;
+      throw new ServerErrorException("Resource has exist, can't create again.");
     }
 
     // 插入数据
@@ -127,18 +125,15 @@ public class ResourceService {
       resourceMapper.insert(resource);
     } catch (DuplicateKeyException e) {
       logger.error("Resource has exist, can't create again.", e);
-      response.setStatus(HttpStatus.SC_CONFLICT);
-      return null;
+      throw new ServerErrorException("Resource has exist, can't create again.");
     }
 
     // 上传失败
     if (!upload(project, name, file)) {
       logger.error("upload resource: {} file: {} failed.", name, file.getOriginalFilename());
-      response.setStatus(HttpStatus.SC_BAD_REQUEST);
-      throw new IllegalArgumentException("file suffix must the same with resource name suffix");
+      throw new ServerErrorException("upload resource: {} file: {} failed.", name, fileSystemStorageService);
     }
 
-    response.setStatus(HttpStatus.SC_CREATED);
     return resource;
   }
 
@@ -150,22 +145,22 @@ public class ResourceService {
    * @param name
    * @param desc
    * @param file
-   * @param response
    * @return
    */
   public Resource putResource(User operator,
                               String projectName,
                               String name,
                               String desc,
-                              MultipartFile file,
-                              HttpServletResponse response) {
+                              MultipartFile file) {
+    verifyDesc(desc);
+
     Resource resource = resourceMapper.queryByProjectAndResName(projectName, name);
 
     if (resource == null) {
-      return createResource(operator, projectName, name, desc, file, response);
+      return createResource(operator, projectName, name, desc, file);
     }
 
-    return modifyResource(operator, projectName, name, desc, file, response);
+    return modifyResource(operator, projectName, name, desc, file);
   }
 
   /**
@@ -176,7 +171,6 @@ public class ResourceService {
    * @param name
    * @param desc
    * @param file
-   * @param response
    * @return
    */
   @Transactional(value = "TransactionManager")
@@ -184,37 +178,32 @@ public class ResourceService {
                                  String projectName,
                                  String name,
                                  String desc,
-                                 MultipartFile file,
-                                 HttpServletResponse response) {
+                                 MultipartFile file) {
+    verifyDesc(desc);
+
     // 文件为空
     if (file != null && file.isEmpty()) {
       logger.error("File does not null but empty: {}", file.getOriginalFilename());
-      response.setStatus(HttpStatus.SC_BAD_REQUEST);
-      return null;
+      throw new ParameterException("file");
     }
 
-    // 判断是否具备相应的权限
     Project project = projectMapper.queryByName(projectName);
-
     if (project == null) {
       logger.error("Project does not exist: {}", projectName);
-      response.setStatus(HttpStatus.SC_BAD_REQUEST);
-      return null;
+      throw new NotFoundException("Not found project \"{0}\"", projectName);
     }
 
+    // 必须要有 project 的写权限
     if (!projectService.hasWritePerm(operator.getId(), project)) {
-      logger.error("User {} has no right permission for the project {}", operator.getName(), projectName);
-      response.setStatus(HttpStatus.SC_UNAUTHORIZED);
-      return null;
+      logger.error("User {} has no right permission for the project {}", operator.getName(), project.getName());
+      throw new PermissionException("User \"{0}\" is not has project \"{1}\" write permission", operator.getName(), project.getName());
     }
 
-    // 判断资源是否已经存在, 如果不存在, 直接返回
     Resource resource = resourceMapper.queryResource(project.getId(), name);
 
     if (resource == null) {
-      logger.error("Resource {} does not exist", name);
-      response.setStatus(HttpStatus.SC_NOT_MODIFIED);
-      return null;
+      logger.error("Download file not exist, project {}, resource {}", project.getName(), name);
+      throw new NotFoundException("Download file not exist, project {0}, resource {1}", project.getName(), name);
     }
 
     Date now = new Date();
@@ -234,15 +223,13 @@ public class ResourceService {
 
     if (count <= 0) {
       logger.error("Resource {} upload failed", name);
-      response.setStatus(HttpStatus.SC_NOT_MODIFIED);
-      return null;
+      throw new ServerErrorException("Not resource update count");
     }
 
-    // 上传失败
-    if (!upload(project, name, file)) {
+    // 如果文件不是空的，则尝试上传新文件
+    if (file != null && !upload(project, name, file)) {
       logger.error("upload resource: {} file: {} failed.", name, file.getOriginalFilename());
-      response.setStatus(HttpStatus.SC_BAD_REQUEST);
-      throw new IllegalArgumentException("file suffix must the same with resource name suffix");
+      throw new ServerErrorException("upload resource: {} file: {} failed.", name, file.getOriginalFilename());
     }
 
     return resource;
@@ -284,7 +271,6 @@ public class ResourceService {
    * @param srcResName
    * @param destResName
    * @param desc
-   * @param response
    * @return
    */
   @Transactional(value = "TransactionManager")
@@ -292,45 +278,38 @@ public class ResourceService {
                                String projectName,
                                String srcResName,
                                String destResName,
-                               String desc,
-                               HttpServletResponse response) {
+                               String desc) {
 
     // 源和目标不能是一样的名称
     if (StringUtils.equalsIgnoreCase(srcResName, destResName)) {
       logger.error("Src resource mustn't the same to dest resource.");
-      response.setStatus(HttpStatus.SC_NOT_MODIFIED);
-      return null;
+      throw new ParameterException("destResName");
     }
 
     // 源和目标后缀必须一样
     if (!StringUtils.equals(CommonUtil.fileSuffix(srcResName), CommonUtil.fileSuffix(destResName))) {
       logger.error("Src resource suffix must the same to dest resource suffix.");
-      response.setStatus(HttpStatus.SC_NOT_MODIFIED);
-      return null;
+      throw new ParameterException("destResName");
     }
 
-    // 判断是否具备相应的权限
     Project project = projectMapper.queryByName(projectName);
-
     if (project == null) {
       logger.error("Project does not exist: {}", projectName);
-      response.setStatus(HttpStatus.SC_BAD_REQUEST);
-      return null;
+      throw new NotFoundException("Not found project \"{0}\"", projectName);
     }
 
+    // 必须有 project 写权限
     if (!projectService.hasWritePerm(operator.getId(), project)) {
-      logger.error("User {} has no right permission for the project {}", operator.getName(), projectName);
-      response.setStatus(HttpStatus.SC_UNAUTHORIZED);
-      return null;
+      logger.error("User {} has no right permission for the project {}", operator.getName(), project.getName());
+      throw new PermissionException("User \"{0}\" is not has project \"{1}\" write permission", operator.getName(), project.getName());
     }
 
-    // 判断源是否存在
+    // 检测原资源是否存在
     Resource srcResource = resourceMapper.queryResource(project.getId(), srcResName);
 
     if (srcResource == null) {
-      logger.error("Resource {} does not exist", srcResName);
-      response.setStatus(HttpStatus.SC_NOT_MODIFIED);
-      return null;
+      logger.error("Download file not exist, project {}, resource {}", project.getName(), srcResName);
+      throw new NotFoundException("Download file not exist, project {0}, resource {1}", project.getName(), srcResName);
     }
 
     // 判断目标是否存在, 不存在则需要创建
@@ -345,6 +324,8 @@ public class ResourceService {
       destResource.setName(destResName);
       destResource.setOriginFilename(srcResource.getOriginFilename());
       destResource.setDesc(desc);
+      destResource.setProjectName(srcResource.getProjectName());
+      destResource.setOwner(srcResource.getOwner());
       destResource.setOwnerId(operator.getId());
       destResource.setOwner(operator.getName());
       destResource.setProjectId(project.getId());
@@ -356,8 +337,7 @@ public class ResourceService {
         resourceMapper.insert(destResource);
       } catch (DuplicateKeyException e) {
         logger.error("Resource has exist, can't create again.", e);
-        response.setStatus(HttpStatus.SC_CONFLICT);
-        return null;
+        throw new ServerErrorException("Resource has exist, can't create again.");
       }
     } else { // 存在
       if (desc != null) {
@@ -385,35 +365,29 @@ public class ResourceService {
    * @param operator
    * @param projectName
    * @param name
-   * @param response
    * @return
    */
   @Transactional(value = "TransactionManager")
   public void deleteResource(User operator,
                              String projectName,
-                             String name,
-                             HttpServletResponse response) {
-
-    // 判断是否具备相应的权限
+                             String name) {
     Project project = projectMapper.queryByName(projectName);
-
     if (project == null) {
       logger.error("Project does not exist: {}", projectName);
-      response.setStatus(HttpStatus.SC_BAD_REQUEST);
-      return;
+      throw new NotFoundException("Not found project \"{0}\"", projectName);
     }
 
+    // 必须有 project 写权限
     if (!projectService.hasWritePerm(operator.getId(), project)) {
-      logger.error("User {} has no right permission for the project {}", operator.getName(), projectName);
-      response.setStatus(HttpStatus.SC_UNAUTHORIZED);
-      return;
+      logger.error("User {} has no right permission for the project {}", operator.getName(), project.getName());
+      throw new PermissionException("User \"{0}\" is not has project \"{1}\" write permission", operator.getName(), project.getName());
     }
 
-    // 查询先
     Resource resource = resourceMapper.queryResource(project.getId(), name);
 
     if (resource == null) {
-      return;
+      logger.error("Download file not exist, project {}, resource {}", project.getName(), name);
+      throw new NotFoundException("Download file not exist, project {0}, resource {1}", project.getName(), name);
     }
 
     // 删除数据库
@@ -430,24 +404,20 @@ public class ResourceService {
    *
    * @param operator
    * @param projectName
-   * @param response
    * @return
    */
-  public List<Resource> getResources(User operator, String projectName, HttpServletResponse response) {
+  public List<Resource> getResources(User operator, String projectName) {
 
-    // 判断是否具备相应的权限, 必须具备读权限
     Project project = projectMapper.queryByName(projectName);
-
     if (project == null) {
       logger.error("Project does not exist: {}", projectName);
-      response.setStatus(HttpStatus.SC_BAD_REQUEST);
-      return null;
+      throw new NotFoundException("Not found project \"{0}\"", projectName);
     }
 
+    // 必须有 project 读权限
     if (!projectService.hasReadPerm(operator.getId(), project)) {
-      logger.error("User {} has no right permission for the project {}", operator.getName(), projectName);
-      response.setStatus(HttpStatus.SC_UNAUTHORIZED);
-      return null;
+      logger.error("User {} has no right permission for the project {}", operator.getName(), project.getName());
+      throw new PermissionException("User \"{0}\" is not has project \"{1}\" read permission", operator.getName(), project.getName());
     }
 
     // 查询资源
@@ -462,33 +432,27 @@ public class ResourceService {
    * @param operator
    * @param projectName
    * @param name
-   * @param response
    * @return
    */
-  public Resource getResource(User operator, String projectName, String name, HttpServletResponse response) {
+  public Resource getResource(User operator, String projectName, String name) {
 
-    // 判断是否具备相应的权限, 必须具备读权限
     Project project = projectMapper.queryByName(projectName);
-
     if (project == null) {
       logger.error("Project does not exist: {}", projectName);
-      response.setStatus(HttpStatus.SC_BAD_REQUEST);
-      return null;
+      throw new NotFoundException("Not found project \"{0}\"", projectName);
     }
 
+    // 必须有 project 读权限
     if (!projectService.hasReadPerm(operator.getId(), project)) {
-      logger.error("User {} has no right permission for the project {}", operator.getName(), projectName);
-      response.setStatus(HttpStatus.SC_UNAUTHORIZED);
-      return null;
+      logger.error("User {} has no right permission for the project {}", operator.getName(), project.getName());
+      throw new PermissionException("User \"{0}\" is not has project \"{1}\" read permission", operator.getName(), project.getName());
     }
 
-    // 查询资源
-    Resource resource = resourceMapper.queryResourceDetail(project.getId(), name);
+    Resource resource = resourceMapper.queryResource(project.getId(), name);
 
     if (resource == null) {
-      logger.error("Resource {} does not exist", name);
-      response.setStatus(HttpStatus.SC_NOT_FOUND);
-      return null;
+      logger.error("Download file not exist, project {}, resource {}", project.getName(), name);
+      throw new NotFoundException("Download file not exist, project {0}, resource {1}", project.getName(), name);
     }
 
     return resource;
@@ -500,37 +464,32 @@ public class ResourceService {
    * @param operator
    * @param projectName
    * @param name
-   * @param response
    * @return
    */
   public org.springframework.core.io.Resource downloadResource(User operator,
                                                                String projectName,
-                                                               String name,
-                                                               HttpServletResponse response) {
-    // 判断是否具备相应的权限, 必须具备读权限
+                                                               String name) {
     Project project = projectMapper.queryByName(projectName);
-
     if (project == null) {
       logger.error("Project does not exist: {}", projectName);
-      response.setStatus(HttpStatus.SC_BAD_REQUEST);
-      return null;
+      throw new NotFoundException("Not found project \"{0}\"", projectName);
     }
 
+    // 必须有 project 读权限
     if (!projectService.hasReadPerm(operator.getId(), project)) {
-      logger.error("User {} has no right permission for the project {}", operator.getName(), projectName);
-      response.setStatus(HttpStatus.SC_UNAUTHORIZED);
-      return null;
+      logger.error("User {} has no right permission for the project {}", operator.getName(), project.getName());
+      throw new PermissionException("User \"{0}\" is not has project \"{1}\" read permission", operator.getName(), project.getName());
     }
 
-    // 下载文件
+    // 校验资源是否存在
     Resource resource = resourceMapper.queryResource(project.getId(), name);
 
     if (resource == null) {
-      logger.error("Download file not exist, project {}, resource {}", projectName, name);
-      return null;
+      logger.error("Download file not exist, project {}, resource {}", project.getName(), name);
+      throw new NotFoundException("Download file not exist, project {0}, resource {1}", project.getName(), name);
     }
 
-    String localFilename = BaseConfig.getLocalDownloadFilename(project.getId(), name);
+    String localFilename = BaseConfig.getLocalDownloadFilename(name);
     String hdfsFilename = BaseConfig.getHdfsResourcesFilename(project.getId(), name);
 
     HdfsClient.getInstance().copyHdfsToLocal(hdfsFilename, localFilename, false, true);

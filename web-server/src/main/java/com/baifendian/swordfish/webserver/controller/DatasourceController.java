@@ -18,13 +18,15 @@ package com.baifendian.swordfish.webserver.controller;
 import com.baifendian.swordfish.dao.enums.DbType;
 import com.baifendian.swordfish.dao.model.DataSource;
 import com.baifendian.swordfish.dao.model.User;
+import com.baifendian.swordfish.webserver.dto.DatasourceDto;
 import com.baifendian.swordfish.webserver.service.DatasourceService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -48,21 +50,20 @@ public class DatasourceController {
    * @param desc
    * @param type
    * @param parameter
-   * @param response
    * @return
    */
   @PostMapping(value = "/{name}")
-  public DataSource createDataSource(@RequestAttribute(value = "session.user") User operator,
-                                     @PathVariable("projectName") String projectName,
-                                     @PathVariable("name") String name,
-                                     @RequestParam(value = "desc", required = false) String desc,
-                                     @RequestParam(value = "type") DbType type,
-                                     @RequestParam(value = "parameter") String parameter,
-                                     HttpServletResponse response) {
+  @ResponseStatus(HttpStatus.CREATED)
+  public DatasourceDto createDataSource(@RequestAttribute(value = "session.user") User operator,
+                                        @PathVariable("projectName") String projectName,
+                                        @PathVariable("name") String name,
+                                        @RequestParam(value = "desc", required = false) String desc,
+                                        @RequestParam(value = "type") DbType type,
+                                        @RequestParam(value = "parameter") String parameter) {
     logger.info("Operator user {}, create datasource, project name: {}, data source name: {}, desc: {}, type: {}, parameter: {}",
-        operator.getName(), projectName, name, desc, type, parameter);
+            operator.getName(), projectName, name, desc, type, parameter);
 
-    return datasourceService.createDataSource(operator, projectName, name, desc, type, parameter, response);
+    return new DatasourceDto(datasourceService.createDataSource(operator, projectName, name, desc, type, parameter));
   }
 
   /**
@@ -74,21 +75,19 @@ public class DatasourceController {
    * @param desc
    * @param type
    * @param parameter
-   * @param response
    * @return
    */
   @PutMapping(value = "/{name}")
-  public DataSource putDataSource(@RequestAttribute(value = "session.user") User operator,
-                                           @PathVariable("projectName") String projectName,
-                                           @PathVariable("name") String name,
-                                           @RequestParam(value = "desc", required = false) String desc,
-                                           @RequestParam(value = "type") String type,
-                                           @RequestParam(value = "parameter") String parameter,
-                                           HttpServletResponse response) {
+  public DatasourceDto putDataSource(@RequestAttribute(value = "session.user") User operator,
+                                     @PathVariable("projectName") String projectName,
+                                     @PathVariable("name") String name,
+                                     @RequestParam(value = "desc", required = false) String desc,
+                                     @RequestParam(value = "type") DbType type,
+                                     @RequestParam(value = "parameter") String parameter) {
     logger.info("Operator user {}, put datasource, project name: {}, data source name: {}, desc: {}, type: {}, parameter: {}",
-        operator.getName(), projectName, name, desc, type, parameter);
+            operator.getName(), projectName, name, desc, type, parameter);
 
-    return datasourceService.putDataSource(operator, projectName, name, desc, DbType.valueOf(type), parameter, response);
+    return new DatasourceDto(datasourceService.putDataSource(operator, projectName, name, desc, type, parameter));
   }
 
   /**
@@ -99,20 +98,18 @@ public class DatasourceController {
    * @param projectName
    * @param desc
    * @param parameter
-   * @param response
    * @return
    */
   @PatchMapping(value = "/{name}")
-  public DataSource modifyDataSource(@RequestAttribute(value = "session.user") User operator,
-                                     @PathVariable("projectName") String projectName,
-                                     @PathVariable("name") String name,
-                                     @RequestParam(value = "desc", required = false) String desc,
-                                     @RequestParam(value = "parameter") String parameter,
-                                     HttpServletResponse response) {
+  public DatasourceDto modifyDataSource(@RequestAttribute(value = "session.user") User operator,
+                                        @PathVariable("projectName") String projectName,
+                                        @PathVariable("name") String name,
+                                        @RequestParam(value = "desc", required = false) String desc,
+                                        @RequestParam(value = "parameter") String parameter) {
     logger.info("Operator user {}, modify datasource, project name: {}, data source name: {}, desc: {}, type: {}, parameter: {}",
-        operator.getName(), projectName, name, desc, parameter);
+            operator.getName(), projectName, name, desc, parameter);
 
-    return datasourceService.modifyDataSource(operator, projectName, name, desc, parameter, response);
+    return new DatasourceDto(datasourceService.modifyDataSource(operator, projectName, name, desc, parameter));
   }
 
   /**
@@ -121,17 +118,15 @@ public class DatasourceController {
    * @param operator
    * @param projectName
    * @param name
-   * @param response
    */
   @DeleteMapping(value = "/{name}")
   public void deleteDataSource(@RequestAttribute(value = "session.user") User operator,
                                @PathVariable("projectName") String projectName,
-                               @PathVariable("name") String name,
-                               HttpServletResponse response) {
+                               @PathVariable("name") String name) {
     logger.info("Operator user {}, delete datasource, project name: {}, data source name: {}",
-        operator.getName(), projectName, name);
+            operator.getName(), projectName, name);
 
-    datasourceService.deleteDataSource(operator, projectName, name, response);
+    datasourceService.deleteDataSource(operator, projectName, name);
   }
 
   /**
@@ -139,17 +134,22 @@ public class DatasourceController {
    *
    * @param operator
    * @param projectName
-   * @param response
    * @return
    */
   @GetMapping(value = "")
-  public List<DataSource> query(@RequestAttribute(value = "session.user") User operator,
-                                @PathVariable("projectName") String projectName,
-                                HttpServletResponse response) {
+  public List<DatasourceDto> query(@RequestAttribute(value = "session.user") User operator,
+                                   @PathVariable("projectName") String projectName) {
     logger.info("Operator user {}, query datasource of project, project name: {}",
-        operator.getName(), projectName);
+            operator.getName(), projectName);
 
-    return datasourceService.query(operator, projectName, response);
+    List<DataSource> dataSourceList = datasourceService.query(operator, projectName);
+    List<DatasourceDto> datasourceDtoList = new ArrayList<>();
+
+    for (DataSource dataSource : dataSourceList) {
+      datasourceDtoList.add(new DatasourceDto(dataSource));
+    }
+
+    return datasourceDtoList;
   }
 
   /**
@@ -158,17 +158,15 @@ public class DatasourceController {
    * @param operator
    * @param projectName
    * @param name
-   * @param response
    * @return
    */
   @GetMapping(value = "/{name}")
-  public DataSource queryByName(@RequestAttribute(value = "session.user") User operator,
-                                @PathVariable("projectName") String projectName,
-                                @PathVariable("name") String name,
-                                HttpServletResponse response) {
+  public DatasourceDto queryByName(@RequestAttribute(value = "session.user") User operator,
+                                   @PathVariable("projectName") String projectName,
+                                   @PathVariable("name") String name) {
     logger.info("Operator user {}, query datasource, project name: {}, data source name: {}",
-        operator.getName(), projectName, name);
+            operator.getName(), projectName, name);
 
-    return datasourceService.queryByName(operator, projectName, name, response);
+    return new DatasourceDto(datasourceService.queryByName(operator, projectName, name));
   }
 }

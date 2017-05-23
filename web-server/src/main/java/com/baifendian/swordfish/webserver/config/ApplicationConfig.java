@@ -40,6 +40,33 @@ public class ApplicationConfig extends WebMvcConfigurerAdapter {
     registry.addMapping("/**").allowedOrigins("*").allowedMethods("*");
   }
 
+//  /**
+//   * 处理 controller 的解决方法
+//   *
+//   * @return
+//   */
+//  @Bean
+//  public ErrorAttributes errorAttributes() {
+//    return new DefaultErrorAttributes() {
+//      @Override
+//      public Map<String, Object> getErrorAttributes(RequestAttributes requestAttributes, boolean includeStackTrace) {
+//        Map<String, Object> errorAttributes = super.getErrorAttributes(requestAttributes, includeStackTrace);
+//        // Customize the default entries in errorAttributes to suit your
+//        Throwable exception = (Throwable) requestAttributes.getAttribute(DefaultErrorAttributes.class.getName() + ".ERROR", 0);
+//        if (!StringUtils.isEmpty(exception.getMessage())) {
+//          errorAttributes.put("message", exception.getMessage());
+//        }
+//        return errorAttributes;
+//      }
+//
+//    };
+//  }
+
+  /**
+   * 解决路由中, 可以包含 ., +, 等特殊字符问题
+   *
+   * @param configurer
+   */
   @Override
   public void configureContentNegotiation(final ContentNegotiationConfigurer configurer) {
     // Turn off suffix-based content negotiation

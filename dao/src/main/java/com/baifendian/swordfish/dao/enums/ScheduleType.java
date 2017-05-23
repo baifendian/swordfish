@@ -20,33 +20,8 @@ package com.baifendian.swordfish.dao.enums;
  */
 public enum ScheduleType {
   /**
-   * 0 分钟 ， 1 小时 ，2 天， 3 周， 4 月
+   * 0 分钟 ， 1 小时 ，2 天， 3 周， 4 月 5 年
    */
-  MINUTE, HOUR, DAY, WEEK, MONTH;
+  MINUTE, HOUR, DAY, WEEK, MONTH, YEAR;
 
-  /**
-   * getter method
-   *
-   * @return the type
-   * @see ScheduleType
-   */
-  public Integer getType() {
-    return ordinal();
-  }
-
-  /**
-   * 通过 type 获取枚举对象 <p>
-   *
-   * @return {@link ScheduleType}
-   */
-  public static ScheduleType valueOfType(Integer type) throws IllegalArgumentException {
-    if (type == null) {
-      return null;
-    }
-    try {
-      return ScheduleType.values()[type];
-    } catch (Exception ex) {
-      throw new IllegalArgumentException("Cannot convert " + type + " to " + ScheduleType.class.getSimpleName() + " .", ex);
-    }
-  }
 }

@@ -32,12 +32,12 @@ public class DataSourceMapperProvider {
    */
   public String insert(Map<String, Object> parameter) {
     DataSource dataSource = (DataSource) parameter.get("dataSource");
-    int type = dataSource.getType().getType();
+    int type = dataSource.getType().ordinal();
 
     return new SQL() {{
       INSERT_INTO(TABLE_NAME);
 
-      VALUES("`name`", "#{dataSource.name}");
+      VALUES("`name`", "#{dataSource.name,jdbcType=VARCHAR}");
       VALUES("`desc`", "#{dataSource.desc}");
       VALUES("`type`", "" + type);
       VALUES("`owner`", "#{dataSource.ownerId}");
@@ -139,6 +139,22 @@ public class DataSourceMapperProvider {
       JOIN("project p on r.project_id = p.id");
 
       WHERE("p.name = #{projectName} and r.name = #{name}");
+    }}.toString();
+  }
+
+  /**
+   * 查询项目下的数据源数目
+   *
+   * @param parameter
+   * @return
+   */
+  public String countProjectDatasource(Map<String, Object> parameter) {
+    return new SQL() {{
+      SELECT("count(0)");
+
+      FROM(TABLE_NAME);
+
+      WHERE("project_id = #{projectId}");
     }}.toString();
   }
 }

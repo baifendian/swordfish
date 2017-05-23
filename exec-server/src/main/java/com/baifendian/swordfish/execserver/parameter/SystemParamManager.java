@@ -15,13 +15,14 @@
  */
 package com.baifendian.swordfish.execserver.parameter;
 
-import com.baifendian.swordfish.common.utils.DateUtils;
 import com.baifendian.swordfish.dao.enums.ExecType;
-import com.baifendian.swordfish.dao.model.ExecutionFlow;
 
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+
+import static com.baifendian.swordfish.common.utils.DateUtils.format;
+import static org.apache.commons.lang.time.DateUtils.addDays;
 
 /**
  * 系统参数管理 <p>
@@ -41,88 +42,62 @@ public class SystemParamManager {
   /**
    * 日常调度实例定时的定时时间日期的前一天，格式为 yyyyMMdd
    */
-  private static final String BIZ_DATE = "sf.system.bizdate";
+  public static final String BIZ_DATE = "sf.system.bizdate";
 
   /**
    * 日常调度实例定时的定时时间日期，格式为 yyyymmdd，取值为 ${sf.system.bizdate} + 1
    */
-  private static final String BIZ_CUR_DATE = "dw.system.bizcurdate";
+  public static final String BIZ_CUR_DATE = "sf.system.bizcurdate";
 
   /**
-   * ${dw.system.cyctime}，格式 yyyyMMddHHmmss，表示的是日常调度实例定时时间（年月日时分秒）
+   * 格式 yyyyMMddHHmmss，表示的是日常调度实例定时时间（年月日时分秒）
    */
   public static final String CYC_TIME = "sf.system.cyctime";
 
   /**
-   * 调度时刻的时间，格式为 yyyyMMddHHmmss
-   */
-  private static final String RUN_TIME = "sf.system.runtime";
-
-  /**
-   * 当前项目的 HDFS 路径
-   */
-  private static final String FILES = "sf.system.files";
-
-  /**
-   * 当前 workflow 的名称
-   */
-  private static final String FLOWNAME = "sf.system.flowname";
-
-  /**
-   * 构建系统参数值 <p>
+   * 构造系统参数
    *
-   * @return 系统参数
+   * @param execType 执行方式, 比如是直接执行, 还是补数据, 还是调度执行
+   * @param time     对于直接执行, 指的是运行的时间, 对于调度执行, 指的是调度时间, 对于补数据, 指业务补数据的时间
+   * @return
    */
-  public static Map<String, String> buildSystemParam(ExecutionFlow executionFlow, Date scheduleDate, Date addDate) {
-    ExecType runType = executionFlow.getType();
+  public static Map<String, String> buildSystemParam(ExecType execType, Date time) {
     Date bizDate;
-    Date execStartTime = executionFlow.getStartTime();
-    switch (runType) {
-      case DIRECT:
-        bizDate = org.apache.commons.lang.time.DateUtils.addDays(execStartTime, -1); // 运行日期的前一天
-        break;
 
-      case SCHEDULER:
-        bizDate = org.apache.commons.lang.time.DateUtils.addDays(scheduleDate, -1); // 调度日期的前一天
-        break;
-
+    switch (execType) {
       case COMPLEMENT_DATA:
-        bizDate = addDate; // 补数据的当天
+        bizDate = time; // 补数据的当天
         break;
-
+      case DIRECT:
+      case SCHEDULER:
       default:
-        bizDate = org.apache.commons.lang.time.DateUtils.addDays(execStartTime, -1); // 运行日期的前一天
+        bizDate = addDays(time, -1); // 运行日期的前一天
     }
 
-    Date bizCurDate = org.apache.commons.lang.time.DateUtils.addDays(bizDate, 1); // bizDate + 1 天
-    Date runTime = execStartTime;
+    Date bizCurDate = addDays(bizDate, 1); // bizDate + 1 天
 
     Map<String, String> valueMap = new HashMap<>();
 
     valueMap.put(BIZ_DATE, formatDate(bizDate));
     valueMap.put(BIZ_CUR_DATE, formatDate(bizCurDate));
     valueMap.put(CYC_TIME, formatTime(bizCurDate));
-    valueMap.put(RUN_TIME, formatTime(runTime));
-    valueMap.put(FLOWNAME, executionFlow.getFlowName());
 
     return valueMap;
   }
 
   /**
-   * 格式化日期字符串（格式："yyyyMMdd"） <p>
-   *
-   * @return 日期字符串
+   * @param date
+   * @return
    */
   private static String formatDate(Date date) {
-    return DateUtils.format(date, DATE_FORMAT);
+    return format(date, DATE_FORMAT);
   }
 
   /**
-   * 格式化时间字符串（格式："yyyyMMddHHmmss"） <p>
-   *
-   * @return 时间字符串
+   * @param date
+   * @return
    */
   private static String formatTime(Date date) {
-    return DateUtils.format(date, TIME_FORMAT);
+    return format(date, TIME_FORMAT);
   }
 }

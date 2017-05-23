@@ -19,7 +19,6 @@ import com.baifendian.swordfish.dao.model.FlowNode;
 import com.baifendian.swordfish.dao.model.FlowNodeRelation;
 import com.baifendian.swordfish.dao.model.flow.FlowDag;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
-
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -31,13 +30,13 @@ import static org.junit.Assert.assertEquals;
 public class DagHelperTest {
 
   @Test
-  public void testFindNodeDepDag(){
+  public void testFindNodeDepDag() {
     FlowDag flowDag = new FlowDag();
-    List<FlowNodeRelation>  relas = new ArrayList<>();
-    relas.add(new FlowNodeRelation(1, "shell1", "shell2"));
-    relas.add(new FlowNodeRelation(1, "shell1", "shell3"));
-    relas.add(new FlowNodeRelation(1, "shell2", "shell4"));
-    relas.add(new FlowNodeRelation(1, "shell4", "shell5"));
+    List<FlowNodeRelation> relas = new ArrayList<>();
+    relas.add(new FlowNodeRelation("shell1", "shell2"));
+    relas.add(new FlowNodeRelation("shell1", "shell3"));
+    relas.add(new FlowNodeRelation("shell2", "shell4"));
+    relas.add(new FlowNodeRelation("shell4", "shell5"));
     flowDag.setEdges(relas);
     List<FlowNode> nodes = new ArrayList<>();
     nodes.add(JsonUtil.parseObject("{\"name\":\"shell1\"}", FlowNode.class));
@@ -50,10 +49,10 @@ public class DagHelperTest {
     FlowNode node = JsonUtil.parseObject("{\"name\":\"shell2\"}", FlowNode.class);
     FlowDag flowDag1 = DagHelper.findNodeDepDag(flowDag, node, true);
     assertEquals(3, flowDag1.getNodes().size());
-    assertEquals("shell2:shell4,shell4:shell5", flowDag1.getEdges().stream().map(rela->rela.getStartNode()+":"+rela.getEndNode()).collect(Collectors.joining(",")));
+    assertEquals("shell2:shell4,shell4:shell5", flowDag1.getEdges().stream().map(rela -> rela.getStartNode() + ":" + rela.getEndNode()).collect(Collectors.joining(",")));
 
     FlowDag flowDagPre = DagHelper.findNodeDepDag(flowDag, node, false);
-    assertEquals("shell1,shell2", flowDagPre.getNodes().stream().map(n->n.getName()).sorted().collect(Collectors.joining(",")));
-    assertEquals("shell1:shell2", flowDagPre.getEdges().stream().map(rela->rela.getStartNode()+":"+rela.getEndNode()).collect(Collectors.joining(",")));
+    assertEquals("shell1,shell2", flowDagPre.getNodes().stream().map(n -> n.getName()).sorted().collect(Collectors.joining(",")));
+    assertEquals("shell1:shell2", flowDagPre.getEdges().stream().map(rela -> rela.getStartNode() + ":" + rela.getEndNode()).collect(Collectors.joining(",")));
   }
 }

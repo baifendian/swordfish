@@ -15,16 +15,16 @@
  */
 package com.baifendian.swordfish.execserver.job.shell;
 
-import com.baifendian.swordfish.common.job.AbstractProcessJob;
-import com.baifendian.swordfish.common.job.BaseParam;
-import com.baifendian.swordfish.common.job.JobProps;
-import com.baifendian.swordfish.common.job.exception.ExecException;
+import com.baifendian.swordfish.common.job.struct.node.BaseParam;
+import com.baifendian.swordfish.common.job.struct.node.shell.ShellParam;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
+import com.baifendian.swordfish.execserver.exception.ExecException;
+import com.baifendian.swordfish.execserver.job.AbstractProcessJob;
+import com.baifendian.swordfish.execserver.job.JobProps;
 import com.baifendian.swordfish.execserver.parameter.ParamHelper;
-
 import org.slf4j.Logger;
 
-import java.io.*;
+import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
@@ -32,7 +32,6 @@ import java.nio.file.attribute.FileAttribute;
 import java.nio.file.attribute.PosixFilePermission;
 import java.nio.file.attribute.PosixFilePermissions;
 import java.util.Set;
-import java.util.UUID;
 
 public class ShellJob extends AbstractProcessJob {
 
@@ -43,30 +42,40 @@ public class ShellJob extends AbstractProcessJob {
    */
   private String currentPath;
 
-  public ShellJob(String jobIdLog, JobProps props, Logger logger) throws IOException {
-    super(jobIdLog, props, logger);
+  public ShellJob(JobProps props, Logger logger) {
+    super(props, logger);
 
     this.currentPath = getWorkingDirectory();
   }
 
   @Override
-  public void initJobParams() {
+  public void initJob() {
     logger.debug("job params {}", props.getJobParams());
+
     shellParam = JsonUtil.parseObject(props.getJobParams(), ShellParam.class);
+
     if (!shellParam.checkValid()) {
       throw new ExecException("ShellJob script param can't be null");
     }
   }
 
   @Override
-  public ProcessBuilder createProcessBuilder() throws IOException {
+  public String createCommand() throws Exception {
+    // 生成的脚本文件
+    String fileName = String.format("%s/%s_node.sh", currentPath, props.getJobAppId());
+    Path path = new File(fileName).toPath();
+
+    if (Files.exists(path)) {
+      return fileName;
+    }
+
     String script = shellParam.getScript();
     script = ParamHelper.resolvePlaceholders(script, props.getDefinedParams());
+
     shellParam.setScript(script);
+
     logger.info("script:\n{}", shellParam.getScript());
-    logger.info("currentPath: {}", currentPath);
-    String fileName = currentPath + "/" + jobIdLog + "_" + UUID.randomUUID().toString().substring(0, 8) + ".sh";
-    Path path = new File(fileName).toPath();
+    logger.info("currentPath:{}", currentPath);
 
     Set<PosixFilePermission> perms = PosixFilePermissions.fromString("rwxr-xr-x");
     FileAttribute<Set<PosixFilePermission>> attr = PosixFilePermissions.asFileAttribute(perms);
@@ -74,14 +83,12 @@ public class ShellJob extends AbstractProcessJob {
     Files.createFile(path, attr);
 
     Files.write(path, shellParam.getScript().getBytes(), StandardOpenOption.APPEND);
-    ProcessBuilder processBuilder = new ProcessBuilder(fileName);
 
-    return processBuilder;
+    return fileName;
   }
 
   @Override
   public BaseParam getParam() {
     return shellParam;
   }
-
 }

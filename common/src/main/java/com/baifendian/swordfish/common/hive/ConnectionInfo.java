@@ -18,7 +18,7 @@ package com.baifendian.swordfish.common.hive;
 import com.google.common.base.Objects;
 
 /**
- * Created by wenting on 9/8/16.
+ * Hive 连接参数信息
  */
 public class ConnectionInfo {
 
@@ -33,10 +33,12 @@ public class ConnectionInfo {
     if (this == other) {
       return true;
     }
+
     if (other instanceof ConnectionInfo) {
       ConnectionInfo that = (ConnectionInfo) other;
       return Objects.equal(this.user, that.user) && this.password == that.password && Objects.equal(this.uri, that.uri);
     }
+
     return false;
   }
 
@@ -44,7 +46,6 @@ public class ConnectionInfo {
   public int hashCode() {
     return Objects.hashCode(user, password, uri);
   }
-
 
   public String getUser() {
     return user;
@@ -68,5 +69,14 @@ public class ConnectionInfo {
 
   public void setUri(String uri) {
     this.uri = uri;
+  }
+
+  @Override
+  public String toString() {
+    return "ConnectionInfo{" +
+        "user='" + user + '\'' +
+        ", password='" + password + '\'' +
+        ", uri='" + uri + '\'' +
+        '}';
   }
 }

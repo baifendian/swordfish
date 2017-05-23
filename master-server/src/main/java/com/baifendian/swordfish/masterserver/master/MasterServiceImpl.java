@@ -19,6 +19,7 @@ import com.baifendian.swordfish.dao.AdHocDao;
 import com.baifendian.swordfish.dao.DaoFactory;
 import com.baifendian.swordfish.dao.FlowDao;
 import com.baifendian.swordfish.dao.enums.ExecType;
+import com.baifendian.swordfish.dao.enums.FlowStatus;
 import com.baifendian.swordfish.dao.enums.NodeDepType;
 import com.baifendian.swordfish.dao.enums.NotifyType;
 import com.baifendian.swordfish.dao.model.AdHoc;
@@ -47,36 +48,44 @@ import java.util.Map;
 public class MasterServiceImpl implements Iface {
 
   /**
-   * LOGGER
+   * logger
    */
-  private final Logger LOGGER = LoggerFactory.getLogger(getClass());
+  private final Logger logger = LoggerFactory.getLogger(getClass());
 
   /**
-   * {@link FlowDao}
+   * 工作流的数据库接口
    */
   private final FlowDao flowDao;
 
+  /**
+   * 即席查询的数据库接口
+   */
   private final AdHocDao adHocDao;
 
   /**
-   * {@link FlowExecManager}
+   * 任务执行的主程序
    */
+  private final JobExecManager jobExecManager;
 
-  private final Master master;
+  public MasterServiceImpl(JobExecManager jobExecManager) {
+    this.jobExecManager = jobExecManager;
 
-  public MasterServiceImpl(FlowDao flowDao, Master master) {
-    this.flowDao = flowDao;
+    this.flowDao = DaoFactory.getDaoInstance(FlowDao.class);
     this.adHocDao = DaoFactory.getDaoInstance(AdHocDao.class);
-    this.master = master;
-
   }
 
   /**
    * 设置调度信息, 最终设置的是 Crontab 表达式(其实是按照 Quartz 的语法)
+   *
+   * @param projectId
+   * @param flowId
+   * @return
+   * @throws TException
+   * @see CronExpression
    */
   @Override
   public RetInfo setSchedule(int projectId, int flowId) throws TException {
-    LOGGER.info("set schedule {} {}", projectId, flowId);
+    logger.info("set schedule, project id: {}, flow id: {}", projectId, flowId);
 
     try {
       Schedule schedule = flowDao.querySchedule(flowId);
@@ -93,7 +102,7 @@ public class MasterServiceImpl implements Iface {
       Map<String, Object> dataMap = FlowScheduleJob.genDataMap(projectId, flowId, schedule);
       QuartzManager.addJobAndTrigger(jobName, jobGroupName, FlowScheduleJob.class, startDate, endDate, schedule.getCrontab(), dataMap);
     } catch (Exception e) {
-      LOGGER.error(e.getMessage(), e);
+      logger.error(e.getMessage(), e);
       return ResultHelper.createErrorResult(e.getMessage());
     }
 
@@ -102,6 +111,11 @@ public class MasterServiceImpl implements Iface {
 
   /**
    * 删除调度信息
+   *
+   * @param projectId
+   * @param flowId
+   * @return
+   * @throws TException
    */
   @Override
   public RetInfo deleteSchedule(int projectId, int flowId) throws TException {
@@ -111,7 +125,7 @@ public class MasterServiceImpl implements Iface {
       String jobGroupName = FlowScheduleJob.genJobGroupName(projectId);
       QuartzManager.deleteJob(jobName, jobGroupName);
     } catch (Exception e) {
-      LOGGER.error(e.getMessage(), e);
+      logger.error(e.getMessage(), e);
       return ResultHelper.createErrorResult(e.getMessage());
     }
 
@@ -120,6 +134,10 @@ public class MasterServiceImpl implements Iface {
 
   /**
    * 删除一个项目的所有调度信息
+   *
+   * @param projectId
+   * @return
+   * @throws TException
    */
   @Override
   public RetInfo deleteSchedules(int projectId) throws TException {
@@ -127,30 +145,44 @@ public class MasterServiceImpl implements Iface {
       String jobGroupName = FlowScheduleJob.genJobGroupName(projectId);
       QuartzManager.deleteJobs(jobGroupName);
     } catch (Exception e) {
-      LOGGER.error(e.getMessage(), e);
+      logger.error(e.getMessage(), e);
       return ResultHelper.createErrorResult(e.getMessage());
     }
 
     return ResultHelper.SUCCESS;
   }
 
+  /**
+   * 运行一个工作流, 是指直接运行的方式
+   *
+   * @param projectId
+   * @param flowId
+   * @param runTime   执行该工作流的时刻
+   * @param execInfo
+   * @return
+   * @throws TException
+   */
   @Override
-  public RetResultInfo execFlow(int projectId, int flowId, long scheduleDate, ExecInfo execInfo) throws TException {
+  public RetResultInfo execFlow(int projectId, int flowId, long runTime, ExecInfo execInfo) throws TException {
     ExecutionFlow executionFlow;
-    LOGGER.debug("exec flow project id:{} flow id:{} schedule date:{} exec info:{}", projectId, flowId, scheduleDate, execInfo);
+
+    logger.info("exec flow project id:{}, flow id:{}, run time:{}, exec info:{}", projectId, flowId, runTime, execInfo);
+
     try {
-      ProjectFlow flow = flowDao.projectFlowfindById(flowId);
+      ProjectFlow flow = flowDao.projectFlowFindById(flowId);
+
       if (flow == null) {
-        LOGGER.error("flowId is not exists");
+        logger.error("flow: {} is not exists", flowId);
         return new RetResultInfo(ResultHelper.createErrorResult("flowId is not exists"), null);
       }
 
+      // 构建一个用于执行的工作流
       executionFlow = flowDao.scheduleFlowToExecution(projectId,
           flowId,
           flow.getOwnerId(),
-          new Date(scheduleDate),
+          new Date(runTime),
           ExecType.DIRECT,
-          1, // 仅仅执行 1 次
+          0, // 默认不重复执行
           execInfo.getNodeName(),
           NodeDepType.valueOfType(execInfo.getNodeDep()),
           NotifyType.valueOfType(execInfo.getNotifyType()),
@@ -160,42 +192,36 @@ public class MasterServiceImpl implements Iface {
       ExecFlowInfo execFlowInfo = new ExecFlowInfo();
       execFlowInfo.setExecId(executionFlow.getId());
 
-      master.addExecFlow(execFlowInfo);
+      logger.info("insert a flow to execution, exec id:{}, flow id:{}", executionFlow.getId(), flowId);
+
+      jobExecManager.addExecFlow(execFlowInfo);
     } catch (Exception e) {
-      LOGGER.error(e.getMessage(), e);
+      logger.error(e.getMessage(), e);
       return new RetResultInfo(ResultHelper.createErrorResult(e.getMessage()), null);
     }
-    return new RetResultInfo(ResultHelper.SUCCESS, Arrays.asList(executionFlow.getId()));
-  }
 
-  @Override
-  public RetInfo execAdHoc(int adHocId) {
-    try {
-      LOGGER.debug("receive exec ad hoc request, id:{}", adHocId);
-      AdHoc adHoc = adHocDao.getAdHoc(adHocId);
-      if (adHoc == null) {
-        LOGGER.error("adhoc id {} not exists", adHocId);
-        return ResultHelper.createErrorResult("adhoc id not exists");
-      }
-      master.execAdHoc(adHocId);
-    } catch (Exception e) {
-      LOGGER.error(e.getMessage(), e);
-      return ResultHelper.createErrorResult(e.getMessage());
-    }
-    return ResultHelper.SUCCESS;
+    return new RetResultInfo(ResultHelper.SUCCESS, Arrays.asList(executionFlow.getId()));
   }
 
   /**
    * 补数据
+   *
+   * @param projectId
+   * @param flowId
+   * @param scheduleInfo
+   * @return
+   * @throws TException
    */
   @Override
   public RetResultInfo appendWorkFlow(int projectId, int flowId, ScheduleInfo scheduleInfo) throws TException {
-    LOGGER.debug("append workflow projectId:{}, flowId:{},scheduleMeta:{}", projectId, flowId, scheduleInfo);
+    logger.info("append workflow projectId:{}, flowId:{}, scheduleMeta:{}", projectId, flowId, scheduleInfo);
+
     try {
-      ProjectFlow flow = flowDao.projectFlowfindById(flowId);
+      ProjectFlow flow = flowDao.projectFlowFindById(flowId);
+
       // 若 workflow 被删除
       if (flow == null) {
-        LOGGER.error("projectId:{},flowId:{} workflow not exists", projectId, flowId);
+        logger.error("projectId:{}, flowId:{} workflow not exists", projectId, flowId);
         return ResultDetailHelper.createErrorResult("current workflow not exists");
       }
 
@@ -206,47 +232,114 @@ public class MasterServiceImpl implements Iface {
       Date endDateTime = new Date(scheduleInfo.getEndDate());
 
       // 提交补数据任务
-      master.submitAddData(flow, cron, startDateTime, endDateTime);
+      jobExecManager.submitAddData(flow, cron, startDateTime, endDateTime);
     } catch (Exception e) {
-      LOGGER.error(e.getMessage(), e);
+      logger.error(e.getMessage(), e);
       return ResultDetailHelper.createErrorResult(e.getMessage());
     }
 
     return ResultDetailHelper.createSuccessResult(Collections.emptyList());
   }
 
+  /**
+   * @param execId
+   * @return
+   * @throws TException
+   */
   @Override
-  public RetInfo registerExecutor(String host, int port, long registerTime) throws TException {
+  public RetInfo cancelExecFlow(int execId) throws TException {
     try {
-      master.registerExecutor(host, port, registerTime);
+      return jobExecManager.cancelExecFlow(execId);
     } catch (Exception e) {
-      LOGGER.warn("executor register error", e);
+      logger.warn("executor report error", e);
       return ResultHelper.createErrorResult(e.getMessage());
     }
+  }
+
+  /**
+   * 根据即席查询的执行 id 执行即席查询
+   *
+   * @param adHocId
+   * @return
+   */
+  @Override
+  public RetInfo execAdHoc(int adHocId) {
+    try {
+      logger.info("receive exec ad hoc request, id: {}", adHocId);
+
+      AdHoc adHoc = adHocDao.getAdHoc(adHocId);
+
+      if (adHoc == null) {
+        logger.error("ad hoc id {} not exists", adHocId);
+        return ResultHelper.createErrorResult("ad hoc id not exists");
+      }
+
+      // 接收到了, 会更新状态, 在依赖资源中
+      if (adHoc.getStatus().typeIsFinished()) {
+        logger.error("ad hoc id {} finished unexpected", adHocId);
+        return ResultHelper.createErrorResult("task finished unexpected");
+      }
+
+      adHoc.setStatus(FlowStatus.WAITING_RES);
+      adHocDao.updateAdHocStatus(adHoc);
+
+      jobExecManager.execAdHoc(adHocId);
+    } catch (Exception e) {
+      logger.error(e.getMessage(), e);
+
+      // 如果是依赖资源中的状态, 更新为失败, 因为调用失败了
+      AdHoc adHoc = adHocDao.getAdHoc(adHocId);
+
+      if (adHoc != null && adHoc.getStatus() == FlowStatus.WAITING_RES) {
+        adHoc.setStatus(FlowStatus.FAILED);
+        adHocDao.updateAdHocStatus(adHoc);
+      }
+
+      return ResultHelper.createErrorResult(e.getMessage());
+    }
+
     return ResultHelper.SUCCESS;
   }
 
   /**
-   * execServer汇报心跳 host : host地址 port : 端口号
+   * 接受 executor 注册的接口
+   *
+   * @param host         executor 注册的 host 地址
+   * @param port         executor 注册的 port
+   * @param registerTime
+   * @return
+   * @throws TException
+   */
+  @Override
+  public RetInfo registerExecutor(String host, int port, long registerTime) throws TException {
+    try {
+      jobExecManager.registerExecutor(host, port, registerTime);
+    } catch (Exception e) {
+      logger.warn("executor register error", e);
+      return ResultHelper.createErrorResult(e.getMessage());
+    }
+
+    return ResultHelper.SUCCESS;
+  }
+
+  /**
+   * 接受 executor 汇报心跳的接口
+   *
+   * @param host          executor 的 host 地址
+   * @param port          executor 的 port
+   * @param heartBeatData
+   * @return
+   * @throws TException
    */
   @Override
   public RetInfo executorReport(String host, int port, HeartBeatData heartBeatData) throws TException {
     try {
-      master.executorReport(host, port, heartBeatData);
+      jobExecManager.executorReport(host, port, heartBeatData);
     } catch (Exception e) {
-      LOGGER.warn("executor report error", e);
+      logger.warn("executor report error", e);
       return ResultHelper.createErrorResult(e.getMessage());
     }
-    return ResultHelper.SUCCESS;
-  }
 
-  @Override
-  public RetInfo cancelExecFlow(int execId) throws TException {
-    try {
-      return master.cancelExecFlow(execId);
-    } catch (Exception e) {
-      LOGGER.warn("executor report error", e);
-      return ResultHelper.createErrorResult(e.getMessage());
-    }
+    return ResultHelper.SUCCESS;
   }
 }

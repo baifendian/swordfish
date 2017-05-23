@@ -136,10 +136,10 @@ service MasterService {
    *
    * projectId : project id
    * flowId : workflow id
-   * scheduleDate : 调度时间（预期的）
+   * runTime : 执行时间
    * execInfo : 执行信息
    */
-  RetResultInfo execFlow(1:i32 projectId, 2:i32 flowId, 3:i64 scheduleDate, 4:ExecInfo execInfo),
+  RetResultInfo execFlow(1:i32 projectId, 2:i32 flowId, 3:i64 runTime, 4:ExecInfo execInfo),
 
   /**
    * 给一个 workflow 补数据
@@ -154,6 +154,7 @@ service MasterService {
    * 注册 execServer
    * ip :  ip 地址
    * port : 端口号
+   * registerTime : 注册时间
    */
   RetInfo registerExecutor(1:string ip, 2:i32 port, 3:i64 registerTime),
 
@@ -162,6 +163,7 @@ service MasterService {
    *
    * ip :  ip 地址
    * port : 端口号
+   * heartBeatData : 心跳信息
    */
   RetInfo executorReport(1:string ip, 2:i32 port, 3:HeartBeatData heartBeatData),
 
@@ -190,14 +192,6 @@ service WorkerService {
    * execId : 执行 id
    */
   RetInfo execFlow(1:i32 execId),
-
-  /**
-   * 调度执行某个 workflow
-   *
-   * execId : 执行 id
-   * scheduleDate : 调度时间（预期的）
-   */
-  RetInfo scheduleExecFlow(1:i32 execId, 2:i64 scheduleDate),
 
   /**
    * 取消在执行的指定workflow

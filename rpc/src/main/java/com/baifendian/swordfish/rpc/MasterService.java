@@ -73,15 +73,15 @@ public class MasterService {
      * 
      * projectId : project id
      * flowId : workflow id
-     * scheduleDate : 调度时间（预期的）
+     * runTime : 执行时间
      * execInfo : 执行信息
      * 
      * @param projectId
      * @param flowId
-     * @param scheduleDate
+     * @param runTime
      * @param execInfo
      */
-    public RetResultInfo execFlow(int projectId, int flowId, long scheduleDate, ExecInfo execInfo) throws org.apache.thrift.TException;
+    public RetResultInfo execFlow(int projectId, int flowId, long runTime, ExecInfo execInfo) throws org.apache.thrift.TException;
 
     /**
      * 给一个 workflow 补数据
@@ -100,6 +100,7 @@ public class MasterService {
      * 注册 execServer
      * ip :  ip 地址
      * port : 端口号
+     * registerTime : 注册时间
      * 
      * @param ip
      * @param port
@@ -112,6 +113,7 @@ public class MasterService {
      * 
      * ip :  ip 地址
      * port : 端口号
+     * heartBeatData : 心跳信息
      * 
      * @param ip
      * @param port
@@ -147,7 +149,7 @@ public class MasterService {
 
     public void deleteSchedules(int projectId, org.apache.thrift.async.AsyncMethodCallback<AsyncClient.deleteSchedules_call> resultHandler) throws org.apache.thrift.TException;
 
-    public void execFlow(int projectId, int flowId, long scheduleDate, ExecInfo execInfo, org.apache.thrift.async.AsyncMethodCallback<AsyncClient.execFlow_call> resultHandler) throws org.apache.thrift.TException;
+    public void execFlow(int projectId, int flowId, long runTime, ExecInfo execInfo, org.apache.thrift.async.AsyncMethodCallback<AsyncClient.execFlow_call> resultHandler) throws org.apache.thrift.TException;
 
     public void appendWorkFlow(int projectId, int flowId, ScheduleInfo scheduleInfo, org.apache.thrift.async.AsyncMethodCallback<AsyncClient.appendWorkFlow_call> resultHandler) throws org.apache.thrift.TException;
 
@@ -252,18 +254,18 @@ public class MasterService {
       throw new org.apache.thrift.TApplicationException(org.apache.thrift.TApplicationException.MISSING_RESULT, "deleteSchedules failed: unknown result");
     }
 
-    public RetResultInfo execFlow(int projectId, int flowId, long scheduleDate, ExecInfo execInfo) throws org.apache.thrift.TException
+    public RetResultInfo execFlow(int projectId, int flowId, long runTime, ExecInfo execInfo) throws org.apache.thrift.TException
     {
-      send_execFlow(projectId, flowId, scheduleDate, execInfo);
+      send_execFlow(projectId, flowId, runTime, execInfo);
       return recv_execFlow();
     }
 
-    public void send_execFlow(int projectId, int flowId, long scheduleDate, ExecInfo execInfo) throws org.apache.thrift.TException
+    public void send_execFlow(int projectId, int flowId, long runTime, ExecInfo execInfo) throws org.apache.thrift.TException
     {
       execFlow_args args = new execFlow_args();
       args.setProjectId(projectId);
       args.setFlowId(flowId);
-      args.setScheduleDate(scheduleDate);
+      args.setRunTime(runTime);
       args.setExecInfo(execInfo);
       sendBase("execFlow", args);
     }
@@ -519,9 +521,9 @@ public class MasterService {
       }
     }
 
-    public void execFlow(int projectId, int flowId, long scheduleDate, ExecInfo execInfo, org.apache.thrift.async.AsyncMethodCallback<execFlow_call> resultHandler) throws org.apache.thrift.TException {
+    public void execFlow(int projectId, int flowId, long runTime, ExecInfo execInfo, org.apache.thrift.async.AsyncMethodCallback<execFlow_call> resultHandler) throws org.apache.thrift.TException {
       checkReady();
-      execFlow_call method_call = new execFlow_call(projectId, flowId, scheduleDate, execInfo, resultHandler, this, ___protocolFactory, ___transport);
+      execFlow_call method_call = new execFlow_call(projectId, flowId, runTime, execInfo, resultHandler, this, ___protocolFactory, ___transport);
       this.___currentMethod = method_call;
       ___manager.call(method_call);
     }
@@ -529,13 +531,13 @@ public class MasterService {
     public static class execFlow_call extends org.apache.thrift.async.TAsyncMethodCall {
       private int projectId;
       private int flowId;
-      private long scheduleDate;
+      private long runTime;
       private ExecInfo execInfo;
-      public execFlow_call(int projectId, int flowId, long scheduleDate, ExecInfo execInfo, org.apache.thrift.async.AsyncMethodCallback<execFlow_call> resultHandler, org.apache.thrift.async.TAsyncClient client, org.apache.thrift.protocol.TProtocolFactory protocolFactory, org.apache.thrift.transport.TNonblockingTransport transport) throws org.apache.thrift.TException {
+      public execFlow_call(int projectId, int flowId, long runTime, ExecInfo execInfo, org.apache.thrift.async.AsyncMethodCallback<execFlow_call> resultHandler, org.apache.thrift.async.TAsyncClient client, org.apache.thrift.protocol.TProtocolFactory protocolFactory, org.apache.thrift.transport.TNonblockingTransport transport) throws org.apache.thrift.TException {
         super(client, protocolFactory, transport, resultHandler, false);
         this.projectId = projectId;
         this.flowId = flowId;
-        this.scheduleDate = scheduleDate;
+        this.runTime = runTime;
         this.execInfo = execInfo;
       }
 
@@ -544,7 +546,7 @@ public class MasterService {
         execFlow_args args = new execFlow_args();
         args.setProjectId(projectId);
         args.setFlowId(flowId);
-        args.setScheduleDate(scheduleDate);
+        args.setRunTime(runTime);
         args.setExecInfo(execInfo);
         args.write(prot);
         prot.writeMessageEnd();
@@ -838,7 +840,7 @@ public class MasterService {
 
       public execFlow_result getResult(I iface, execFlow_args args) throws org.apache.thrift.TException {
         execFlow_result result = new execFlow_result();
-        result.success = iface.execFlow(args.projectId, args.flowId, args.scheduleDate, args.execInfo);
+        result.success = iface.execFlow(args.projectId, args.flowId, args.runTime, args.execInfo);
         return result;
       }
     }
@@ -3271,7 +3273,7 @@ public class MasterService {
 
     private static final org.apache.thrift.protocol.TField PROJECT_ID_FIELD_DESC = new org.apache.thrift.protocol.TField("projectId", org.apache.thrift.protocol.TType.I32, (short)1);
     private static final org.apache.thrift.protocol.TField FLOW_ID_FIELD_DESC = new org.apache.thrift.protocol.TField("flowId", org.apache.thrift.protocol.TType.I32, (short)2);
-    private static final org.apache.thrift.protocol.TField SCHEDULE_DATE_FIELD_DESC = new org.apache.thrift.protocol.TField("scheduleDate", org.apache.thrift.protocol.TType.I64, (short)3);
+    private static final org.apache.thrift.protocol.TField RUN_TIME_FIELD_DESC = new org.apache.thrift.protocol.TField("runTime", org.apache.thrift.protocol.TType.I64, (short)3);
     private static final org.apache.thrift.protocol.TField EXEC_INFO_FIELD_DESC = new org.apache.thrift.protocol.TField("execInfo", org.apache.thrift.protocol.TType.STRUCT, (short)4);
 
     private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
@@ -3282,14 +3284,14 @@ public class MasterService {
 
     public int projectId; // required
     public int flowId; // required
-    public long scheduleDate; // required
+    public long runTime; // required
     public ExecInfo execInfo; // required
 
     /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
     public enum _Fields implements org.apache.thrift.TFieldIdEnum {
       PROJECT_ID((short)1, "projectId"),
       FLOW_ID((short)2, "flowId"),
-      SCHEDULE_DATE((short)3, "scheduleDate"),
+      RUN_TIME((short)3, "runTime"),
       EXEC_INFO((short)4, "execInfo");
 
       private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
@@ -3309,8 +3311,8 @@ public class MasterService {
             return PROJECT_ID;
           case 2: // FLOW_ID
             return FLOW_ID;
-          case 3: // SCHEDULE_DATE
-            return SCHEDULE_DATE;
+          case 3: // RUN_TIME
+            return RUN_TIME;
           case 4: // EXEC_INFO
             return EXEC_INFO;
           default:
@@ -3355,7 +3357,7 @@ public class MasterService {
     // isset id assignments
     private static final int __PROJECTID_ISSET_ID = 0;
     private static final int __FLOWID_ISSET_ID = 1;
-    private static final int __SCHEDULEDATE_ISSET_ID = 2;
+    private static final int __RUNTIME_ISSET_ID = 2;
     private byte __isset_bitfield = 0;
     public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
     static {
@@ -3364,7 +3366,7 @@ public class MasterService {
           new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.I32)));
       tmpMap.put(_Fields.FLOW_ID, new org.apache.thrift.meta_data.FieldMetaData("flowId", org.apache.thrift.TFieldRequirementType.DEFAULT, 
           new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.I32)));
-      tmpMap.put(_Fields.SCHEDULE_DATE, new org.apache.thrift.meta_data.FieldMetaData("scheduleDate", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+      tmpMap.put(_Fields.RUN_TIME, new org.apache.thrift.meta_data.FieldMetaData("runTime", org.apache.thrift.TFieldRequirementType.DEFAULT, 
           new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.I64)));
       tmpMap.put(_Fields.EXEC_INFO, new org.apache.thrift.meta_data.FieldMetaData("execInfo", org.apache.thrift.TFieldRequirementType.DEFAULT, 
           new org.apache.thrift.meta_data.StructMetaData(org.apache.thrift.protocol.TType.STRUCT, ExecInfo.class)));
@@ -3378,7 +3380,7 @@ public class MasterService {
     public execFlow_args(
       int projectId,
       int flowId,
-      long scheduleDate,
+      long runTime,
       ExecInfo execInfo)
     {
       this();
@@ -3386,8 +3388,8 @@ public class MasterService {
       setProjectIdIsSet(true);
       this.flowId = flowId;
       setFlowIdIsSet(true);
-      this.scheduleDate = scheduleDate;
-      setScheduleDateIsSet(true);
+      this.runTime = runTime;
+      setRunTimeIsSet(true);
       this.execInfo = execInfo;
     }
 
@@ -3398,7 +3400,7 @@ public class MasterService {
       __isset_bitfield = other.__isset_bitfield;
       this.projectId = other.projectId;
       this.flowId = other.flowId;
-      this.scheduleDate = other.scheduleDate;
+      this.runTime = other.runTime;
       if (other.isSetExecInfo()) {
         this.execInfo = new ExecInfo(other.execInfo);
       }
@@ -3414,8 +3416,8 @@ public class MasterService {
       this.projectId = 0;
       setFlowIdIsSet(false);
       this.flowId = 0;
-      setScheduleDateIsSet(false);
-      this.scheduleDate = 0;
+      setRunTimeIsSet(false);
+      this.runTime = 0;
       this.execInfo = null;
     }
 
@@ -3465,27 +3467,27 @@ public class MasterService {
       __isset_bitfield = EncodingUtils.setBit(__isset_bitfield, __FLOWID_ISSET_ID, value);
     }
 
-    public long getScheduleDate() {
-      return this.scheduleDate;
+    public long getRunTime() {
+      return this.runTime;
     }
 
-    public execFlow_args setScheduleDate(long scheduleDate) {
-      this.scheduleDate = scheduleDate;
-      setScheduleDateIsSet(true);
+    public execFlow_args setRunTime(long runTime) {
+      this.runTime = runTime;
+      setRunTimeIsSet(true);
       return this;
     }
 
-    public void unsetScheduleDate() {
-      __isset_bitfield = EncodingUtils.clearBit(__isset_bitfield, __SCHEDULEDATE_ISSET_ID);
+    public void unsetRunTime() {
+      __isset_bitfield = EncodingUtils.clearBit(__isset_bitfield, __RUNTIME_ISSET_ID);
     }
 
-    /** Returns true if field scheduleDate is set (has been assigned a value) and false otherwise */
-    public boolean isSetScheduleDate() {
-      return EncodingUtils.testBit(__isset_bitfield, __SCHEDULEDATE_ISSET_ID);
+    /** Returns true if field runTime is set (has been assigned a value) and false otherwise */
+    public boolean isSetRunTime() {
+      return EncodingUtils.testBit(__isset_bitfield, __RUNTIME_ISSET_ID);
     }
 
-    public void setScheduleDateIsSet(boolean value) {
-      __isset_bitfield = EncodingUtils.setBit(__isset_bitfield, __SCHEDULEDATE_ISSET_ID, value);
+    public void setRunTimeIsSet(boolean value) {
+      __isset_bitfield = EncodingUtils.setBit(__isset_bitfield, __RUNTIME_ISSET_ID, value);
     }
 
     public ExecInfo getExecInfo() {
@@ -3530,11 +3532,11 @@ public class MasterService {
         }
         break;
 
-      case SCHEDULE_DATE:
+      case RUN_TIME:
         if (value == null) {
-          unsetScheduleDate();
+          unsetRunTime();
         } else {
-          setScheduleDate((Long)value);
+          setRunTime((Long)value);
         }
         break;
 
@@ -3557,8 +3559,8 @@ public class MasterService {
       case FLOW_ID:
         return Integer.valueOf(getFlowId());
 
-      case SCHEDULE_DATE:
-        return Long.valueOf(getScheduleDate());
+      case RUN_TIME:
+        return Long.valueOf(getRunTime());
 
       case EXEC_INFO:
         return getExecInfo();
@@ -3578,8 +3580,8 @@ public class MasterService {
         return isSetProjectId();
       case FLOW_ID:
         return isSetFlowId();
-      case SCHEDULE_DATE:
-        return isSetScheduleDate();
+      case RUN_TIME:
+        return isSetRunTime();
       case EXEC_INFO:
         return isSetExecInfo();
       }
@@ -3617,12 +3619,12 @@ public class MasterService {
           return false;
       }
 
-      boolean this_present_scheduleDate = true;
-      boolean that_present_scheduleDate = true;
-      if (this_present_scheduleDate || that_present_scheduleDate) {
-        if (!(this_present_scheduleDate && that_present_scheduleDate))
+      boolean this_present_runTime = true;
+      boolean that_present_runTime = true;
+      if (this_present_runTime || that_present_runTime) {
+        if (!(this_present_runTime && that_present_runTime))
           return false;
-        if (this.scheduleDate != that.scheduleDate)
+        if (this.runTime != that.runTime)
           return false;
       }
 
@@ -3671,12 +3673,12 @@ public class MasterService {
           return lastComparison;
         }
       }
-      lastComparison = Boolean.valueOf(isSetScheduleDate()).compareTo(typedOther.isSetScheduleDate());
+      lastComparison = Boolean.valueOf(isSetRunTime()).compareTo(typedOther.isSetRunTime());
       if (lastComparison != 0) {
         return lastComparison;
       }
-      if (isSetScheduleDate()) {
-        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.scheduleDate, typedOther.scheduleDate);
+      if (isSetRunTime()) {
+        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.runTime, typedOther.runTime);
         if (lastComparison != 0) {
           return lastComparison;
         }
@@ -3719,8 +3721,8 @@ public class MasterService {
       sb.append(this.flowId);
       first = false;
       if (!first) sb.append(", ");
-      sb.append("scheduleDate:");
-      sb.append(this.scheduleDate);
+      sb.append("runTime:");
+      sb.append(this.runTime);
       first = false;
       if (!first) sb.append(", ");
       sb.append("execInfo:");
@@ -3794,10 +3796,10 @@ public class MasterService {
                 org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
               }
               break;
-            case 3: // SCHEDULE_DATE
+            case 3: // RUN_TIME
               if (schemeField.type == org.apache.thrift.protocol.TType.I64) {
-                struct.scheduleDate = iprot.readI64();
-                struct.setScheduleDateIsSet(true);
+                struct.runTime = iprot.readI64();
+                struct.setRunTimeIsSet(true);
               } else { 
                 org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
               }
@@ -3832,8 +3834,8 @@ public class MasterService {
         oprot.writeFieldBegin(FLOW_ID_FIELD_DESC);
         oprot.writeI32(struct.flowId);
         oprot.writeFieldEnd();
-        oprot.writeFieldBegin(SCHEDULE_DATE_FIELD_DESC);
-        oprot.writeI64(struct.scheduleDate);
+        oprot.writeFieldBegin(RUN_TIME_FIELD_DESC);
+        oprot.writeI64(struct.runTime);
         oprot.writeFieldEnd();
         if (struct.execInfo != null) {
           oprot.writeFieldBegin(EXEC_INFO_FIELD_DESC);
@@ -3864,7 +3866,7 @@ public class MasterService {
         if (struct.isSetFlowId()) {
           optionals.set(1);
         }
-        if (struct.isSetScheduleDate()) {
+        if (struct.isSetRunTime()) {
           optionals.set(2);
         }
         if (struct.isSetExecInfo()) {
@@ -3877,8 +3879,8 @@ public class MasterService {
         if (struct.isSetFlowId()) {
           oprot.writeI32(struct.flowId);
         }
-        if (struct.isSetScheduleDate()) {
-          oprot.writeI64(struct.scheduleDate);
+        if (struct.isSetRunTime()) {
+          oprot.writeI64(struct.runTime);
         }
         if (struct.isSetExecInfo()) {
           struct.execInfo.write(oprot);
@@ -3898,8 +3900,8 @@ public class MasterService {
           struct.setFlowIdIsSet(true);
         }
         if (incoming.get(2)) {
-          struct.scheduleDate = iprot.readI64();
-          struct.setScheduleDateIsSet(true);
+          struct.runTime = iprot.readI64();
+          struct.setRunTimeIsSet(true);
         }
         if (incoming.get(3)) {
           struct.execInfo = new ExecInfo();

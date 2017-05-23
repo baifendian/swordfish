@@ -19,19 +19,14 @@ import com.baifendian.swordfish.dao.BaseDao;
 import com.baifendian.swordfish.dao.datasource.ConnectionFactory;
 import com.baifendian.swordfish.dao.mapper.ProjectFlowMapper;
 import com.baifendian.swordfish.dao.mapper.ProjectUserMapper;
-import com.baifendian.swordfish.dao.model.Schedule;
 import com.baifendian.swordfish.dao.model.User;
-
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 
 @Component
@@ -61,7 +56,7 @@ public class MailSendService extends BaseDao {
     List<User> users = projectUserMapper.queryForUser(projectId);
 
     if (users == null) {
-      LOGGER.error("Not find project: {}", projectId);
+      LOGGER.error("Not find PROJECT: {}", projectId);
       return false;
     }
 
@@ -75,7 +70,7 @@ public class MailSendService extends BaseDao {
   }
 
   /**
-   * 若 workflow 无邮件组，且指定 sendToUserIfMailsEmpty 为 true 时，则发送邮件给项目组成员
+   * 若 WORKFLOW 无邮件组，且指定 sendToUserIfMailsEmpty 为 true 时，则发送邮件给项目组成员
    *
    * @param flowId                 flowid
    * @param title                  邮件主题
@@ -107,7 +102,7 @@ public class MailSendService extends BaseDao {
     User user = projectFlowMapper.queryFlowOwner(flowId);
 
     if (user == null) {
-      LOGGER.error("Not find workflow: {}", flowId);
+      LOGGER.error("Not find WORKFLOW: {}", flowId);
       return false;
     }
 

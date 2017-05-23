@@ -20,16 +20,32 @@ import org.apache.ibatis.jdbc.SQL;
 import java.util.Map;
 
 public class MasterServerMapperProvider {
+
+  public static final String TABLE_NAME = "master_server";
+
+  /**
+   * 查询 master 的所有信息
+   *
+   * @return
+   */
   public String query() {
     return new SQL() {{
       SELECT("*");
-      FROM("master_server");
+
+      FROM(TABLE_NAME);
     }}.toString();
   }
 
+  /**
+   * 插入到 table 中
+   *
+   * @param parameter
+   * @return
+   */
   public String insert(Map<String, Object> parameter) {
     return new SQL() {{
-      INSERT_INTO("master_server");
+      INSERT_INTO(TABLE_NAME);
+
       VALUES("host", "#{masterServer.host}");
       VALUES("port", "#{masterServer.port}");
       VALUES("create_time", "#{masterServer.createTime}");
@@ -37,19 +53,46 @@ public class MasterServerMapperProvider {
     }}.toString();
   }
 
+  /**
+   * 更新信息
+   *
+   * @param parameter
+   * @return
+   */
   public String update(Map<String, Object> parameter) {
     return new SQL() {{
-      UPDATE("master_server");
-      SET("modify_time=#{masterServer.modifyTime}");
-      WHERE("host=#{masterServer.host}");
-      WHERE("port=#{masterServer.port}");
+      UPDATE(TABLE_NAME);
+
+      SET("modify_time = #{masterServer.modifyTime}");
+
+      WHERE("host = #{masterServer.host}");
+      WHERE("port = #{masterServer.port}");
     }}.toString();
   }
 
+  /**
+   * 删除记录
+   *
+   * @return
+   */
   public String delete() {
     return new SQL() {{
-      DELETE_FROM("master_server");
+      DELETE_FROM(TABLE_NAME);
     }}.toString();
   }
 
+  /**
+   * 删除指定的 host, port 信息
+   *
+   * @param parameter
+   * @return
+   */
+  public String deleteByHostPort(Map<String, Object> parameter) {
+    return new SQL() {{
+      DELETE_FROM(TABLE_NAME);
+
+      WHERE("host = #{host}");
+      WHERE("port = #{port}");
+    }}.toString();
+  }
 }

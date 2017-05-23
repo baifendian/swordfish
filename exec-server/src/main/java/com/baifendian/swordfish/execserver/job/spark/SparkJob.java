@@ -15,60 +15,92 @@
  */
 package com.baifendian.swordfish.execserver.job.spark;
 
-import com.baifendian.swordfish.common.job.BaseParam;
-import com.baifendian.swordfish.common.job.JobProps;
-import com.baifendian.swordfish.common.job.yarn.AbstractYarnJob;
+import com.baifendian.swordfish.common.job.struct.node.BaseParam;
+import com.baifendian.swordfish.common.job.struct.node.spark.SparkParam;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
+import com.baifendian.swordfish.execserver.job.JobProps;
+import com.baifendian.swordfish.execserver.job.yarn.AbstractYarnJob;
 import com.baifendian.swordfish.execserver.parameter.ParamHelper;
-
 import org.slf4j.Logger;
 
-import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Spark 作业 <p>
  */
 public class SparkJob extends AbstractYarnJob {
+  /**
+   * spark 命令
+   */
+  private static final String SPARK_COMMAND = "spark-submit";
 
   /**
    * 提交的参数
    */
   private SparkParam sparkParam;
 
-  public SparkJob(String jobIdLog, JobProps props, Logger logger) throws IllegalAccessException, IOException {
-    super(jobIdLog, props, logger);
+  public SparkJob(JobProps props, Logger logger) {
+    super(props, logger);
   }
 
   @Override
-  public void initJobParams() {
+  public void initJob() {
     sparkParam = JsonUtil.parseObject(props.getJobParams(), SparkParam.class);
     sparkParam.setQueue(props.getQueue());
+
     if (sparkParam.getArgs() != null) {
       String args = ParamHelper.resolvePlaceholders(sparkParam.getArgs(), props.getDefinedParams());
       sparkParam.setArgs(args);
     }
   }
 
-  public List<String> buildCommand() {
-    return SparkSubmitArgsUtil.buildArgs(sparkParam);
-  }
-
+  /**
+   * spark 示例:
+   * <p>
+   * spark-submit --class org.apache.spark.examples.FilesAndArchivesTest \
+   * --master yarn \
+   * --deploy-mode cluster \
+   * --driver-cores 1 \
+   * --driver-memory 512M \
+   * --num-executors 4 \
+   * --executor-cores 2 \
+   * --executor-memory 1024M \
+   * --files story.txt#st \
+   * --archives dicts.tar.gz#z \
+   * spark-examples-1.0-SNAPSHOT-hadoop2.6.0.jar st z blackheads,Adrien
+   *
+   * @return
+   * @throws Exception
+   */
   @Override
-  public ProcessBuilder createProcessBuilder() {
-    ProcessBuilder processBuilder = new ProcessBuilder("spark-submit");
-    List<String> args = buildCommand();
-    if (args != null) {
-      processBuilder.command().addAll(args);
-    }
+  public String createCommand() throws Exception {
+    List<String> args = new ArrayList<>();
 
-    return processBuilder;
+    args.add(SPARK_COMMAND);
+
+    // 添加其它参数
+    args.addAll(SparkSubmitArgsUtil.buildArgs(sparkParam));
+
+    String command = ParamHelper.resolvePlaceholders(String.join(" ", args), props.getDefinedParams());
+
+    logger.info("spark job command:\n{}", command);
+
+    return command;
   }
 
-  protected String findLogLinks(String line) {
+  /**
+   * 查找日志连接
+   *
+   * @param line
+   * @return
+   */
+  @Override
+  public String findLogLinks(String line) {
     if (line.contains("tracking URL:")) {
       return line.substring(line.indexOf("URL:") + "URL:".length() + 1);
     }
+
     return null;
   }
 
@@ -76,5 +108,4 @@ public class SparkJob extends AbstractYarnJob {
   public BaseParam getParam() {
     return sparkParam;
   }
-
 }

@@ -16,32 +16,58 @@
 package com.baifendian.swordfish.dao.mapper;
 
 import com.baifendian.swordfish.dao.model.MasterServer;
-
 import org.apache.ibatis.annotations.*;
 import org.apache.ibatis.type.JdbcType;
 import org.mybatis.spring.annotation.MapperScan;
 
 import java.util.Date;
 
-@MapperScan
 public interface MasterServerMapper {
+  /**
+   * 查询 master
+   *
+   * @return
+   */
   @Results(value = {
-          @Result(property = "host", column = "host", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-          @Result(property = "port", column = "port", javaType = int.class, jdbcType = JdbcType.INTEGER),
-          @Result(property = "createTime", column = "create_time", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP),
-          @Result(property = "modifyTime", column = "modify_time", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP),
+      @Result(property = "id", column = "id", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
+      @Result(property = "host", column = "host", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+      @Result(property = "port", column = "port", javaType = int.class, jdbcType = JdbcType.INTEGER),
+      @Result(property = "createTime", column = "create_time", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP),
+      @Result(property = "modifyTime", column = "modify_time", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP)
   })
   @SelectProvider(type = MasterServerMapperProvider.class, method = "query")
   MasterServer query();
 
-
+  /**
+   * 插入一个 master 信息
+   *
+   * @param masterServer
+   * @return
+   */
   @InsertProvider(type = MasterServerMapperProvider.class, method = "insert")
   int insert(@Param("masterServer") MasterServer masterServer);
 
+  /**
+   * 更新一个 master 信息
+   *
+   * @param masterServer
+   * @return
+   */
   @UpdateProvider(type = MasterServerMapperProvider.class, method = "update")
   int update(@Param("masterServer") MasterServer masterServer);
 
-  @SelectProvider(type = MasterServerMapperProvider.class, method = "delete")
+  /**
+   * 删除 master 信息
+   */
+  @DeleteProvider(type = MasterServerMapperProvider.class, method = "delete")
   void delete();
 
+  /**
+   * 根据 host, port 删除
+   *
+   * @param host
+   * @param port
+   */
+  @DeleteProvider(type = MasterServerMapperProvider.class, method = "deleteByHostPort")
+  int deleteByHostPort(@Param("host") String host, @Param("port") int port);
 }

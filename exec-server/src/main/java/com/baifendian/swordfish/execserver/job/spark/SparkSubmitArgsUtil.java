@@ -15,9 +15,9 @@
  */
 package com.baifendian.swordfish.execserver.job.spark;
 
-import com.baifendian.swordfish.dao.model.flow.params.Property;
-import com.baifendian.swordfish.common.job.ResourceInfo;
-
+import com.baifendian.swordfish.common.job.struct.node.spark.SparkParam;
+import com.baifendian.swordfish.common.job.struct.resource.ResourceInfo;
+import com.baifendian.swordfish.dao.model.flow.Property;
 import org.apache.commons.lang.StringUtils;
 
 import java.util.ArrayList;
@@ -92,7 +92,7 @@ public class SparkSubmitArgsUtil {
       args.add(param.getQueue());
     }
 
-    if (!param.getProperties().isEmpty()) {
+    if (param.getProperties() != null && !param.getProperties().isEmpty()) {
       for (Property property : param.getProperties()) {
         args.add(SparkSubmitArgsConst.CONF);
         args.add(property.getProp() + "=" + property.getValue());
@@ -106,17 +106,19 @@ public class SparkSubmitArgsUtil {
     if (StringUtils.isNotEmpty(param.getArgs())) {
       args.add(param.getArgs());
     }
+
     return args;
   }
 
   private static String getFilesStr(List<ResourceInfo> files, boolean isSymbolic) {
-    if (files == null)
-      return "";
+    if (files == null) {
+      return StringUtils.EMPTY;
+    }
 
-    if (isSymbolic)
+    if (isSymbolic) {
       return StringUtils.join(files.stream().map(p -> p.getSymbolicRes()).toArray(), ",");
-    else
-      return StringUtils.join(files.stream().map(p -> p.getRes()).toArray(), ",");
-  }
+    }
 
+    return StringUtils.join(files.stream().map(p -> p.getRes()).toArray(), ",");
+  }
 }

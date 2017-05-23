@@ -41,6 +41,7 @@ public class JsonUtil {
   static {
     // 未匹配的属性不解析
     JSON_MAPPER.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+
     // 使用系统默认时区
     JSON_MAPPER.setTimeZone(TimeZone.getDefault());
   }
@@ -159,6 +160,20 @@ public class JsonUtil {
     } catch (IOException e) {
       throw new RuntimeException("Json parse exception.", e);
     }
+  }
+
+  /**
+   * 判断是否是一个 json object
+   *
+   * @param json
+   * @return
+   */
+  public static boolean isJsonNode(String json) {
+    if (json == null) {
+      return true;
+    }
+
+    return readTree(json) != null;
   }
 
   /**

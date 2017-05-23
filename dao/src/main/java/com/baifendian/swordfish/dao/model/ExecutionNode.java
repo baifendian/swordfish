@@ -19,14 +19,13 @@ import com.baifendian.swordfish.dao.enums.FlowStatus;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
-public class ExecutionNode extends FlowNode{
+public class ExecutionNode {
 
   /**
-   * 具体workflow执行的 id
+   * 具体 workflow 执行的 id
    **/
   private Integer execId;
 
@@ -60,8 +59,14 @@ public class ExecutionNode extends FlowNode{
    **/
   private String jobId;
 
+  /**
+   * 日志 link
+   */
   private String logLinks;
 
+  /**
+   * 得到日志链接
+   */
   private List<String> logLinkList = new ArrayList<>();
 
   public Integer getExecId() {
@@ -104,6 +109,14 @@ public class ExecutionNode extends FlowNode{
     this.attempt = attempt;
   }
 
+  public void incAttempt() {
+    if (attempt == null) {
+      attempt = 0;
+    }
+
+    attempt += 1;
+  }
+
   public String getJobId() {
     return jobId;
   }
@@ -114,6 +127,9 @@ public class ExecutionNode extends FlowNode{
 
   public void setLogLinkList(List<String> logLinkList) {
     this.logLinkList = logLinkList;
+    if (logLinkList != null) {
+      this.logLinks = JsonUtil.toJsonString(logLinkList);
+    }
   }
 
   public void setJobId(String jobId) {
@@ -133,9 +149,7 @@ public class ExecutionNode extends FlowNode{
   }
 
   public void setLogLinks(String logLinks) {
-    this.logLinkList = Arrays.asList(new String[] {logLinks});
+    this.logLinkList = JsonUtil.parseObjectList(logLinks, String.class);
     this.logLinks = logLinks;
   }
-
-
 }

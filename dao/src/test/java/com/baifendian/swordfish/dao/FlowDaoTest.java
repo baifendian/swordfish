@@ -15,16 +15,13 @@
  */
 package com.baifendian.swordfish.dao;
 
-import com.baifendian.swordfish.dao.enums.ExecType;
 import com.baifendian.swordfish.dao.model.ExecutionFlow;
 import com.baifendian.swordfish.dao.model.ExecutionNode;
 import com.baifendian.swordfish.dao.model.ProjectFlow;
 import com.baifendian.swordfish.dao.model.Schedule;
-
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -77,7 +74,7 @@ public class FlowDaoTest {
 
   @Test
   public void testProjectFlowfindById() {
-    ProjectFlow flow = flowDao.projectFlowfindById(2);
+    ProjectFlow flow = flowDao.projectFlowFindById(2);
     System.out.println(flow);
   }
 

@@ -15,16 +15,27 @@
  */
 package com.baifendian.swordfish.webserver.service;
 
+import com.baifendian.swordfish.common.config.BaseConfig;
+import com.baifendian.swordfish.common.hadoop.HdfsClient;
+import com.baifendian.swordfish.common.job.struct.node.BaseParam;
+import com.baifendian.swordfish.common.job.struct.node.BaseParamFactory;
 import com.baifendian.swordfish.common.utils.graph.Graph;
 import com.baifendian.swordfish.dao.FlowDao;
-import com.baifendian.swordfish.dao.mapper.FlowNodeMapper;
 import com.baifendian.swordfish.dao.mapper.ProjectFlowMapper;
 import com.baifendian.swordfish.dao.mapper.ProjectMapper;
-import com.baifendian.swordfish.dao.mapper.ResourceMapper;
-import com.baifendian.swordfish.dao.model.*;
+import com.baifendian.swordfish.dao.model.FlowNode;
+import com.baifendian.swordfish.dao.model.Project;
+import com.baifendian.swordfish.dao.model.ProjectFlow;
+import com.baifendian.swordfish.dao.model.User;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
+import com.baifendian.swordfish.webserver.dto.WorkflowData;
+import com.baifendian.swordfish.webserver.dto.WorkflowNodeDto;
+import com.baifendian.swordfish.webserver.exception.*;
+import com.baifendian.swordfish.webserver.service.storage.FileSystemStorageService;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import net.lingala.zip4j.core.ZipFile;
+import net.lingala.zip4j.exception.ZipException;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,24 +44,25 @@ import org.springframework.core.io.InputStreamResource;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.core.io.Resource;
 
-import javax.servlet.http.HttpServletResponse;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
+
+import static com.baifendian.swordfish.webserver.utils.ParamVerify.*;
 
 @Service
 public class WorkflowService {
 
   private static Logger logger = LoggerFactory.getLogger(WorkflowService.class.getName());
 
-  @Autowired
-  private ProjectFlowMapper projectFlowMapper;
+  private static final String WorkflowJson = "workflow.json";
 
   @Autowired
-  private FlowNodeMapper flowNodeMapper;
+  private ProjectFlowMapper projectFlowMapper;
 
   @Autowired
   private ProjectMapper projectMapper;
@@ -59,13 +71,13 @@ public class WorkflowService {
   private ProjectService projectService;
 
   @Autowired
-  private ResourceMapper resourceMapper;
+  private FileSystemStorageService fileSystemStorageService;
 
   @Autowired
   private FlowDao flowDao;
 
   /**
-   * 创建一个工作流, 需要具备项目的 'w' 权限。
+   * 创建一个工作流, 需要具备项目的 \"w\" 权限。
    *
    * @param operator    操作用户实体
    * @param projectName 工作流所在项目名称
@@ -75,102 +87,111 @@ public class WorkflowService {
    * @param queue       工作流所在队列名称
    * @param data        工作流定义json
    * @param file        工作流定义文件
-   * @param response    操作请求response
+   * @param extras      工作流的额外参数
+   * @param flag        工作流的标示, 0 表示正常途径创建的, 1 表示是临时的工作流, 后期可能根据一定规则清理
    * @return 已经创建的工作流实体
    */
-  public ProjectFlow createWorkflow(User operator, String projectName, String name, String desc, String proxyUser, String queue, String data, MultipartFile file, HttpServletResponse response) {
+  public ProjectFlow createWorkflow(User operator, String projectName, String name, String desc, String proxyUser, String queue, String data, MultipartFile file, String extras, Integer flag) {
 
-    // 查看是否对项目具备相应的权限
+    // 校验变量
+    verifyWorkflowName(name);
+    verifyDesc(desc);
+    verifyExtras(extras);
+
     Project project = projectMapper.queryByName(projectName);
 
     if (project == null) {
       logger.error("Project does not exist: {}", projectName);
-      response.setStatus(HttpStatus.SC_NOT_MODIFIED);
-      return null;
+      throw new NotFoundException("Not found project \"{0}\"", projectName);
     }
 
+    // project 是否存在写权限
     if (!projectService.hasWritePerm(operator.getId(), project)) {
-      logger.error("User {} has no right permission for the project {} to create project flow", operator.getName(), projectName);
-      response.setStatus(HttpStatus.SC_UNAUTHORIZED);
-      return null;
+      logger.error("User {} has no right permission for the project {}", operator.getName(), project.getName());
+      throw new PermissionException("User \"{0}\" is not has project \"{1}\" write permission", operator.getName(), project.getName());
     }
 
-    // 对工作流详定义json进行反序列化
-    ProjectFlow.ProjectFlowData projectFlowData = projectFlowDataDes(data, file);
+    // 判断 proxyUser 是否合理的
+    verifyProxyUser(operator.getProxyUserList(), proxyUser);
 
-    if (projectFlowData == null) {
+    // 对工作流详定义 json 进行反序列化
+    WorkflowData workflowData = workflowDataDes(data, file, name, project);
+
+    if (workflowData == null) {
       logger.error("Project flow data or file not valid");
-      response.setStatus(HttpStatus.SC_BAD_REQUEST);
-      return null;
+      throw new ParameterException("Data \"{0}\" not valid", data);
     }
 
     // 检测工作流节点是否正常
-    List<FlowNode> flowNodes = projectFlowData.getNodes();
+    List<WorkflowNodeDto> flowNodes = workflowData.getNodes();
 
     if (CollectionUtils.isEmpty(flowNodes)) {
       logger.error("flow node information is empty");
-      response.setStatus(HttpStatus.SC_BAD_REQUEST);
-      return null;
+      throw new ParameterException("Data \"{0}\" is null", data);
     }
 
     // 检测工作节点是否存在闭环
     if (graphHasCycle(flowNodes)) {
       logger.error("Proejct flow DAG has cycle");
-      response.setStatus(HttpStatus.SC_BAD_REQUEST);
-      return null;
+      throw new ParameterException("Flow node has cycle");
     }
 
-    // 检测工作流节点定义json是否正常
-    for (FlowNode flowNode : flowNodes) {
-      // TODO:: 这个检测不是很合理, 需要修改, 不太完备
+    // 检测工作流节点定义 json 是否正常
+    for (WorkflowNodeDto flowNode : flowNodes) {
       if (!flowNodeParamCheck(flowNode.getParameter(), flowNode.getType())) {
         logger.error("Flow node {} parameter invalid", flowNode.getName());
-        response.setStatus(HttpStatus.SC_BAD_REQUEST);
-        return null;
+        throw new ParameterException("Flow node \"{0}\" parameter invalid ", flowNode.getName());
       }
+
+      // 校验节点的额外参数
+      verifyExtras(flowNode.getExtras());
     }
-
-
 
     ProjectFlow projectFlow = new ProjectFlow();
     Date now = new Date();
 
     // 组装新建数据流实体
     try {
-      projectFlow.setData(projectFlowData);
+      List<FlowNode> flowNodeList = new ArrayList<>();
+
+      for (WorkflowNodeDto flowNode : flowNodes) {
+        flowNodeList.add(flowNode.convertFlowNode());
+      }
+
       projectFlow.setName(name);
       projectFlow.setProjectId(project.getId());
       projectFlow.setProjectName(projectName);
       projectFlow.setDesc(desc);
-      projectFlow.setFlowsNodes(flowNodes);
       projectFlow.setCreateTime(now);
       projectFlow.setModifyTime(now);
       projectFlow.setProxyUser(proxyUser);
       projectFlow.setQueue(queue);
       projectFlow.setOwnerId(operator.getId());
       projectFlow.setOwner(operator.getName());
+      projectFlow.setExtras(extras);
+      projectFlow.setFlowsNodes(flowNodeList);
+      projectFlow.setUserDefinedParamList(workflowData.getUserDefParams());
+      projectFlow.setFlag(flag);
     } catch (Exception e) {
       logger.error("Project flow set value error", e);
-      response.setStatus(HttpStatus.SC_BAD_REQUEST);
-      return null;
+      throw new BadRequestException("Project flow set value error", e);
     }
 
     try {
       flowDao.createProjectFlow(projectFlow);
     } catch (DuplicateKeyException e) {
       logger.error("Workflow has exist, can't create again.", e);
-      response.setStatus(HttpStatus.SC_CONFLICT);
-      return null;
+      throw new ServerErrorException("Workflow has exist, can't create again.");
     } catch (Exception e) {
       logger.error("Workflow create has error", e);
-      response.setStatus(HttpStatus.SC_NOT_MODIFIED);
+      throw new ServerErrorException("Workflow create has error", e);
     }
 
     return projectFlow;
   }
 
   /**
-   * 覆盖式修改一个工作流，如果不存在就创建。需要具备项目的 'w' 权限。
+   * 覆盖式修改一个工作流，如果不存在就创建。需要具备项目的 \"w\" 权限。
    * <p>
    * 覆盖式的更新所有可以更新的字段,对于传null的值也会覆盖写入。
    * </p>
@@ -183,21 +204,20 @@ public class WorkflowService {
    * @param queue
    * @param data
    * @param file
-   * @param response
    * @return
    */
-  public ProjectFlow putWorkflow(User operator, String projectName, String name, String desc, String proxyUser, String queue, String data, MultipartFile file, HttpServletResponse response) {
+  public ProjectFlow putWorkflow(User operator, String projectName, String name, String desc, String proxyUser, String queue, String data, MultipartFile file, String extras) {
     ProjectFlow projectFlow = flowDao.projectFlowFindByPorjectNameAndName(projectName, name);
 
     if (projectFlow == null) {
-      return createWorkflow(operator, projectName, name, desc, proxyUser, queue, data, file, response);
+      return createWorkflow(operator, projectName, name, desc, proxyUser, queue, data, file, extras, null);
     }
 
-    return patchWorkflow(operator, projectName, name, desc, proxyUser, queue, data, file, response);
+    return patchWorkflow(operator, projectName, name, desc, proxyUser, queue, data, file, extras);
   }
 
   /**
-   * 非覆盖式修改一个已经存在的工作流。需要具备项目的 'w' 权限。
+   * 非覆盖式修改一个已经存在的工作流。需要具备项目的 \"w\" 权限。
    * <p>
    * 非覆盖式的更新所有可以更新的字段，对于传null的值不写入。
    * </p>
@@ -210,69 +230,84 @@ public class WorkflowService {
    * @param queue
    * @param data
    * @param file
-   * @param response
    * @return
    */
-  public ProjectFlow patchWorkflow(User operator, String projectName, String name, String desc, String proxyUser, String queue, String data, MultipartFile file, HttpServletResponse response) {
+  public ProjectFlow patchWorkflow(User operator, String projectName, String name, String desc, String proxyUser, String queue, String data, MultipartFile file, String extras) {
 
-    // 查询项目是否存在以及是否具备相应权限
+    verifyDesc(desc);
+    verifyExtras(extras);
+
     Project project = projectMapper.queryByName(projectName);
 
     if (project == null) {
       logger.error("Project does not exist: {}", projectName);
-      response.setStatus(HttpStatus.SC_NOT_MODIFIED);
-      return null;
+      throw new NotFoundException("Not found project \"{0}\"", projectName);
     }
 
+    // 必须有 project 写权限
     if (!projectService.hasWritePerm(operator.getId(), project)) {
-      logger.error("User {} has no right permission for the project {} to patch project flow", operator.getName(), projectName);
-      response.setStatus(HttpStatus.SC_UNAUTHORIZED);
-      return null;
+      logger.error("User {} has no right permission for the project {}", operator.getName(), project.getName());
+      throw new PermissionException("User \"{0}\" is not has project \"{1}\" write permission", operator.getName(), project.getName());
     }
 
-    // 查询工作流信息
+    // 判断 proxyUser 是否合理的
+    if (StringUtils.isNotEmpty(proxyUser)) {
+      verifyProxyUser(operator.getProxyUserList(), proxyUser);
+    }
+
     ProjectFlow projectFlow = flowDao.projectFlowfindByName(project.getId(), name);
-    Date now = new Date();
 
     if (projectFlow == null) {
-      logger.error("Workflow does not exist: {}", name);
-      response.setStatus(HttpStatus.SC_NOT_MODIFIED);
-      return null;
+      logger.error("Not found project flow {} in project {}", name, project.getName());
+      throw new NotFoundException("Not found project flow \"{0}\" in project \"{1}\"", name, project.getName());
     }
 
+    Date now = new Date();
+
     // 解析
-    ProjectFlow.ProjectFlowData projectFlowData = projectFlowDataDes(data, file);
+    WorkflowData workflowData = workflowDataDes(data, file, name, project);
 
-    if (projectFlowData != null) {
-      if (!StringUtils.isEmpty(projectFlowData.getExtras())) {
-        projectFlow.setExtras(projectFlowData.getExtras());
+    if (workflowData != null) {
+      if (!CollectionUtils.isEmpty(workflowData.getUserDefParams())) {
+        projectFlow.setUserDefinedParamList(workflowData.getUserDefParams());
       }
 
-      if (!CollectionUtils.isEmpty(projectFlowData.getUserDefParams())) {
-        projectFlow.setUserDefinedParams(JsonUtil.toJsonString(projectFlowData.getUserDefParams()));
-      }
-
-      List<FlowNode> flowNodeList = projectFlowData.getNodes();
-      if (flowNodeList != null) {
-        projectFlow.setFlowsNodes(projectFlowData.getNodes());
-
+      List<WorkflowNodeDto> workflowNodeDTOList = workflowData.getNodes();
+      if (CollectionUtils.isNotEmpty(workflowNodeDTOList)) {
         // 闭环检测
-        if (graphHasCycle(flowNodeList)) {
+        if (graphHasCycle(workflowNodeDTOList)) {
           logger.error("Graph has cycle");
-          response.setStatus(HttpStatus.SC_BAD_REQUEST);
-          return null;
+          throw new BadRequestException("Flow node has cycle");
         }
 
         // parameter 检测
-        for (FlowNode flowNode : flowNodeList) {
-          // TODO::参数检测存在问题
-          if (!flowNodeParamCheck(flowNode.getParameter(), flowNode.getType())) {
-            response.setStatus(HttpStatus.SC_BAD_REQUEST);
-            return null;
+        for (WorkflowNodeDto workflowNodeDTO : workflowNodeDTOList) {
+          if (!flowNodeParamCheck(workflowNodeDTO.getParameter(), workflowNodeDTO.getType())) {
+            logger.error("Flow node {} parameter invalid", workflowNodeDTO.getName());
+            throw new BadRequestException("workflow node parameter not valid");
+          }
+
+          // 校验节点的额外参数
+          verifyExtras(workflowNodeDTO.getExtras());
+        }
+
+        // 拼装 flowNode
+        List<FlowNode> flowNodeList = new ArrayList<>();
+        for (WorkflowNodeDto workflowNodeDTO : workflowNodeDTOList) {
+          try {
+            flowNodeList.add(workflowNodeDTO.convertFlowNode());
+          } catch (JsonProcessingException e) {
+            logger.error("workflow node dto convert flowNode error", e);
+            throw new BadRequestException("workflow node parameter not valid");
           }
         }
 
+        projectFlow.setFlowsNodes(flowNodeList);
       }
+    }
+
+    if (StringUtils.isNotEmpty(extras)) {
+      projectFlow.setExtras(extras);
     }
 
     if (StringUtils.isNotEmpty(name)) {
@@ -300,11 +335,62 @@ public class WorkflowService {
       flowDao.modifyProjectFlow(projectFlow);
     } catch (Exception e) {
       logger.error("Workflow modify has error", e);
-      response.setStatus(HttpStatus.SC_NOT_MODIFIED);
-      return null;
+      throw new ServerErrorException("Workflow modify has error", e);
     }
 
     return projectFlow;
+  }
+
+  /**
+   * 拷贝一个工作流
+   *
+   * @param operator
+   * @param projectName
+   * @param srcWorkflowName
+   * @param destWorkflowName
+   * @return
+   */
+  public ProjectFlow postWorkflowCopy(User operator, String projectName, String srcWorkflowName, String destWorkflowName) {
+
+    Project project = projectMapper.queryByName(projectName);
+
+    if (project == null) {
+      logger.error("Project does not exist: {}", projectName);
+      throw new NotFoundException("Not found project \"{0}\"", projectName);
+    }
+
+    // 必须有 project 写权限
+    if (!projectService.hasWritePerm(operator.getId(), project)) {
+      logger.error("User {} has no right permission for the project {}", operator.getName(), project.getName());
+      throw new PermissionException("User \"{0}\" is not has project \"{1}\" write permission", operator.getName(), project.getName());
+    }
+
+    ProjectFlow srcProjectFlow = flowDao.projectFlowfindByName(project.getId(), srcWorkflowName);
+
+    if (srcProjectFlow == null) {
+      logger.error("Not found project flow {} in project {}", srcWorkflowName, project.getName());
+      throw new NotFoundException("Not found project flow \"{0}\" in project \"{1}\"", srcWorkflowName, project.getName());
+    }
+
+    String data = JsonUtil.toJsonString(new WorkflowData(srcProjectFlow.getFlowsNodes(), srcProjectFlow.getUserDefinedParamList(), FlowNode.class));
+
+    // 尝试拷贝文件
+    String srcHdfsFilename = BaseConfig.getHdfsWorkflowFilename(project.getId(), srcWorkflowName);
+    String destHdfsFilename = BaseConfig.getHdfsWorkflowFilename(project.getId(), destWorkflowName);
+
+    logger.info("try copy workflow file {} to workflow file {}", srcHdfsFilename, destHdfsFilename);
+    try {
+      if (HdfsClient.getInstance().exists(srcHdfsFilename)) {
+        HdfsClient.getInstance().copy(srcHdfsFilename, destHdfsFilename, false, true);
+      } else {
+        logger.info("workflow file {} not exists no copy required", srcHdfsFilename);
+      }
+    } catch (IOException e) {
+      logger.error("copy hdfs file error", e);
+      throw new ServerErrorException("copy hdfs file error");
+    }
+
+    return putWorkflow(operator, projectName, destWorkflowName, srcProjectFlow.getDesc(), srcProjectFlow.getProxyUser(), srcProjectFlow.getQueue(), data, null, srcProjectFlow.getExtras());
   }
 
   /**
@@ -313,35 +399,35 @@ public class WorkflowService {
    * @param operator
    * @param projectName
    * @param name
-   * @param response
    */
-  public void deleteProjectFlow(User operator, String projectName, String name, HttpServletResponse response) {
+  public void deleteProjectFlow(User operator, String projectName, String name) {
 
-    // 查询项目是否存在以及是否具备相应权限
     Project project = projectMapper.queryByName(projectName);
 
     if (project == null) {
-      response.setStatus(HttpStatus.SC_NOT_MODIFIED);
-      return;
+      logger.error("Project does not exist: {}", projectName);
+      throw new NotFoundException("Not found project \"{0}\"", projectName);
     }
 
+    // 应该有项目写权限
     if (!projectService.hasWritePerm(operator.getId(), project)) {
-      response.setStatus(HttpStatus.SC_UNAUTHORIZED);
-      return;
+      logger.error("User {} has no right permission for the project {}", operator.getName(), project.getName());
+      throw new PermissionException("User \"{0}\" is not has project \"{1}\" write permission", operator.getName(), project.getName());
     }
 
     ProjectFlow projectFlow = flowDao.projectFlowfindByName(project.getId(), name);
 
     if (projectFlow == null) {
-      response.setStatus(HttpStatus.SC_NOT_MODIFIED);
-      return;
+      logger.error("Not found project flow {} in project {}", name, project.getName());
+      throw new NotFoundException("Not found project flow \"{0}\" in project \"{1}\"", name, project.getName());
     }
 
-    projectFlowMapper.deleteByProjectAndName(project.getId(), name);
+    // 删除工作流
+    flowDao.deleteWorkflow(projectFlow.getId());
 
-    // TODO 删除调度，删除日志等
-
-    return;
+    // 删除工作流相关的资源信息
+    String hdfsFilename = BaseConfig.getHdfsWorkflowFilename(project.getId(), name);
+    HdfsClient.getInstance().delete(hdfsFilename, true);
   }
 
   /**
@@ -352,17 +438,18 @@ public class WorkflowService {
    * @param queue
    * @param proxyUser
    */
-  public void modifyWorkflowConf(User operator, String projectName, String queue, String proxyUser, HttpServletResponse response) {
+  public void modifyWorkflowConf(User operator, String projectName, String queue, String proxyUser) {
     Project project = projectMapper.queryByName(projectName);
 
     if (project == null) {
-      response.setStatus(HttpStatus.SC_NOT_MODIFIED);
-      return;
+      logger.error("Project does not exist: {}", projectName);
+      throw new NotFoundException("Not found project \"{0}\"", projectName);
     }
 
+    // 必须有 project 写权限
     if (!projectService.hasWritePerm(operator.getId(), project)) {
-      response.setStatus(HttpStatus.SC_UNAUTHORIZED);
-      return;
+      logger.error("User {} has no right permission for the project {}", operator.getName(), project.getName());
+      throw new PermissionException("User \"{0}\" is not has project \"{1}\" write permission", operator.getName(), project.getName());
     }
 
     projectFlowMapper.updateProjectConf(project.getId(), queue, proxyUser);
@@ -373,25 +460,24 @@ public class WorkflowService {
    *
    * @param operator
    * @param projectName
-   * @param response
    * @return
    */
-  public List<ProjectFlow> queryAllProjectFlow(User operator, String projectName, HttpServletResponse response) {
+  public List<ProjectFlow> queryAllProjectFlow(User operator, String projectName) {
 
     Project project = projectMapper.queryByName(projectName);
 
     if (project == null) {
-      response.setStatus(HttpStatus.SC_NOT_MODIFIED);
-      return null;
+      logger.error("Project does not exist: {}", projectName);
+      throw new NotFoundException("Not found project \"{0}\"", projectName);
     }
 
+    // 必须有 project 读权限
     if (!projectService.hasReadPerm(operator.getId(), project)) {
-      response.setStatus(HttpStatus.SC_UNAUTHORIZED);
-      return null;
+      logger.error("User {} has no right permission for the project {}", operator.getName(), project.getName());
+      throw new PermissionException("User \"{0}\" is not has project \"{1}\" read permission", operator.getName(), project.getName());
     }
 
     return flowDao.projectFlowFindByProject(project.getId());
-
   }
 
   /**
@@ -400,21 +486,21 @@ public class WorkflowService {
    * @param operator
    * @param projectName
    * @param name
-   * @param response
    * @return
    */
-  public ProjectFlow queryProjectFlow(User operator, String projectName, String name, HttpServletResponse response) {
+  public ProjectFlow queryProjectFlow(User operator, String projectName, String name) {
 
     Project project = projectMapper.queryByName(projectName);
 
     if (project == null) {
-      response.setStatus(HttpStatus.SC_NOT_MODIFIED);
-      return null;
+      logger.error("Project does not exist: {}", projectName);
+      throw new NotFoundException("Not found project \"{0}\"", projectName);
     }
 
+    // 必须有 project 读权限
     if (!projectService.hasReadPerm(operator.getId(), project)) {
-      response.setStatus(HttpStatus.SC_UNAUTHORIZED);
-      return null;
+      logger.error("User {} has no right permission for the project {}", operator.getName(), project.getName());
+      throw new PermissionException("User \"{0}\" is not has project \"{1}\" read permission", operator.getName(), project.getName());
     }
 
     return flowDao.projectFlowfindByName(project.getId(), name);
@@ -424,91 +510,133 @@ public class WorkflowService {
    * @param operator
    * @param projectName
    * @param name
-   * @param response
    * @return
    */
-  public Resource downloadProjectFlowFile(User operator, String projectName, String name, HttpServletResponse response) {
+  public org.springframework.core.io.Resource downloadProjectFlowFile(User operator, String projectName, String name) {
+
     Project project = projectMapper.queryByName(projectName);
 
     if (project == null) {
-      response.setStatus(HttpStatus.SC_NOT_MODIFIED);
-      return null;
+      logger.error("Project does not exist: {}", projectName);
+      throw new NotFoundException("Not found project \"{0}\"", projectName);
     }
 
+    // 必须有 project 读权限
     if (!projectService.hasReadPerm(operator.getId(), project)) {
-      response.setStatus(HttpStatus.SC_UNAUTHORIZED);
-      return null;
+      logger.error("User {} has no right permission for the project {}", operator.getName(), project.getName());
+      throw new PermissionException("User \"{0}\" is not has project \"{1}\" read permission", operator.getName(), project.getName());
     }
 
+    // 尝试从 hdfs 下载
+    logger.info("try download workflow {} file from hdfs", name);
+
+    String localFilename = BaseConfig.getLocalWorkflowFilename(project.getId(), UUID.randomUUID().toString());
+    String hdfsFilename = BaseConfig.getHdfsWorkflowFilename(project.getId(), name);
+
+    logger.info("download hdfs {} to local {}", hdfsFilename, localFilename);
+
+    try {
+      HdfsClient.getInstance().copyHdfsToLocal(hdfsFilename, localFilename, false, true);
+    } catch (Exception e) {
+      logger.error("try download workflow {} file error", e);
+    }
+
+    org.springframework.core.io.Resource file = fileSystemStorageService.loadAsResource(localFilename);
+
+    if (file != null) {
+      return file;
+    }
+
+    // 从数据库中导出
+    logger.info("try download workflow {} file from db", name);
     ProjectFlow projectFlow = flowDao.projectFlowfindByName(project.getId(), name);
 
-    String json = "";
-
     try {
-      json = JsonUtil.toJsonString(projectFlow.getData());
-    } catch (RuntimeException e) {
-      e.printStackTrace();
-      return null;
-    }
-
-    try {
+      String json = JsonUtil.toJsonString(new WorkflowData(projectFlow.getFlowsNodes(), projectFlow.getUserDefinedParamList(), FlowNode.class));
       InputStreamResource resource = new InputStreamResource(new FileInputStream(json));
       return resource;
-    } catch (FileNotFoundException e) {
-      e.printStackTrace();
-      return null;
+    } catch (Exception e) {
+      logger.error("download workflow file from db error", e);
+      throw new ServerErrorException("download workflow file from db error");
     }
-
   }
 
   /**
-   * project flow data 反序列化
+   * 工作流 data 反序列化
    *
    * @param data
    * @param file
+   * @param workflowName
+   * @param project
    * @return
    */
-  private ProjectFlow.ProjectFlowData projectFlowDataDes(String data, MultipartFile file) {
-    ProjectFlow.ProjectFlowData projectFlowData = null;
+  private WorkflowData workflowDataDes(String data, MultipartFile file, String workflowName, Project project) {
+    WorkflowData workflowData = null;
 
     if (file != null && !file.isEmpty()) {
-      // TODO::
-      // 先将文件存放到本地
+      // 生成路径
+      String filename = UUID.randomUUID().toString();
+      // 下载到本地的路径, 带 ".zip"
+      String localFilename = BaseConfig.getLocalWorkflowFilename(project.getId(), filename);
+      // 解压出来的文件目录
+      String localExtractDir = BaseConfig.getLocalWorkflowExtractDir(project.getId(), filename);
+      // hdfs 的路径
+      String hdfsFilename = BaseConfig.getHdfsWorkflowFilename(project.getId(), workflowName);
 
-      // 解压
+      try {
+        // 先将文件存放到本地
+        logger.info("save workflow file {} to local {}", workflowName, localFilename);
+        fileSystemStorageService.store(file, localFilename);
 
-      // 读取 workflow.json 文件
-//
-//        ByteArrayInputStream stream = new ByteArrayInputStream(file.getBytes());
-//        String jsonString = IOUtils.toString(stream, "UTF-8");
-      String jsonString = "";
-      projectFlowData = JsonUtil.parseObject(jsonString, ProjectFlow.ProjectFlowData.class);
+        // 解压 并读取
+        ZipFile zipFile = new ZipFile(localFilename);
+        logger.info("ext file {} to {}", localFilename, localExtractDir);
+        zipFile.extractAll(localExtractDir);
+
+        String jsonString = fileSystemStorageService.readFileToString(WorkflowJson);
+        workflowData = JsonUtil.parseObject(jsonString, WorkflowData.class);
+
+        // 上传文件到 HDFS
+        if (workflowData != null) {
+          logger.info("update workflow local file {} to hdfs {}", localFilename, hdfsFilename);
+          HdfsClient.getInstance().copyLocalToHdfs(localFilename, hdfsFilename, true, true);
+        }
+      } catch (ZipException e) {
+        logger.error("ext file error", e);
+        return null;
+      } catch (IOException e) {
+        logger.error("read workflow.json error", e);
+        return null;
+      } catch (Exception e) {
+        logger.error("workflow file process error", e);
+        return null;
+      }
     } else if (data != null) {
-      projectFlowData = JsonUtil.parseObject(data, ProjectFlow.ProjectFlowData.class);
+      workflowData = JsonUtil.parseObject(data, WorkflowData.class);
     }
 
-    return projectFlowData;
+    return workflowData;
   }
 
   /**
    * 闭环检测
    *
-   * @param flowNodeList
+   * @param workflowNodeResponseList
    * @return
    */
-  private boolean graphHasCycle(List<FlowNode> flowNodeList) {
-    Graph<String, FlowNode, String> graph = new Graph<>();
+  private boolean graphHasCycle(List<WorkflowNodeDto> workflowNodeResponseList) {
+    Graph<String, WorkflowNodeDto, String> graph = new Graph<>();
 
     // 填充顶点
-    for (FlowNode flowNode : flowNodeList) {
-      graph.addVertex(flowNode.getName(), flowNode);
+    for (WorkflowNodeDto workflowNodeResponse : workflowNodeResponseList) {
+      graph.addVertex(workflowNodeResponse.getName(), workflowNodeResponse);
     }
 
     // 填充边关系
-    for (FlowNode flowNode : flowNodeList) {
-      if (CollectionUtils.isNotEmpty(flowNode.getDepList())) {
-        for (String dep : flowNode.getDepList()) {
-          graph.addEdge(dep, flowNode.getName());
+    for (WorkflowNodeDto workflowNodeResponse : workflowNodeResponseList) {
+      if (CollectionUtils.isNotEmpty(workflowNodeResponse.getDep())) {
+        for (String dep : workflowNodeResponse.getDep()) {
+          graph.addEdge(dep, workflowNodeResponse.getName());
         }
       }
     }
@@ -524,21 +652,12 @@ public class WorkflowService {
    * @return
    */
   private boolean flowNodeParamCheck(String parameter, String type) {
-    /*ObjectMapper mapper = new ObjectMapper();
+    BaseParam baseParam = BaseParamFactory.getBaseParam(type, parameter);
 
-    try {
-      switch (type) {
-        case "MR":
-        case "mr":
-          mapper.readValue(parameter, NodeParamMR.class);
-          break;
-        default:
-          return false;
-      }
-    } catch (Exception e) {
-      logger.error(e.toString());
+    if (baseParam == null) {
       return false;
-    }*/
-    return true;
+    }
+
+    return baseParam.checkValid();
   }
 }

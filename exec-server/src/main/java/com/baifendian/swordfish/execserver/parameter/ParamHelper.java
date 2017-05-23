@@ -15,9 +15,8 @@
  */
 package com.baifendian.swordfish.execserver.parameter;
 
-import com.baifendian.swordfish.common.utils.PlaceholderUtil;
-import com.baifendian.swordfish.common.utils.TimePlaceholderUtil;
-
+import com.baifendian.swordfish.execserver.parameter.placeholder.PlaceholderUtil;
+import com.baifendian.swordfish.execserver.parameter.placeholder.TimePlaceholderUtil;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateUtils;
 import org.slf4j.Logger;
@@ -37,63 +36,51 @@ public class ParamHelper {
   private static final Logger LOGGER = LoggerFactory.getLogger(ParamHelper.class);
 
   /**
-   * 替换参数的占位符 <p>
+   * 替换参数的占位符
    *
-   * @return 替换后的文本
-   */
-  public static String resolvePlaceholders(String text, Map<String, String> systemParamMap, Map<String, String> customParamMap) {
-    if (StringUtils.isEmpty(text)) {
-      return text;
-    }
-
-    // 获取 dw.system.cyctime
-    Date cycTime = null;
-    String cycTimeStr = systemParamMap.get(SystemParamManager.CYC_TIME);
-    if (StringUtils.isNotEmpty(cycTimeStr)) {
-      try {
-        cycTime = DateUtils.parseDate(cycTimeStr, new String[]{SystemParamManager.TIME_FORMAT});
-      } catch (ParseException e) {
-        LOGGER.error(e.getMessage(), e);
-      }
-    } else {
-      cycTime = new Date();
-    }
-
-    text = PlaceholderUtil.resolvePlaceholders(text, systemParamMap, true);
-    text = PlaceholderUtil.resolvePlaceholders(text, customParamMap, true);
-    if (cycTime != null) {
-      text = TimePlaceholderUtil.resolvePlaceholders(text, cycTime, true);
-    }
-    return text;
-  }
-
-  /**
-   * 替换参数的占位符 <p>
-   *
-   * @return 替换后的文本
+   * @param text
+   * @param paramMap
+   * @return
    */
   public static String resolvePlaceholders(String text, Map<String, String> paramMap) {
     if (StringUtils.isEmpty(text)) {
       return text;
     }
 
-    // 获取 dw.system.cyctime
-    Date cycTime = null;
+    // 得到当前的时间, 调度执行时刻的时间
     String cycTimeStr = paramMap.get(SystemParamManager.CYC_TIME);
+    Date cycTime = getCycTime(cycTimeStr);
+
+    // 替换 ${...} 形式
+    text = PlaceholderUtil.resolvePlaceholders(text, paramMap, true);
+
+    // 替换时间的形式: $[...]
+    if (cycTime != null) {
+      text = TimePlaceholderUtil.resolvePlaceholders(text, cycTime, true);
+    }
+
+    return text;
+  }
+
+  /**
+   * 获取 "当前时间参数信息" 信息
+   *
+   * @param cycTimeStr
+   * @return
+   */
+  private static Date getCycTime(String cycTimeStr) {
+    Date cycTime = null;
+
     if (StringUtils.isNotEmpty(cycTimeStr)) {
       try {
         cycTime = DateUtils.parseDate(cycTimeStr, new String[]{SystemParamManager.TIME_FORMAT});
       } catch (ParseException e) {
-        LOGGER.error(e.getMessage(), e);
+        LOGGER.error(String.format("parse time exception: %s", cycTimeStr), e);
       }
     } else {
       cycTime = new Date();
     }
 
-    text = PlaceholderUtil.resolvePlaceholders(text, paramMap, true);
-    if (cycTime != null) {
-      text = TimePlaceholderUtil.resolvePlaceholders(text, cycTime, true);
-    }
-    return text;
+    return cycTime;
   }
 }

@@ -19,9 +19,6 @@ import com.baifendian.swordfish.dao.exception.DagException;
 import com.baifendian.swordfish.dao.model.FlowNode;
 import com.baifendian.swordfish.dao.model.FlowNodeRelation;
 import com.baifendian.swordfish.dao.model.flow.FlowDag;
-import com.baifendian.swordfish.dao.utils.json.JsonUtil;
-
-import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -30,88 +27,104 @@ import java.util.List;
 /**
  * Dag 相关工具类
  * <p>
- * 
  */
 public class DagHelper {
 
-    /**
-     * 获取节点依赖(或被依赖)的DAG
-     * <p>
-     *
-     * @param flowDag
-     *            DAG
-     * @param isDependentBy
-     *            是否被依赖
-     * @return {@link FlowDag}
-     */
-    public static FlowDag findNodeDepDag(FlowDag flowDag, FlowNode node, boolean isDependentBy) {
-        FlowDag dagRequestDep = new FlowDag(); // 待返回的新DAG
-        List<FlowNode> nodesDep = new ArrayList<>();
-        dagRequestDep.setNodes(nodesDep);
-        List<FlowNodeRelation> edgesDep = new ArrayList<>();
-        dagRequestDep.setEdges(edgesDep);
+  /**
+   * 获取节点依赖(或被依赖)的 DAG <p>
+   *
+   * @param flowDag       整个工作流 DAG
+   * @param node          查询的节点
+   * @param isDependentBy 为 true 表示查询 node 的后续, 为 false 表示前续
+   * @return
+   */
+  public static FlowDag findNodeDepDag(FlowDag flowDag, FlowNode node, boolean isDependentBy) {
+    FlowDag dagRequestDep = new FlowDag();
+    List<FlowNode> nodesDep = new ArrayList<>();
 
-        List<FlowNode> nodesTemp = new ArrayList<>(); // 待处理的节点列表
-        List<FlowNode> nodesTempSwap = new ArrayList<>(); // 临时存储节点信息
-        List<FlowNodeRelation> edges = flowDag.getEdges(); // DAG的边列表
-        nodesTemp.add(node);
-        while (!nodesTemp.isEmpty()) {
-            Iterator<FlowNode> iterator = nodesTemp.iterator();
-            while (iterator.hasNext()) {
-                FlowNode flowNode = iterator.next();
-                for (FlowNodeRelation edge : edges) {
-                    if (isDependentBy) { // 查询被依赖的 DAG
-                        if (edge.getStartNode().equals(flowNode.getName())) { // 当前node依赖的边
-                            edgesDep.add(edge);
-                            FlowNode endFlowNode = findNodeByName(flowDag.getNodes(), edge.getEndNode());
-                            if (endFlowNode != null) {
-                                if (!nodesDep.contains(endFlowNode)) { // 没有处理过的节点
-                                    nodesTempSwap.add(endFlowNode);
-                                }
-                            } else {
-                                throw new DagException(String.format("DAG error ，end node %s not in flow dag", edge.getEndNode()));// 节点可能被删除了，报错处理
-                            }
-                        }
-                    } else { // 查询依赖的 DAG
-                        if (edge.getEndNode().equals(flowNode.getName())) { // 当前node依赖的边
-                            edgesDep.add(edge);
-                            FlowNode startFlowNode = findNodeByName(flowDag.getNodes(), edge.getStartNode());
-                            if (startFlowNode != null) {
-                                if (!nodesDep.contains(startFlowNode)) { // 没有处理过的节点
-                                    nodesTempSwap.add(startFlowNode);
-                                }
-                            } else {
-                                throw new DagException(String.format("DAG error ，end node %s not in flow dag", edge.getStartNode()));// 节点可能被删除了，报错处理
-                            }
-                        }
-                    }
+    dagRequestDep.setNodes(nodesDep);
+
+    List<FlowNodeRelation> edgesDep = new ArrayList<>();
+    dagRequestDep.setEdges(edgesDep);
+
+    // 待处理的节点列表
+    List<FlowNode> nodesTemp = new ArrayList<>();
+    // 临时存储节点信息
+    List<FlowNode> nodesTempSwap = new ArrayList<>();
+    // DAG的边列表
+    List<FlowNodeRelation> edges = flowDag.getEdges();
+
+    nodesTemp.add(node);
+
+    while (!nodesTemp.isEmpty()) {
+      Iterator<FlowNode> iterator = nodesTemp.iterator();
+
+      while (iterator.hasNext()) {
+        FlowNode flowNode = iterator.next();
+        for (FlowNodeRelation edge : edges) {
+          // 查询被依赖的 DAG
+          if (isDependentBy) {
+            // 当前 node 依赖的边
+            if (edge.getStartNode().equals(flowNode.getName())) {
+              edgesDep.add(edge);
+              FlowNode endFlowNode = findNodeByName(flowDag.getNodes(), edge.getEndNode());
+              if (endFlowNode != null) {
+                // 没有处理过的节点
+                if (!nodesDep.contains(endFlowNode)) {
+                  nodesTempSwap.add(endFlowNode);
                 }
-                nodesDep.add(flowNode); // 处理完成的节点加入到“依赖的节点列表中”
+              } else {
+                // 节点可能被删除了，报错处理
+                throw new DagException(String.format("DAG error ，end node %s not in flow dag", edge.getEndNode()));
+              }
             }
-            // 处理完一组节点后，更新待处理的节点
-            nodesTemp.clear();
-            nodesTemp.addAll(nodesTempSwap);
-            nodesTempSwap.clear();
+          } else { // 查询依赖的 DAG
+            // 当前node依赖的边
+            if (edge.getEndNode().equals(flowNode.getName())) {
+              edgesDep.add(edge);
+              FlowNode startFlowNode = findNodeByName(flowDag.getNodes(), edge.getStartNode());
+
+              if (startFlowNode != null) {
+                // 没有处理过的节点
+                if (!nodesDep.contains(startFlowNode)) {
+                  nodesTempSwap.add(startFlowNode);
+                }
+              } else {
+                // 节点可能被删除了，报错处理
+                throw new DagException(String.format("DAG error ，end node %s not in flow dag", edge.getStartNode()));
+              }
+            }
+          }
         }
 
-        return dagRequestDep;
+        // 处理完成的节点加入到 “依赖的节点列表中”
+        nodesDep.add(flowNode);
+      }
+
+      // 处理完一组节点后，更新待处理的节点
+      nodesTemp.clear();
+      nodesTemp.addAll(nodesTempSwap);
+      nodesTempSwap.clear();
     }
 
-    /**
-     * 通过 name 获取节点
-     * <p>
-     *
-     * @param nodeDetails
-     * @param nodeName
-     * @return {@link FlowNode}
-     */
-    public static FlowNode findNodeByName(List<FlowNode> nodeDetails, String nodeName) {
-        for (FlowNode flowNode : nodeDetails) {
-            if (flowNode.getName().equals(nodeName)) {
-                return flowNode;
-            }
-        }
-        return null;
+    return dagRequestDep;
+  }
+
+  /**
+   * 通过 name 获取节点 <p>
+   *
+   * @param nodeDetails
+   * @param nodeName
+   * @return
+   * @see FlowNode
+   */
+  public static FlowNode findNodeByName(List<FlowNode> nodeDetails, String nodeName) {
+    for (FlowNode flowNode : nodeDetails) {
+      if (flowNode.getName().equals(nodeName)) {
+        return flowNode;
+      }
     }
 
+    return null;
+  }
 }

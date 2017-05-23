@@ -1,10 +1,8 @@
 package com.baifendian.swordfish.dao.mapper;
 
-import com.baifendian.swordfish.dao.DaoFactory;
 import com.baifendian.swordfish.dao.datasource.ConnectionFactory;
 import com.baifendian.swordfish.dao.model.FlowNode;
 import com.fasterxml.jackson.core.JsonProcessingException;
-
 import org.junit.Before;
 import org.junit.Test;
 

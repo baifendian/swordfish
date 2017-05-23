@@ -15,21 +15,23 @@
  */
 package com.baifendian.swordfish.webserver.controller;
 
-import com.baifendian.swordfish.common.job.UdfsInfo;
+import com.baifendian.swordfish.common.job.struct.node.common.UdfsInfo;
 import com.baifendian.swordfish.dao.model.User;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
-import com.baifendian.swordfish.webserver.dto.AdHocLogData;
-import com.baifendian.swordfish.webserver.dto.AdHocResultData;
-import com.baifendian.swordfish.webserver.dto.ExecutorId;
+import com.baifendian.swordfish.webserver.dto.AdHocLogDto;
+import com.baifendian.swordfish.webserver.dto.AdHocResultDto;
+import com.baifendian.swordfish.webserver.dto.ExecutorIdDto;
+import com.baifendian.swordfish.webserver.exception.BadRequestException;
 import com.baifendian.swordfish.webserver.service.AdhocService;
-import org.apache.commons.httpclient.HttpStatus;
+import org.springframework.http.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletResponse;
 import java.util.List;
+
+import static org.apache.commons.httpclient.HttpStatus.SC_CREATED;
 
 /**
  * 即席查询的服务入口
@@ -53,32 +55,31 @@ public class AdhocController {
    * @param proxyUser
    * @param queue
    * @param udfs
-   * @param response
+   * @param timeout
    * @return
    */
   @PostMapping(value = "/projects/{projectName}/adHoc")
-  public ExecutorId execAdhoc(@RequestAttribute(value = "session.user") User operator,
-                              @PathVariable String projectName,
-                              @RequestParam(value = "stms") String stms,
-                              @RequestParam(value = "limit", required = false, defaultValue = "1000") int limit,
-                              @RequestParam(value = "proxyUser") String proxyUser,
-                              @RequestParam(value = "queue") String queue,
-                              @RequestParam(value = "udfs", required = false) String udfs,
-                              @RequestParam(value = "timeout", required = false, defaultValue = "1800") int timeout,
-                              HttpServletResponse response) {
+  @ResponseStatus(HttpStatus.CREATED)
+  public ExecutorIdDto execAdhoc(@RequestAttribute(value = "session.user") User operator,
+                                 @PathVariable String projectName,
+                                 @RequestParam(value = "stms") String stms,
+                                 @RequestParam(value = "limit", required = false, defaultValue = "1000") int limit,
+                                 @RequestParam(value = "proxyUser") String proxyUser,
+                                 @RequestParam(value = "queue") String queue,
+                                 @RequestParam(value = "udfs", required = false) String udfs,
+                                 @RequestParam(value = "timeout", required = false, defaultValue = "1800") int timeout
+                                 ) {
     logger.info("Operator user {}, exec adhoc, project name: {}, stms: {}, limit: {}, proxyUser: {}, queue: {}, udfs: {}, timeout: {}",
-        operator.getName(), projectName, stms, limit, proxyUser, queue, udfs, timeout);
+            operator.getName(), projectName, stms, limit, proxyUser, queue, udfs, timeout);
 
     // limit 的限制
     if (limit <= 0 || limit > 5000) {
-      response.setStatus(HttpStatus.SC_NOT_MODIFIED);
-      throw new IllegalArgumentException("Argument is not valid, limit must be between (0, 5000]");
+      throw new BadRequestException("Argument is not valid, limit must be between (0, 5000]");
     }
 
     // timeout 的限制
     if (timeout <= 0 || timeout > 14400) {
-      response.setStatus(HttpStatus.SC_NOT_MODIFIED);
-      throw new IllegalArgumentException("Argument is not valid, timeout must be between (0, 14400]");
+      throw new BadRequestException("Argument is not valid, timeout must be between (0, 14400]");
     }
 
     // 检验 udfs, 生成对象
@@ -88,11 +89,11 @@ public class AdhocController {
       udfsInfos = JsonUtil.parseObjectList(udfs, UdfsInfo.class);
     } catch (Exception e) {
       logger.error("Parse json exception.", e);
-      response.setStatus(HttpStatus.SC_BAD_REQUEST);
-      throw new IllegalArgumentException("Argument is not valid, udfs format not a valid.");
+      throw new BadRequestException("Argument is not valid, udfs format is invalid.");
     }
 
-    return adhocService.execAdhoc(operator, projectName, stms, limit, proxyUser, queue, udfsInfos, timeout, response);
+
+    return adhocService.execAdhoc(operator, projectName, stms, limit, proxyUser, queue, udfsInfos, timeout);
   }
 
   /**
@@ -103,32 +104,28 @@ public class AdhocController {
    * @param index
    * @param from
    * @param size
-   * @param response
    * @return
    */
   @GetMapping(value = "/adHoc/{execId}/logs")
-  public AdHocLogData queryLogs(@RequestAttribute(value = "session.user") User operator,
-                                @PathVariable int execId,
-                                @RequestParam(value = "index") int index,
-                                @RequestParam(value = "from", required = false, defaultValue = "0") int from,
-                                @RequestParam(value = "size", required = false, defaultValue = "100") int size,
-                                HttpServletResponse response) {
+  public AdHocLogDto queryLogs(@RequestAttribute(value = "session.user") User operator,
+                               @PathVariable int execId,
+                               @RequestParam(value = "index") int index,
+                               @RequestParam(value = "from", required = false, defaultValue = "0") int from,
+                               @RequestParam(value = "size", required = false, defaultValue = "100") int size) {
     logger.info("Operator user {}, get adhoc logs, exec id: {}, index: {}, from: {}, size: {}",
-        operator.getName(), execId, index, from, size);
+            operator.getName(), execId, index, from, size);
 
     // index & from 的限制
     if (index < 0 || from < 0) {
-      response.setStatus(HttpStatus.SC_NOT_MODIFIED);
-      throw new IllegalArgumentException("Argument is not valid, index & from must be equal or more than zero");
+      throw new BadRequestException("Argument is not valid, index & from must be equal or more than zero");
     }
 
     // size 的限制
     if (size <= 0 || size > 1000) {
-      response.setStatus(HttpStatus.SC_NOT_MODIFIED);
-      throw new IllegalArgumentException("Argument is not valid, size must be between (0, 1000]");
+      throw new BadRequestException("Argument is not valid, size must be between (0, 1000]");
     }
 
-    return adhocService.queryLogs(operator, execId, index, from, size, response);
+    return adhocService.queryLogs(operator, execId, index, from, size);
   }
 
   /**
@@ -137,23 +134,35 @@ public class AdhocController {
    * @param operator
    * @param execId
    * @param index
-   * @param response
    * @return
    */
   @GetMapping(value = "/adHoc/{execId}/result")
-  public AdHocResultData queryResult(@RequestAttribute(value = "session.user") User operator,
-                                     @PathVariable int execId,
-                                     @RequestParam(value = "index") int index,
-                                     HttpServletResponse response) {
+  public AdHocResultDto queryResult(@RequestAttribute(value = "session.user") User operator,
+                                    @PathVariable int execId,
+                                    @RequestParam(value = "index") int index) {
     logger.info("Operator user {}, get adhoc result, exec id: {}, index: {}",
-        operator.getName(), execId, index);
+            operator.getName(), execId, index);
 
     // index 的限制
     if (index < 0) {
-      response.setStatus(HttpStatus.SC_NOT_MODIFIED);
-      throw new IllegalArgumentException("Argument is not valid, index must be equal or more than zero");
+      throw new BadRequestException("Argument is not valid, index must be equal or more than zero");
     }
 
-    return adhocService.queryResult(operator, execId, index, response);
+    return adhocService.queryResult(operator, execId, index);
+  }
+
+  /**
+   * 关闭即席查询
+   *
+   * @param operator
+   * @param execId
+   */
+  @PostMapping(value = "/adHoc/{execId}/kill")
+  public void killAdhoc(@RequestAttribute(value = "session.user") User operator,
+                        @PathVariable int execId) {
+    logger.info("Operator user {}, kill adhoc result, exec id: {}",
+            operator.getName(), execId);
+
+    adhocService.killAdhoc(operator, execId);
   }
 }

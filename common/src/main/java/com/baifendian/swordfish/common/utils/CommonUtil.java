@@ -29,12 +29,6 @@ public class CommonUtil {
   }
 
   /**
-   * 关键词, 不需要列举全
-   */
-  private final static Set<String> keywords = Sets.newHashSet("SELECT", "ALL", "DISTINCT", "FROM", "WHERE", "BY",
-      "WITH", "LIMIT", "JOIN", "UNION", "OVER", "IN", "IF", "AND", "OR", "PARTITION");
-
-  /**
    * 识别文件后缀名称
    *
    * @param filename

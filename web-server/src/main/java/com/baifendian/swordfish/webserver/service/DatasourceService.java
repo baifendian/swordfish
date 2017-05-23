@@ -15,15 +15,17 @@
  */
 package com.baifendian.swordfish.webserver.service;
 
-import com.baifendian.swordfish.common.datasource.DataSourceManager;
+
+import com.baifendian.swordfish.common.job.struct.datasource.Datasource;
+import com.baifendian.swordfish.common.job.struct.datasource.DatasourceFactory;
 import com.baifendian.swordfish.dao.enums.DbType;
 import com.baifendian.swordfish.dao.mapper.DataSourceMapper;
 import com.baifendian.swordfish.dao.mapper.ProjectMapper;
 import com.baifendian.swordfish.dao.model.DataSource;
 import com.baifendian.swordfish.dao.model.Project;
 import com.baifendian.swordfish.dao.model.User;
-import com.baifendian.swordfish.webserver.dto.BaseResponse;
-import org.apache.commons.httpclient.HttpStatus;
+import com.baifendian.swordfish.webserver.dto.BaseStatusDto;
+import com.baifendian.swordfish.webserver.exception.*;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,7 +33,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 
-import javax.servlet.http.HttpServletResponse;
 import java.util.Date;
 import java.util.List;
 
@@ -41,10 +42,10 @@ public class DatasourceService {
   private static Logger logger = LoggerFactory.getLogger(DatasourceService.class.getName());
 
   @Autowired
-  private DataSourceMapper dataSourceMapper;
+  private ProjectMapper projectMapper;
 
   @Autowired
-  private ProjectMapper projectMapper;
+  private DataSourceMapper dataSourceMapper;
 
   @Autowired
   private ProjectService projectService;
@@ -58,46 +59,53 @@ public class DatasourceService {
    * @param desc
    * @param type
    * @param parameter
-   * @param response
    * @return
    */
-  public DataSource createDataSource(User operator, String projectName, String name, String desc, DbType type, String parameter, HttpServletResponse response) {
-    // 查询项目
-    Project project = projectMapper.queryByName(projectName);
+  public DataSource createDataSource(User operator, String projectName, String name, String desc, DbType type, String parameter) {
 
-    // 不存在的项目名
+    Project project = projectMapper.queryByName(projectName);
     if (project == null) {
-      response.setStatus(HttpStatus.SC_NOT_MODIFIED);
-      return null;
+      logger.error("Project does not exist: {}", projectName);
+      throw new NotFoundException("Not found project \"{0}\"", projectName);
     }
 
-    // 没有权限
+    // 必须要有用户写权限
     if (!projectService.hasWritePerm(operator.getId(), project)) {
-      response.setStatus(HttpStatus.SC_UNAUTHORIZED);
-      return null;
+      logger.error("User {} has no right permission for the project {}", operator.getName(), project.getName());
+      throw new PermissionException("User \"{0}\" is not has project \"{1}\" write permission", operator.getName(), project.getName());
+    }
+
+    // 序列化数据源参数对象
+    Datasource datasource = DatasourceFactory.getDatasource(type, parameter);
+    if (datasource == null) {
+      throw new PermissionException("Parameter \"{0}\" is not valid", parameter);
     }
 
     // 构建数据源
     DataSource dataSource = new DataSource();
-    Date now = new Date();
+    try {
+      Date now = new Date();
 
-    dataSource.setName(name);
-    dataSource.setDesc(desc);
-    dataSource.setOwnerId(operator.getId());
-    dataSource.setOwnerName(operator.getName());
-    dataSource.setType(type);
-    dataSource.setProjectId(project.getId());
-    dataSource.setProjectName(project.getName());
-    dataSource.setParameter(parameter);
-    dataSource.setCreateTime(now);
-    dataSource.setModifyTime(now);
+      dataSource.setName(name);
+      dataSource.setDesc(desc);
+      dataSource.setOwnerId(operator.getId());
+      dataSource.setOwnerName(operator.getName());
+      dataSource.setType(type);
+      dataSource.setProjectId(project.getId());
+      dataSource.setProjectName(project.getName());
+      dataSource.setParameter(parameter);
+      dataSource.setCreateTime(now);
+      dataSource.setModifyTime(now);
+    } catch (Exception e) {
+      logger.error("Datasource set value error", e);
+      throw new ParameterException("Datasource set value error ");
+    }
 
     try {
       dataSourceMapper.insert(dataSource);
     } catch (DuplicateKeyException e) {
       logger.error("DataSource has exist, can't create again.", e);
-      response.setStatus(HttpStatus.SC_CONFLICT);
-      return null;
+      throw new ServerErrorException("DataSource has exist, can't create again.");
     }
 
     return dataSource;
@@ -108,21 +116,26 @@ public class DatasourceService {
    *
    * @param type
    * @param parameter
-   * @param response
    * @return
    */
-  public BaseResponse testDataSource(DbType type, String parameter, HttpServletResponse response) {
+  public BaseStatusDto testDataSource(DbType type, String parameter) {
     int status = 0;
     String msg = null;
 
+    // 序列化数据源参数对象
+    Datasource datasource = DatasourceFactory.getDatasource(type, parameter);
+    if (datasource == null) {
+      throw new ParameterException("Parameter \"{0}\" is not valid", parameter);
+    }
+
     try {
-      DataSourceManager.getHandler(type, parameter).isConnectable();
+      datasource.isConnectable();
     } catch (Exception e) {
       status = 1;
       msg = e.toString();
     }
 
-    return new BaseResponse(status, msg);
+    return new BaseStatusDto(status, msg);
   }
 
   /**
@@ -134,17 +147,16 @@ public class DatasourceService {
    * @param desc
    * @param type
    * @param parameter
-   * @param response
    * @return
    */
-  public DataSource putDataSource(User operator, String projectName, String name, String desc, DbType type, String parameter, HttpServletResponse response) {
+  public DataSource putDataSource(User operator, String projectName, String name, String desc, DbType type, String parameter) {
     DataSource dataSource = dataSourceMapper.getByProjectNameAndName(projectName, name);
 
     if (dataSource == null) {
-      return createDataSource(operator, projectName, name, desc, type, parameter, response);
+      return createDataSource(operator, projectName, name, desc, type, parameter);
     }
 
-    return modifyDataSource(operator, projectName, name, desc, parameter, response);
+    return modifyDataSource(operator, projectName, name, desc, parameter);
   }
 
   /**
@@ -155,40 +167,39 @@ public class DatasourceService {
    * @param name
    * @param desc
    * @param parameter
-   * @param response
    * @return
    */
-  public DataSource modifyDataSource(User operator, String projectName, String name, String desc, String parameter, HttpServletResponse response) {
-    // 查询项目
-    Project project = projectMapper.queryByName(projectName);
+  public DataSource modifyDataSource(User operator, String projectName, String name, String desc, String parameter) {
 
-    // 不存在的项目名
+    Project project = projectMapper.queryByName(projectName);
     if (project == null) {
-      response.setStatus(HttpStatus.SC_NOT_MODIFIED);
-      return null;
+      logger.error("Project does not exist: {}", projectName);
+      throw new NotFoundException("Not found project \"{0}\"", projectName);
     }
 
-    // 没有权限
+    // 必须要有 project 写权限
     if (!projectService.hasWritePerm(operator.getId(), project)) {
-      response.setStatus(HttpStatus.SC_UNAUTHORIZED);
-      return null;
+      logger.error("User {} has no right permission for the project {}", operator.getName(), project.getName());
+      throw new PermissionException("User \"{0}\" is not has project \"{1}\" write permission", operator.getName(), project.getName());
     }
 
     // 查找指定数据源
-
-    DataSource dataSource = dataSourceMapper.getByName(project.getId(),name);
-    Date now = new Date();
-
-    if (dataSource == null){
-      response.setStatus(HttpStatus.SC_NOT_MODIFIED);
-      return null;
+    DataSource dataSource = dataSourceMapper.getByName(project.getId(), name);
+    if (dataSource == null) {
+      throw new NotFoundException("Not found datasource \"{0}\" in project \"{1}\"", name, project.getName());
     }
 
-    if (!StringUtils.isEmpty(desc)){
+    Date now = new Date();
+
+    if (!StringUtils.isEmpty(desc)) {
       dataSource.setDesc(desc);
     }
 
-    if (!StringUtils.isEmpty(parameter)){
+    if (!StringUtils.isEmpty(parameter)) {
+      Datasource datasource = DatasourceFactory.getDatasource(dataSource.getType(), parameter);
+      if (datasource == null) {
+        throw new ParameterException("Parameter \"{0}\" is not valid", parameter);
+      }
       dataSource.setParameter(parameter);
     }
 
@@ -207,31 +218,26 @@ public class DatasourceService {
    * @param operator
    * @param projectName
    * @param name
-   * @param response
    */
-  public void deleteDataSource(User operator, String projectName, String name, HttpServletResponse response) {
-    // 查询项目
-    Project project = projectMapper.queryByName(projectName);
+  public void deleteDataSource(User operator, String projectName, String name) {
 
-    //不存在的项目名
+    Project project = projectMapper.queryByName(projectName);
     if (project == null) {
-      response.setStatus(HttpStatus.SC_NOT_MODIFIED);
-      return;
+      logger.error("Project does not exist: {}", projectName);
+      throw new NotFoundException("Not found project \"{0}\"", projectName);
     }
 
-    //没有权限
+
+    // 必须有 project 写权限
     if (!projectService.hasWritePerm(operator.getId(), project)) {
-      response.setStatus(HttpStatus.SC_UNAUTHORIZED);
-      return;
+      logger.error("User {} has no right permission for the project {}", operator.getName(), project.getName());
+      throw new PermissionException("User \"{0}\" is not has project \"{1}\" write permission", operator.getName(), project.getName());
     }
 
     int count = dataSourceMapper.deleteByProjectAndName(project.getId(), name);
     if (count <= 0) {
-      response.setStatus(HttpStatus.SC_NOT_MODIFIED);
-      return;
+      throw new ServerErrorException("Not delete project count");
     }
-
-    return;
   }
 
   /**
@@ -239,23 +245,20 @@ public class DatasourceService {
    *
    * @param operator
    * @param projectName
-   * @param response
    * @return
    */
-  public List<DataSource> query(User operator, String projectName, HttpServletResponse response) {
-    // 查询项目
-    Project project = projectMapper.queryByName(projectName);
+  public List<DataSource> query(User operator, String projectName) {
 
-    // 不存在的项目名
+    Project project = projectMapper.queryByName(projectName);
     if (project == null) {
-      response.setStatus(HttpStatus.SC_NOT_MODIFIED);
-      return null;
+      logger.error("Project does not exist: {}", projectName);
+      throw new NotFoundException("Not found project \"{0}\"", projectName);
     }
 
-    // 没有权限
+    // 必须有 project 读权限
     if (!projectService.hasReadPerm(operator.getId(), project)) {
-      response.setStatus(HttpStatus.SC_UNAUTHORIZED);
-      return null;
+      logger.error("User {} has no right permission for the project {}", operator.getName(), project.getName());
+      throw new PermissionException("User \"{0}\" is not has project \"{1}\" read permission", operator.getName(), project.getName());
     }
 
     return dataSourceMapper.getByProjectId(project.getId());
@@ -267,25 +270,23 @@ public class DatasourceService {
    * @param operator
    * @param projectName
    * @param name
-   * @param response
    * @return
    */
-  public DataSource queryByName(User operator, String projectName, String name, HttpServletResponse response) {
-    // 查询项目信息
-    Project project = projectMapper.queryByName(projectName);
+  public DataSource queryByName(User operator, String projectName, String name) {
 
-    // 不存在的项目名
+    Project project = projectMapper.queryByName(projectName);
     if (project == null) {
-      response.setStatus(HttpStatus.SC_NOT_MODIFIED);
-      return null;
+      logger.error("Project does not exist: {}", projectName);
+      throw new NotFoundException("Not found project \"{0}\"", projectName);
     }
 
-    // 没有权限
+    // 必须要有 project 读权限
     if (!projectService.hasReadPerm(operator.getId(), project)) {
-      response.setStatus(HttpStatus.SC_UNAUTHORIZED);
-      return null;
+      logger.error("User {} has no right permission for the project {}", operator.getName(), project.getName());
+      throw new PermissionException("User \"{0}\" is not has project \"{1}\" read permission", operator.getName(), project.getName());
     }
 
     return dataSourceMapper.getByName(project.getId(), name);
   }
+
 }

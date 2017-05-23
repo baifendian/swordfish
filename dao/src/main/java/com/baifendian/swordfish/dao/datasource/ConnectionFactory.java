@@ -16,7 +16,6 @@
 package com.baifendian.swordfish.dao.datasource;
 
 import com.alibaba.druid.pool.DruidDataSource;
-
 import org.apache.ibatis.mapping.Environment;
 import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.session.SqlSession;
@@ -30,7 +29,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.util.ResourceUtils;
 
 import javax.sql.DataSource;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;

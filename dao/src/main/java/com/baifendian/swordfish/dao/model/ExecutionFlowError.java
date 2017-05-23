@@ -22,6 +22,7 @@ public class ExecutionFlowError {
   private String projectName;
   private String workflowName;
   private String owner;
+  private String proxyUser;
   private int times;
 
   public String getProjectName() {
@@ -54,5 +55,13 @@ public class ExecutionFlowError {
 
   public void setTimes(int times) {
     this.times = times;
+  }
+
+  public String getProxyUser() {
+    return proxyUser;
+  }
+
+  public void setProxyUser(String proxyUser) {
+    this.proxyUser = proxyUser;
   }
 }
