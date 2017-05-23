@@ -380,7 +380,6 @@ public class FlowScheduleJob implements Job {
       }
 
       if (isNotFinshed) {
-
         //如果没有启动时间,也没有调度真实时间，直接算超时，如果有就计算超时
         if (checkTimeout(systemTime, timeout)) {
           logger.error("等待依赖的 workflow 任务超时");
