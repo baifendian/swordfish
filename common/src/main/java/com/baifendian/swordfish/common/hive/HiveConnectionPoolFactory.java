@@ -15,6 +15,7 @@
  */
 package com.baifendian.swordfish.common.hive;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.pool.BaseKeyedPoolableObjectFactory;
 import org.apache.hive.jdbc.HiveConnection;
 import org.slf4j.Logger;
@@ -41,11 +42,11 @@ public class HiveConnectionPoolFactory extends BaseKeyedPoolableObjectFactory {
       ConnectionInfo connectionInfo = (ConnectionInfo) object;
       Properties info = new Properties();
 
-      if (connectionInfo.getUser() != null) {
+      if (StringUtils.isNotEmpty(connectionInfo.getUser())) {
         info.put("user", connectionInfo.getUser());
       }
 
-      if (connectionInfo.getPassword() != null) {
+      if (StringUtils.isNotEmpty(connectionInfo.getPassword())) {
         info.put("password", connectionInfo.getPassword());
       }
 

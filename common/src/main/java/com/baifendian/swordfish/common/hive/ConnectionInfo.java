@@ -70,4 +70,13 @@ public class ConnectionInfo {
   public void setUri(String uri) {
     this.uri = uri;
   }
+
+  @Override
+  public String toString() {
+    return "ConnectionInfo{" +
+        "user='" + user + '\'' +
+        ", password='" + password + '\'' +
+        ", uri='" + uri + '\'' +
+        '}';
+  }
 }

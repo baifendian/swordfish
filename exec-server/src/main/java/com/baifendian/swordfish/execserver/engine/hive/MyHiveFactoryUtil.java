@@ -33,7 +33,7 @@ public class MyHiveFactoryUtil {
 
   private static final Logger logger = LoggerFactory.getLogger(MyHiveFactoryUtil.class);
 
-  private static final Properties PROPERTIES = new Properties();
+  private static final Properties properties = new Properties();
 
   private static HiveConfig hiveConfig;
 
@@ -41,7 +41,7 @@ public class MyHiveFactoryUtil {
     try {
       File dataSourceFile = ResourceUtils.getFile("classpath:common/hive/hive.properties");
       InputStream is = new FileInputStream(dataSourceFile);
-      PROPERTIES.load(is);
+      properties.load(is);
     } catch (IOException e) {
       logger.error(e.getMessage(), e);
     }
@@ -53,8 +53,8 @@ public class MyHiveFactoryUtil {
    * @param hiveConfig
    */
   public static void buildHiveConfig(HiveConfig hiveConfig) {
-    hiveConfig.setMetastoreUris(PROPERTIES.getProperty("hive.metastore.uris"));
-    hiveConfig.setThriftUris(PROPERTIES.getProperty("hive.thrift.uris"));
+    hiveConfig.setMetastoreUris(properties.getProperty("hive.metastore.uris"));
+    hiveConfig.setThriftUris(properties.getProperty("hive.thrift.uris"));
   }
 
   /**
