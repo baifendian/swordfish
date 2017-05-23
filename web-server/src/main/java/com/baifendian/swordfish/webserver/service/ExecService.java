@@ -31,10 +31,7 @@ import com.baifendian.swordfish.rpc.RetResultInfo;
 import com.baifendian.swordfish.rpc.ScheduleInfo;
 import com.baifendian.swordfish.rpc.client.MasterClient;
 import com.baifendian.swordfish.webserver.dto.*;
-import com.baifendian.swordfish.webserver.exception.NotFoundException;
-import com.baifendian.swordfish.webserver.exception.ParameterException;
-import com.baifendian.swordfish.webserver.exception.PermissionException;
-import com.baifendian.swordfish.webserver.exception.ServerErrorException;
+import com.baifendian.swordfish.webserver.exception.*;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -111,6 +108,13 @@ public class ExecService {
     if (projectFlow == null) {
       logger.error("Not found project flow {} in project {}", workflowName, project.getName());
       throw new NotFoundException("Not found project flow \"{0}\" in project \"{1}\"", workflowName, project.getName());
+    }
+
+    // 已经在运行的任务禁止重复提交
+    ExecutionFlow executionFlow = executionFlowMapper.selectPreDate(projectFlow.getId(), new Date());
+    if (executionFlow != null && executionFlow.getStatus() != null && !executionFlow.getStatus().typeIsFinished()) {
+      logger.error("The workflow is already running");
+      throw new PreFailedException("The workflow \"{0}\" is already running", projectFlow.getName());
     }
 
     // 查看 master 是否存在
