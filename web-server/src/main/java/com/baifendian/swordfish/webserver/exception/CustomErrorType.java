@@ -17,12 +17,13 @@ package com.baifendian.swordfish.webserver.exception;
 
 import org.springframework.http.HttpStatus;
 
-import java.io.Serializable;
-
 public class CustomErrorType {
   private int status;
   private String error;
   private String message;
+
+  public CustomErrorType() {
+  }
 
   public CustomErrorType(HttpStatus status, String message) {
     this.status = status.value();

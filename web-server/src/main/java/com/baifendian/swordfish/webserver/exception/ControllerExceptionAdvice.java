@@ -39,13 +39,13 @@ public class ControllerExceptionAdvice extends ResponseEntityExceptionHandler {
    * @param ex
    * @return
    */
-  @ExceptionHandler(Exception.class)
+  //@ExceptionHandler(NotModifiedException.class)
   @ResponseBody
-  ResponseEntity<?> handleControllerException(HttpServletRequest request, Throwable ex) {
-    HttpStatus status = getStatus(request);
+  ResponseEntity<?> handleControllerNotModifiedException (HttpServletRequest request, Throwable ex) {
     logger.error("controller catch some error", ex);
-    return new ResponseEntity<Object>(new CustomErrorType(status, ex.getMessage()), status);
+    return new ResponseEntity<Object>(new CustomErrorType(NOT_MODIFIED, ex.getMessage()), NOT_MODIFIED);
   }
+
 
   /**
    * 处理 controller 异常
@@ -54,12 +54,14 @@ public class ControllerExceptionAdvice extends ResponseEntityExceptionHandler {
    * @param ex
    * @return
    */
-  @ExceptionHandler(NotModifiedException.class)
+  @ExceptionHandler(Exception.class)
   @ResponseBody
-  ResponseEntity<?> handleControllerNotModifiedException(HttpServletRequest request, NotModifiedException ex) {
+  ResponseEntity<?> handleControllerException (HttpServletRequest request, Throwable ex) {
+    HttpStatus status = getStatus(request);
     logger.error("controller catch some error", ex);
     return new ResponseEntity<Object>(new CustomErrorType(NOT_MODIFIED, ex.getMessage()), NOT_MODIFIED);
   }
+
 
   /**
    * 返回状态
