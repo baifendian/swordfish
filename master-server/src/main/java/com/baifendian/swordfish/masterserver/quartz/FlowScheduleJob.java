@@ -131,8 +131,8 @@ public class FlowScheduleJob implements Job {
 
     Date scheduledFireTime = context.getScheduledFireTime();
 
-    // 起始时间 (ms)
-    long startTime = System.currentTimeMillis();
+    // 系统触发的时间
+    long systemTime = System.currentTimeMillis();
 
     ProjectFlow flow = flowDao.projectFlowFindById(flowId);
 
@@ -156,7 +156,7 @@ public class FlowScheduleJob implements Job {
 
     try {
       executionFlow = flowDao.scheduleFlowToExecution(projectId, flowId, flow.getOwnerId(), scheduledFireTime,
-          ExecType.SCHEDULER, schedule.getMaxTryTimes(), null, null, schedule.getNotifyType(), schedule.getNotifyMails(), schedule.getTimeout());
+              ExecType.SCHEDULER, schedule.getMaxTryTimes(), null, null, schedule.getNotifyType(), schedule.getNotifyMails(), schedule.getTimeout());
     } catch (Exception e) {
       logger.error("insert execution flow error", e);
       throw new JobExecutionException(e);
@@ -184,12 +184,9 @@ public class FlowScheduleJob implements Job {
         }
 
         // 如果自依赖的上一个调度周期失败，那么本次也失败
-        if (!checkWorkflowStatus(flowId, previousFireTime, startTime, schedule.getTimeout())) {
-          executionFlow.setStatus(FlowStatus.DEP_FAILED);
-          executionFlow.setEndTime(now);
+        if (!checkWorkflowStatus(flowId, previousFireTime, systemTime, schedule.getTimeout())) {
 
-          flowDao.updateExecutionFlow(executionFlow);
-
+          updateWaitingDepFlowStatus(executionFlow,FlowStatus.DEP_FAILED);
           logger.error("Self dependence last cycle execution failed!");
 
           // 发送邮件
@@ -211,15 +208,12 @@ public class FlowScheduleJob implements Job {
       }
 
       // 检测依赖
-      boolean isSuccess = checkDeps(schedule, scheduledFireTime, deps, startTime, schedule.getTimeout());
+      boolean isSuccess = checkDeps(schedule, scheduledFireTime, deps, systemTime, schedule.getTimeout());
 
       // 依赖失败，则当前任务也失败
       if (!isSuccess) {
-        executionFlow.setStatus(FlowStatus.DEP_FAILED);
-        executionFlow.setEndTime(now);
 
-        flowDao.updateExecutionFlow(executionFlow);
-
+        updateWaitingDepFlowStatus(executionFlow,FlowStatus.DEP_FAILED);
         logger.error("depended workflow execution failed");
 
         // 发送邮件
@@ -243,23 +237,28 @@ public class FlowScheduleJob implements Job {
    */
   private void updateWaitingDepFlowStatus(ExecutionFlow executionFlow, FlowStatus flowStatus) {
     executionFlow.setStatus(flowStatus);
+
+    if (flowStatus == FlowStatus.DEP_FAILED){
+      executionFlow.setEndTime(new Date());
+    }
+
     flowDao.updateExecutionFlow(executionFlow);
   }
 
   /**
-   * 检测一个 当前工作流是某个工作节点是否完成 <p>
+   * 检测一个 指定时间的任务是否完成
    *
-   * @param flowId
-   * @param previousFireTime
-   * @param startTime
-   * @param timeout
+   * @param flowId     指定的任务ID
+   * @param dataTime   指定时间
+   * @param systemTime 当前系统触发时间，用于判断超时
+   * @param timeout    等待任务完成的超时
    */
-  private boolean checkWorkflowStatus(int flowId, Date previousFireTime, long startTime, Integer timeout) {
+  private boolean checkWorkflowStatus(int flowId, Date dataTime, long systemTime, Integer timeout) {
     // 循环检测，直到检测到依赖是否成功
     while (true) {
       boolean isNotFinshed = false;
       // 看上一个调度周期是否有成功的
-      ExecutionFlow executionFlow = flowDao.queryExecutionFlowByScheduleTime(flowId, previousFireTime);
+      ExecutionFlow executionFlow = flowDao.queryExecutionFlowByScheduleTime(flowId, dataTime);
 
       if (executionFlow == null) {
         return false;
@@ -274,7 +273,7 @@ public class FlowScheduleJob implements Job {
 
       if (isNotFinshed) {
         // 如果超时
-        if (checkTimeout(startTime, timeout)) {
+        if (checkTimeout(systemTime, timeout)) {
           logger.error("Wait for last cycle timeout");
           return false;
         }
@@ -315,11 +314,11 @@ public class FlowScheduleJob implements Job {
    * @param schedule          当前工作流调度信息
    * @param scheduledFireTime 当前调度应该触发的时间
    * @param deps              依赖工作流列表
-   * @param startTime         系统提交的实际时间戳
+   * @param systemTime         系统提交的实际时间戳
    * @param timeout           等待依赖工作流的超时
    * @return
    */
-  private boolean checkDeps(Schedule schedule, Date scheduledFireTime, List<DepWorkflow> deps, long startTime, Integer timeout) {
+  private boolean checkDeps(Schedule schedule, Date scheduledFireTime, List<DepWorkflow> deps, long systemTime, Integer timeout) {
     for (DepWorkflow depWorkflow : deps) {
       int depFlowId = depWorkflow.getWorkflowId();
       Schedule depSchedule = flowDao.querySchedule(depFlowId);
@@ -331,13 +330,21 @@ public class FlowScheduleJob implements Job {
 
         // 如果不能识别周期采用不能识别周期策略
         if (cycle == null || depCycle == null) {
-          if (!checkDepWorkflowStatus(scheduledFireTime, depFlowId, startTime, timeout)) {
+          if (!checkExecutionFlowStatus(scheduledFireTime, depFlowId, systemTime, timeout)) {
             return false;
           }
         }
 
-        // 如果可以识别周期采用周期依赖策略
-        if (!checkDepCycleWorkflowStatus(scheduledFireTime, depFlowId, depSchedule, cycle, depCycle, startTime, timeout)) {
+        boolean depStatus = true;
+        //如果被依赖工作流的调度级别比较小
+        if (cycle.ordinal() > depCycle.ordinal()) {
+          Map.Entry<Date, Date> cycleDate = CrontabUtil.getPreCycleDate(scheduledFireTime, depCycle);
+          depStatus = checkCycleWorkflowStatus(cycleDate.getKey(), cycleDate.getValue(), depFlowId, depSchedule, systemTime, timeout);
+        } else {
+          depStatus = checkExecutionFlowStatus(scheduledFireTime, depFlowId, systemTime, timeout);
+        }
+
+        if (!depStatus) {
           return false;
         }
       }
@@ -346,19 +353,19 @@ public class FlowScheduleJob implements Job {
   }
 
   /**
-   * 检测未能识别调度周期下的依赖工作流情况
+   * 检测相对时间最近前一次executionFlow执行的结果。
    *
-   * @param scheduledFireTime 当前调度应该触发的时间
-   * @param depFlowId         依赖工作流的ID
-   * @param startTime         系统当前提交运行的时间戳
-   * @param timeout           等待依赖工作流运行的超时时间
+   * @param relativeTime 检测的相对时间
+   * @param flowId       工作流的ID
+   * @param systemTime   系统当前提交运行的时间戳
+   * @param timeout      等待依赖工作流运行的超时时间
    * @return
    */
-  private boolean checkDepWorkflowStatus(Date scheduledFireTime, int depFlowId, long startTime, int timeout) {
+  private boolean checkExecutionFlowStatus(Date relativeTime, int flowId, long systemTime, int timeout) {
     while (true) {
       //是否没有完成
       boolean isNotFinshed = false;
-      ExecutionFlow executionFlow = flowDao.executionFlowPreDate(depFlowId, scheduledFireTime);
+      ExecutionFlow executionFlow = flowDao.executionFlowPreDate(flowId, relativeTime);
 
       //系统没有触发调度直接认为依赖失败
       if (executionFlow == null) {
@@ -375,7 +382,7 @@ public class FlowScheduleJob implements Job {
       if (isNotFinshed) {
 
         //如果没有启动时间,也没有调度真实时间，直接算超时，如果有就计算超时
-        if (checkTimeout(startTime, timeout)) {
+        if (checkTimeout(systemTime, timeout)) {
           logger.error("等待依赖的 workflow 任务超时");
           return false; // 也认为是执行失败
         }
@@ -394,48 +401,41 @@ public class FlowScheduleJob implements Job {
   }
 
   /**
-   * 检测周期性的工作流依赖情况
+   * 检测一个周期时间内最后一次触发的工作流的执行结果
    *
-   * @param scheduledFireTime 本次调度触发的时间
-   * @param depFlowId         依赖的工作流ID
-   * @param depSchedule       依赖的工作流调度信息
-   * @param cycle             当前工作流所属的调度周期
-   * @param depCycle          依赖工作流所属的调度周期
-   * @param startTime         当前操作的系统时间戳
-   * @param timeout           依赖未完成等待超时限制
+   * @param startTime  周期起始时间
+   * @param endTime    周期结束时间
+   * @param flowId     工作流ID
+   * @param schedule   工作流调度信息
+   * @param systemTime 当前系统触发时间，用于判断超时
+   * @param timeout    等待工作流执行完成的超时
    * @return
    */
-  private boolean checkDepCycleWorkflowStatus(Date scheduledFireTime, int depFlowId, Schedule depSchedule, ScheduleType cycle, ScheduleType depCycle, long startTime, Integer timeout) {
-    //先计算周期时间
-    Map.Entry<Date, Date> cycleDate;
-    if (cycle.ordinal() > depCycle.ordinal()) {
-      cycleDate = CrontabUtil.getPreCycleDate(scheduledFireTime, depCycle);
-    } else {
-      cycleDate = CrontabUtil.getPreCycleDate(scheduledFireTime, cycle);
-    }
+  private boolean checkCycleWorkflowStatus(Date startTime, Date endTime, int flowId, Schedule schedule, long systemTime, Integer timeout) {
+
 
     // 循环检测，直到检测到依赖是否成功
     while (true) {
       boolean isNotFinshed = false;
       //step1.我们尝试取周期内依赖任务最后一次的触发时间
-      Date depFireTime = null;
+      Date fireTime = null;
       try {
-        List<Date> dateList = CrontabUtil.getCycleFireDate(cycleDate.getKey(), cycleDate.getValue(), depSchedule.getCrontab());
+        List<Date> dateList = CrontabUtil.getCycleFireDate(startTime, endTime, schedule.getCrontab());
         if (CollectionUtils.isNotEmpty(dateList)) {
-          depFireTime = dateList.get(dateList.size() - 1);
+          fireTime = dateList.get(dateList.size() - 1);
         }
       } catch (Exception e) {
-        logger.error("get dep flow: {} statTime: {} - endTime: {} fire data error", depFlowId, cycleDate.getKey(), cycleDate.getValue());
+        logger.error("get dep flow: {} statTime: {} - endTime: {} fire data error", flowId, startTime, endTime);
         return false; // 对于出现了解析异常我们认为失败了
       }
 
-      //step2.如果依赖任务更本不应该在上一个周期执行，那么很明显依赖关系配置不正确，不予执行。
-      if (depFireTime == null) {
+      //如果在时间段内没有找到已经出发的时间点，就返回失败。
+      if (fireTime == null) {
         return false;
       }
 
       //寻找调度执行记录
-      ExecutionFlow executionFlow = flowDao.queryExecutionFlowByScheduleTime(depFlowId, scheduledFireTime);
+      ExecutionFlow executionFlow = flowDao.queryExecutionFlowByScheduleTime(flowId, fireTime);
 
       //根本没有执行,等待执行。
       if (executionFlow == null) {
@@ -451,7 +451,7 @@ public class FlowScheduleJob implements Job {
 
       if (isNotFinshed) { // 如果依赖的任务没有完成
         // 如果等待超时
-        if (checkTimeout(startTime, timeout)) {
+        if (checkTimeout(systemTime, timeout)) {
           logger.error("Wait for last cycle timeout");
           return false;
         }

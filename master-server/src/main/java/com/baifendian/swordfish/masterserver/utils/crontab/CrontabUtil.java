@@ -86,10 +86,15 @@ public class CrontabUtil {
    * @param crontab
    * @return
    */
-  public static List<Date> getCycleFireDate(Date startTime, Date endTime, String crontab) throws ParseException {
+  public static List<Date> getCycleFireDate(Date startTime, Date endTime, String crontab){
     List<Date> dateList = new ArrayList<>();
 
-    CronExpression cronExpression = new CronExpression(crontab);
+    CronExpression cronExpression = null;
+    try {
+      cronExpression = new CronExpression(crontab);
+    } catch (ParseException e) {
+      return null;
+    }
 
     while (true) {
       startTime = cronExpression.getNextValidTimeAfter(startTime);
