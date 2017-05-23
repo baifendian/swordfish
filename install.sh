@@ -89,7 +89,7 @@ function file_replace()
     # 5. common.hive 组件下的文件替换
     if [ "$1" = "exec-server" ]; then
         sed -i "s#hive.metastore.uris.*#hive.metastore.uris = thrift://${hiveAddress}:9083#g" conf/common/hive/hive.properties
-        sed -i "s#hive.thrift.uris.*#hive.thrift.uris = jdbc:hive2://${hiveAddress}:10000/%s#g" conf/common/hive/hive.properties
+        sed -i "s#hive.thrift.uris.*#hive.thrift.uris = jdbc:hive2://${hiveAddress}:10000#g" conf/common/hive/hive.properties
         sed -i "s#hive.uris.*#hive.uris = jdbc:hive2://${hiveAddress}:10000#g" conf/common/hive/hive.properties
     fi
 }
