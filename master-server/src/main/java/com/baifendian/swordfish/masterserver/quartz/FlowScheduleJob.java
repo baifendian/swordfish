@@ -240,7 +240,7 @@ public class FlowScheduleJob implements Job {
 
     executionFlow.setStatus(flowStatus);
 
-    if (flowStatus == FlowStatus.DEP_FAILED) {
+    if (flowStatus.typeIsFinished()) {
       executionFlow.setEndTime(now);
     }
 

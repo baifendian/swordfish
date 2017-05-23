@@ -218,7 +218,7 @@ public class AdhocService {
     AdHocLogDto adHocLogDto = new AdHocLogDto();
 
     // 如果任务被 kill 了或者是某些异常导致失败
-    if (!adHocResult.getStatus().typeIsFinished() && adhoc.getStatus().typeIsFinished()) {
+    if (adHocResult.getStatus().typeIsNotFinished() && adhoc.getStatus().typeIsFinished()) {
       adHocLogDto.setStatus(adhoc.getStatus());
       adHocLogDto.setHasResult(true);
     } else {
@@ -299,7 +299,7 @@ public class AdhocService {
     }
 
     // 如果没有完成, 则更新为 kill
-    if (!adhoc.getStatus().typeIsFinished()) {
+    if (adhoc.getStatus().typeIsNotFinished()) {
       adhoc.setStatus(FlowStatus.KILL);
       adHocMapper.updateStatus(adhoc);
     }
