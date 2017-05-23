@@ -26,8 +26,8 @@ $ git clone https://github.com/baifendian/swordfish.git
 # 如何部署
 [服务部署手册](https://github.com/baifendian/swordfish/wiki/deploy)
 
-# 插件开发
-[插件开发手册](https://github.com/baifendian/swordfish/wiki/plugin-dev)
+# 任务开发
+[任务开发手册](https://github.com/baifendian/swordfish/wiki/job-dev)
 
 # Restful API
 [API 说明](https://github.com/baifendian/swordfish/wiki)
