@@ -288,7 +288,8 @@ public class FlowDao extends BaseDao {
     executionFlow.setStatus(FlowStatus.INIT);
     executionFlow.setExtras(projectFlow.getExtras());
 
-    executionFlowMapper.insertAndGetId(executionFlow); // 插入执行信息
+    // 插入执行信息
+    executionFlowMapper.insertAndGetId(executionFlow);
 
     return executionFlow;
   }
@@ -341,7 +342,6 @@ public class FlowDao extends BaseDao {
    * @see Schedule
    */
   public Schedule querySchedule(int flowId) {
-    // 插入执行节点信息
     return scheduleMapper.selectByFlowId(flowId);
   }
 
