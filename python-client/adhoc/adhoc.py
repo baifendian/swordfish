@@ -69,25 +69,3 @@ if __name__ == '__main__':
     (status, result) = query_logs(sessionId, 205, index, _from, 1000)
 
     print 'Get log %s, %s' % (status, result)
-    #
-    # if status >= 4:
-    #     if status == 4:
-    #         print "Exec success"
-    #     else:
-    #         print "Exec failed"
-    #
-    #     time.sleep(5)
-    #
-    #     (status, result) = query_result(sessionId, execId, index)
-    #
-    #     index = index + 1
-    # else:
-    #     logContent = result.get("logContent")
-    #
-    #     _from += 0 if logContent is None else len(logContent)
-    #
-    #     time.sleep(5)
-    #
-    #     (status, result) = query_logs(sessionId, execId, index, _from, 1000)
-    #
-    #     print status, result
