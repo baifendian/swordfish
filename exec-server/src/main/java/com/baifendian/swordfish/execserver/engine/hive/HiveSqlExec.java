@@ -115,7 +115,7 @@ public class HiveSqlExec {
     // 得到 hive 的连接信息
     ConnectionInfo connectionInfo = hiveJdbcExec.getConnectionInfo(userName);
 
-    logger.info("execution get connection information:{}", connectionInfo);
+    logger.info("execution connection information:{}", connectionInfo);
 
     HiveConnectionClient hiveConnectionClient = hiveJdbcExec.getHiveConnectionClient();
 
