@@ -133,7 +133,7 @@ public class ScheduleService {
       scheduleMapper.insert(scheduleObj);
     } catch (DuplicateKeyException e) {
       logger.error("schedule has exist, can't create again.", e);
-      throw new NotModifiedException("schedule has exist, can't create again.");
+      throw new ServerErrorException("schedule has exist, can't create again.");
     }
 
     return scheduleObj;

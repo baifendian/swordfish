@@ -15,22 +15,21 @@
  */
 package com.baifendian.swordfish.webserver.exception;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.ResponseStatus;
-
 import java.text.MessageFormat;
 
 /**
- * 没有操作异常
+ * 未能满足前置条件异常
  */
-@ResponseStatus(code = HttpStatus.NOT_MODIFIED)
-public class NotModifiedException extends RuntimeException {
-
-  public NotModifiedException(String msg) {
+public class PreFailedException extends RuntimeException {
+  public PreFailedException(String msg) {
     super(msg);
   }
 
-  public NotModifiedException(String msg, Object... arguments) {
+  public PreFailedException(String msg, Throwable cause) {
+    super(msg, cause);
+  }
+
+  public PreFailedException(String msg, Object... arguments) {
     super(MessageFormat.format(msg, arguments));
   }
 }

@@ -37,7 +37,7 @@ public class DataSourceMapperProvider {
     return new SQL() {{
       INSERT_INTO(TABLE_NAME);
 
-      VALUES("`name`", "#{dataSource.name}");
+      VALUES("`name`", "#{dataSource.name,jdbcType=VARCHAR}");
       VALUES("`desc`", "#{dataSource.desc}");
       VALUES("`type`", "" + type);
       VALUES("`owner`", "#{dataSource.ownerId}");

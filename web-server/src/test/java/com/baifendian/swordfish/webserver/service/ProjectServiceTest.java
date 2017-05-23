@@ -22,8 +22,8 @@ import com.baifendian.swordfish.dao.model.User;
 import com.baifendian.swordfish.mock.MockDataService;
 import com.baifendian.swordfish.webserver.RestfulApiApplication;
 import com.baifendian.swordfish.webserver.exception.NotFoundException;
-import com.baifendian.swordfish.webserver.exception.NotModifiedException;
 import com.baifendian.swordfish.webserver.exception.PermissionException;
+import com.baifendian.swordfish.webserver.exception.ServerErrorException;
 import org.apache.commons.httpclient.HttpStatus;
 import org.junit.Before;
 import org.junit.Test;
@@ -106,7 +106,7 @@ public class ProjectServiceTest {
       boolean thrown = false;
       try{
         Project res = projectService.createProject(user,name,desc);
-      }catch (NotModifiedException e){
+      }catch (ServerErrorException e){
         thrown = true;
       }
       assertTrue(thrown);
@@ -208,7 +208,7 @@ public class ProjectServiceTest {
       boolean thrown = false;
       try{
         ProjectUser projectUser = projectService.addProjectUser(userAdmin,project.getName(),user1.getName(),perm);
-      }catch (NotModifiedException e){
+      }catch (ServerErrorException e){
         thrown = true;
       }
       assertTrue(thrown);

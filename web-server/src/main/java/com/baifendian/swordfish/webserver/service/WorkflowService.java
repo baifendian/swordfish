@@ -181,7 +181,7 @@ public class WorkflowService {
       flowDao.createProjectFlow(projectFlow);
     } catch (DuplicateKeyException e) {
       logger.error("Workflow has exist, can't create again.", e);
-      throw new NotModifiedException("Workflow has exist, can't create again.");
+      throw new ServerErrorException("Workflow has exist, can't create again.");
     } catch (Exception e) {
       logger.error("Workflow create has error", e);
       throw new ServerErrorException("Workflow create has error", e);

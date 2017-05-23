@@ -80,7 +80,7 @@ public class ScheduleMapperProvider {
       SELECT("p_f.name as project_flow_name");
       SELECT("p.name as project_name");
       SELECT("u.name as owner_name");
-      SELECT("*");
+      SELECT("s.*");
 
       FROM(DB_NAME + " as s");
 
@@ -97,7 +97,7 @@ public class ScheduleMapperProvider {
       SELECT("p_f.name as project_flow_name");
       SELECT("p.name as project_name");
       SELECT("u.name as owner_name");
-      SELECT("*");
+      SELECT("s.*");
 
       FROM(DB_NAME + " as s");
 
@@ -114,7 +114,7 @@ public class ScheduleMapperProvider {
       SELECT("p_f.name as project_flow_name");
       SELECT("p.name as project_name");
       SELECT("u.name as owner_name");
-      SELECT("*");
+      SELECT("s.*");
 
       FROM(DB_NAME + " as s");
 

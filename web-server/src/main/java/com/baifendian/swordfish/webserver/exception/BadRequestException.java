@@ -23,7 +23,6 @@ import java.text.MessageFormat;
 /**
  * 错误的请求异常
  */
-@ResponseStatus(code = HttpStatus.BAD_REQUEST)
 public class BadRequestException extends RuntimeException {
 
   public BadRequestException(String msg) {

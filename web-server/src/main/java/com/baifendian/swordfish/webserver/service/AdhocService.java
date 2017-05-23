@@ -30,7 +30,6 @@ import com.baifendian.swordfish.webserver.dto.AdHocResultDto;
 import com.baifendian.swordfish.webserver.dto.ExecutorIdDto;
 import com.baifendian.swordfish.webserver.dto.LogResult;
 import com.baifendian.swordfish.webserver.exception.NotFoundException;
-import com.baifendian.swordfish.webserver.exception.NotModifiedException;
 import com.baifendian.swordfish.webserver.exception.PermissionException;
 import com.baifendian.swordfish.webserver.exception.ServerErrorException;
 import org.apache.commons.lang.StringUtils;
@@ -132,7 +131,7 @@ public class AdhocService {
       adHocMapper.insert(adhoc);
     } catch (DuplicateKeyException e) {
       logger.error("Adhoc has exist, can't create again.", e);
-      throw new NotModifiedException("Adhoc has exist, can't create again.");
+      throw new ServerErrorException("Adhoc has exist, can't create again.");
     }
 
     // 连接

@@ -25,10 +25,7 @@ import com.baifendian.swordfish.dao.model.Project;
 import com.baifendian.swordfish.dao.model.ProjectUser;
 import com.baifendian.swordfish.dao.model.User;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
-import com.baifendian.swordfish.webserver.exception.NotFoundException;
-import com.baifendian.swordfish.webserver.exception.NotModifiedException;
-import com.baifendian.swordfish.webserver.exception.ParameterException;
-import com.baifendian.swordfish.webserver.exception.PermissionException;
+import com.baifendian.swordfish.webserver.exception.*;
 import com.baifendian.swordfish.webserver.utils.ParamVerify;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -107,7 +104,7 @@ public class UserService {
       userMapper.insert(user);
     } catch (DuplicateKeyException e) {
       logger.error("User has exist, can't create again.", e);
-      throw new NotModifiedException("User has exist, can't create again.");
+      throw new ServerErrorException("User has exist, can't create again.");
     }
 
     return user;
@@ -191,7 +188,7 @@ public class UserService {
     int count = userMapper.update(user);
 
     if (count <= 0) {
-      throw new NotModifiedException("Not update count");
+      throw new ServerErrorException("Not update count");
     }
 
     return user;
@@ -221,21 +218,21 @@ public class UserService {
 
     if (CollectionUtils.isNotEmpty(projects)) {
       logger.error("Can't delete a account which has projects");
-      throw new NotModifiedException("Can't delete a account which has projects");
+      throw new PreFailedException("Can't delete a account which has projects");
     }
 
     List<ProjectUser> projectUsers = projectUserMapper.queryByUser(operator.getId());
 
     if (CollectionUtils.isNotEmpty(projectUsers)) {
       logger.error("Can't delete a account which join some projects");
-      throw new NotModifiedException("Can't delete a account which join some projects");
+      throw new PreFailedException("Can't delete a account which join some projects");
     }
 
     // 如果没有加入到任何项目, 则可以进行删除了
     int count = userMapper.delete(name);
 
     if (count <= 0) {
-      throw new NotModifiedException("Not delete count");
+      throw new ServerErrorException("Not delete count");
     }
 
     return;
