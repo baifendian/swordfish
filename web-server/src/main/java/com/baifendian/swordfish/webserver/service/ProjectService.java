@@ -98,7 +98,7 @@ public class ProjectService {
       projectMapper.insert(project);
     } catch (DuplicateKeyException e) {
       logger.error("Project has exist, can't create again.", e);
-      throw new NotModifiedException("Project has exist, can't create again.");
+      throw new ServerErrorException("Project has exist, can't create again.");
     }
 
     return project;
@@ -138,7 +138,7 @@ public class ProjectService {
     int count = projectMapper.updateById(project);
 
     if (count <= 0) {
-      throw new NotModifiedException("Not update count");
+      throw new ServerErrorException("Not update count");
     }
 
     return project;
@@ -169,23 +169,23 @@ public class ProjectService {
 
     count = projectFlowMapper.countProjectFlows(project.getId());
     if (count > 0) {
-      throw new NotModifiedException("Project's workflow is not empty");
+      throw new PreFailedException("Project's workflow is not empty");
     }
 
     count = resourceMapper.countProjectRes(project.getId());
     if (count > 0) {
-      throw new NotModifiedException("Project's resource is not empty");
+      throw new PreFailedException("Project's resource is not empty");
     }
 
     count = dataSourceMapper.countProjectDatasource(project.getId());
     if (count > 0) {
-      throw new NotModifiedException("Project's data source is not empty");
+      throw new PreFailedException("Project's data source is not empty");
     }
 
     count = projectMapper.deleteById(project.getId());
 
     if (count <= 0) {
-      throw new NotModifiedException("Not delete count");
+      throw new ServerErrorException("Not delete count");
     }
 
     // 应该清理 Local/HDFS 上的相关目录
@@ -249,7 +249,7 @@ public class ProjectService {
 
     // 增加用户已经存在
     if (projectUser != null) {
-      throw new NotModifiedException("User has exist, can't add again.");
+      throw new ServerErrorException("User has exist, can't add again.");
     }
 
     // 构建信息, 插入
@@ -348,7 +348,7 @@ public class ProjectService {
     int count = projectUserMapper.delete(project.getId(), user.getId());
 
     if (count <= 0) {
-      throw new NotModifiedException("Not delete count");
+      throw new ServerErrorException("Not delete count");
     }
 
     return;

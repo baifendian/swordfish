@@ -103,7 +103,7 @@ public class ResourceService {
 
     if (resource != null) {
       logger.error("Resource {} does not empty", name);
-      throw new NotModifiedException("Resource has exist, can't create again.");
+      throw new ServerErrorException("Resource has exist, can't create again.");
     }
 
     // 插入数据
@@ -125,7 +125,7 @@ public class ResourceService {
       resourceMapper.insert(resource);
     } catch (DuplicateKeyException e) {
       logger.error("Resource has exist, can't create again.", e);
-      throw new NotModifiedException("Resource has exist, can't create again.");
+      throw new ServerErrorException("Resource has exist, can't create again.");
     }
 
     // 上传失败
@@ -223,7 +223,7 @@ public class ResourceService {
 
     if (count <= 0) {
       logger.error("Resource {} upload failed", name);
-      throw new NotModifiedException("Not resource update count");
+      throw new ServerErrorException("Not resource update count");
     }
 
     // 如果文件不是空的，则尝试上传新文件
@@ -337,7 +337,7 @@ public class ResourceService {
         resourceMapper.insert(destResource);
       } catch (DuplicateKeyException e) {
         logger.error("Resource has exist, can't create again.", e);
-        throw new NotModifiedException("Resource has exist, can't create again.");
+        throw new ServerErrorException("Resource has exist, can't create again.");
       }
     } else { // 存在
       if (desc != null) {

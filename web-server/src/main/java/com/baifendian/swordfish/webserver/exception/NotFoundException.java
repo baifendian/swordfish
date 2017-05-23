@@ -23,7 +23,6 @@ import java.text.MessageFormat;
 /**
  * 404 错误码异常
  */
-@ResponseStatus(code = HttpStatus.NOT_FOUND)
 public class NotFoundException extends RuntimeException {
 
   public NotFoundException() {

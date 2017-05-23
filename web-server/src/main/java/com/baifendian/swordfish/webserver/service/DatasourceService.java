@@ -25,10 +25,7 @@ import com.baifendian.swordfish.dao.model.DataSource;
 import com.baifendian.swordfish.dao.model.Project;
 import com.baifendian.swordfish.dao.model.User;
 import com.baifendian.swordfish.webserver.dto.BaseStatusDto;
-import com.baifendian.swordfish.webserver.exception.NotFoundException;
-import com.baifendian.swordfish.webserver.exception.NotModifiedException;
-import com.baifendian.swordfish.webserver.exception.ParameterException;
-import com.baifendian.swordfish.webserver.exception.PermissionException;
+import com.baifendian.swordfish.webserver.exception.*;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -108,7 +105,7 @@ public class DatasourceService {
       dataSourceMapper.insert(dataSource);
     } catch (DuplicateKeyException e) {
       logger.error("DataSource has exist, can't create again.", e);
-      throw new NotModifiedException("DataSource has exist, can't create again.");
+      throw new ServerErrorException("DataSource has exist, can't create again.");
     }
 
     return dataSource;
@@ -239,7 +236,7 @@ public class DatasourceService {
 
     int count = dataSourceMapper.deleteByProjectAndName(project.getId(), name);
     if (count <= 0) {
-      throw new NotModifiedException("Not delete project count");
+      throw new ServerErrorException("Not delete project count");
     }
 
     return;

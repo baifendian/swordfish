@@ -23,8 +23,7 @@ import java.text.MessageFormat;
 /**
  * 请求参数异常
  */
-@ResponseStatus(code = HttpStatus.BAD_REQUEST)
-public class ParameterException extends RuntimeException {
+public class ParameterException extends BadRequestException {
 
   public ParameterException(String msg) {
     super(msg);

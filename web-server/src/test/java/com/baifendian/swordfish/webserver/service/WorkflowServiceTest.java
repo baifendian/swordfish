@@ -27,8 +27,8 @@ import com.baifendian.swordfish.utils.TestUtils;
 import com.baifendian.swordfish.webserver.RestfulApiApplication;
 import com.baifendian.swordfish.webserver.dto.WorkflowData;
 import com.baifendian.swordfish.webserver.exception.NotFoundException;
-import com.baifendian.swordfish.webserver.exception.NotModifiedException;
 import com.baifendian.swordfish.webserver.exception.PermissionException;
+import com.baifendian.swordfish.webserver.exception.ServerErrorException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.junit.Before;
 import org.junit.Test;
@@ -102,7 +102,7 @@ public class WorkflowServiceTest {
       boolean thrown = false;
       try{
          ProjectFlow projectFlow2 = workflowService.createWorkflow(user,project.getName(),projectFlow.getName(),desc,proxyUser,queue,data,null,extras,null);
-      }catch (NotModifiedException e){
+      }catch (ServerErrorException e){
         thrown = true;
       }
       assertTrue(thrown);
