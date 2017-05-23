@@ -121,7 +121,8 @@ public class ProjectService {
       logger.error("Project does not exist: {}", name);
       throw new NotFoundException("Not found project \"{0}\"", name);
     }
-    //只有项目owner才能操作
+
+    // 只有项目 owner 才能操作
     if (!isProjectOwner(operator.getId(), project)) {
       logger.error("User {} owner for the project {}", operator.getName(), name);
       throw new PermissionException("User \"{0}\" not owner for the project \"{1}\"", operator.getName(), project.getName());
@@ -158,7 +159,8 @@ public class ProjectService {
       logger.error("Project does not exist: {}", name);
       throw new NotFoundException("Not found project \"{0}\"", name);
     }
-    //只有管理员或者owner 可以删除
+
+    // 只有管理员或者 owner 可以删除
     if (operator.getId() != project.getOwnerId() && operator.getRole() != UserRoleType.ADMIN_USER) {
       logger.error("User \"{}\" owner for the project \"{}\"", operator.getName(), name);
       throw new PermissionException("User \"{0}\" not owner for the project \"{1}\"", operator.getName(), name);
@@ -223,7 +225,7 @@ public class ProjectService {
    */
   public ProjectUser addProjectUser(User operator, String name, String userName, int perm) {
 
-    //不能添加自己
+    // 不能添加自己
     if (operator.getName().equals(name)) {
       throw new BadRequestException("Can't add myself");
     }
@@ -233,18 +235,19 @@ public class ProjectService {
       logger.error("Project does not exist: {}", name);
       throw new NotFoundException("Not found project \"{0}\"", name);
     }
-    //只有owner可以操作
+
+    // 只有 owner 可以操作
     if (!isProjectOwner(operator.getId(), project)) {
       logger.error("User \"{}\" owner for the project \"{}\"", operator.getName(), project.getName());
       throw new PermissionException("User \"{0}\" not owner for the project \"{1}\"", operator.getName(), project.getName());
     }
+
     User user = userMapper.queryByName(userName);
     if (user == null) {
       logger.error("User {} not found", userName);
       throw new NotFoundException("User \"{0}\" not found", userName);
     }
 
-    //TODO 是否会有并发问题？
     ProjectUser projectUser = projectUserMapper.query(project.getId(), user.getId());
 
     // 增加用户已经存在
@@ -283,13 +286,14 @@ public class ProjectService {
       logger.error("Project does not exist: {}", name);
       throw new NotFoundException("Not found project \"{0}\"", name);
     }
-    //必须是项目owner
+
+    // 必须是项目owner
     if (!isProjectOwner(operator.getId(), project)) {
       logger.error("User \"{}\" owner for the project \"{}\"", operator.getName(), project.getName());
       throw new PermissionException("User \"{0}\" not owner for the project \"{1}\"", operator.getName(), project.getName());
     }
 
-    //查询用户信息，如果查询不到抛出异常
+    // 查询用户信息，如果查询不到抛出异常
     User user = userMapper.queryByName(userName);
     if (user == null) {
       logger.error("User {} not found", userName);
@@ -333,7 +337,8 @@ public class ProjectService {
       logger.error("Project does not exist: {}", name);
       throw new NotFoundException("Not found project \"{0}\"", name);
     }
-    //必须是项目owner
+
+    // 必须是项目owner
     if (!isProjectOwner(operator.getId(), project)) {
       logger.error("User \"{}\" owner for the project \"{}\"", operator.getName(), project.getName());
       throw new PermissionException("User \"{0}\" not owner for the project \"{1}\"", operator.getName(), project.getName());
@@ -363,11 +368,13 @@ public class ProjectService {
    */
   public List<ProjectUser> queryUser(User operator, String name) {
     Project project = projectMapper.queryByName(name);
+
     if (project == null) {
       logger.error("Project does not exist: {}", name);
       throw new NotFoundException("Not found project \"{0}\"", name);
     }
-    //只有owner可以操作
+
+    // 只有 owner 可以操作
     if (!isProjectOwner(operator.getId(), project)) {
       logger.error("User \"{}\" owner for the project \"{}\"", operator.getName(), project.getName());
       throw new PermissionException("User \"{0}\" not owner for the project \"{1}\"", operator.getName(), project.getName());

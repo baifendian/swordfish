@@ -70,7 +70,7 @@ public class StatService {
       throw new NotFoundException("Not found project \"{0}\"", projectName);
     }
 
-    //需要有project 执行权限
+    // 需要有 project 执行权限
     if (!projectService.hasExecPerm(operator.getId(), project)) {
       logger.error("User {} has no right permission for the project {}", operator.getName(), project.getName());
       throw new PermissionException("User \"{0}\" is not has project \"{1}\" exec permission", operator.getName(), project.getName());
@@ -97,6 +97,7 @@ public class StatService {
    */
   public List<StatDto> queryStatesHour(User operator, String projectName, long day) {
     Date date = new Date(day);
+
     // 查看是否对项目具备相应的权限
     Project project = projectMapper.queryByName(projectName);
     if (project == null) {
@@ -137,11 +138,13 @@ public class StatService {
       logger.error("Project does not exist: {}", projectName);
       throw new NotFoundException("Not found project \"{0}\"", projectName);
     }
-    //必须要有project 执行权限
+
+    // 必须要有 project 执行权限
     if (!projectService.hasExecPerm(operator.getId(), project)) {
       logger.error("User {} has no right permission for the project {}", operator.getName(), project.getName());
       throw new PermissionException("User \"{0}\" is not has project \"{1}\" exec permission", operator.getName(), project.getName());
     }
+
     return executionFlowMapper.selectDurationsByProject(project.getId(), num, datetime);
   }
 
@@ -161,11 +164,13 @@ public class StatService {
       logger.error("Project does not exist: {}", projectName);
       throw new NotFoundException("Not found project \"{0}\"", projectName);
     }
-    //必须有project执行权限
+
+    // 必须有 project 执行权限
     if (!projectService.hasExecPerm(operator.getId(), project)) {
       logger.error("User {} has no right permission for the project {}", operator.getName(), project.getName());
       throw new PermissionException("User \"{0}\" is not has project \"{1}\" exec permission", operator.getName(), project.getName());
     }
+
     return executionFlowMapper.selectErrorsByProject(project.getId(), num, datetime);
   }
 }

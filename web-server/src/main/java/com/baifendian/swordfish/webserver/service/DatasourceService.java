@@ -177,7 +177,7 @@ public class DatasourceService {
       throw new NotFoundException("Not found project \"{0}\"", projectName);
     }
 
-    //必须要有project写权限
+    // 必须要有 project 写权限
     if (!projectService.hasWritePerm(operator.getId(), project)) {
       logger.error("User {} has no right permission for the project {}", operator.getName(), project.getName());
       throw new PermissionException("User \"{0}\" is not has project \"{1}\" write permission", operator.getName(), project.getName());
@@ -228,7 +228,7 @@ public class DatasourceService {
     }
 
 
-    //必须有project写权限
+    // 必须有 project 写权限
     if (!projectService.hasWritePerm(operator.getId(), project)) {
       logger.error("User {} has no right permission for the project {}", operator.getName(), project.getName());
       throw new PermissionException("User \"{0}\" is not has project \"{1}\" write permission", operator.getName(), project.getName());
@@ -238,8 +238,6 @@ public class DatasourceService {
     if (count <= 0) {
       throw new ServerErrorException("Not delete project count");
     }
-
-    return;
   }
 
   /**
@@ -256,7 +254,8 @@ public class DatasourceService {
       logger.error("Project does not exist: {}", projectName);
       throw new NotFoundException("Not found project \"{0}\"", projectName);
     }
-    //必须有project读权限
+
+    // 必须有 project 读权限
     if (!projectService.hasReadPerm(operator.getId(), project)) {
       logger.error("User {} has no right permission for the project {}", operator.getName(), project.getName());
       throw new PermissionException("User \"{0}\" is not has project \"{1}\" read permission", operator.getName(), project.getName());
@@ -281,7 +280,7 @@ public class DatasourceService {
       throw new NotFoundException("Not found project \"{0}\"", projectName);
     }
 
-    //必须要有project读权限
+    // 必须要有 project 读权限
     if (!projectService.hasReadPerm(operator.getId(), project)) {
       logger.error("User {} has no right permission for the project {}", operator.getName(), project.getName());
       throw new PermissionException("User \"{0}\" is not has project \"{1}\" read permission", operator.getName(), project.getName());
