@@ -116,13 +116,13 @@ public class FlowScheduleJob implements Job {
    */
   @Override
   public void execute(JobExecutionContext context) throws JobExecutionException {
-    logger.info("trigger at:{}", context.getFireTime());
-
     // 1. 获取参数
     JobDataMap dataMap = context.getJobDetail().getJobDataMap();
 
     int projectId = dataMap.getInt(PARAM_PROJECT_ID);
     int flowId = dataMap.getInt(PARAM_FLOW_ID);
+
+    logger.info("trigger at:{}, flow id:{}", context.getFireTime(), flowId);
 
     // Schedule schedule =
     // JsonUtil.parseObject(dataMap.getString(PARAM_SCHEDULE),
@@ -187,7 +187,7 @@ public class FlowScheduleJob implements Job {
 
           updateWaitingDepFlowStatus(executionFlow, FlowStatus.DEP_FAILED);
 
-          logger.error("Self dependence last cycle execution failed!");
+          logger.error("Exec id:{} self dependence last cycle execution failed!", executionFlow.getId());
 
           // 发送邮件
           if (executionFlow.getNotifyType().typeIsSendFailureMail()) {
@@ -214,7 +214,7 @@ public class FlowScheduleJob implements Job {
       if (!isSuccess) {
         updateWaitingDepFlowStatus(executionFlow, FlowStatus.DEP_FAILED);
 
-        logger.error("depended workflow execution failed");
+        logger.error("Exec id:{} depended workflow execution failed", executionFlow.getId());
 
         // 发送邮件
         if (executionFlow.getNotifyType().typeIsSendFailureMail()) {
