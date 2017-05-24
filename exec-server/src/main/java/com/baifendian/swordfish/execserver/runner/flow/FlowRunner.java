@@ -617,6 +617,7 @@ public class FlowRunner implements Runnable {
       NodeRunner nodeRunner = entry.getKey();
       Future<Boolean> future = entry.getValue();
 
+      // 进程还在的情况下
       if (!future.isDone()) {
         ExecutionNode executionNode = nodeRunner.getExecutionNode();
 
@@ -625,6 +626,7 @@ public class FlowRunner implements Runnable {
 
         flowDao.updateExecutionNode(executionNode);
       } else {
+        // 已经结束的情况
         Boolean value = false;
 
         try {
@@ -641,6 +643,8 @@ public class FlowRunner implements Runnable {
         } catch (InterruptedException e) {
           logger.error(e.getMessage(), e);
         } catch (ExecutionException e) {
+          logger.error(e.getMessage(), e);
+        } catch (CancellationException e) {
           logger.error(e.getMessage(), e);
         } finally {
           if (!value) {
@@ -665,7 +669,7 @@ public class FlowRunner implements Runnable {
         return;
       }
 
-      logger.info("Kill has been called on exec: {}, num: {}", executionFlow.getId(), activeNodeRunners.size());
+      logger.info("Kill has been called on exec id: {}, num: {}", executionFlow.getId(), activeNodeRunners.size());
 
       // 正在运行中的
       for (Map.Entry<NodeRunner, Future<Boolean>> entry : activeNodeRunners.entrySet()) {
