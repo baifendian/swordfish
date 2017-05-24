@@ -19,6 +19,12 @@ import com.baifendian.swordfish.dao.enums.ScheduleType;
 import com.baifendian.swordfish.dao.model.Schedule;
 import com.cronutils.model.Cron;
 import org.junit.Test;
+import org.quartz.CronExpression;
+
+import java.text.ParseException;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 import static com.baifendian.swordfish.masterserver.utils.crontab.CrontabUtil.*;
 import static junit.framework.TestCase.assertEquals;
@@ -61,5 +67,36 @@ public class TestCrontabUtil {
     assertEquals(weekType2, ScheduleType.WEEK);
     assertEquals(monthType1, ScheduleType.MONTH);
     assertEquals(monthType2, ScheduleType.MONTH);
+  }
+
+  @Test
+  public void testGetCycleFireDate() throws ParseException {
+    //准备数据
+    String hourCrontab = "0 0 2-22/2 * * ? *";
+    CronExpression cronExpression = CrontabUtil.parseCronExp(hourCrontab);
+    Date startTime = new Date(1495555200000L);
+    Date endTime = new Date(1495814400000L);
+
+    List<Date> dateList = CrontabUtil.getCycleFireDate(startTime, endTime, cronExpression);
+
+    for (Date date : dateList) {
+      System.out.println(date);
+    }
+  }
+
+  @Test
+  public void testGetPreCycleDate() {
+    Date now = new Date();
+    System.out.println("now: " + now);
+    Map.Entry<Date, Date> minMap = CrontabUtil.getPreCycleDate(now, ScheduleType.MINUTE);
+    System.out.println("min level is "+minMap.getKey()+" - "+minMap.getValue());
+    Map.Entry<Date, Date> hourMap = CrontabUtil.getPreCycleDate(now, ScheduleType.HOUR);
+    System.out.println("hour level is "+hourMap.getKey()+" - "+hourMap.getValue());
+    Map.Entry<Date, Date> dayMap = CrontabUtil.getPreCycleDate(now, ScheduleType.DAY);
+    System.out.println("day level is "+dayMap.getKey()+" - "+dayMap.getValue());
+    Map.Entry<Date, Date> weekMap = CrontabUtil.getPreCycleDate(now, ScheduleType.WEEK);
+    System.out.println("week level is "+weekMap.getKey()+" - "+weekMap.getValue());
+    Map.Entry<Date, Date> monthMap = CrontabUtil.getPreCycleDate(now, ScheduleType.MONTH);
+    System.out.println("month level is "+monthMap.getKey()+" - "+monthMap.getValue());
   }
 }

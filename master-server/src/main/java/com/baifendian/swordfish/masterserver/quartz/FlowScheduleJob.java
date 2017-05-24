@@ -29,10 +29,7 @@ import com.baifendian.swordfish.dao.utils.json.JsonUtil;
 import com.baifendian.swordfish.masterserver.master.ExecFlowInfo;
 import com.baifendian.swordfish.masterserver.utils.crontab.CrontabUtil;
 import org.apache.commons.collections.CollectionUtils;
-import org.quartz.Job;
-import org.quartz.JobDataMap;
-import org.quartz.JobExecutionContext;
-import org.quartz.JobExecutionException;
+import org.quartz.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -155,7 +152,7 @@ public class FlowScheduleJob implements Job {
 
     try {
       executionFlow = flowDao.scheduleFlowToExecution(projectId, flowId, flow.getOwnerId(), scheduledFireTime,
-          ExecType.SCHEDULER, schedule.getMaxTryTimes(), null, null, schedule.getNotifyType(), schedule.getNotifyMails(), schedule.getTimeout());
+              ExecType.SCHEDULER, schedule.getMaxTryTimes(), null, null, schedule.getNotifyType(), schedule.getNotifyMails(), schedule.getTimeout());
     } catch (Exception e) {
       logger.error("insert execution flow error", e);
       throw new JobExecutionException(e);
@@ -239,8 +236,8 @@ public class FlowScheduleJob implements Job {
     Date now = new Date();
 
     executionFlow.setStatus(flowStatus);
-    if (flowStatus !=null && flowStatus.typeIsFinished()) {
-      executionFlow.setEndTime(new Date());
+    if (flowStatus != null && flowStatus.typeIsFinished()) {
+      executionFlow.setEndTime(now);
     }
     flowDao.updateExecutionFlow(executionFlow);
   }
@@ -267,7 +264,7 @@ public class FlowScheduleJob implements Job {
       FlowStatus flowStatus = executionFlow.getStatus();
       if (flowStatus != null && flowStatus.typeIsSuccess()) {
         return true;
-      } else if (flowStatus == null || !flowStatus.typeIsFinished()) {
+      } else if (flowStatus == null || flowStatus.typeIsNotFinished()) {
         isNotFinshed = true;
       }
 
@@ -340,7 +337,12 @@ public class FlowScheduleJob implements Job {
         // 如果被依赖工作流的调度级别比较小
         if (cycle.ordinal() > depCycle.ordinal()) {
           Map.Entry<Date, Date> cycleDate = CrontabUtil.getPreCycleDate(scheduledFireTime, depCycle);
-          depStatus = checkCycleWorkflowStatus(cycleDate.getKey(), cycleDate.getValue(), depFlowId, depSchedule, systemTime, timeout);
+          //检测本次调度级别最早的依赖调度有没有执行完成。
+          depStatus = checkCycleWorkflowStatus(cycleDate.getValue(), scheduledFireTime, depFlowId, depSchedule, systemTime, timeout);
+          //如果本次调度级别最早的依赖调度没有完成，那么再看本周起最后的依赖调度有没有完成。
+          if (!depStatus) {
+            depStatus = checkCycleWorkflowStatus(cycleDate.getKey(), cycleDate.getValue(), depFlowId, depSchedule, systemTime, timeout);
+          }
         } else {
           depStatus = checkExecutionFlowStatus(scheduledFireTime, depFlowId, systemTime, timeout);
         }
@@ -377,7 +379,7 @@ public class FlowScheduleJob implements Job {
       FlowStatus flowStatus = executionFlow.getStatus();
       if (flowStatus != null && flowStatus.typeIsSuccess()) {
         return true;
-      } else if (flowStatus == null || !flowStatus.typeIsFinished()) {
+      } else if (flowStatus == null || flowStatus.typeIsNotFinished()) {
         isNotFinshed = true;
       }
 
@@ -402,7 +404,7 @@ public class FlowScheduleJob implements Job {
   }
 
   /**
-   * 检测一个周期时间内最后一次触发的工作流的执行结果
+   * 检测一个一个工作流有没有完成对一个时间段的工作
    *
    * @param startTime  周期起始时间
    * @param endTime    周期结束时间
@@ -417,15 +419,18 @@ public class FlowScheduleJob implements Job {
     while (true) {
       boolean isNotFinshed = false;
       // step1.我们尝试取周期内依赖任务最后一次的触发时间
-      Date fireTime = null;
+      CronExpression cronExpression;
       try {
-        List<Date> dateList = CrontabUtil.getCycleFireDate(startTime, endTime, schedule.getCrontab());
-        if (CollectionUtils.isNotEmpty(dateList)) {
-          fireTime = dateList.get(dateList.size() - 1);
-        }
+        cronExpression = CrontabUtil.parseCronExp(schedule.getCrontab());
       } catch (Exception e) {
         logger.error("get dep flow: {} statTime: {} - endTime: {} fire data error", flowId, startTime, endTime);
         return false;
+      }
+
+      Date fireTime = null;
+      List<Date> dateList = CrontabUtil.getCycleFireDate(startTime, endTime, cronExpression);
+      if (CollectionUtils.isNotEmpty(dateList)) {
+        fireTime = dateList.get(dateList.size() - 1);
       }
 
       // 如果在时间段内没有找到已经出发的时间点，就返回失败。
@@ -443,7 +448,7 @@ public class FlowScheduleJob implements Job {
         FlowStatus flowStatus = executionFlow.getStatus();
         if (flowStatus != null && flowStatus.typeIsSuccess()) {
           return true;
-        } else if (flowStatus == null || !flowStatus.typeIsFinished()) {
+        } else if (flowStatus == null || flowStatus.typeIsNotFinished()) {
           isNotFinshed = true;
         }
       }

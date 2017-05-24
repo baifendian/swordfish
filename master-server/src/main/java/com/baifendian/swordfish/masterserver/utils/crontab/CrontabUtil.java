@@ -49,19 +49,14 @@ public class CrontabUtil {
   }
 
   /**
-   * 将一个String crontab转化为一个CronExpression对象
+   * 把String crontab转换为一个CronExpression对象
    *
    * @param crontab
    * @return
+   * @throws ParseException
    */
-  public static CronExpression parseCronExp(String crontab) {
-    CronExpression cronExpression = null;
-    try {
-      cronExpression = new CronExpression(crontab);
-    } catch (ParseException e) {
-      e.printStackTrace();
-    }
-    return cronExpression;
+  public static CronExpression parseCronExp(String crontab) throws ParseException {
+    return new CronExpression(crontab);
   }
 
   /**
@@ -83,13 +78,11 @@ public class CrontabUtil {
    *
    * @param startTime
    * @param endTime
-   * @param crontab
+   * @param cronExpression
    * @return
    */
-  public static List<Date> getCycleFireDate(Date startTime, Date endTime, String crontab) throws ParseException {
+  public static List<Date> getCycleFireDate(Date startTime, Date endTime, CronExpression cronExpression) {
     List<Date> dateList = new ArrayList<>();
-
-    CronExpression  cronExpression = new CronExpression(crontab);
 
     while (true) {
       startTime = cronExpression.getNextValidTimeAfter(startTime);
@@ -129,16 +122,21 @@ public class CrontabUtil {
     // 介绍时间
     Calendar scheduleEndTime = Calendar.getInstance();
     scheduleEndTime.setTime(scheduledFireTime);
+
+
     switch (scheduleType) {
       case MINUTE:
         // 上一分钟 ~ 当前分钟的开始
         scheduleStartTime.add(Calendar.MINUTE, -1);
+        scheduleStartTime.set(Calendar.SECOND, 0);
         scheduleEndTime.set(Calendar.SECOND, 0);
         break;
 
       case HOUR:
         // 上一小时 ~ 当前小时的开始
         scheduleStartTime.add(Calendar.HOUR_OF_DAY, -1);
+        scheduleStartTime.set(Calendar.MINUTE, 0);
+        scheduleStartTime.set(Calendar.SECOND, 0);
         scheduleEndTime.set(Calendar.MINUTE, 0);
         scheduleEndTime.set(Calendar.SECOND, 0);
         break;
@@ -146,6 +144,9 @@ public class CrontabUtil {
       case DAY:
         // 上一天 ~ 当前天的开始
         scheduleStartTime.add(Calendar.DAY_OF_MONTH, -1);
+        scheduleStartTime.set(Calendar.HOUR_OF_DAY, 0);
+        scheduleStartTime.set(Calendar.MINUTE, 0);
+        scheduleStartTime.set(Calendar.SECOND, 0);
         scheduleEndTime.set(Calendar.HOUR_OF_DAY, 0);
         scheduleEndTime.set(Calendar.MINUTE, 0);
         scheduleEndTime.set(Calendar.SECOND, 0);
@@ -153,9 +154,16 @@ public class CrontabUtil {
 
       case WEEK:
         // 上一周 ~ 当前周的开始(周一)
+        scheduleStartTime.setFirstDayOfWeek(Calendar.MONDAY);
+        scheduleEndTime.setFirstDayOfWeek(Calendar.MONDAY);
+
         scheduleStartTime.add(Calendar.WEEK_OF_YEAR, -1);
+        scheduleStartTime.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
+        scheduleStartTime.set(Calendar.HOUR_OF_DAY, 0);
+        scheduleStartTime.set(Calendar.MINUTE, 0);
+        scheduleStartTime.set(Calendar.SECOND, 0);
         scheduleEndTime.setTime(scheduleStartTime.getTime());
-        scheduleEndTime.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
+        scheduleEndTime.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);
         scheduleEndTime.set(Calendar.HOUR_OF_DAY, 0);
         scheduleEndTime.set(Calendar.MINUTE, 0);
         scheduleEndTime.set(Calendar.SECOND, 0);
@@ -165,8 +173,12 @@ public class CrontabUtil {
       case MONTH:
         // 上一月
         scheduleStartTime.add(Calendar.MONTH, -1);
+        scheduleStartTime.set(Calendar.DAY_OF_MONTH, 1);
+        scheduleStartTime.set(Calendar.HOUR_OF_DAY, 0);
+        scheduleStartTime.set(Calendar.MINUTE, 0);
+        scheduleStartTime.set(Calendar.SECOND, 0);
         scheduleEndTime.setTime(scheduleStartTime.getTime());
-        scheduleEndTime.set(Calendar.DAY_OF_MONTH, 1);
+        scheduleEndTime.set(Calendar.DAY_OF_MONTH, scheduleEndTime.getActualMaximum(Calendar.DAY_OF_MONTH));
         scheduleEndTime.set(Calendar.HOUR_OF_DAY, 0);
         scheduleEndTime.set(Calendar.MINUTE, 0);
         scheduleEndTime.set(Calendar.SECOND, 0);
