@@ -186,6 +186,12 @@ public class ScheduleService {
       throw new NotFoundException("Not found schedule for workflow \"{0}\"", projectFlow.getId());
     }
 
+    // 上线状态的调度禁止修改
+    if (scheduleObj.getScheduleStatus() == ScheduleStatus.ONLINE) {
+      logger.error("Can not modify online schedule");
+      throw new PreFailedException("ProjectFlow \"{0}\" schedule is online can not modify!", projectFlow.getName());
+    }
+
     Date now = new Date();
 
     // 封装检查更新参数
@@ -266,6 +272,7 @@ public class ScheduleService {
     return patchSchedule(operator, projectName, workflowName, schedule, notifyType, notifyMails, maxTryTimes, failurePolicy, depWorkflows, depPolicyType, timeout, null);
   }
 
+
   /**
    * 设置一个调度的上下线
    *
@@ -275,6 +282,7 @@ public class ScheduleService {
    * @param scheduleStatus
    * @throws Exception
    */
+  @Transactional(value = "TransactionManager")
   public void postScheduleStatus(User operator, String projectName, String workflowName, ScheduleStatus scheduleStatus) throws Exception {
     Project project = projectMapper.queryByName(projectName);
 
