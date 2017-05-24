@@ -19,7 +19,6 @@ import com.baifendian.swordfish.dao.DaoFactory;
 import com.baifendian.swordfish.dao.FlowDao;
 import com.baifendian.swordfish.dao.enums.FailurePolicyType;
 import com.baifendian.swordfish.dao.model.ExecutionFlow;
-import com.baifendian.swordfish.execserver.exception.ExecException;
 import com.baifendian.swordfish.execserver.parameter.SystemParamManager;
 import com.baifendian.swordfish.execserver.utils.Constants;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
@@ -222,7 +221,8 @@ public class FlowRunnerManager {
     FlowRunner flowRunner = runningFlows.get(execId);
 
     if (flowRunner == null) {
-      throw new ExecException("Execution " + execId + "is not running");
+      logger.error("Execution id {} is not running", execId);
+      return;
     }
 
     flowRunner.clean();
