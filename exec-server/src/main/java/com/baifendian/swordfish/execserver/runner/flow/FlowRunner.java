@@ -646,6 +646,8 @@ public class FlowRunner implements Runnable {
           logger.error(e.getMessage(), e);
         } catch (CancellationException e) {
           logger.error(e.getMessage(), e);
+        } catch (Exception e) {
+          logger.error(e.getMessage(), e);
         } finally {
           if (!value) {
             ExecutionNode executionNode = nodeRunner.getExecutionNode();
