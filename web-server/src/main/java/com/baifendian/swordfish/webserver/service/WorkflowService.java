@@ -503,7 +503,13 @@ public class WorkflowService {
       throw new PermissionException("User \"{0}\" is not has project \"{1}\" read permission", operator.getName(), project.getName());
     }
 
-    return flowDao.projectFlowfindByName(project.getId(), name);
+    // 如果projectFlow 抛出异常
+    ProjectFlow projectFlow = flowDao.projectFlowfindByName(project.getId(), name);
+    if (projectFlow == null) {
+      throw new NotFoundException("Not found Workflow \"{0}\"", name);
+    }
+
+    return projectFlow;
   }
 
   /**
