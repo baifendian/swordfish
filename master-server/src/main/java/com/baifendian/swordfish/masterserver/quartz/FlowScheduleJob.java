@@ -238,7 +238,7 @@ public class FlowScheduleJob implements Job {
   private void updateWaitingDepFlowStatus(ExecutionFlow executionFlow, FlowStatus flowStatus) {
     executionFlow.setStatus(flowStatus);
 
-    if (flowStatus == FlowStatus.DEP_FAILED){
+    if (flowStatus !=null && flowStatus.typeIsFinished()){
       executionFlow.setEndTime(new Date());
     }
 
