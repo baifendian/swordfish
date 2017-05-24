@@ -126,7 +126,7 @@ public class MysqlDatasource extends Datasource {
       Class.forName("com.mysql.jdbc.Driver");
 
       String address = this.address;
-      if (address.lastIndexOf("/") != address.length()) {
+      if (address.lastIndexOf("/") != (address.length() - 1)) {
         address += "/";
       }
       String url = address + this.database;
