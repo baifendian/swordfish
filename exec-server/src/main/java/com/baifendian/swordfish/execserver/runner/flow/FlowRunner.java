@@ -239,9 +239,6 @@ public class FlowRunner implements Runnable {
 
       // 执行 flow, 这里会等待任务完全结束才会返回
       status = runFlow(dagGraph);
-
-      // 更新 ExecutionFlow
-      updateExecutionFlow(status);
     } catch (ExecTimeoutException e) {
       logger.error("Exec flow timeout", e);
       clean();
@@ -252,6 +249,9 @@ public class FlowRunner implements Runnable {
       // 执行失败
       if (status == null) {
         updateExecutionFlow(FlowStatus.FAILED);
+      } else {
+        // 更新 ExecutionFlow
+        updateExecutionFlow(status);
       }
 
       // 执行完后, 清理目录, 避免文件过大
@@ -422,6 +422,12 @@ public class FlowRunner implements Runnable {
 
             try {
               value = future.get();
+            } catch (CancellationException e) {
+              logger.error("task has been cancel");
+
+              // 清理任务
+              clean();
+              return FlowStatus.KILL;
             } catch (InterruptedException e) {
               logger.error(e.getMessage(), e);
             } catch (ExecutionException e) {
@@ -573,10 +579,13 @@ public class FlowRunner implements Runnable {
   private void updateExecutionFlow(FlowStatus status) {
     Date now = new Date();
 
-    executionFlow.setEndTime(now);
-    executionFlow.setStatus(status);
+    // 没有完成才更新
+    if (executionFlow.getStatus().typeIsNotFinished()) {
+      executionFlow.setEndTime(now);
+      executionFlow.setStatus(status);
 
-    flowDao.updateExecutionFlow(executionFlow);
+      flowDao.updateExecutionFlow(executionFlow);
+    }
   }
 
   /**
@@ -644,8 +653,8 @@ public class FlowRunner implements Runnable {
           logger.error(e.getMessage(), e);
         } catch (ExecutionException e) {
           logger.error(e.getMessage(), e);
-        } catch (CancellationException e) {
-          logger.error(e.getMessage(), e);
+        } catch (CancellationException e) { // 任务被取消了
+          logger.error("task has been cancel");
         } catch (Exception e) {
           logger.error(e.getMessage(), e);
         } finally {

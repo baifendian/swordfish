@@ -17,7 +17,9 @@ package com.baifendian.swordfish.webserver.controller;
 
 import com.baifendian.swordfish.dao.model.ProjectFlow;
 import com.baifendian.swordfish.dao.model.User;
+import com.baifendian.swordfish.webserver.dto.StreamingJobDto;
 import com.baifendian.swordfish.webserver.dto.WorkflowDto;
+import com.baifendian.swordfish.webserver.service.StreamingService;
 import com.baifendian.swordfish.webserver.service.WorkflowService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,17 +34,14 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * 工作流管理的服务入口
- */
 @RestController
-@RequestMapping("/projects/{projectName}")
-public class WorkflowController {
+@RequestMapping("")
+public class StreamingController {
 
-  private static Logger logger = LoggerFactory.getLogger(WorkflowController.class.getName());
+  private static Logger logger = LoggerFactory.getLogger(StreamingController.class.getName());
 
   @Autowired
-  private WorkflowService workflowService;
+  private StreamingService streamingService;
 
   /**
    * 创建工作流
@@ -56,21 +55,22 @@ public class WorkflowController {
    * @param data
    * @param file
    */
-  @PostMapping(value = "/workflows/{name}")
+  @PostMapping(value = "/projects/{projectName}/streaming/{name}")
   @ResponseStatus(HttpStatus.CREATED)
-  public WorkflowDto createWorkflow(@RequestAttribute(value = "session.user") User operator,
-                                    @PathVariable String projectName,
-                                    @PathVariable String name,
-                                    @RequestParam(value = "desc", required = false) String desc,
-                                    @RequestParam(value = "proxyUser") String proxyUser,
-                                    @RequestParam(value = "queue") String queue,
-                                    @RequestParam(value = "data", required = false) String data,
-                                    @RequestParam(value = "file", required = false) MultipartFile file,
-                                    @RequestParam(value = "extras", required = false) String extras) {
+  public StreamingJobDto createStreaming(@RequestAttribute(value = "session.user") User operator,
+                                         @PathVariable String projectName,
+                                         @PathVariable String name,
+                                         @RequestParam(value = "desc", required = false) String desc,
+                                         @RequestParam(value = "proxyUser") String proxyUser,
+                                         @RequestParam(value = "queue") String queue,
+                                         @RequestParam(value = "data", required = false) String data,
+                                         @RequestParam(value = "file", required = false) MultipartFile file,
+                                         @RequestParam(value = "extras", required = false) String extras) {
     logger.info("Operator user {}, create workflow, project name: {}, workflow name: {}, desc: {}, proxyUser: {}, queue: {}, data: {}, file: [{},{}]",
         operator.getName(), projectName, name, desc, proxyUser, queue, data, (file == null) ? null : file.getName(), (file == null) ? null : file.getOriginalFilename());
 
-    return new WorkflowDto(workflowService.createWorkflow(operator, projectName, name, desc, proxyUser, queue, data, file, extras, null));
+    return null;
+//    return new WorkflowDto(streamingService.createWorkflow(operator, projectName, name, desc, proxyUser, queue, data, file, extras, null));
   }
 
   /**
@@ -98,7 +98,8 @@ public class WorkflowController {
     logger.info("Operator user {}, put workflow, project name: {}, workflow name: {}, desc: {}, proxyUser: {}, queue: {}, data: {}, file: [{},{}]",
         operator.getName(), projectName, name, desc, proxyUser, queue, data, (file == null) ? null : file.getName(), (file == null) ? null : file.getOriginalFilename());
 
-    return new WorkflowDto(workflowService.putWorkflow(operator, projectName, name, desc, proxyUser, queue, data, file, extras));
+    return null;
+//    return new WorkflowDto(workflowService.putWorkflow(operator, projectName, name, desc, proxyUser, queue, data, file, extras));
   }
 
   /**
@@ -126,7 +127,8 @@ public class WorkflowController {
     logger.info("Operator user {}, modify workflow, project name: {}, workflow name: {}, desc: {}, proxyUser: {}, queue: {}, data: {}, file: [{},{}]",
         operator.getName(), projectName, name, desc, proxyUser, queue, data, (file == null) ? null : file.getName(), (file == null) ? null : file.getOriginalFilename());
 
-    return new WorkflowDto(workflowService.patchWorkflow(operator, projectName, name, desc, proxyUser, queue, data, file, extras));
+    return null;
+//    return new WorkflowDto(workflowService.patchWorkflow(operator, projectName, name, desc, proxyUser, queue, data, file, extras));
   }
 
 
@@ -146,7 +148,8 @@ public class WorkflowController {
                                       @RequestParam(value = "destWorkflowName") String destWorkflowName) {
     logger.info("Operator user {}, project name: {} , source workflow: {}, dest workflow: {}", operator.getName(), projectName, srcWorkflowName, destWorkflowName);
 
-    return new WorkflowDto(workflowService.postWorkflowCopy(operator, projectName, srcWorkflowName, destWorkflowName));
+    return null;
+//    return new WorkflowDto(workflowService.postWorkflowCopy(operator, projectName, srcWorkflowName, destWorkflowName));
   }
 
   /**
@@ -163,7 +166,7 @@ public class WorkflowController {
     logger.info("Operator user {}, delete workflow, project name: {}, workflow name: {}",
         operator.getName(), projectName, name);
 
-    workflowService.deleteProjectFlow(operator, projectName, name);
+//    workflowService.deleteProjectFlow(operator, projectName, name);
   }
 
   /**
@@ -182,7 +185,7 @@ public class WorkflowController {
     logger.info("Operator user {}, modify workflow conf, project name: {}, proxyUser: {}, queue: {}",
         operator.getName(), projectName, proxyUser, queue);
 
-    workflowService.modifyWorkflowConf(operator, projectName, queue, proxyUser);
+//    workflowService.modifyWorkflowConf(operator, projectName, queue, proxyUser);
   }
 
   /**
@@ -198,14 +201,16 @@ public class WorkflowController {
     logger.info("Operator user {}, query workflow list of project, project name: {}",
         operator.getName(), projectName);
 
-    List<ProjectFlow> projectFlowList = workflowService.queryAllProjectFlow(operator, projectName);
-    List<WorkflowDto> workflowDtoList = new ArrayList<>();
-
-    for (ProjectFlow projectFlow : projectFlowList) {
-      workflowDtoList.add(new WorkflowDto(projectFlow));
-    }
-
-    return workflowDtoList;
+    return null;
+//
+//    List<ProjectFlow> projectFlowList = workflowService.queryAllProjectFlow(operator, projectName);
+//    List<WorkflowDto> workflowDtoList = new ArrayList<>();
+//
+//    for (ProjectFlow projectFlow : projectFlowList) {
+//      workflowDtoList.add(new WorkflowDto(projectFlow));
+//    }
+//
+//    return workflowDtoList;
   }
 
   /**
@@ -223,7 +228,8 @@ public class WorkflowController {
     logger.info("Operator user {}, query workflow detail, project name: {}, workflow name: {}",
         operator.getName(), projectName, name);
 
-    return new WorkflowDto(workflowService.queryProjectFlow(operator, projectName, name));
+    return null;
+//    return new WorkflowDto(workflowService.queryProjectFlow(operator, projectName, name));
   }
 
   /**
@@ -240,18 +246,18 @@ public class WorkflowController {
                                                          @PathVariable String name) {
     logger.info("Operator user {}, download workflow, project name: {}, workflow name: {}",
         operator.getName(), projectName, name);
-
-    org.springframework.core.io.Resource file = workflowService.downloadProjectFlowFile(operator, projectName, name);
-
-    if (file == null) {
-      return ResponseEntity
-          .noContent().build();
-    }
-
-    return ResponseEntity
-        .ok()
-        .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getFilename() + "\"")
-        .body(file);
-
+//
+//    org.springframework.core.io.Resource file = workflowService.downloadProjectFlowFile(operator, projectName, name);
+//
+//    if (file == null) {
+//      return ResponseEntity
+//          .noContent().build();
+//    }
+//
+//    return ResponseEntity
+//        .ok()
+//        .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getFilename() + "\"")
+//        .body(file);
+    return null;
   }
 }
