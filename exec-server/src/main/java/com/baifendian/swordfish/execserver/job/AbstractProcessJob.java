@@ -160,6 +160,10 @@ public abstract class AbstractProcessJob extends AbstractJob {
       process.waitFor(remainTime, TimeUnit.SECONDS);
 
       exitCode = process.exitValue();
+    } catch (InterruptedException e) {
+      logger.error("interrupt exception, maybe task has been cancel or killed.");
+      exitCode = -1;
+      throw new ExecException("Process has been interrupted. Exit code is " + exitCode);
     } catch (Exception e) {
       logger.error(e.getMessage(), e);
       exitCode = -1;
