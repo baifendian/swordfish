@@ -94,7 +94,8 @@ public class UserService {
     user.setDesc(desc);
     user.setPhone(phone);
     user.setPassword(HttpUtil.getMd5(password));
-    user.setRole(UserRoleType.GENERAL_USER); // 创建的用户都是普通用户, 管理员用户当前是内置的
+    // 创建的用户都是普通用户, 管理员用户当前是内置的
+    user.setRole(UserRoleType.GENERAL_USER);
     user.setProxyUsers(proxyUsers);
     user.setCreateTime(now);
     user.setModifyTime(now);
@@ -156,10 +157,11 @@ public class UserService {
     Date now = new Date();
 
     if (email != null) {
-      //邮箱不能重复
+      // 邮箱不能重复
       if (userMapper.queryByEmail(email) != null) {
         throw new ParameterException("Email has exist, can't modify again.");
       }
+
       user.setEmail(email);
     }
 
@@ -209,10 +211,11 @@ public class UserService {
       throw new ParameterException("Can't not delete user self");
     }
 
-    //只有管理员可以操作
+    // 只有管理员可以操作
     if (!isAdmin(operator)) {
       throw new PermissionException("User \"{0}\" is not admin user", operator.getName());
     }
+
     // 删除用户的时候, 必须保证用户没有参与到任何的项目开发之中
     List<Project> projects = projectMapper.queryProjectByUser(operator.getId());
 
@@ -301,22 +304,23 @@ public class UserService {
   }
 
 
-
   /**
    * 判断一个用户说还是不是admin
+   *
    * @param user
    * @return
    */
-  public boolean isAdmin(User user){
+  public boolean isAdmin(User user) {
     return user.getRole() == UserRoleType.ADMIN_USER;
   }
 
   /**
    * 判断一个用户是不是普通用户
+   *
    * @param user
    * @return
    */
-  public boolean isGeneral(User user){
+  public boolean isGeneral(User user) {
     return user.getRole() == UserRoleType.GENERAL_USER;
   }
 

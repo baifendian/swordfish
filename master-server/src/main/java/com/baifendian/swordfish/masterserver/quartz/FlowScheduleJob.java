@@ -116,14 +116,13 @@ public class FlowScheduleJob implements Job {
    */
   @Override
   public void execute(JobExecutionContext context) throws JobExecutionException {
-    logger.info("trigger at:" + context.getFireTime());
-
-    Date now = new Date();
-
     // 1. 获取参数
     JobDataMap dataMap = context.getJobDetail().getJobDataMap();
+
     int projectId = dataMap.getInt(PARAM_PROJECT_ID);
     int flowId = dataMap.getInt(PARAM_FLOW_ID);
+
+    logger.info("trigger at:{}, flow id:{}", context.getFireTime(), flowId);
 
     // Schedule schedule =
     // JsonUtil.parseObject(dataMap.getString(PARAM_SCHEDULE),
@@ -156,7 +155,7 @@ public class FlowScheduleJob implements Job {
 
     try {
       executionFlow = flowDao.scheduleFlowToExecution(projectId, flowId, flow.getOwnerId(), scheduledFireTime,
-              ExecType.SCHEDULER, schedule.getMaxTryTimes(), null, null, schedule.getNotifyType(), schedule.getNotifyMails(), schedule.getTimeout());
+          ExecType.SCHEDULER, schedule.getMaxTryTimes(), null, null, schedule.getNotifyType(), schedule.getNotifyMails(), schedule.getTimeout());
     } catch (Exception e) {
       logger.error("insert execution flow error", e);
       throw new JobExecutionException(e);
@@ -175,7 +174,7 @@ public class FlowScheduleJob implements Job {
 
       // 存在上一调度周期
       if (previousFireTime != null) {
-        logger.info("previous fire time is {}", previousFireTime);
+        logger.info("previous fire time is: {}", previousFireTime);
 
         // 需要更新状态为 WAITING_DEP
         if (isNotUpdateWaitingDep) {
@@ -186,8 +185,9 @@ public class FlowScheduleJob implements Job {
         // 如果自依赖的上一个调度周期失败，那么本次也失败
         if (!checkWorkflowStatus(flowId, previousFireTime, systemTime, schedule.getTimeout())) {
 
-          updateWaitingDepFlowStatus(executionFlow,FlowStatus.DEP_FAILED);
-          logger.error("Self dependence last cycle execution failed!");
+          updateWaitingDepFlowStatus(executionFlow, FlowStatus.DEP_FAILED);
+
+          logger.error("Exec id:{} self dependence last cycle execution failed!", executionFlow.getId());
 
           // 发送邮件
           if (executionFlow.getNotifyType().typeIsSendFailureMail()) {
@@ -212,9 +212,9 @@ public class FlowScheduleJob implements Job {
 
       // 依赖失败，则当前任务也失败
       if (!isSuccess) {
+        updateWaitingDepFlowStatus(executionFlow, FlowStatus.DEP_FAILED);
 
-        updateWaitingDepFlowStatus(executionFlow,FlowStatus.DEP_FAILED);
-        logger.error("depended workflow execution failed");
+        logger.error("Exec id:{} depended workflow execution failed", executionFlow.getId());
 
         // 发送邮件
         if (executionFlow.getNotifyType().typeIsSendFailureMail()) {
@@ -226,7 +226,7 @@ public class FlowScheduleJob implements Job {
     }
 
     // 发送执行任务到 worker
-    sendToExecution(executionFlow, scheduledFireTime);
+    sendToExecution(executionFlow);
   }
 
   /**
@@ -236,12 +236,12 @@ public class FlowScheduleJob implements Job {
    * @param flowStatus
    */
   private void updateWaitingDepFlowStatus(ExecutionFlow executionFlow, FlowStatus flowStatus) {
-    executionFlow.setStatus(flowStatus);
+    Date now = new Date();
 
-    if (flowStatus !=null && flowStatus.typeIsFinished()){
+    executionFlow.setStatus(flowStatus);
+    if (flowStatus !=null && flowStatus.typeIsFinished()) {
       executionFlow.setEndTime(new Date());
     }
-
     flowDao.updateExecutionFlow(executionFlow);
   }
 
@@ -314,7 +314,7 @@ public class FlowScheduleJob implements Job {
    * @param schedule          当前工作流调度信息
    * @param scheduledFireTime 当前调度应该触发的时间
    * @param deps              依赖工作流列表
-   * @param systemTime         系统提交的实际时间戳
+   * @param systemTime        系统提交的实际时间戳
    * @param timeout           等待依赖工作流的超时
    * @return
    */
@@ -324,7 +324,7 @@ public class FlowScheduleJob implements Job {
       Schedule depSchedule = flowDao.querySchedule(depFlowId);
       if (depSchedule != null) {
 
-        //识别周期
+        // 识别周期
         ScheduleType cycle = CrontabUtil.getCycle(schedule.getCrontab());
         ScheduleType depCycle = CrontabUtil.getCycle(depSchedule.getCrontab());
 
@@ -335,8 +335,9 @@ public class FlowScheduleJob implements Job {
           }
         }
 
-        boolean depStatus = true;
-        //如果被依赖工作流的调度级别比较小
+        boolean depStatus;
+
+        // 如果被依赖工作流的调度级别比较小
         if (cycle.ordinal() > depCycle.ordinal()) {
           Map.Entry<Date, Date> cycleDate = CrontabUtil.getPreCycleDate(scheduledFireTime, depCycle);
           depStatus = checkCycleWorkflowStatus(cycleDate.getKey(), cycleDate.getValue(), depFlowId, depSchedule, systemTime, timeout);
@@ -349,6 +350,7 @@ public class FlowScheduleJob implements Job {
         }
       }
     }
+
     return true;
   }
 
@@ -363,27 +365,27 @@ public class FlowScheduleJob implements Job {
    */
   private boolean checkExecutionFlowStatus(Date relativeTime, int flowId, long systemTime, int timeout) {
     while (true) {
-      //是否没有完成
+      // 是否没有完成
       boolean isNotFinshed = false;
       ExecutionFlow executionFlow = flowDao.executionFlowPreDate(flowId, relativeTime);
 
-      //系统没有触发调度直接认为依赖失败
+      // 系统没有触发调度直接认为依赖失败
       if (executionFlow == null) {
         return false;
       }
 
       FlowStatus flowStatus = executionFlow.getStatus();
       if (flowStatus != null && flowStatus.typeIsSuccess()) {
-        return true; // 已经执行成功
+        return true;
       } else if (flowStatus == null || !flowStatus.typeIsFinished()) {
         isNotFinshed = true;
       }
 
       if (isNotFinshed) {
-        //如果没有启动时间,也没有调度真实时间，直接算超时，如果有就计算超时
+        // 如果没有启动时间, 也没有调度真实时间，直接算超时，如果有就计算超时
         if (checkTimeout(systemTime, timeout)) {
-          logger.error("等待依赖的 workflow 任务超时");
-          return false; // 也认为是执行失败
+          logger.error("Wait for dependence workflow timeout");
+          return false;
         }
 
         try {
@@ -393,9 +395,9 @@ public class FlowScheduleJob implements Job {
           return false;
         }
       } else {
+        // 完成了, 返回
         return false;
       }
-
     }
   }
 
@@ -411,12 +413,10 @@ public class FlowScheduleJob implements Job {
    * @return
    */
   private boolean checkCycleWorkflowStatus(Date startTime, Date endTime, int flowId, Schedule schedule, long systemTime, Integer timeout) {
-
-
     // 循环检测，直到检测到依赖是否成功
     while (true) {
       boolean isNotFinshed = false;
-      //step1.我们尝试取周期内依赖任务最后一次的触发时间
+      // step1.我们尝试取周期内依赖任务最后一次的触发时间
       Date fireTime = null;
       try {
         List<Date> dateList = CrontabUtil.getCycleFireDate(startTime, endTime, schedule.getCrontab());
@@ -425,10 +425,10 @@ public class FlowScheduleJob implements Job {
         }
       } catch (Exception e) {
         logger.error("get dep flow: {} statTime: {} - endTime: {} fire data error", flowId, startTime, endTime);
-        return false; // 对于出现了解析异常我们认为失败了
+        return false;
       }
 
-      //如果在时间段内没有找到已经出发的时间点，就返回失败。
+      // 如果在时间段内没有找到已经出发的时间点，就返回失败。
       if (fireTime == null) {
         return false;
       }
@@ -436,7 +436,7 @@ public class FlowScheduleJob implements Job {
       //寻找调度执行记录
       ExecutionFlow executionFlow = flowDao.queryExecutionFlowByScheduleTime(flowId, fireTime);
 
-      //根本没有执行,等待执行。
+      // 根本没有执行, 等待执行
       if (executionFlow == null) {
         isNotFinshed = true;
       } else {
@@ -448,7 +448,8 @@ public class FlowScheduleJob implements Job {
         }
       }
 
-      if (isNotFinshed) { // 如果依赖的任务没有完成
+      // 如果依赖的任务没有完成
+      if (isNotFinshed) {
         // 如果等待超时
         if (checkTimeout(systemTime, timeout)) {
           logger.error("Wait for last cycle timeout");
@@ -460,7 +461,7 @@ public class FlowScheduleJob implements Job {
           Thread.sleep(checkInterval);
         } catch (InterruptedException e) {
           logger.error(e.getMessage(), e);
-          return false; // 也认为是执行失败
+          return false;
         }
       } else {
         return false;
@@ -484,11 +485,12 @@ public class FlowScheduleJob implements Job {
    * 发送执行任务到 worker <p>
    *
    * @param executionFlow
-   * @param scheduleDate
    */
-  private void sendToExecution(ExecutionFlow executionFlow, Date scheduleDate) {
+  private void sendToExecution(ExecutionFlow executionFlow) {
     ExecFlowInfo execFlowInfo = new ExecFlowInfo();
     execFlowInfo.setExecId(executionFlow.getId());
+
+    logger.info("scheduler to execution, exec id:{}, schedule time:{}", executionFlow.getId(), executionFlow.getScheduleTime());
 
     executionFlowQueue.add(execFlowInfo);
   }

@@ -124,8 +124,8 @@ public class Submit2ExecutorServerThread extends Thread {
         try {
           ExecutorClient executorClient = new ExecutorClient(executorServerInfo);
 
-          logger.info("exec id:{}, project id:{}, executor client:{}:{}", execId, executionFlow.getProjectId(),
-              executorServerInfo.getHost(), executorServerInfo.getPort());
+          logger.info("exec id:{}, project id:{}, executor client:{}:{}, try count:{}", execId, executionFlow.getProjectId(),
+              executorServerInfo.getHost(), executorServerInfo.getPort(), i);
 
           // 可能抛出运行时异常, 或者是 TException 异常
           executorClient.execFlow(execId);

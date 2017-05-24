@@ -46,6 +46,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.Charset;
 import java.util.*;
@@ -151,13 +152,13 @@ public class FlowRunner implements Runnable {
 
     FlowStatus status = null;
 
+    // 得到执行的目录
+    String execLocalPath = BaseConfig.getFlowExecDir(executionFlow.getProjectId(), executionFlow.getFlowId(),
+        executionFlow.getId());
+
+    logger.info("exec id:{}, current execution dir:{}, max try times:{}, timeout:{}, failure policy type:{}", executionFlow.getId(), execLocalPath, maxTryTimes, timeout, failurePolicyType);
+
     try {
-      // 得到执行的目录
-      String execLocalPath = BaseConfig.getFlowExecDir(executionFlow.getProjectId(), executionFlow.getFlowId(),
-          executionFlow.getId());
-
-      logger.info("exec id:{}, current execution dir:{}, max try times:{}, timeout:{}, failure policy type:{}", executionFlow.getId(), execLocalPath, maxTryTimes, timeout, failurePolicyType);
-
       // 如果存在, 首先清除该目录
       File execLocalPathFile = new File(execLocalPath);
 
@@ -251,6 +252,13 @@ public class FlowRunner implements Runnable {
       // 执行失败
       if (status == null) {
         updateExecutionFlow(FlowStatus.FAILED);
+      }
+
+      // 执行完后, 清理目录, 避免文件过大
+      try {
+        FileUtils.deleteDirectory(new File(execLocalPath));
+      } catch (IOException e) {
+        logger.error(String.format("delete dir exception: %s", execLocalPath), e);
       }
 
       // 后置处理

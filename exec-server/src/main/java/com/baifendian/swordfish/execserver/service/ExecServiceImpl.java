@@ -88,6 +88,8 @@ public class ExecServiceImpl implements Iface {
   @Override
   public RetInfo execFlow(int execId) throws TException {
     try {
+      logger.info("exec flow, exec id:{}", execId);
+
       // 查询 ExecutionFlow
       ExecutionFlow executionFlow = flowDao.queryExecutionFlow(execId);
       if (executionFlow == null) {
@@ -95,7 +97,7 @@ public class ExecServiceImpl implements Iface {
       }
 
       // 必须是初始化状态才接受
-      if (executionFlow.getStatus() != FlowStatus.INIT) {
+      if (executionFlow.getStatus().typeIsFinished()) {
         return ResultHelper.createErrorResult("execId has finish");
       }
 

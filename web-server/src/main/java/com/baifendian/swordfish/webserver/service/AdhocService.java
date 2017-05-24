@@ -177,7 +177,7 @@ public class AdhocService {
       throw new NotFoundException("Exec id \"{0}\" has no correspond project", execId);
     }
 
-    //必须要有project执行权限
+    // 必须要有 project 执行权限
     if (!projectService.hasExecPerm(operator.getId(), project)) {
       logger.error("User {} has no right permission for the project {}", operator.getName(), project.getName());
       throw new PermissionException("User \"{0}\" is not has project \"{1}\" exec permission", operator.getName(), project.getName());
@@ -218,7 +218,7 @@ public class AdhocService {
     AdHocLogDto adHocLogDto = new AdHocLogDto();
 
     // 如果任务被 kill 了或者是某些异常导致失败
-    if (!adHocResult.getStatus().typeIsFinished() && adhoc.getStatus().typeIsFinished()) {
+    if (adHocResult.getStatus().typeIsNotFinished() && adhoc.getStatus().typeIsFinished()) {
       adHocLogDto.setStatus(adhoc.getStatus());
       adHocLogDto.setHasResult(true);
     } else {
@@ -250,7 +250,7 @@ public class AdhocService {
       throw new NotFoundException("Exec id \"{0}\" has no correspond project", execId);
     }
 
-    //如果有项目的执行去哪先才可以kill
+    // 如果有项目的执行去哪先才可以 kill
     if (!projectService.hasWritePerm(operator.getId(), project)) {
       logger.error("User {} has no right permission for the project {}", operator.getName(), project.getName());
       throw new PermissionException("User \"{0}\" is not has project \"{1}\" write permission", operator.getName(), project.getName());
@@ -285,7 +285,7 @@ public class AdhocService {
       throw new NotFoundException("Exec id \"{0}\" has no correspond project", execId);
     }
 
-    //如果有项目的执行去哪先才可以kill
+    // 如果有项目的执行去哪先才可以 kill
     if (!projectService.hasWritePerm(operator.getId(), project)) {
       logger.error("User {} has no right permission for the project {}", operator.getName(), project.getName());
       throw new PermissionException("User \"{0}\" is not has project \"{1}\" write permission", operator.getName(), project.getName());
@@ -299,7 +299,7 @@ public class AdhocService {
     }
 
     // 如果没有完成, 则更新为 kill
-    if (!adhoc.getStatus().typeIsFinished()) {
+    if (adhoc.getStatus().typeIsNotFinished()) {
       adhoc.setStatus(FlowStatus.KILL);
       adHocMapper.updateStatus(adhoc);
     }

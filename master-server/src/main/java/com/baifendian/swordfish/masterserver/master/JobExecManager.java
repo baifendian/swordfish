@@ -118,6 +118,7 @@ public class JobExecManager {
     }
 
     flowSubmit2ExecutorThread.disable();
+
     try {
       flowSubmit2ExecutorThread.join();
     } catch (InterruptedException e) {
