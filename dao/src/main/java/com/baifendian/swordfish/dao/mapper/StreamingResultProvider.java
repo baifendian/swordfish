@@ -13,14 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.baifendian.swordfish.webserver.dto;
+package com.baifendian.swordfish.dao.mapper;
 
-import com.baifendian.swordfish.dao.model.StreamingJob;
-
-public class StreamingJobDto {
-
-  public StreamingJobDto(StreamingJob streamingJob) {
-
-  }
+public class StreamingResultProvider {
 
 }

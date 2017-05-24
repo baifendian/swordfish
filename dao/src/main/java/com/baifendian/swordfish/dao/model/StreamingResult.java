@@ -1,0 +1,350 @@
+/*
+ * Copyright (C) 2017 Baifendian Corporation
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *          http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package com.baifendian.swordfish.dao.model;
+
+import com.baifendian.swordfish.dao.enums.FlowStatus;
+import com.baifendian.swordfish.dao.utils.json.JsonObjectDeserializer;
+import com.baifendian.swordfish.dao.utils.json.JsonObjectSerializer;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
+import java.util.Date;
+
+/**
+ * 描述一个流任务的结果
+ */
+public class StreamingResult {
+
+  /**
+   * 流任务 id
+   **/
+  private int id;
+
+  /**
+   * 提交人 id
+   */
+  private int submitUserId;
+
+  /**
+   * 提交人
+   */
+  private String submitUser;
+
+  /**
+   * 提交时间
+   **/
+  private Date submitTime;
+
+  /**
+   * 队列信息
+   * 数据库映射字段/DTO需要字段
+   */
+  private String queue;
+
+  /**
+   * 代理用户
+   * 数据库映射字段/DTO需要字段
+   */
+  private String proxyUser;
+
+  /**
+   * 调度时间
+   **/
+  private Date scheduleTime;
+
+  /**
+   * 起始时间
+   **/
+  private Date startTime;
+
+  /**
+   * 执行的状态
+   **/
+  private FlowStatus status;
+
+
+  /**
+   * 执行的 job id
+   **/
+  private String jobId;
+
+  /**
+   * 日志 link, json array
+   */
+  private String logLinks;
+
+  /**
+   * 流任务
+   * 数据库映射字段/DTO也需要使用
+   */
+  private String name;
+
+  /**
+   * 项目 id
+   * 数据库映射字段
+   */
+  private int projectId;
+
+  /**
+   * 项目名称
+   * DTO 需要字段
+   */
+  private String projectName;
+
+  /**
+   * 工作流描述
+   * 数据库映射字段/DTO需要字段
+   */
+  private String desc;
+
+  /**
+   * 创建时间
+   * 数据库映射字段/DTO需要字段
+   */
+  private Date createTime;
+
+  /**
+   * 修改时间
+   * 数据库映射字段/DTO需要字段
+   */
+  private Date modifyTime;
+
+  /**
+   * owner id
+   * 数据库映射字段
+   */
+  private int ownerId;
+
+  /**
+   * owner 名称
+   * DTO需要字段
+   */
+  private String owner;
+
+  /**
+   * 结点类型
+   * 数据库映射字段/DTO需要字段
+   */
+  private String type;
+
+  /**
+   * 结点参数
+   * 数据库映射字段/DTO需要字段
+   */
+  @JsonDeserialize(using = JsonObjectDeserializer.class)
+  @JsonSerialize(using = JsonObjectSerializer.class)
+  private String parameter;
+
+  /**
+   * 用户定义参数
+   * 数据库映射字段
+   */
+  @JsonDeserialize(using = JsonObjectDeserializer.class)
+  @JsonSerialize(using = JsonObjectSerializer.class)
+  private String userDefinedParams;
+
+  /**
+   * 额外字段
+   * 数据库映射字段/DTO需要字段
+   */
+  @JsonDeserialize(using = JsonObjectDeserializer.class)
+  @JsonSerialize(using = JsonObjectSerializer.class)
+  private String extras;
+
+  public int getId() {
+    return id;
+  }
+
+  public void setId(int id) {
+    this.id = id;
+  }
+
+  public int getSubmitUserId() {
+    return submitUserId;
+  }
+
+  public void setSubmitUserId(int submitUserId) {
+    this.submitUserId = submitUserId;
+  }
+
+  public String getSubmitUser() {
+    return submitUser;
+  }
+
+  public void setSubmitUser(String submitUser) {
+    this.submitUser = submitUser;
+  }
+
+  public Date getSubmitTime() {
+    return submitTime;
+  }
+
+  public void setSubmitTime(Date submitTime) {
+    this.submitTime = submitTime;
+  }
+
+  public String getQueue() {
+    return queue;
+  }
+
+  public void setQueue(String queue) {
+    this.queue = queue;
+  }
+
+  public String getProxyUser() {
+    return proxyUser;
+  }
+
+  public void setProxyUser(String proxyUser) {
+    this.proxyUser = proxyUser;
+  }
+
+  public Date getScheduleTime() {
+    return scheduleTime;
+  }
+
+  public void setScheduleTime(Date scheduleTime) {
+    this.scheduleTime = scheduleTime;
+  }
+
+  public Date getStartTime() {
+    return startTime;
+  }
+
+  public void setStartTime(Date startTime) {
+    this.startTime = startTime;
+  }
+
+  public FlowStatus getStatus() {
+    return status;
+  }
+
+  public void setStatus(FlowStatus status) {
+    this.status = status;
+  }
+
+  public String getJobId() {
+    return jobId;
+  }
+
+  public void setJobId(String jobId) {
+    this.jobId = jobId;
+  }
+
+  public String getLogLinks() {
+    return logLinks;
+  }
+
+  public void setLogLinks(String logLinks) {
+    this.logLinks = logLinks;
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public void setName(String name) {
+    this.name = name;
+  }
+
+  public int getProjectId() {
+    return projectId;
+  }
+
+  public void setProjectId(int projectId) {
+    this.projectId = projectId;
+  }
+
+  public String getProjectName() {
+    return projectName;
+  }
+
+  public void setProjectName(String projectName) {
+    this.projectName = projectName;
+  }
+
+  public String getDesc() {
+    return desc;
+  }
+
+  public void setDesc(String desc) {
+    this.desc = desc;
+  }
+
+  public Date getCreateTime() {
+    return createTime;
+  }
+
+  public void setCreateTime(Date createTime) {
+    this.createTime = createTime;
+  }
+
+  public Date getModifyTime() {
+    return modifyTime;
+  }
+
+  public void setModifyTime(Date modifyTime) {
+    this.modifyTime = modifyTime;
+  }
+
+  public int getOwnerId() {
+    return ownerId;
+  }
+
+  public void setOwnerId(int ownerId) {
+    this.ownerId = ownerId;
+  }
+
+  public String getOwner() {
+    return owner;
+  }
+
+  public void setOwner(String owner) {
+    this.owner = owner;
+  }
+
+  public String getType() {
+    return type;
+  }
+
+  public void setType(String type) {
+    this.type = type;
+  }
+
+  public String getParameter() {
+    return parameter;
+  }
+
+  public void setParameter(String parameter) {
+    this.parameter = parameter;
+  }
+
+  public String getUserDefinedParams() {
+    return userDefinedParams;
+  }
+
+  public void setUserDefinedParams(String userDefinedParams) {
+    this.userDefinedParams = userDefinedParams;
+  }
+
+  public String getExtras() {
+    return extras;
+  }
+
+  public void setExtras(String extras) {
+    this.extras = extras;
+  }
+}

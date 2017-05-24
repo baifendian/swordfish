@@ -16,6 +16,8 @@
 package com.baifendian.swordfish.webserver.utils;
 
 import com.baifendian.swordfish.common.config.BaseConfig;
+import com.baifendian.swordfish.common.job.struct.node.BaseParam;
+import com.baifendian.swordfish.common.job.struct.node.BaseParamFactory;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
 import com.baifendian.swordfish.webserver.exception.BadRequestException;
 import com.baifendian.swordfish.webserver.exception.NotFoundException;
@@ -78,6 +80,18 @@ public class ParamVerify {
   public static void verifyWorkflowName(String workflowName) {
     if (!matchWorkflowName(workflowName)) {
       throw new ParameterException("Workflow name \"{0}\" not valid", workflowName);
+    }
+  }
+
+  /**
+   * 校验流任务名称
+   *
+   * @param streamingName
+   */
+  public static void verifyStreamingName(String streamingName) {
+    // 这里和工作流名称一致
+    if (!matchWorkflowName(streamingName)) {
+      throw new ParameterException("StreamingJob name \"{0}\" not valid", streamingName);
     }
   }
 
@@ -181,5 +195,22 @@ public class ParamVerify {
     if (!proxyUserList.get(0).equals("*") && !proxyUserList.contains(proxyUser)) {
       throw new BadRequestException("Proxy user \"{0}\" not allowed", proxyUser);
     }
+  }
+
+  /**
+   * 检测 node parameter 格式是否正常
+   *
+   * @param parameter
+   * @param type
+   * @return
+   */
+  public static boolean flowNodeParamCheck(String parameter, String type) {
+    BaseParam baseParam = BaseParamFactory.getBaseParam(type, parameter);
+
+    if (baseParam == null) {
+      return false;
+    }
+
+    return baseParam.checkValid();
   }
 }

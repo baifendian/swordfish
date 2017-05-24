@@ -248,7 +248,7 @@ public class ProjectFlow {
   }
 
   public void setUserDefinedParams(String userDefinedParams) {
-    this.userDefinedParamList = JsonUtil.parseObjectList(userDefinedParams,Property.class);
+    this.userDefinedParamList = JsonUtil.parseObjectList(userDefinedParams, Property.class);
     this.userDefinedParams = userDefinedParams;
   }
 
@@ -286,22 +286,27 @@ public class ProjectFlow {
 
   @Override
   public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
+    if (this == o) {
+      return true;
+    }
+
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+
     ProjectFlow that = (ProjectFlow) o;
+
     return id == that.id &&
-            projectId == that.projectId &&
-            ownerId == that.ownerId &&
-            Objects.equals(name, that.name) &&
-            Objects.equals(projectName, that.projectName) &&
-            Objects.equals(desc, that.desc) &&
-            //Objects.equals(createTime, that.createTime) &&
-            //Objects.equals(modifyTime, that.modifyTime) &&
-            Objects.equals(owner, that.owner) &&
-            Objects.equals(proxyUser, that.proxyUser) &&
-            Objects.equals(userDefinedParams, that.userDefinedParams) &&
-            Objects.equals(extras, that.extras) &&
-            Objects.equals(queue, that.queue) &&
-            EqualUtils.equalLists(flowsNodes, that.flowsNodes);
+        projectId == that.projectId &&
+        ownerId == that.ownerId &&
+        Objects.equals(name, that.name) &&
+        Objects.equals(projectName, that.projectName) &&
+        Objects.equals(desc, that.desc) &&
+        Objects.equals(owner, that.owner) &&
+        Objects.equals(proxyUser, that.proxyUser) &&
+        Objects.equals(userDefinedParams, that.userDefinedParams) &&
+        Objects.equals(extras, that.extras) &&
+        Objects.equals(queue, that.queue) &&
+        EqualUtils.equalLists(flowsNodes, that.flowsNodes);
   }
 }
