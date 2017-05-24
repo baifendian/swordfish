@@ -71,7 +71,7 @@ public class ScheduleController {
                                     @RequestParam(value = "failurePolicy", required = false, defaultValue = "END") FailurePolicyType failurePolicy,
                                     @RequestParam(value = "depWorkflows", required = false) String depWorkflows,
                                     @RequestParam(value = "depPolicy", required = false, defaultValue = "NO_DEP_PRE") DepPolicyType depPolicyType,
-                                    @RequestParam(value = "timeout", required = false, defaultValue = "18000") int timeout) {
+                                    @RequestParam(value = "timeout", required = false, defaultValue = "1800") int timeout) {
     logger.info("Operator user {}, exec workflow, project name: {}, workflow name: {}, schedule: {}, notify type: {}, notify mails: {}, max try times: {}," +
             "failure policy: {}, dep workflows: {}, dep policy: {}, timeout: {}",
         operator.getName(), projectName, workflowName, schedule, notifyType, notifyMails, maxTryTimes, failurePolicy, depWorkflows, depPolicyType, timeout);
