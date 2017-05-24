@@ -22,6 +22,7 @@ import com.baifendian.swordfish.dao.enums.ScheduleStatus;
 import com.baifendian.swordfish.dao.model.Schedule;
 import com.baifendian.swordfish.dao.model.User;
 import com.baifendian.swordfish.webserver.dto.ScheduleDto;
+import com.baifendian.swordfish.webserver.exception.ParameterException;
 import com.baifendian.swordfish.webserver.service.ScheduleService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -71,10 +72,15 @@ public class ScheduleController {
                                     @RequestParam(value = "failurePolicy", required = false, defaultValue = "END") FailurePolicyType failurePolicy,
                                     @RequestParam(value = "depWorkflows", required = false) String depWorkflows,
                                     @RequestParam(value = "depPolicy", required = false, defaultValue = "NO_DEP_PRE") DepPolicyType depPolicyType,
-                                    @RequestParam(value = "timeout", required = false, defaultValue = "18000") int timeout) {
+                                    @RequestParam(value = "timeout", required = false, defaultValue = "1800") int timeout) {
     logger.info("Operator user {}, exec workflow, project name: {}, workflow name: {}, schedule: {}, notify type: {}, notify mails: {}, max try times: {}," +
-            "failure policy: {}, dep workflows: {}, dep policy: {}, timeout: {}",
-        operator.getName(), projectName, workflowName, schedule, notifyType, notifyMails, maxTryTimes, failurePolicy, depWorkflows, depPolicyType, timeout);
+                    "failure policy: {}, dep workflows: {}, dep policy: {}, timeout: {}",
+            operator.getName(), projectName, workflowName, schedule, notifyType, notifyMails, maxTryTimes, failurePolicy, depWorkflows, depPolicyType, timeout);
+
+    if (timeout < 0 || timeout > 43200) {
+      logger.error("Timeout {} not in [0,43200]");
+      throw new ParameterException("Timeout \"{0}\" not in [0,43200]", timeout);
+    }
 
     return new ScheduleDto(scheduleService.createSchedule(operator, projectName, workflowName, schedule, notifyType, notifyMails, maxTryTimes, failurePolicy, depWorkflows, depPolicyType, timeout));
   }
@@ -107,8 +113,8 @@ public class ScheduleController {
                                              @RequestParam(value = "depPolicy", required = false, defaultValue = "NO_DEP_PRE") DepPolicyType depPolicyType,
                                              @RequestParam(value = "timeout", required = false, defaultValue = "18000") int timeout) {
     logger.info("Operator user {}, exec workflow, project name: {}, workflow name: {}, schedule: {}, notify type: {}, notify mails: {}, max try times: {}," +
-            "failure policy: {}, dep workflows: {}, dep policy: {}, timeout: {}",
-        operator.getName(), projectName, workflowName, schedule, notifyType, notifyMails, maxTryTimes, failurePolicy, depWorkflows, depPolicyType, timeout);
+                    "failure policy: {}, dep workflows: {}, dep policy: {}, timeout: {}",
+            operator.getName(), projectName, workflowName, schedule, notifyType, notifyMails, maxTryTimes, failurePolicy, depWorkflows, depPolicyType, timeout);
 
     return new ScheduleDto(scheduleService.putSchedule(operator, projectName, workflowName, schedule, notifyType, notifyMails, maxTryTimes, failurePolicy, depWorkflows, depPolicyType, timeout));
   }
@@ -141,8 +147,8 @@ public class ScheduleController {
                                    @RequestParam(value = "depPolicy", required = false, defaultValue = "NO_DEP_PRE") DepPolicyType depPolicyType,
                                    @RequestParam(value = "timeout", required = false, defaultValue = "18000") int timeout) {
     logger.info("Operator user {}, exec workflow, project name: {}, workflow name: {}, schedule: {}, notify type: {}, notify mails: {}, max try times: {}," +
-            "failure policy: {}, dep workflows: {}, dep policy: {}, timeout: {}",
-        operator.getName(), projectName, workflowName, schedule, notifyType, notifyMails, maxTryTimes, failurePolicy, depWorkflows, depPolicyType, timeout);
+                    "failure policy: {}, dep workflows: {}, dep policy: {}, timeout: {}",
+            operator.getName(), projectName, workflowName, schedule, notifyType, notifyMails, maxTryTimes, failurePolicy, depWorkflows, depPolicyType, timeout);
 
     return new ScheduleDto(scheduleService.patchSchedule(operator, projectName, workflowName, schedule, notifyType, notifyMails, maxTryTimes, failurePolicy, depWorkflows, depPolicyType, timeout, null));
   }
@@ -159,7 +165,7 @@ public class ScheduleController {
                              @PathVariable String projectName,
                              @PathVariable String workflowName) {
     logger.info("Operator user {}, schedule online, project name: {}, workflow name: {}",
-        operator.getName(), projectName, workflowName);
+            operator.getName(), projectName, workflowName);
 
     try {
       scheduleService.postScheduleStatus(operator, projectName, workflowName, ScheduleStatus.ONLINE);
@@ -180,7 +186,7 @@ public class ScheduleController {
                               @PathVariable String projectName,
                               @PathVariable String workflowName) {
     logger.info("Operator user {}, schedule offline, project name: {}, workflow name: {}",
-        operator.getName(), projectName, workflowName);
+            operator.getName(), projectName, workflowName);
 
     try {
       scheduleService.postScheduleStatus(operator, projectName, workflowName, ScheduleStatus.OFFLINE);
@@ -202,7 +208,7 @@ public class ScheduleController {
                                    @PathVariable String projectName,
                                    @PathVariable String workflowName) {
     logger.info("Operator user {}, query schedule, project name: {}, workflow name: {}",
-        operator.getName(), projectName, workflowName);
+            operator.getName(), projectName, workflowName);
 
     return new ScheduleDto(scheduleService.querySchedule(operator, projectName, workflowName));
   }
@@ -218,7 +224,7 @@ public class ScheduleController {
   public List<ScheduleDto> queryAllSchedule(@RequestAttribute(value = "session.user") User operator,
                                             @PathVariable String projectName) {
     logger.info("Operator user {}, query schedules, project name: {}",
-        operator.getName(), projectName);
+            operator.getName(), projectName);
 
     List<Schedule> scheduleList = scheduleService.queryAllSchedule(operator, projectName);
     List<ScheduleDto> scheduleDtoList = new ArrayList<>();

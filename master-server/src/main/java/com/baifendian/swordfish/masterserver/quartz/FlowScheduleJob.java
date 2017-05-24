@@ -29,10 +29,7 @@ import com.baifendian.swordfish.dao.utils.json.JsonUtil;
 import com.baifendian.swordfish.masterserver.master.ExecFlowInfo;
 import com.baifendian.swordfish.masterserver.utils.crontab.CrontabUtil;
 import org.apache.commons.collections.CollectionUtils;
-import org.quartz.Job;
-import org.quartz.JobDataMap;
-import org.quartz.JobExecutionContext;
-import org.quartz.JobExecutionException;
+import org.quartz.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -155,7 +152,7 @@ public class FlowScheduleJob implements Job {
 
     try {
       executionFlow = flowDao.scheduleFlowToExecution(projectId, flowId, flow.getOwnerId(), scheduledFireTime,
-          ExecType.SCHEDULER, schedule.getMaxTryTimes(), null, null, schedule.getNotifyType(), schedule.getNotifyMails(), schedule.getTimeout());
+              ExecType.SCHEDULER, schedule.getMaxTryTimes(), null, null, schedule.getNotifyType(), schedule.getNotifyMails(), schedule.getTimeout());
     } catch (Exception e) {
       logger.error("insert execution flow error", e);
       throw new JobExecutionException(e);
@@ -239,16 +236,14 @@ public class FlowScheduleJob implements Job {
     Date now = new Date();
 
     executionFlow.setStatus(flowStatus);
-
-    if (flowStatus.typeIsFinished()) {
+    if (flowStatus != null && flowStatus.typeIsFinished()) {
       executionFlow.setEndTime(now);
     }
-
     flowDao.updateExecutionFlow(executionFlow);
   }
 
   /**
-   * 检测一个 指定时间的任务是否完成
+   * 检测一个指定时间的任务是否完成
    *
    * @param flowId     指定的任务ID
    * @param dataTime   指定时间
@@ -269,7 +264,7 @@ public class FlowScheduleJob implements Job {
       FlowStatus flowStatus = executionFlow.getStatus();
       if (flowStatus != null && flowStatus.typeIsSuccess()) {
         return true;
-      } else if (flowStatus == null || !flowStatus.typeIsFinished()) {
+      } else if (flowStatus == null || flowStatus.typeIsNotFinished()) {
         isNotFinshed = true;
       }
 
@@ -338,11 +333,24 @@ public class FlowScheduleJob implements Job {
         }
 
         boolean depStatus;
-
         // 如果被依赖工作流的调度级别比较小
         if (cycle.ordinal() > depCycle.ordinal()) {
           Map.Entry<Date, Date> cycleDate = CrontabUtil.getPreCycleDate(scheduledFireTime, depCycle);
-          depStatus = checkCycleWorkflowStatus(cycleDate.getKey(), cycleDate.getValue(), depFlowId, depSchedule, systemTime, timeout);
+
+          // 生成工作流的调度信息
+          CronExpression cronExpression;
+          try {
+            cronExpression = CrontabUtil.parseCronExp(schedule.getCrontab());
+          } catch (Exception e) {
+            logger.error("flow {} crontab parse error", depFlowId);
+            return false;
+          }
+          //检测本次调度级别最早的依赖调度有没有执行完成。
+          depStatus = checkCycleWorkflowStatus(cycleDate.getValue(), scheduledFireTime, depFlowId, cronExpression, systemTime, timeout, true);
+          //如果本次调度级别最早的依赖调度没有完成，那么再看本周起最后的依赖调度有没有完成。
+          if (!depStatus) {
+            depStatus = checkCycleWorkflowStatus(cycleDate.getKey(), cycleDate.getValue(), depFlowId, cronExpression, systemTime, timeout, false);
+          }
         } else {
           depStatus = checkExecutionFlowStatus(scheduledFireTime, depFlowId, systemTime, timeout);
         }
@@ -379,7 +387,7 @@ public class FlowScheduleJob implements Job {
       FlowStatus flowStatus = executionFlow.getStatus();
       if (flowStatus != null && flowStatus.typeIsSuccess()) {
         return true;
-      } else if (flowStatus == null || !flowStatus.typeIsFinished()) {
+      } else if (flowStatus == null || flowStatus.typeIsNotFinished()) {
         isNotFinshed = true;
       }
 
@@ -404,71 +412,30 @@ public class FlowScheduleJob implements Job {
   }
 
   /**
-   * 检测一个周期时间内最后一次触发的工作流的执行结果
+   * 检测一段时间内调度最后一个工作流，或第一个工作流是否完成
    *
-   * @param startTime  周期起始时间
-   * @param endTime    周期结束时间
-   * @param flowId     工作流ID
-   * @param schedule   工作流调度信息
-   * @param systemTime 当前系统触发时间，用于判断超时
-   * @param timeout    等待工作流执行完成的超时
-   * @return
+   * @param startTime      周期起始时间
+   * @param endTime        周期结束时间
+   * @param flowId         工作流ID
+   * @param cronExpression 工作流的调度信息
+   * @param systemTime     当前系统触发时间，用于判断超时
+   * @param timeout        等待工作流执行完成的超时
+   * @Param firstOrLast    检测第一个还是最后一个任务 如果true是第一个任务，如果false是最后一个任务
    */
-  private boolean checkCycleWorkflowStatus(Date startTime, Date endTime, int flowId, Schedule schedule, long systemTime, Integer timeout) {
-    // 循环检测，直到检测到依赖是否成功
-    while (true) {
-      boolean isNotFinshed = false;
-      // step1.我们尝试取周期内依赖任务最后一次的触发时间
-      Date fireTime = null;
-      try {
-        List<Date> dateList = CrontabUtil.getCycleFireDate(startTime, endTime, schedule.getCrontab());
-        if (CollectionUtils.isNotEmpty(dateList)) {
-          fireTime = dateList.get(dateList.size() - 1);
-        }
-      } catch (Exception e) {
-        logger.error("get dep flow: {} statTime: {} - endTime: {} fire data error", flowId, startTime, endTime);
-        return false;
-      }
+  private boolean checkCycleWorkflowStatus(Date startTime, Date endTime, int flowId, CronExpression cronExpression, long systemTime, Integer timeout, boolean firstOrLast) {
 
-      // 如果在时间段内没有找到已经出发的时间点，就返回失败。
-      if (fireTime == null) {
-        return false;
-      }
-
-      //寻找调度执行记录
-      ExecutionFlow executionFlow = flowDao.queryExecutionFlowByScheduleTime(flowId, fireTime);
-
-      // 根本没有执行, 等待执行
-      if (executionFlow == null) {
-        isNotFinshed = true;
-      } else {
-        FlowStatus flowStatus = executionFlow.getStatus();
-        if (flowStatus != null && flowStatus.typeIsSuccess()) {
-          return true;
-        } else if (flowStatus == null || !flowStatus.typeIsFinished()) {
-          isNotFinshed = true;
-        }
-      }
-
-      // 如果依赖的任务没有完成
-      if (isNotFinshed) {
-        // 如果等待超时
-        if (checkTimeout(systemTime, timeout)) {
-          logger.error("Wait for last cycle timeout");
-          return false;
-        }
-
-        // 等待一定的时间，再进行下一次检测
-        try {
-          Thread.sleep(checkInterval);
-        } catch (InterruptedException e) {
-          logger.error(e.getMessage(), e);
-          return false;
-        }
-      } else {
-        return false;
-      }
+    Date fireTime = null;
+    List<Date> dateList = CrontabUtil.getCycleFireDate(startTime, endTime, cronExpression);
+    if (CollectionUtils.isNotEmpty(dateList)) {
+      fireTime = dateList.get(firstOrLast ? 0 : dateList.size() - 1);
     }
+
+    // 如果在时间段内没有找到触发的时间点，就返回失败。
+    if (fireTime == null) {
+      return false;
+    }
+    // 如果有就检测指定调度时间点的任务是否执行了
+    return checkWorkflowStatus(flowId, fireTime, systemTime, timeout);
   }
 
   /**

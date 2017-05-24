@@ -56,7 +56,7 @@ public class StatController {
                                    @RequestParam(value = "startTime") long startTime,
                                    @RequestParam(value = "endTime") long endTime) {
     logger.info("Operator user {}, get states, project name: {}, start time: {}, end time: {}",
-        operator.getName(), projectName, startTime, endTime);
+            operator.getName(), projectName, startTime, endTime);
 
     // 检测时间跨度是否合法
     Date startDate = new Date(startTime);
@@ -82,7 +82,7 @@ public class StatController {
                                        @RequestParam(value = "projectName") String projectName,
                                        @RequestParam(value = "date") long date) {
     logger.info("Operator user {}, get states, project name: {}, date: {}",
-        operator.getName(), projectName, date);
+            operator.getName(), projectName, date);
 
     return statService.queryStatesHour(operator, projectName, date);
   }
@@ -99,9 +99,9 @@ public class StatController {
   public List<ExecutionFlowDto> queryTopConsumes(@RequestAttribute(value = "session.user") User operator,
                                                  @RequestParam(value = "projectName") String projectName,
                                                  @RequestParam(value = "date") long date,
-                                                 @RequestParam(value = "num") int num) {
+                                                 @RequestParam(value = "num", required = false, defaultValue = "10") int num) {
     logger.info("Operator user {}, get top consumers of workflow,  project name: {}, date: {}, num: {}",
-        operator.getName(), projectName, date, num);
+            operator.getName(), projectName, date, num);
 
     // 校验返回数目
     if (num <= 0 || num > 100) {
@@ -133,7 +133,7 @@ public class StatController {
                                                  @RequestParam(value = "date") long date,
                                                  @RequestParam(value = "num") int num) {
     logger.info("Operator user {}, get top errors of workflow, project name: {}, date: {}, num: {}",
-        operator.getName(), projectName, date, num);
+            operator.getName(), projectName, date, num);
 
     // 校验返回数目
     if (num <= 0 || num > 100) {
