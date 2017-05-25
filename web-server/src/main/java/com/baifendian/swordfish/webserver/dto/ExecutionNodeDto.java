@@ -44,7 +44,7 @@ public class ExecutionNodeDto {
   private int duration;
   @JsonSerialize(using = JsonOrdinalSerializer.class)
   private FlowStatus status;
-  private List<String> logLinks;
+  private List<String> appLinks;
   private String jobId;
   private List<String> dep;
   @JsonRawValue
@@ -71,12 +71,12 @@ public class ExecutionNodeDto {
       this.status = executionNode.getStatus();
 
       // link 需要添加前缀
-      List<String> links = executionNode.getLogLinkList();
+      List<String> links = executionNode.getAppLinkList();
       if (CollectionUtils.isNotEmpty(links)) {
-        this.logLinks = new ArrayList<>();
+        this.appLinks = new ArrayList<>();
 
         for (String link : links) {
-          this.logLinks.add(String.format("%s/cluster/app/%s", ConfigurationUtil.getWebappAddress(), link));
+          this.appLinks.add(String.format("%s/cluster/app/%s", ConfigurationUtil.getWebappAddress(), link));
         }
       }
 
@@ -148,12 +148,12 @@ public class ExecutionNodeDto {
     this.status = status;
   }
 
-  public List<String> getLogLinks() {
-    return logLinks;
+  public List<String> getAppLinks() {
+    return appLinks;
   }
 
-  public void setLogLinks(List<String> logLinks) {
-    this.logLinks = logLinks;
+  public void setAppLinks(List<String> appLinks) {
+    this.appLinks = appLinks;
   }
 
   public String getJobId() {

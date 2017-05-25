@@ -192,7 +192,7 @@ CREATE TABLE `execution_nodes` (
   `start_time` datetime NOT NULL COMMENT 'the start time of the node exec',
   `end_time` datetime DEFAULT NULL COMMENT 'the end time of the node exec',
   `attempt` tinyint(4) NOT NULL COMMENT 'attempt exec times',
-  `log_links` text DEFAULT NULL COMMENT 'log links, is a json array, element is a string',
+  `app_links` text DEFAULT NULL COMMENT 'log links, is a json array, element is a string',
   `job_id` varchar(64) NOT NULL COMMENT 'job id',
   `status` tinyint(4) NOT NULL COMMENT 'status',
   PRIMARY KEY (`exec_id`, `name`),

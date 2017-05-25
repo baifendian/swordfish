@@ -40,7 +40,7 @@ public class ExecutionNodeMapperProvider {
         VALUES("start_time", "#{executionNode.startTime}");
         VALUES("end_time", "#{executionNode.endTime}");
         VALUES("attempt", "#{executionNode.attempt}");
-        VALUES("log_links", "#{executionNode.logLinks}");
+        VALUES("log_links", "#{executionNode.appLinks}");
         VALUES("job_id", "#{executionNode.jobId}");
         VALUES("status", EnumFieldUtil.genFieldStr("executionNode.status", FlowStatus.class));
       }
@@ -66,8 +66,8 @@ public class ExecutionNodeMapperProvider {
         if (executionNode.getStatus() != null) {
           SET("status = " + EnumFieldUtil.genFieldStr("executionNode.status", FlowStatus.class));
         }
-        if (executionNode.getLogLinks() != null) {
-          SET("log_links = #{executionNode.logLinks}");
+        if (executionNode.getAppLinks() != null) {
+          SET("log_links = #{executionNode.appLinks}");
         }
 
         WHERE("exec_id = #{executionNode.execId}");

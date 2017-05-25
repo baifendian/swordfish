@@ -54,7 +54,7 @@ public interface ExecutionNodeMapper {
           @Result(property = "startTime", column = "start_time", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP),
           @Result(property = "endTime", column = "end_time", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP),
           @Result(property = "attempt", column = "attempt", javaType = int.class, jdbcType = JdbcType.TINYINT),
-          @Result(property = "logLinks", column = "log_links", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+          @Result(property = "appLinks", column = "app_links", javaType = String.class, jdbcType = JdbcType.VARCHAR),
           @Result(property = "jobId", column = "job_id", javaType = String.class, jdbcType = JdbcType.VARCHAR)
   })
   @SelectProvider(type = ExecutionNodeMapperProvider.class, method = "selectExecNode")
@@ -72,7 +72,7 @@ public interface ExecutionNodeMapper {
           @Result(property = "startTime", column = "start_time", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP),
           @Result(property = "endTime", column = "end_time", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP),
           @Result(property = "attempt", column = "attempt", javaType = int.class, jdbcType = JdbcType.TINYINT),
-          @Result(property = "logLinks", column = "log_links", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+          @Result(property = "appLinks", column = "app_links", javaType = String.class, jdbcType = JdbcType.VARCHAR),
           @Result(property = "jobId", column = "job_id", javaType = String.class, jdbcType = JdbcType.VARCHAR)
   })
   @SelectProvider(type = ExecutionNodeMapperProvider.class, method = "selectExecNodeById")
@@ -99,7 +99,7 @@ public interface ExecutionNodeMapper {
           @Result(property = "startTime", column = "start_time", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP),
           @Result(property = "endTime", column = "end_time", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP),
           @Result(property = "attempt", column = "attempt", javaType = int.class, jdbcType = JdbcType.TINYINT),
-          @Result(property = "logLinks", column = "log_links", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+          @Result(property = "appLinks", column = "app_links", javaType = String.class, jdbcType = JdbcType.VARCHAR),
           @Result(property = "jobId", column = "job_id", javaType = String.class, jdbcType = JdbcType.VARCHAR)
   })
   @SelectProvider(type = ExecutionNodeMapperProvider.class, method = "selectExecNodeByJobId")

@@ -66,7 +66,7 @@ public abstract class AbstractYarnJob extends AbstractProcessJob {
 
     if (captureLogLinks) {
       ExecutionNode executionNode = flowDao.queryExecutionNode(props.getExecId(), props.getNodeName());
-      executionNode.setLogLinkList(logLinks);
+      executionNode.setAppLinkList(logLinks);
 
       flowDao.updateExecutionNode(executionNode);
     }
