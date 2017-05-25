@@ -247,41 +247,43 @@ CREATE TABLE `master_server` (
   UNIQUE KEY `host_port` (`host`, `port`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
--- `streamingJob job` table
+-- `streaming job` table
 DROP TABLE If Exists `streaming_job`;
 CREATE TABLE `streaming_job` (
-  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'streamingJob job id, also a exec id',
-  `name` varchar(64) NOT NULL COMMENT 'streamingJob job name',
-  `desc` varchar(256) DEFAULT NULL COMMENT 'streamingJob job description',
-  `project_id` int(11) NOT NULL COMMENT 'project id of the streamingJob job',
-  `create_time` datetime NOT NULL COMMENT 'create time of the streamingJob job',
-  `modify_time` datetime NOT NULL COMMENT 'modify time of the streamingJob job',
-  `owner` int(11) NOT NULL COMMENT 'owner id of the streamingJob job',
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'streaming job id, also a exec id',
+  `name` varchar(64) NOT NULL COMMENT 'streaming job name',
+  `desc` varchar(256) DEFAULT NULL COMMENT 'streaming job description',
+  `project_id` int(11) NOT NULL COMMENT 'project id of the streaming job',
+  `create_time` datetime NOT NULL COMMENT 'create time of the streaming job',
+  `modify_time` datetime NOT NULL COMMENT 'modify time of the streaming job',
+  `owner` int(11) NOT NULL COMMENT 'owner id of the streaming job',
   `type` varchar(64) NOT NULL COMMENT 'job type',
   `parameter` text NOT NULL COMMENT 'job parameter information',
-  `user_defined_params` text DEFAULT NULL COMMENT 'user defined parameter of the streamingJob job',
-  `extras` text DEFAULT NULL COMMENT 'extends of the streamingJob job',
+  `user_defined_params` text DEFAULT NULL COMMENT 'user defined parameter of the streaming job',
+  `extras` text DEFAULT NULL COMMENT 'extends of the streaming job',
   PRIMARY KEY (`id`),
   UNIQUE KEY `project_streaming_name` (`project_id`, `name`),
   FOREIGN KEY (`project_id`) REFERENCES `project`(`id`),
   FOREIGN KEY (`owner`) REFERENCES `user`(`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
--- `streamingJob result` table
+-- `streaming result` table
 DROP TABLE If Exists `streaming_result`;
 CREATE TABLE `streaming_result` (
-  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'streamingJob job id, also a exec id',
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'exec id',
+  `streaming_id` int(11) NOT NULL COMMENT 'streaming job id, also a exec id',
   `submit_user` int(11) NOT NULL COMMENT 'submit user',
   `submit_time` datetime NOT NULL COMMENT 'submit time',
   `queue` varchar(64) NOT NULL COMMENT 'queue of this exec',
   `proxy_user` varchar(32) NOT NULL COMMENT 'proxy user of this exec',
   `schedule_time` datetime NOT NULL COMMENT 'real schedule time of this exec',
   `start_time` datetime DEFAULT NULL COMMENT 'real start time of this exec',
+  `end_time` datetime DEFAULT NULL COMMENT 'end time of this exec, not exactly',
   `status` tinyint(4) NOT NULL COMMENT 'exec status',
   `app_links` text DEFAULT NULL COMMENT 'application links, is a json array, element is a string, used for track the application',
   `job_links` text DEFAULT NULL COMMENT 'job links, is a json array, element is a string, used for track the job',
   `job_id` varchar(64) DEFAULT NULL COMMENT 'job id',
   PRIMARY KEY (`id`),
-  FOREIGN KEY (`id`) REFERENCES `streaming_job`(`id`) ON DELETE CASCADE,
+  FOREIGN KEY (`streaming_id`) REFERENCES `streaming_job`(`id`) ON DELETE CASCADE,
   FOREIGN KEY (`submit_user`) REFERENCES `user`(`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;

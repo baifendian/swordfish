@@ -131,17 +131,6 @@ public class ExecutionNode {
     return jobId;
   }
 
-  public List<String> getAppLinkList() {
-    return appLinkList;
-  }
-
-  public void setAppLinkList(List<String> appLinkList) {
-    this.appLinkList = appLinkList;
-    if (appLinkList != null) {
-      this.appLinks = JsonUtil.toJsonString(appLinkList);
-    }
-  }
-
   public void setJobId(String jobId) {
     this.jobId = jobId;
   }
@@ -152,6 +141,17 @@ public class ExecutionNode {
 
   public void setName(String name) {
     this.name = name;
+  }
+
+  public List<String> getAppLinkList() {
+    return appLinkList;
+  }
+
+  public void setAppLinkList(List<String> appLinkList) {
+    this.appLinkList = appLinkList;
+    if (appLinkList != null) {
+      this.appLinks = JsonUtil.toJsonString(appLinkList);
+    }
   }
 
   public String getAppLinks() {

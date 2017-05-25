@@ -53,7 +53,7 @@ public class ProjectFlowMapperProvider {
   }
 
   /**
-   * 通过 id 更新(用于重命名) <p>
+   * 通过 id 更新 <p>
    *
    * @param parameter
    * @return sql 语句

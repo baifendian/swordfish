@@ -22,12 +22,14 @@ import com.baifendian.swordfish.webserver.dto.StreamingJobDto;
 import com.baifendian.swordfish.webserver.dto.StreamingResultDto;
 import com.baifendian.swordfish.webserver.exception.BadRequestException;
 import com.baifendian.swordfish.webserver.service.StreamingService;
+import org.apache.hadoop.fs.FileStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -149,6 +151,7 @@ public class StreamingController {
    * @param queue
    */
   @PostMapping(value = "/executors/streaming")
+  @ResponseStatus(HttpStatus.CREATED)
   public ExecutorIdDto executeStreamingJob(@RequestAttribute(value = "session.user") User operator,
                                            @RequestParam(value = "projectName") String projectName,
                                            @RequestParam(value = "name") String name,
@@ -180,16 +183,39 @@ public class StreamingController {
    * 查询项目下流任务及其结果
    *
    * @param operator
+   * @param startDate
+   * @param endDate
    * @param projectName
+   * @param name
+   * @param status
+   * @param from
+   * @param size
    * @return
    */
-  @GetMapping(value = "/projects/{projectName}/streamings")
+  @GetMapping(value = "/executors/streamings")
   public List<StreamingResultDto> queryProjectStreamingJobAndResult(@RequestAttribute(value = "session.user") User operator,
-                                                                    @PathVariable String projectName) {
-    logger.info("Operator user {}, query streaming job and result of project, project name: {}",
-        operator.getName(), projectName);
+                                                                    @RequestParam(value = "startDate") long startDate,
+                                                                    @RequestParam(value = "endDate") long endDate,
+                                                                    @RequestParam(value = "projectName") String projectName,
+                                                                    @RequestParam(value = "name", required = false) String name,
+                                                                    @RequestParam(value = "status", required = false) FileStatus status,
+                                                                    @RequestParam(value = "from", required = false, defaultValue = "0") int from,
+                                                                    @RequestParam(value = "size", required = false, defaultValue = "100") int size) {
+    logger.info("Operator user {}, query streaming job exec list, start date: {}, end date: {}, project name: {}, name: {}, status: {}, from: {}, size: {}",
+        operator.getName(), startDate, endDate, projectName, name, status, from, size);
 
-    return streamingService.queryProjectStreamingJobAndResult(operator, projectName);
+    // from 的限制
+    if (from < 0) {
+      throw new BadRequestException("Argument is not valid, from must be equal or more than zero");
+    }
+
+    // size 的限制
+    if (size <= 0 || size > 1000) {
+      throw new BadRequestException("Argument is not valid, size must be between (0, 1000]");
+    }
+
+
+    return streamingService.queryProjectStreamingJobAndResult(operator, projectName, name, new Date(startDate), new Date(endDate), status, from, size);
   }
 
   /**

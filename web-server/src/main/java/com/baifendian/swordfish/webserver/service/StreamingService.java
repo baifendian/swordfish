@@ -15,25 +15,28 @@
  */
 package com.baifendian.swordfish.webserver.service;
 
+import com.baifendian.swordfish.dao.enums.FlowStatus;
+import com.baifendian.swordfish.dao.mapper.MasterServerMapper;
 import com.baifendian.swordfish.dao.mapper.ProjectMapper;
 import com.baifendian.swordfish.dao.mapper.StreamingJobMapper;
 import com.baifendian.swordfish.dao.mapper.StreamingResultMapper;
-import com.baifendian.swordfish.dao.model.Project;
-import com.baifendian.swordfish.dao.model.StreamingJob;
-import com.baifendian.swordfish.dao.model.StreamingResult;
-import com.baifendian.swordfish.dao.model.User;
+import com.baifendian.swordfish.dao.model.*;
 import com.baifendian.swordfish.dao.model.flow.Property;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
+import com.baifendian.swordfish.rpc.RetInfo;
+import com.baifendian.swordfish.rpc.client.MasterClient;
 import com.baifendian.swordfish.webserver.dto.ExecutorIdDto;
 import com.baifendian.swordfish.webserver.dto.LogResult;
 import com.baifendian.swordfish.webserver.dto.StreamingResultDto;
 import com.baifendian.swordfish.webserver.exception.*;
 import org.apache.commons.lang.StringUtils;
+import org.apache.hadoop.fs.FileStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
@@ -53,6 +56,9 @@ public class StreamingService {
 
   @Autowired
   private StreamingResultMapper streamingResultMapper;
+
+  @Autowired
+  private MasterServerMapper masterServerMapper;
 
   @Autowired
   private ProjectService projectService;
@@ -300,15 +306,12 @@ public class StreamingService {
       throw new NotFoundException("Not found streaming job \"{0}\" in project \"{1}\"", name, project.getName());
     }
 
-    // 必须是停止运行的
-    StreamingResult streamingResult = streamingResultMapper.findByIdNoJoin(streamingJob.getId());
+    // 必须是停止运行的才能删除
+    StreamingResult streamingResult = streamingResultMapper.findLatestByStreamingId(streamingJob.getId());
 
     if (streamingResult != null && streamingResult.getStatus().typeIsNotFinished()) {
-      String logLinks = streamingResult.getLogLinks();
-      // if have log links
-      if (StringUtils.isNotEmpty(logLinks)) {
-
-      }
+      logger.error("Streaming job is not finished yet: {}", streamingJob.getId());
+      throw new PreFailedException("Project \"{0}\", streaming job \"{1}\" not stop, must stop first", operator.getName(), project.getName());
     }
 
     // 删除工作流
@@ -325,7 +328,86 @@ public class StreamingService {
    * @param queue
    * @return
    */
+  @Transactional(value = "TransactionManager")
   public ExecutorIdDto executeStreamingJob(User operator, String projectName, String name, String proxyUser, String queue) {
+
+    // 查询项目, 如果不存在, 返回错误
+    Project project = projectMapper.queryByName(projectName);
+
+    if (project == null) {
+      logger.error("Project does not exist: {}", projectName);
+      throw new NotFoundException("Not found project \"{0}\"", projectName);
+    }
+
+    // 应该有项目写权限
+    if (!projectService.hasWritePerm(operator.getId(), project)) {
+      logger.error("User {} has no right permission for the project {}", operator.getName(), project.getName());
+      throw new PermissionException("User \"{0}\" is not has project \"{1}\" write permission", operator.getName(), project.getName());
+    }
+
+    // 对于执行流任务的情况, 必须是预先存在的
+    StreamingJob streamingJob = streamingJobMapper.findByProjectNameAndName(projectName, name);
+
+    if (streamingJob == null) {
+      logger.error("Not found streaming job {} in project {}", name, project.getName());
+      throw new NotFoundException("Not found streaming job \"{0}\" in project \"{1}\"", name, project.getName());
+    }
+
+    // 如果最新一条信息是显示没有执行, 插入或者更新一条记录
+    StreamingResult streamingResult = streamingResultMapper.findLatestByStreamingId(streamingJob.getId());
+    Date now = new Date();
+
+    if (streamingResult != null && streamingResult.getStatus().typeIsNotFinished()) {
+      logger.error("Streaming job is not finished yet: {}", streamingJob.getId());
+      throw new PreFailedException("Project \"{0}\", streaming job \"{1}\" not stop, must stop first", operator.getName(), project.getName());
+    }
+
+    // 查看 master 是否存在
+    MasterServer masterServer = masterServerMapper.query();
+    if (masterServer == null) {
+      logger.error("Master server does not exist.");
+      throw new ServerErrorException("Master server does not exist.");
+    }
+
+    streamingResult = new StreamingResult();
+
+    streamingResult.setStreamingId(streamingJob.getId());
+    streamingResult.setSubmitUserId(operator.getId());
+    streamingResult.setSubmitTime(now);
+    streamingResult.setQueue(queue);
+    streamingResult.setProxyUser(proxyUser);
+    streamingResult.setScheduleTime(now);
+    streamingResult.setStatus(FlowStatus.INIT);
+
+    // 调用 master 进行执行
+    try {
+      streamingResultMapper.insert(streamingResult);
+    } catch (DuplicateKeyException e) {
+      logger.error("Streaming create failed.", e);
+      throw new ServerErrorException("Streaming create failed.");
+    }
+
+    // 连接
+    MasterClient masterClient = new MasterClient(masterServer.getHost(), masterServer.getPort());
+
+    logger.info("Call master client, exec id: {}, host: {}, port: {}", streamingResult.getId(), masterServer.getHost(), masterServer.getPort());
+
+//    RetInfo retInfo = masterClient.execAdHoc(adhoc.getId());
+//
+//    if (retInfo == null || retInfo.getStatus() != 0) {
+//      // 查询状态, 如果还是 INIT, 则需要更新为 FAILED
+//      AdHoc adHoc = adHocMapper.selectById(adhoc.getId());
+//
+//      if (adHoc != null && adHoc.getStatus() == FlowStatus.INIT) {
+//        adHoc.setStatus(FlowStatus.FAILED);
+//        adHocMapper.updateStatus(adHoc);
+//      }
+//
+//      logger.error("call master server error");
+//      throw new ServerErrorException("master server return error");
+//    }
+//
+//    return new ExecutorIdDto(adhoc.getId());
     return null;
   }
 
@@ -344,9 +426,22 @@ public class StreamingService {
    *
    * @param operator
    * @param projectName
+   * @param name
+   * @param startDate
+   * @param endDate
+   * @param status
+   * @param from
+   * @param size
    * @return
    */
-  public List<StreamingResultDto> queryProjectStreamingJobAndResult(User operator, String projectName) {
+  public List<StreamingResultDto> queryProjectStreamingJobAndResult(User operator,
+                                                                    String projectName,
+                                                                    String name,
+                                                                    Date startDate,
+                                                                    Date endDate,
+                                                                    FileStatus status,
+                                                                    int from,
+                                                                    int size) {
     return null;
   }
 
@@ -365,12 +460,14 @@ public class StreamingService {
    * 查询日志信息
    *
    * @param operator
-   * @param jobId
+   * @param execId
    * @param from
    * @param size
    * @return
    */
-  public LogResult getStreamingJobLog(User operator, String jobId, int from, int size) {
+  public LogResult getStreamingJobLog(User operator, String execId, int from, int size) {
+//    StreamingJob streamingJob = streamingJobMapper.findByProjectNameAndName(projectName, name);
+
 //    ExecutionNode executionNode = streaming_result.selectExecNodeByJobId(jobId);
 //
 //    if (executionNode == null) {

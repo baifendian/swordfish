@@ -83,4 +83,6 @@ public interface StreamingJobMapper {
    */
   @SelectProvider(type = StreamingJobProvider.class, method = "selectProjectStreamingCount")
   int selectProjectStreamingCount(@Param("projectId") int projectId);
+
+  
 }

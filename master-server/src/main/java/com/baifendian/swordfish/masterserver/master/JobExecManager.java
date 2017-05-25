@@ -17,6 +17,7 @@ package com.baifendian.swordfish.masterserver.master;
 
 import com.baifendian.swordfish.dao.DaoFactory;
 import com.baifendian.swordfish.dao.FlowDao;
+import com.baifendian.swordfish.dao.StreamingDao;
 import com.baifendian.swordfish.dao.model.ExecutionFlow;
 import com.baifendian.swordfish.dao.model.ProjectFlow;
 import com.baifendian.swordfish.masterserver.config.MasterConfig;
@@ -64,6 +65,11 @@ public class JobExecManager {
   private final FlowDao flowDao;
 
   /**
+   * 流任务的数据库接口
+   */
+  private final StreamingDao streamingDao;
+
+  /**
    * 执行具体的任务的线程, 会从任务队列获取任务, 然后调用 executor 执行
    */
   private Submit2ExecutorServerThread flowSubmit2ExecutorThread;
@@ -74,16 +80,22 @@ public class JobExecManager {
   private ExecutorCheckThread executorCheckThread;
 
   /**
-   * 具备定时调度运行的 executor service
+   * streaming 任务检查线程
    */
-  private ScheduledExecutorService executorCheckService;
+  private StreamingCheckThread streamingCheckThread;
+
+  /**
+   * 具备定时调度运行的 service, 当前检测的是 exec-service 服务, 也可以检测其它的服务
+   */
+  private ScheduledExecutorService checkService;
 
   public JobExecManager() {
     flowDao = DaoFactory.getDaoInstance(FlowDao.class);
+    streamingDao = DaoFactory.getDaoInstance(StreamingDao.class);
 
     executorServerManager = new ExecutorServerManager();
     executionFlowQueue = new LinkedBlockingQueue<>(MasterConfig.executionFlowQueueSize);
-    executorCheckService = Executors.newScheduledThreadPool(5);
+    checkService = Executors.newScheduledThreadPool(5);
   }
 
   /**
@@ -103,8 +115,15 @@ public class JobExecManager {
     // 检测 executor 的线程
     executorCheckThread = new ExecutorCheckThread(executorServerManager, MasterConfig.heartBeatTimeoutInterval,
         executionFlowQueue, flowDao);
+
     // 固定执行 executor 的检测
-    executorCheckService.scheduleAtFixedRate(executorCheckThread, 10, MasterConfig.heartBeatCheckInterval, TimeUnit.SECONDS);
+    checkService.scheduleAtFixedRate(executorCheckThread, 10, MasterConfig.heartBeatCheckInterval, TimeUnit.SECONDS);
+
+    // 查看流任务的状态
+    streamingCheckThread = new StreamingCheckThread(streamingDao);
+
+    // 固定执行 executor 的检测
+    checkService.scheduleAtFixedRate(streamingCheckThread, 10, MasterConfig.streamingCheckInterval, TimeUnit.SECONDS);
 
     recoveryExecFlow();
   }
@@ -113,8 +132,8 @@ public class JobExecManager {
    * 停止 executor 的执行
    */
   public void stop() {
-    if (!executorCheckService.isShutdown()) {
-      executorCheckService.shutdownNow();
+    if (!checkService.isShutdown()) {
+      checkService.shutdownNow();
     }
 
     flowSubmit2ExecutorThread.disable();

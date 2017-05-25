@@ -17,14 +17,12 @@ package com.baifendian.swordfish.dao.mapper;
 
 import com.baifendian.swordfish.dao.enums.FlowStatus;
 import com.baifendian.swordfish.dao.model.StreamingResult;
-import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.Result;
-import org.apache.ibatis.annotations.Results;
-import org.apache.ibatis.annotations.SelectProvider;
+import org.apache.ibatis.annotations.*;
 import org.apache.ibatis.type.EnumOrdinalTypeHandler;
 import org.apache.ibatis.type.JdbcType;
 
 import java.sql.Timestamp;
+import java.util.List;
 
 public interface StreamingResultMapper {
 //
@@ -36,7 +34,7 @@ public interface StreamingResultMapper {
 //   */
 //  @InsertProvider(type = StreamingResultProvider.class, method = "insert")
 //  int insert(@Param("result") StreamingResult result);
-//
+
 //  /**
 //   * 根据流 id 查询结果信息, 会有连接, 查询的是详情
 //   *
@@ -61,25 +59,64 @@ public interface StreamingResultMapper {
 //  StreamingResult findById(@Param("id") int id);
 
   /**
+   * 插入记录并获取记录 id <p>
+   *
+   * @param result
+   * @return 插入记录数
+   */
+  @InsertProvider(type = StreamingResultProvider.class, method = "insert")
+  @SelectKey(statement = "SELECT LAST_INSERT_ID() AS id", keyProperty = "result.id", resultType = int.class, before = false)
+  int insert(@Param("result") StreamingResult result);
+
+  /**
    * 根据流 id 查询结果信息, 查询的是简单的信息
    *
-   * @param id
+   * @param streamingId
    * @return
    */
   @Results(value = {@Result(property = "id", column = "id", id = true, javaType = int.class, jdbcType = JdbcType.INTEGER),
+      @Result(property = "streamingId", column = "streaming_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
       @Result(property = "submitUserId", column = "submit_user", javaType = int.class, jdbcType = JdbcType.INTEGER),
-      @Result(property = "submitUser", column = "submit_user_name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
       @Result(property = "submitTime", column = "submit_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE),
       @Result(property = "queue", column = "queue", javaType = String.class, jdbcType = JdbcType.VARCHAR),
       @Result(property = "proxyUser", column = "proxy_user", javaType = String.class, jdbcType = JdbcType.VARCHAR),
       @Result(property = "scheduleTime", column = "schedule_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE),
       @Result(property = "startTime", column = "start_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE),
+      @Result(property = "endTime", column = "end_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE),
       @Result(property = "status", column = "status", typeHandler = EnumOrdinalTypeHandler.class, javaType = FlowStatus.class, jdbcType = JdbcType.TINYINT),
       @Result(property = "logLinks", column = "log_links", javaType = String.class, jdbcType = JdbcType.VARCHAR),
       @Result(property = "jobId", column = "job_id", javaType = String.class, jdbcType = JdbcType.VARCHAR)
   })
-  @SelectProvider(type = StreamingResultProvider.class, method = "findByIdNoJoin")
-  StreamingResult findByIdNoJoin(@Param("id") int id);
+  @SelectProvider(type = StreamingResultProvider.class, method = "findLatestByStreamingId")
+  StreamingResult findLatestByStreamingId(@Param("streamingId") int streamingId);
 
+  /**
+   * 查询没有完成的流任务
+   *
+   * @return
+   */
+  @Results(value = {@Result(property = "id", column = "id", id = true, javaType = int.class, jdbcType = JdbcType.INTEGER),
+      @Result(property = "streamingId", column = "streaming_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
+      @Result(property = "submitUserId", column = "submit_user", javaType = int.class, jdbcType = JdbcType.INTEGER),
+      @Result(property = "submitTime", column = "submit_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE),
+      @Result(property = "queue", column = "queue", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+      @Result(property = "proxyUser", column = "proxy_user", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+      @Result(property = "scheduleTime", column = "schedule_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE),
+      @Result(property = "startTime", column = "start_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE),
+      @Result(property = "endTime", column = "end_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE),
+      @Result(property = "status", column = "status", typeHandler = EnumOrdinalTypeHandler.class, javaType = FlowStatus.class, jdbcType = JdbcType.TINYINT),
+      @Result(property = "logLinks", column = "log_links", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+      @Result(property = "jobId", column = "job_id", javaType = String.class, jdbcType = JdbcType.VARCHAR)
+  })
+  @SelectProvider(type = StreamingResultProvider.class, method = "findNoFinishedJob")
+  List<StreamingResult> findNoFinishedJob();
 
+  /**
+   * 更新任务信息
+   *
+   * @param job
+   * @return
+   */
+  @UpdateProvider(type = StreamingResultProvider.class, method = "updateResult")
+  int updateResult(@Param("job") StreamingResult job);
 }

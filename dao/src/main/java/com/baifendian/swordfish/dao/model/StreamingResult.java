@@ -18,10 +18,13 @@ package com.baifendian.swordfish.dao.model;
 import com.baifendian.swordfish.dao.enums.FlowStatus;
 import com.baifendian.swordfish.dao.utils.json.JsonObjectDeserializer;
 import com.baifendian.swordfish.dao.utils.json.JsonObjectSerializer;
+import com.baifendian.swordfish.dao.utils.json.JsonUtil;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * 描述一个流任务的结果
@@ -29,9 +32,14 @@ import java.util.Date;
 public class StreamingResult {
 
   /**
-   * 流任务 id
+   * 流任务执行 id
    **/
   private int id;
+
+  /**
+   * 流任务的 id
+   */
+  private int streamingId;
 
   /**
    * 提交人 id
@@ -71,6 +79,11 @@ public class StreamingResult {
   private Date startTime;
 
   /**
+   * 结束时间
+   */
+  private Date endTime;
+
+  /**
    * 执行的状态
    **/
   private FlowStatus status;
@@ -84,7 +97,22 @@ public class StreamingResult {
   /**
    * 日志 link, json array
    */
-  private String logLinks;
+  private String appLinks;
+
+  /**
+   * 日志 link, json array
+   */
+  private String jobLinks;
+
+  /**
+   * 得到日志链接
+   */
+  private List<String> appLinkList = new ArrayList<>();
+
+  /**
+   * 得到 job 的链接
+   */
+  private List<String> jobLinkList = new ArrayList<>();
 
   /**
    * 流任务
@@ -172,6 +200,14 @@ public class StreamingResult {
     this.id = id;
   }
 
+  public int getStreamingId() {
+    return streamingId;
+  }
+
+  public void setStreamingId(int streamingId) {
+    this.streamingId = streamingId;
+  }
+
   public int getSubmitUserId() {
     return submitUserId;
   }
@@ -228,6 +264,14 @@ public class StreamingResult {
     this.startTime = startTime;
   }
 
+  public Date getEndTime() {
+    return endTime;
+  }
+
+  public void setEndTime(Date endTime) {
+    this.endTime = endTime;
+  }
+
   public FlowStatus getStatus() {
     return status;
   }
@@ -242,14 +286,6 @@ public class StreamingResult {
 
   public void setJobId(String jobId) {
     this.jobId = jobId;
-  }
-
-  public String getLogLinks() {
-    return logLinks;
-  }
-
-  public void setLogLinks(String logLinks) {
-    this.logLinks = logLinks;
   }
 
   public String getName() {
@@ -346,5 +382,46 @@ public class StreamingResult {
 
   public void setExtras(String extras) {
     this.extras = extras;
+  }
+
+
+  public List<String> getAppLinkList() {
+    return appLinkList;
+  }
+
+  public void setAppLinkList(List<String> appLinkList) {
+    this.appLinkList = appLinkList;
+    if (appLinkList != null) {
+      this.appLinks = JsonUtil.toJsonString(appLinkList);
+    }
+  }
+
+  public String getAppLinks() {
+    return appLinks;
+  }
+
+  public void setAppLinks(String appLinks) {
+    this.appLinkList = JsonUtil.parseObjectList(appLinks, String.class);
+    this.appLinks = appLinks;
+  }
+
+  public String getJobLinks() {
+    return jobLinks;
+  }
+
+  public void setJobLinks(String jobLinks) {
+    this.jobLinkList = JsonUtil.parseObjectList(jobLinks, String.class);
+    this.jobLinks = jobLinks;
+  }
+
+  public List<String> getJobLinkList() {
+    return jobLinkList;
+  }
+
+  public void setJobLinkList(List<String> jobLinkList) {
+    this.jobLinkList = jobLinkList;
+    if (jobLinkList != null) {
+      this.jobLinks = JsonUtil.toJsonString(jobLinkList);
+    }
   }
 }
