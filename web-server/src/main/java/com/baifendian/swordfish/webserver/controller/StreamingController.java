@@ -222,7 +222,7 @@ public class StreamingController {
                              @PathVariable(value = "execId") String execId,
                              @RequestParam(value = "from", required = false, defaultValue = "0") int from,
                              @RequestParam(value = "size", required = false, defaultValue = "100") int size) {
-    logger.info("Operator user {}, query log, exec id: {}, from: {}, size: {}",
+    logger.info("Operator user {}, query streaming job log, exec id: {}, from: {}, size: {}",
         operator.getName(), execId, from, size);
 
     // from 的限制

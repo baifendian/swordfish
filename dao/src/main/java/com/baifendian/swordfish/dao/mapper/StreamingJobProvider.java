@@ -57,7 +57,7 @@ public class StreamingJobProvider {
   public String findByProjectNameAndName(Map<String, Object> parameter) {
     return new SQL() {
       {
-        SELECT("p_f.owner as owner_id");
+        SELECT("s.owner as owner_id");
         SELECT("p.name as project_name");
         SELECT("u.name as owner_name");
         SELECT("s.*");
@@ -69,6 +69,29 @@ public class StreamingJobProvider {
 
         WHERE("p.name = #{projectName}");
         WHERE("s.name = #{name}");
+      }
+    }.toString();
+  }
+
+  /**
+   * 更新流任务信息
+   *
+   * @param parameter
+   * @return
+   */
+  public String updateStreamingJob(Map<String, Object> parameter) {
+    return new SQL() {
+      {
+        UPDATE(TABLE_NAME);
+
+        SET("`desc`=#{job.desc}");
+        SET("`modify_time`=#{job.modifyTime}");
+        SET("`owner`=#{job.ownerId}");
+        SET("`parameter`=#{job.parameter}");
+        SET("`user_defined_params`=#{job.userDefinedParams}");
+        SET("`extras`=#{flow.extras}");
+
+        WHERE("id = #{job.id}");
       }
     }.toString();
   }

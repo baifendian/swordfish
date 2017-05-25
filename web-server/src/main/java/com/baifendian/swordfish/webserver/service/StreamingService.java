@@ -83,6 +83,7 @@ public class StreamingService {
     verifyDesc(desc);
     verifyExtras(extras);
 
+    // 查询项目, 如果不存在, 返回错误
     Project project = projectMapper.queryByName(projectName);
 
     if (project == null) {
@@ -98,16 +99,16 @@ public class StreamingService {
 
     // 对节点进行解析
     if (!flowNodeParamCheck(parameter, type)) {
-      logger.error("StreamingJob parameter:{} invalid", parameter);
-      throw new ParameterException("StreamingJob parameter: \"{0}\" invalid", parameter);
+      logger.error("Streaming job parameter:{} invalid", parameter);
+      throw new ParameterException("Streaming job parameter: \"{0}\" invalid", parameter);
     }
 
     // 对自定义参数进行解析
     try {
       JsonUtil.parseObjectList(userDefParams, Property.class);
     } catch (Exception e) {
-      logger.error("StreamingJob user define parameters:{} invalid", userDefParams);
-      throw new ParameterException("StreamingJob user define parameters: \"{0}\" invalid", userDefParams);
+      logger.error("Streaming job user define parameters:{} invalid", userDefParams);
+      throw new ParameterException("Streaming job user define parameters: \"{0}\" invalid", userDefParams);
     }
 
     StreamingJob streamingJob = new StreamingJob();
@@ -135,11 +136,11 @@ public class StreamingService {
     try {
       streamingJobMapper.insertAndGetId(streamingJob);
     } catch (DuplicateKeyException e) {
-      logger.error("StreamingJob has exist, can't create again.", e);
-      throw new ServerErrorException("StreamingJob has exist, can't create again.");
+      logger.error("Streaming job has exist, can't create again.", e);
+      throw new ServerErrorException("Streaming job has exist, can't create again.");
     } catch (Exception e) {
-      logger.error("StreamingJob create has error", e);
-      throw new ServerErrorException("StreamingJob create has error", e);
+      logger.error("Streaming job create has error", e);
+      throw new ServerErrorException("Streaming job create has error", e);
     }
 
     return streamingJob;
@@ -199,6 +200,7 @@ public class StreamingService {
     verifyDesc(desc);
     verifyExtras(extras);
 
+    // 查询项目, 如果不存在, 返回错误
     Project project = projectMapper.queryByName(projectName);
 
     if (project == null) {
@@ -212,11 +214,12 @@ public class StreamingService {
       throw new PermissionException("User \"{0}\" is not has project \"{1}\" write permission", operator.getName(), project.getName());
     }
 
+    // 对于修改流任务的情况, 必须是预先存在的
     StreamingJob streamingJob = streamingJobMapper.findByProjectNameAndName(projectName, name);
 
     if (streamingJob == null) {
-      logger.error("Not found streaming {} in project {}", name, project.getName());
-      throw new NotFoundException("Not found streaming \"{0}\" in project \"{1}\"", name, project.getName());
+      logger.error("Not found streaming job {} in project {}", name, project.getName());
+      throw new NotFoundException("Not found streaming job \"{0}\" in project \"{1}\"", name, project.getName());
     }
 
     Date now = new Date();
@@ -224,8 +227,8 @@ public class StreamingService {
     // 对节点进行解析
     if (StringUtils.isNotEmpty(parameter)) {
       if (!flowNodeParamCheck(parameter, streamingJob.getType())) {
-        logger.error("StreamingJob parameter:{} invalid", parameter);
-        throw new ParameterException("StreamingJob parameter: \"{0}\" invalid", parameter);
+        logger.error("Streaming job parameter:{} invalid", parameter);
+        throw new ParameterException("Streaming job parameter: \"{0}\" invalid", parameter);
       }
 
       streamingJob.setParameter(parameter);
@@ -236,8 +239,8 @@ public class StreamingService {
       try {
         JsonUtil.parseObjectList(userDefParams, Property.class);
       } catch (Exception e) {
-        logger.error("StreamingJob user define parameters:{} invalid", userDefParams);
-        throw new ParameterException("StreamingJob user define parameters: \"{0}\" invalid", userDefParams);
+        logger.error("Streaming job user define parameters:{} invalid", userDefParams);
+        throw new ParameterException("Streaming job user define parameters: \"{0}\" invalid", userDefParams);
       }
 
       streamingJob.setUserDefinedParams(userDefParams);
@@ -258,8 +261,8 @@ public class StreamingService {
     try {
       streamingJobMapper.updateStreamingJob(streamingJob);
     } catch (Exception e) {
-      logger.error("Streaming modify has error", e);
-      throw new ServerErrorException("Streaming modify has error", e);
+      logger.error("Streaming job modify has error", e);
+      throw new ServerErrorException("Streaming job modify has error", e);
     }
 
     return streamingJob;
@@ -274,6 +277,7 @@ public class StreamingService {
    */
   public void deleteStreamingJob(User operator, String projectName, String name) {
 
+    // 查询项目, 如果不存在, 返回错误
     Project project = projectMapper.queryByName(projectName);
 
     if (project == null) {
@@ -287,11 +291,12 @@ public class StreamingService {
       throw new PermissionException("User \"{0}\" is not has project \"{1}\" write permission", operator.getName(), project.getName());
     }
 
+    // 对于修改流任务的情况, 必须是预先存在的
     StreamingJob streamingJob = streamingJobMapper.findByProjectNameAndName(projectName, name);
 
     if (streamingJob == null) {
-      logger.error("Not found streamingJob job {} in project {}", name, project.getName());
-      throw new NotFoundException("Not found streamingJob job \"{0}\" in project \"{1}\"", name, project.getName());
+      logger.error("Not found streaming job {} in project {}", name, project.getName());
+      throw new NotFoundException("Not found streaming job \"{0}\" in project \"{1}\"", name, project.getName());
     }
 
     // 删除工作流

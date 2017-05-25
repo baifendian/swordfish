@@ -30,7 +30,7 @@ public interface StreamingJobMapper {
    * @return 插入记录数
    */
   @InsertProvider(type = StreamingJobProvider.class, method = "insert")
-  @SelectKey(statement = "SELECT LAST_INSERT_ID() AS id", keyProperty = "flow.id", resultType = int.class, before = false)
+  @SelectKey(statement = "SELECT LAST_INSERT_ID() AS id", keyProperty = "job.id", resultType = int.class, before = false)
   int insertAndGetId(@Param("job") StreamingJob job);
 
   /**
