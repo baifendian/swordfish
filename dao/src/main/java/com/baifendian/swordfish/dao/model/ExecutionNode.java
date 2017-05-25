@@ -62,12 +62,12 @@ public class ExecutionNode {
   /**
    * 日志 link
    */
-  private String logLinks;
+  private String appLinks;
 
   /**
    * 得到日志链接
    */
-  private List<String> logLinkList = new ArrayList<>();
+  private List<String> appLinkList = new ArrayList<>();
 
   public Integer getExecId() {
     return execId;
@@ -121,14 +121,14 @@ public class ExecutionNode {
     return jobId;
   }
 
-  public List<String> getLogLinkList() {
-    return logLinkList;
+  public List<String> getAppLinkList() {
+    return appLinkList;
   }
 
-  public void setLogLinkList(List<String> logLinkList) {
-    this.logLinkList = logLinkList;
-    if (logLinkList != null) {
-      this.logLinks = JsonUtil.toJsonString(logLinkList);
+  public void setAppLinkList(List<String> appLinkList) {
+    this.appLinkList = appLinkList;
+    if (appLinkList != null) {
+      this.appLinks = JsonUtil.toJsonString(appLinkList);
     }
   }
 
@@ -144,12 +144,12 @@ public class ExecutionNode {
     this.name = name;
   }
 
-  public String getLogLinks() {
-    return logLinks;
+  public String getAppLinks() {
+    return appLinks;
   }
 
-  public void setLogLinks(String logLinks) {
-    this.logLinkList = JsonUtil.parseObjectList(logLinks, String.class);
-    this.logLinks = logLinks;
+  public void setAppLinks(String appLinks) {
+    this.appLinkList = JsonUtil.parseObjectList(appLinks, String.class);
+    this.appLinks = appLinks;
   }
 }
