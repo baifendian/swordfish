@@ -225,7 +225,7 @@ public class MasterServiceImpl implements Iface {
         return ResultDetailHelper.createErrorResult("current workflow not exists");
       }
 
-      String crontabStr = scheduleInfo.getCronExpression();
+      String crontabStr = scheduleInfo.getCrontab();
       CronExpression cron = new CronExpression(crontabStr);
 
       Date startDateTime = new Date(scheduleInfo.getStartDate());
