@@ -45,7 +45,7 @@ struct ScheduleInfo {
   2: i64 endDate,
    	
   /** cron 表达式 */
-  3: string cronExpression
+  3: string crontab
 }
 
 /**
