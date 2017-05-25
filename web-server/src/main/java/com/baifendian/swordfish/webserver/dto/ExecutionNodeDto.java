@@ -71,9 +71,9 @@ public class ExecutionNodeDto {
       this.status = executionNode.getStatus();
 
       // link 需要添加前缀
-      List<String> appIds = executionNode.getAppLinksList();
-      List<String> links = executionNode.getAppLinkList();
-      if (CollectionUtils.isNotEmpty(links)) {
+      List<String> appIds = executionNode.getAppLinkList();
+
+      if (CollectionUtils.isNotEmpty(appIds)) {
         this.appLinks = new ArrayList<>();
 
         for (String appId : appIds) {

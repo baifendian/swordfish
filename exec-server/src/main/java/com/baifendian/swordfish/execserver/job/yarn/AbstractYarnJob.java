@@ -56,6 +56,7 @@ public abstract class AbstractYarnJob extends AbstractProcessJob {
     super(props, logger);
 
     flowDao = DaoFactory.getDaoInstance(FlowDao.class);
+
     appLinks = new ArrayList<>();
     jobLinks = new ArrayList<>();
   }
@@ -88,11 +89,11 @@ public abstract class AbstractYarnJob extends AbstractProcessJob {
       ExecutionNode executionNode = flowDao.queryExecutionNode(props.getExecId(), props.getNodeName());
 
       if (captureAppLinks) {
-        executionNode.setAppLinks(appLinks);
+        executionNode.setAppLinkList(appLinks);
       }
 
       if (captureJobLinks) {
-        executionNode.setJobLinks(appLinks);
+        executionNode.setJobLinkList(appLinks);
       }
 
       flowDao.updateExecutionNode(executionNode);

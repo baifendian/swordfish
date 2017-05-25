@@ -60,14 +60,24 @@ public class ExecutionNode {
   private String jobId;
 
   /**
-   * 日志 link
+   * application link
    */
   private String appLinks;
+
+  /**
+   * job link
+   */
+  private String jobLinks;
 
   /**
    * 得到日志链接
    */
   private List<String> appLinkList = new ArrayList<>();
+
+  /**
+   * 得到 job 的链接
+   */
+  private List<String> jobLinkList = new ArrayList<>();
 
   public Integer getExecId() {
     return execId;
@@ -151,5 +161,25 @@ public class ExecutionNode {
   public void setAppLinks(String appLinks) {
     this.appLinkList = JsonUtil.parseObjectList(appLinks, String.class);
     this.appLinks = appLinks;
+  }
+
+  public String getJobLinks() {
+    return jobLinks;
+  }
+
+  public void setJobLinks(String jobLinks) {
+    this.jobLinkList = JsonUtil.parseObjectList(jobLinks, String.class);
+    this.jobLinks = jobLinks;
+  }
+
+  public List<String> getJobLinkList() {
+    return jobLinkList;
+  }
+
+  public void setJobLinkList(List<String> jobLinkList) {
+    this.jobLinkList = jobLinkList;
+    if (jobLinkList != null) {
+      this.jobLinks = JsonUtil.toJsonString(jobLinkList);
+    }
   }
 }
