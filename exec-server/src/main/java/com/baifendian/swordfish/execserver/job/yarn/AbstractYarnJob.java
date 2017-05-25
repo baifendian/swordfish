@@ -22,14 +22,20 @@ import com.baifendian.swordfish.execserver.job.AbstractProcessJob;
 import com.baifendian.swordfish.execserver.job.JobProps;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 
 import java.io.File;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public abstract class AbstractYarnJob extends AbstractProcessJob {
+
+  private static final Pattern APPLICATION_REGEX = Pattern.compile("application_\\d+_\\d+");
+  private static final Pattern JOB_REGEX = Pattern.compile("job_\\d+_\\d+");
 
   /**
    * 数据库接口
@@ -37,36 +43,57 @@ public abstract class AbstractYarnJob extends AbstractProcessJob {
   private FlowDao flowDao;
 
   /**
+   * 应用 links
+   */
+  private List<String> appLinks;
+
+  /**
    * 日志 links
    */
-  private List<String> logLinks;
+  private List<String> jobLinks;
 
   public AbstractYarnJob(JobProps props, Logger logger) {
     super(props, logger);
 
     flowDao = DaoFactory.getDaoInstance(FlowDao.class);
-    logLinks = new ArrayList<>();
+    appLinks = new ArrayList<>();
+    jobLinks = new ArrayList<>();
   }
 
   @Override
   protected void logProcess(List<String> logs) {
     super.logProcess(logs);
 
-    boolean captureLogLinks = false;
+    boolean captureAppLinks = false;
+    boolean captureJobLinks = false;
 
     // 分析日志
     for (String log : logs) {
-      String appid = findAppid(log);
+      String appId = findAppId(log);
 
-      if (appid != null && !logLinks.contains(appid)) {
-        logLinks.add(appid);
-        captureLogLinks = true;
+      if (StringUtils.isNotEmpty(appId) && !appLinks.contains(appId)) {
+        appLinks.add(appId);
+        captureAppLinks = true;
+      }
+
+      String jobId = findJobId(log);
+
+      if (StringUtils.isNotEmpty(jobId) && !jobLinks.contains(jobId)) {
+        jobLinks.add(jobId);
+        captureJobLinks = true;
       }
     }
 
-    if (captureLogLinks) {
+    if (captureAppLinks || captureJobLinks) {
       ExecutionNode executionNode = flowDao.queryExecutionNode(props.getExecId(), props.getNodeName());
-      executionNode.setLogLinkList(logLinks);
+
+      if (captureAppLinks) {
+        executionNode.setAppLinks(appLinks);
+      }
+
+      if (captureJobLinks) {
+        executionNode.setJobLinks(appLinks);
+      }
 
       flowDao.updateExecutionNode(executionNode);
     }
@@ -75,20 +102,30 @@ public abstract class AbstractYarnJob extends AbstractProcessJob {
   /**
    * 获取 appid <p>
    *
+   * @param line
    * @return appid
    */
-  private String findAppid(String line) {
-    if (line.contains("YarnClientImpl: Submitted application")) {
-      return line.substring(line.indexOf("application") + "application".length() + 1);
+  protected String findAppId(String line) {
+    Matcher matcher = APPLICATION_REGEX.matcher(line);
+
+    if (matcher.find()) {
+      return matcher.group();
     }
 
     return null;
   }
 
-  @Deprecated
-  protected String findLogLinks(String line) {
-    if (line.contains("The url to track the job:")) {
-      return line.substring(line.indexOf("job:") + "job:".length() + 1);
+  /**
+   * 查找 job id
+   *
+   * @param line
+   * @return
+   */
+  protected String findJobId(String line) {
+    Matcher matcher = JOB_REGEX.matcher(line);
+
+    if (matcher.find()) {
+      return matcher.group();
     }
 
     return null;
@@ -100,8 +137,8 @@ public abstract class AbstractYarnJob extends AbstractProcessJob {
     super.cancel();
 
     // 然后 kill application
-    if (CollectionUtils.isNotEmpty(logLinks)) {
-      for (String appid : logLinks) {
+    if (CollectionUtils.isNotEmpty(appLinks)) {
+      for (String appid : appLinks) {
         String commandFile = "/tmp/" + props.getJobAppId() + ".kill";
         String cmd = "yarn application -kill " + appid;
 
@@ -128,6 +165,43 @@ public abstract class AbstractYarnJob extends AbstractProcessJob {
 
         Runtime.getRuntime().exec(runCmd);
       }
+    }
+  }
+
+  public static void main(String[] args) {
+    String msg = "[INFO] 2017-05-23 18:25:22.268 com.baifendian.swordfish.execserver.runner.node.NodeRunner:[147] -  hive execute log : INFO  : Starting Job = job_1493947416024_0139, Tracking URL = http://hlg-5p149-wangwenting:8088/proxy/application_1493947416024_0139/\n" +
+        "job_1493947416024_0140 [INFO] 2017-05-23 18:25:22.268 com.baifendian.swordfish.execserver.runner.node.NodeRunner:[147] -  hive execute log : INFO  : Kill Command = /opt/hadoop/bin/hadoop job  -kill job_1493947416024_0139\n" +
+        "[INFO] 2017-05-23 18:25:27.269 com.baifendian.swordfish.execserver.runner.node.NodeRunner:[147] -  hive execute log : INFO  : Hadoop job information for Stage-1: number of mappers: 1; number of reducers: 0";
+
+    // 查找 application id
+    Matcher matcher = APPLICATION_REGEX.matcher(msg);
+
+    while (matcher.find()) {
+      System.out.println(matcher.group());
+    }
+
+    // 查找 job id
+    matcher = JOB_REGEX.matcher(msg);
+
+    while (matcher.find()) {
+      System.out.println(matcher.group());
+    }
+
+    // 测试另外的 msg
+    msg = "sh.execserver.runner.node.NodeRunner:application[147] -  hive execute log : INFO  : Hadoop job information for Stage-1: number of mappers: 1; number of reducers: 0";
+
+    // 查找 application id
+    matcher = APPLICATION_REGEX.matcher(msg);
+
+    while (matcher.find()) {
+      System.out.println(matcher.group());
+    }
+
+    // 查找 job id
+    matcher = JOB_REGEX.matcher(msg);
+
+    while (matcher.find()) {
+      System.out.println(matcher.group());
     }
   }
 }

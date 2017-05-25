@@ -52,7 +52,7 @@ public interface StreamingJobMapper {
       @Result(property = "type", column = "type", javaType = String.class, jdbcType = JdbcType.VARCHAR),
       @Result(property = "parameter", column = "parameter", javaType = String.class, jdbcType = JdbcType.VARCHAR),
       @Result(property = "userDefinedParams", column = "user_defined_params", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-      @Result(property = "extras", column = "extras", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+      @Result(property = "extras", column = "extras", javaType = String.class, jdbcType = JdbcType.VARCHAR)
   })
   @SelectProvider(type = StreamingJobProvider.class, method = "findByProjectNameAndName")
   StreamingJob findByProjectNameAndName(@Param("projectName") String projectName, @Param("name") String name);

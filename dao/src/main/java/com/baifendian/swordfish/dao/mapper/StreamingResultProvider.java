@@ -15,6 +15,33 @@
  */
 package com.baifendian.swordfish.dao.mapper;
 
+import org.apache.ibatis.jdbc.SQL;
+
+import java.util.Map;
+
 public class StreamingResultProvider {
 
+  private static final String TABLE_NAME = "streaming_result";
+
+  /**
+   * find by id, but not join
+   *
+   * @param parameter
+   * @return
+   */
+  public String findByIdNoJoin(Map<String, Object> parameter) {
+    return new SQL() {
+      {
+        SELECT("s.submit_user as submit_user_id");
+        SELECT("u.name as submit_user_name");
+        SELECT("s.*");
+
+        FROM(TABLE_NAME + " s");
+
+        JOIN("user u on s.submit_user = u.id");
+
+        WHERE("s.id = #{id}");
+      }
+    }.toString();
+  }
 }

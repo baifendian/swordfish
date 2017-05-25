@@ -71,12 +71,12 @@ public class ExecutionNodeDto {
       this.status = executionNode.getStatus();
 
       // link 需要添加前缀
-      List<String> links = executionNode.getLogLinkList();
+      List<String> appIds = executionNode.getAppLinksList();
       if (CollectionUtils.isNotEmpty(links)) {
         this.logLinks = new ArrayList<>();
 
-        for (String link : links) {
-          this.logLinks.add(String.format("%s/cluster/app/%s", ConfigurationUtil.getWebappAddress(), link));
+        for (String appId : appIds) {
+          this.logLinks.add(ConfigurationUtil.getWebappAddress(appId));
         }
       }
 

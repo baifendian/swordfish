@@ -308,10 +308,6 @@ public class WorkflowService {
       projectFlow.setExtras(extras);
     }
 
-//    if (StringUtils.isNotEmpty(name)) {
-//      projectFlow.setName(name);
-//    }
-
     if (StringUtils.isNotEmpty(desc)) {
       projectFlow.setDesc(desc);
     }

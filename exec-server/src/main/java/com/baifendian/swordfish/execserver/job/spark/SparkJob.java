@@ -89,21 +89,6 @@ public class SparkJob extends AbstractYarnJob {
     return command;
   }
 
-  /**
-   * 查找日志连接
-   *
-   * @param line
-   * @return
-   */
-  @Override
-  public String findLogLinks(String line) {
-    if (line.contains("tracking URL:")) {
-      return line.substring(line.indexOf("URL:") + "URL:".length() + 1);
-    }
-
-    return null;
-  }
-
   @Override
   public BaseParam getParam() {
     return sparkParam;

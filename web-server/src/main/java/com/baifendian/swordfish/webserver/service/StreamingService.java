@@ -20,6 +20,7 @@ import com.baifendian.swordfish.dao.mapper.StreamingJobMapper;
 import com.baifendian.swordfish.dao.mapper.StreamingResultMapper;
 import com.baifendian.swordfish.dao.model.Project;
 import com.baifendian.swordfish.dao.model.StreamingJob;
+import com.baifendian.swordfish.dao.model.StreamingResult;
 import com.baifendian.swordfish.dao.model.User;
 import com.baifendian.swordfish.dao.model.flow.Property;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
@@ -297,6 +298,17 @@ public class StreamingService {
     if (streamingJob == null) {
       logger.error("Not found streaming job {} in project {}", name, project.getName());
       throw new NotFoundException("Not found streaming job \"{0}\" in project \"{1}\"", name, project.getName());
+    }
+
+    // 必须是停止运行的
+    StreamingResult streamingResult = streamingResultMapper.findByIdNoJoin(streamingJob.getId());
+
+    if (streamingResult != null && streamingResult.getStatus().typeIsNotFinished()) {
+      String logLinks = streamingResult.getLogLinks();
+      // if have log links
+      if (StringUtils.isNotEmpty(logLinks)) {
+
+      }
     }
 
     // 删除工作流
