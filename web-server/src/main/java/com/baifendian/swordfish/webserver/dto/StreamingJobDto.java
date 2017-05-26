@@ -33,12 +33,10 @@ public class StreamingJobDto {
 
   private String type;
 
-  @JsonInclude(JsonInclude.Include.NON_NULL)
   @JsonRawValue
   @JsonDeserialize(using = JsonObjectDeserializer.class)
   private String parameter;
 
-  @JsonInclude(JsonInclude.Include.NON_NULL)
   @JsonRawValue
   @JsonDeserialize(using = JsonObjectDeserializer.class)
   private String userDefParams;
@@ -63,6 +61,7 @@ public class StreamingJobDto {
     this.type = streamingJob.getType();
     this.parameter = streamingJob.getParameter();
     this.userDefParams = streamingJob.getUserDefinedParams();
+    this.extras = streamingJob.getExtras();
     this.createTime = streamingJob.getCreateTime();
     this.modifyTime = streamingJob.getModifyTime();
     this.owner = streamingJob.getOwner();

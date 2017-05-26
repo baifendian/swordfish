@@ -89,7 +89,7 @@ public class StreamingJobProvider {
         SET("`owner`=#{job.ownerId}");
         SET("`parameter`=#{job.parameter}");
         SET("`user_defined_params`=#{job.userDefinedParams}");
-        SET("`extras`=#{flow.extras}");
+        SET("`extras`=#{job.extras}");
 
         WHERE("id = #{job.id}");
       }
