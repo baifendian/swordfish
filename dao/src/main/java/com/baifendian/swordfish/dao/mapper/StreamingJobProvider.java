@@ -129,4 +129,28 @@ public class StreamingJobProvider {
       }
     }.toString();
   }
+
+  /**
+   * 根据项目查询流任务
+   *
+   * @param parameter
+   * @return
+   */
+  public String queryProjectStreamingJobs(Map<String, Object> parameter) {
+    return new SQL() {
+      {
+        SELECT("s.owner as owner_id");
+        SELECT("p.name as project_name");
+        SELECT("u.name as owner_name");
+        SELECT("s.*");
+
+        FROM(TABLE_NAME + " s");
+
+        JOIN("project p on s.project_id = p.id");
+        JOIN("user u on s.owner = u.id");
+
+        WHERE("s.project_id = #{projectId}");
+      }
+    }.toString();
+  }
 }

@@ -65,7 +65,7 @@ public class StreamingCheckThread implements Runnable {
 
               // 任务不存在
               if (tmpStatus == null) {
-                logger.error("application not exist: {}", streamingResult.getId());
+                logger.error("application not exist: {}", appId);
                 status = FlowStatus.KILL;
                 break;
               } else if (!tmpStatus.typeIsSuccess()) {// 如果没有完成
@@ -73,7 +73,7 @@ public class StreamingCheckThread implements Runnable {
                 break;
               }
             } catch (Exception e) {
-              logger.error(String.format("get application exception: {}", streamingResult.getId()), e);
+              logger.error(String.format("get application exception: {}", appId), e);
             }
           }
 

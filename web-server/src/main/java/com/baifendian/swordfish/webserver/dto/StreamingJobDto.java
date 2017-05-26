@@ -17,6 +17,7 @@ package com.baifendian.swordfish.webserver.dto;
 
 import com.baifendian.swordfish.dao.model.StreamingJob;
 import com.baifendian.swordfish.dao.utils.json.JsonObjectDeserializer;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonRawValue;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
@@ -32,10 +33,12 @@ public class StreamingJobDto {
 
   private String type;
 
+  @JsonInclude(JsonInclude.Include.NON_NULL)
   @JsonRawValue
   @JsonDeserialize(using = JsonObjectDeserializer.class)
   private String parameter;
 
+  @JsonInclude(JsonInclude.Include.NON_NULL)
   @JsonRawValue
   @JsonDeserialize(using = JsonObjectDeserializer.class)
   private String userDefParams;

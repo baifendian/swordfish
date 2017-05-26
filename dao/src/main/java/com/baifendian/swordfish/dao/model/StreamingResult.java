@@ -34,7 +34,7 @@ public class StreamingResult {
   /**
    * 流任务执行 id
    **/
-  private int id;
+  private int execId;
 
   /**
    * 流任务的 id
@@ -87,7 +87,6 @@ public class StreamingResult {
    * 执行的状态
    **/
   private FlowStatus status;
-
 
   /**
    * 执行的 job id
@@ -192,12 +191,12 @@ public class StreamingResult {
   @JsonSerialize(using = JsonObjectSerializer.class)
   private String extras;
 
-  public int getId() {
-    return id;
+  public int getExecId() {
+    return execId;
   }
 
-  public void setId(int id) {
-    this.id = id;
+  public void setExecId(int execId) {
+    this.execId = execId;
   }
 
   public int getStreamingId() {

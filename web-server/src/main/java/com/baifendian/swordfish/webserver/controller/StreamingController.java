@@ -16,24 +16,18 @@
 package com.baifendian.swordfish.webserver.controller;
 
 import com.baifendian.swordfish.dao.model.User;
-import com.baifendian.swordfish.webserver.dto.ExecutorIdDto;
-import com.baifendian.swordfish.webserver.dto.LogResult;
 import com.baifendian.swordfish.webserver.dto.StreamingJobDto;
-import com.baifendian.swordfish.webserver.dto.StreamingResultDto;
-import com.baifendian.swordfish.webserver.exception.BadRequestException;
 import com.baifendian.swordfish.webserver.service.StreamingService;
-import org.apache.hadoop.fs.FileStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Date;
 import java.util.List;
 
 @RestController
-@RequestMapping("")
+@RequestMapping("/projects/{projectName}")
 public class StreamingController {
 
   private static Logger logger = LoggerFactory.getLogger(StreamingController.class.getName());
@@ -54,7 +48,7 @@ public class StreamingController {
    * @param extras
    * @return
    */
-  @PostMapping(value = "/projects/{projectName}/streaming/{name}")
+  @PostMapping(value = "/streaming/{name}")
   @ResponseStatus(HttpStatus.CREATED)
   public StreamingJobDto createStreamingJob(@RequestAttribute(value = "session.user") User operator,
                                             @PathVariable String projectName,
@@ -83,7 +77,7 @@ public class StreamingController {
    * @param extras
    * @return
    */
-  @PutMapping(value = "/projects/{projectName}/streaming/{name}")
+  @PutMapping(value = "/streaming/{name}")
   public StreamingJobDto putStreamingJob(@RequestAttribute(value = "session.user") User operator,
                                          @PathVariable String projectName,
                                          @PathVariable String name,
@@ -110,7 +104,7 @@ public class StreamingController {
    * @param extras
    * @return
    */
-  @PatchMapping(value = "/projects/{projectName}/streaming/{name}")
+  @PatchMapping(value = "/streaming/{name}")
   public StreamingJobDto patchStreamingJob(@RequestAttribute(value = "session.user") User operator,
                                            @PathVariable String projectName,
                                            @PathVariable String name,
@@ -131,7 +125,7 @@ public class StreamingController {
    * @param projectName
    * @param name
    */
-  @DeleteMapping(value = "/projects/{projectName}/streaming/{name}")
+  @DeleteMapping(value = "/streaming/{name}")
   public void deleteStreamingJob(@RequestAttribute(value = "session.user") User operator,
                                  @PathVariable String projectName,
                                  @PathVariable String name) {
@@ -142,125 +136,33 @@ public class StreamingController {
   }
 
   /**
-   * 执行一个流任务
+   * 查询项目下的所有流任务
    *
    * @param operator
    * @param projectName
-   * @param name
-   * @param proxyUser
-   * @param queue
    */
-  @PostMapping(value = "/executors/streaming")
-  @ResponseStatus(HttpStatus.CREATED)
-  public ExecutorIdDto executeStreamingJob(@RequestAttribute(value = "session.user") User operator,
-                                           @RequestParam(value = "projectName") String projectName,
-                                           @RequestParam(value = "name") String name,
-                                           @RequestParam(value = "proxyUser") String proxyUser,
-                                           @RequestParam(value = "queue") String queue) {
-    logger.info("Operator user {}, execute streaming job, project name: {}, name: {}, proxy user: {}, queue: {}",
-        operator.getName(), projectName, name, proxyUser, queue);
+  @GetMapping(value = "/streamings")
+  public List<StreamingJobDto> queryProjectStreamingJobs(@RequestAttribute(value = "session.user") User operator,
+                                                         @PathVariable String projectName) {
+    logger.info("Operator user {}, query project streaming jobs, project name: {}",
+        operator.getName(), projectName);
 
-    return streamingService.executeStreamingJob(operator, projectName, name, proxyUser, queue);
+    return streamingService.queryProjectStreamingJobs(operator, projectName);
   }
 
   /**
-   * 关闭流任务
+   * 查询某个流任务详情
    *
    * @param operator
-   * @param execId
-   * @return
-   */
-  @PostMapping(value = "/executors/streaming/{execId}/kill")
-  public void killStreamingJob(@RequestAttribute(value = "session.user") User operator,
-                               @PathVariable int execId) {
-    logger.info("Operator user {}, kill streaming job, exec id: {}",
-        operator.getName(), execId);
-
-    streamingService.killStreamingJob(operator, execId);
-  }
-
-  /**
-   * 查询项目下流任务及其结果
-   *
-   * @param operator
-   * @param startDate
-   * @param endDate
    * @param projectName
-   * @param name
-   * @param status
-   * @param from
-   * @param size
-   * @return
    */
-  @GetMapping(value = "/executors/streamings")
-  public List<StreamingResultDto> queryProjectStreamingJobAndResult(@RequestAttribute(value = "session.user") User operator,
-                                                                    @RequestParam(value = "startDate") long startDate,
-                                                                    @RequestParam(value = "endDate") long endDate,
-                                                                    @RequestParam(value = "projectName") String projectName,
-                                                                    @RequestParam(value = "name", required = false) String name,
-                                                                    @RequestParam(value = "status", required = false) FileStatus status,
-                                                                    @RequestParam(value = "from", required = false, defaultValue = "0") int from,
-                                                                    @RequestParam(value = "size", required = false, defaultValue = "100") int size) {
-    logger.info("Operator user {}, query streaming job exec list, start date: {}, end date: {}, project name: {}, name: {}, status: {}, from: {}, size: {}",
-        operator.getName(), startDate, endDate, projectName, name, status, from, size);
+  @GetMapping(value = "/streaming/{name}")
+  public List<StreamingJobDto> queryStreamingJob(@RequestAttribute(value = "session.user") User operator,
+                                                 @PathVariable String projectName,
+                                                 @PathVariable String name) {
+    logger.info("Operator user {}, query streaming job, project name: {}, name: {}",
+        operator.getName(), projectName, name);
 
-    // from 的限制
-    if (from < 0) {
-      throw new BadRequestException("Argument is not valid, from must be equal or more than zero");
-    }
-
-    // size 的限制
-    if (size <= 0 || size > 1000) {
-      throw new BadRequestException("Argument is not valid, size must be between (0, 1000]");
-    }
-
-
-    return streamingService.queryProjectStreamingJobAndResult(operator, projectName, name, new Date(startDate), new Date(endDate), status, from, size);
-  }
-
-  /**
-   * 查询具体某个流任务的详情
-   *
-   * @param operator
-   * @param execId
-   * @return
-   */
-  @GetMapping(value = "/executors/streaming/{execId}")
-  public List<StreamingResultDto> queryStreamingJobAndResult(@RequestAttribute(value = "session.user") User operator,
-                                                             @PathVariable int execId) {
-    logger.info("Operator user {}, query streaming job and result, exec id: {}",
-        operator.getName(), execId);
-
-    return streamingService.queryStreamingJobAndResult(operator, execId);
-  }
-
-  /**
-   * 查询日志接口
-   *
-   * @param operator
-   * @param execId
-   * @param from
-   * @param size
-   * @return
-   */
-  @GetMapping(value = "/executors/streaming/{execId}/logs")
-  public LogResult queryLogs(@RequestAttribute(value = "session.user") User operator,
-                             @PathVariable(value = "execId") String execId,
-                             @RequestParam(value = "from", required = false, defaultValue = "0") int from,
-                             @RequestParam(value = "size", required = false, defaultValue = "100") int size) {
-    logger.info("Operator user {}, query streaming job log, exec id: {}, from: {}, size: {}",
-        operator.getName(), execId, from, size);
-
-    // from 的限制
-    if (from < 0) {
-      throw new BadRequestException("Argument is not valid, from must be equal or more than zero");
-    }
-
-    // size 的限制
-    if (size <= 0 || size > 1000) {
-      throw new BadRequestException("Argument is not valid, size must be between (0, 1000]");
-    }
-
-    return streamingService.getStreamingJobLog(operator, execId, from, size);
+    return streamingService.queryStreamingJob(operator, projectName, name);
   }
 }

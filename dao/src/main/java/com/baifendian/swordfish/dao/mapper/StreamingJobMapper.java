@@ -20,6 +20,7 @@ import org.apache.ibatis.annotations.*;
 import org.apache.ibatis.type.JdbcType;
 
 import java.sql.Timestamp;
+import java.util.List;
 
 public interface StreamingJobMapper {
 
@@ -84,5 +85,26 @@ public interface StreamingJobMapper {
   @SelectProvider(type = StreamingJobProvider.class, method = "selectProjectStreamingCount")
   int selectProjectStreamingCount(@Param("projectId") int projectId);
 
-  
+  /**
+   * 查询项目下所有的任务信息
+   *
+   * @param projectId
+   * @return
+   */
+  @Results(value = {@Result(property = "id", column = "id", id = true, javaType = int.class, jdbcType = JdbcType.INTEGER),
+      @Result(property = "name", column = "name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+      @Result(property = "desc", column = "desc", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+      @Result(property = "projectId", column = "project_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
+      @Result(property = "projectName", column = "project_name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+      @Result(property = "createTime", column = "create_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE),
+      @Result(property = "modifyTime", column = "modify_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE),
+      @Result(property = "ownerId", column = "owner_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
+      @Result(property = "owner", column = "owner_name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+      @Result(property = "type", column = "type", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+      @Result(property = "parameter", column = "parameter", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+      @Result(property = "userDefinedParams", column = "user_defined_params", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+      @Result(property = "extras", column = "extras", javaType = String.class, jdbcType = JdbcType.VARCHAR)
+  })
+  @SelectProvider(type = StreamingJobProvider.class, method = "queryProjectStreamingJobs")
+  List<StreamingJob> queryProjectStreamingJobs(@Param("projectId") int projectId);
 }

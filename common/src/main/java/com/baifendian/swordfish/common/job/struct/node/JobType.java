@@ -31,10 +31,15 @@ public class JobType {
    * 判断是否是长任务
    */
   public static boolean isLongJob(String job) {
-    if (StringUtils.equals(job, SPARK_STREAMING)) {
-      return true;
+    if (StringUtils.isEmpty(job)) {
+      return false;
     }
 
-    return false;
+    switch (job) {
+      case SPARK_STREAMING:
+        return true;
+      default:
+        return false;
+    }
   }
 }

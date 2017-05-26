@@ -139,7 +139,7 @@ public class NodeRunner implements Callable<Boolean> {
     } catch (Exception e) {
       success = false;
 
-      logger.error(String.format("job process exception, exec id: {}, node: {}", executionFlow.getId(), executionNode.getName()), e);
+      logger.error(String.format("job process exception, exec id: %s, node: %s", executionFlow.getId(), executionNode.getName()), e);
 
       kill();
     } finally {

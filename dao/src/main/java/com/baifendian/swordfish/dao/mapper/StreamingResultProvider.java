@@ -66,9 +66,18 @@ public class StreamingResultProvider {
 
     return new SQL() {
       {
+        SELECT("r.submit_user as submit_user_id");
+        SELECT("r.owner as owner_id");
+        SELECT("u2.name as submit_user_name");
+        SELECT("u1.name as owner_name");
+        SELECT("p.name as project_name");
         SELECT("*");
 
-        FROM(TABLE_NAME);
+        FROM(TABLE_NAME + " as r");
+        JOIN("streaming_job s on r.streaming_id = s.id");
+        JOIN("project p on s.project_id = p.id");
+        JOIN("user u1 on s.owner = u1.id");
+        JOIN("user u2 on r.submit_user = u2.id");
 
         WHERE("id=" + "(" + subSql + ")");
       }
@@ -86,7 +95,7 @@ public class StreamingResultProvider {
       {
         SELECT("*");
 
-        FROM(TABLE_NAME + " s");
+        FROM(TABLE_NAME);
 
         WHERE("status <= " + FlowStatus.RUNNING.ordinal());
       }
@@ -116,7 +125,7 @@ public class StreamingResultProvider {
         SET("`job_links` = #{job.jobLinks}");
         SET("`job_id` = #{job.jobId}");
 
-        WHERE("id = #{job.id}");
+        WHERE("id = #{job.execId}");
       }
     }.toString();
   }
