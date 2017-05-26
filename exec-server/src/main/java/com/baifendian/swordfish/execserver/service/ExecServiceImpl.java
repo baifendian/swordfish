@@ -173,6 +173,30 @@ public class ExecServiceImpl implements Iface {
   }
 
   /**
+   * 执行某个流任务
+   * <p>
+   * execId : 执行 id
+   *
+   * @param execId
+   */
+  public RetInfo execStreamingJob(int execId) throws TException {
+    // TODO::
+    return ResultHelper.SUCCESS;
+  }
+
+  /**
+   * 取消在执行的指定流任务
+   * <p>
+   * execId : 执行 id
+   *
+   * @param execId
+   */
+  public RetInfo cancelStreamingJob(int execId) throws TException {
+    // TODO::
+    return ResultHelper.SUCCESS;
+  }
+
+  /**
    * 销毁资源 <p>
    */
   public void destory() {

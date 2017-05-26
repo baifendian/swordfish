@@ -333,6 +333,59 @@ public class MasterClient {
   }
 
   /**
+   * 执行一个流任务, 用于 web-server
+   *
+   * @param execId
+   * @return
+   */
+  public RetInfo execStreamingJob(int execId) {
+    if (!connect()) {
+      close();
+      return null;
+    }
+
+    try {
+      RetInfo ret = client.execStreamingJob(execId);
+
+      return ret;
+    } catch (TException e) {
+      logger.error("exec streaming job error", e);
+      return null;
+    } finally {
+      close();
+    }
+  }
+
+  /**
+   * 取消流任务执行, 用于 web-server
+   *
+   * @param execId
+   * @return
+   */
+  public boolean cancelStreamingJob(int execId) {
+    if (!connect()) {
+      close();
+      return false;
+    }
+
+    try {
+      RetInfo ret = client.cancelExecFlow(execId);
+
+      if (ret.getStatus() != 0) {
+        logger.error("cancel streaming job error:{}", ret.getMsg());
+        return false;
+      }
+    } catch (TException e) {
+      logger.error("cancel streaming job error", e);
+      return false;
+    } finally {
+      close();
+    }
+
+    return true;
+  }
+
+  /**
    * 补数据接口, 用于 web-server
    *
    * @param projectId

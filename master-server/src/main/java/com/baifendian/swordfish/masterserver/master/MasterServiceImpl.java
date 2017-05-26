@@ -204,6 +204,45 @@ public class MasterServiceImpl implements Iface {
   }
 
   /**
+   * @param execId
+   * @return
+   * @throws TException
+   */
+  @Override
+  public RetInfo cancelExecFlow(int execId) throws TException {
+    try {
+      return jobExecManager.cancelExecFlow(execId);
+    } catch (Exception e) {
+      logger.warn("executor report error", e);
+      return ResultHelper.createErrorResult(e.getMessage());
+    }
+  }
+
+  /**
+   * 执行某个流任务
+   * <p>
+   * execId : 执行 id
+   *
+   * @param execId
+   */
+  public RetInfo execStreamingJob(int execId) throws TException {
+    // TODO::
+    return ResultHelper.SUCCESS;
+  }
+
+  /**
+   * 取消在执行的指定流任务
+   * <p>
+   * execId : 执行 id
+   *
+   * @param execId
+   */
+  public RetInfo cancelStreamingJob(int execId) throws TException {
+    // TODO::
+    return ResultHelper.SUCCESS;
+  }
+
+  /**
    * 补数据
    *
    * @param projectId
@@ -239,21 +278,6 @@ public class MasterServiceImpl implements Iface {
     }
 
     return ResultDetailHelper.createSuccessResult(Collections.emptyList());
-  }
-
-  /**
-   * @param execId
-   * @return
-   * @throws TException
-   */
-  @Override
-  public RetInfo cancelExecFlow(int execId) throws TException {
-    try {
-      return jobExecManager.cancelExecFlow(execId);
-    } catch (Exception e) {
-      logger.warn("executor report error", e);
-      return ResultHelper.createErrorResult(e.getMessage());
-    }
   }
 
   /**

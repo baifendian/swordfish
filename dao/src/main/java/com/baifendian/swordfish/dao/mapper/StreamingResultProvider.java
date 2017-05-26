@@ -31,7 +31,9 @@ public class StreamingResultProvider {
         INSERT_INTO(TABLE_NAME);
 
         VALUES("`streaming_id`", "#{result.streamingId}");
-        VALUES("`submit_user`", "#{result.submitUser}");
+        VALUES("`parameter`", "#{result.parameter}");
+        VALUES("`user_defined_params`", "#{result.userDefinedParams}");
+        VALUES("`submit_user`", "#{result.submitUserId}");
         VALUES("`submit_time`", "#{result.submitTime}");
         VALUES("`queue`", "#{result.queue}");
         VALUES("`proxy_user`", "#{result.proxyUser}");
@@ -47,13 +49,31 @@ public class StreamingResultProvider {
   }
 
   /**
+   * 根据执行 id 查询执行结果
+   *
+   * @param parameter
+   * @return
+   */
+  public String selectById(Map<String, Object> parameter) {
+    return new SQL() {
+      {
+        SELECT("*");
+
+        FROM(TABLE_NAME);
+
+        WHERE("id=#{execId}");
+      }
+    }.toString();
+  }
+
+  /**
    * 查询某流任务最新的一条结果记录
    * for example: select * from table where id=(select max(id) from table where field=xxx limit 1);
    *
    * @param parameter
    * @return
    */
-  public String findLatestByStreamingId(Map<String, Object> parameter) {
+  public String findLatestDetailByStreamingId(Map<String, Object> parameter) {
     String subSql = new SQL() {
       {
         SELECT("max(id)");
@@ -114,7 +134,9 @@ public class StreamingResultProvider {
       {
         UPDATE(TABLE_NAME);
 
-        SET("`submit_user` = #{job.submitUser}");
+        SET("`parameter` = #{job.parameter}");
+        SET("`user_defined_params` = #{job.userDefinedParams}");
+        SET("`submit_user` = #{job.submitUserId}");
         SET("`submit_time` = #{job.submitTime}");
         SET("`queue` = #{job.queue}");
         SET("`proxy_user` = #{job.proxyUser}");

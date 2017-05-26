@@ -31,7 +31,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * 返回结果信息，返回包括执行id信息
+ * 返回结果信息，返回包括执行 id 信息
  */
 public class RetResultInfo implements org.apache.thrift.TBase<RetResultInfo, RetResultInfo._Fields>, java.io.Serializable, Cloneable {
   private static final org.apache.thrift.protocol.TStruct STRUCT_DESC = new org.apache.thrift.protocol.TStruct("RetResultInfo");
@@ -50,7 +50,7 @@ public class RetResultInfo implements org.apache.thrift.TBase<RetResultInfo, Ret
    */
   public RetInfo retInfo; // required
   /**
-   * 返回flow exec Id
+   * 返回 exec Id
    */
   public List<Integer> execIds; // required
 
@@ -61,7 +61,7 @@ public class RetResultInfo implements org.apache.thrift.TBase<RetResultInfo, Ret
      */
     RET_INFO((short)1, "retInfo"),
     /**
-     * 返回flow exec Id
+     * 返回 exec Id
      */
     EXEC_IDS((short)2, "execIds");
 
@@ -218,14 +218,14 @@ public class RetResultInfo implements org.apache.thrift.TBase<RetResultInfo, Ret
   }
 
   /**
-   * 返回flow exec Id
+   * 返回 exec Id
    */
   public List<Integer> getExecIds() {
     return this.execIds;
   }
 
   /**
-   * 返回flow exec Id
+   * 返回 exec Id
    */
   public RetResultInfo setExecIds(List<Integer> execIds) {
     this.execIds = execIds;

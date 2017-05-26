@@ -164,8 +164,8 @@ public class StreamingExecService {
    */
 
   public void killStreamingJob(User operator, int execId) {
-//
-//    // 根据执行 id 查询项目 id
+
+    // 根据执行 id 查询项目 id
 //
 //    // 查询项目, 如果不存在, 返回错误
 //    Project project = projectMapper.queryByName(projectName);
