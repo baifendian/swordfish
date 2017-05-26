@@ -391,8 +391,8 @@ public class ExecService {
     try {
       logger.info("Call master client kill workflow , project id: {}, flow id: {},host: {}, port: {}", project.getId(), executionFlow.getWorkflowName(), masterServer.getHost(), masterServer.getPort());
       if (!masterClient.cancelExecFlow(execId)) {
-        logger.error("Call master client kill workflow false , project id: {}, exec flow id: {},host: {}, port: {}", project.getId(), execId, masterServer.getHost(), masterServer.getPort());
-        throw new ServerErrorException("Call master client kill workflow false , project id: \"{0}\", exec flow id: \"{1}\",host: \"{2}\", port: \"{3}\"", project.getId(), execId, masterServer.getHost(), masterServer.getPort());
+        logger.error("Call master client kill workflow false , project id: {}, exec flow id: {}, host: {}, port: {}", project.getId(), execId, masterServer.getHost(), masterServer.getPort());
+        throw new ServerErrorException("Call master client kill workflow false , project id: \"{0}\", exec flow id: \"{1}\", host: \"{2}\", port: \"{3}\"", project.getId(), execId, masterServer.getHost(), masterServer.getPort());
       }
     } catch (Exception e) {
       logger.error("Call master client set schedule error", e);

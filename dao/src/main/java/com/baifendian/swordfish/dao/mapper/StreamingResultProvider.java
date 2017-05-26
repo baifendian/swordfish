@@ -17,8 +17,11 @@ package com.baifendian.swordfish.dao.mapper;
 
 import com.baifendian.swordfish.dao.enums.FlowStatus;
 import com.baifendian.swordfish.dao.mapper.utils.EnumFieldUtil;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.ibatis.jdbc.SQL;
 
+import java.util.List;
 import java.util.Map;
 
 public class StreamingResultProvider {
@@ -57,6 +60,7 @@ public class StreamingResultProvider {
   public String selectById(Map<String, Object> parameter) {
     return new SQL() {
       {
+        SELECT("submit_user as submit_user_id");
         SELECT("*");
 
         FROM(TABLE_NAME);
@@ -84,25 +88,9 @@ public class StreamingResultProvider {
       }
     }.toString() + " limit 1";
 
-    return new SQL() {
-      {
-        SELECT("r.submit_user as submit_user_id");
-        SELECT("s.owner as owner_id");
-        SELECT("u2.name as submit_user_name");
-        SELECT("u1.name as owner_name");
-        SELECT("p.name as project_name");
-        SELECT("r.*");
-
-        FROM(TABLE_NAME + " as r");
-
-        JOIN("streaming_job s on r.streaming_id = s.id");
-        JOIN("project p on s.project_id = p.id");
-        JOIN("user u1 on s.owner = u1.id");
-        JOIN("user u2 on r.submit_user = u2.id");
-
-        WHERE("r.id=" + "(" + subSql + ")");
-      }
-    }.toString();
+    return constructCommonDetailSQL().
+        WHERE("r.id=" + "(" + subSql + ")").
+        toString();
   }
 
   /**
@@ -114,6 +102,7 @@ public class StreamingResultProvider {
   public String findNoFinishedJob(Map<String, Object> parameter) {
     return new SQL() {
       {
+        SELECT("submit_user as submit_user_id");
         SELECT("*");
 
         FROM(TABLE_NAME);
@@ -151,5 +140,152 @@ public class StreamingResultProvider {
         WHERE("id = #{job.execId}");
       }
     }.toString();
+  }
+
+  /**
+   * 查询项目的 id
+   *
+   * @param parameter
+   * @return
+   */
+  public String queryProjectId(Map<String, Object> parameter) {
+    return new SQL() {
+      {
+        SELECT("p.*");
+
+        FROM(TABLE_NAME + " as r");
+
+        JOIN("streaming_job s on r.streaming_id = s.id");
+        JOIN("project p on s.project_id = p.id");
+
+        WHERE("r.id=#{execId}");
+      }
+    }.toString();
+  }
+
+  /**
+   * 根据执行 id 查询详细信息
+   *
+   * @param parameter
+   * @return
+   */
+  public String findDetailByExecId(Map<String, Object> parameter) {
+    return constructCommonDetailSQL().
+        WHERE("r.id=#{execId}")
+        .toString();
+  }
+
+  /**
+   * 根据项目和名称查询
+   *
+   * @param parameter
+   * @return
+   */
+  public String findDetailByProjectAndNames(Map<String, Object> parameter) {
+    List<String> nameList = (List<String>) parameter.get("nameList");
+
+    if (CollectionUtils.isEmpty(nameList)) {
+      return constructCommonDetailSQL().
+          WHERE("p.id=#{projectId}")
+          .toString();
+    }
+
+    String names = "\"" + String.join("\", \"", nameList) + "\"";
+
+    return constructCommonDetailSQL().
+        WHERE("p.id=#{projectId}").
+        WHERE("s.name in (" + names + ")")
+        .toString();
+  }
+
+  /**
+   * 根据多个条件一起组合查询
+   *
+   * @param parameter
+   * @return
+   */
+  public String findByMultiCondition(Map<String, Object> parameter) {
+    FlowStatus status = (FlowStatus) parameter.get("status");
+    String name = (String) parameter.get("name");
+
+    SQL sql = constructCommonDetailSQL().
+        WHERE("s.project_id=#{projectId}").
+        WHERE("schedule_time >= #{startDate}").
+        WHERE("schedule_time < #{endDate}");
+
+
+    if (StringUtils.isNotEmpty(name)) {
+      sql = sql.WHERE("name = #{name}");
+    }
+
+    if (status != null) {
+      sql = sql.WHERE("`status`=" + status.ordinal());
+    }
+
+    String subClause = sql.toString();
+
+    return new SQL() {
+      {
+        SELECT("*");
+
+        FROM("(" + subClause + ") e_f");
+      }
+    }.toString() + " order by schedule_time DESC limit #{start},#{limit}";
+  }
+
+  /**
+   * 查询数目
+   *
+   * @param parameter
+   * @return
+   */
+  public String findCountByMultiCondition(Map<String, Object> parameter) {
+    FlowStatus status = (FlowStatus) parameter.get("status");
+    String name = (String) parameter.get("name");
+
+    return new SQL() {
+      {
+        SELECT("count(0)");
+
+        FROM(TABLE_NAME + " r");
+
+        JOIN("streaming_job s on r.streaming_id = s.id");
+
+        WHERE("s.project_id=#{projectId}");
+        WHERE("schedule_time >= #{startDate}");
+        WHERE("schedule_time < #{endDate}");
+
+        if (StringUtils.isNotEmpty(name)) {
+          WHERE("name = #{name}");
+        }
+
+        if (status != null) {
+          WHERE("`status`=" + status.ordinal());
+        }
+      }
+    }.toString();
+  }
+
+  /**
+   * 构造一个比较通用的 sql, 主要做了详细的关联
+   *
+   * @return
+   */
+  private SQL constructCommonDetailSQL() {
+    return new SQL() {{
+      SELECT("r.submit_user as submit_user_id");
+      SELECT("s.owner as owner_id");
+      SELECT("u2.name as submit_user_name");
+      SELECT("u1.name as owner_name");
+      SELECT("p.name as project_name");
+      SELECT("r.*");
+
+      FROM(TABLE_NAME + " as r");
+
+      JOIN("streaming_job s on r.streaming_id = s.id");
+      JOIN("project p on s.project_id = p.id");
+      JOIN("user u1 on s.owner = u1.id");
+      JOIN("user u2 on r.submit_user = u2.id");
+    }};
   }
 }

@@ -15,13 +15,14 @@
  */
 package com.baifendian.swordfish.webserver.controller;
 
+import com.baifendian.swordfish.dao.enums.FlowStatus;
 import com.baifendian.swordfish.dao.model.User;
 import com.baifendian.swordfish.webserver.dto.ExecutorIdDto;
 import com.baifendian.swordfish.webserver.dto.LogResult;
 import com.baifendian.swordfish.webserver.dto.StreamingResultDto;
+import com.baifendian.swordfish.webserver.dto.StreamingResultsDto;
 import com.baifendian.swordfish.webserver.exception.BadRequestException;
 import com.baifendian.swordfish.webserver.service.StreamingExecService;
-import org.apache.hadoop.fs.FileStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -92,14 +93,14 @@ public class StreamingExecController {
    * @return
    */
   @GetMapping(value = "/streamings")
-  public List<StreamingResultDto> queryStreamingExecs(@RequestAttribute(value = "session.user") User operator,
-                                                      @RequestParam(value = "startDate") long startDate,
-                                                      @RequestParam(value = "endDate") long endDate,
-                                                      @RequestParam(value = "projectName") String projectName,
-                                                      @RequestParam(value = "name", required = false) String name,
-                                                      @RequestParam(value = "status", required = false) FileStatus status,
-                                                      @RequestParam(value = "from", required = false, defaultValue = "0") int from,
-                                                      @RequestParam(value = "size", required = false, defaultValue = "100") int size) {
+  public StreamingResultsDto queryStreamingExecs(@RequestAttribute(value = "session.user") User operator,
+                                                 @RequestParam(value = "startDate") long startDate,
+                                                 @RequestParam(value = "endDate") long endDate,
+                                                 @RequestParam(value = "projectName") String projectName,
+                                                 @RequestParam(value = "name", required = false) String name,
+                                                 @RequestParam(value = "status", required = false) FlowStatus status,
+                                                 @RequestParam(value = "from", required = false, defaultValue = "0") int from,
+                                                 @RequestParam(value = "size", required = false, defaultValue = "100") int size) {
     logger.info("Operator user {}, query streaming job exec list, start date: {}, end date: {}, project name: {}, name: {}, status: {}, from: {}, size: {}",
         operator.getName(), startDate, endDate, projectName, name, status, from, size);
 
@@ -121,17 +122,17 @@ public class StreamingExecController {
    *
    * @param operator
    * @param projectName
-   * @param name
+   * @param names
    * @return
    */
   @GetMapping(value = "/streaming/latest")
   public List<StreamingResultDto> queryLatest(@RequestAttribute(value = "session.user") User operator,
                                               @RequestParam(value = "projectName") String projectName,
-                                              @RequestParam(value = "name") String name) {
-    logger.info("Operator user {}, query streaming latest exec information, project name: {}, name: {}",
-        operator.getName(), projectName, name);
+                                              @RequestParam(value = "names") String names) {
+    logger.info("Operator user {}, query streaming latest exec information, project name: {}, names: {}",
+        operator.getName(), projectName, names);
 
-    return streamingExecService.queryLatest(operator, projectName, name);
+    return streamingExecService.queryLatest(operator, projectName, names);
   }
 
   /**
@@ -161,7 +162,7 @@ public class StreamingExecController {
    */
   @GetMapping(value = "/streaming/{execId}/logs")
   public LogResult queryLogs(@RequestAttribute(value = "session.user") User operator,
-                             @PathVariable(value = "execId") String execId,
+                             @PathVariable(value = "execId") int execId,
                              @RequestParam(value = "from", required = false, defaultValue = "0") int from,
                              @RequestParam(value = "size", required = false, defaultValue = "100") int size) {
     logger.info("Operator user {}, query streaming job log, exec id: {}, from: {}, size: {}",

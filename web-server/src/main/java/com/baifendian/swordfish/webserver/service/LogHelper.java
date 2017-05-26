@@ -39,6 +39,11 @@ public class LogHelper {
   private EsSearch search = EsSearch.getInstance();
 
   public LogResult getLog(Integer from, Integer size, String jobId) {
+    // 日志 id 为空, 返回空的日志信息
+    if (StringUtils.isEmpty(jobId)) {
+      return LogResult.EMPTY_LOG_RESULT;
+    }
+
     if (from == null) {
       from = 0;
     }
