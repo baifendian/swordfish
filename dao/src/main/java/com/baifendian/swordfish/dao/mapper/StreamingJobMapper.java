@@ -65,7 +65,7 @@ public interface StreamingJobMapper {
    * @return
    */
   @UpdateProvider(type = StreamingJobProvider.class, method = "updateStreamingJob")
-  StreamingJob updateStreamingJob(@Param("job") StreamingJob job);
+  int updateStreamingJob(@Param("job") StreamingJob job);
 
   /**
    * 删除一个流任务 <p>
