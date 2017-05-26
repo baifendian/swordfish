@@ -72,7 +72,6 @@ public class StreamingService {
    * @param type
    * @param parameter
    * @param userDefParams
-   * @param extras
    * @return
    */
   public StreamingJob createStreamingJob(User operator,
@@ -81,13 +80,11 @@ public class StreamingService {
                                          String desc,
                                          String type,
                                          String parameter,
-                                         String userDefParams,
-                                         String extras) {
+                                         String userDefParams) {
 
     // 校验变量
     verifyStreamingName(name);
     verifyDesc(desc);
-    verifyExtras(extras);
 
     // 必须是流任务类型
     if (!JobType.isLongJob(type)) {
@@ -139,7 +136,6 @@ public class StreamingService {
       streamingJob.setType(type);
       streamingJob.setParameter(parameter);
       streamingJob.setUserDefinedParams(userDefParams);
-      streamingJob.setExtras(extras);
     } catch (Exception e) {
       logger.error("Str set value error", e);
       throw new BadRequestException("Project flow set value error", e);
@@ -178,15 +174,14 @@ public class StreamingService {
                                       String desc,
                                       String type,
                                       String parameter,
-                                      String userDefParams,
-                                      String extras) {
+                                      String userDefParams) {
     StreamingJob streamingJob = streamingJobMapper.findByProjectNameAndName(projectName, name);
 
     if (streamingJob == null) {
-      return createStreamingJob(operator, projectName, name, desc, type, parameter, userDefParams, extras);
+      return createStreamingJob(operator, projectName, name, desc, type, parameter, userDefParams);
     }
 
-    return patchStreamingJob(operator, projectName, name, desc, parameter, userDefParams, extras);
+    return patchStreamingJob(operator, projectName, name, desc, parameter, userDefParams);
   }
 
   /**
@@ -198,7 +193,6 @@ public class StreamingService {
    * @param desc
    * @param parameter
    * @param userDefParams
-   * @param extras
    * @return
    */
   public StreamingJob patchStreamingJob(User operator,
@@ -206,11 +200,9 @@ public class StreamingService {
                                         String name,
                                         String desc,
                                         String parameter,
-                                        String userDefParams,
-                                        String extras) {
+                                        String userDefParams) {
 
     verifyDesc(desc);
-    verifyExtras(extras);
 
     // 查询项目, 如果不存在, 返回错误
     Project project = projectMapper.queryByName(projectName);
@@ -256,10 +248,6 @@ public class StreamingService {
       }
 
       streamingJob.setUserDefinedParams(userDefParams);
-    }
-
-    if (StringUtils.isNotEmpty(extras)) {
-      streamingJob.setExtras(extras);
     }
 
     if (StringUtils.isNotEmpty(desc)) {

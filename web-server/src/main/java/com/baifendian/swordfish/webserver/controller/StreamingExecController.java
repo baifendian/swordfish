@@ -113,7 +113,6 @@ public class StreamingExecController {
       throw new BadRequestException("Argument is not valid, size must be between (0, 1000]");
     }
 
-
     return streamingExecService.queryProjectStreamingJobAndResult(operator, projectName, name, new Date(startDate), new Date(endDate), status, from, size);
   }
 
@@ -131,6 +130,15 @@ public class StreamingExecController {
         operator.getName(), execId);
 
     return streamingExecService.queryStreamingJobAndResult(operator, execId);
+  }
+
+  @GetMapping(value = "/streaming/{execId}")
+  public List<StreamingResultDto> queryDetail(@RequestAttribute(value = "session.user") User operator,
+                                              @PathVariable int execId) {
+    logger.info("Operator user {}, query streaming result detail, exec id: {}",
+        operator.getName(), execId);
+
+    return streamingExecService.queryDetail(operator, execId);
   }
 
   /**
@@ -160,6 +168,6 @@ public class StreamingExecController {
       throw new BadRequestException("Argument is not valid, size must be between (0, 1000]");
     }
 
-    return streamingExecService.getStreamingJobLog(operator, execId, from, size);
+    return streamingExecService.queryLogs(operator, execId, from, size);
   }
 }

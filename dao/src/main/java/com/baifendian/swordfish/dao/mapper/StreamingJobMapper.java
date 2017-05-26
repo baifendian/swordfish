@@ -52,8 +52,7 @@ public interface StreamingJobMapper {
       @Result(property = "owner", column = "owner_name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
       @Result(property = "type", column = "type", javaType = String.class, jdbcType = JdbcType.VARCHAR),
       @Result(property = "parameter", column = "parameter", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-      @Result(property = "userDefinedParams", column = "user_defined_params", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-      @Result(property = "extras", column = "extras", javaType = String.class, jdbcType = JdbcType.VARCHAR)
+      @Result(property = "userDefinedParams", column = "user_defined_params", javaType = String.class, jdbcType = JdbcType.VARCHAR)
   })
   @SelectProvider(type = StreamingJobProvider.class, method = "findByProjectNameAndName")
   StreamingJob findByProjectNameAndName(@Param("projectName") String projectName, @Param("name") String name);
@@ -102,8 +101,7 @@ public interface StreamingJobMapper {
       @Result(property = "owner", column = "owner_name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
       @Result(property = "type", column = "type", javaType = String.class, jdbcType = JdbcType.VARCHAR),
       @Result(property = "parameter", column = "parameter", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-      @Result(property = "userDefinedParams", column = "user_defined_params", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-      @Result(property = "extras", column = "extras", javaType = String.class, jdbcType = JdbcType.VARCHAR)
+      @Result(property = "userDefinedParams", column = "user_defined_params", javaType = String.class, jdbcType = JdbcType.VARCHAR)
   })
   @SelectProvider(type = StreamingJobProvider.class, method = "queryProjectStreamingJobs")
   List<StreamingJob> queryProjectStreamingJobs(@Param("projectId") int projectId);

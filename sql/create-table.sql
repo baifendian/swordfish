@@ -260,7 +260,6 @@ CREATE TABLE `streaming_job` (
   `type` varchar(64) NOT NULL COMMENT 'job type',
   `parameter` text NOT NULL COMMENT 'job parameter information',
   `user_defined_params` text DEFAULT NULL COMMENT 'user defined parameter of the streaming job',
-  `extras` text DEFAULT NULL COMMENT 'extends of the streaming job',
   PRIMARY KEY (`id`),
   UNIQUE KEY `project_streaming_name` (`project_id`, `name`),
   FOREIGN KEY (`project_id`) REFERENCES `project`(`id`),
@@ -272,6 +271,8 @@ DROP TABLE If Exists `streaming_result`;
 CREATE TABLE `streaming_result` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'exec id',
   `streaming_id` int(11) NOT NULL COMMENT 'streaming job id, also a exec id',
+  `parameter` text NOT NULL COMMENT 'parameter information of this exec',
+  `user_defined_params` text DEFAULT NULL COMMENT 'user defined parameter of this exec',
   `submit_user` int(11) NOT NULL COMMENT 'submit user',
   `submit_time` datetime NOT NULL COMMENT 'submit time',
   `queue` varchar(64) NOT NULL COMMENT 'queue of this exec',

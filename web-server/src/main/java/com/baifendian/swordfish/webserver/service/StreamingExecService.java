@@ -81,10 +81,10 @@ public class StreamingExecService {
       throw new NotFoundException("Not found project \"{0}\"", projectName);
     }
 
-    // 应该有项目写权限
-    if (!projectService.hasWritePerm(operator.getId(), project)) {
+    // 应该有项目执行权限
+    if (!projectService.hasExecPerm(operator.getId(), project)) {
       logger.error("User {} has no right permission for the project {}", operator.getName(), project.getName());
-      throw new PermissionException("User \"{0}\" is not has project \"{1}\" write permission", operator.getName(), project.getName());
+      throw new PermissionException("User \"{0}\" is not has project \"{1}\" exec permission", operator.getName(), project.getName());
     }
 
     // 对于执行流任务的情况, 必须是预先存在的
@@ -130,7 +130,7 @@ public class StreamingExecService {
     }
 
     // 连接
-    MasterClient masterClient = new MasterClient(masterServer.getHost(), masterServer.getPort());
+//    MasterClient masterClient = new MasterClient(masterServer.getHost(), masterServer.getPort());
 
 //    logger.info("Call master client, exec id: {}, host: {}, port: {}", streamingResult.getId(), masterServer.getHost(), masterServer.getPort());
 
@@ -150,7 +150,7 @@ public class StreamingExecService {
 //    }
 //
 //    return new ExecutorIdDto(adhoc.getId());
-    return null;
+    return new ExecutorIdDto(streamingResult.getExecId());
   }
 
   /**
@@ -199,6 +199,17 @@ public class StreamingExecService {
   }
 
   /**
+   * 查询任务运行的详情
+   *
+   * @param operator
+   * @param execId
+   * @return
+   */
+  public List<StreamingResultDto> queryDetail(User operator, int execId) {
+    return null;
+  }
+
+  /**
    * 查询日志信息
    *
    * @param operator
@@ -207,7 +218,8 @@ public class StreamingExecService {
    * @param size
    * @return
    */
-  public LogResult getStreamingJobLog(User operator, String execId, int from, int size) {
+
+  public LogResult queryLogs(User operator, String execId, int from, int size) {
 //    StreamingJob streamingJob = streamingJobMapper.findByProjectNameAndName(projectName, name);
 
 //    ExecutionNode executionNode = streaming_result.selectExecNodeByJobId(jobId);

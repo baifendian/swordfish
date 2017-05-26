@@ -43,7 +43,6 @@ public class StreamingJobProvider {
         VALUES("`type`", "#{job.type}");
         VALUES("`parameter`", "#{job.parameter}");
         VALUES("`user_defined_params`", "#{job.userDefinedParams}");
-        VALUES("`extras`", "#{job.extras}");
       }
     }.toString();
   }
@@ -89,7 +88,6 @@ public class StreamingJobProvider {
         SET("`owner`=#{job.ownerId}");
         SET("`parameter`=#{job.parameter}");
         SET("`user_defined_params`=#{job.userDefinedParams}");
-        SET("`extras`=#{job.extras}");
 
         WHERE("id = #{job.id}");
       }

@@ -47,10 +47,6 @@ public class StreamingJobDto {
 
   private String owner;
 
-  @JsonRawValue
-  @JsonDeserialize(using = JsonObjectDeserializer.class)
-  private String extras;
-
   public StreamingJobDto() {
   }
 
@@ -61,7 +57,6 @@ public class StreamingJobDto {
     this.type = streamingJob.getType();
     this.parameter = streamingJob.getParameter();
     this.userDefParams = streamingJob.getUserDefinedParams();
-    this.extras = streamingJob.getExtras();
     this.createTime = streamingJob.getCreateTime();
     this.modifyTime = streamingJob.getModifyTime();
     this.owner = streamingJob.getOwner();
@@ -137,13 +132,5 @@ public class StreamingJobDto {
 
   public void setOwner(String owner) {
     this.owner = owner;
-  }
-
-  public String getExtras() {
-    return extras;
-  }
-
-  public void setExtras(String extras) {
-    this.extras = extras;
   }
 }

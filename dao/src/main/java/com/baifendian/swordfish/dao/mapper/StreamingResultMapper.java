@@ -76,6 +76,8 @@ public interface StreamingResultMapper {
    */
   @Results(value = {@Result(property = "execId", column = "id", id = true, javaType = int.class, jdbcType = JdbcType.INTEGER),
       @Result(property = "streamingId", column = "streaming_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
+      @Result(property = "parameter", column = "parameter", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+      @Result(property = "userDefinedParams", column = "user_defined_params", javaType = String.class, jdbcType = JdbcType.VARCHAR),
       @Result(property = "name", column = "name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
       @Result(property = "desc", column = "desc", javaType = String.class, jdbcType = JdbcType.VARCHAR),
       @Result(property = "projectId", column = "project_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
@@ -86,7 +88,6 @@ public interface StreamingResultMapper {
       @Result(property = "queue", column = "queue", javaType = String.class, jdbcType = JdbcType.VARCHAR),
       @Result(property = "ownerId", column = "owner_id", javaType = Timestamp.class, jdbcType = JdbcType.DATE),
       @Result(property = "owner", column = "owner_name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-      @Result(property = "extras", column = "extras", javaType = String.class, jdbcType = JdbcType.VARCHAR),
       @Result(property = "type", column = "type", javaType = String.class, jdbcType = JdbcType.VARCHAR),
       @Result(property = "submitTime", column = "submit_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE),
       @Result(property = "startTime", column = "start_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE),

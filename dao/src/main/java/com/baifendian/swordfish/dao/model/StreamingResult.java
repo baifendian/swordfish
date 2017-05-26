@@ -42,6 +42,22 @@ public class StreamingResult {
   private int streamingId;
 
   /**
+   * 结点参数, 注意这个是当次执行的情况
+   * 数据库映射字段/DTO需要字段
+   */
+  @JsonDeserialize(using = JsonObjectDeserializer.class)
+  @JsonSerialize(using = JsonObjectSerializer.class)
+  private String parameter;
+
+  /**
+   * 用户定义参数, 注意这个是当次执行的情况
+   * 数据库映射字段
+   */
+  @JsonDeserialize(using = JsonObjectDeserializer.class)
+  @JsonSerialize(using = JsonObjectSerializer.class)
+  private String userDefinedParams;
+
+  /**
    * 提交人 id
    */
   private int submitUserId;
@@ -167,30 +183,6 @@ public class StreamingResult {
    */
   private String type;
 
-  /**
-   * 结点参数
-   * 数据库映射字段/DTO需要字段
-   */
-  @JsonDeserialize(using = JsonObjectDeserializer.class)
-  @JsonSerialize(using = JsonObjectSerializer.class)
-  private String parameter;
-
-  /**
-   * 用户定义参数
-   * 数据库映射字段
-   */
-  @JsonDeserialize(using = JsonObjectDeserializer.class)
-  @JsonSerialize(using = JsonObjectSerializer.class)
-  private String userDefinedParams;
-
-  /**
-   * 额外字段
-   * 数据库映射字段/DTO需要字段
-   */
-  @JsonDeserialize(using = JsonObjectDeserializer.class)
-  @JsonSerialize(using = JsonObjectSerializer.class)
-  private String extras;
-
   public int getExecId() {
     return execId;
   }
@@ -205,6 +197,22 @@ public class StreamingResult {
 
   public void setStreamingId(int streamingId) {
     this.streamingId = streamingId;
+  }
+
+  public String getParameter() {
+    return parameter;
+  }
+
+  public void setParameter(String parameter) {
+    this.parameter = parameter;
+  }
+
+  public String getUserDefinedParams() {
+    return userDefinedParams;
+  }
+
+  public void setUserDefinedParams(String userDefinedParams) {
+    this.userDefinedParams = userDefinedParams;
   }
 
   public int getSubmitUserId() {
@@ -358,31 +366,6 @@ public class StreamingResult {
   public void setType(String type) {
     this.type = type;
   }
-
-  public String getParameter() {
-    return parameter;
-  }
-
-  public void setParameter(String parameter) {
-    this.parameter = parameter;
-  }
-
-  public String getUserDefinedParams() {
-    return userDefinedParams;
-  }
-
-  public void setUserDefinedParams(String userDefinedParams) {
-    this.userDefinedParams = userDefinedParams;
-  }
-
-  public String getExtras() {
-    return extras;
-  }
-
-  public void setExtras(String extras) {
-    this.extras = extras;
-  }
-
 
   public List<String> getAppLinkList() {
     return appLinkList;

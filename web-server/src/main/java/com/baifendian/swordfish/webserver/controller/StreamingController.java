@@ -45,7 +45,6 @@ public class StreamingController {
    * @param type
    * @param parameter
    * @param userDefParams
-   * @param extras
    * @return
    */
   @PostMapping(value = "/streaming/{name}")
@@ -56,12 +55,11 @@ public class StreamingController {
                                             @RequestParam(value = "desc", required = false) String desc,
                                             @RequestParam(value = "type") String type,
                                             @RequestParam(value = "parameter") String parameter,
-                                            @RequestParam(value = "userDefParams", required = false) String userDefParams,
-                                            @RequestParam(value = "extras", required = false) String extras) {
-    logger.info("Operator user {}, create streaming job, project name: {}, name: {}, desc: {}, type: {}, parameter: {}, user define parameters: {}, extras: {}",
-        operator.getName(), projectName, name, desc, type, parameter, userDefParams, extras);
+                                            @RequestParam(value = "userDefParams", required = false) String userDefParams) {
+    logger.info("Operator user {}, create streaming job, project name: {}, name: {}, desc: {}, type: {}, parameter: {}, user define parameters: {}",
+        operator.getName(), projectName, name, desc, type, parameter, userDefParams);
 
-    return new StreamingJobDto(streamingService.createStreamingJob(operator, projectName, name, desc, type, parameter, userDefParams, extras));
+    return new StreamingJobDto(streamingService.createStreamingJob(operator, projectName, name, desc, type, parameter, userDefParams));
   }
 
   /**
@@ -74,7 +72,6 @@ public class StreamingController {
    * @param type
    * @param parameter
    * @param userDefParams
-   * @param extras
    * @return
    */
   @PutMapping(value = "/streaming/{name}")
@@ -84,12 +81,11 @@ public class StreamingController {
                                          @RequestParam(value = "desc", required = false) String desc,
                                          @RequestParam(value = "type") String type,
                                          @RequestParam(value = "parameter") String parameter,
-                                         @RequestParam(value = "userDefParams", required = false) String userDefParams,
-                                         @RequestParam(value = "extras", required = false) String extras) {
-    logger.info("Operator user {}, modify and create streaming job, project name: {}, name: {}, desc: {}, type: {}, parameter: {}, user define parameters: {}, extras: {}",
-        operator.getName(), projectName, name, desc, type, parameter, userDefParams, extras);
+                                         @RequestParam(value = "userDefParams", required = false) String userDefParams) {
+    logger.info("Operator user {}, modify and create streaming job, project name: {}, name: {}, desc: {}, type: {}, parameter: {}, user define parameters: {}",
+        operator.getName(), projectName, name, desc, type, parameter, userDefParams);
 
-    return new StreamingJobDto(streamingService.putStreamingJob(operator, projectName, name, desc, type, parameter, userDefParams, extras));
+    return new StreamingJobDto(streamingService.putStreamingJob(operator, projectName, name, desc, type, parameter, userDefParams));
   }
 
   /**
@@ -101,7 +97,6 @@ public class StreamingController {
    * @param desc
    * @param parameter
    * @param userDefParams
-   * @param extras
    * @return
    */
   @PatchMapping(value = "/streaming/{name}")
@@ -110,12 +105,11 @@ public class StreamingController {
                                            @PathVariable String name,
                                            @RequestParam(value = "desc", required = false) String desc,
                                            @RequestParam(value = "parameter") String parameter,
-                                           @RequestParam(value = "userDefParams", required = false) String userDefParams,
-                                           @RequestParam(value = "extras", required = false) String extras) {
-    logger.info("Operator user {}, modify streaming job, project name: {}, name: {}, desc: {}, parameter: {}, user define parameters: {}, extras: {}",
-        operator.getName(), projectName, name, desc, parameter, userDefParams, extras);
+                                           @RequestParam(value = "userDefParams", required = false) String userDefParams) {
+    logger.info("Operator user {}, modify streaming job, project name: {}, name: {}, desc: {}, parameter: {}, user define parameters: {}",
+        operator.getName(), projectName, name, desc, parameter, userDefParams);
 
-    return new StreamingJobDto(streamingService.patchStreamingJob(operator, projectName, name, desc, parameter, userDefParams, extras));
+    return new StreamingJobDto(streamingService.patchStreamingJob(operator, projectName, name, desc, parameter, userDefParams));
   }
 
   /**

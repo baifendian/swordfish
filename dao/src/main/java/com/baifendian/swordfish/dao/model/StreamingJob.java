@@ -102,14 +102,6 @@ public class StreamingJob {
   @JsonSerialize(using = JsonObjectSerializer.class)
   private String userDefinedParams;
 
-  /**
-   * 额外字段
-   * 数据库映射字段/DTO需要字段
-   */
-  @JsonDeserialize(using = JsonObjectDeserializer.class)
-  @JsonSerialize(using = JsonObjectSerializer.class)
-  private String extras;
-
   public int getId() {
     return id;
   }
@@ -204,13 +196,5 @@ public class StreamingJob {
 
   public void setUserDefinedParams(String userDefinedParams) {
     this.userDefinedParams = userDefinedParams;
-  }
-
-  public String getExtras() {
-    return extras;
-  }
-
-  public void setExtras(String extras) {
-    this.extras = extras;
   }
 }
