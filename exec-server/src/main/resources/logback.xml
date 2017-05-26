@@ -76,4 +76,4 @@
     <logger name="hammock-cafe" level="ALL"/>
     <logger name="user" level="ALL"/>
 
-</>
+</configuration>
