@@ -1,5 +1,5 @@
 <!-- Logback configuration. See http://logback.qos.ch/manual/index.html -->
-<configuration scan="true" scanPeriod="10 seconds">
+<configuration scan="true" scanPeriod="120 seconds">
 
     <conversionRule conversionWord="nanos"
                     converterClass="com.baifendian.swordfish.common.utils.NanoSampleConverter"/>
@@ -14,14 +14,13 @@
             <charset>UTF-8</charset> <!-- 此处设置字符集 -->
         </encoder>
 
-        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <!-- rollover daily 配置日志所生成的目录以及生成文件名的规则 -->
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <!-- rollover daily -->
             <fileNamePattern>logs/web-server-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
-            <timeBasedFileNamingAndTriggeringPolicy
-                    class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
-                <!-- or whenever the file size reaches 64 MB -->
-                <maxFileSize>64 MB</maxFileSize>
-            </timeBasedFileNamingAndTriggeringPolicy>
+            <!-- each file should be at most 100MB, keep 60 days worth of history, but at most 20GB -->
+            <maxFileSize>128MB</maxFileSize>
+            <maxHistory>14</maxHistory>
+            <totalSizeCap>6GB</totalSizeCap>
         </rollingPolicy>
 
         <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
@@ -50,7 +49,7 @@
          By default, only log at level INFO and above. -->
     <root level="TRACE">
         <appender-ref ref="FILE"/>
-        <appender-ref ref="STDOUT"/>
+        <!--<appender-ref ref="STDOUT"/>-->
     </root>
 
     <!-- For loggers in the these namespaces, log at all levels. -->
