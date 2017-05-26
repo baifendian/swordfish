@@ -92,14 +92,14 @@ public class StreamingExecController {
    * @return
    */
   @GetMapping(value = "/streamings")
-  public List<StreamingResultDto> queryProjectStreamingJobAndResult(@RequestAttribute(value = "session.user") User operator,
-                                                                    @RequestParam(value = "startDate") long startDate,
-                                                                    @RequestParam(value = "endDate") long endDate,
-                                                                    @RequestParam(value = "projectName") String projectName,
-                                                                    @RequestParam(value = "name", required = false) String name,
-                                                                    @RequestParam(value = "status", required = false) FileStatus status,
-                                                                    @RequestParam(value = "from", required = false, defaultValue = "0") int from,
-                                                                    @RequestParam(value = "size", required = false, defaultValue = "100") int size) {
+  public List<StreamingResultDto> queryStreamingExecs(@RequestAttribute(value = "session.user") User operator,
+                                                      @RequestParam(value = "startDate") long startDate,
+                                                      @RequestParam(value = "endDate") long endDate,
+                                                      @RequestParam(value = "projectName") String projectName,
+                                                      @RequestParam(value = "name", required = false) String name,
+                                                      @RequestParam(value = "status", required = false) FileStatus status,
+                                                      @RequestParam(value = "from", required = false, defaultValue = "0") int from,
+                                                      @RequestParam(value = "size", required = false, defaultValue = "100") int size) {
     logger.info("Operator user {}, query streaming job exec list, start date: {}, end date: {}, project name: {}, name: {}, status: {}, from: {}, size: {}",
         operator.getName(), startDate, endDate, projectName, name, status, from, size);
 
@@ -113,25 +113,34 @@ public class StreamingExecController {
       throw new BadRequestException("Argument is not valid, size must be between (0, 1000]");
     }
 
-    return streamingExecService.queryProjectStreamingJobAndResult(operator, projectName, name, new Date(startDate), new Date(endDate), status, from, size);
+    return streamingExecService.queryStreamingExecs(operator, projectName, name, new Date(startDate), new Date(endDate), status, from, size);
   }
 
   /**
-   * 查询具体某个流任务的详情
+   * 查询流任务最新运行详情
+   *
+   * @param operator
+   * @param projectName
+   * @param name
+   * @return
+   */
+  @GetMapping(value = "/streaming/latest")
+  public List<StreamingResultDto> queryLatest(@RequestAttribute(value = "session.user") User operator,
+                                              @RequestParam(value = "projectName") String projectName,
+                                              @RequestParam(value = "name") String name) {
+    logger.info("Operator user {}, query streaming latest exec information, project name: {}, name: {}",
+        operator.getName(), projectName, name);
+
+    return streamingExecService.queryLatest(operator, projectName, name);
+  }
+
+  /**
+   * 查询流任务运行的详情
    *
    * @param operator
    * @param execId
    * @return
    */
-  @GetMapping(value = "/streaming/{execId}")
-  public List<StreamingResultDto> queryStreamingJobAndResult(@RequestAttribute(value = "session.user") User operator,
-                                                             @PathVariable int execId) {
-    logger.info("Operator user {}, query streaming job and result, exec id: {}",
-        operator.getName(), execId);
-
-    return streamingExecService.queryStreamingJobAndResult(operator, execId);
-  }
-
   @GetMapping(value = "/streaming/{execId}")
   public List<StreamingResultDto> queryDetail(@RequestAttribute(value = "session.user") User operator,
                                               @PathVariable int execId) {

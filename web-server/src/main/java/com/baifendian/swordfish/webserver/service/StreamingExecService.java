@@ -21,6 +21,7 @@ import com.baifendian.swordfish.dao.mapper.ProjectMapper;
 import com.baifendian.swordfish.dao.mapper.StreamingJobMapper;
 import com.baifendian.swordfish.dao.mapper.StreamingResultMapper;
 import com.baifendian.swordfish.dao.model.*;
+import com.baifendian.swordfish.rpc.RetInfo;
 import com.baifendian.swordfish.rpc.client.MasterClient;
 import com.baifendian.swordfish.webserver.dto.ExecutorIdDto;
 import com.baifendian.swordfish.webserver.dto.LogResult;
@@ -96,7 +97,7 @@ public class StreamingExecService {
     }
 
     // 如果最新一条信息是显示没有执行, 插入或者更新一条记录
-    StreamingResult streamingResult = streamingResultMapper.findLatestByStreamingId(streamingJob.getId());
+    StreamingResult streamingResult = streamingResultMapper.findLatestDetailByStreamingId(streamingJob.getId());
     Date now = new Date();
 
     if (streamingResult != null && streamingResult.getStatus().typeIsNotFinished()) {
@@ -114,6 +115,8 @@ public class StreamingExecService {
     streamingResult = new StreamingResult();
 
     streamingResult.setStreamingId(streamingJob.getId());
+    streamingResult.setParameter(streamingJob.getParameter());
+    streamingResult.setUserDefinedParams(streamingJob.getUserDefinedParams());
     streamingResult.setSubmitUserId(operator.getId());
     streamingResult.setSubmitTime(now);
     streamingResult.setQueue(queue);
@@ -129,27 +132,27 @@ public class StreamingExecService {
       throw new ServerErrorException("Streaming create failed.");
     }
 
-    // 连接
-//    MasterClient masterClient = new MasterClient(masterServer.getHost(), masterServer.getPort());
+    int execId = streamingResult.getExecId();
 
-//    logger.info("Call master client, exec id: {}, host: {}, port: {}", streamingResult.getId(), masterServer.getHost(), masterServer.getPort());
+    MasterClient masterClient = new MasterClient(masterServer.getHost(), masterServer.getPort());
 
-//    RetInfo retInfo = masterClient.execAdHoc(adhoc.getId());
-//
-//    if (retInfo == null || retInfo.getStatus() != 0) {
-//      // 查询状态, 如果还是 INIT, 则需要更新为 FAILED
-//      AdHoc adHoc = adHocMapper.selectById(adhoc.getId());
-//
-//      if (adHoc != null && adHoc.getStatus() == FlowStatus.INIT) {
-//        adHoc.setStatus(FlowStatus.FAILED);
-//        adHocMapper.updateStatus(adHoc);
-//      }
-//
-//      logger.error("call master server error");
-//      throw new ServerErrorException("master server return error");
-//    }
-//
-//    return new ExecutorIdDto(adhoc.getId());
+    logger.info("Call master client, exec id: {}, host: {}, port: {}", execId, masterServer.getHost(), masterServer.getPort());
+
+    RetInfo retInfo = masterClient.execStreamingJob(execId);
+
+    if (retInfo == null || retInfo.getStatus() != 0) {
+      // 查询状态, 如果还是 INIT, 则需要更新为 FAILED
+      StreamingResult streamingResult1 = streamingResultMapper.selectById(execId);
+
+      if (streamingResult1 != null && streamingResult1.getStatus() == FlowStatus.INIT) {
+        streamingResult1.setStatus(FlowStatus.FAILED);
+        streamingResultMapper.updateResult(streamingResult1);
+      }
+
+      logger.error("call master server error");
+      throw new ServerErrorException("master server return error");
+    }
+
     return new ExecutorIdDto(streamingResult.getExecId());
   }
 
@@ -159,8 +162,24 @@ public class StreamingExecService {
    * @param operator
    * @param execId
    */
-  public void killStreamingJob(User operator, int execId) {
 
+  public void killStreamingJob(User operator, int execId) {
+//
+//    // 根据执行 id 查询项目 id
+//
+//    // 查询项目, 如果不存在, 返回错误
+//    Project project = projectMapper.queryByName(projectName);
+//
+//    if (project == null) {
+//      logger.error("Project does not exist: {}", projectName);
+//      throw new NotFoundException("Not found project \"{0}\"", projectName);
+//    }
+//
+//    // 应该有项目执行权限
+//    if (!projectService.hasExecPerm(operator.getId(), project)) {
+//      logger.error("User {} has no right permission for the project {}", operator.getName(), project.getName());
+//      throw new PermissionException("User \"{0}\" is not has project \"{1}\" exec permission", operator.getName(), project.getName());
+//    }
   }
 
   /**
@@ -176,14 +195,14 @@ public class StreamingExecService {
    * @param size
    * @return
    */
-  public List<StreamingResultDto> queryProjectStreamingJobAndResult(User operator,
-                                                                    String projectName,
-                                                                    String name,
-                                                                    Date startDate,
-                                                                    Date endDate,
-                                                                    FileStatus status,
-                                                                    int from,
-                                                                    int size) {
+  public List<StreamingResultDto> queryStreamingExecs(User operator,
+                                                      String projectName,
+                                                      String name,
+                                                      Date startDate,
+                                                      Date endDate,
+                                                      FileStatus status,
+                                                      int from,
+                                                      int size) {
     return null;
   }
 
@@ -195,6 +214,18 @@ public class StreamingExecService {
    * @return
    */
   public List<StreamingResultDto> queryStreamingJobAndResult(User operator, int execId) {
+    return null;
+  }
+
+  /**
+   * 查询流任务最新的运行详情
+   *
+   * @param operator
+   * @param projectName
+   * @param name
+   * @return
+   */
+  public List<StreamingResultDto> queryLatest(User operator, String projectName, String name) {
     return null;
   }
 

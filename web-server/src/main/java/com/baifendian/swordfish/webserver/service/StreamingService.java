@@ -16,28 +16,20 @@
 package com.baifendian.swordfish.webserver.service;
 
 import com.baifendian.swordfish.common.job.struct.node.JobType;
-import com.baifendian.swordfish.dao.enums.FlowStatus;
-import com.baifendian.swordfish.dao.mapper.MasterServerMapper;
 import com.baifendian.swordfish.dao.mapper.ProjectMapper;
 import com.baifendian.swordfish.dao.mapper.StreamingJobMapper;
 import com.baifendian.swordfish.dao.mapper.StreamingResultMapper;
 import com.baifendian.swordfish.dao.model.*;
 import com.baifendian.swordfish.dao.model.flow.Property;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
-import com.baifendian.swordfish.rpc.client.MasterClient;
-import com.baifendian.swordfish.webserver.dto.ExecutorIdDto;
-import com.baifendian.swordfish.webserver.dto.LogResult;
 import com.baifendian.swordfish.webserver.dto.StreamingJobDto;
-import com.baifendian.swordfish.webserver.dto.StreamingResultDto;
 import com.baifendian.swordfish.webserver.exception.*;
 import org.apache.commons.lang.StringUtils;
-import org.apache.hadoop.fs.FileStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -300,7 +292,7 @@ public class StreamingService {
     }
 
     // 必须是停止运行的才能删除
-    StreamingResult streamingResult = streamingResultMapper.findLatestByStreamingId(streamingJob.getId());
+    StreamingResult streamingResult = streamingResultMapper.findLatestDetailByStreamingId(streamingJob.getId());
 
     if (streamingResult != null && streamingResult.getStatus().typeIsNotFinished()) {
       logger.error("Streaming job is not finished yet: {}", streamingJob.getId());
