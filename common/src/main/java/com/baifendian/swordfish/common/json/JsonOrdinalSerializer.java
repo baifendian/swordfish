@@ -28,6 +28,6 @@ public class JsonOrdinalSerializer<E extends Enum> extends JsonSerializer<E> {
 
   @Override
   public void serialize(E e, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
-    jsonGenerator.writeString(String.valueOf(e.ordinal()));
+    jsonGenerator.writeNumber(e.ordinal());
   }
 }

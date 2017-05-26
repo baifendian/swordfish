@@ -35,7 +35,7 @@ public interface StreamingResultMapper {
    * @return 插入记录数
    */
   @InsertProvider(type = StreamingResultProvider.class, method = "insert")
-  @SelectKey(statement = "SELECT LAST_INSERT_ID() AS id", keyProperty = "result.id", resultType = int.class, before = false)
+  @SelectKey(statement = "SELECT LAST_INSERT_ID() AS id", keyProperty = "result.execId", resultType = int.class, before = false)
   int insert(@Param("result") StreamingResult result);
 
   /**
@@ -44,7 +44,7 @@ public interface StreamingResultMapper {
    * @param execId
    * @return
    */
-  @Results(value = {@Result(property = "id", column = "id", id = true, javaType = int.class, jdbcType = JdbcType.INTEGER),
+  @Results(value = {@Result(property = "execId", column = "id", id = true, javaType = int.class, jdbcType = JdbcType.INTEGER),
       @Result(property = "streamingId", column = "streaming_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
       @Result(property = "parameter", column = "parameter", javaType = String.class, jdbcType = JdbcType.VARCHAR),
       @Result(property = "userDefinedParams", column = "user_defined_params", javaType = String.class, jdbcType = JdbcType.VARCHAR),
@@ -81,7 +81,7 @@ public interface StreamingResultMapper {
       @Result(property = "modifyTime", column = "modify_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE),
       @Result(property = "proxyUser", column = "proxy_user", javaType = String.class, jdbcType = JdbcType.VARCHAR),
       @Result(property = "queue", column = "queue", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-      @Result(property = "ownerId", column = "owner_id", javaType = Timestamp.class, jdbcType = JdbcType.DATE),
+      @Result(property = "ownerId", column = "owner_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
       @Result(property = "owner", column = "owner_name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
       @Result(property = "type", column = "type", javaType = String.class, jdbcType = JdbcType.VARCHAR),
       @Result(property = "submitTime", column = "submit_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE),
@@ -136,6 +136,13 @@ public interface StreamingResultMapper {
    * @param execId
    * @return
    */
+  @Results(value = {@Result(property = "id", column = "id", id = true, javaType = int.class, jdbcType = JdbcType.INTEGER),
+      @Result(property = "name", column = "name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+      @Result(property = "desc", column = "desc", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+      @Result(property = "createTime", column = "create_time", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP),
+      @Result(property = "modifyTime", column = "modify_time", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP),
+      @Result(property = "ownerId", column = "owner", javaType = int.class, jdbcType = JdbcType.INTEGER)
+  })
   @SelectProvider(type = StreamingResultProvider.class, method = "queryProject")
   Project queryProject(@Param("execId") int execId);
 
@@ -157,7 +164,7 @@ public interface StreamingResultMapper {
       @Result(property = "modifyTime", column = "modify_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE),
       @Result(property = "proxyUser", column = "proxy_user", javaType = String.class, jdbcType = JdbcType.VARCHAR),
       @Result(property = "queue", column = "queue", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-      @Result(property = "ownerId", column = "owner_id", javaType = Timestamp.class, jdbcType = JdbcType.DATE),
+      @Result(property = "ownerId", column = "owner_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
       @Result(property = "owner", column = "owner_name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
       @Result(property = "type", column = "type", javaType = String.class, jdbcType = JdbcType.VARCHAR),
       @Result(property = "submitTime", column = "submit_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE),
@@ -177,7 +184,7 @@ public interface StreamingResultMapper {
    * 根据项目 id 和名称查询
    *
    * @param projectId
-   * @param names
+   * @param nameList
    * @return
    */
   @Results(value = {@Result(property = "execId", column = "id", id = true, javaType = int.class, jdbcType = JdbcType.INTEGER),
@@ -192,7 +199,7 @@ public interface StreamingResultMapper {
       @Result(property = "modifyTime", column = "modify_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE),
       @Result(property = "proxyUser", column = "proxy_user", javaType = String.class, jdbcType = JdbcType.VARCHAR),
       @Result(property = "queue", column = "queue", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-      @Result(property = "ownerId", column = "owner_id", javaType = Timestamp.class, jdbcType = JdbcType.DATE),
+      @Result(property = "ownerId", column = "owner_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
       @Result(property = "owner", column = "owner_name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
       @Result(property = "type", column = "type", javaType = String.class, jdbcType = JdbcType.VARCHAR),
       @Result(property = "submitTime", column = "submit_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE),
@@ -245,7 +252,7 @@ public interface StreamingResultMapper {
       @Result(property = "modifyTime", column = "modify_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE),
       @Result(property = "proxyUser", column = "proxy_user", javaType = String.class, jdbcType = JdbcType.VARCHAR),
       @Result(property = "queue", column = "queue", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-      @Result(property = "ownerId", column = "owner_id", javaType = Timestamp.class, jdbcType = JdbcType.DATE),
+      @Result(property = "ownerId", column = "owner_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
       @Result(property = "owner", column = "owner_name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
       @Result(property = "type", column = "type", javaType = String.class, jdbcType = JdbcType.VARCHAR),
       @Result(property = "submitTime", column = "submit_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE),

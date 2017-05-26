@@ -369,7 +369,7 @@ public class MasterClient {
     }
 
     try {
-      RetInfo ret = client.cancelExecFlow(execId);
+      RetInfo ret = client.cancelStreamingJob(execId);
 
       if (ret.getStatus() != 0) {
         logger.error("cancel streaming job error:{}", ret.getMsg());

@@ -61,9 +61,9 @@ public class StreamingResultProvider {
     return new SQL() {
       {
         SELECT("submit_user as submit_user_id");
-        SELECT("*");
+        SELECT("r.*");
 
-        FROM(TABLE_NAME);
+        FROM(TABLE_NAME + " r");
 
         WHERE("id=#{execId}");
       }
@@ -148,15 +148,15 @@ public class StreamingResultProvider {
    * @param parameter
    * @return
    */
-  public String queryProjectId(Map<String, Object> parameter) {
+  public String queryProject(Map<String, Object> parameter) {
     return new SQL() {
       {
         SELECT("p.*");
 
-        FROM(TABLE_NAME + " as r");
+        FROM("project p");
 
-        JOIN("streaming_job s on r.streaming_id = s.id");
-        JOIN("project p on s.project_id = p.id");
+        JOIN("streaming_job s on p.id = s.project_id");
+        JOIN(TABLE_NAME + " as r on s.id = r.streaming_id");
 
         WHERE("r.id=#{execId}");
       }
@@ -213,7 +213,6 @@ public class StreamingResultProvider {
         WHERE("schedule_time >= #{startDate}").
         WHERE("schedule_time < #{endDate}");
 
-
     if (StringUtils.isNotEmpty(name)) {
       sql = sql.WHERE("name = #{name}");
     }
@@ -230,7 +229,7 @@ public class StreamingResultProvider {
 
         FROM("(" + subClause + ") e_f");
       }
-    }.toString() + " order by schedule_time DESC limit #{start},#{limit}";
+    }.toString() + " order by schedule_time DESC limit #{start}, #{limit}";
   }
 
   /**
@@ -275,6 +274,11 @@ public class StreamingResultProvider {
     return new SQL() {{
       SELECT("r.submit_user as submit_user_id");
       SELECT("s.owner as owner_id");
+      SELECT("s.name");
+      SELECT("s.`desc`");
+      SELECT("s.create_time");
+      SELECT("s.modify_time");
+      SELECT("s.type");
       SELECT("u2.name as submit_user_name");
       SELECT("u1.name as owner_name");
       SELECT("p.name as project_name");

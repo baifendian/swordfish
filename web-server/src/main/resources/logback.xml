@@ -49,7 +49,7 @@
          By default, only log at level INFO and above. -->
     <root level="TRACE">
         <appender-ref ref="FILE"/>
-        <!--<appender-ref ref="STDOUT"/>-->
+        <appender-ref ref="STDOUT"/>
     </root>
 
     <!-- For loggers in the these namespaces, log at all levels. -->

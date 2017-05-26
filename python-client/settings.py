@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 # api url
-g_url = "http://%s:%s" % ('172.18.1.22', '12345')
+g_url = "http://%s:%s" % ('localhost', '12345') #
 
 # user name & password for login
 g_user = 'unit_test'  # 'udp'
