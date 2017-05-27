@@ -15,7 +15,6 @@
  */
 package com.baifendian.swordfish.webserver.controller;
 
-import com.baifendian.swordfish.dao.enums.FlowStatus;
 import com.baifendian.swordfish.dao.model.User;
 import com.baifendian.swordfish.webserver.dto.ExecutorIdDto;
 import com.baifendian.swordfish.webserver.dto.LogResult;
@@ -98,7 +97,7 @@ public class StreamingExecController {
                                                  @RequestParam(value = "endDate") long endDate,
                                                  @RequestParam(value = "projectName") String projectName,
                                                  @RequestParam(value = "name", required = false) String name,
-                                                 @RequestParam(value = "status", required = false) FlowStatus status,
+                                                 @RequestParam(value = "status", required = false) Integer status,
                                                  @RequestParam(value = "from", required = false, defaultValue = "0") int from,
                                                  @RequestParam(value = "size", required = false, defaultValue = "100") int size) {
     logger.info("Operator user {}, query streaming job exec list, start date: {}, end date: {}, project name: {}, name: {}, status: {}, from: {}, size: {}",
@@ -128,7 +127,7 @@ public class StreamingExecController {
   @GetMapping(value = "/streaming/latest")
   public List<StreamingResultDto> queryLatest(@RequestAttribute(value = "session.user") User operator,
                                               @RequestParam(value = "projectName") String projectName,
-                                              @RequestParam(value = "names") String names) {
+                                              @RequestParam(value = "names", required = false) String names) {
     logger.info("Operator user {}, query streaming latest exec information, project name: {}, names: {}",
         operator.getName(), projectName, names);
 

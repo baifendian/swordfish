@@ -19,15 +19,15 @@ import java.util.List;
 
 public class StreamingResultsDto {
   private int total;
-  private int length;
+  private int from;
   private List<StreamingResultDto> executions;
 
   public StreamingResultsDto() {
   }
 
-  public StreamingResultsDto(int total, List<StreamingResultDto> executions) {
+  public StreamingResultsDto(int total, int from, List<StreamingResultDto> executions) {
     this.total = total;
-    this.length = executions.size();
+    this.from = from;
     this.executions = executions;
   }
 
@@ -39,12 +39,12 @@ public class StreamingResultsDto {
     this.total = total;
   }
 
-  public int getLength() {
-    return length;
+  public int getFrom() {
+    return from;
   }
 
-  public void setLength(int length) {
-    this.length = length;
+  public void setFrom(int from) {
+    this.from = from;
   }
 
   public List<StreamingResultDto> getExecutions() {

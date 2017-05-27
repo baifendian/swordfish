@@ -219,7 +219,7 @@ public class StreamingExecService {
                                                  String name,
                                                  Date startDate,
                                                  Date endDate,
-                                                 FlowStatus status,
+                                                 Integer status,
                                                  int from,
                                                  int size) {
 
@@ -248,7 +248,7 @@ public class StreamingExecService {
 
     int total = streamingResultMapper.findCountByMultiCondition(project.getId(), name, startDate, endDate, status);
 
-    return new StreamingResultsDto(total, streamingResultDtos);
+    return new StreamingResultsDto(total, from, streamingResultDtos);
   }
 
   /**
