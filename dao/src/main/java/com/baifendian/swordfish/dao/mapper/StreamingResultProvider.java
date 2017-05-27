@@ -103,9 +103,9 @@ public class StreamingResultProvider {
     return new SQL() {
       {
         SELECT("submit_user as submit_user_id");
-        SELECT("*");
+        SELECT("r.*");
 
-        FROM(TABLE_NAME);
+        FROM(TABLE_NAME + " as r");
 
         WHERE("status <= " + FlowStatus.RUNNING.ordinal());
       }
@@ -205,7 +205,7 @@ public class StreamingResultProvider {
    * @return
    */
   public String findByMultiCondition(Map<String, Object> parameter) {
-    FlowStatus status = (FlowStatus) parameter.get("status");
+    Integer status = (Integer) parameter.get("status");
     String name = (String) parameter.get("name");
 
     SQL sql = constructCommonDetailSQL().
@@ -218,7 +218,7 @@ public class StreamingResultProvider {
     }
 
     if (status != null) {
-      sql = sql.WHERE("`status`=" + status.ordinal());
+      sql = sql.WHERE("`status`=#{status}");
     }
 
     String subClause = sql.toString();
@@ -239,7 +239,7 @@ public class StreamingResultProvider {
    * @return
    */
   public String findCountByMultiCondition(Map<String, Object> parameter) {
-    FlowStatus status = (FlowStatus) parameter.get("status");
+    Integer status = (Integer) parameter.get("status");
     String name = (String) parameter.get("name");
 
     return new SQL() {
@@ -259,7 +259,7 @@ public class StreamingResultProvider {
         }
 
         if (status != null) {
-          WHERE("`status`=" + status.ordinal());
+          WHERE("`status`=#{status}");
         }
       }
     }.toString();
