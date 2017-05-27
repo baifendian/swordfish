@@ -22,15 +22,15 @@ import java.util.List;
  */
 public class ExecWorkflowsDto {
   private int total;
-  private int length;
+  private int from;
   private List<ExecutionFlowDto> executions;
 
   public ExecWorkflowsDto() {
   }
 
-  public ExecWorkflowsDto(int total, int length, List<ExecutionFlowDto> executions) {
+  public ExecWorkflowsDto(int total, int from, List<ExecutionFlowDto> executions) {
     this.total = total;
-    this.length = length;
+    this.from = from;
     this.executions = executions;
   }
 
@@ -42,12 +42,12 @@ public class ExecWorkflowsDto {
     this.total = total;
   }
 
-  public int getLength() {
-    return length;
+  public int getFrom() {
+    return from;
   }
 
-  public void setLength(int length) {
-    this.length = length;
+  public void setFrom(int from) {
+    this.from = from;
   }
 
   public List<ExecutionFlowDto> getExecutions() {
