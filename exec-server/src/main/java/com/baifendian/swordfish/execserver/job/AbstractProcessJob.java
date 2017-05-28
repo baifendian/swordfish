@@ -191,7 +191,7 @@ public abstract class AbstractProcessJob extends AbstractJob {
   }
 
   @Override
-  public void cancel() throws Exception {
+  public void cancel(boolean cancelApplication) throws Exception {
     if (process == null) {
       throw new IllegalStateException("not started.");
     }

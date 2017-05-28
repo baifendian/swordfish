@@ -164,7 +164,7 @@ public class StreamingRunner implements Callable<Boolean> {
   public void kill() {
     if (job != null && job.isStarted()) {
       try {
-        job.cancel();
+        job.cancel(false);
       } catch (Exception e) {
         logger.error(e.getMessage(), e);
       }

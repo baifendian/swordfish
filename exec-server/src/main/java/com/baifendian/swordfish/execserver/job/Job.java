@@ -42,7 +42,7 @@ public interface Job {
   /**
    * 取消执行
    */
-  void cancel() throws Exception;
+  void cancel(boolean cancelApplication) throws Exception;
 
   /**
    * 作业是否已经启动

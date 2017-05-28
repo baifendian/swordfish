@@ -191,11 +191,13 @@ public abstract class AbstractYarnJob extends AbstractProcessJob {
   }
 
   @Override
-  public void cancel() throws Exception {
+  public void cancel(boolean cancelApplication) throws Exception {
     // 先停止任务
-    super.cancel();
+    super.cancel(cancelApplication);
 
-    cancelApplication(appLinks, props, logger);
+    if (cancelApplication) {
+      cancelApplication(appLinks, props, logger);
+    }
   }
 
   /**

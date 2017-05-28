@@ -69,7 +69,7 @@ public class EtlSqlJob extends AbstractJob {
   }
 
   @Override
-  public void cancel() throws Exception {
+  public void cancel(boolean cancelApplication) throws Exception {
   }
 
   @Override
