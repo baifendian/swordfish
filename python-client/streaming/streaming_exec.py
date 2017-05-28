@@ -112,10 +112,10 @@ if __name__ == '__main__':
 
     execId = data.get("execId")
 
-    print 'kill exec of %s...' % (execId)
-    status = kill_exec(sessionId, execId)
-
-    print status
+    # print 'kill exec of %s...' % (execId)
+    # status = kill_exec(sessionId, execId)
+    #
+    # print status
 
     print 'get streaming execs...'
     (status, data) = get_streaming_execs(sessionId, 0, 100000000000000,

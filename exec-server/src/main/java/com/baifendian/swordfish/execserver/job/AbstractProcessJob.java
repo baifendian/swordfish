@@ -78,6 +78,10 @@ public abstract class AbstractProcessJob extends AbstractJob {
    * @return 超时时间
    */
   private long calcNodeTimeout() {
+    if (isLongJob()) {
+      return 0;
+    }
+
     long usedTime = (System.currentTimeMillis() - props.getExecJobStartTime().getTime()) / 1000;
 
     long remainTime = props.getExecJobTimeout() - usedTime;
