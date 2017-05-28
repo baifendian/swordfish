@@ -168,7 +168,10 @@ public abstract class AbstractProcessJob extends AbstractJob {
           Thread.sleep(3000);
         }
 
+        logger.info("streaming job has exit, work dir:{}", workDir);
+
         exitCode = (isCompleted()) ? 0 : -1;
+        process.destroy();
       } else {// 等待运行完毕
         process.waitFor(remainTime, TimeUnit.SECONDS);
         exitCode = process.exitValue();
