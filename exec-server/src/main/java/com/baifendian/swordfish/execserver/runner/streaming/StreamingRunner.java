@@ -60,7 +60,7 @@ public class StreamingRunner implements Callable<Boolean> {
   @Override
   public Boolean call() {
     // "项目id/streamingId/执行id"
-    String jobScriptPath = BaseConfig.getFlowExecDir(streamingResult.getProjectId(), streamingResult.getStreamingId(), streamingResult.getExecId());
+    String jobScriptPath = BaseConfig.getStreamingExecDir(streamingResult.getProjectId(), streamingResult.getStreamingId(), streamingResult.getExecId());
 
     logger.info("streaming id:{}, exec id:{}, script path:{}", streamingResult.getStreamingId(), streamingResult.getExecId(), jobScriptPath);
 

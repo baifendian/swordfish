@@ -133,8 +133,7 @@ public class StreamingResultProvider {
       {
         UPDATE(TABLE_NAME);
 
-        VALUES("`worker`", "#{result.worker}");
-
+        SET("`worker` = #{result.worker}");
         SET("`parameter` = #{result.parameter}");
         SET("`user_defined_params` = #{result.userDefinedParams}");
         SET("`submit_user` = #{result.submitUserId}");

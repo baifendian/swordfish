@@ -88,7 +88,7 @@ if __name__ == '__main__':
                                                     "mainClass": "org.apache.spark.examples.streaming.DirectKafkaWordCount",
                                                     "mainJar": {
                                                         "scope": "PROJECT",
-                                                        "res": "spark-examples-1.0-SNAPSHOT-hadoop2.6.0.jar"
+                                                        "res": "spark_hadoop.jar"
                                                     },
                                                     "args": "172.18.1.22:9092,172.18.1.23:9092,172.18.1.24:9092 test_01",
                                                     "driverCores": 1,

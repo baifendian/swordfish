@@ -73,7 +73,7 @@ public class StreamingExecService {
    * @param queue
    * @return
    */
-  @Transactional(value = "TransactionManager")
+  // @Transactional(value = "TransactionaltionManager")
   public ExecutorIdDto executeStreamingJob(User operator, String projectName, String name, String proxyUser, String queue) {
 
     // 查询项目, 如果不存在, 返回错误
