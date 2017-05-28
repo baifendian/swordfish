@@ -171,7 +171,6 @@ public abstract class AbstractProcessJob extends AbstractJob {
         logger.info("streaming job has exit, work dir:{}", workDir);
 
         exitCode = (isCompleted()) ? 0 : -1;
-        process.destroy();
       } else {// 等待运行完毕
         process.waitFor(remainTime, TimeUnit.SECONDS);
         exitCode = process.exitValue();
@@ -218,7 +217,8 @@ public abstract class AbstractProcessJob extends AbstractJob {
    * @return
    */
   private boolean isRunning() {
-    return isStarted() && !isCompleted();
+    // 如果是长任务, 我们认为一直是启动的
+    return isStarted() && (isLongJob() || (!isLongJob() && !isCompleted()));
   }
 
   /**
