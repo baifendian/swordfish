@@ -36,6 +36,18 @@ public class StreamingDao extends BaseDao {
     streamingResultMapper = ConnectionFactory.getSqlSession().getMapper(StreamingResultMapper.class);
   }
 
+
+  /**
+   * 获取 flow 执行详情 <p>
+   *
+   * @param execId
+   * @return streaming 的执行信息
+   * @see StreamingResult
+   */
+  public StreamingResult queryStreamingExec(int execId) {
+    return streamingResultMapper.selectById(execId);
+  }
+
   /**
    * 查找没有完成的流任务
    *
@@ -48,10 +60,10 @@ public class StreamingDao extends BaseDao {
   /**
    * 更新流任务的状态
    *
-   * @param job
+   * @param result
    * @return
    */
-  public int updateResult(StreamingResult job) {
-    return streamingResultMapper.updateResult(job);
+  public int updateResult(StreamingResult result) {
+    return streamingResultMapper.updateResult(result);
   }
 }

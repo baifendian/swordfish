@@ -91,7 +91,7 @@ public class AdHocSqlJob {
 
       logger.info("update adhoc result sql: {}, index: {}, status: {}", execResult.getStm(), execResult.getIndex(), execResult.getStatus());
 
-      adHocResult.setExecId(props.getAdHocId());
+      adHocResult.setExecId(props.getExecJobId());
 
       adHocResult.setStm(execResult.getStm());
       adHocResult.setIndex(execResult.getIndex());

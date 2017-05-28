@@ -58,6 +58,11 @@ public class MasterClient {
   private int retries;
 
   /**
+   * 再次发送心态间隔
+   */
+  private int executorHeartbeatTryInterval;
+
+  /**
    * 传输层对象
    */
   private TTransport tTransport;
@@ -126,7 +131,7 @@ public class MasterClient {
       }
 
       try {
-        Thread.sleep(1000);
+        Thread.sleep(3);
       } catch (InterruptedException e) {
         logger.error("report info error", e);
         return false;
@@ -153,7 +158,7 @@ public class MasterClient {
     try {
       RetInfo retInfo = client.executorReport(clientHost, clientPort, heartBeatData);
       if (retInfo.getStatus() != 0) {
-        logger.error("executor report return {}", retInfo.getMsg());
+        logger.error("executor report return information {}", retInfo.getMsg());
         return false;
       }
     } catch (TException e) {

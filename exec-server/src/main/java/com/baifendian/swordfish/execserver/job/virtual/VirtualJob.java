@@ -29,8 +29,8 @@ public class VirtualJob extends AbstractProcessJob {
    * @param props  作业配置信息,各类作业根据此配置信息生成具体的作业
    * @param logger 日志
    */
-  public VirtualJob(JobProps props, Logger logger) {
-    super(props, logger);
+  public VirtualJob(JobProps props, boolean isLongJob, Logger logger) {
+    super(props, isLongJob, logger);
   }
 
   @Override

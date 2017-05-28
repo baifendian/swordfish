@@ -33,6 +33,7 @@ public class StreamingResultProvider {
       {
         INSERT_INTO(TABLE_NAME);
 
+        VALUES("`worker`", "#{result.worker}");
         VALUES("`streaming_id`", "#{result.streamingId}");
         VALUES("`parameter`", "#{result.parameter}");
         VALUES("`user_defined_params`", "#{result.userDefinedParams}");
@@ -61,11 +62,20 @@ public class StreamingResultProvider {
     return new SQL() {
       {
         SELECT("submit_user as submit_user_id");
+        SELECT("s.owner as owner_id");
+        SELECT("s.project_id");
+        SELECT("s.name");
+        SELECT("s.`desc`");
+        SELECT("s.create_time");
+        SELECT("s.modify_time");
+        SELECT("s.type");
         SELECT("r.*");
 
         FROM(TABLE_NAME + " r");
 
-        WHERE("id=#{execId}");
+        JOIN("streaming_job s on r.streaming_id = s.id");
+
+        WHERE("r.id=#{execId}");
       }
     }.toString();
   }
@@ -123,21 +133,23 @@ public class StreamingResultProvider {
       {
         UPDATE(TABLE_NAME);
 
-        SET("`parameter` = #{job.parameter}");
-        SET("`user_defined_params` = #{job.userDefinedParams}");
-        SET("`submit_user` = #{job.submitUserId}");
-        SET("`submit_time` = #{job.submitTime}");
-        SET("`queue` = #{job.queue}");
-        SET("`proxy_user` = #{job.proxyUser}");
-        SET("`schedule_time` = #{job.scheduleTime}");
-        SET("`start_time` = #{job.startTime}");
-        SET("`end_time` = #{job.endTime}");
-        SET("`status` = " + EnumFieldUtil.genFieldStr("job.status", FlowStatus.class));
-        SET("`app_links` = #{job.appLinks}");
-        SET("`job_links` = #{job.jobLinks}");
-        SET("`job_id` = #{job.jobId}");
+        VALUES("`worker`", "#{result.worker}");
 
-        WHERE("id = #{job.execId}");
+        SET("`parameter` = #{result.parameter}");
+        SET("`user_defined_params` = #{result.userDefinedParams}");
+        SET("`submit_user` = #{result.submitUserId}");
+        SET("`submit_time` = #{result.submitTime}");
+        SET("`queue` = #{result.queue}");
+        SET("`proxy_user` = #{result.proxyUser}");
+        SET("`schedule_time` = #{result.scheduleTime}");
+        SET("`start_time` = #{result.startTime}");
+        SET("`end_time` = #{result.endTime}");
+        SET("`status` = " + EnumFieldUtil.genFieldStr("result.status", FlowStatus.class));
+        SET("`app_links` = #{result.appLinks}");
+        SET("`job_links` = #{result.jobLinks}");
+        SET("`job_id` = #{result.jobId}");
+
+        WHERE("id = #{result.execId}");
       }
     }.toString();
   }
@@ -255,7 +267,7 @@ public class StreamingResultProvider {
         WHERE("schedule_time < #{endDate}");
 
         if (StringUtils.isNotEmpty(name)) {
-          WHERE("name = #{name}");
+          WHERE("s.name = #{name}");
         }
 
         if (status != null) {
@@ -274,6 +286,7 @@ public class StreamingResultProvider {
     return new SQL() {{
       SELECT("r.submit_user as submit_user_id");
       SELECT("s.owner as owner_id");
+      SELECT("s.project_id");
       SELECT("s.name");
       SELECT("s.`desc`");
       SELECT("s.create_time");

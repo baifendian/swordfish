@@ -26,9 +26,9 @@ public class JobProps {
   private int projectId;
 
   /**
-   * flow id
+   * 一个具体任务的 id, 注意, 即席查询没有 exec id, 它的 exec id 实际上该 id
    **/
-  private int workflowId;
+  private int execJobId;
 
   /**
    * node Name
@@ -39,11 +39,6 @@ public class JobProps {
    * 执行 id
    **/
   private int execId;
-
-  /**
-   * 即席查询时的 adHocId
-   */
-  private int adHocId;
 
   /**
    * 作业执行用户
@@ -88,12 +83,12 @@ public class JobProps {
   /**
    * 工作流的启动时间
    */
-  private Date flowStartTime;
+  private Date execJobStartTime;
 
   /**
    * 工作流超时时间
    */
-  private int flowTimeout;
+  private int execJobTimeout;
 
   public int getProjectId() {
     return projectId;
@@ -143,12 +138,12 @@ public class JobProps {
     this.envFile = envFile;
   }
 
-  public int getWorkflowId() {
-    return workflowId;
+  public int getExecJobId() {
+    return execJobId;
   }
 
-  public void setWorkflowId(int workflowId) {
-    this.workflowId = workflowId;
+  public void setExecJobId(int execJobId) {
+    this.execJobId = execJobId;
   }
 
   public String getNodeName() {
@@ -175,14 +170,6 @@ public class JobProps {
     this.queue = queue;
   }
 
-  public int getAdHocId() {
-    return adHocId;
-  }
-
-  public void setAdHocId(int adHocId) {
-    this.adHocId = adHocId;
-  }
-
   public Date getCycTime() {
     return cycTime;
   }
@@ -199,19 +186,19 @@ public class JobProps {
     this.jobAppId = jobAppId;
   }
 
-  public Date getFlowStartTime() {
-    return flowStartTime;
+  public Date getExecJobStartTime() {
+    return execJobStartTime;
   }
 
-  public void setFlowStartTime(Date flowStartTime) {
-    this.flowStartTime = flowStartTime;
+  public void setExecJobStartTime(Date execJobStartTime) {
+    this.execJobStartTime = execJobStartTime;
   }
 
-  public int getFlowTimeout() {
-    return flowTimeout;
+  public int getExecJobTimeout() {
+    return execJobTimeout;
   }
 
-  public void setFlowTimeout(int flowTimeout) {
-    this.flowTimeout = flowTimeout;
+  public void setExecJobTimeout(int execJobTimeout) {
+    this.execJobTimeout = execJobTimeout;
   }
 }

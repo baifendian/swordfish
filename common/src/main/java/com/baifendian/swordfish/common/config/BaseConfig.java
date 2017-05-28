@@ -99,7 +99,7 @@ public class BaseConfig {
    * @param filename
    * @return
    */
-  public static String getLocalDownloadFilename( String filename) {
+  public static String getLocalDownloadFilename(String filename) {
     return MessageFormat.format("{0}/{1}/{2}", localDownloadBasePath, UUID.randomUUID().toString(), filename);
   }
 
@@ -166,17 +166,6 @@ public class BaseConfig {
     return MessageFormat.format("{0}/{1}", getLocalWorkflowDir(projectId), filename);
   }
 
-//  /**
-//   * 本地工作流数据缓存 WORKFLOW.json 文件
-//   *
-//   * @param projectId
-//   * @param filename
-//   * @return
-//   */
-//  public static String getLocalWorkflowJson(int projectId, String filename) {
-//    return MessageFormat.format("{0}/{1}", getLocalWorkflowExtractDir(projectId, filename), "WORKFLOW.json");
-//  }
-
   /**
    * hdfs 上项目的文件目录
    *
@@ -238,7 +227,19 @@ public class BaseConfig {
    * @return
    */
   public static String getFlowExecDir(int projectId, int workflowId, long execId) {
-    return String.format("%s/%d/%d/%d", localExecBasePath, projectId, workflowId, execId);
+    return String.format("%s/flow/%d/%d/%d", localExecBasePath, projectId, workflowId, execId);
+  }
+
+  /**
+   * 流任务执行的目录
+   *
+   * @param projectId
+   * @param jobId
+   * @param execId
+   * @return
+   */
+  public static String getStreamingExecDir(int projectId, int jobId, long execId) {
+    return String.format("%s/streaming/%d/%d/%d", localExecBasePath, projectId, jobId, execId);
   }
 
   /**

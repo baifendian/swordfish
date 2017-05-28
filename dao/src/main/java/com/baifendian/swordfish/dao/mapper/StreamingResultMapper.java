@@ -45,7 +45,15 @@ public interface StreamingResultMapper {
    * @return
    */
   @Results(value = {@Result(property = "execId", column = "id", id = true, javaType = int.class, jdbcType = JdbcType.INTEGER),
+      @Result(property = "worker", column = "worker", javaType = String.class, jdbcType = JdbcType.VARCHAR),
       @Result(property = "streamingId", column = "streaming_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
+      @Result(property = "name", column = "name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+      @Result(property = "desc", column = "desc", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+      @Result(property = "projectId", column = "project_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
+      @Result(property = "createTime", column = "create_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE),
+      @Result(property = "modifyTime", column = "modify_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE),
+      @Result(property = "ownerId", column = "owner_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
+      @Result(property = "type", column = "type", javaType = String.class, jdbcType = JdbcType.VARCHAR),
       @Result(property = "parameter", column = "parameter", javaType = String.class, jdbcType = JdbcType.VARCHAR),
       @Result(property = "userDefinedParams", column = "user_defined_params", javaType = String.class, jdbcType = JdbcType.VARCHAR),
       @Result(property = "submitUserId", column = "submit_user_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
@@ -70,6 +78,7 @@ public interface StreamingResultMapper {
    * @return
    */
   @Results(value = {@Result(property = "execId", column = "id", id = true, javaType = int.class, jdbcType = JdbcType.INTEGER),
+      @Result(property = "worker", column = "worker", javaType = String.class, jdbcType = JdbcType.VARCHAR),
       @Result(property = "streamingId", column = "streaming_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
       @Result(property = "parameter", column = "parameter", javaType = String.class, jdbcType = JdbcType.VARCHAR),
       @Result(property = "userDefinedParams", column = "user_defined_params", javaType = String.class, jdbcType = JdbcType.VARCHAR),
@@ -103,6 +112,7 @@ public interface StreamingResultMapper {
    * @return
    */
   @Results(value = {@Result(property = "execId", column = "id", id = true, javaType = int.class, jdbcType = JdbcType.INTEGER),
+      @Result(property = "worker", column = "worker", javaType = String.class, jdbcType = JdbcType.VARCHAR),
       @Result(property = "streamingId", column = "streaming_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
       @Result(property = "parameter", column = "parameter", javaType = String.class, jdbcType = JdbcType.VARCHAR),
       @Result(property = "userDefinedParams", column = "user_defined_params", javaType = String.class, jdbcType = JdbcType.VARCHAR),
@@ -124,11 +134,11 @@ public interface StreamingResultMapper {
   /**
    * 更新任务信息
    *
-   * @param job
+   * @param result
    * @return
    */
   @UpdateProvider(type = StreamingResultProvider.class, method = "updateResult")
-  int updateResult(@Param("job") StreamingResult job);
+  int updateResult(@Param("result") StreamingResult result);
 
   /**
    * 查询项目 id
@@ -153,6 +163,7 @@ public interface StreamingResultMapper {
    * @return
    */
   @Results(value = {@Result(property = "execId", column = "id", id = true, javaType = int.class, jdbcType = JdbcType.INTEGER),
+      @Result(property = "worker", column = "worker", javaType = String.class, jdbcType = JdbcType.VARCHAR),
       @Result(property = "streamingId", column = "streaming_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
       @Result(property = "parameter", column = "parameter", javaType = String.class, jdbcType = JdbcType.VARCHAR),
       @Result(property = "userDefinedParams", column = "user_defined_params", javaType = String.class, jdbcType = JdbcType.VARCHAR),
@@ -188,6 +199,7 @@ public interface StreamingResultMapper {
    * @return
    */
   @Results(value = {@Result(property = "execId", column = "id", id = true, javaType = int.class, jdbcType = JdbcType.INTEGER),
+      @Result(property = "worker", column = "worker", javaType = String.class, jdbcType = JdbcType.VARCHAR),
       @Result(property = "streamingId", column = "streaming_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
       @Result(property = "parameter", column = "parameter", javaType = String.class, jdbcType = JdbcType.VARCHAR),
       @Result(property = "userDefinedParams", column = "user_defined_params", javaType = String.class, jdbcType = JdbcType.VARCHAR),
@@ -241,6 +253,7 @@ public interface StreamingResultMapper {
    * @return
    */
   @Results(value = {@Result(property = "execId", column = "id", id = true, javaType = int.class, jdbcType = JdbcType.INTEGER),
+      @Result(property = "worker", column = "worker", javaType = String.class, jdbcType = JdbcType.VARCHAR),
       @Result(property = "streamingId", column = "streaming_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
       @Result(property = "parameter", column = "parameter", javaType = String.class, jdbcType = JdbcType.VARCHAR),
       @Result(property = "userDefinedParams", column = "user_defined_params", javaType = String.class, jdbcType = JdbcType.VARCHAR),

@@ -74,6 +74,8 @@ public class FlowRunnerManager {
     ThreadFactory nodeThreadFactory = new ThreadFactoryBuilder().setNameFormat("Exec-Worker-NodeRunner").build();
     nodeExecutorService = Executors.newFixedThreadPool(nodeThreads, nodeThreadFactory);
 
+    int streamingThreads = conf.getInt(Constants.EXECUTOR_STREAMING_THREADS, Constants.defaultStreamingThreadNum);
+
     // 主要指清理 runningFlows 中运行完成的任务
     Thread cleanThread = new Thread(() -> {
       while (true) {
@@ -215,9 +217,11 @@ public class FlowRunnerManager {
   /**
    * 取消执行的 flow
    *
-   * @param execId
+   * @param executionFlow
    */
-  public void cancelFlow(int execId) {
+  public void cancelFlow(ExecutionFlow executionFlow) {
+    int execId = executionFlow.getId();
+
     FlowRunner flowRunner = runningFlows.get(execId);
 
     if (flowRunner == null) {

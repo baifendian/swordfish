@@ -15,9 +15,13 @@
  */
 package com.baifendian.swordfish.execserver.job.yarn;
 
+import com.baifendian.swordfish.common.hadoop.YarnRestClient;
 import com.baifendian.swordfish.dao.DaoFactory;
 import com.baifendian.swordfish.dao.FlowDao;
+import com.baifendian.swordfish.dao.StreamingDao;
+import com.baifendian.swordfish.dao.enums.FlowStatus;
 import com.baifendian.swordfish.dao.model.ExecutionNode;
+import com.baifendian.swordfish.dao.model.StreamingResult;
 import com.baifendian.swordfish.execserver.job.AbstractProcessJob;
 import com.baifendian.swordfish.execserver.job.JobProps;
 import org.apache.commons.collections.CollectionUtils;
@@ -26,6 +30,7 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
@@ -38,24 +43,30 @@ public abstract class AbstractYarnJob extends AbstractProcessJob {
   private static final Pattern JOB_REGEX = Pattern.compile("job_\\d+_\\d+");
 
   /**
-   * 数据库接口
+   * 短任务数据库接口
    */
   private FlowDao flowDao;
 
   /**
+   * 流任务数据库接口
+   */
+  private StreamingDao streamingDao;
+
+  /**
    * 应用 links
    */
-  private List<String> appLinks;
+  protected List<String> appLinks;
 
   /**
    * 日志 links
    */
-  private List<String> jobLinks;
+  protected List<String> jobLinks;
 
-  public AbstractYarnJob(JobProps props, Logger logger) {
-    super(props, logger);
+  public AbstractYarnJob(JobProps props, boolean isLongJob, Logger logger) {
+    super(props, isLongJob, logger);
 
     flowDao = DaoFactory.getDaoInstance(FlowDao.class);
+    streamingDao = DaoFactory.getDaoInstance(StreamingDao.class);
 
     appLinks = new ArrayList<>();
     jobLinks = new ArrayList<>();
@@ -86,18 +97,58 @@ public abstract class AbstractYarnJob extends AbstractProcessJob {
     }
 
     if (captureAppLinks || captureJobLinks) {
-      ExecutionNode executionNode = flowDao.queryExecutionNode(props.getExecId(), props.getNodeName());
+      // 短任务
+      if (!isLongJob()) {
+        ExecutionNode executionNode = flowDao.queryExecutionNode(props.getExecId(), props.getNodeName());
 
-      if (captureAppLinks) {
-        executionNode.setAppLinkList(appLinks);
+        if (executionNode != null) {
+          if (captureAppLinks) {
+            executionNode.setAppLinkList(appLinks);
+          }
+
+          if (captureJobLinks) {
+            executionNode.setJobLinkList(appLinks);
+          }
+
+          flowDao.updateExecutionNode(executionNode);
+        }
+      } else { // 长任务
+        StreamingResult streamingResult = streamingDao.queryStreamingExec(props.getExecId());
+
+        if (streamingResult != null) {
+          if (captureAppLinks) {
+            streamingResult.setAppLinkList(appLinks);
+          }
+
+          if (captureJobLinks) {
+            streamingResult.setJobLinkList(appLinks);
+          }
+
+          streamingDao.updateResult(streamingResult);
+        }
       }
-
-      if (captureJobLinks) {
-        executionNode.setJobLinkList(appLinks);
-      }
-
-      flowDao.updateExecutionNode(executionNode);
     }
+  }
+
+  @Override
+  public boolean isCompleted() {
+    if (CollectionUtils.isNotEmpty(appLinks)) {
+      String appId = appLinks.get(appLinks.size() - 1);
+
+      try {
+        FlowStatus status = YarnRestClient.getInstance().getApplicationStatus(appId);
+
+        // 如果是完成了或者是运行中, 我们认为是 OK 的
+        if (status.typeIsFinished() || status == FlowStatus.RUNNING) {
+          complete = true;
+        }
+      } catch (Exception e) {
+        logger.error(String.format("request status of application %s exception", appId), e);
+        complete = true;
+      }
+    }
+
+    return complete;
   }
 
   /**
@@ -106,6 +157,7 @@ public abstract class AbstractYarnJob extends AbstractProcessJob {
    * @param line
    * @return appid
    */
+
   protected String findAppId(String line) {
     Matcher matcher = APPLICATION_REGEX.matcher(line);
 
@@ -137,34 +189,52 @@ public abstract class AbstractYarnJob extends AbstractProcessJob {
     // 先停止任务
     super.cancel();
 
-    // 然后 kill application
+    cancelApplication(appLinks, props, logger);
+  }
+
+  /**
+   * 关闭应用
+   *
+   * @param appLinks 应用列表
+   * @param props    每个任务, 应该有一个唯一的 job application id, 这里用于生成脚本
+   */
+  public static void cancelApplication(List<String> appLinks, JobProps props, Logger logger) throws IOException {
+
+    // 然后 kill application, 一般来说, 就是最后一个(前面的都运行完了)
     if (CollectionUtils.isNotEmpty(appLinks)) {
-      for (String appid : appLinks) {
-        String commandFile = "/tmp/" + props.getJobAppId() + ".kill";
-        String cmd = "yarn application -kill " + appid;
+      String appid = appLinks.get(appLinks.size() - 1);
+      String commandFile = String.format("%s/%s_%s.kill", props.getWorkDir(), props.getJobAppId(), appid);
+      String cmd = "yarn application -kill " + appid;
 
-        StringBuilder sb = new StringBuilder();
-        sb.append("#!/bin/sh\n");
-        sb.append("BASEDIR=$(cd `dirname $0`; pwd)\n");
-        sb.append("cd $BASEDIR\n");
+      StringBuilder sb = new StringBuilder();
+      sb.append("#!/bin/sh\n");
+      sb.append("BASEDIR=$(cd `dirname $0`; pwd)\n");
+      sb.append("cd $BASEDIR\n");
 
-        if (props.getEnvFile() != null) {
-          sb.append("source " + props.getEnvFile() + "\n");
-        }
+      if (props.getEnvFile() != null) {
+        sb.append("source " + props.getEnvFile() + "\n");
+      }
 
-        sb.append("\n\n");
-        sb.append(cmd);
+      sb.append("\n\n");
+      sb.append(cmd);
 
+      File f = new File(commandFile);
+
+      if (!f.exists()) {
         FileUtils.writeStringToFile(new File(commandFile), sb.toString(), Charset.forName("UTF-8"));
+      }
 
-        String runCmd = "sh " + commandFile;
-        if (props.getProxyUser() != null) {
-          runCmd = "sudo -u " + props.getProxyUser() + " " + runCmd;
-        }
+      String runCmd = "sh " + commandFile;
+      if (props.getProxyUser() != null) {
+        runCmd = "sudo -u " + props.getProxyUser() + " " + runCmd;
+      }
 
-        logger.info("kill cmd:{}", runCmd);
+      logger.info("kill cmd:{}", runCmd);
 
+      try {
         Runtime.getRuntime().exec(runCmd);
+      } catch (Exception e) {
+        logger.error(String.format("kill application %s exception", appid), e);
       }
     }
   }

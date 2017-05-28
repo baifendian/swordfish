@@ -40,8 +40,8 @@ public class SparkJob extends AbstractYarnJob {
    */
   private SparkParam sparkParam;
 
-  public SparkJob(JobProps props, Logger logger) {
-    super(props, logger);
+  public SparkJob(JobProps props, boolean isLongJob, Logger logger) {
+    super(props, isLongJob, logger);
   }
 
   @Override

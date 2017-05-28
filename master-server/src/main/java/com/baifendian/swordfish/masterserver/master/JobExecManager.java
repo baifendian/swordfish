@@ -18,8 +18,10 @@ package com.baifendian.swordfish.masterserver.master;
 import com.baifendian.swordfish.dao.DaoFactory;
 import com.baifendian.swordfish.dao.FlowDao;
 import com.baifendian.swordfish.dao.StreamingDao;
+import com.baifendian.swordfish.dao.enums.FlowStatus;
 import com.baifendian.swordfish.dao.model.ExecutionFlow;
 import com.baifendian.swordfish.dao.model.ProjectFlow;
+import com.baifendian.swordfish.dao.model.StreamingResult;
 import com.baifendian.swordfish.masterserver.config.MasterConfig;
 import com.baifendian.swordfish.masterserver.exception.ExecException;
 import com.baifendian.swordfish.masterserver.exception.MasterException;
@@ -27,6 +29,7 @@ import com.baifendian.swordfish.masterserver.exec.ExecutorClient;
 import com.baifendian.swordfish.masterserver.exec.ExecutorServerInfo;
 import com.baifendian.swordfish.masterserver.exec.ExecutorServerManager;
 import com.baifendian.swordfish.masterserver.quartz.FlowScheduleJob;
+import com.baifendian.swordfish.masterserver.utils.ResultHelper;
 import com.baifendian.swordfish.rpc.HeartBeatData;
 import com.baifendian.swordfish.rpc.RetInfo;
 import org.apache.thrift.TException;
@@ -232,6 +235,75 @@ public class JobExecManager {
   }
 
   /**
+   * 执行流任务
+   *
+   * @param execId
+   * @throws TException
+   */
+  public RetInfo execStreamingJob(int execId) throws TException {
+
+    ExecutorServerInfo executorServerInfo = executorServerManager.getExecutorServer();
+
+    if (executorServerInfo == null) {
+      throw new ExecException("can't found active executor server");
+    }
+
+    StreamingResult streamingResult = streamingDao.queryStreamingExec(execId);
+
+    if (streamingResult == null) {
+      logger.error("streaming exec id {} not exists", execId);
+      return ResultHelper.createErrorResult("streaming exec id not exists");
+    }
+
+    // 接收到了, 会更新状态, 在依赖资源中
+    if (streamingResult.getStatus().typeIsFinished()) {
+      logger.error("streaming exec id {} finished unexpected", execId);
+      return ResultHelper.createErrorResult("task finished unexpected");
+    }
+
+    streamingResult.setStatus(FlowStatus.WAITING_RES);
+    streamingResult.setWorker(String.format("%s:%s", executorServerInfo.getHost(), executorServerInfo.getPort()));
+
+    streamingDao.updateResult(streamingResult);
+
+    logger.info("exec streaming job {} on server {}:{}", execId, executorServerInfo.getHost(), executorServerInfo.getPort());
+
+    ExecutorClient executionClient = new ExecutorClient(executorServerInfo.getHost(), executorServerInfo.getPort());
+
+    return executionClient.execStreamingJob(execId);
+  }
+
+  /**
+   * 取消流任务的执行
+   *
+   * @param execId
+   * @return
+   * @throws TException
+   */
+  public RetInfo cancelStreamingJob(int execId) throws TException {
+    StreamingResult streamingResult = streamingDao.queryStreamingExec(execId);
+
+    if (streamingResult == null) {
+      throw new MasterException("streaming exec id is not exists");
+    }
+
+    String worker = streamingResult.getWorker();
+    if (worker == null) {
+      throw new MasterException("worker is not exists");
+    }
+
+    String[] workerInfo = worker.split(":");
+    if (workerInfo.length < 2) {
+      throw new MasterException("worker is not validate format " + worker);
+    }
+
+    logger.info("cancel exec streaming {} on worker {}", execId, worker);
+
+    ExecutorClient executionClient = new ExecutorClient(workerInfo[0], Integer.valueOf(workerInfo[1]));
+    return executionClient.cancelStreamingJob(execId);
+  }
+
+  /**
    * 注册 executor
    *
    * @param host
@@ -286,7 +358,7 @@ public class JobExecManager {
   public RetInfo cancelExecFlow(int execId) throws TException {
     ExecutionFlow executionFlow = flowDao.queryExecutionFlow(execId);
     if (executionFlow == null) {
-      throw new MasterException("execId is not exists");
+      throw new MasterException("workflow exec id is not exists");
     }
 
     String worker = executionFlow.getWorker();

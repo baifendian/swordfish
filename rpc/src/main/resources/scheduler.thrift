@@ -118,7 +118,7 @@ service MasterService {
    * 删除某个 workflow 的调度
    *
    * projectId : 项目 id
-   * flowId : workflowId
+   * flowId : execJobId
    */
   RetInfo deleteSchedule(1:i32 projectId, 2:i32 flowId),
 

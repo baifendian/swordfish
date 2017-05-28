@@ -270,6 +270,7 @@ CREATE TABLE `streaming_job` (
 DROP TABLE If Exists `streaming_result`;
 CREATE TABLE `streaming_result` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'exec id',
+  `worker` varchar(64) DEFAULT NULL COMMENT 'exec work information, host:port',
   `streaming_id` int(11) NOT NULL COMMENT 'streaming job id, also a exec id',
   `parameter` text NOT NULL COMMENT 'parameter information of this exec',
   `user_defined_params` text DEFAULT NULL COMMENT 'user defined parameter of this exec',

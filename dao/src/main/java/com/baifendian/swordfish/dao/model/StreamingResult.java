@@ -37,6 +37,11 @@ public class StreamingResult {
   private int execId;
 
   /**
+   * worker 的 host
+   **/
+  private String worker;
+
+  /**
    * 流任务的 id
    */
   private int streamingId;
@@ -189,6 +194,14 @@ public class StreamingResult {
 
   public void setExecId(int execId) {
     this.execId = execId;
+  }
+
+  public String getWorker() {
+    return worker;
+  }
+
+  public void setWorker(String worker) {
+    this.worker = worker;
   }
 
   public int getStreamingId() {

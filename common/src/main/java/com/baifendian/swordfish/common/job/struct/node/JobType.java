@@ -25,7 +25,6 @@ public class JobType {
   public static final String SPARK = "SPARK";
   public static final String VIRTUAL = "VIRTUAL";
   public static final String SPARK_STREAMING = "SPARK_STREAMING"; // 长任务类型
-  public static final String UPLOAD = "UPLOAD";
 
   /**
    * 判断是否是长任务

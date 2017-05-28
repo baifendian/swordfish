@@ -102,9 +102,9 @@ public class FlowRunner implements Runnable {
   private final int timeout;
 
   /**
-   * 起始时间 (ms)
+   * 真实的调度时间 (ms)
    */
-  private final long startTime;
+  private final long scheduleTime;
 
   /**
    * 系统参数
@@ -128,7 +128,7 @@ public class FlowRunner implements Runnable {
     this.failurePolicyType = context.getFailurePolicyType();
     this.systemParamMap = context.getSystemParamMap();
     this.customParamMap = context.getCustomParamMap();
-    this.startTime = System.currentTimeMillis();
+    this.scheduleTime = executionFlow.getScheduleTime().getTime();
   }
 
   /**
@@ -139,6 +139,7 @@ public class FlowRunner implements Runnable {
     // 查看是否已经完成
     ExecutionFlow newExecutionFlow = flowDao.queryExecutionFlow(executionFlow.getId());
 
+    // 能查到
     if (newExecutionFlow != null) {
       if (newExecutionFlow.getStatus().typeIsFinished()) {
         logger.info("flow is done: {}", executionFlow.getId());
@@ -146,8 +147,9 @@ public class FlowRunner implements Runnable {
       }
 
       flowDao.deleteExecutionNodes(executionFlow.getId());
-    } else {
+    } else { // 压根查不到
       logger.info("flow is not exist: {}", executionFlow.getId());
+      return;
     }
 
     FlowStatus status = null;
@@ -560,7 +562,7 @@ public class FlowRunner implements Runnable {
    * @return 超时时间
    */
   private int calcNodeTimeout() {
-    int usedTime = (int) ((System.currentTimeMillis() - startTime) / 1000);
+    int usedTime = (int) ((System.currentTimeMillis() - scheduleTime) / 1000);
 
     int remainTime = timeout - usedTime;
 

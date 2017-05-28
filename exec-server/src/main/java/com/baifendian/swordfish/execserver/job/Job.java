@@ -59,6 +59,13 @@ public interface Job {
   boolean isCompleted();
 
   /**
+   * 是否长任务类型
+   *
+   * @return
+   */
+  boolean isLongJob();
+
+  /**
    * 获取返回码
    *
    * @return 0 表示成功，其他值表示失败

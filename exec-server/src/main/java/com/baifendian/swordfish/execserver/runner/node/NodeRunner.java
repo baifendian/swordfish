@@ -109,13 +109,13 @@ public class NodeRunner implements Callable<Boolean> {
     props.setProxyUser(executionFlow.getProxyUser());
     props.setDefinedParams(allParamMap);
     props.setProjectId(executionFlow.getProjectId());
-    props.setWorkflowId(executionFlow.getFlowId());
+    props.setExecJobId(executionFlow.getFlowId());
     props.setNodeName(flowNode.getName());
     props.setExecId(executionFlow.getId());
     props.setEnvFile(BaseConfig.getSystemEnvPath());
     props.setQueue(executionFlow.getQueue());
-    props.setFlowStartTime(executionFlow.getStartTime());
-    props.setFlowTimeout(executionFlow.getTimeout());
+    props.setExecJobStartTime(executionFlow.getScheduleTime());
+    props.setExecJobTimeout(executionFlow.getTimeout());
 
     props.setJobAppId(String.format("%s_%s", executionNode.getJobId(), HttpUtil.getMd5(executionNode.getName()).substring(0, 8)));
 

@@ -42,8 +42,8 @@ public class ShellJob extends AbstractProcessJob {
    */
   private String currentPath;
 
-  public ShellJob(JobProps props, Logger logger) {
-    super(props, logger);
+  public ShellJob(JobProps props, boolean isLongJob, Logger logger) {
+    super(props, isLongJob, logger);
 
     this.currentPath = getWorkingDirectory();
   }

@@ -47,8 +47,8 @@ public abstract class AbstractProcessJob extends AbstractJob {
    */
   protected Process process;
 
-  public AbstractProcessJob(JobProps props, Logger logger) {
-    super(props, logger);
+  public AbstractProcessJob(JobProps props, boolean isLongJob, Logger logger) {
+    super(props, isLongJob, logger);
   }
 
   /**
@@ -78,9 +78,9 @@ public abstract class AbstractProcessJob extends AbstractJob {
    * @return 超时时间
    */
   private long calcNodeTimeout() {
-    long usedTime = (System.currentTimeMillis() - props.getFlowStartTime().getTime()) / 1000;
+    long usedTime = (System.currentTimeMillis() - props.getExecJobStartTime().getTime()) / 1000;
 
-    long remainTime = props.getFlowTimeout() - usedTime;
+    long remainTime = props.getExecJobTimeout() - usedTime;
 
     if (remainTime <= 0) {
       throw new ExecTimeoutException("workflow execution time out");
@@ -156,10 +156,19 @@ public abstract class AbstractProcessJob extends AbstractJob {
       // 读取控制台输出
       readProcessOutput();
 
-      // 等待运行完毕
-      process.waitFor(remainTime, TimeUnit.SECONDS);
+      // 长任务是比较特殊的
+      if (isLongJob()) {
+        // 如果没有完成, 会循环, 认为是没有提交
+        // 对于流任务, 最多等待 10 分钟, 不然会认为超时退出
+        while (!isCompleted() && process.isAlive()) {
+          Thread.sleep(3000);
+        }
 
-      exitCode = process.exitValue();
+        exitCode = (isCompleted()) ? 0 : -1;
+      } else {// 等待运行完毕
+        process.waitFor(remainTime, TimeUnit.SECONDS);
+        exitCode = process.exitValue();
+      }
     } catch (InterruptedException e) {
       logger.error("interrupt exception, maybe task has been cancel or killed.");
       exitCode = -1;

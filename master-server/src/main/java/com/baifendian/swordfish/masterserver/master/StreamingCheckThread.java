@@ -61,22 +61,20 @@ public class StreamingCheckThread implements Runnable {
           FlowStatus status = FlowStatus.SUCCESS;
 
           // 可能有好多个子任务, 都完成算真的完成, 有一个失败, 算失败
-          for (String appId : appIds) {
-            try {
-              FlowStatus tmpStatus = YarnRestClient.getInstance().getApplicationStatus(appId);
+          String appId = appIds.get(appIds.size() - 1);
 
-              // 任务不存在
-              if (tmpStatus == null) {
-                logger.error("application not exist: {}", appId);
-                status = FlowStatus.KILL;
-                break;
-              } else if (!tmpStatus.typeIsSuccess()) {// 如果没有完成
-                status = tmpStatus;
-                break;
-              }
-            } catch (Exception e) {
-              logger.error(String.format("get application exception: {}", appId), e);
+          try {
+            FlowStatus tmpStatus = YarnRestClient.getInstance().getApplicationStatus(appId);
+
+            // 任务不存在
+            if (tmpStatus == null) {
+              logger.error("application not exist: {}", appId);
+              status = FlowStatus.KILL;
+            } else if (!tmpStatus.typeIsSuccess()) {// 如果没有完成
+              status = tmpStatus;
             }
+          } catch (Exception e) {
+            logger.error(String.format("get application exception: {}", appId), e);
           }
 
           // 更新状态

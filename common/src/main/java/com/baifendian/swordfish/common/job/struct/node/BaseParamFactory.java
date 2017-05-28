@@ -20,7 +20,6 @@ import com.baifendian.swordfish.common.job.struct.node.hql.HqlParam;
 import com.baifendian.swordfish.common.job.struct.node.mr.MrParam;
 import com.baifendian.swordfish.common.job.struct.node.shell.ShellParam;
 import com.baifendian.swordfish.common.job.struct.node.spark.SparkParam;
-import com.baifendian.swordfish.common.job.struct.node.upload.UploadParam;
 import com.baifendian.swordfish.common.job.struct.node.virtual.VirtualParam;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
 import org.slf4j.Logger;
@@ -46,8 +45,6 @@ public class BaseParamFactory {
           return JsonUtil.parseObject(parameter, HqlParam.class);
         case VIRTUAL:
           return VirtualParam.getInstance();
-        case UPLOAD:
-          return JsonUtil.parseObject(parameter, UploadParam.class);
         case SPARK_STREAMING:
           return JsonUtil.parseObject(parameter, SparkParam.class);
         case SPARK:
