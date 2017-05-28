@@ -138,6 +138,11 @@ public abstract class AbstractYarnJob extends AbstractProcessJob {
       try {
         FlowStatus status = YarnRestClient.getInstance().getApplicationStatus(appId);
 
+        if (status == null) {
+          complete = true;
+          return complete;
+        }
+
         // 如果是完成了或者是运行中, 我们认为是 OK 的
         if (status.typeIsFinished() || status == FlowStatus.RUNNING) {
           complete = true;

@@ -16,6 +16,8 @@
 package com.baifendian.swordfish.execserver.runner.streaming;
 
 import com.baifendian.swordfish.common.config.BaseConfig;
+import com.baifendian.swordfish.common.job.struct.node.BaseParam;
+import com.baifendian.swordfish.common.job.struct.node.BaseParamFactory;
 import com.baifendian.swordfish.dao.StreamingDao;
 import com.baifendian.swordfish.dao.enums.ExecType;
 import com.baifendian.swordfish.dao.model.StreamingResult;
@@ -23,10 +25,12 @@ import com.baifendian.swordfish.execserver.job.Job;
 import com.baifendian.swordfish.execserver.job.JobManager;
 import com.baifendian.swordfish.execserver.job.JobProps;
 import com.baifendian.swordfish.execserver.parameter.SystemParamManager;
+import com.baifendian.swordfish.execserver.utils.EnvHelper;
 import com.baifendian.swordfish.execserver.utils.JobLogger;
 import org.slf4j.Logger;
 
-import java.util.Map;
+import java.lang.reflect.InvocationTargetException;
+import java.util.*;
 import java.util.concurrent.Callable;
 
 public class StreamingRunner implements Callable<Boolean> {
@@ -89,6 +93,16 @@ public class StreamingRunner implements Callable<Boolean> {
     boolean success = false;
 
     try {
+      // 准备工作目录和用户
+      EnvHelper.workDirAndUserCreate(jobScriptPath, streamingResult.getProxyUser(), logger);
+
+      // 解析作业参数获取需要的 "项目级资源文件" 清单
+      List<String> projectRes = genProjectResFiles();
+
+      // 将 hdfs 资源拷贝到本地
+      EnvHelper.copyResToLocal(streamingResult.getProjectId(), jobScriptPath, projectRes, logger);
+
+      // 可以运行了
       job = JobManager.newJob(streamingResult.getType(), props, jobLogger);
 
       // job 的前处理
@@ -112,6 +126,36 @@ public class StreamingRunner implements Callable<Boolean> {
     }
 
     return success;
+  }
+
+  /**
+   * 得到资源文件
+   *
+   * @return
+   * @throws IllegalArgumentException
+   * @throws InvocationTargetException
+   * @throws NoSuchMethodException
+   * @throws InstantiationException
+   * @throws IllegalAccessException
+   */
+  private List<String> genProjectResFiles() throws
+      IllegalArgumentException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
+
+    // 项目资源文件
+    Set<String> projectFiles = new HashSet<>();
+
+    // 得到结点参数信息
+    BaseParam baseParam = BaseParamFactory.getBaseParam(streamingResult.getType(), streamingResult.getParameter());
+
+    // 结点参数中获取资源文件
+    if (baseParam != null) {
+      List<String> projectResourceFiles = baseParam.getProjectResourceFiles();
+      if (projectResourceFiles != null) {
+        projectFiles.addAll(projectResourceFiles);
+      }
+    }
+
+    return new ArrayList<>(projectFiles);
   }
 
   /**

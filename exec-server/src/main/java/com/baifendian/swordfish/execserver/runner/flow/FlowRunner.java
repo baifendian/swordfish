@@ -35,13 +35,12 @@ import com.baifendian.swordfish.dao.model.flow.FlowDag;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
 import com.baifendian.swordfish.execserver.exception.ExecTimeoutException;
 import com.baifendian.swordfish.execserver.job.JobContext;
+import com.baifendian.swordfish.execserver.utils.EnvHelper;
 import com.baifendian.swordfish.execserver.runner.node.NodeRunner;
 import com.baifendian.swordfish.execserver.utils.LoggerUtil;
-import com.baifendian.swordfish.execserver.utils.OsUtil;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -161,33 +160,8 @@ public class FlowRunner implements Runnable {
     logger.info("exec id:{}, current execution dir:{}, max try times:{}, timeout:{}, failure policy type:{}", executionFlow.getId(), execLocalPath, maxTryTimes, timeout, failurePolicyType);
 
     try {
-      // 如果存在, 首先清除该目录
-      File execLocalPathFile = new File(execLocalPath);
-
-      if (execLocalPathFile.exists()) {
-        FileUtils.forceDelete(execLocalPathFile);
-      }
-
-      // 创建目录
-      FileUtils.forceMkdir(execLocalPathFile);
-
-      // proxyUser 用户处理, 如果系统不存在该用户，这里自动创建用户
-      String proxyUser = executionFlow.getProxyUser();
-      List<String> osUserList = OsUtil.getUserList();
-
-      // 不存在, 则创建
-      if (!osUserList.contains(proxyUser)) {
-        String userGroup = OsUtil.getGroup();
-        if (StringUtils.isNotEmpty(userGroup)) {
-          logger.info("create os user:{}", proxyUser);
-
-          String cmd = String.format("sudo useradd -g %s %s", userGroup, proxyUser);
-
-          logger.info("exec cmd: {}", cmd);
-
-          OsUtil.exeCmd(cmd);
-        }
-      }
+      // 创建工作目录和用户
+      EnvHelper.workDirAndUserCreate(execLocalPath, executionFlow.getProxyUser(), logger);
 
       // 解析工作流, 得到 DAG 信息
       FlowDag flowDag = JsonUtil.parseObject(executionFlow.getWorkflowData(), FlowDag.class);
@@ -223,18 +197,9 @@ public class FlowRunner implements Runnable {
 
       // 解析作业参数获取需要的 "项目级资源文件" 清单
       List<String> projectRes = genProjectResFiles(flowDag);
-      for (String res : projectRes) {
-        File resFile = new File(execLocalPath, res);
-        if (!resFile.exists()) {
-          String resHdfsPath = BaseConfig.getHdfsResourcesFilename(executionFlow.getProjectId(), res);
 
-          logger.info("get project file:{}", resHdfsPath);
-
-          HdfsClient.getInstance().copyHdfsToLocal(resHdfsPath, execLocalPath + File.separator + res, false, true);
-        } else {
-          logger.info("file:{} exists, ignore", resFile.getName());
-        }
-      }
+      // 将 hdfs 资源拷贝到本地
+      EnvHelper.copyResToLocal(executionFlow.getProjectId(), execLocalPath, projectRes, logger);
 
       // 生成具体 Dag, 待执行
       Graph<String, FlowNode, FlowNodeRelation> dagGraph = genDagGraph(flowDag);

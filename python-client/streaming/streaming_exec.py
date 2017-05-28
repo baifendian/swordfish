@@ -105,7 +105,7 @@ if __name__ == '__main__':
     (status, data) = exec_streaming(sessionId,
                                     settings.g_project,
                                     streamingName,
-                                    "qifeng.dai",
+                                    "jinmiao.li",
                                     'alg')
 
     print status, json.dumps(data, indent=4)
