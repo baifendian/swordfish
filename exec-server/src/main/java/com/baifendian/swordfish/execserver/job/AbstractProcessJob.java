@@ -78,16 +78,11 @@ public abstract class AbstractProcessJob extends AbstractJob {
    * @return 超时时间
    */
   private long calcNodeTimeout() {
-    if (isLongJob()) {
-      return 0;
-    }
-
     long usedTime = (System.currentTimeMillis() - props.getExecJobStartTime().getTime()) / 1000;
-
     long remainTime = props.getExecJobTimeout() - usedTime;
 
-    if (remainTime <= 0) {
-      throw new ExecTimeoutException("workflow execution time out");
+    if (remainTime <= 0 && !isLongJob()) {
+      throw new ExecTimeoutException("workflow or streaming job execution time out");
     }
 
     return remainTime;
@@ -160,6 +155,10 @@ public abstract class AbstractProcessJob extends AbstractJob {
       // 读取控制台输出
       readProcessOutput();
 
+      int pid = getProcessId(process);
+
+      logger.info("Process start, process id is: {}", pid);
+
       // 长任务是比较特殊的
       if (isLongJob()) {
         // 如果没有完成, 会循环, 认为是没有提交
@@ -168,12 +167,14 @@ public abstract class AbstractProcessJob extends AbstractJob {
           Thread.sleep(3000);
         }
 
-        logger.info("streaming job has exit, work dir:{}", workDir);
+        logger.info("streaming job has exit, work dir:{}, pid:{}", workDir, pid);
 
         exitCode = (isCompleted()) ? 0 : -1;
       } else {// 等待运行完毕
         process.waitFor(remainTime, TimeUnit.SECONDS);
         exitCode = process.exitValue();
+
+        logger.info("job has exit, work dir:{}, pid:{}", workDir, pid);
       }
     } catch (InterruptedException e) {
       logger.error("interrupt exception, maybe task has been cancel or killed.");
@@ -185,6 +186,12 @@ public abstract class AbstractProcessJob extends AbstractJob {
       throw new ExecException("Process error. Exit code is " + exitCode);
     } finally {
       complete = true;
+
+      // 长任务, 需要关闭进程
+      if (isLongJob() && process.isAlive()) {
+        // 关闭进程
+        process.destroy();
+      }
     }
   }
 
@@ -212,16 +219,6 @@ public abstract class AbstractProcessJob extends AbstractJob {
   }
 
   /**
-   * 是否还在运行
-   *
-   * @return
-   */
-  private boolean isRunning() {
-    // 如果是长任务, 我们认为一直是启动的
-    return isStarted() && (isLongJob() || (!isLongJob() && !isCompleted()));
-  }
-
-  /**
    * 检测是否启动过了
    */
   private void checkStarted() {
@@ -240,7 +237,7 @@ public abstract class AbstractProcessJob extends AbstractJob {
   private boolean softKill(int processId, final long time, final TimeUnit unit) throws InterruptedException {
     checkStarted();
 
-    if (processId != 0 && isRunning()) {
+    if (processId != 0 && process.isAlive()) {
       try {
         String cmd;
         if (props.getProxyUser() != null) {
@@ -268,7 +265,7 @@ public abstract class AbstractProcessJob extends AbstractJob {
   public void hardKill(int processId) {
     checkStarted();
 
-    if (processId != 0 && isRunning()) {
+    if (processId != 0 && process.isAlive()) {
       try {
         String cmd;
 

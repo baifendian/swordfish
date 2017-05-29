@@ -81,6 +81,7 @@ public abstract class AbstractYarnJob extends AbstractProcessJob {
 
     // 分析日志
     for (String log : logs) {
+      // app id 操作
       String appId = findAppId(log);
 
       if (StringUtils.isNotEmpty(appId) && !appLinks.contains(appId)) {
@@ -88,6 +89,7 @@ public abstract class AbstractYarnJob extends AbstractProcessJob {
         captureAppLinks = true;
       }
 
+      // job id 操作
       String jobId = findJobId(log);
 
       if (StringUtils.isNotEmpty(jobId) && !jobLinks.contains(jobId)) {
@@ -96,6 +98,7 @@ public abstract class AbstractYarnJob extends AbstractProcessJob {
       }
     }
 
+    // 有一个改变才能进行里面的操作
     if (captureAppLinks || captureJobLinks) {
       // 短任务
       if (!isLongJob()) {
@@ -232,14 +235,16 @@ public abstract class AbstractYarnJob extends AbstractProcessJob {
         FileUtils.writeStringToFile(new File(commandFile), sb.toString(), Charset.forName("UTF-8"));
       }
 
+      // 以某账号运行
       String runCmd = "sh " + commandFile;
-      if (props.getProxyUser() != null) {
+      if (StringUtils.isNotEmpty(props.getProxyUser())) {
         runCmd = "sudo -u " + props.getProxyUser() + " " + runCmd;
       }
 
       logger.info("kill cmd:{}", runCmd);
 
       try {
+        // 一般来说, 这种命令挺消耗资源, 但是一般也很快
         Runtime.getRuntime().exec(runCmd);
       } catch (Exception e) {
         logger.error(String.format("kill application %s exception", appid), e);
