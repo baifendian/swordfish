@@ -56,6 +56,24 @@ public class WorkerService {
     public RetInfo cancelExecFlow(int execId) throws org.apache.thrift.TException;
 
     /**
+     * 执行某个流任务
+     * 
+     * execId : 执行 id
+     * 
+     * @param execId
+     */
+    public RetInfo execStreamingJob(int execId) throws org.apache.thrift.TException;
+
+    /**
+     * 取消在执行的指定流任务
+     * 
+     * execId : 执行 id
+     * 
+     * @param execId
+     */
+    public RetInfo cancelStreamingJob(int execId) throws org.apache.thrift.TException;
+
+    /**
      * 执行某个 adHoc SQL
      * 
      * adHocId : adHoc id
@@ -71,6 +89,10 @@ public class WorkerService {
     public void execFlow(int execId, org.apache.thrift.async.AsyncMethodCallback<AsyncClient.execFlow_call> resultHandler) throws org.apache.thrift.TException;
 
     public void cancelExecFlow(int execId, org.apache.thrift.async.AsyncMethodCallback<AsyncClient.cancelExecFlow_call> resultHandler) throws org.apache.thrift.TException;
+
+    public void execStreamingJob(int execId, org.apache.thrift.async.AsyncMethodCallback<AsyncClient.execStreamingJob_call> resultHandler) throws org.apache.thrift.TException;
+
+    public void cancelStreamingJob(int execId, org.apache.thrift.async.AsyncMethodCallback<AsyncClient.cancelStreamingJob_call> resultHandler) throws org.apache.thrift.TException;
 
     public void execAdHoc(int adHocId, org.apache.thrift.async.AsyncMethodCallback<AsyncClient.execAdHoc_call> resultHandler) throws org.apache.thrift.TException;
 
@@ -140,6 +162,52 @@ public class WorkerService {
         return result.success;
       }
       throw new org.apache.thrift.TApplicationException(org.apache.thrift.TApplicationException.MISSING_RESULT, "cancelExecFlow failed: unknown result");
+    }
+
+    public RetInfo execStreamingJob(int execId) throws org.apache.thrift.TException
+    {
+      send_execStreamingJob(execId);
+      return recv_execStreamingJob();
+    }
+
+    public void send_execStreamingJob(int execId) throws org.apache.thrift.TException
+    {
+      execStreamingJob_args args = new execStreamingJob_args();
+      args.setExecId(execId);
+      sendBase("execStreamingJob", args);
+    }
+
+    public RetInfo recv_execStreamingJob() throws org.apache.thrift.TException
+    {
+      execStreamingJob_result result = new execStreamingJob_result();
+      receiveBase(result, "execStreamingJob");
+      if (result.isSetSuccess()) {
+        return result.success;
+      }
+      throw new org.apache.thrift.TApplicationException(org.apache.thrift.TApplicationException.MISSING_RESULT, "execStreamingJob failed: unknown result");
+    }
+
+    public RetInfo cancelStreamingJob(int execId) throws org.apache.thrift.TException
+    {
+      send_cancelStreamingJob(execId);
+      return recv_cancelStreamingJob();
+    }
+
+    public void send_cancelStreamingJob(int execId) throws org.apache.thrift.TException
+    {
+      cancelStreamingJob_args args = new cancelStreamingJob_args();
+      args.setExecId(execId);
+      sendBase("cancelStreamingJob", args);
+    }
+
+    public RetInfo recv_cancelStreamingJob() throws org.apache.thrift.TException
+    {
+      cancelStreamingJob_result result = new cancelStreamingJob_result();
+      receiveBase(result, "cancelStreamingJob");
+      if (result.isSetSuccess()) {
+        return result.success;
+      }
+      throw new org.apache.thrift.TApplicationException(org.apache.thrift.TApplicationException.MISSING_RESULT, "cancelStreamingJob failed: unknown result");
     }
 
     public RetInfo execAdHoc(int adHocId) throws org.apache.thrift.TException
@@ -247,6 +315,70 @@ public class WorkerService {
       }
     }
 
+    public void execStreamingJob(int execId, org.apache.thrift.async.AsyncMethodCallback<execStreamingJob_call> resultHandler) throws org.apache.thrift.TException {
+      checkReady();
+      execStreamingJob_call method_call = new execStreamingJob_call(execId, resultHandler, this, ___protocolFactory, ___transport);
+      this.___currentMethod = method_call;
+      ___manager.call(method_call);
+    }
+
+    public static class execStreamingJob_call extends org.apache.thrift.async.TAsyncMethodCall {
+      private int execId;
+      public execStreamingJob_call(int execId, org.apache.thrift.async.AsyncMethodCallback<execStreamingJob_call> resultHandler, org.apache.thrift.async.TAsyncClient client, org.apache.thrift.protocol.TProtocolFactory protocolFactory, org.apache.thrift.transport.TNonblockingTransport transport) throws org.apache.thrift.TException {
+        super(client, protocolFactory, transport, resultHandler, false);
+        this.execId = execId;
+      }
+
+      public void write_args(org.apache.thrift.protocol.TProtocol prot) throws org.apache.thrift.TException {
+        prot.writeMessageBegin(new org.apache.thrift.protocol.TMessage("execStreamingJob", org.apache.thrift.protocol.TMessageType.CALL, 0));
+        execStreamingJob_args args = new execStreamingJob_args();
+        args.setExecId(execId);
+        args.write(prot);
+        prot.writeMessageEnd();
+      }
+
+      public RetInfo getResult() throws org.apache.thrift.TException {
+        if (getState() != org.apache.thrift.async.TAsyncMethodCall.State.RESPONSE_READ) {
+          throw new IllegalStateException("Method call not finished!");
+        }
+        org.apache.thrift.transport.TMemoryInputTransport memoryTransport = new org.apache.thrift.transport.TMemoryInputTransport(getFrameBuffer().array());
+        org.apache.thrift.protocol.TProtocol prot = client.getProtocolFactory().getProtocol(memoryTransport);
+        return (new Client(prot)).recv_execStreamingJob();
+      }
+    }
+
+    public void cancelStreamingJob(int execId, org.apache.thrift.async.AsyncMethodCallback<cancelStreamingJob_call> resultHandler) throws org.apache.thrift.TException {
+      checkReady();
+      cancelStreamingJob_call method_call = new cancelStreamingJob_call(execId, resultHandler, this, ___protocolFactory, ___transport);
+      this.___currentMethod = method_call;
+      ___manager.call(method_call);
+    }
+
+    public static class cancelStreamingJob_call extends org.apache.thrift.async.TAsyncMethodCall {
+      private int execId;
+      public cancelStreamingJob_call(int execId, org.apache.thrift.async.AsyncMethodCallback<cancelStreamingJob_call> resultHandler, org.apache.thrift.async.TAsyncClient client, org.apache.thrift.protocol.TProtocolFactory protocolFactory, org.apache.thrift.transport.TNonblockingTransport transport) throws org.apache.thrift.TException {
+        super(client, protocolFactory, transport, resultHandler, false);
+        this.execId = execId;
+      }
+
+      public void write_args(org.apache.thrift.protocol.TProtocol prot) throws org.apache.thrift.TException {
+        prot.writeMessageBegin(new org.apache.thrift.protocol.TMessage("cancelStreamingJob", org.apache.thrift.protocol.TMessageType.CALL, 0));
+        cancelStreamingJob_args args = new cancelStreamingJob_args();
+        args.setExecId(execId);
+        args.write(prot);
+        prot.writeMessageEnd();
+      }
+
+      public RetInfo getResult() throws org.apache.thrift.TException {
+        if (getState() != org.apache.thrift.async.TAsyncMethodCall.State.RESPONSE_READ) {
+          throw new IllegalStateException("Method call not finished!");
+        }
+        org.apache.thrift.transport.TMemoryInputTransport memoryTransport = new org.apache.thrift.transport.TMemoryInputTransport(getFrameBuffer().array());
+        org.apache.thrift.protocol.TProtocol prot = client.getProtocolFactory().getProtocol(memoryTransport);
+        return (new Client(prot)).recv_cancelStreamingJob();
+      }
+    }
+
     public void execAdHoc(int adHocId, org.apache.thrift.async.AsyncMethodCallback<execAdHoc_call> resultHandler) throws org.apache.thrift.TException {
       checkReady();
       execAdHoc_call method_call = new execAdHoc_call(adHocId, resultHandler, this, ___protocolFactory, ___transport);
@@ -294,6 +426,8 @@ public class WorkerService {
     private static <I extends Iface> Map<String,  org.apache.thrift.ProcessFunction<I, ? extends  org.apache.thrift.TBase>> getProcessMap(Map<String,  org.apache.thrift.ProcessFunction<I, ? extends  org.apache.thrift.TBase>> processMap) {
       processMap.put("execFlow", new execFlow());
       processMap.put("cancelExecFlow", new cancelExecFlow());
+      processMap.put("execStreamingJob", new execStreamingJob());
+      processMap.put("cancelStreamingJob", new cancelStreamingJob());
       processMap.put("execAdHoc", new execAdHoc());
       return processMap;
     }
@@ -334,6 +468,46 @@ public class WorkerService {
       public cancelExecFlow_result getResult(I iface, cancelExecFlow_args args) throws org.apache.thrift.TException {
         cancelExecFlow_result result = new cancelExecFlow_result();
         result.success = iface.cancelExecFlow(args.execId);
+        return result;
+      }
+    }
+
+    public static class execStreamingJob<I extends Iface> extends org.apache.thrift.ProcessFunction<I, execStreamingJob_args> {
+      public execStreamingJob() {
+        super("execStreamingJob");
+      }
+
+      public execStreamingJob_args getEmptyArgsInstance() {
+        return new execStreamingJob_args();
+      }
+
+      protected boolean isOneway() {
+        return false;
+      }
+
+      public execStreamingJob_result getResult(I iface, execStreamingJob_args args) throws org.apache.thrift.TException {
+        execStreamingJob_result result = new execStreamingJob_result();
+        result.success = iface.execStreamingJob(args.execId);
+        return result;
+      }
+    }
+
+    public static class cancelStreamingJob<I extends Iface> extends org.apache.thrift.ProcessFunction<I, cancelStreamingJob_args> {
+      public cancelStreamingJob() {
+        super("cancelStreamingJob");
+      }
+
+      public cancelStreamingJob_args getEmptyArgsInstance() {
+        return new cancelStreamingJob_args();
+      }
+
+      protected boolean isOneway() {
+        return false;
+      }
+
+      public cancelStreamingJob_result getResult(I iface, cancelStreamingJob_args args) throws org.apache.thrift.TException {
+        cancelStreamingJob_result result = new cancelStreamingJob_result();
+        result.success = iface.cancelStreamingJob(args.execId);
         return result;
       }
     }
@@ -1770,6 +1944,1428 @@ public class WorkerService {
 
       @Override
       public void read(org.apache.thrift.protocol.TProtocol prot, cancelExecFlow_result struct) throws org.apache.thrift.TException {
+        TTupleProtocol iprot = (TTupleProtocol) prot;
+        BitSet incoming = iprot.readBitSet(1);
+        if (incoming.get(0)) {
+          struct.success = new RetInfo();
+          struct.success.read(iprot);
+          struct.setSuccessIsSet(true);
+        }
+      }
+    }
+
+  }
+
+  public static class execStreamingJob_args implements org.apache.thrift.TBase<execStreamingJob_args, execStreamingJob_args._Fields>, java.io.Serializable, Cloneable   {
+    private static final org.apache.thrift.protocol.TStruct STRUCT_DESC = new org.apache.thrift.protocol.TStruct("execStreamingJob_args");
+
+    private static final org.apache.thrift.protocol.TField EXEC_ID_FIELD_DESC = new org.apache.thrift.protocol.TField("execId", org.apache.thrift.protocol.TType.I32, (short)1);
+
+    private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
+    static {
+      schemes.put(StandardScheme.class, new execStreamingJob_argsStandardSchemeFactory());
+      schemes.put(TupleScheme.class, new execStreamingJob_argsTupleSchemeFactory());
+    }
+
+    public int execId; // required
+
+    /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
+    public enum _Fields implements org.apache.thrift.TFieldIdEnum {
+      EXEC_ID((short)1, "execId");
+
+      private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
+
+      static {
+        for (_Fields field : EnumSet.allOf(_Fields.class)) {
+          byName.put(field.getFieldName(), field);
+        }
+      }
+
+      /**
+       * Find the _Fields constant that matches fieldId, or null if its not found.
+       */
+      public static _Fields findByThriftId(int fieldId) {
+        switch(fieldId) {
+          case 1: // EXEC_ID
+            return EXEC_ID;
+          default:
+            return null;
+        }
+      }
+
+      /**
+       * Find the _Fields constant that matches fieldId, throwing an exception
+       * if it is not found.
+       */
+      public static _Fields findByThriftIdOrThrow(int fieldId) {
+        _Fields fields = findByThriftId(fieldId);
+        if (fields == null) throw new IllegalArgumentException("Field " + fieldId + " doesn't exist!");
+        return fields;
+      }
+
+      /**
+       * Find the _Fields constant that matches name, or null if its not found.
+       */
+      public static _Fields findByName(String name) {
+        return byName.get(name);
+      }
+
+      private final short _thriftId;
+      private final String _fieldName;
+
+      _Fields(short thriftId, String fieldName) {
+        _thriftId = thriftId;
+        _fieldName = fieldName;
+      }
+
+      public short getThriftFieldId() {
+        return _thriftId;
+      }
+
+      public String getFieldName() {
+        return _fieldName;
+      }
+    }
+
+    // isset id assignments
+    private static final int __EXECID_ISSET_ID = 0;
+    private byte __isset_bitfield = 0;
+    public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
+    static {
+      Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.EXEC_ID, new org.apache.thrift.meta_data.FieldMetaData("execId", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.I32)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
+      org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(execStreamingJob_args.class, metaDataMap);
+    }
+
+    public execStreamingJob_args() {
+    }
+
+    public execStreamingJob_args(
+      int execId)
+    {
+      this();
+      this.execId = execId;
+      setExecIdIsSet(true);
+    }
+
+    /**
+     * Performs a deep copy on <i>other</i>.
+     */
+    public execStreamingJob_args(execStreamingJob_args other) {
+      __isset_bitfield = other.__isset_bitfield;
+      this.execId = other.execId;
+    }
+
+    public execStreamingJob_args deepCopy() {
+      return new execStreamingJob_args(this);
+    }
+
+    @Override
+    public void clear() {
+      setExecIdIsSet(false);
+      this.execId = 0;
+    }
+
+    public int getExecId() {
+      return this.execId;
+    }
+
+    public execStreamingJob_args setExecId(int execId) {
+      this.execId = execId;
+      setExecIdIsSet(true);
+      return this;
+    }
+
+    public void unsetExecId() {
+      __isset_bitfield = EncodingUtils.clearBit(__isset_bitfield, __EXECID_ISSET_ID);
+    }
+
+    /** Returns true if field execId is set (has been assigned a value) and false otherwise */
+    public boolean isSetExecId() {
+      return EncodingUtils.testBit(__isset_bitfield, __EXECID_ISSET_ID);
+    }
+
+    public void setExecIdIsSet(boolean value) {
+      __isset_bitfield = EncodingUtils.setBit(__isset_bitfield, __EXECID_ISSET_ID, value);
+    }
+
+    public void setFieldValue(_Fields field, Object value) {
+      switch (field) {
+      case EXEC_ID:
+        if (value == null) {
+          unsetExecId();
+        } else {
+          setExecId((Integer)value);
+        }
+        break;
+
+      }
+    }
+
+    public Object getFieldValue(_Fields field) {
+      switch (field) {
+      case EXEC_ID:
+        return Integer.valueOf(getExecId());
+
+      }
+      throw new IllegalStateException();
+    }
+
+    /** Returns true if field corresponding to fieldID is set (has been assigned a value) and false otherwise */
+    public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
+      switch (field) {
+      case EXEC_ID:
+        return isSetExecId();
+      }
+      throw new IllegalStateException();
+    }
+
+    @Override
+    public boolean equals(Object that) {
+      if (that == null)
+        return false;
+      if (that instanceof execStreamingJob_args)
+        return this.equals((execStreamingJob_args)that);
+      return false;
+    }
+
+    public boolean equals(execStreamingJob_args that) {
+      if (that == null)
+        return false;
+
+      boolean this_present_execId = true;
+      boolean that_present_execId = true;
+      if (this_present_execId || that_present_execId) {
+        if (!(this_present_execId && that_present_execId))
+          return false;
+        if (this.execId != that.execId)
+          return false;
+      }
+
+      return true;
+    }
+
+    @Override
+    public int hashCode() {
+      return 0;
+    }
+
+    public int compareTo(execStreamingJob_args other) {
+      if (!getClass().equals(other.getClass())) {
+        return getClass().getName().compareTo(other.getClass().getName());
+      }
+
+      int lastComparison = 0;
+      execStreamingJob_args typedOther = (execStreamingJob_args)other;
+
+      lastComparison = Boolean.valueOf(isSetExecId()).compareTo(typedOther.isSetExecId());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetExecId()) {
+        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.execId, typedOther.execId);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
+    }
+
+    public void read(org.apache.thrift.protocol.TProtocol iprot) throws org.apache.thrift.TException {
+      schemes.get(iprot.getScheme()).getScheme().read(iprot, this);
+    }
+
+    public void write(org.apache.thrift.protocol.TProtocol oprot) throws org.apache.thrift.TException {
+      schemes.get(oprot.getScheme()).getScheme().write(oprot, this);
+    }
+
+    @Override
+    public String toString() {
+      StringBuilder sb = new StringBuilder("execStreamingJob_args(");
+      boolean first = true;
+
+      sb.append("execId:");
+      sb.append(this.execId);
+      first = false;
+      sb.append(")");
+      return sb.toString();
+    }
+
+    public void validate() throws org.apache.thrift.TException {
+      // check for required fields
+      // check for sub-struct validity
+    }
+
+    private void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {
+      try {
+        write(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(out)));
+      } catch (org.apache.thrift.TException te) {
+        throw new java.io.IOException(te);
+      }
+    }
+
+    private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
+      try {
+        // it doesn't seem like you should have to do this, but java serialization is wacky, and doesn't call the default constructor.
+        __isset_bitfield = 0;
+        read(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(in)));
+      } catch (org.apache.thrift.TException te) {
+        throw new java.io.IOException(te);
+      }
+    }
+
+    private static class execStreamingJob_argsStandardSchemeFactory implements SchemeFactory {
+      public execStreamingJob_argsStandardScheme getScheme() {
+        return new execStreamingJob_argsStandardScheme();
+      }
+    }
+
+    private static class execStreamingJob_argsStandardScheme extends StandardScheme<execStreamingJob_args> {
+
+      public void read(org.apache.thrift.protocol.TProtocol iprot, execStreamingJob_args struct) throws org.apache.thrift.TException {
+        org.apache.thrift.protocol.TField schemeField;
+        iprot.readStructBegin();
+        while (true)
+        {
+          schemeField = iprot.readFieldBegin();
+          if (schemeField.type == org.apache.thrift.protocol.TType.STOP) { 
+            break;
+          }
+          switch (schemeField.id) {
+            case 1: // EXEC_ID
+              if (schemeField.type == org.apache.thrift.protocol.TType.I32) {
+                struct.execId = iprot.readI32();
+                struct.setExecIdIsSet(true);
+              } else { 
+                org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+              }
+              break;
+            default:
+              org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+          }
+          iprot.readFieldEnd();
+        }
+        iprot.readStructEnd();
+
+        // check for required fields of primitive type, which can't be checked in the validate method
+        struct.validate();
+      }
+
+      public void write(org.apache.thrift.protocol.TProtocol oprot, execStreamingJob_args struct) throws org.apache.thrift.TException {
+        struct.validate();
+
+        oprot.writeStructBegin(STRUCT_DESC);
+        oprot.writeFieldBegin(EXEC_ID_FIELD_DESC);
+        oprot.writeI32(struct.execId);
+        oprot.writeFieldEnd();
+        oprot.writeFieldStop();
+        oprot.writeStructEnd();
+      }
+
+    }
+
+    private static class execStreamingJob_argsTupleSchemeFactory implements SchemeFactory {
+      public execStreamingJob_argsTupleScheme getScheme() {
+        return new execStreamingJob_argsTupleScheme();
+      }
+    }
+
+    private static class execStreamingJob_argsTupleScheme extends TupleScheme<execStreamingJob_args> {
+
+      @Override
+      public void write(org.apache.thrift.protocol.TProtocol prot, execStreamingJob_args struct) throws org.apache.thrift.TException {
+        TTupleProtocol oprot = (TTupleProtocol) prot;
+        BitSet optionals = new BitSet();
+        if (struct.isSetExecId()) {
+          optionals.set(0);
+        }
+        oprot.writeBitSet(optionals, 1);
+        if (struct.isSetExecId()) {
+          oprot.writeI32(struct.execId);
+        }
+      }
+
+      @Override
+      public void read(org.apache.thrift.protocol.TProtocol prot, execStreamingJob_args struct) throws org.apache.thrift.TException {
+        TTupleProtocol iprot = (TTupleProtocol) prot;
+        BitSet incoming = iprot.readBitSet(1);
+        if (incoming.get(0)) {
+          struct.execId = iprot.readI32();
+          struct.setExecIdIsSet(true);
+        }
+      }
+    }
+
+  }
+
+  public static class execStreamingJob_result implements org.apache.thrift.TBase<execStreamingJob_result, execStreamingJob_result._Fields>, java.io.Serializable, Cloneable   {
+    private static final org.apache.thrift.protocol.TStruct STRUCT_DESC = new org.apache.thrift.protocol.TStruct("execStreamingJob_result");
+
+    private static final org.apache.thrift.protocol.TField SUCCESS_FIELD_DESC = new org.apache.thrift.protocol.TField("success", org.apache.thrift.protocol.TType.STRUCT, (short)0);
+
+    private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
+    static {
+      schemes.put(StandardScheme.class, new execStreamingJob_resultStandardSchemeFactory());
+      schemes.put(TupleScheme.class, new execStreamingJob_resultTupleSchemeFactory());
+    }
+
+    public RetInfo success; // required
+
+    /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
+    public enum _Fields implements org.apache.thrift.TFieldIdEnum {
+      SUCCESS((short)0, "success");
+
+      private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
+
+      static {
+        for (_Fields field : EnumSet.allOf(_Fields.class)) {
+          byName.put(field.getFieldName(), field);
+        }
+      }
+
+      /**
+       * Find the _Fields constant that matches fieldId, or null if its not found.
+       */
+      public static _Fields findByThriftId(int fieldId) {
+        switch(fieldId) {
+          case 0: // SUCCESS
+            return SUCCESS;
+          default:
+            return null;
+        }
+      }
+
+      /**
+       * Find the _Fields constant that matches fieldId, throwing an exception
+       * if it is not found.
+       */
+      public static _Fields findByThriftIdOrThrow(int fieldId) {
+        _Fields fields = findByThriftId(fieldId);
+        if (fields == null) throw new IllegalArgumentException("Field " + fieldId + " doesn't exist!");
+        return fields;
+      }
+
+      /**
+       * Find the _Fields constant that matches name, or null if its not found.
+       */
+      public static _Fields findByName(String name) {
+        return byName.get(name);
+      }
+
+      private final short _thriftId;
+      private final String _fieldName;
+
+      _Fields(short thriftId, String fieldName) {
+        _thriftId = thriftId;
+        _fieldName = fieldName;
+      }
+
+      public short getThriftFieldId() {
+        return _thriftId;
+      }
+
+      public String getFieldName() {
+        return _fieldName;
+      }
+    }
+
+    // isset id assignments
+    public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
+    static {
+      Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.SUCCESS, new org.apache.thrift.meta_data.FieldMetaData("success", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+          new org.apache.thrift.meta_data.StructMetaData(org.apache.thrift.protocol.TType.STRUCT, RetInfo.class)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
+      org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(execStreamingJob_result.class, metaDataMap);
+    }
+
+    public execStreamingJob_result() {
+    }
+
+    public execStreamingJob_result(
+      RetInfo success)
+    {
+      this();
+      this.success = success;
+    }
+
+    /**
+     * Performs a deep copy on <i>other</i>.
+     */
+    public execStreamingJob_result(execStreamingJob_result other) {
+      if (other.isSetSuccess()) {
+        this.success = new RetInfo(other.success);
+      }
+    }
+
+    public execStreamingJob_result deepCopy() {
+      return new execStreamingJob_result(this);
+    }
+
+    @Override
+    public void clear() {
+      this.success = null;
+    }
+
+    public RetInfo getSuccess() {
+      return this.success;
+    }
+
+    public execStreamingJob_result setSuccess(RetInfo success) {
+      this.success = success;
+      return this;
+    }
+
+    public void unsetSuccess() {
+      this.success = null;
+    }
+
+    /** Returns true if field success is set (has been assigned a value) and false otherwise */
+    public boolean isSetSuccess() {
+      return this.success != null;
+    }
+
+    public void setSuccessIsSet(boolean value) {
+      if (!value) {
+        this.success = null;
+      }
+    }
+
+    public void setFieldValue(_Fields field, Object value) {
+      switch (field) {
+      case SUCCESS:
+        if (value == null) {
+          unsetSuccess();
+        } else {
+          setSuccess((RetInfo)value);
+        }
+        break;
+
+      }
+    }
+
+    public Object getFieldValue(_Fields field) {
+      switch (field) {
+      case SUCCESS:
+        return getSuccess();
+
+      }
+      throw new IllegalStateException();
+    }
+
+    /** Returns true if field corresponding to fieldID is set (has been assigned a value) and false otherwise */
+    public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
+      switch (field) {
+      case SUCCESS:
+        return isSetSuccess();
+      }
+      throw new IllegalStateException();
+    }
+
+    @Override
+    public boolean equals(Object that) {
+      if (that == null)
+        return false;
+      if (that instanceof execStreamingJob_result)
+        return this.equals((execStreamingJob_result)that);
+      return false;
+    }
+
+    public boolean equals(execStreamingJob_result that) {
+      if (that == null)
+        return false;
+
+      boolean this_present_success = true && this.isSetSuccess();
+      boolean that_present_success = true && that.isSetSuccess();
+      if (this_present_success || that_present_success) {
+        if (!(this_present_success && that_present_success))
+          return false;
+        if (!this.success.equals(that.success))
+          return false;
+      }
+
+      return true;
+    }
+
+    @Override
+    public int hashCode() {
+      return 0;
+    }
+
+    public int compareTo(execStreamingJob_result other) {
+      if (!getClass().equals(other.getClass())) {
+        return getClass().getName().compareTo(other.getClass().getName());
+      }
+
+      int lastComparison = 0;
+      execStreamingJob_result typedOther = (execStreamingJob_result)other;
+
+      lastComparison = Boolean.valueOf(isSetSuccess()).compareTo(typedOther.isSetSuccess());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetSuccess()) {
+        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.success, typedOther.success);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
+    }
+
+    public void read(org.apache.thrift.protocol.TProtocol iprot) throws org.apache.thrift.TException {
+      schemes.get(iprot.getScheme()).getScheme().read(iprot, this);
+    }
+
+    public void write(org.apache.thrift.protocol.TProtocol oprot) throws org.apache.thrift.TException {
+      schemes.get(oprot.getScheme()).getScheme().write(oprot, this);
+      }
+
+    @Override
+    public String toString() {
+      StringBuilder sb = new StringBuilder("execStreamingJob_result(");
+      boolean first = true;
+
+      sb.append("success:");
+      if (this.success == null) {
+        sb.append("null");
+      } else {
+        sb.append(this.success);
+      }
+      first = false;
+      sb.append(")");
+      return sb.toString();
+    }
+
+    public void validate() throws org.apache.thrift.TException {
+      // check for required fields
+      // check for sub-struct validity
+      if (success != null) {
+        success.validate();
+      }
+    }
+
+    private void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {
+      try {
+        write(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(out)));
+      } catch (org.apache.thrift.TException te) {
+        throw new java.io.IOException(te);
+      }
+    }
+
+    private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
+      try {
+        read(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(in)));
+      } catch (org.apache.thrift.TException te) {
+        throw new java.io.IOException(te);
+      }
+    }
+
+    private static class execStreamingJob_resultStandardSchemeFactory implements SchemeFactory {
+      public execStreamingJob_resultStandardScheme getScheme() {
+        return new execStreamingJob_resultStandardScheme();
+      }
+    }
+
+    private static class execStreamingJob_resultStandardScheme extends StandardScheme<execStreamingJob_result> {
+
+      public void read(org.apache.thrift.protocol.TProtocol iprot, execStreamingJob_result struct) throws org.apache.thrift.TException {
+        org.apache.thrift.protocol.TField schemeField;
+        iprot.readStructBegin();
+        while (true)
+        {
+          schemeField = iprot.readFieldBegin();
+          if (schemeField.type == org.apache.thrift.protocol.TType.STOP) { 
+            break;
+          }
+          switch (schemeField.id) {
+            case 0: // SUCCESS
+              if (schemeField.type == org.apache.thrift.protocol.TType.STRUCT) {
+                struct.success = new RetInfo();
+                struct.success.read(iprot);
+                struct.setSuccessIsSet(true);
+              } else { 
+                org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+              }
+              break;
+            default:
+              org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+          }
+          iprot.readFieldEnd();
+        }
+        iprot.readStructEnd();
+
+        // check for required fields of primitive type, which can't be checked in the validate method
+        struct.validate();
+      }
+
+      public void write(org.apache.thrift.protocol.TProtocol oprot, execStreamingJob_result struct) throws org.apache.thrift.TException {
+        struct.validate();
+
+        oprot.writeStructBegin(STRUCT_DESC);
+        if (struct.success != null) {
+          oprot.writeFieldBegin(SUCCESS_FIELD_DESC);
+          struct.success.write(oprot);
+          oprot.writeFieldEnd();
+        }
+        oprot.writeFieldStop();
+        oprot.writeStructEnd();
+      }
+
+    }
+
+    private static class execStreamingJob_resultTupleSchemeFactory implements SchemeFactory {
+      public execStreamingJob_resultTupleScheme getScheme() {
+        return new execStreamingJob_resultTupleScheme();
+      }
+    }
+
+    private static class execStreamingJob_resultTupleScheme extends TupleScheme<execStreamingJob_result> {
+
+      @Override
+      public void write(org.apache.thrift.protocol.TProtocol prot, execStreamingJob_result struct) throws org.apache.thrift.TException {
+        TTupleProtocol oprot = (TTupleProtocol) prot;
+        BitSet optionals = new BitSet();
+        if (struct.isSetSuccess()) {
+          optionals.set(0);
+        }
+        oprot.writeBitSet(optionals, 1);
+        if (struct.isSetSuccess()) {
+          struct.success.write(oprot);
+        }
+      }
+
+      @Override
+      public void read(org.apache.thrift.protocol.TProtocol prot, execStreamingJob_result struct) throws org.apache.thrift.TException {
+        TTupleProtocol iprot = (TTupleProtocol) prot;
+        BitSet incoming = iprot.readBitSet(1);
+        if (incoming.get(0)) {
+          struct.success = new RetInfo();
+          struct.success.read(iprot);
+          struct.setSuccessIsSet(true);
+        }
+      }
+    }
+
+  }
+
+  public static class cancelStreamingJob_args implements org.apache.thrift.TBase<cancelStreamingJob_args, cancelStreamingJob_args._Fields>, java.io.Serializable, Cloneable   {
+    private static final org.apache.thrift.protocol.TStruct STRUCT_DESC = new org.apache.thrift.protocol.TStruct("cancelStreamingJob_args");
+
+    private static final org.apache.thrift.protocol.TField EXEC_ID_FIELD_DESC = new org.apache.thrift.protocol.TField("execId", org.apache.thrift.protocol.TType.I32, (short)1);
+
+    private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
+    static {
+      schemes.put(StandardScheme.class, new cancelStreamingJob_argsStandardSchemeFactory());
+      schemes.put(TupleScheme.class, new cancelStreamingJob_argsTupleSchemeFactory());
+    }
+
+    public int execId; // required
+
+    /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
+    public enum _Fields implements org.apache.thrift.TFieldIdEnum {
+      EXEC_ID((short)1, "execId");
+
+      private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
+
+      static {
+        for (_Fields field : EnumSet.allOf(_Fields.class)) {
+          byName.put(field.getFieldName(), field);
+        }
+      }
+
+      /**
+       * Find the _Fields constant that matches fieldId, or null if its not found.
+       */
+      public static _Fields findByThriftId(int fieldId) {
+        switch(fieldId) {
+          case 1: // EXEC_ID
+            return EXEC_ID;
+          default:
+            return null;
+        }
+      }
+
+      /**
+       * Find the _Fields constant that matches fieldId, throwing an exception
+       * if it is not found.
+       */
+      public static _Fields findByThriftIdOrThrow(int fieldId) {
+        _Fields fields = findByThriftId(fieldId);
+        if (fields == null) throw new IllegalArgumentException("Field " + fieldId + " doesn't exist!");
+        return fields;
+      }
+
+      /**
+       * Find the _Fields constant that matches name, or null if its not found.
+       */
+      public static _Fields findByName(String name) {
+        return byName.get(name);
+      }
+
+      private final short _thriftId;
+      private final String _fieldName;
+
+      _Fields(short thriftId, String fieldName) {
+        _thriftId = thriftId;
+        _fieldName = fieldName;
+      }
+
+      public short getThriftFieldId() {
+        return _thriftId;
+      }
+
+      public String getFieldName() {
+        return _fieldName;
+      }
+    }
+
+    // isset id assignments
+    private static final int __EXECID_ISSET_ID = 0;
+    private byte __isset_bitfield = 0;
+    public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
+    static {
+      Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.EXEC_ID, new org.apache.thrift.meta_data.FieldMetaData("execId", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.I32)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
+      org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(cancelStreamingJob_args.class, metaDataMap);
+    }
+
+    public cancelStreamingJob_args() {
+    }
+
+    public cancelStreamingJob_args(
+      int execId)
+    {
+      this();
+      this.execId = execId;
+      setExecIdIsSet(true);
+    }
+
+    /**
+     * Performs a deep copy on <i>other</i>.
+     */
+    public cancelStreamingJob_args(cancelStreamingJob_args other) {
+      __isset_bitfield = other.__isset_bitfield;
+      this.execId = other.execId;
+    }
+
+    public cancelStreamingJob_args deepCopy() {
+      return new cancelStreamingJob_args(this);
+    }
+
+    @Override
+    public void clear() {
+      setExecIdIsSet(false);
+      this.execId = 0;
+    }
+
+    public int getExecId() {
+      return this.execId;
+    }
+
+    public cancelStreamingJob_args setExecId(int execId) {
+      this.execId = execId;
+      setExecIdIsSet(true);
+      return this;
+    }
+
+    public void unsetExecId() {
+      __isset_bitfield = EncodingUtils.clearBit(__isset_bitfield, __EXECID_ISSET_ID);
+    }
+
+    /** Returns true if field execId is set (has been assigned a value) and false otherwise */
+    public boolean isSetExecId() {
+      return EncodingUtils.testBit(__isset_bitfield, __EXECID_ISSET_ID);
+    }
+
+    public void setExecIdIsSet(boolean value) {
+      __isset_bitfield = EncodingUtils.setBit(__isset_bitfield, __EXECID_ISSET_ID, value);
+    }
+
+    public void setFieldValue(_Fields field, Object value) {
+      switch (field) {
+      case EXEC_ID:
+        if (value == null) {
+          unsetExecId();
+        } else {
+          setExecId((Integer)value);
+        }
+        break;
+
+      }
+    }
+
+    public Object getFieldValue(_Fields field) {
+      switch (field) {
+      case EXEC_ID:
+        return Integer.valueOf(getExecId());
+
+      }
+      throw new IllegalStateException();
+    }
+
+    /** Returns true if field corresponding to fieldID is set (has been assigned a value) and false otherwise */
+    public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
+      switch (field) {
+      case EXEC_ID:
+        return isSetExecId();
+      }
+      throw new IllegalStateException();
+    }
+
+    @Override
+    public boolean equals(Object that) {
+      if (that == null)
+        return false;
+      if (that instanceof cancelStreamingJob_args)
+        return this.equals((cancelStreamingJob_args)that);
+      return false;
+    }
+
+    public boolean equals(cancelStreamingJob_args that) {
+      if (that == null)
+        return false;
+
+      boolean this_present_execId = true;
+      boolean that_present_execId = true;
+      if (this_present_execId || that_present_execId) {
+        if (!(this_present_execId && that_present_execId))
+          return false;
+        if (this.execId != that.execId)
+          return false;
+      }
+
+      return true;
+    }
+
+    @Override
+    public int hashCode() {
+      return 0;
+    }
+
+    public int compareTo(cancelStreamingJob_args other) {
+      if (!getClass().equals(other.getClass())) {
+        return getClass().getName().compareTo(other.getClass().getName());
+      }
+
+      int lastComparison = 0;
+      cancelStreamingJob_args typedOther = (cancelStreamingJob_args)other;
+
+      lastComparison = Boolean.valueOf(isSetExecId()).compareTo(typedOther.isSetExecId());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetExecId()) {
+        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.execId, typedOther.execId);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
+    }
+
+    public void read(org.apache.thrift.protocol.TProtocol iprot) throws org.apache.thrift.TException {
+      schemes.get(iprot.getScheme()).getScheme().read(iprot, this);
+    }
+
+    public void write(org.apache.thrift.protocol.TProtocol oprot) throws org.apache.thrift.TException {
+      schemes.get(oprot.getScheme()).getScheme().write(oprot, this);
+    }
+
+    @Override
+    public String toString() {
+      StringBuilder sb = new StringBuilder("cancelStreamingJob_args(");
+      boolean first = true;
+
+      sb.append("execId:");
+      sb.append(this.execId);
+      first = false;
+      sb.append(")");
+      return sb.toString();
+    }
+
+    public void validate() throws org.apache.thrift.TException {
+      // check for required fields
+      // check for sub-struct validity
+    }
+
+    private void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {
+      try {
+        write(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(out)));
+      } catch (org.apache.thrift.TException te) {
+        throw new java.io.IOException(te);
+      }
+    }
+
+    private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
+      try {
+        // it doesn't seem like you should have to do this, but java serialization is wacky, and doesn't call the default constructor.
+        __isset_bitfield = 0;
+        read(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(in)));
+      } catch (org.apache.thrift.TException te) {
+        throw new java.io.IOException(te);
+      }
+    }
+
+    private static class cancelStreamingJob_argsStandardSchemeFactory implements SchemeFactory {
+      public cancelStreamingJob_argsStandardScheme getScheme() {
+        return new cancelStreamingJob_argsStandardScheme();
+      }
+    }
+
+    private static class cancelStreamingJob_argsStandardScheme extends StandardScheme<cancelStreamingJob_args> {
+
+      public void read(org.apache.thrift.protocol.TProtocol iprot, cancelStreamingJob_args struct) throws org.apache.thrift.TException {
+        org.apache.thrift.protocol.TField schemeField;
+        iprot.readStructBegin();
+        while (true)
+        {
+          schemeField = iprot.readFieldBegin();
+          if (schemeField.type == org.apache.thrift.protocol.TType.STOP) { 
+            break;
+          }
+          switch (schemeField.id) {
+            case 1: // EXEC_ID
+              if (schemeField.type == org.apache.thrift.protocol.TType.I32) {
+                struct.execId = iprot.readI32();
+                struct.setExecIdIsSet(true);
+              } else { 
+                org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+              }
+              break;
+            default:
+              org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+          }
+          iprot.readFieldEnd();
+        }
+        iprot.readStructEnd();
+
+        // check for required fields of primitive type, which can't be checked in the validate method
+        struct.validate();
+      }
+
+      public void write(org.apache.thrift.protocol.TProtocol oprot, cancelStreamingJob_args struct) throws org.apache.thrift.TException {
+        struct.validate();
+
+        oprot.writeStructBegin(STRUCT_DESC);
+        oprot.writeFieldBegin(EXEC_ID_FIELD_DESC);
+        oprot.writeI32(struct.execId);
+        oprot.writeFieldEnd();
+        oprot.writeFieldStop();
+        oprot.writeStructEnd();
+      }
+
+    }
+
+    private static class cancelStreamingJob_argsTupleSchemeFactory implements SchemeFactory {
+      public cancelStreamingJob_argsTupleScheme getScheme() {
+        return new cancelStreamingJob_argsTupleScheme();
+      }
+    }
+
+    private static class cancelStreamingJob_argsTupleScheme extends TupleScheme<cancelStreamingJob_args> {
+
+      @Override
+      public void write(org.apache.thrift.protocol.TProtocol prot, cancelStreamingJob_args struct) throws org.apache.thrift.TException {
+        TTupleProtocol oprot = (TTupleProtocol) prot;
+        BitSet optionals = new BitSet();
+        if (struct.isSetExecId()) {
+          optionals.set(0);
+        }
+        oprot.writeBitSet(optionals, 1);
+        if (struct.isSetExecId()) {
+          oprot.writeI32(struct.execId);
+        }
+      }
+
+      @Override
+      public void read(org.apache.thrift.protocol.TProtocol prot, cancelStreamingJob_args struct) throws org.apache.thrift.TException {
+        TTupleProtocol iprot = (TTupleProtocol) prot;
+        BitSet incoming = iprot.readBitSet(1);
+        if (incoming.get(0)) {
+          struct.execId = iprot.readI32();
+          struct.setExecIdIsSet(true);
+        }
+      }
+    }
+
+  }
+
+  public static class cancelStreamingJob_result implements org.apache.thrift.TBase<cancelStreamingJob_result, cancelStreamingJob_result._Fields>, java.io.Serializable, Cloneable   {
+    private static final org.apache.thrift.protocol.TStruct STRUCT_DESC = new org.apache.thrift.protocol.TStruct("cancelStreamingJob_result");
+
+    private static final org.apache.thrift.protocol.TField SUCCESS_FIELD_DESC = new org.apache.thrift.protocol.TField("success", org.apache.thrift.protocol.TType.STRUCT, (short)0);
+
+    private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
+    static {
+      schemes.put(StandardScheme.class, new cancelStreamingJob_resultStandardSchemeFactory());
+      schemes.put(TupleScheme.class, new cancelStreamingJob_resultTupleSchemeFactory());
+    }
+
+    public RetInfo success; // required
+
+    /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
+    public enum _Fields implements org.apache.thrift.TFieldIdEnum {
+      SUCCESS((short)0, "success");
+
+      private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
+
+      static {
+        for (_Fields field : EnumSet.allOf(_Fields.class)) {
+          byName.put(field.getFieldName(), field);
+        }
+      }
+
+      /**
+       * Find the _Fields constant that matches fieldId, or null if its not found.
+       */
+      public static _Fields findByThriftId(int fieldId) {
+        switch(fieldId) {
+          case 0: // SUCCESS
+            return SUCCESS;
+          default:
+            return null;
+        }
+      }
+
+      /**
+       * Find the _Fields constant that matches fieldId, throwing an exception
+       * if it is not found.
+       */
+      public static _Fields findByThriftIdOrThrow(int fieldId) {
+        _Fields fields = findByThriftId(fieldId);
+        if (fields == null) throw new IllegalArgumentException("Field " + fieldId + " doesn't exist!");
+        return fields;
+      }
+
+      /**
+       * Find the _Fields constant that matches name, or null if its not found.
+       */
+      public static _Fields findByName(String name) {
+        return byName.get(name);
+      }
+
+      private final short _thriftId;
+      private final String _fieldName;
+
+      _Fields(short thriftId, String fieldName) {
+        _thriftId = thriftId;
+        _fieldName = fieldName;
+      }
+
+      public short getThriftFieldId() {
+        return _thriftId;
+      }
+
+      public String getFieldName() {
+        return _fieldName;
+      }
+    }
+
+    // isset id assignments
+    public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
+    static {
+      Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.SUCCESS, new org.apache.thrift.meta_data.FieldMetaData("success", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+          new org.apache.thrift.meta_data.StructMetaData(org.apache.thrift.protocol.TType.STRUCT, RetInfo.class)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
+      org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(cancelStreamingJob_result.class, metaDataMap);
+    }
+
+    public cancelStreamingJob_result() {
+    }
+
+    public cancelStreamingJob_result(
+      RetInfo success)
+    {
+      this();
+      this.success = success;
+    }
+
+    /**
+     * Performs a deep copy on <i>other</i>.
+     */
+    public cancelStreamingJob_result(cancelStreamingJob_result other) {
+      if (other.isSetSuccess()) {
+        this.success = new RetInfo(other.success);
+      }
+    }
+
+    public cancelStreamingJob_result deepCopy() {
+      return new cancelStreamingJob_result(this);
+    }
+
+    @Override
+    public void clear() {
+      this.success = null;
+    }
+
+    public RetInfo getSuccess() {
+      return this.success;
+    }
+
+    public cancelStreamingJob_result setSuccess(RetInfo success) {
+      this.success = success;
+      return this;
+    }
+
+    public void unsetSuccess() {
+      this.success = null;
+    }
+
+    /** Returns true if field success is set (has been assigned a value) and false otherwise */
+    public boolean isSetSuccess() {
+      return this.success != null;
+    }
+
+    public void setSuccessIsSet(boolean value) {
+      if (!value) {
+        this.success = null;
+      }
+    }
+
+    public void setFieldValue(_Fields field, Object value) {
+      switch (field) {
+      case SUCCESS:
+        if (value == null) {
+          unsetSuccess();
+        } else {
+          setSuccess((RetInfo)value);
+        }
+        break;
+
+      }
+    }
+
+    public Object getFieldValue(_Fields field) {
+      switch (field) {
+      case SUCCESS:
+        return getSuccess();
+
+      }
+      throw new IllegalStateException();
+    }
+
+    /** Returns true if field corresponding to fieldID is set (has been assigned a value) and false otherwise */
+    public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
+      switch (field) {
+      case SUCCESS:
+        return isSetSuccess();
+      }
+      throw new IllegalStateException();
+    }
+
+    @Override
+    public boolean equals(Object that) {
+      if (that == null)
+        return false;
+      if (that instanceof cancelStreamingJob_result)
+        return this.equals((cancelStreamingJob_result)that);
+      return false;
+    }
+
+    public boolean equals(cancelStreamingJob_result that) {
+      if (that == null)
+        return false;
+
+      boolean this_present_success = true && this.isSetSuccess();
+      boolean that_present_success = true && that.isSetSuccess();
+      if (this_present_success || that_present_success) {
+        if (!(this_present_success && that_present_success))
+          return false;
+        if (!this.success.equals(that.success))
+          return false;
+      }
+
+      return true;
+    }
+
+    @Override
+    public int hashCode() {
+      return 0;
+    }
+
+    public int compareTo(cancelStreamingJob_result other) {
+      if (!getClass().equals(other.getClass())) {
+        return getClass().getName().compareTo(other.getClass().getName());
+      }
+
+      int lastComparison = 0;
+      cancelStreamingJob_result typedOther = (cancelStreamingJob_result)other;
+
+      lastComparison = Boolean.valueOf(isSetSuccess()).compareTo(typedOther.isSetSuccess());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetSuccess()) {
+        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.success, typedOther.success);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
+    }
+
+    public void read(org.apache.thrift.protocol.TProtocol iprot) throws org.apache.thrift.TException {
+      schemes.get(iprot.getScheme()).getScheme().read(iprot, this);
+    }
+
+    public void write(org.apache.thrift.protocol.TProtocol oprot) throws org.apache.thrift.TException {
+      schemes.get(oprot.getScheme()).getScheme().write(oprot, this);
+      }
+
+    @Override
+    public String toString() {
+      StringBuilder sb = new StringBuilder("cancelStreamingJob_result(");
+      boolean first = true;
+
+      sb.append("success:");
+      if (this.success == null) {
+        sb.append("null");
+      } else {
+        sb.append(this.success);
+      }
+      first = false;
+      sb.append(")");
+      return sb.toString();
+    }
+
+    public void validate() throws org.apache.thrift.TException {
+      // check for required fields
+      // check for sub-struct validity
+      if (success != null) {
+        success.validate();
+      }
+    }
+
+    private void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {
+      try {
+        write(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(out)));
+      } catch (org.apache.thrift.TException te) {
+        throw new java.io.IOException(te);
+      }
+    }
+
+    private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
+      try {
+        read(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(in)));
+      } catch (org.apache.thrift.TException te) {
+        throw new java.io.IOException(te);
+      }
+    }
+
+    private static class cancelStreamingJob_resultStandardSchemeFactory implements SchemeFactory {
+      public cancelStreamingJob_resultStandardScheme getScheme() {
+        return new cancelStreamingJob_resultStandardScheme();
+      }
+    }
+
+    private static class cancelStreamingJob_resultStandardScheme extends StandardScheme<cancelStreamingJob_result> {
+
+      public void read(org.apache.thrift.protocol.TProtocol iprot, cancelStreamingJob_result struct) throws org.apache.thrift.TException {
+        org.apache.thrift.protocol.TField schemeField;
+        iprot.readStructBegin();
+        while (true)
+        {
+          schemeField = iprot.readFieldBegin();
+          if (schemeField.type == org.apache.thrift.protocol.TType.STOP) { 
+            break;
+          }
+          switch (schemeField.id) {
+            case 0: // SUCCESS
+              if (schemeField.type == org.apache.thrift.protocol.TType.STRUCT) {
+                struct.success = new RetInfo();
+                struct.success.read(iprot);
+                struct.setSuccessIsSet(true);
+              } else { 
+                org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+              }
+              break;
+            default:
+              org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+          }
+          iprot.readFieldEnd();
+        }
+        iprot.readStructEnd();
+
+        // check for required fields of primitive type, which can't be checked in the validate method
+        struct.validate();
+      }
+
+      public void write(org.apache.thrift.protocol.TProtocol oprot, cancelStreamingJob_result struct) throws org.apache.thrift.TException {
+        struct.validate();
+
+        oprot.writeStructBegin(STRUCT_DESC);
+        if (struct.success != null) {
+          oprot.writeFieldBegin(SUCCESS_FIELD_DESC);
+          struct.success.write(oprot);
+          oprot.writeFieldEnd();
+        }
+        oprot.writeFieldStop();
+        oprot.writeStructEnd();
+      }
+
+    }
+
+    private static class cancelStreamingJob_resultTupleSchemeFactory implements SchemeFactory {
+      public cancelStreamingJob_resultTupleScheme getScheme() {
+        return new cancelStreamingJob_resultTupleScheme();
+      }
+    }
+
+    private static class cancelStreamingJob_resultTupleScheme extends TupleScheme<cancelStreamingJob_result> {
+
+      @Override
+      public void write(org.apache.thrift.protocol.TProtocol prot, cancelStreamingJob_result struct) throws org.apache.thrift.TException {
+        TTupleProtocol oprot = (TTupleProtocol) prot;
+        BitSet optionals = new BitSet();
+        if (struct.isSetSuccess()) {
+          optionals.set(0);
+        }
+        oprot.writeBitSet(optionals, 1);
+        if (struct.isSetSuccess()) {
+          struct.success.write(oprot);
+        }
+      }
+
+      @Override
+      public void read(org.apache.thrift.protocol.TProtocol prot, cancelStreamingJob_result struct) throws org.apache.thrift.TException {
         TTupleProtocol iprot = (TTupleProtocol) prot;
         BitSet incoming = iprot.readBitSet(1);
         if (incoming.get(0)) {

@@ -58,6 +58,9 @@ public class ProjectService {
   private ProjectUserMapper projectUserMapper;
 
   @Autowired
+  private StreamingJobMapper streamingJobMapper;
+
+  @Autowired
   private ProjectFlowMapper projectFlowMapper;
 
   @Autowired
@@ -172,6 +175,11 @@ public class ProjectService {
     count = projectFlowMapper.countProjectFlows(project.getId());
     if (count > 0) {
       throw new PreFailedException("Project's workflow is not empty");
+    }
+
+    count = streamingJobMapper.selectProjectStreamingCount(project.getId());
+    if (count > 0) {
+      throw new PreFailedException("Project's streaming is not empty");
     }
 
     count = resourceMapper.countProjectRes(project.getId());
@@ -338,7 +346,7 @@ public class ProjectService {
       throw new NotFoundException("Not found project \"{0}\"", name);
     }
 
-    // 必须是项目owner
+    // 必须不是项目 owner
     if (!isProjectOwner(operator.getId(), project)) {
       logger.error("User \"{}\" owner for the project \"{}\"", operator.getName(), project.getName());
       throw new PermissionException("User \"{0}\" not owner for the project \"{1}\"", operator.getName(), project.getName());

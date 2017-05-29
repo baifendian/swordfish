@@ -13,11 +13,10 @@ struct RetInfo {
    * 错误信息，当有错误的情况下返回
    */
   2: string msg
-
 }
 
 /**
- * 返回结果信息，返回包括执行id信息
+ * 返回结果信息，返回包括执行 id 信息
  */
 struct RetResultInfo {
   /**
@@ -26,10 +25,9 @@ struct RetResultInfo {
   1: RetInfo retInfo,
 
   /**
-   * 返回flow exec Id
+   * 返回 exec Id
    */
   2: list<i32> execIds
-
 }
 
 /**
@@ -45,7 +43,7 @@ struct ScheduleInfo {
   2: i64 endDate,
    	
   /** cron 表达式 */
-  3: string cronExpression
+  3: string crontab
 }
 
 /**
@@ -120,7 +118,7 @@ service MasterService {
    * 删除某个 workflow 的调度
    *
    * projectId : 项目 id
-   * flowId : workflowId
+   * flowId : execJobId
    */
   RetInfo deleteSchedule(1:i32 projectId, 2:i32 flowId),
 
@@ -140,6 +138,27 @@ service MasterService {
    * execInfo : 执行信息
    */
   RetResultInfo execFlow(1:i32 projectId, 2:i32 flowId, 3:i64 runTime, 4:ExecInfo execInfo),
+
+  /**
+   * 取消在执行的指定 workflow
+   *
+   * execId : 执行 id
+   */
+  RetInfo cancelExecFlow(1:i32 execId),
+
+  /**
+   * 执行某个流任务
+   *
+   * execId : 执行 id
+   */
+  RetInfo execStreamingJob(1:i32 execId),
+
+  /**
+   * 取消在执行的指定流任务
+   *
+   * execId : 执行 id
+   */
+  RetInfo cancelStreamingJob(1:i32 execId),
 
   /**
    * 给一个 workflow 补数据
@@ -172,14 +191,7 @@ service MasterService {
    *
    * adHocId : adHoc id
    */
-  RetInfo execAdHoc(1:i32 adHocId),
-
-  /**
-   * 取消在执行的指定 workflow
-   *
-   * execId : 执行 id
-   */
-  RetInfo cancelExecFlow(1:i32 execId)
+  RetInfo execAdHoc(1:i32 adHocId)
 }
 
 /**
@@ -199,6 +211,20 @@ service WorkerService {
    * execId : 执行 id
    */
   RetInfo cancelExecFlow(1:i32 execId),
+
+  /**
+   * 执行某个流任务
+   *
+   * execId : 执行 id
+   */
+  RetInfo execStreamingJob(1:i32 execId),
+
+  /**
+   * 取消在执行的指定流任务
+   *
+   * execId : 执行 id
+   */
+  RetInfo cancelStreamingJob(1:i32 execId),
 
   /**
    * 执行某个 adHoc SQL

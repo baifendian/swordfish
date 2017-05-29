@@ -47,8 +47,8 @@ public abstract class AbstractProcessJob extends AbstractJob {
    */
   protected Process process;
 
-  public AbstractProcessJob(JobProps props, Logger logger) {
-    super(props, logger);
+  public AbstractProcessJob(JobProps props, boolean isLongJob, Logger logger) {
+    super(props, isLongJob, logger);
   }
 
   /**
@@ -78,12 +78,11 @@ public abstract class AbstractProcessJob extends AbstractJob {
    * @return 超时时间
    */
   private long calcNodeTimeout() {
-    long usedTime = (System.currentTimeMillis() - props.getFlowStartTime().getTime()) / 1000;
+    long usedTime = (System.currentTimeMillis() - props.getExecJobStartTime().getTime()) / 1000;
+    long remainTime = props.getExecJobTimeout() - usedTime;
 
-    long remainTime = props.getFlowTimeout() - usedTime;
-
-    if (remainTime <= 0) {
-      throw new ExecTimeoutException("workflow execution time out");
+    if (remainTime <= 0 && !isLongJob()) {
+      throw new ExecTimeoutException("workflow or streaming job execution time out");
     }
 
     return remainTime;
@@ -156,10 +155,31 @@ public abstract class AbstractProcessJob extends AbstractJob {
       // 读取控制台输出
       readProcessOutput();
 
-      // 等待运行完毕
-      process.waitFor(remainTime, TimeUnit.SECONDS);
+      int pid = getProcessId(process);
 
-      exitCode = process.exitValue();
+      logger.info("Process start, process id is: {}", pid);
+
+      // 长任务是比较特殊的
+      if (isLongJob()) {
+        // 如果没有完成, 会循环, 认为是没有提交
+        // 对于流任务, 最多等待 10 分钟, 不然会认为超时退出
+        while (!isCompleted() && process.isAlive()) {
+          Thread.sleep(3000);
+        }
+
+        logger.info("streaming job has exit, work dir:{}, pid:{}", workDir, pid);
+
+        exitCode = (isCompleted()) ? 0 : -1;
+      } else {// 等待运行完毕
+        process.waitFor(remainTime, TimeUnit.SECONDS);
+        exitCode = process.exitValue();
+
+        logger.info("job has exit, work dir:{}, pid:{}", workDir, pid);
+      }
+    } catch (InterruptedException e) {
+      logger.error("interrupt exception, maybe task has been cancel or killed.");
+      exitCode = -1;
+      throw new ExecException("Process has been interrupted. Exit code is " + exitCode);
     } catch (Exception e) {
       logger.error(e.getMessage(), e);
       exitCode = -1;
@@ -174,31 +194,23 @@ public abstract class AbstractProcessJob extends AbstractJob {
   }
 
   @Override
-  public void cancel() throws Exception {
+  public void cancel(boolean cancelApplication) throws Exception {
     if (process == null) {
       throw new IllegalStateException("not started.");
     }
 
     int processId = getProcessId(process);
 
-    logger.info("cancel job:{}, kill process:{}", props.getJobAppId(), processId);
-
     // kill, 等待完成
     boolean killed = softKill(processId, 500, TimeUnit.MILLISECONDS);
 
     if (!killed) {
-      logger.warn("Kill with signal TERM failed. Killing with KILL signal.");
+      // 强制关闭
       hardKill(processId);
-    }
-  }
 
-  /**
-   * 是否还在运行
-   *
-   * @return
-   */
-  private boolean isRunning() {
-    return isStarted() && !isCompleted();
+      // destory
+      process.destroy();
+    }
   }
 
   /**
@@ -220,24 +232,25 @@ public abstract class AbstractProcessJob extends AbstractJob {
   private boolean softKill(int processId, final long time, final TimeUnit unit) throws InterruptedException {
     checkStarted();
 
-    if (processId != 0 && isRunning()) {
+    if (processId != 0 && process.isAlive()) {
       try {
-        String cmd;
-        if (props.getProxyUser() != null) {
-          cmd = String.format("sudo -u %s kill %d", props.getProxyUser(), processId);
-        } else {
-          cmd = String.format("kill %d", processId);
-        }
+//        if (props.getProxyUser() != null) {
+//          cmd = String.format("sudo -u %s kill %d", props.getProxyUser(), processId);
+//        } else {
+//          cmd = String.format("kill %d", processId);
+//        }
+        // 注意通过 sudo -u user command 运行的命令, 是不能直接通过 user 来 kill 的
+        String cmd = String.format("sudo kill %d", processId);
+
+        logger.info("softkill job:{}, process id:{}, cmd:{}", props.getJobAppId(), processId, cmd);
 
         Runtime.getRuntime().exec(cmd);
       } catch (IOException e) {
         logger.info("kill attempt failed.", e);
       }
-
-      return false;
     }
 
-    return false;
+    return process.isAlive();
   }
 
   /**
@@ -248,22 +261,24 @@ public abstract class AbstractProcessJob extends AbstractJob {
   public void hardKill(int processId) {
     checkStarted();
 
-    if (processId != 0 && isRunning()) {
+    if (processId != 0 && process.isAlive()) {
       try {
-        String cmd;
+//        String cmd;
+//
+//        if (props.getProxyUser() != null) {
+//          cmd = String.format("sudo -u %s kill -9 %d", props.getProxyUser(), processId);
+//        } else {
+//          cmd = String.format("kill -9 %d", processId);
+//        }
 
-        if (props.getProxyUser() != null) {
-          cmd = String.format("sudo -u %s kill -9 %d", props.getProxyUser(), processId);
-        } else {
-          cmd = String.format("kill -9 %d", processId);
-        }
+        String cmd = String.format("sudo kill -9 %d", processId);
+
+        logger.info("hardKill job:{}, process id:{}, cmd:{}", props.getJobAppId(), processId, cmd);
 
         Runtime.getRuntime().exec(cmd);
       } catch (IOException e) {
         logger.error("Kill attempt failed.", e);
       }
-
-      process.destroy();
     }
   }
 

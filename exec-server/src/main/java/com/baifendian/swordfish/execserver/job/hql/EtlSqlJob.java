@@ -34,8 +34,8 @@ public class EtlSqlJob extends AbstractJob {
 
   protected List<ExecResult> results;
 
-  public EtlSqlJob(JobProps props, Logger logger) {
-    super(props, logger);
+  public EtlSqlJob(JobProps props, boolean isLongJob, Logger logger) {
+    super(props, isLongJob, logger);
   }
 
   @Override
@@ -69,7 +69,7 @@ public class EtlSqlJob extends AbstractJob {
   }
 
   @Override
-  public void cancel() throws Exception {
+  public void cancel(boolean cancelApplication) throws Exception {
   }
 
   @Override

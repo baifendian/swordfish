@@ -15,119 +15,277 @@
  */
 package com.baifendian.swordfish.execserver.job.yarn;
 
+import com.baifendian.swordfish.common.hadoop.YarnRestClient;
 import com.baifendian.swordfish.dao.DaoFactory;
 import com.baifendian.swordfish.dao.FlowDao;
+import com.baifendian.swordfish.dao.StreamingDao;
+import com.baifendian.swordfish.dao.enums.FlowStatus;
 import com.baifendian.swordfish.dao.model.ExecutionNode;
+import com.baifendian.swordfish.dao.model.StreamingResult;
 import com.baifendian.swordfish.execserver.job.AbstractProcessJob;
 import com.baifendian.swordfish.execserver.job.JobProps;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public abstract class AbstractYarnJob extends AbstractProcessJob {
 
+  private static final Pattern APPLICATION_REGEX = Pattern.compile("application_\\d+_\\d+");
+  private static final Pattern JOB_REGEX = Pattern.compile("job_\\d+_\\d+");
+
   /**
-   * 数据库接口
+   * 短任务数据库接口
    */
   private FlowDao flowDao;
 
   /**
+   * 流任务数据库接口
+   */
+  private StreamingDao streamingDao;
+
+  /**
+   * 应用 links
+   */
+  protected List<String> appLinks;
+
+  /**
    * 日志 links
    */
-  private List<String> logLinks;
+  protected List<String> jobLinks;
 
-  public AbstractYarnJob(JobProps props, Logger logger) {
-    super(props, logger);
+  public AbstractYarnJob(JobProps props, boolean isLongJob, Logger logger) {
+    super(props, isLongJob, logger);
 
     flowDao = DaoFactory.getDaoInstance(FlowDao.class);
-    logLinks = new ArrayList<>();
+    streamingDao = DaoFactory.getDaoInstance(StreamingDao.class);
+
+    appLinks = new ArrayList<>();
+    jobLinks = new ArrayList<>();
   }
 
   @Override
   protected void logProcess(List<String> logs) {
     super.logProcess(logs);
 
-    boolean captureLogLinks = false;
+    boolean captureAppLinks = false;
+    boolean captureJobLinks = false;
 
     // 分析日志
     for (String log : logs) {
-      String appid = findAppid(log);
+      // app id 操作
+      String appId = findAppId(log);
 
-      if (appid != null && !logLinks.contains(appid)) {
-        logLinks.add(appid);
-        captureLogLinks = true;
+      if (StringUtils.isNotEmpty(appId) && !appLinks.contains(appId)) {
+        appLinks.add(appId);
+        captureAppLinks = true;
+      }
+
+      // job id 操作
+      String jobId = findJobId(log);
+
+      if (StringUtils.isNotEmpty(jobId) && !jobLinks.contains(jobId)) {
+        jobLinks.add(jobId);
+        captureJobLinks = true;
       }
     }
 
-    if (captureLogLinks) {
-      ExecutionNode executionNode = flowDao.queryExecutionNode(props.getExecId(), props.getNodeName());
-      executionNode.setLogLinkList(logLinks);
+    // 有一个改变才能进行里面的操作
+    if (captureAppLinks || captureJobLinks) {
+      // 短任务
+      if (!isLongJob()) {
+        ExecutionNode executionNode = flowDao.queryExecutionNode(props.getExecId(), props.getNodeName());
 
-      flowDao.updateExecutionNode(executionNode);
+        if (executionNode != null) {
+          if (captureAppLinks) {
+            executionNode.setAppLinkList(appLinks);
+          }
+
+          if (captureJobLinks) {
+            executionNode.setJobLinkList(appLinks);
+          }
+
+          flowDao.updateExecutionNode(executionNode);
+        }
+      } else { // 长任务
+        StreamingResult streamingResult = streamingDao.queryStreamingExec(props.getExecId());
+
+        if (streamingResult != null) {
+          if (captureAppLinks) {
+            streamingResult.setAppLinkList(appLinks);
+          }
+
+          if (captureJobLinks) {
+            streamingResult.setJobLinkList(appLinks);
+          }
+
+          streamingDao.updateResult(streamingResult);
+        }
+      }
     }
+  }
+
+  @Override
+  public boolean isCompleted() {
+    if (CollectionUtils.isNotEmpty(appLinks)) {
+      String appId = appLinks.get(appLinks.size() - 1);
+
+      try {
+        FlowStatus status = YarnRestClient.getInstance().getApplicationStatus(appId);
+
+        if (status == null) {
+          return complete;
+        }
+
+        logger.info("current status is: {}", status);
+
+        // 如果是完成了或者是运行中, 我们认为是 OK 的
+        if (status.typeIsFinished() || status == FlowStatus.RUNNING) {
+          complete = true;
+        }
+      } catch (Exception e) {
+        logger.error(String.format("request status of application %s exception", appId), e);
+        complete = true;
+      }
+    }
+
+    return complete;
   }
 
   /**
    * 获取 appid <p>
    *
+   * @param line
    * @return appid
    */
-  private String findAppid(String line) {
-    if (line.contains("YarnClientImpl: Submitted application")) {
-      return line.substring(line.indexOf("application") + "application".length() + 1);
+
+  protected String findAppId(String line) {
+    Matcher matcher = APPLICATION_REGEX.matcher(line);
+
+    if (matcher.find()) {
+      return matcher.group();
     }
 
     return null;
   }
 
-  @Deprecated
-  protected String findLogLinks(String line) {
-    if (line.contains("The url to track the job:")) {
-      return line.substring(line.indexOf("job:") + "job:".length() + 1);
+  /**
+   * 查找 job id
+   *
+   * @param line
+   * @return
+   */
+  protected String findJobId(String line) {
+    Matcher matcher = JOB_REGEX.matcher(line);
+
+    if (matcher.find()) {
+      return matcher.group();
     }
 
     return null;
   }
 
   @Override
-  public void cancel() throws Exception {
+  public void cancel(boolean cancelApplication) throws Exception {
     // 先停止任务
-    super.cancel();
+    super.cancel(cancelApplication);
 
-    // 然后 kill application
-    if (CollectionUtils.isNotEmpty(logLinks)) {
-      for (String appid : logLinks) {
-        String commandFile = "/tmp/" + props.getJobAppId() + ".kill";
-        String cmd = "yarn application -kill " + appid;
+    if (cancelApplication) {
+      cancelApplication(appLinks, props, logger);
+    }
+  }
 
-        StringBuilder sb = new StringBuilder();
-        sb.append("#!/bin/sh\n");
-        sb.append("BASEDIR=$(cd `dirname $0`; pwd)\n");
-        sb.append("cd $BASEDIR\n");
+  /**
+   * 关闭应用
+   *
+   * @param appLinks 应用列表
+   * @param props    每个任务, 应该有一个唯一的 job application id, 这里用于生成脚本
+   */
+  public static void cancelApplication(List<String> appLinks, JobProps props, Logger logger) throws IOException {
 
-        if (props.getEnvFile() != null) {
-          sb.append("source " + props.getEnvFile() + "\n");
-        }
+    // 然后 kill application, 一般来说, 就是最后一个(前面的都运行完了)
+    if (CollectionUtils.isNotEmpty(appLinks)) {
+      String appid = appLinks.get(appLinks.size() - 1);
+      String commandFile = String.format("%s/%s_%s.kill", props.getWorkDir(), props.getJobAppId(), appid);
+      String cmd = "yarn application -kill " + appid;
 
-        sb.append("\n\n");
-        sb.append(cmd);
+      StringBuilder sb = new StringBuilder();
+      sb.append("#!/bin/sh\n");
+      sb.append("BASEDIR=$(cd `dirname $0`; pwd)\n");
+      sb.append("cd $BASEDIR\n");
 
-        FileUtils.writeStringToFile(new File(commandFile), sb.toString(), Charset.forName("UTF-8"));
-
-        String runCmd = "sh " + commandFile;
-        if (props.getProxyUser() != null) {
-          runCmd = "sudo -u " + props.getProxyUser() + " " + runCmd;
-        }
-
-        logger.info("kill cmd:{}", runCmd);
-
-        Runtime.getRuntime().exec(runCmd);
+      if (props.getEnvFile() != null) {
+        sb.append("source " + props.getEnvFile() + "\n");
       }
+
+      sb.append("\n\n");
+      sb.append(cmd);
+
+      File f = new File(commandFile);
+
+      if (!f.exists()) {
+        FileUtils.writeStringToFile(new File(commandFile), sb.toString(), Charset.forName("UTF-8"));
+      }
+
+      // 以某账号运行
+      String runCmd = "sh " + commandFile;
+      if (StringUtils.isNotEmpty(props.getProxyUser())) {
+        runCmd = "sudo -u " + props.getProxyUser() + " " + runCmd;
+      }
+
+      logger.info("kill cmd:{}", runCmd);
+
+      try {
+        // 一般来说, 这种命令挺消耗资源, 但是一般也很快
+        Runtime.getRuntime().exec(runCmd);
+      } catch (Exception e) {
+        logger.error(String.format("kill application %s exception", appid), e);
+      }
+    }
+  }
+
+  public static void main(String[] args) {
+    String msg = "[INFO] 2017-05-23 18:25:22.268 com.baifendian.swordfish.execserver.runner.node.NodeRunner:[147] -  hive execute log : INFO  : Starting Job = job_1493947416024_0139, Tracking URL = http://hlg-5p149-wangwenting:8088/proxy/application_1493947416024_0139/\n" +
+        "job_1493947416024_0140 [INFO] 2017-05-23 18:25:22.268 com.baifendian.swordfish.execserver.runner.node.NodeRunner:[147] -  hive execute log : INFO  : Kill Command = /opt/hadoop/bin/hadoop job  -kill job_1493947416024_0139\n" +
+        "[INFO] 2017-05-23 18:25:27.269 com.baifendian.swordfish.execserver.runner.node.NodeRunner:[147] -  hive execute log : INFO  : Hadoop job information for Stage-1: number of mappers: 1; number of reducers: 0";
+
+    // 查找 application id
+    Matcher matcher = APPLICATION_REGEX.matcher(msg);
+
+    while (matcher.find()) {
+      System.out.println(matcher.group());
+    }
+
+    // 查找 job id
+    matcher = JOB_REGEX.matcher(msg);
+
+    while (matcher.find()) {
+      System.out.println(matcher.group());
+    }
+
+    // 测试另外的 msg
+    msg = "sh.execserver.runner.node.NodeRunner:application[147] -  hive execute log : INFO  : Hadoop job information for Stage-1: number of mappers: 1; number of reducers: 0";
+
+    // 查找 application id
+    matcher = APPLICATION_REGEX.matcher(msg);
+
+    while (matcher.find()) {
+      System.out.println(matcher.group());
+    }
+
+    // 查找 job id
+    matcher = JOB_REGEX.matcher(msg);
+
+    while (matcher.find()) {
+      System.out.println(matcher.group());
     }
   }
 }

@@ -54,7 +54,7 @@ public class AdHocRunner implements Runnable {
     props.setProxyUser(adHoc.getProxyUser());
     props.setQueue(adHoc.getQueue());
     props.setProjectId(adHoc.getProjectId());
-    props.setAdHocId(adHoc.getId());
+    props.setExecJobId(adHoc.getId());
     props.setCycTime(adHoc.getCreateTime());
 
     FlowStatus status;

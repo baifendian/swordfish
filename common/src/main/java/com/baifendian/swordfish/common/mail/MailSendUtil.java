@@ -87,6 +87,8 @@ public class MailSendUtil {
       // 这里是 SMTP 发送服务器的名字, 163 的如下："smtp.163.com"
       email.setHostName(mailServerHost);
 
+      email.setSmtpPort(mailServerPort);
+
       // 字符编码集的设置
       email.setCharset("UTF-8");
       // 收件人的邮箱

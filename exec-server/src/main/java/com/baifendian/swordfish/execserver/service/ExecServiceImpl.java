@@ -18,11 +18,14 @@ package com.baifendian.swordfish.execserver.service;
 import com.baifendian.swordfish.dao.AdHocDao;
 import com.baifendian.swordfish.dao.DaoFactory;
 import com.baifendian.swordfish.dao.FlowDao;
+import com.baifendian.swordfish.dao.StreamingDao;
 import com.baifendian.swordfish.dao.enums.FlowStatus;
 import com.baifendian.swordfish.dao.model.AdHoc;
 import com.baifendian.swordfish.dao.model.ExecutionFlow;
+import com.baifendian.swordfish.dao.model.StreamingResult;
 import com.baifendian.swordfish.execserver.runner.adhoc.AdHocRunnerManager;
 import com.baifendian.swordfish.execserver.runner.flow.FlowRunnerManager;
+import com.baifendian.swordfish.execserver.runner.streaming.StreamingRunnerManager;
 import com.baifendian.swordfish.execserver.utils.ResultHelper;
 import com.baifendian.swordfish.rpc.RetInfo;
 import com.baifendian.swordfish.rpc.WorkerService.Iface;
@@ -49,6 +52,11 @@ public class ExecServiceImpl implements Iface {
   private final AdHocDao adHocDao;
 
   /**
+   * {@link StreamingDao}
+   */
+  private final StreamingDao streamingDao;
+
+  /**
    * {@link FlowRunnerManager}
    */
   private final FlowRunnerManager flowRunnerManager;
@@ -57,6 +65,11 @@ public class ExecServiceImpl implements Iface {
    * {@link AdHocRunnerManager}
    */
   private final AdHocRunnerManager adHocRunnerManager;
+
+  /**
+   * {@link AdHocRunnerManager}
+   */
+  private final StreamingRunnerManager streamingRunnerManager;
 
   /**
    * 当前 executor 的 host
@@ -71,8 +84,11 @@ public class ExecServiceImpl implements Iface {
   public ExecServiceImpl(String host, int port, Configuration conf) {
     this.flowDao = DaoFactory.getDaoInstance(FlowDao.class);
     this.adHocDao = DaoFactory.getDaoInstance(AdHocDao.class);
+    this.streamingDao = DaoFactory.getDaoInstance(StreamingDao.class);
+
     this.flowRunnerManager = new FlowRunnerManager(conf);
     this.adHocRunnerManager = new AdHocRunnerManager(conf);
+    this.streamingRunnerManager = new StreamingRunnerManager(conf);
 
     this.host = host;
     this.port = port;
@@ -93,12 +109,12 @@ public class ExecServiceImpl implements Iface {
       // 查询 ExecutionFlow
       ExecutionFlow executionFlow = flowDao.queryExecutionFlow(execId);
       if (executionFlow == null) {
-        return ResultHelper.createErrorResult("execId not find");
+        return ResultHelper.createErrorResult("workflow exec id not find");
       }
 
       // 必须是初始化状态才接受
       if (executionFlow.getStatus().typeIsFinished()) {
-        return ResultHelper.createErrorResult("execId has finish");
+        return ResultHelper.createErrorResult("workflow exec id has finish");
       }
 
       // 更新状态为 RUNNING
@@ -155,14 +171,73 @@ public class ExecServiceImpl implements Iface {
       // 查询 ExecutionFlow
       ExecutionFlow executionFlow = flowDao.queryExecutionFlow(execId);
       if (executionFlow == null) {
-        return ResultHelper.createErrorResult("execId not exists");
+        return ResultHelper.createErrorResult("workflow exec id not exists");
       }
 
       if (executionFlow.getStatus().typeIsFinished()) {
-        return ResultHelper.createErrorResult("execId run finished");
+        logger.error("workflow exec id run finished, exec id:{}", execId);
+        return ResultHelper.SUCCESS;
       }
 
-      flowRunnerManager.cancelFlow(execId);
+      flowRunnerManager.cancelFlow(executionFlow);
+    } catch (Exception e) {
+      logger.error(e.getMessage(), e);
+      return ResultHelper.createErrorResult(e.getMessage());
+    }
+
+    return ResultHelper.SUCCESS;
+  }
+
+  /**
+   * 执行某个流任务
+   * <p>
+   * execId : 执行 id
+   *
+   * @param execId
+   */
+  public RetInfo execStreamingJob(int execId) throws TException {
+    logger.info("exec streaming job: {}", execId);
+
+    StreamingResult streamingResult = streamingDao.queryStreamingExec(execId);
+
+    if (streamingResult == null) {
+      logger.error("streaming exec id {} not exists", execId);
+      return ResultHelper.createErrorResult("streaming exec id not exists");
+    }
+
+    if (streamingResult.getStatus().typeIsFinished()) {
+      logger.error("streaming exec id {} finished unexpected", execId);
+      return ResultHelper.createErrorResult("task finished unexpected");
+    }
+
+    streamingRunnerManager.submitJob(streamingResult);
+    return ResultHelper.SUCCESS;
+  }
+
+  /**
+   * 取消在执行的指定流任务
+   * <p>
+   * execId : 执行 id
+   *
+   * @param execId
+   */
+  public RetInfo cancelStreamingJob(int execId) throws TException {
+    logger.info("cancel streaming job: {}", execId);
+
+    try {
+      // 查询
+      StreamingResult streamingResult = streamingDao.queryStreamingExec(execId);
+
+      if (streamingResult == null) {
+        return ResultHelper.createErrorResult("streaming exec id not exists");
+      }
+
+      if (streamingResult.getStatus().typeIsFinished()) {
+        logger.error("streaming exec run finished, exec id:{}", execId);
+        return ResultHelper.SUCCESS;
+      }
+
+      streamingRunnerManager.cancelJob(streamingResult);
     } catch (Exception e) {
       logger.error(e.getMessage(), e);
       return ResultHelper.createErrorResult(e.getMessage());
@@ -177,5 +252,6 @@ public class ExecServiceImpl implements Iface {
   public void destory() {
     flowRunnerManager.destroy();
     adHocRunnerManager.destory();
+    streamingRunnerManager.destory();
   }
 }

@@ -25,16 +25,20 @@ public class JobType {
   public static final String SPARK = "SPARK";
   public static final String VIRTUAL = "VIRTUAL";
   public static final String SPARK_STREAMING = "SPARK_STREAMING"; // 长任务类型
-  public static final String UPLOAD = "UPLOAD";
 
   /**
    * 判断是否是长任务
    */
   public static boolean isLongJob(String job) {
-    if (StringUtils.equals(job, SPARK_STREAMING)) {
-      return true;
+    if (StringUtils.isEmpty(job)) {
+      return false;
     }
 
-    return false;
+    switch (job) {
+      case SPARK_STREAMING:
+        return true;
+      default:
+        return false;
+    }
   }
 }

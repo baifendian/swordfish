@@ -30,17 +30,22 @@ public abstract class AbstractJob implements Job {
   /**
    * 退出状态
    */
-  protected int exitCode = -1;
+  protected volatile int exitCode = -1;
 
   /**
    * 是否完成
    */
-  protected boolean complete = false;
+  protected volatile boolean complete = false;
 
   /**
    * 是否已经启动
    */
-  protected boolean started = false;
+  protected volatile boolean started = false;
+
+  /**
+   * 是否长任务
+   */
+  protected volatile boolean isLongJob = false;
 
   /**
    * 日志记录
@@ -51,8 +56,9 @@ public abstract class AbstractJob implements Job {
    * @param props  作业配置信息, 各类作业根据此配置信息生成具体的作业
    * @param logger 日志
    */
-  protected AbstractJob(JobProps props, Logger logger) {
+  protected AbstractJob(JobProps props, boolean isLongJob, Logger logger) {
     this.props = props;
+    this.isLongJob = isLongJob;
     this.logger = logger;
 
     initJob();
@@ -93,6 +99,11 @@ public abstract class AbstractJob implements Job {
   @Override
   public List<ExecResult> getResults() {
     return null;
+  }
+
+  @Override
+  public boolean isLongJob() {
+    return isLongJob;
   }
 
   /**

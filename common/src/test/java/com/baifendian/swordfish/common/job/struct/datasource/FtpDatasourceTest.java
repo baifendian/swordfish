@@ -13,26 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.baifendian.swordfish.common.job.struct.node.upload;
+package com.baifendian.swordfish.common.job.struct.datasource;
 
-public class MappingRelation {
-  private int originFieldIndex;
-
-  private String targetField;
-
-  public int getOriginFieldIndex() {
-    return originFieldIndex;
-  }
-
-  public void setOriginFieldIndex(int originFieldIndex) {
-    this.originFieldIndex = originFieldIndex;
-  }
-
-  public String getTargetField() {
-    return targetField;
-  }
-
-  public void setTargetField(String targetField) {
-    this.targetField = targetField;
-  }
+/**
+ * ftp数据源测试
+ */
+public class FtpDatasourceTest {
 }

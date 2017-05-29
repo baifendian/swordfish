@@ -60,14 +60,24 @@ public class ExecutionNode {
   private String jobId;
 
   /**
-   * 日志 link
+   * application link
    */
-  private String logLinks;
+  private String appLinks;
+
+  /**
+   * job link
+   */
+  private String jobLinks;
 
   /**
    * 得到日志链接
    */
-  private List<String> logLinkList = new ArrayList<>();
+  private List<String> appLinkList = new ArrayList<>();
+
+  /**
+   * 得到 job 的链接
+   */
+  private List<String> jobLinkList = new ArrayList<>();
 
   public Integer getExecId() {
     return execId;
@@ -121,17 +131,6 @@ public class ExecutionNode {
     return jobId;
   }
 
-  public List<String> getLogLinkList() {
-    return logLinkList;
-  }
-
-  public void setLogLinkList(List<String> logLinkList) {
-    this.logLinkList = logLinkList;
-    if (logLinkList != null) {
-      this.logLinks = JsonUtil.toJsonString(logLinkList);
-    }
-  }
-
   public void setJobId(String jobId) {
     this.jobId = jobId;
   }
@@ -144,12 +143,43 @@ public class ExecutionNode {
     this.name = name;
   }
 
-  public String getLogLinks() {
-    return logLinks;
+  public List<String> getAppLinkList() {
+    return appLinkList;
   }
 
-  public void setLogLinks(String logLinks) {
-    this.logLinkList = JsonUtil.parseObjectList(logLinks, String.class);
-    this.logLinks = logLinks;
+  public void setAppLinkList(List<String> appLinkList) {
+    this.appLinkList = appLinkList;
+    if (appLinkList != null) {
+      this.appLinks = JsonUtil.toJsonString(appLinkList);
+    }
+  }
+
+  public String getAppLinks() {
+    return appLinks;
+  }
+
+  public void setAppLinks(String appLinks) {
+    this.appLinkList = JsonUtil.parseObjectList(appLinks, String.class);
+    this.appLinks = appLinks;
+  }
+
+  public String getJobLinks() {
+    return jobLinks;
+  }
+
+  public void setJobLinks(String jobLinks) {
+    this.jobLinkList = JsonUtil.parseObjectList(jobLinks, String.class);
+    this.jobLinks = jobLinks;
+  }
+
+  public List<String> getJobLinkList() {
+    return jobLinkList;
+  }
+
+  public void setJobLinkList(List<String> jobLinkList) {
+    this.jobLinkList = jobLinkList;
+    if (jobLinkList != null) {
+      this.jobLinks = JsonUtil.toJsonString(jobLinkList);
+    }
   }
 }

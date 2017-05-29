@@ -15,10 +15,13 @@
  */
 package com.baifendian.swordfish.webserver.exception;
 
+import org.springframework.beans.TypeMismatchException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
+import org.springframework.web.bind.ServletRequestBindingException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -28,6 +31,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 import static org.springframework.http.HttpStatus.*;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.ConstraintViolationException;
 
 /**
  * 异常的处理方式, 抛出的任何异常会进行截获, 并返回相应的提示信息
@@ -50,6 +54,14 @@ public class ControllerExceptionAdvice extends ResponseEntityExceptionHandler {
           HttpStatus status, WebRequest request) {
     return new ResponseEntity<Object>(new CustomErrorType(BAD_REQUEST, ex.getMessage()), BAD_REQUEST);
   }
+
+  @Override
+  protected ResponseEntity<Object> handleTypeMismatch(TypeMismatchException ex, HttpHeaders headers,
+                                                      HttpStatus status, WebRequest request) {
+
+    return new ResponseEntity<Object>(new CustomErrorType(BAD_REQUEST, ex.getMessage()), BAD_REQUEST);
+  }
+
 
   /**
    * 处理 controller 异常

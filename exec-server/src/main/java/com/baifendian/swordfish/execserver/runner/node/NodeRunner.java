@@ -109,13 +109,13 @@ public class NodeRunner implements Callable<Boolean> {
     props.setProxyUser(executionFlow.getProxyUser());
     props.setDefinedParams(allParamMap);
     props.setProjectId(executionFlow.getProjectId());
-    props.setWorkflowId(executionFlow.getFlowId());
+    props.setExecJobId(executionFlow.getFlowId());
     props.setNodeName(flowNode.getName());
     props.setExecId(executionFlow.getId());
     props.setEnvFile(BaseConfig.getSystemEnvPath());
     props.setQueue(executionFlow.getQueue());
-    props.setFlowStartTime(executionFlow.getStartTime());
-    props.setFlowTimeout(executionFlow.getTimeout());
+    props.setExecJobStartTime(executionFlow.getScheduleTime());
+    props.setExecJobTimeout(executionFlow.getTimeout());
 
     props.setJobAppId(String.format("%s_%s", executionNode.getJobId(), HttpUtil.getMd5(executionNode.getName()).substring(0, 8)));
 
@@ -139,7 +139,7 @@ public class NodeRunner implements Callable<Boolean> {
     } catch (Exception e) {
       success = false;
 
-      logger.error(String.format("job process exception, exec id: {}, node: {}", executionFlow.getId(), executionNode.getName()), e);
+      logger.error(String.format("job process exception, exec id: %s, node: %s", executionFlow.getId(), executionNode.getName()), e);
 
       kill();
     } finally {
@@ -157,7 +157,7 @@ public class NodeRunner implements Callable<Boolean> {
   public void kill() {
     if (job != null && job.isStarted()) {
       try {
-        job.cancel();
+        job.cancel(true);
       } catch (Exception e) {
         logger.error(e.getMessage(), e);
       }

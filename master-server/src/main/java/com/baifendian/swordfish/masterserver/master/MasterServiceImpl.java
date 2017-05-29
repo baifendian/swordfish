@@ -18,14 +18,12 @@ package com.baifendian.swordfish.masterserver.master;
 import com.baifendian.swordfish.dao.AdHocDao;
 import com.baifendian.swordfish.dao.DaoFactory;
 import com.baifendian.swordfish.dao.FlowDao;
+import com.baifendian.swordfish.dao.StreamingDao;
 import com.baifendian.swordfish.dao.enums.ExecType;
 import com.baifendian.swordfish.dao.enums.FlowStatus;
 import com.baifendian.swordfish.dao.enums.NodeDepType;
 import com.baifendian.swordfish.dao.enums.NotifyType;
-import com.baifendian.swordfish.dao.model.AdHoc;
-import com.baifendian.swordfish.dao.model.ExecutionFlow;
-import com.baifendian.swordfish.dao.model.ProjectFlow;
-import com.baifendian.swordfish.dao.model.Schedule;
+import com.baifendian.swordfish.dao.model.*;
 import com.baifendian.swordfish.masterserver.quartz.FlowScheduleJob;
 import com.baifendian.swordfish.masterserver.quartz.QuartzManager;
 import com.baifendian.swordfish.masterserver.utils.ResultDetailHelper;
@@ -63,6 +61,11 @@ public class MasterServiceImpl implements Iface {
   private final AdHocDao adHocDao;
 
   /**
+   * 流任务的数据库接口
+   */
+  private final StreamingDao streamingDao;
+
+  /**
    * 任务执行的主程序
    */
   private final JobExecManager jobExecManager;
@@ -72,6 +75,7 @@ public class MasterServiceImpl implements Iface {
 
     this.flowDao = DaoFactory.getDaoInstance(FlowDao.class);
     this.adHocDao = DaoFactory.getDaoInstance(AdHocDao.class);
+    this.streamingDao = DaoFactory.getDaoInstance(StreamingDao.class);
   }
 
   /**
@@ -119,6 +123,7 @@ public class MasterServiceImpl implements Iface {
    */
   @Override
   public RetInfo deleteSchedule(int projectId, int flowId) throws TException {
+    logger.info("delete schedules of project id:{}, flow id:{}", projectId, flowId);
 
     try {
       String jobName = FlowScheduleJob.genJobName(flowId);
@@ -141,6 +146,8 @@ public class MasterServiceImpl implements Iface {
    */
   @Override
   public RetInfo deleteSchedules(int projectId) throws TException {
+    logger.info("delete schedules of project id:{}", projectId);
+
     try {
       String jobGroupName = FlowScheduleJob.genJobGroupName(projectId);
       QuartzManager.deleteJobs(jobGroupName);
@@ -164,16 +171,16 @@ public class MasterServiceImpl implements Iface {
    */
   @Override
   public RetResultInfo execFlow(int projectId, int flowId, long runTime, ExecInfo execInfo) throws TException {
-    ExecutionFlow executionFlow;
-
     logger.info("exec flow project id:{}, flow id:{}, run time:{}, exec info:{}", projectId, flowId, runTime, execInfo);
+
+    ExecutionFlow executionFlow;
 
     try {
       ProjectFlow flow = flowDao.projectFlowFindById(flowId);
 
       if (flow == null) {
         logger.error("flow: {} is not exists", flowId);
-        return new RetResultInfo(ResultHelper.createErrorResult("flowId is not exists"), null);
+        return new RetResultInfo(ResultHelper.createErrorResult("flow is not exists"), null);
       }
 
       // 构建一个用于执行的工作流
@@ -204,6 +211,70 @@ public class MasterServiceImpl implements Iface {
   }
 
   /**
+   * @param execId
+   * @return
+   * @throws TException
+   */
+  @Override
+  public RetInfo cancelExecFlow(int execId) throws TException {
+    logger.info("receive exec workflow request, id: {}", execId);
+
+    try {
+      return jobExecManager.cancelExecFlow(execId);
+    } catch (Exception e) {
+      logger.warn("executor report error", e);
+      return ResultHelper.createErrorResult(e.getMessage());
+    }
+  }
+
+  /**
+   * 执行某个流任务
+   * <p>
+   * execId : 执行 id
+   *
+   * @param execId
+   */
+  public RetInfo execStreamingJob(int execId) throws TException {
+    logger.info("receive exec streaming job request, id: {}", execId);
+
+    try {
+      return jobExecManager.execStreamingJob(execId);
+    } catch (Exception e) {
+      logger.error(e.getMessage(), e);
+
+      // 如果是依赖资源中的状态, 更新为失败, 因为调用失败了
+      StreamingResult streamingResult = streamingDao.queryStreamingExec(execId);
+
+      if (streamingResult != null && streamingResult.getStatus() == FlowStatus.WAITING_RES) {
+        streamingResult.setStatus(FlowStatus.FAILED);
+        streamingResult.setEndTime(new Date());
+
+        streamingDao.updateResult(streamingResult);
+      }
+
+      return ResultHelper.createErrorResult(e.getMessage());
+    }
+  }
+
+  /**
+   * 取消在执行的指定流任务
+   * <p>
+   * execId : 执行 id
+   *
+   * @param execId
+   */
+  public RetInfo cancelStreamingJob(int execId) throws TException {
+    logger.info("receive cancel streaming job request, id: {}", execId);
+
+    try {
+      return jobExecManager.cancelStreamingJob(execId);
+    } catch (Exception e) {
+      logger.warn("executor report error", e);
+      return ResultHelper.createErrorResult(e.getMessage());
+    }
+  }
+
+  /**
    * 补数据
    *
    * @param projectId
@@ -225,7 +296,7 @@ public class MasterServiceImpl implements Iface {
         return ResultDetailHelper.createErrorResult("current workflow not exists");
       }
 
-      String crontabStr = scheduleInfo.getCronExpression();
+      String crontabStr = scheduleInfo.getCrontab();
       CronExpression cron = new CronExpression(crontabStr);
 
       Date startDateTime = new Date(scheduleInfo.getStartDate());
@@ -239,21 +310,6 @@ public class MasterServiceImpl implements Iface {
     }
 
     return ResultDetailHelper.createSuccessResult(Collections.emptyList());
-  }
-
-  /**
-   * @param execId
-   * @return
-   * @throws TException
-   */
-  @Override
-  public RetInfo cancelExecFlow(int execId) throws TException {
-    try {
-      return jobExecManager.cancelExecFlow(execId);
-    } catch (Exception e) {
-      logger.warn("executor report error", e);
-      return ResultHelper.createErrorResult(e.getMessage());
-    }
   }
 
   /**
@@ -292,6 +348,8 @@ public class MasterServiceImpl implements Iface {
 
       if (adHoc != null && adHoc.getStatus() == FlowStatus.WAITING_RES) {
         adHoc.setStatus(FlowStatus.FAILED);
+        adHoc.setEndTime(new Date());
+
         adHocDao.updateAdHocStatus(adHoc);
       }
 

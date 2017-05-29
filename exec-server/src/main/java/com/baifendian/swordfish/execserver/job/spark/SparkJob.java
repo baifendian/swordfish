@@ -40,8 +40,8 @@ public class SparkJob extends AbstractYarnJob {
    */
   private SparkParam sparkParam;
 
-  public SparkJob(JobProps props, Logger logger) {
-    super(props, logger);
+  public SparkJob(JobProps props, boolean isLongJob, Logger logger) {
+    super(props, isLongJob, logger);
   }
 
   @Override
@@ -87,21 +87,6 @@ public class SparkJob extends AbstractYarnJob {
     logger.info("spark job command:\n{}", command);
 
     return command;
-  }
-
-  /**
-   * 查找日志连接
-   *
-   * @param line
-   * @return
-   */
-  @Override
-  public String findLogLinks(String line) {
-    if (line.contains("tracking URL:")) {
-      return line.substring(line.indexOf("URL:") + "URL:".length() + 1);
-    }
-
-    return null;
   }
 
   @Override

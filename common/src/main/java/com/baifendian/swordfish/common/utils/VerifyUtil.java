@@ -18,6 +18,7 @@ package com.baifendian.swordfish.common.utils;
 import com.baifendian.swordfish.common.config.BaseConfig;
 import com.baifendian.swordfish.common.consts.Constants;
 import org.apache.commons.lang3.StringUtils;
+
 import java.util.regex.Pattern;
 
 /**
@@ -87,7 +88,7 @@ public class VerifyUtil {
    * @return
    */
   public static boolean matcheDatasourceName(String str) {
-    return regexMatches(str, Constants.REGEX_WORKFLOW_NAME);
+    return regexMatches(str, Constants.REGEX_DATASOURCE_NAME);
   }
 
   /**
@@ -97,11 +98,12 @@ public class VerifyUtil {
    * @return
    */
   public static boolean matchWorkflowName(String str) {
-    return regexMatches(str, Constants.REGEX_DATASOURCE_NAME);
+    return regexMatches(str, Constants.REGEX_WORKFLOW_NAME);
   }
 
   /**
    * 检测代理用户是合法
+   *
    * @param str
    * @return
    */

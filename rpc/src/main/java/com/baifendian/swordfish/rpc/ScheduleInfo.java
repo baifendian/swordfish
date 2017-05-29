@@ -38,7 +38,7 @@ public class ScheduleInfo implements org.apache.thrift.TBase<ScheduleInfo, Sched
 
   private static final org.apache.thrift.protocol.TField START_DATE_FIELD_DESC = new org.apache.thrift.protocol.TField("startDate", org.apache.thrift.protocol.TType.I64, (short)1);
   private static final org.apache.thrift.protocol.TField END_DATE_FIELD_DESC = new org.apache.thrift.protocol.TField("endDate", org.apache.thrift.protocol.TType.I64, (short)2);
-  private static final org.apache.thrift.protocol.TField CRON_EXPRESSION_FIELD_DESC = new org.apache.thrift.protocol.TField("cronExpression", org.apache.thrift.protocol.TType.STRING, (short)3);
+  private static final org.apache.thrift.protocol.TField CRONTAB_FIELD_DESC = new org.apache.thrift.protocol.TField("crontab", org.apache.thrift.protocol.TType.STRING, (short)3);
 
   private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
   static {
@@ -57,7 +57,7 @@ public class ScheduleInfo implements org.apache.thrift.TBase<ScheduleInfo, Sched
   /**
    * cron 表达式
    */
-  public String cronExpression; // required
+  public String crontab; // required
 
   /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
   public enum _Fields implements org.apache.thrift.TFieldIdEnum {
@@ -72,7 +72,7 @@ public class ScheduleInfo implements org.apache.thrift.TBase<ScheduleInfo, Sched
     /**
      * cron 表达式
      */
-    CRON_EXPRESSION((short)3, "cronExpression");
+    CRONTAB((short)3, "crontab");
 
     private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
@@ -91,8 +91,8 @@ public class ScheduleInfo implements org.apache.thrift.TBase<ScheduleInfo, Sched
           return START_DATE;
         case 2: // END_DATE
           return END_DATE;
-        case 3: // CRON_EXPRESSION
-          return CRON_EXPRESSION;
+        case 3: // CRONTAB
+          return CRONTAB;
         default:
           return null;
       }
@@ -143,7 +143,7 @@ public class ScheduleInfo implements org.apache.thrift.TBase<ScheduleInfo, Sched
         new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.I64)));
     tmpMap.put(_Fields.END_DATE, new org.apache.thrift.meta_data.FieldMetaData("endDate", org.apache.thrift.TFieldRequirementType.DEFAULT, 
         new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.I64)));
-    tmpMap.put(_Fields.CRON_EXPRESSION, new org.apache.thrift.meta_data.FieldMetaData("cronExpression", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+    tmpMap.put(_Fields.CRONTAB, new org.apache.thrift.meta_data.FieldMetaData("crontab", org.apache.thrift.TFieldRequirementType.DEFAULT, 
         new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING)));
     metaDataMap = Collections.unmodifiableMap(tmpMap);
     org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(ScheduleInfo.class, metaDataMap);
@@ -155,14 +155,14 @@ public class ScheduleInfo implements org.apache.thrift.TBase<ScheduleInfo, Sched
   public ScheduleInfo(
     long startDate,
     long endDate,
-    String cronExpression)
+    String crontab)
   {
     this();
     this.startDate = startDate;
     setStartDateIsSet(true);
     this.endDate = endDate;
     setEndDateIsSet(true);
-    this.cronExpression = cronExpression;
+    this.crontab = crontab;
   }
 
   /**
@@ -172,8 +172,8 @@ public class ScheduleInfo implements org.apache.thrift.TBase<ScheduleInfo, Sched
     __isset_bitfield = other.__isset_bitfield;
     this.startDate = other.startDate;
     this.endDate = other.endDate;
-    if (other.isSetCronExpression()) {
-      this.cronExpression = other.cronExpression;
+    if (other.isSetCrontab()) {
+      this.crontab = other.crontab;
     }
   }
 
@@ -187,7 +187,7 @@ public class ScheduleInfo implements org.apache.thrift.TBase<ScheduleInfo, Sched
     this.startDate = 0;
     setEndDateIsSet(false);
     this.endDate = 0;
-    this.cronExpression = null;
+    this.crontab = null;
   }
 
   /**
@@ -251,30 +251,30 @@ public class ScheduleInfo implements org.apache.thrift.TBase<ScheduleInfo, Sched
   /**
    * cron 表达式
    */
-  public String getCronExpression() {
-    return this.cronExpression;
+  public String getCrontab() {
+    return this.crontab;
   }
 
   /**
    * cron 表达式
    */
-  public ScheduleInfo setCronExpression(String cronExpression) {
-    this.cronExpression = cronExpression;
+  public ScheduleInfo setCrontab(String crontab) {
+    this.crontab = crontab;
     return this;
   }
 
-  public void unsetCronExpression() {
-    this.cronExpression = null;
+  public void unsetCrontab() {
+    this.crontab = null;
   }
 
-  /** Returns true if field cronExpression is set (has been assigned a value) and false otherwise */
-  public boolean isSetCronExpression() {
-    return this.cronExpression != null;
+  /** Returns true if field crontab is set (has been assigned a value) and false otherwise */
+  public boolean isSetCrontab() {
+    return this.crontab != null;
   }
 
-  public void setCronExpressionIsSet(boolean value) {
+  public void setCrontabIsSet(boolean value) {
     if (!value) {
-      this.cronExpression = null;
+      this.crontab = null;
     }
   }
 
@@ -296,11 +296,11 @@ public class ScheduleInfo implements org.apache.thrift.TBase<ScheduleInfo, Sched
       }
       break;
 
-    case CRON_EXPRESSION:
+    case CRONTAB:
       if (value == null) {
-        unsetCronExpression();
+        unsetCrontab();
       } else {
-        setCronExpression((String)value);
+        setCrontab((String)value);
       }
       break;
 
@@ -315,8 +315,8 @@ public class ScheduleInfo implements org.apache.thrift.TBase<ScheduleInfo, Sched
     case END_DATE:
       return Long.valueOf(getEndDate());
 
-    case CRON_EXPRESSION:
-      return getCronExpression();
+    case CRONTAB:
+      return getCrontab();
 
     }
     throw new IllegalStateException();
@@ -333,8 +333,8 @@ public class ScheduleInfo implements org.apache.thrift.TBase<ScheduleInfo, Sched
       return isSetStartDate();
     case END_DATE:
       return isSetEndDate();
-    case CRON_EXPRESSION:
-      return isSetCronExpression();
+    case CRONTAB:
+      return isSetCrontab();
     }
     throw new IllegalStateException();
   }
@@ -370,12 +370,12 @@ public class ScheduleInfo implements org.apache.thrift.TBase<ScheduleInfo, Sched
         return false;
     }
 
-    boolean this_present_cronExpression = true && this.isSetCronExpression();
-    boolean that_present_cronExpression = true && that.isSetCronExpression();
-    if (this_present_cronExpression || that_present_cronExpression) {
-      if (!(this_present_cronExpression && that_present_cronExpression))
+    boolean this_present_crontab = true && this.isSetCrontab();
+    boolean that_present_crontab = true && that.isSetCrontab();
+    if (this_present_crontab || that_present_crontab) {
+      if (!(this_present_crontab && that_present_crontab))
         return false;
-      if (!this.cronExpression.equals(that.cronExpression))
+      if (!this.crontab.equals(that.crontab))
         return false;
     }
 
@@ -415,12 +415,12 @@ public class ScheduleInfo implements org.apache.thrift.TBase<ScheduleInfo, Sched
         return lastComparison;
       }
     }
-    lastComparison = Boolean.valueOf(isSetCronExpression()).compareTo(typedOther.isSetCronExpression());
+    lastComparison = Boolean.valueOf(isSetCrontab()).compareTo(typedOther.isSetCrontab());
     if (lastComparison != 0) {
       return lastComparison;
     }
-    if (isSetCronExpression()) {
-      lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.cronExpression, typedOther.cronExpression);
+    if (isSetCrontab()) {
+      lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.crontab, typedOther.crontab);
       if (lastComparison != 0) {
         return lastComparison;
       }
@@ -453,11 +453,11 @@ public class ScheduleInfo implements org.apache.thrift.TBase<ScheduleInfo, Sched
     sb.append(this.endDate);
     first = false;
     if (!first) sb.append(", ");
-    sb.append("cronExpression:");
-    if (this.cronExpression == null) {
+    sb.append("crontab:");
+    if (this.crontab == null) {
       sb.append("null");
     } else {
-      sb.append(this.cronExpression);
+      sb.append(this.crontab);
     }
     first = false;
     sb.append(")");
@@ -521,10 +521,10 @@ public class ScheduleInfo implements org.apache.thrift.TBase<ScheduleInfo, Sched
               org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
             }
             break;
-          case 3: // CRON_EXPRESSION
+          case 3: // CRONTAB
             if (schemeField.type == org.apache.thrift.protocol.TType.STRING) {
-              struct.cronExpression = iprot.readString();
-              struct.setCronExpressionIsSet(true);
+              struct.crontab = iprot.readString();
+              struct.setCrontabIsSet(true);
             } else { 
               org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
             }
@@ -550,9 +550,9 @@ public class ScheduleInfo implements org.apache.thrift.TBase<ScheduleInfo, Sched
       oprot.writeFieldBegin(END_DATE_FIELD_DESC);
       oprot.writeI64(struct.endDate);
       oprot.writeFieldEnd();
-      if (struct.cronExpression != null) {
-        oprot.writeFieldBegin(CRON_EXPRESSION_FIELD_DESC);
-        oprot.writeString(struct.cronExpression);
+      if (struct.crontab != null) {
+        oprot.writeFieldBegin(CRONTAB_FIELD_DESC);
+        oprot.writeString(struct.crontab);
         oprot.writeFieldEnd();
       }
       oprot.writeFieldStop();
@@ -579,7 +579,7 @@ public class ScheduleInfo implements org.apache.thrift.TBase<ScheduleInfo, Sched
       if (struct.isSetEndDate()) {
         optionals.set(1);
       }
-      if (struct.isSetCronExpression()) {
+      if (struct.isSetCrontab()) {
         optionals.set(2);
       }
       oprot.writeBitSet(optionals, 3);
@@ -589,8 +589,8 @@ public class ScheduleInfo implements org.apache.thrift.TBase<ScheduleInfo, Sched
       if (struct.isSetEndDate()) {
         oprot.writeI64(struct.endDate);
       }
-      if (struct.isSetCronExpression()) {
-        oprot.writeString(struct.cronExpression);
+      if (struct.isSetCrontab()) {
+        oprot.writeString(struct.crontab);
       }
     }
 
@@ -607,8 +607,8 @@ public class ScheduleInfo implements org.apache.thrift.TBase<ScheduleInfo, Sched
         struct.setEndDateIsSet(true);
       }
       if (incoming.get(2)) {
-        struct.cronExpression = iprot.readString();
-        struct.setCronExpressionIsSet(true);
+        struct.crontab = iprot.readString();
+        struct.setCrontabIsSet(true);
       }
     }
   }

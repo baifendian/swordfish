@@ -147,6 +147,8 @@ public class AdhocService {
 
       if (adHoc != null && adHoc.getStatus() == FlowStatus.INIT) {
         adHoc.setStatus(FlowStatus.FAILED);
+        adHoc.setEndTime(now);
+
         adHocMapper.updateStatus(adHoc);
       }
 
@@ -301,6 +303,8 @@ public class AdhocService {
     // 如果没有完成, 则更新为 kill
     if (adhoc.getStatus().typeIsNotFinished()) {
       adhoc.setStatus(FlowStatus.KILL);
+      adhoc.setEndTime(new Date());
+
       adHocMapper.updateStatus(adhoc);
     }
   }

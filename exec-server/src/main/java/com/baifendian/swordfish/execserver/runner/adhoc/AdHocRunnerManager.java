@@ -45,7 +45,7 @@ public class AdHocRunnerManager {
   public AdHocRunnerManager(Configuration conf) {
     adHocDao = DaoFactory.getDaoInstance(AdHocDao.class);
 
-    int threads = conf.getInt(Constants.EXECUTOR_ADHOCRUNNER_THREADS, 20);
+    int threads = conf.getInt(Constants.EXECUTOR_ADHOCRUNNER_THREADS, Constants.defaultAdhocExecutorNum);
 
     ThreadFactory flowThreadFactory = new ThreadFactoryBuilder().setNameFormat("Exec-Server-AdHocRunner").build();
     adHocExecutorService = Executors.newFixedThreadPool(threads, flowThreadFactory);

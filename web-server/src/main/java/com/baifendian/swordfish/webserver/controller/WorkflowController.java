@@ -15,10 +15,6 @@
  */
 package com.baifendian.swordfish.webserver.controller;
 
-/**
- * 工作流管理的服务入口
- */
-
 import com.baifendian.swordfish.dao.model.ProjectFlow;
 import com.baifendian.swordfish.dao.model.User;
 import com.baifendian.swordfish.webserver.dto.WorkflowDto;
@@ -36,6 +32,9 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * 工作流管理的服务入口
+ */
 @RestController
 @RequestMapping("/projects/{projectName}")
 public class WorkflowController {

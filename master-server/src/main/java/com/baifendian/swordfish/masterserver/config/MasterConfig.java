@@ -46,6 +46,16 @@ public class MasterConfig {
   public static int heartBeatTimeoutInterval;
 
   /**
+   * 流任务的检测间隔
+   */
+  public static int streamingCheckInterval;
+
+  /**
+   * 流任务的超时时间, 提交后没执行的超时时间
+   */
+  public static int streamingTimeoutThreshold;
+
+  /**
    * master 的最小线程数
    */
   public static int masterMinThreads;
@@ -77,6 +87,8 @@ public class MasterConfig {
     executionFlowQueueSize = conf.getInt("masterToWorker.executionFlow.queueSize", 10000);
     heartBeatTimeoutInterval = conf.getInt("master.heartbeat.timeout.interval", 60) * 1000;
     heartBeatCheckInterval = conf.getInt("master.heartbeat.check.interval", 30);
+    streamingCheckInterval = conf.getInt("streaming.check.interval", 30);
+    streamingTimeoutThreshold = conf.getInt("streaming.timeout.threshold", 1800);
     masterMinThreads = conf.getInt(MASTER_MIN_THREADS, 50);
     masterMaxThreads = conf.getInt(MASTER_MAX_THREADS, 200);
     masterPort = conf.getInt(MASTER_PORT, 9999);

@@ -82,7 +82,7 @@ public class SparkSubmitArgsUtil {
       args.add(getFilesStr(param.getFiles(), true));
     }
 
-    if (!param.getArchives().isEmpty()) {
+    if (param.getArchives() != null && !param.getArchives().isEmpty()) {
       args.add(SparkSubmitArgsConst.ARCHIVES);
       args.add(getFilesStr(param.getArchives(), true));
     }

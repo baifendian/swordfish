@@ -74,9 +74,20 @@ public class ConfigurationUtil {
    *
    * @return
    */
-  public static String getWebappAddress() {
+  public static String getWebappAddress(String appId) {
     init();
-    return configuration.get("yarn.resourcemanager.webapp.address");
+    return String.format(configuration.get("yarn.resourcemanager.webapp.address"), appId);
+  }
+
+  /**
+   * 根据 appid 生成一个 url
+   *
+   * @param appId
+   * @return
+   */
+  public static String getApplicationStatusAddress(String appId) {
+    init();
+    return String.format(configuration.get("yarn.application.status.address"), appId);
   }
 
   /**
@@ -104,5 +115,6 @@ public class ConfigurationUtil {
     configuration.set("yarn.resourcemanager.scheduler.address", PROPERTIES.getProperty("yarn.resourcemanager.scheduler.address"));
     configuration.set("mapreduce.jobhistory.address", PROPERTIES.getProperty("mapreduce.jobhistory.address"));
     configuration.set("yarn.resourcemanager.webapp.address", PROPERTIES.getProperty("yarn.resourcemanager.webapp.address"));
+    configuration.set("yarn.application.status.address", PROPERTIES.getProperty("yarn.application.status.address"));
   }
 }

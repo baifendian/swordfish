@@ -14,21 +14,21 @@
             <includes>
                 <include>**/*.*</include>
             </includes>
-            <outputDirectory>swordfish-web-server-${project.version}</outputDirectory>
+            <outputDirectory>.</outputDirectory>
         </fileSet>
         <fileSet>
             <directory>master-server/target/swordfish-master-server-${project.version}</directory>
             <includes>
                 <include>**/*.*</include>
             </includes>
-            <outputDirectory>swordfish-master-server-${project.version}</outputDirectory>
+            <outputDirectory>.</outputDirectory>
         </fileSet>
         <fileSet>
             <directory>exec-server/target/swordfish-exec-server-${project.version}</directory>
             <includes>
                 <include>**/*.*</include>
             </includes>
-            <outputDirectory>swordfish-exec-server-${project.version}</outputDirectory>
+            <outputDirectory>.</outputDirectory>
         </fileSet>
     </fileSets>
 </assembly>

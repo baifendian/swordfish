@@ -102,19 +102,6 @@ public class FlowDao extends BaseDao {
   }
 
   /**
-   * 按时间段查询 flow 的调度的最新运行状态(调度或者补数据) <p>
-   *
-   * @param flowId
-   * @param startDate
-   * @param endDate
-   * @return
-   * @see ExecutionFlow
-   */
-  public List<ExecutionFlow> queryFlowLastStatus(Integer flowId, Date startDate, Date endDate) {
-    return executionFlowMapper.selectByFlowIdAndTimes(flowId, startDate, endDate);
-  }
-
-  /**
    * 根据具体的scheduleTime获取一个调度的执行记录
    *
    * @param scheduleTime
@@ -122,18 +109,6 @@ public class FlowDao extends BaseDao {
    */
   public ExecutionFlow queryExecutionFlowByScheduleTime(int flowId, Date scheduleTime) {
     return executionFlowMapper.selectExecutionFlowByScheduleTime(flowId, scheduleTime);
-  }
-
-  /**
-   * 按时间查询 flow 的调度的最新运行状态(调度或者补数据) <p>
-   *
-   * @param flowId
-   * @param scheduleTime
-   * @return
-   * @see ExecutionFlow
-   */
-  public List<ExecutionFlow> queryFlowLastStatus(int flowId, Date scheduleTime) {
-    return executionFlowMapper.selectByFlowIdAndTime(flowId, scheduleTime);
   }
 
   /**

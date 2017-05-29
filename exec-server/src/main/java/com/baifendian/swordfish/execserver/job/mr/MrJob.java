@@ -52,8 +52,8 @@ public class MrJob extends AbstractYarnJob {
    * @param logger
    * @throws IOException
    */
-  public MrJob(JobProps props, Logger logger) {
-    super(props, logger);
+  public MrJob(JobProps props, boolean isLongJob, Logger logger) {
+    super(props, isLongJob, logger);
   }
 
   @Override

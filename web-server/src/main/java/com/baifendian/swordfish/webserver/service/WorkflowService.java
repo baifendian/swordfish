@@ -17,8 +17,6 @@ package com.baifendian.swordfish.webserver.service;
 
 import com.baifendian.swordfish.common.config.BaseConfig;
 import com.baifendian.swordfish.common.hadoop.HdfsClient;
-import com.baifendian.swordfish.common.job.struct.node.BaseParam;
-import com.baifendian.swordfish.common.job.struct.node.BaseParamFactory;
 import com.baifendian.swordfish.common.utils.graph.Graph;
 import com.baifendian.swordfish.dao.FlowDao;
 import com.baifendian.swordfish.dao.mapper.ProjectFlowMapper;
@@ -310,10 +308,6 @@ public class WorkflowService {
       projectFlow.setExtras(extras);
     }
 
-    if (StringUtils.isNotEmpty(name)) {
-      projectFlow.setName(name);
-    }
-
     if (StringUtils.isNotEmpty(desc)) {
       projectFlow.setDesc(desc);
     }
@@ -503,7 +497,13 @@ public class WorkflowService {
       throw new PermissionException("User \"{0}\" is not has project \"{1}\" read permission", operator.getName(), project.getName());
     }
 
-    return flowDao.projectFlowfindByName(project.getId(), name);
+    // 如果projectFlow 抛出异常
+    ProjectFlow projectFlow = flowDao.projectFlowfindByName(project.getId(), name);
+    if (projectFlow == null) {
+      throw new NotFoundException("Not found Workflow \"{0}\"", name);
+    }
+
+    return projectFlow;
   }
 
   /**
@@ -642,22 +642,5 @@ public class WorkflowService {
     }
 
     return graph.hasCycle();
-  }
-
-  /**
-   * 检测 flowNode parameter 格式是否正常
-   *
-   * @param parameter
-   * @param type
-   * @return
-   */
-  private boolean flowNodeParamCheck(String parameter, String type) {
-    BaseParam baseParam = BaseParamFactory.getBaseParam(type, parameter);
-
-    if (baseParam == null) {
-      return false;
-    }
-
-    return baseParam.checkValid();
   }
 }

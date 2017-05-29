@@ -58,7 +58,7 @@ public class MasterThriftServer {
   // master 的接口实现
   private MasterServiceImpl masterService;
 
-  //
+  // 任务执行管理器
   private JobExecManager jobExecManager;
 
   public MasterThriftServer() throws UnknownHostException {

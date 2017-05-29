@@ -22,27 +22,33 @@ public class LogResult {
   /**
    * 总的大小
    */
-  private long total;
+  private long total = 0;
 
   /**
    * 当前长度
    */
-  private long length;
+  private long length = 0;
 
   /**
    * 当前日志偏移
    */
-  private long offset;
+  private long offset = 0;
 
   /**
    * 搜索和解析时间, 毫秒
    */
-  private long took;
+  private long took = 0;
 
   /**
    * 日志信息
    */
   private List<String> content = Collections.emptyList();
+
+  /**
+   * 空的日志信息
+   */
+  public static final LogResult EMPTY_LOG_RESULT = new LogResult() {
+  };
 
   public LogResult() {
 

@@ -15,7 +15,6 @@
  */
 package com.baifendian.swordfish.masterserver.exec;
 
-import com.baifendian.swordfish.masterserver.utils.ResultHelper;
 import com.baifendian.swordfish.rpc.RetInfo;
 import com.baifendian.swordfish.rpc.WorkerService;
 import org.apache.thrift.TException;
@@ -96,23 +95,14 @@ public class ExecutorClient {
    * @return
    * @throws TException
    */
-  public boolean execFlow(int execId) throws TException {
+  public RetInfo execFlow(int execId) throws TException {
     connect();
 
     try {
-      RetInfo retInfo = client.execFlow(execId);
-      if (retInfo.getStatus() != ResultHelper.SUCCESS.getStatus()) {
-        // 运行时异常信息
-        throw new RuntimeException(retInfo.getMsg());
-      }
-    } catch (TException e) {
-      logger.error("exec flow error", e);
-      throw e;
+      return client.execFlow(execId);
     } finally {
       close();
     }
-
-    return true;
   }
 
   /**
@@ -127,6 +117,40 @@ public class ExecutorClient {
 
     try {
       return client.cancelExecFlow(execId);
+    } finally {
+      close();
+    }
+  }
+
+  /**
+   * 执行一次
+   *
+   * @param execId
+   * @return
+   * @throws TException
+   */
+  public RetInfo execStreamingJob(int execId) throws TException {
+    connect();
+
+    try {
+      return client.execStreamingJob(execId);
+    } finally {
+      close();
+    }
+  }
+
+  /**
+   * 取消执行
+   *
+   * @param execId
+   * @return
+   * @throws TException
+   */
+  public RetInfo cancelStreamingJob(int execId) throws TException {
+    connect();
+
+    try {
+      return client.cancelStreamingJob(execId);
     } finally {
       close();
     }

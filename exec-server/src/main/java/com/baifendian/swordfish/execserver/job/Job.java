@@ -42,7 +42,7 @@ public interface Job {
   /**
    * 取消执行
    */
-  void cancel() throws Exception;
+  void cancel(boolean cancelApplication) throws Exception;
 
   /**
    * 作业是否已经启动
@@ -57,6 +57,13 @@ public interface Job {
    * @return 是否已完成
    */
   boolean isCompleted();
+
+  /**
+   * 是否长任务类型
+   *
+   * @return
+   */
+  boolean isLongJob();
 
   /**
    * 获取返回码

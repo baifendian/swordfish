@@ -22,11 +22,13 @@ import com.baifendian.swordfish.masterserver.config.MasterConfig;
 import com.baifendian.swordfish.masterserver.exec.ExecutorClient;
 import com.baifendian.swordfish.masterserver.exec.ExecutorServerInfo;
 import com.baifendian.swordfish.masterserver.exec.ExecutorServerManager;
+import com.baifendian.swordfish.rpc.RetInfo;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.thrift.TException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 
@@ -108,14 +110,26 @@ public class Submit2ExecutorServerThread extends Thread {
       logger.info("get execution flow from queue, execId:{} submit to exec {}:{}",
           execId, executorServerInfo.getHost(), executorServerInfo.getPort());
 
-      boolean isSuccess = false;
-      boolean isExecutorServerError = false;
-
       // 更新执行该任务的 worker 信息
       ExecutionFlow executionFlow = flowDao.queryExecutionFlow(execId);
+
+      // 判断 exec flow 是否超时
+      if (isScheduleTimeout(executionFlow.getTimeout(), executionFlow.getScheduleTime().getTime())) {
+        Date now = new Date();
+
+        executionFlow.setEndTime(now);
+        executionFlow.setStatus(FlowStatus.KILL);
+
+        flowDao.updateExecutionFlow(executionFlow);
+        continue;
+      }
+
       executionFlow.setWorker(String.format("%s:%d", executorServerInfo.getHost(), executorServerInfo.getPort()));
 
       flowDao.updateExecutionFlow(executionFlow);
+
+      boolean isSuccess = false;
+      boolean isExecutorServerError = false;
 
       // 得到了要执行的任务, 以及要执行的 executor server, 则需要开始执行
       for (int i = 0; i < MasterConfig.failRetryCount; ++i) {
@@ -127,10 +141,12 @@ public class Submit2ExecutorServerThread extends Thread {
           logger.info("exec id:{}, project id:{}, executor client:{}:{}, try count:{}", execId, executionFlow.getProjectId(),
               executorServerInfo.getHost(), executorServerInfo.getPort(), i);
 
-          // 可能抛出运行时异常, 或者是 TException 异常
-          executorClient.execFlow(execId);
+          // 可能抛出 TException 异常
+          // 这里实际上不对执行状态做判断, 失败则失败了
+          RetInfo retinfo = executorClient.execFlow(execId);
 
-          isSuccess = true;
+          isSuccess = retinfo.getStatus() == 0;
+
           break;
         } catch (TException e) {
           logger.error("run executor get error", e);
@@ -162,6 +178,23 @@ public class Submit2ExecutorServerThread extends Thread {
     }
 
     logger.warn("stop execution workflow thread");
+  }
+
+  /**
+   * 判断是否超时
+   *
+   * @param timeout      单位是秒
+   * @param scheduleTime 单位是毫秒
+   * @return
+   */
+  private boolean isScheduleTimeout(int timeout, long scheduleTime) {
+    int remainTime = timeout - (int) ((System.currentTimeMillis() - scheduleTime) / 1000);
+
+    if (remainTime <= 0) {
+      return true;
+    }
+
+    return false;
   }
 
   /**
