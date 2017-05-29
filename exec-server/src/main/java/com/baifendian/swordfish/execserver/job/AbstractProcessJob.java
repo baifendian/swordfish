@@ -186,12 +186,6 @@ public abstract class AbstractProcessJob extends AbstractJob {
       throw new ExecException("Process error. Exit code is " + exitCode);
     } finally {
       complete = true;
-
-      // 长任务, 需要关闭进程
-      if (isLongJob() && process.isAlive()) {
-        // 关闭进程
-        process.destroy();
-      }
     }
   }
 
@@ -207,14 +201,15 @@ public abstract class AbstractProcessJob extends AbstractJob {
 
     int processId = getProcessId(process);
 
-    logger.info("cancel job:{}, kill process:{}", props.getJobAppId(), processId);
-
     // kill, 等待完成
     boolean killed = softKill(processId, 500, TimeUnit.MILLISECONDS);
 
     if (!killed) {
-      logger.warn("Kill with signal TERM failed. Killing with KILL signal.");
+      // 强制关闭
       hardKill(processId);
+
+      // destory
+      process.destroy();
     }
   }
 
@@ -239,22 +234,23 @@ public abstract class AbstractProcessJob extends AbstractJob {
 
     if (processId != 0 && process.isAlive()) {
       try {
-        String cmd;
-        if (props.getProxyUser() != null) {
-          cmd = String.format("sudo -u %s kill %d", props.getProxyUser(), processId);
-        } else {
-          cmd = String.format("kill %d", processId);
-        }
+//        if (props.getProxyUser() != null) {
+//          cmd = String.format("sudo -u %s kill %d", props.getProxyUser(), processId);
+//        } else {
+//          cmd = String.format("kill %d", processId);
+//        }
+        // 注意通过 sudo -u user command 运行的命令, 是不能直接通过 user 来 kill 的
+        String cmd = String.format("sudo kill %d", processId);
+
+        logger.info("softkill job:{}, process id:{}, cmd:{}", props.getJobAppId(), processId, cmd);
 
         Runtime.getRuntime().exec(cmd);
       } catch (IOException e) {
         logger.info("kill attempt failed.", e);
       }
-
-      return false;
     }
 
-    return false;
+    return process.isAlive();
   }
 
   /**
@@ -267,20 +263,22 @@ public abstract class AbstractProcessJob extends AbstractJob {
 
     if (processId != 0 && process.isAlive()) {
       try {
-        String cmd;
+//        String cmd;
+//
+//        if (props.getProxyUser() != null) {
+//          cmd = String.format("sudo -u %s kill -9 %d", props.getProxyUser(), processId);
+//        } else {
+//          cmd = String.format("kill -9 %d", processId);
+//        }
 
-        if (props.getProxyUser() != null) {
-          cmd = String.format("sudo -u %s kill -9 %d", props.getProxyUser(), processId);
-        } else {
-          cmd = String.format("kill -9 %d", processId);
-        }
+        String cmd = String.format("sudo kill -9 %d", processId);
+
+        logger.info("hardKill job:{}, process id:{}, cmd:{}", props.getJobAppId(), processId, cmd);
 
         Runtime.getRuntime().exec(cmd);
       } catch (IOException e) {
         logger.error("Kill attempt failed.", e);
       }
-
-      process.destroy();
     }
   }
 
