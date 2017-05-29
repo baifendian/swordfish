@@ -39,10 +39,13 @@ pid=$SWORDFISH_PID_DIR/swordfish-$command.pid
 cd $SWORDFISH_HOME
 
 if [ "$command" = "web-server" ]; then
+  LOG_FILE=conf/webserver_logback.xml
   CLASS=com.baifendian.swordfish.webserver.RestfulApiApplication
 elif [ "$command" = "master-server" ]; then
+  LOG_FILE=conf/masterserver_logback.xml
   CLASS=com.baifendian.swordfish.masterserver.MasterThriftServer
 elif [ "$command" = "exec-server" ]; then
+  LOG_FILE=conf/execserver_logback.xml
   CLASS=com.baifendian.swordfish.execserver.ExecThriftServer
 else
   echo "Error: No command named \`$command' was found."
@@ -61,8 +64,11 @@ case $startStop in
     fi
 
     echo starting $command, logging to $log
-    echo "nohup $JAVA_HOME/bin/java $SWORDFISH_OPTS -classpath $SWORDFISH_CONF_DIR:$SWORDFISH_LIB_JARS $CLASS > $log 2>&1 < /dev/null &"
-    nohup $JAVA_HOME/bin/java $SWORDFISH_OPTS -classpath $SWORDFISH_CONF_DIR:$SWORDFISH_LIB_JARS $CLASS > "$log" 2>&1 < /dev/null &
+
+    exec_command="-Dlogback.configurationFile=$LOG_FILE $SWORDFISH_OPTS -classpath $SWORDFISH_CONF_DIR:$SWORDFISH_LIB_JARS $CLASS > $log 2>&1 < /dev/null &"
+
+    echo "nohup $JAVA_HOME/bin/java $exec_command"
+    nohup $JAVA_HOME/bin/java $exec_command
     echo $! > $pid
     ;;
 

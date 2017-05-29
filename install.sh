@@ -81,18 +81,14 @@ function file_replace()
     sed -i "s#yarn.application.status.address.*#yarn.application.status.address = http://${hadoopYarnAddress}:8088/ws/v1/cluster/apps/%s#g" conf/common/hadoop/hadoop.properties
 
     # 4. quartz
-    if [ "$1" = "master-server" ]; then
-        sed -i "s#org.quartz.dataSource.myDS.URL.*#org.quartz.dataSource.myDS.URL= jdbc:mysql://${mysqlAddress}/${mysqlDb}?autoReconnect=true#g" conf/quartz.properties
-        sed -i "s#org.quartz.dataSource.myDS.user.*#org.quartz.dataSource.myDS.user = ${mysqlUser}#g" conf/quartz.properties
-        sed -i "s#org.quartz.dataSource.myDS.password.*#org.quartz.dataSource.myDS.password = ${mysqlPassword}#g" conf/quartz.properties
-    fi
+    sed -i "s#org.quartz.dataSource.myDS.URL.*#org.quartz.dataSource.myDS.URL= jdbc:mysql://${mysqlAddress}/${mysqlDb}?autoReconnect=true#g" conf/quartz.properties
+    sed -i "s#org.quartz.dataSource.myDS.user.*#org.quartz.dataSource.myDS.user = ${mysqlUser}#g" conf/quartz.properties
+    sed -i "s#org.quartz.dataSource.myDS.password.*#org.quartz.dataSource.myDS.password = ${mysqlPassword}#g" conf/quartz.properties
 
     # 5. common.hive 组件下的文件替换
-    if [ "$1" = "exec-server" ]; then
-        sed -i "s#hive.metastore.uris.*#hive.metastore.uris = thrift://${hiveAddress}:9083#g" conf/common/hive/hive.properties
-        sed -i "s#hive.thrift.uris.*#hive.thrift.uris = jdbc:hive2://${hiveAddress}:10000#g" conf/common/hive/hive.properties
-        sed -i "s#hive.uris.*#hive.uris = jdbc:hive2://${hiveAddress}:10000#g" conf/common/hive/hive.properties
-    fi
+    sed -i "s#hive.metastore.uris.*#hive.metastore.uris = thrift://${hiveAddress}:9083#g" conf/common/hive/hive.properties
+    sed -i "s#hive.thrift.uris.*#hive.thrift.uris = jdbc:hive2://${hiveAddress}:10000#g" conf/common/hive/hive.properties
+    sed -i "s#hive.uris.*#hive.uris = jdbc:hive2://${hiveAddress}:10000#g" conf/common/hive/hive.properties
 }
 
 function process_check()
@@ -116,13 +112,10 @@ CUR_DIR=`dirname $0`
 SWORDFISH_HOME=`cd "$CUR_DIR"; pwd`
 
 # stop all service
-cd $SWORDFISH_HOME/target/swordfish-all-${version}/swordfish-web-server-${version}/
+cd $SWORDFISH_HOME/target/swordfish-all-${version}/
+
 sh bin/swordfish-daemon.sh stop web-server
-
-cd $SWORDFISH_HOME/target/swordfish-all-${version}/swordfish-master-server-${version}/
 sh bin/swordfish-daemon.sh stop master-server
-
-cd $SWORDFISH_HOME/target/swordfish-all-${version}/swordfish-exec-server-${version}/
 sh bin/swordfish-daemon.sh stop exec-server
 
 # compile project
@@ -132,36 +125,24 @@ mvn -U clean package assembly:assembly -Dmaven.test.skip=true || { echo "maven f
 if [ "$r" = "true" ]; then
     echo "exec file replace"
 
-    # web-server
-    cd $SWORDFISH_HOME/target/swordfish-all-${version}/swordfish-web-server-${version}/
+    cd $SWORDFISH_HOME/target/swordfish-all-${version}/
 
-    file_replace web-server || { echo "Web server conf replace failed."; exit 1; }
-
-    # master-server
-    cd $SWORDFISH_HOME/target/swordfish-all-${version}/swordfish-master-server-${version}/
-
-    file_replace master-server || { echo "Master server conf replace failed."; exit 1; }
-
-    # exec-server
-    cd $SWORDFISH_HOME/target/swordfish-all-${version}/swordfish-exec-server-${version}/
-
-    file_replace exec-server || { echo "Exec server conf replace failed."; exit 1; }
+    file_replace || { echo "conf file replace failed."; exit 1; }
 else
     echo "do not exec file replace"
 fi
 
 # start all service
-cd $SWORDFISH_HOME/target/swordfish-all-${version}/swordfish-web-server-${version}/
+cd $SWORDFISH_HOME/target/swordfish-all-${version}/
+
 sh bin/swordfish-daemon.sh start web-server
 
 process_check web-server
 
-cd $SWORDFISH_HOME/target/swordfish-all-${version}/swordfish-master-server-${version}/
 sh bin/swordfish-daemon.sh start master-server
 
 process_check master-server
 
-cd $SWORDFISH_HOME/target/swordfish-all-${version}/swordfish-exec-server-${version}/
 sh bin/swordfish-daemon.sh start exec-server
 
 process_check exec-server

@@ -73,66 +73,67 @@ if __name__ == '__main__':
     sessionId = login.get_session(settings.g_user, settings.g_password)
 
     print sessionId
-
-    streamingName = sys.argv[1]
-
-    print 'streaming name: %s' % (streamingName)
-
-    print 'create streaming...'
-    (status, data) = streaming.create_streaming(sessionId,
-                                                settings.g_project,
-                                                streamingName,
-                                                "test streaming task",
-                                                "SPARK_STREAMING",
-                                                json.dumps({
-                                                    "mainClass": "org.apache.spark.examples.streaming.DirectKafkaWordCount",
-                                                    "mainJar": {
-                                                        "scope": "PROJECT",
-                                                        "res": "spark_hadoop.jar"
-                                                    },
-                                                    "args": "172.18.1.22:9092,172.18.1.23:9092,172.18.1.24:9092 test_01",
-                                                    "driverCores": 1,
-                                                    "driverMemory": "1024M",
-                                                    "numExecutors": 1,
-                                                    "executorMemory": "1024M",
-                                                    "executorCores": 1
-                                                }),
-                                                None)
-
-    print status, json.dumps(data, indent=4)
-
-    print 'exec streaming...'
-    (status, data) = exec_streaming(sessionId,
-                                    settings.g_project,
-                                    streamingName,
-                                    "jinmiao.li",
-                                    'alg')
-
-    print status, json.dumps(data, indent=4)
-
-    execId = data.get("execId")
-
-    # print 'kill exec of %s...' % (execId)
-    # status = kill_exec(sessionId, execId)
     #
-    # print status
+    # streamingName = sys.argv[1]
+    #
+    # print 'streaming name: %s' % (streamingName)
+    #
+    # print 'create streaming...'
+    # (status, data) = streaming.create_streaming(sessionId,
+    #                                             settings.g_project,
+    #                                             streamingName,
+    #                                             "test streaming task",
+    #                                             "SPARK_STREAMING",
+    #                                             json.dumps({
+    #                                                 "mainClass": "org.apache.spark.examples.streaming.DirectKafkaWordCount",
+    #                                                 "mainJar": {
+    #                                                     "scope": "PROJECT",
+    #                                                     "res": "spark_hadoop.jar"
+    #                                                 },
+    #                                                 "args": "172.18.1.22:9092,172.18.1.23:9092,172.18.1.24:9092 test_01",
+    #                                                 "driverCores": 1,
+    #                                                 "driverMemory": "1024M",
+    #                                                 "numExecutors": 1,
+    #                                                 "executorMemory": "1024M",
+    #                                                 "executorCores": 1
+    #                                             }),
+    #                                             None)
+    #
+    # print status, json.dumps(data, indent=4)
+    #
+    # print 'exec streaming...'
+    # (status, data) = exec_streaming(sessionId,
+    #                                 settings.g_project,
+    #                                 streamingName,
+    #                                 "jinmiao.li",
+    #                                 'alg')
+    #
+    # print status, json.dumps(data, indent=4)
+    #
+    # execId = data.get("execId")
+    #
+    # # print 'kill exec of %s...' % (execId)
+    # # status = kill_exec(sessionId, execId)
+    # #
+    # # print status
+    #
+    # print 'get streaming execs...'
+    # (status, data) = get_streaming_execs(sessionId, 0, 100000000000000,
+    #                                      settings.g_project, None, 0, 0, 100)
+    #
+    # print status, json.dumps(data, indent=4)
+    #
+    # print 'get steraming latest exec...'
+    # (status, data) = get_streaming_latest_exec(sessionId, settings.g_project, json.dumps(['abc', streamingName]))
+    #
+    # print status, json.dumps(data, indent=4)
+    #
+    # print 'get streaming detail of %s...' % (execId)
+    # (status, data) = get_streaming_exec_detail(sessionId, execId)
+    #
+    # print status, json.dumps(data, indent=4)
 
-    print 'get streaming execs...'
-    (status, data) = get_streaming_execs(sessionId, 0, 100000000000000,
-                                         settings.g_project, None, 0, 0, 100)
-
-    print status, json.dumps(data, indent=4)
-
-    print 'get steraming latest exec...'
-    (status, data) = get_streaming_latest_exec(sessionId, settings.g_project, json.dumps(['abc', streamingName]))
-
-    print status, json.dumps(data, indent=4)
-
-    print 'get streaming detail of %s...' % (execId)
-    (status, data) = get_streaming_exec_detail(sessionId, execId)
-
-    print status, json.dumps(data, indent=4)
-
+    execId = 21
     print 'get log of %s...' % (execId)
     (status, data) = get_logs(sessionId, execId, 0, 100)
 
