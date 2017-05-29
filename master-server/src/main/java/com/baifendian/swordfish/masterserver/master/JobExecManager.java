@@ -142,6 +142,7 @@ public class JobExecManager {
     flowSubmit2ExecutorThread.disable();
 
     try {
+      flowSubmit2ExecutorThread.interrupt();
       flowSubmit2ExecutorThread.join();
     } catch (InterruptedException e) {
       logger.error("join thread exception", e);
