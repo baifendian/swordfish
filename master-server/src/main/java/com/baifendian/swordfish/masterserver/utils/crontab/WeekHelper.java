@@ -17,7 +17,10 @@ package com.baifendian.swordfish.masterserver.utils.crontab;
 
 import com.baifendian.swordfish.dao.enums.ScheduleType;
 import com.cronutils.model.Cron;
-import com.cronutils.model.field.expression.*;
+import com.cronutils.model.field.expression.Always;
+import com.cronutils.model.field.expression.And;
+import com.cronutils.model.field.expression.On;
+import com.cronutils.model.field.expression.QuestionMark;
 
 /**
  * 周周期判断工具类
@@ -30,12 +33,13 @@ public class WeekHelper extends CycleHelper {
   @Override
   protected ScheduleType getCycle() {
     if (minField.getExpression() instanceof On
-            && hourField.getExpression() instanceof On
-            && dayOfMonthField.getExpression() instanceof QuestionMark
-            && (dayOfWeekField.getExpression() instanceof And || dayOfWeekField.getExpression() instanceof On)
-            && monthField.getExpression() instanceof Always){
+        && hourField.getExpression() instanceof On
+        && dayOfMonthField.getExpression() instanceof QuestionMark
+        && (dayOfWeekField.getExpression() instanceof And || dayOfWeekField.getExpression() instanceof On)
+        && monthField.getExpression() instanceof Always) {
       return ScheduleType.WEEK;
     }
+
     return null;
   }
 }

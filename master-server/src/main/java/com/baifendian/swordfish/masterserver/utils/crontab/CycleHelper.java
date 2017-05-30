@@ -42,6 +42,7 @@ public abstract class CycleHelper {
     if (cron == null) {
       throw new IllegalArgumentException("cron must not be null!");
     }
+
     this.cron = cron;
     this.minField = cron.retrieve(CronFieldName.MINUTE);
     this.hourField = cron.retrieve(CronFieldName.HOUR);
@@ -57,5 +58,4 @@ public abstract class CycleHelper {
    * @return
    */
   protected abstract ScheduleType getCycle();
-
 }
