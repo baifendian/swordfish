@@ -24,15 +24,15 @@ import static junit.framework.TestCase.assertTrue;
  */
 public class VerifyUtilTest {
   @Test
-  public void testMatcheUserName(){
+  public void testMatcheUserName() {
     {
-      String test ="bfd_test";
+      String test = "bfd_test";
       assertTrue(VerifyUtil.matcheUserName(test));
     }
   }
 
   @Test
-  public void testMatcheProjectName(){
+  public void testMatcheProjectName() {
     {
       String test = "bfd_test";
       assertTrue(VerifyUtil.matcheProjectName(test));
@@ -40,10 +40,11 @@ public class VerifyUtilTest {
   }
 
   @Test
-  public void testMatcheResName(){
+  public void testMatcheResName() {
     {
-      String test = "aa.jar";
-      assertTrue(VerifyUtil.matcheResName(test));
+      assertTrue(VerifyUtil.matcheResName("aa.jar"));
+
+      assertTrue(VerifyUtil.matcheResName("spark-examples-1.0-SNAPSHOT-hadoop2.6.0.jar"));
     }
   }
 }

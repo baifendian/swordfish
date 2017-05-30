@@ -248,7 +248,8 @@ public class ExecService {
       logger.error("Project does not exist: {}", projectName);
       throw new NotFoundException("Not found project \"{0}\"", projectName);
     }
-    //project 必须有执行权限
+
+    // project 必须有执行权限
     if (!projectService.hasExecPerm(operator.getId(), project)) {
       logger.error("User {} has no right permission for the project {}", operator.getName(), project.getName());
       throw new PermissionException("User \"{0}\" is not has project \"{1}\" exec permission", operator.getName(), project.getName());
