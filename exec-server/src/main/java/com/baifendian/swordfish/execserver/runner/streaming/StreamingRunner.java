@@ -44,11 +44,6 @@ public class StreamingRunner implements Callable<Boolean> {
   private StreamingResult streamingResult;
 
   /**
-   * 流数据数据库接口
-   */
-  private StreamingDao streamingDao;
-
-  /**
    * 用于记录日志, 会封装 job id
    */
   private Logger logger;
@@ -58,9 +53,8 @@ public class StreamingRunner implements Callable<Boolean> {
    */
   private Job job;
 
-  public StreamingRunner(StreamingResult streamingResult, StreamingDao streamingDao, Logger jobLogger) {
+  public StreamingRunner(StreamingResult streamingResult, Logger jobLogger) {
     this.streamingResult = streamingResult;
-    this.streamingDao = streamingDao;
     this.logger = jobLogger;
   }
 
@@ -75,12 +69,26 @@ public class StreamingRunner implements Callable<Boolean> {
     // 系统参数, 注意 schedule time 是真正调度运行的时刻
     Map<String, String> systemParamMap = SystemParamManager.buildSystemParam(ExecType.DIRECT, streamingResult.getScheduleTime());
 
+    // 自定义参数
+    Map<String, String> customParamMap = streamingResult.getUserDefinedParamMap();
+
+    // 作业参数配置
+    Map<String, String> allParamMap = new HashMap<>();
+
+    if (systemParamMap != null) {
+      allParamMap.putAll(systemParamMap);
+    }
+
+    if (customParamMap != null) {
+      allParamMap.putAll(customParamMap);
+    }
+
     JobProps props = new JobProps();
 
     props.setJobParams(streamingResult.getParameter());
     props.setWorkDir(jobScriptPath);
     props.setProxyUser(streamingResult.getProxyUser());
-    props.setDefinedParams(systemParamMap);
+    props.setDefinedParams(allParamMap);
     props.setProjectId(streamingResult.getProjectId());
     props.setExecJobId(streamingResult.getStreamingId());
     props.setExecId(streamingResult.getExecId());

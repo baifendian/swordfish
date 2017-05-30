@@ -16,15 +16,19 @@
 package com.baifendian.swordfish.dao.model;
 
 import com.baifendian.swordfish.dao.enums.FlowStatus;
+import com.baifendian.swordfish.dao.model.flow.Property;
 import com.baifendian.swordfish.dao.utils.json.JsonObjectDeserializer;
 import com.baifendian.swordfish.dao.utils.json.JsonObjectSerializer;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import org.apache.commons.lang.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * 描述一个流任务的结果
@@ -61,6 +65,11 @@ public class StreamingResult {
   @JsonDeserialize(using = JsonObjectDeserializer.class)
   @JsonSerialize(using = JsonObjectSerializer.class)
   private String userDefinedParams;
+
+  /**
+   * 用户定义参数
+   */
+  private Map<String, String> userDefinedParamMap;
 
   /**
    * 提交人 id
@@ -226,6 +235,21 @@ public class StreamingResult {
 
   public void setUserDefinedParams(String userDefinedParams) {
     this.userDefinedParams = userDefinedParams;
+  }
+
+  public void setUserDefinedParamMap(Map<String, String> userDefinedParamMap) {
+    this.userDefinedParamMap = userDefinedParamMap;
+  }
+
+  public Map<String, String> getUserDefinedParamMap() {
+    List<Property> propList;
+
+    if (userDefinedParamMap == null && StringUtils.isNotEmpty(userDefinedParams)) {
+      propList = JsonUtil.parseObjectList(userDefinedParams, Property.class);
+      userDefinedParamMap = propList.stream().collect(Collectors.toMap(Property::getProp, Property::getValue));
+    }
+
+    return userDefinedParamMap;
   }
 
   public int getSubmitUserId() {
