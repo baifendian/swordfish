@@ -81,26 +81,28 @@ public class StreamingResultDto {
   }
 
   public StreamingResultDto(StreamingResult streamingResult) {
-    this.execId = streamingResult.getExecId();
-    this.name = streamingResult.getName();
-    this.desc = streamingResult.getDesc();
-    this.projectName = streamingResult.getProjectName();
-    this.createTime = streamingResult.getCreateTime();
-    this.modifyTime = streamingResult.getModifyTime();
-    this.owner = streamingResult.getOwner();
-    this.type = streamingResult.getType();
-    this.parameter = streamingResult.getParameter();
-    this.userDefParams = streamingResult.getUserDefinedParams();
-    this.submitTime = streamingResult.getSubmitTime();
-    this.startTime = streamingResult.getStartTime();
-    this.endTime = streamingResult.getEndTime();
-    this.submitUser = streamingResult.getSubmitUser();
-    this.proxyUser = streamingResult.getProxyUser();
-    this.queue = streamingResult.getQueue();
-    this.status = streamingResult.getStatus();
-    this.appLinks = streamingResult.getAppLinks();
-    this.notifyType = streamingResult.getNotifyType();
-    this.notifyMails = streamingResult.getNotifyMails();
+    if (streamingResult != null) {
+      this.execId = streamingResult.getExecId();
+      this.name = streamingResult.getName();
+      this.desc = streamingResult.getDesc();
+      this.projectName = streamingResult.getProjectName();
+      this.createTime = streamingResult.getCreateTime();
+      this.modifyTime = streamingResult.getModifyTime();
+      this.owner = streamingResult.getOwner();
+      this.type = streamingResult.getType();
+      this.parameter = streamingResult.getParameter();
+      this.userDefParams = streamingResult.getUserDefinedParams();
+      this.submitTime = streamingResult.getSubmitTime();
+      this.startTime = streamingResult.getStartTime();
+      this.endTime = streamingResult.getEndTime();
+      this.submitUser = streamingResult.getSubmitUser();
+      this.proxyUser = streamingResult.getProxyUser();
+      this.queue = streamingResult.getQueue();
+      this.status = streamingResult.getStatus();
+      this.appLinks = streamingResult.getAppLinks();
+      this.notifyType = streamingResult.getNotifyType();
+      this.notifyMails = streamingResult.getNotifyMails();
+    }
   }
 
   public int getExecId() {

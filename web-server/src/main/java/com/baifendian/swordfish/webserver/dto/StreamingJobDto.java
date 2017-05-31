@@ -57,17 +57,19 @@ public class StreamingJobDto {
   }
 
   public StreamingJobDto(StreamingJob streamingJob) {
-    this.name = streamingJob.getName();
-    this.desc = streamingJob.getDesc();
-    this.projectName = streamingJob.getProjectName();
-    this.type = streamingJob.getType();
-    this.parameter = streamingJob.getParameter();
-    this.userDefParams = streamingJob.getUserDefinedParams();
-    this.createTime = streamingJob.getCreateTime();
-    this.modifyTime = streamingJob.getModifyTime();
-    this.owner = streamingJob.getOwner();
-    this.notifyType = streamingJob.getNotifyType();
-    this.notifyMails = streamingJob.getNotifyMails();
+    if (streamingJob != null) {
+      this.name = streamingJob.getName();
+      this.desc = streamingJob.getDesc();
+      this.projectName = streamingJob.getProjectName();
+      this.type = streamingJob.getType();
+      this.parameter = streamingJob.getParameter();
+      this.userDefParams = streamingJob.getUserDefinedParams();
+      this.createTime = streamingJob.getCreateTime();
+      this.modifyTime = streamingJob.getModifyTime();
+      this.owner = streamingJob.getOwner();
+      this.notifyType = streamingJob.getNotifyType();
+      this.notifyMails = streamingJob.getNotifyMails();
+    }
   }
 
   public String getName() {
