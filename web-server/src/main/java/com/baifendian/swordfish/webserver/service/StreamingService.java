@@ -391,7 +391,9 @@ public class StreamingService {
     List<StreamingJobDto> streamingJobDtos = new ArrayList<>();
     StreamingJob streamingJob = streamingJobMapper.findByProjectNameAndName(projectName, name);
 
-    streamingJobDtos.add(new StreamingJobDto(streamingJob));
+    if (streamingJob != null) {
+      streamingJobDtos.add(new StreamingJobDto(streamingJob));
+    }
 
     return streamingJobDtos;
   }
