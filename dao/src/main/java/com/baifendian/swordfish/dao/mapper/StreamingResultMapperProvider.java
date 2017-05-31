@@ -24,7 +24,7 @@ import org.apache.ibatis.jdbc.SQL;
 import java.util.List;
 import java.util.Map;
 
-public class StreamingResultProvider {
+public class StreamingResultMapperProvider {
 
   private static final String TABLE_NAME = "streaming_result";
 
@@ -59,25 +59,8 @@ public class StreamingResultProvider {
    * @return
    */
   public String selectById(Map<String, Object> parameter) {
-    return new SQL() {
-      {
-        SELECT("submit_user as submit_user_id");
-        SELECT("s.owner as owner_id");
-        SELECT("s.project_id");
-        SELECT("s.name");
-        SELECT("s.`desc`");
-        SELECT("s.create_time");
-        SELECT("s.modify_time");
-        SELECT("s.type");
-        SELECT("r.*");
-
-        FROM(TABLE_NAME + " r");
-
-        JOIN("streaming_job s on r.streaming_id = s.id");
-
-        WHERE("r.id=#{execId}");
-      }
-    }.toString();
+    return constructCommonSimpleSQL().
+        WHERE("r.id=#{execId}").toString();
   }
 
   /**
@@ -110,16 +93,8 @@ public class StreamingResultProvider {
    * @return
    */
   public String findNoFinishedJob(Map<String, Object> parameter) {
-    return new SQL() {
-      {
-        SELECT("submit_user as submit_user_id");
-        SELECT("r.*");
-
-        FROM(TABLE_NAME + " as r");
-
-        WHERE("status <= " + FlowStatus.RUNNING.ordinal());
-      }
-    }.toString();
+    return constructCommonSimpleSQL().
+        WHERE("status <= " + FlowStatus.RUNNING.ordinal()).toString();
   }
 
   /**
@@ -277,6 +252,31 @@ public class StreamingResultProvider {
   }
 
   /**
+   * 构造简单的 sql 语句, 主要做了简单的连接
+   *
+   * @return
+   */
+  private SQL constructCommonSimpleSQL() {
+    return new SQL() {{
+      SELECT("submit_user as submit_user_id");
+      SELECT("s.owner as owner_id");
+      SELECT("s.project_id");
+      SELECT("s.name");
+      SELECT("s.`desc`");
+      SELECT("s.create_time");
+      SELECT("s.modify_time");
+      SELECT("s.notify_type");
+      SELECT("s.notify_mails");
+      SELECT("s.type");
+      SELECT("r.*");
+
+      FROM(TABLE_NAME + " as r");
+
+      JOIN("streaming_job s on r.streaming_id = s.id");
+    }};
+  }
+
+  /**
    * 构造一个比较通用的 sql, 主要做了详细的关联
    *
    * @return
@@ -291,6 +291,8 @@ public class StreamingResultProvider {
       SELECT("s.create_time");
       SELECT("s.modify_time");
       SELECT("s.type");
+      SELECT("s.notify_type");
+      SELECT("s.notify_mails");
       SELECT("u2.name as submit_user_name");
       SELECT("u1.name as owner_name");
       SELECT("p.name as project_name");

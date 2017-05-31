@@ -16,6 +16,7 @@
 package com.baifendian.swordfish.common.utils;
 
 import com.baifendian.swordfish.common.consts.Constants;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.FastDateFormat;
 
 import java.text.DateFormat;
@@ -74,6 +75,10 @@ public class DateUtils {
    * @return
    */
   public static String format(Date date, String formatString) {
+    if (date == null) {
+      return StringUtils.EMPTY;
+    }
+
     FastDateFormat format = FastDateFormat.getInstance(formatString);
     return format.format(date);
   }

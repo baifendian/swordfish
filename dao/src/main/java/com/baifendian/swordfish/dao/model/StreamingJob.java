@@ -15,6 +15,7 @@
  */
 package com.baifendian.swordfish.dao.model;
 
+import com.baifendian.swordfish.dao.enums.NotifyType;
 import com.baifendian.swordfish.dao.utils.json.JsonObjectDeserializer;
 import com.baifendian.swordfish.dao.utils.json.JsonObjectSerializer;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
@@ -101,6 +102,17 @@ public class StreamingJob {
   @JsonDeserialize(using = JsonObjectDeserializer.class)
   @JsonSerialize(using = JsonObjectSerializer.class)
   private String userDefinedParams;
+
+  /**
+   * 报警类型
+   * 数据库映射字段 notify_type
+   */
+  private NotifyType notifyType;
+
+  /**
+   * 报警邮件列表
+   */
+  private String notifyMails;
 
   public int getId() {
     return id;
@@ -196,5 +208,21 @@ public class StreamingJob {
 
   public void setUserDefinedParams(String userDefinedParams) {
     this.userDefinedParams = userDefinedParams;
+  }
+
+  public NotifyType getNotifyType() {
+    return notifyType;
+  }
+
+  public void setNotifyType(NotifyType notifyType) {
+    this.notifyType = notifyType;
+  }
+
+  public String getNotifyMails() {
+    return notifyMails;
+  }
+
+  public void setNotifyMails(String notifyMails) {
+    this.notifyMails = notifyMails;
   }
 }

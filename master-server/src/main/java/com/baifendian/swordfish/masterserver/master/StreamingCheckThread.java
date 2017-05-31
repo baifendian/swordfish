@@ -16,6 +16,7 @@
 package com.baifendian.swordfish.masterserver.master;
 
 import com.baifendian.swordfish.common.hadoop.YarnRestClient;
+import com.baifendian.swordfish.common.mail.EmailManager;
 import com.baifendian.swordfish.dao.StreamingDao;
 import com.baifendian.swordfish.dao.enums.FlowStatus;
 import com.baifendian.swordfish.dao.model.StreamingResult;
@@ -87,6 +88,11 @@ public class StreamingCheckThread implements Runnable {
             }
 
             streamingDao.updateResult(streamingResult);
+
+            // 发送报警
+            if (status.typeIsFinished()) {
+              EmailManager.sendMessageOfStreamingJob(streamingResult);
+            }
           }
         } else if (System.currentTimeMillis() - streamingResult.getScheduleTime().getTime() >=
             MasterConfig.streamingTimeoutThreshold * 1000) { // 提交很久了, 没有任何执行和接受
@@ -95,6 +101,9 @@ public class StreamingCheckThread implements Runnable {
           streamingResult.setEndTime(now);
 
           streamingDao.updateResult(streamingResult);
+
+          // 发送报警
+          EmailManager.sendMessageOfStreamingJob(streamingResult);
         }
       }
     }
