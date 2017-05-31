@@ -234,13 +234,15 @@ public class ExecService {
    */
   public ExecWorkflowsDto getExecWorkflow(User operator, String projectName, String workflowName, Date startDate, Date endDate, String status, int from, int size) {
 
-    List<String> workflowList;
+    List<String> workflowList = new ArrayList<>();
 
-    try {
-      workflowList = JsonUtil.parseObjectList(workflowName, String.class);
-    } catch (Exception e) {
-      logger.error("des11n workflow list error", e);
-      throw new ParameterException("Workflow name \"{0}\" not valid", workflowName);
+    if (StringUtils.isNotEmpty(workflowName)) {
+      try {
+        workflowList = JsonUtil.parseObjectList(workflowName, String.class);
+      } catch (Exception e) {
+        logger.error("des11n workflow list error", e);
+        throw new ParameterException("Workflow name \"{0}\" not valid", workflowName);
+      }
     }
 
     Project project = projectMapper.queryByName(projectName);
@@ -270,7 +272,7 @@ public class ExecService {
     }
 
     int total = executionFlowMapper.sumByFlowIdAndTimesAndStatus(projectName, workflowList, startDate, endDate, flowStatusList);
-    return new ExecWorkflowsDto(total, size, executionFlowResponseList);
+    return new ExecWorkflowsDto(total, from, executionFlowResponseList);
   }
 
   /**
