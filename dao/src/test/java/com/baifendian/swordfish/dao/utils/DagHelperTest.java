@@ -32,26 +32,34 @@ public class DagHelperTest {
   @Test
   public void testFindNodeDepDag() {
     FlowDag flowDag = new FlowDag();
+
     List<FlowNodeRelation> relas = new ArrayList<>();
+
     relas.add(new FlowNodeRelation("shell1", "shell2"));
     relas.add(new FlowNodeRelation("shell1", "shell3"));
     relas.add(new FlowNodeRelation("shell2", "shell4"));
     relas.add(new FlowNodeRelation("shell4", "shell5"));
+
     flowDag.setEdges(relas);
+
     List<FlowNode> nodes = new ArrayList<>();
+
     nodes.add(JsonUtil.parseObject("{\"name\":\"shell1\"}", FlowNode.class));
     nodes.add(JsonUtil.parseObject("{\"name\":\"shell2\"}", FlowNode.class));
     nodes.add(JsonUtil.parseObject("{\"name\":\"shell3\"}", FlowNode.class));
     nodes.add(JsonUtil.parseObject("{\"name\":\"shell4\"}", FlowNode.class));
     nodes.add(JsonUtil.parseObject("{\"name\":\"shell5\"}", FlowNode.class));
+
     flowDag.setNodes(nodes);
 
     FlowNode node = JsonUtil.parseObject("{\"name\":\"shell2\"}", FlowNode.class);
     FlowDag flowDag1 = DagHelper.findNodeDepDag(flowDag, node, true);
+
     assertEquals(3, flowDag1.getNodes().size());
     assertEquals("shell2:shell4,shell4:shell5", flowDag1.getEdges().stream().map(rela -> rela.getStartNode() + ":" + rela.getEndNode()).collect(Collectors.joining(",")));
 
     FlowDag flowDagPre = DagHelper.findNodeDepDag(flowDag, node, false);
+
     assertEquals("shell1,shell2", flowDagPre.getNodes().stream().map(n -> n.getName()).sorted().collect(Collectors.joining(",")));
     assertEquals("shell1:shell2", flowDagPre.getEdges().stream().map(rela -> rela.getStartNode() + ":" + rela.getEndNode()).collect(Collectors.joining(",")));
   }

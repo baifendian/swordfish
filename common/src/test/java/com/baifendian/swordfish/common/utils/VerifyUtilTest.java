@@ -19,9 +19,6 @@ import org.junit.Test;
 
 import static junit.framework.TestCase.assertTrue;
 
-/**
- * 校验工具单元测试
- */
 public class VerifyUtilTest {
   @Test
   public void testMatcheUserName() {

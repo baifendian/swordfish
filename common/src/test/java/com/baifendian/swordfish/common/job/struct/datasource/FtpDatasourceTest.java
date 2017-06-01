@@ -15,27 +15,24 @@
  */
 package com.baifendian.swordfish.common.job.struct.datasource;
 
-import com.baifendian.swordfish.common.utils.VerifyUtil;
 import org.junit.Test;
 
-import static junit.framework.TestCase.assertTrue;
-
-/**
- * ftp数据源测试
- */
 public class FtpDatasourceTest {
   @Test
   public void testIsConnectable() throws Exception {
-    FtpDatasource ftpDatasource = new FtpDatasource();
-    ftpDatasource.setHost("10.12.7.10");
-    ftpDatasource.setPort(21);
-    ftpDatasource.setUser("bfd_541");
-    ftpDatasource.setPassword("bfd123456");
-    ftpDatasource.isConnectable();
+//    FtpDatasource ftpDatasource = new FtpDatasource();
+//
+//    ftpDatasource.setHost("10.12.7.10");
+//    ftpDatasource.setPort(21);
+//    ftpDatasource.setUser("bfd_541");
+//    ftpDatasource.setPassword("bfd123456");
+//    ftpDatasource.isConnectable();
   }
-  @Test(expected=Exception.class)
+
+  @Test(expected = Exception.class)
   public void testIsConnectable2() throws Exception {
     FtpDatasource ftpDatasource = new FtpDatasource();
+
     ftpDatasource.setHost("10.12.7.10");
     ftpDatasource.setPort(21);
     ftpDatasource.setUser("bfd_541");

@@ -15,38 +15,30 @@
  */
 package com.baifendian.swordfish.dao.mapper;
 
-import com.baifendian.swordfish.dao.datasource.ConnectionFactory;
-import com.baifendian.swordfish.dao.enums.DepPolicyType;
-import com.baifendian.swordfish.dao.enums.FailurePolicyType;
-import com.baifendian.swordfish.dao.enums.NotifyType;
-import com.baifendian.swordfish.dao.enums.ScheduleStatus;
-import com.baifendian.swordfish.dao.model.Schedule;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.junit.Test;
-
-import java.util.Arrays;
-import java.util.Date;
 
 public class ScheduleMapperTest {
 
   @Test
   public void testInsert() throws JsonProcessingException {
-    ScheduleMapper scheduleMapper = ConnectionFactory.getSqlSession().getMapper(ScheduleMapper.class);
-    Schedule schedule = new Schedule();
-    schedule.setFlowId(2);
-    schedule.setStartDate(new Date());
-    schedule.setEndDate(new Date(System.currentTimeMillis() + 24 * 3600 * 1000));
-    schedule.setCrontab("10 * * * * ?");
-    schedule.setCreateTime(new Date());
-    schedule.setNotifyMails(Arrays.asList("aaron.liu@baifendian.com"));
-    schedule.setDepPolicy(DepPolicyType.DEP_PRE);
-    schedule.setFailurePolicy(FailurePolicyType.CONTINUE);
-    schedule.setMaxTryTimes(3);
-    schedule.setTimeout(5000);
-    schedule.setNotifyType(NotifyType.ALL);
-    schedule.setModifyTime(new Date());
-    schedule.setOwner("1");
-    schedule.setScheduleStatus(ScheduleStatus.OFFLINE);
-    scheduleMapper.insert(schedule);
+//    ScheduleMapper scheduleMapper = ConnectionFactory.getSqlSession().getMapper(ScheduleMapper.class);
+//
+//    Schedule schedule = new Schedule();
+//    schedule.setFlowId(2);
+//    schedule.setStartDate(new Date());
+//    schedule.setEndDate(new Date(System.currentTimeMillis() + 24 * 3600 * 1000));
+//    schedule.setCrontab("10 * * * * ?");
+//    schedule.setCreateTime(new Date());
+//    schedule.setNotifyMails(Arrays.asList("aaron.liu@baifendian.com"));
+//    schedule.setDepPolicy(DepPolicyType.DEP_PRE);
+//    schedule.setFailurePolicy(FailurePolicyType.CONTINUE);
+//    schedule.setMaxTryTimes(3);
+//    schedule.setTimeout(5000);
+//    schedule.setNotifyType(NotifyType.ALL);
+//    schedule.setModifyTime(new Date());
+//    schedule.setOwner("1");
+//    schedule.setScheduleStatus(ScheduleStatus.OFFLINE);
+//    scheduleMapper.insert(schedule);
   }
 }

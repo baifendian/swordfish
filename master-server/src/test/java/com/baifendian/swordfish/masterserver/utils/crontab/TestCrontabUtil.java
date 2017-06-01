@@ -16,7 +16,6 @@
 package com.baifendian.swordfish.masterserver.utils.crontab;
 
 import com.baifendian.swordfish.dao.enums.ScheduleType;
-import com.baifendian.swordfish.dao.model.Schedule;
 import com.cronutils.model.Cron;
 import org.junit.Test;
 import org.quartz.CronExpression;
@@ -26,7 +25,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import static com.baifendian.swordfish.masterserver.utils.crontab.CrontabUtil.*;
+import static com.baifendian.swordfish.masterserver.utils.crontab.CrontabUtil.getCycle;
+import static com.baifendian.swordfish.masterserver.utils.crontab.CrontabUtil.parseCron;
 import static junit.framework.TestCase.assertEquals;
 
 /**
@@ -35,7 +35,7 @@ import static junit.framework.TestCase.assertEquals;
 public class TestCrontabUtil {
   @Test
   public void testGetCycle() {
-    //准备数据
+    // 准备数据
     String minCrontab = "0 0/2 0-23 * * ? *";
     String hourCrontab = "0 0 2-22/2 * * ? *";
     String dayCrontab = "0 0 0 * * ? *";
@@ -88,15 +88,20 @@ public class TestCrontabUtil {
   public void testGetPreCycleDate() {
     Date now = new Date();
     System.out.println("now: " + now);
+
     Map.Entry<Date, Date> minMap = CrontabUtil.getPreCycleDate(now, ScheduleType.MINUTE);
-    System.out.println("min level is "+minMap.getKey()+" - "+minMap.getValue());
+    System.out.println("min level is " + minMap.getKey() + " - " + minMap.getValue());
+
     Map.Entry<Date, Date> hourMap = CrontabUtil.getPreCycleDate(now, ScheduleType.HOUR);
-    System.out.println("hour level is "+hourMap.getKey()+" - "+hourMap.getValue());
+    System.out.println("hour level is " + hourMap.getKey() + " - " + hourMap.getValue());
+
     Map.Entry<Date, Date> dayMap = CrontabUtil.getPreCycleDate(now, ScheduleType.DAY);
-    System.out.println("day level is "+dayMap.getKey()+" - "+dayMap.getValue());
+    System.out.println("day level is " + dayMap.getKey() + " - " + dayMap.getValue());
+
     Map.Entry<Date, Date> weekMap = CrontabUtil.getPreCycleDate(now, ScheduleType.WEEK);
-    System.out.println("week level is "+weekMap.getKey()+" - "+weekMap.getValue());
+    System.out.println("week level is " + weekMap.getKey() + " - " + weekMap.getValue());
+
     Map.Entry<Date, Date> monthMap = CrontabUtil.getPreCycleDate(now, ScheduleType.MONTH);
-    System.out.println("month level is "+monthMap.getKey()+" - "+monthMap.getValue());
+    System.out.println("month level is " + monthMap.getKey() + " - " + monthMap.getValue());
   }
 }
