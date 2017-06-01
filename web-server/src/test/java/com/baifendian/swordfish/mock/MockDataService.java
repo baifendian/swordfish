@@ -15,6 +15,8 @@
  */
 package com.baifendian.swordfish.mock;
 
+import com.baifendian.swordfish.common.job.struct.datasource.Datasource;
+import com.baifendian.swordfish.common.job.struct.datasource.MysqlDatasource;
 import com.baifendian.swordfish.dao.FlowDao;
 import com.baifendian.swordfish.dao.enums.*;
 import com.baifendian.swordfish.dao.mapper.*;
@@ -139,7 +141,7 @@ public class MockDataService {
     project.setModifyTime(now);
     project.setOwnerId(user.getId());
     project.setOwner(user.getName());
-
+    System.out.println("user_name is:" + user.getName() + "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
     projectMapper.insert(project);
     return project;
   }
@@ -202,7 +204,7 @@ public class MockDataService {
    *
    * @return
    */
-  public FlowNode mocNode(String[] depList, int flowId, String parameter, String extras,boolean storage) throws JsonProcessingException {
+  public FlowNode mocNode(String[] depList, int flowId, String parameter, String extras, boolean storage) throws JsonProcessingException {
     FlowNode flowNode = new FlowNode();
     flowNode.setName(getRandomString());
     flowNode.setDesc(getRandomString());
@@ -213,7 +215,7 @@ public class MockDataService {
     flowNode.setDepList(Arrays.asList(depList));
     flowNode.setExtras(extras);
 
-    if(storage){
+    if (storage) {
       flowNodeMapper.insert(flowNode);
     }
     return flowNode;
@@ -225,20 +227,20 @@ public class MockDataService {
    * @return
    */
   public FlowNode mocRmNode(String[] depList, int flowId) throws JsonProcessingException {
-    return mocNode(depList, flowId, MR_PARAMETER, MR_PARAMETER,true);
+    return mocNode(depList, flowId, MR_PARAMETER, MR_PARAMETER, true);
   }
 
   /**
    * 虚拟一个RM节点，但是不写入数据库
+   *
    * @param depList
    * @param flowId
    * @return
    * @throws JsonProcessingException
    */
   public FlowNode mocRmNodeJson(String[] depList, int flowId) throws JsonProcessingException {
-    return mocNode(depList, flowId, MR_PARAMETER, MR_PARAMETER,false);
+    return mocNode(depList, flowId, MR_PARAMETER, MR_PARAMETER, false);
   }
-
 
 
   /**
@@ -253,7 +255,7 @@ public class MockDataService {
 
     List<FlowNode> flowNodeList = Arrays.asList(new FlowNode[]{flowNode1, flowNode2, flowNode3});
 
-    return new WorkflowData(flowNodeList,Arrays.asList(new Property[]{new Property("year","$[yyyy]")}),FlowNode.class);
+    return new WorkflowData(flowNodeList, Arrays.asList(new Property[]{new Property("year", "$[yyyy]")}), FlowNode.class);
   }
 
   /**
@@ -267,12 +269,12 @@ public class MockDataService {
     return JsonUtil.toJsonString(projectFlowData);
   }
 
-  public ProjectFlow mocProjectFlow(Project project,User user) throws JsonProcessingException {
-    return mocProjectFlow(project,user,true);
+  public ProjectFlow mocProjectFlow(Project project, User user) throws JsonProcessingException {
+    return mocProjectFlow(project, user, true);
   }
 
-  public ProjectFlow mocProjectFlowJson(Project project,User user) throws JsonProcessingException {
-    return mocProjectFlow(project,user,false);
+  public ProjectFlow mocProjectFlowJson(Project project, User user) throws JsonProcessingException {
+    return mocProjectFlow(project, user, false);
   }
 
   /**
@@ -305,7 +307,7 @@ public class MockDataService {
 
     projectFlow.setFlowsNodes(flowNodeList);
 
-    if (storage){
+    if (storage) {
       flowDao.createProjectFlow(projectFlow);
     }
 
@@ -314,9 +316,10 @@ public class MockDataService {
 
   /**
    * 虚拟一个Schedule
+   *
    * @return
    */
-  public Schedule mockSchedule(String projectName,int flowId,int userId) throws IOException {
+  public Schedule mockSchedule(String projectName, int flowId, int userId) throws IOException {
     Schedule schedule = new Schedule();
     Date now = new Date();
     schedule.setFlowId(flowId);
@@ -327,7 +330,7 @@ public class MockDataService {
     schedule.setNotifyMailsStr(JsonUtil.toJsonString(Arrays.asList(new String[]{"ABC@baifendian.com"})));
     schedule.setMaxTryTimes(2);
     schedule.setFailurePolicy(FailurePolicyType.END);
-    schedule.setDepWorkflowsStr(JsonUtil.toJsonString(Arrays.asList(new Schedule.DepWorkflow[]{new Schedule.DepWorkflow(projectName,getRandomString())})));
+    schedule.setDepWorkflowsStr(JsonUtil.toJsonString(Arrays.asList(new Schedule.DepWorkflow[]{new Schedule.DepWorkflow(projectName, getRandomString())})));
     schedule.setDepPolicy(DepPolicyType.NO_DEP_PRE);
     schedule.setTimeout(3600);
     schedule.setOwnerId(userId);
@@ -336,5 +339,28 @@ public class MockDataService {
     schedule.setScheduleStatus(ScheduleStatus.OFFLINE);
     scheduleMapper.insert(schedule);
     return schedule;
+  }
+
+  /**
+   * 生成一个数据源对象
+   *
+   * @return
+   */
+  public Datasource mockDatasource() {
+    MysqlDatasource datasource = new MysqlDatasource();
+    datasource.setAddress("jdbc:mysql://172.18.1.22:3306");
+    datasource.setDatabase("swordfish");
+    datasource.setUser("admin");
+    datasource.setPassword("admin@daydayup");
+    return datasource;
+  }
+
+  /**
+   * 生成一个json化的数据源对象
+   *
+   * @return
+   */
+  public String mockDatasourceJson() {
+    return JsonUtil.toJsonString(mockDatasource());
   }
 }

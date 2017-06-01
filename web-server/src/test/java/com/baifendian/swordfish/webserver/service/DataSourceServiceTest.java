@@ -22,6 +22,9 @@ import com.baifendian.swordfish.dao.model.Project;
 import com.baifendian.swordfish.dao.model.User;
 import com.baifendian.swordfish.mock.MockDataService;
 import com.baifendian.swordfish.webserver.RestfulApiApplication;
+import com.baifendian.swordfish.webserver.exception.NotFoundException;
+import com.baifendian.swordfish.webserver.exception.PermissionException;
+import com.baifendian.swordfish.webserver.exception.ServerErrorException;
 import org.apache.commons.httpclient.HttpStatus;
 import org.junit.Before;
 import org.junit.Test;
@@ -75,7 +78,7 @@ public class DataSourceServiceTest {
       //正常创建一个数据源
       String name = mockDataService.getRandomString();
       String desc = mockDataService.getRandomString();
-      String paramter = mockDataService.getRandomString();
+      String paramter = mockDataService.mockDatasourceJson();
 
       MockHttpServletResponse mockHttpServletResponse = new MockHttpServletResponse();
       DataSource res = datasourceService.createDataSource(user, project.getName(), name, desc, DbType.MYSQL, paramter);
@@ -88,22 +91,30 @@ public class DataSourceServiceTest {
       mockDataService.createProjectUser(project.getId(), user1.getId(), Constants.PROJECT_USER_PERM_READ);
       String name = mockDataService.getRandomString();
       String desc = mockDataService.getRandomString();
-      String paramter = mockDataService.getRandomString();
+      String paramter = mockDataService.mockDatasourceJson();
 
       MockHttpServletResponse mockHttpServletResponse = new MockHttpServletResponse();
-      DataSource res = datasourceService.createDataSource(user1, project.getName(), name, desc, DbType.MYSQL, paramter);
-      assertEquals(mockHttpServletResponse.getStatus(), HttpStatus.SC_UNAUTHORIZED);
-      assertTrue(res == null);
+      boolean res = false;
+      try {
+        datasourceService.createDataSource(user1, project.getName(), name, desc, DbType.MYSQL, paramter);
+      } catch (PermissionException e) {
+        res = true;
+      }
+      assertTrue(res);
     }
     {
       //重复创建一个数据源
       String name = dataSource.getName();
       String desc = mockDataService.getRandomString();
-      String paramter = mockDataService.getRandomString();
+      String paramter = mockDataService.mockDatasourceJson();
       MockHttpServletResponse mockHttpServletResponse = new MockHttpServletResponse();
-      DataSource res = datasourceService.createDataSource(user, project.getName(), name, desc, DbType.MYSQL, paramter);
-      assertEquals(mockHttpServletResponse.getStatus(), HttpStatus.SC_CONFLICT);
-      assertTrue(res == null);
+      boolean res = false;
+      try {
+        datasourceService.createDataSource(user, project.getName(), name, desc, DbType.MYSQL, paramter);
+      } catch (ServerErrorException e) {
+        res = true;
+      }
+      assertTrue(res);
     }
   }
 
@@ -112,7 +123,7 @@ public class DataSourceServiceTest {
     {
       //正常修改一个数据源
       String desc = mockDataService.getRandomString();
-      String paramter = mockDataService.getRandomString();
+      String paramter = mockDataService.mockDatasourceJson();
       MockHttpServletResponse mockHttpServletResponse = new MockHttpServletResponse();
       DataSource res = datasourceService.modifyDataSource(user, project.getName(), dataSource.getName(), desc, paramter);
       assertEquals(mockHttpServletResponse.getStatus(), HttpStatus.SC_OK);
@@ -123,21 +134,30 @@ public class DataSourceServiceTest {
       User user1 = mockDataService.createGeneralUser();
       mockDataService.createProjectUser(project.getId(), user1.getId(), Constants.PROJECT_USER_PERM_READ);
       String desc = mockDataService.getRandomString();
-      String paramter = mockDataService.getRandomString();
+      String paramter = mockDataService.mockDatasourceJson();
       MockHttpServletResponse mockHttpServletResponse = new MockHttpServletResponse();
-      DataSource res = datasourceService.modifyDataSource(user1, project.getName(), dataSource.getName(), desc, paramter);
-      assertEquals(mockHttpServletResponse.getStatus(), HttpStatus.SC_UNAUTHORIZED);
-      assertTrue(res == null);
+      boolean res = false;
+      try {
+        datasourceService.modifyDataSource(user1, project.getName(), dataSource.getName(), desc, paramter);
+      } catch (PermissionException e) {
+        res = true;
+      }
+
+      assertTrue(res);
     }
     {
       //修改一个不存在的数据源
       String name = mockDataService.getRandomString();
       String desc = mockDataService.getRandomString();
-      String paramter = mockDataService.getRandomString();
+      String paramter = mockDataService.mockDatasourceJson();
       MockHttpServletResponse mockHttpServletResponse = new MockHttpServletResponse();
-      DataSource res = datasourceService.modifyDataSource(user, project.getName(), name, desc, paramter);
-      assertEquals(mockHttpServletResponse.getStatus(), HttpStatus.SC_NOT_MODIFIED);
-      assertTrue(res == null);
+      boolean res = false;
+      try {
+        datasourceService.modifyDataSource(user, project.getName(), name, desc, paramter);
+      } catch (NotFoundException e) {
+        res = true;
+      }
+      assertTrue(res);
     }
   }
 
@@ -155,16 +175,24 @@ public class DataSourceServiceTest {
       User user1 = mockDataService.createGeneralUser();
       mockDataService.createProjectUser(project.getId(), user1.getId(), Constants.PROJECT_USER_PERM_READ);
       DataSource dataSource1 = mockDataService.createDataSource(project.getId(), user.getId());
-      MockHttpServletResponse mockHttpServletResponse = new MockHttpServletResponse();
-      datasourceService.deleteDataSource(user1, project.getName(), dataSource1.getName());
-      assertEquals(mockHttpServletResponse.getStatus(), HttpStatus.SC_UNAUTHORIZED);
+      boolean res = false;
+      try {
+        datasourceService.deleteDataSource(user1, project.getName(), dataSource1.getName());
+      } catch (PermissionException e) {
+        res = true;
+      }
+      assertTrue(res);
     }
     {
       //删除一个不存在的数据源
       String name = mockDataService.getRandomString();
-      MockHttpServletResponse mockHttpServletResponse = new MockHttpServletResponse();
-      datasourceService.deleteDataSource(user, project.getName(), name);
-      assertEquals(mockHttpServletResponse.getStatus(), HttpStatus.SC_NOT_MODIFIED);
+      boolean res = false;
+      try {
+        datasourceService.deleteDataSource(user, project.getName(), name);
+      } catch (ServerErrorException e) {
+        res = true;
+      }
+      assertTrue(res);
     }
   }
 
@@ -183,9 +211,14 @@ public class DataSourceServiceTest {
       User user1 = mockDataService.createGeneralUser();
       mockDataService.createProjectUser(project.getId(), user1.getId(), Constants.PROJECT_USER_PERM_WRITE);
       MockHttpServletResponse mockHttpServletResponse = new MockHttpServletResponse();
-      List<DataSource> dataSourceList = datasourceService.query(user1, project.getName());
-      assertEquals(mockHttpServletResponse.getStatus(), HttpStatus.SC_UNAUTHORIZED);
-      assertTrue(dataSourceList == null);
+      boolean res = false;
+      try {
+        datasourceService.query(user1, project.getName());
+      } catch (PermissionException e) {
+        res = true;
+      }
+
+      assertTrue(res);
     }
   }
 
@@ -203,9 +236,13 @@ public class DataSourceServiceTest {
       User user1 = mockDataService.createGeneralUser();
       mockDataService.createProjectUser(project.getId(), user1.getId(), Constants.PROJECT_USER_PERM_WRITE);
       MockHttpServletResponse mockHttpServletResponse = new MockHttpServletResponse();
-      DataSource res = datasourceService.queryByName(user1, project.getName(), dataSource.getName());
-      assertEquals(mockHttpServletResponse.getStatus(), HttpStatus.SC_UNAUTHORIZED);
-      assertTrue(res == null);
+      boolean res = false;
+      try {
+        datasourceService.queryByName(user1, project.getName(), dataSource.getName());
+      } catch (PermissionException e) {
+        res = true;
+      }
+      assertTrue(res);
     }
     {
       //查看一个不存在的数据源

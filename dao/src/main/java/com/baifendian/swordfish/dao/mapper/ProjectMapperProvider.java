@@ -33,7 +33,7 @@ public class ProjectMapperProvider {
     return new SQL() {{
       INSERT_INTO(TABLE_NAME);
 
-      VALUES("`name`", "#{newProject.name,jdbcType=VARCHAR}");
+      VALUES("`name`", "#{newProject.name}");
       VALUES("`desc`", "#{newProject.desc}");
       VALUES("`create_time`", "#{newProject.createTime}");
       VALUES("`modify_time`", "#{newProject.modifyTime}");
