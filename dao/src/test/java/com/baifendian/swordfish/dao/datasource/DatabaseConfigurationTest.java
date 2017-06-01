@@ -26,9 +26,6 @@ import java.util.UUID;
 
 import static org.junit.Assert.assertEquals;
 
-/**
- * author: smile8 date:   2017/3/16 desc:
- */
 public class DatabaseConfigurationTest {
   private static SqlSession sqlSession;
 
@@ -55,7 +52,5 @@ public class DatabaseConfigurationTest {
     Session userSession2 = mapper.queryById(uuid);
 
     assertEquals(userSession2.getId(), userSession.getId());
-
-    System.out.println(userSession2.toString());
   }
 }

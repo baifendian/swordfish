@@ -30,8 +30,6 @@ public class HdfsClientTest {
 
   private static String tmpFilename;
 
-  private static String tmpFilenameCopy;
-
   @BeforeClass
   public static void runOnceBeforeClass() {
     HdfsClient.init(ConfigurationUtil.getConfiguration());
@@ -40,7 +38,6 @@ public class HdfsClientTest {
 
     String uuid = "a286e22a-4dc8-c093-a1db-f69af4f3b8ce";
     tmpFilename = "/tmp/" + uuid + ".txt";
-    tmpFilenameCopy = tmpFilename + ".copy";
   }
 
   @AfterClass
@@ -74,7 +71,7 @@ public class HdfsClientTest {
 
     try {
       assertTrue(hdfsClient.copyLocalToHdfs(tmpFilename, "/tmp", false, true));
-      assertTrue(hdfsClient.copyHdfsToLocal(tmpFilename, tmpFilenameCopy, false, true));
+      assertTrue(hdfsClient.delete(tmpFilename, false));
     } catch (HdfsException e) {
       assertFalse(true);
     }

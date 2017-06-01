@@ -66,7 +66,7 @@ public class ScheduleController {
                                     @PathVariable String projectName,
                                     @PathVariable String workflowName,
                                     @RequestParam(value = "schedule") String schedule,
-                                    @RequestParam(value = "notifyType", required = false, defaultValue = "None") NotifyType notifyType,
+                                    @RequestParam(value = "notifyType", required = false) NotifyType notifyType,
                                     @RequestParam(value = "notifyMails", required = false) String notifyMails,
                                     @RequestParam(value = "maxTryTimes", required = false, defaultValue = "1") int maxTryTimes,
                                     @RequestParam(value = "failurePolicy", required = false, defaultValue = "END") FailurePolicyType failurePolicy,

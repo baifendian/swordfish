@@ -107,6 +107,22 @@ public class ParamVerify {
   }
 
   /**
+   * 检测 email 列表
+   *
+   * @param emails
+   */
+  public static void verifyEmails(String emails, boolean mustExist) {
+    try {
+      List<String> emailList = JsonUtil.parseObjectList(emails, String.class);
+      if (mustExist && emailList == null) {
+        throw new ParameterException("Extra parameter \"{0}\" not valid, emails must set correct", emails);
+      }
+    } catch (Exception e) {
+      throw new ParameterException("Extra parameter \"{0}\" not valid", emails);
+    }
+  }
+
+  /**
    * 校验资源名称
    *
    * @param resourceName

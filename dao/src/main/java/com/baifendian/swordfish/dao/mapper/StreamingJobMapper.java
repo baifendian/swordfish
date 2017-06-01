@@ -15,8 +15,10 @@
  */
 package com.baifendian.swordfish.dao.mapper;
 
+import com.baifendian.swordfish.dao.enums.NotifyType;
 import com.baifendian.swordfish.dao.model.StreamingJob;
 import org.apache.ibatis.annotations.*;
+import org.apache.ibatis.type.EnumOrdinalTypeHandler;
 import org.apache.ibatis.type.JdbcType;
 
 import java.sql.Timestamp;
@@ -30,7 +32,7 @@ public interface StreamingJobMapper {
    * @param job
    * @return 插入记录数
    */
-  @InsertProvider(type = StreamingJobProvider.class, method = "insert")
+  @InsertProvider(type = StreamingJobMapperProvider.class, method = "insert")
   @SelectKey(statement = "SELECT LAST_INSERT_ID() AS id", keyProperty = "job.id", resultType = int.class, before = false)
   int insertAndGetId(@Param("job") StreamingJob job);
 
@@ -52,9 +54,11 @@ public interface StreamingJobMapper {
       @Result(property = "owner", column = "owner_name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
       @Result(property = "type", column = "type", javaType = String.class, jdbcType = JdbcType.VARCHAR),
       @Result(property = "parameter", column = "parameter", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-      @Result(property = "userDefinedParams", column = "user_defined_params", javaType = String.class, jdbcType = JdbcType.VARCHAR)
+      @Result(property = "userDefinedParams", column = "user_defined_params", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+      @Result(property = "notifyType", column = "notify_type", typeHandler = EnumOrdinalTypeHandler.class, javaType = NotifyType.class, jdbcType = JdbcType.TINYINT),
+      @Result(property = "notifyMails", column = "notify_mails", javaType = String.class, jdbcType = JdbcType.VARCHAR)
   })
-  @SelectProvider(type = StreamingJobProvider.class, method = "findByProjectNameAndName")
+  @SelectProvider(type = StreamingJobMapperProvider.class, method = "findByProjectNameAndName")
   StreamingJob findByProjectNameAndName(@Param("projectName") String projectName, @Param("name") String name);
 
   /**
@@ -63,7 +67,7 @@ public interface StreamingJobMapper {
    * @param job
    * @return
    */
-  @UpdateProvider(type = StreamingJobProvider.class, method = "updateStreamingJob")
+  @UpdateProvider(type = StreamingJobMapperProvider.class, method = "updateStreamingJob")
   int updateStreamingJob(@Param("job") StreamingJob job);
 
   /**
@@ -72,7 +76,7 @@ public interface StreamingJobMapper {
    * @param id
    * @return 删除记录数
    */
-  @DeleteProvider(type = StreamingJobProvider.class, method = "deleteById")
+  @DeleteProvider(type = StreamingJobMapperProvider.class, method = "deleteById")
   int deleteById(@Param("id") int id);
 
   /**
@@ -81,7 +85,7 @@ public interface StreamingJobMapper {
    * @param projectId
    * @return
    */
-  @SelectProvider(type = StreamingJobProvider.class, method = "selectProjectStreamingCount")
+  @SelectProvider(type = StreamingJobMapperProvider.class, method = "selectProjectStreamingCount")
   int selectProjectStreamingCount(@Param("projectId") int projectId);
 
   /**
@@ -101,8 +105,10 @@ public interface StreamingJobMapper {
       @Result(property = "owner", column = "owner_name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
       @Result(property = "type", column = "type", javaType = String.class, jdbcType = JdbcType.VARCHAR),
       @Result(property = "parameter", column = "parameter", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-      @Result(property = "userDefinedParams", column = "user_defined_params", javaType = String.class, jdbcType = JdbcType.VARCHAR)
+      @Result(property = "userDefinedParams", column = "user_defined_params", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+      @Result(property = "notifyType", column = "notify_type", typeHandler = EnumOrdinalTypeHandler.class, javaType = NotifyType.class, jdbcType = JdbcType.TINYINT),
+      @Result(property = "notifyMails", column = "notify_mails", javaType = String.class, jdbcType = JdbcType.VARCHAR)
   })
-  @SelectProvider(type = StreamingJobProvider.class, method = "queryProjectStreamingJobs")
+  @SelectProvider(type = StreamingJobMapperProvider.class, method = "queryProjectStreamingJobs")
   List<StreamingJob> queryProjectStreamingJobs(@Param("projectId") int projectId);
 }

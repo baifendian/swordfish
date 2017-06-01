@@ -15,7 +15,6 @@
  */
 package com.baifendian.swordfish.masterserver.master;
 
-import com.baifendian.swordfish.common.mail.EmailManager;
 import com.baifendian.swordfish.dao.FlowDao;
 import com.baifendian.swordfish.dao.enums.ExecType;
 import com.baifendian.swordfish.dao.model.ExecutionFlow;
@@ -126,9 +125,6 @@ public class FlowExecManager {
           resultList.add(new AbstractMap.SimpleImmutableEntry<>(new Date(scheduleDate.getTime()), execStatus));
           scheduleDate = cron.getTimeAfter(scheduleDate);
         }
-
-        // 发送邮件
-        EmailManager.sendAddDataEmail(flow, !isFailed, resultList);
       } catch (Exception e) {
         logger.error(e.getMessage(), e);
       }

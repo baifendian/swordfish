@@ -33,7 +33,7 @@ public class ResourceMapperProvider {
       {
         INSERT_INTO(TABLE_NAME);
 
-        VALUES("`name`", "#{resource.name}");
+        VALUES("`name`", "#{resource.name,jdbcType=VARCHAR}");
         VALUES("`origin_filename`", "#{resource.originFilename}");
         VALUES("`desc`", "#{resource.desc}");
         VALUES("`owner`", "#{resource.ownerId}");
@@ -74,12 +74,14 @@ public class ResourceMapperProvider {
   public String queryResource(Map<String, Object> parameter) {
     return new SQL() {
       {
-        SELECT("*");
-
-        FROM(TABLE_NAME);
-
-        WHERE("`project_id` = #{projectId}");
-        WHERE("`name` = #{name}");
+        SELECT("r.*");
+        SELECT("u.name as owner_name");
+        SELECT("p.name as project_name");
+        FROM(TABLE_NAME+" as r");
+        JOIN("user as u on r.owner = u.id");
+        JOIN("project as p on r.project_id = p.id");
+        WHERE("r.project_id = #{projectId}");
+        WHERE("r.name = #{name}");
       }
     }.toString();
   }

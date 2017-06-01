@@ -78,8 +78,9 @@ public class DatasourceService {
     // 序列化数据源参数对象
     Datasource datasource = DatasourceFactory.getDatasource(type, parameter);
     if (datasource == null) {
-      throw new PermissionException("Parameter \"{0}\" is not valid", parameter);
+      throw new ParameterException("Parameter \"{0}\" is not valid", parameter);
     }
+
 
     // 构建数据源
     DataSource dataSource = new DataSource();

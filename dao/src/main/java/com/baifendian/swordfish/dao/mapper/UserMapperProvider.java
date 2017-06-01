@@ -113,7 +113,7 @@ public class UserMapperProvider {
       {
         INSERT_INTO(TABLE_NAME);
 
-        VALUES("`name`", "#{user.name}");
+        VALUES("`name`", "#{user.name,jdbcType=VARCHAR}");
         VALUES("`email`", "#{user.email}");
         VALUES("`desc`", "#{user.desc}");
         VALUES("`phone`", "#{user.phone}");
@@ -155,10 +155,10 @@ public class UserMapperProvider {
   /**
    * 删除用户
    *
-   * @param name
+   * @param parameter
    * @return
    */
-  public String delete(String name) {
+  public String delete(Map<String, Object> parameter) {
     return new SQL() {
       {
         DELETE_FROM(TABLE_NAME);

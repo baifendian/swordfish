@@ -32,14 +32,15 @@ public class DayHelper extends CycleHelper {
 
   @Override
   protected ScheduleType getCycle() {
-    //匹配UDP天调度特征
+
     if (minField.getExpression() instanceof On
-            && hourField.getExpression() instanceof On
-            && dayOfMonthField.getExpression() instanceof Always
-            && dayOfWeekField.getExpression() instanceof QuestionMark
-            && monthField.getExpression() instanceof Always) {
+        && hourField.getExpression() instanceof On
+        && dayOfMonthField.getExpression() instanceof Always
+        && dayOfWeekField.getExpression() instanceof QuestionMark
+        && monthField.getExpression() instanceof Always) {
       return ScheduleType.DAY;
     }
+
     return null;
   }
 }

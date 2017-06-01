@@ -97,7 +97,9 @@ if __name__ == '__main__':
                                                     "executorMemory": "1024M",
                                                     "executorCores": 1
                                                 }),
-                                                None)
+                                                None, "FAILURE",
+                                                json.dumps(["qifeng.dai@baifendian.com",
+                                                            "jinwei.cao@baifendian.com"]))
 
     print status, json.dumps(data, indent=4)
 

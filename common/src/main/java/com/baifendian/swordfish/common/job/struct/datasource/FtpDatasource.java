@@ -65,6 +65,8 @@ public class FtpDatasource extends Datasource {
   public void isConnectable() throws Exception {
     FTPClient ftpClient = new FTPClient();
     ftpClient.connect(this.host, this.port);
-    ftpClient.login(this.user, this.password);
+    if (!ftpClient.login(this.user, this.password)){
+      throw new Exception("wrong user name or password");
+    }
   }
 }

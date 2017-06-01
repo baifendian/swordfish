@@ -34,8 +34,8 @@ public class DAGGraph<VK, VD, ED> extends Graph<VK, VD, ED> {
   /**
    * 判断增加 startId -> endId 会否导致环存在, 这个算法就是判断从 endId 到 startId 是不是可达的
    *
-   * @param startKey      起点
-   * @param endKey        终点
+   * @param startKey     起点
+   * @param endKey       终点
    * @param createVertex 是否创建顶点
    * @return
    */
@@ -56,7 +56,7 @@ public class DAGGraph<VK, VD, ED> extends Graph<VK, VD, ED> {
       VK key = q.poll();
 
       for (VK postKey : getPostNode(key)) {
-        if (postKey == startKey) {
+        if (postKey.equals(startKey)) {
           return false;
         }
 

@@ -26,14 +26,14 @@ public class UserSessionDto {
   /**
    * 用户信息
    */
-  private User user;
+  private UserDto user;
 
   public UserSessionDto() {
   }
 
   public UserSessionDto(String sessionId, User user) {
     this.sessionId = sessionId;
-    this.user = user;
+    this.user = new UserDto(user);
   }
 
   public String getSessionId() {
@@ -44,11 +44,11 @@ public class UserSessionDto {
     this.sessionId = sessionId;
   }
 
-  public User getUser() {
+  public UserDto getUser() {
     return user;
   }
 
-  public void setUser(User user) {
+  public void setUser(UserDto user) {
     this.user = user;
   }
 

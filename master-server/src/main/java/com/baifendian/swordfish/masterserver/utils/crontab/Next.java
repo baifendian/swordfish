@@ -44,6 +44,7 @@ public class Next extends CycleHelper {
         return cycle;
       }
     }
+
     return null;
   }
 }

@@ -34,11 +34,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
+import static com.baifendian.swordfish.webserver.utils.ParamVerify.verifyProxyUser;
 
 @Service
 public class StreamingExecService {
@@ -73,7 +74,6 @@ public class StreamingExecService {
    * @param queue
    * @return
    */
-  // @Transactional(value = "TransactionaltionManager")
   public ExecutorIdDto executeStreamingJob(User operator, String projectName, String name, String proxyUser, String queue) {
 
     // 查询项目, 如果不存在, 返回错误
@@ -89,6 +89,9 @@ public class StreamingExecService {
       logger.error("User {} has no right permission for the project {}", operator.getName(), project.getName());
       throw new PermissionException("User \"{0}\" is not has project \"{1}\" exec permission", operator.getName(), project.getName());
     }
+
+    // 判断 proxyUser 是否合理的
+    verifyProxyUser(operator.getProxyUserList(), proxyUser);
 
     // 对于执行流任务的情况, 必须是预先存在的
     StreamingJob streamingJob = streamingJobMapper.findByProjectNameAndName(projectName, name);
@@ -323,7 +326,9 @@ public class StreamingExecService {
 
     List<StreamingResultDto> streamingResultDtos = new ArrayList<>();
 
-    streamingResultDtos.add(new StreamingResultDto(streamingResult));
+    if (streamingResult != null) {
+      streamingResultDtos.add(new StreamingResultDto(streamingResult));
+    }
 
     return streamingResultDtos;
   }

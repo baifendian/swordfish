@@ -55,10 +55,14 @@ if __name__ == '__main__':
 
     print sessionId
 
-    (status, data) = add_user(sessionId, settings.g_user, settings.g_email, None, settings.g_password, None, ["*"])
+    for i in xrange(1, 60):
+        user = "%s_%d" % (settings.g_user, i / 3 + 100)
+        email = "%s_%d" % (settings.g_email, i / 3 + 100)
 
-    print status, json.dumps(data, indent=4)
+        (status, data) = add_user(sessionId, user, email, None, settings.g_password, None, ["*"])
 
-    (status, data) = query_user(sessionId, True)
+        print status, json.dumps(data, indent=4)
 
-    print status, json.dumps(data, indent=4)
+    # (status, data) = query_user(sessionId, True)
+    #
+    # print status, json.dumps(data, indent=4)

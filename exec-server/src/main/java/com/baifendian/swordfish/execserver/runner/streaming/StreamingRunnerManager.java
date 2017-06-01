@@ -77,7 +77,7 @@ public class StreamingRunnerManager {
     // 提交执行
     Logger jobLogger = new JobLogger(jobId, logger);
 
-    StreamingRunner runner = new StreamingRunner(streamingResult, streamingDao, jobLogger);
+    StreamingRunner runner = new StreamingRunner(streamingResult, jobLogger);
     streamingExecutorService.submit(runner);
   }
 

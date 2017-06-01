@@ -234,13 +234,15 @@ public class ExecService {
    */
   public ExecWorkflowsDto getExecWorkflow(User operator, String projectName, String workflowName, Date startDate, Date endDate, String status, int from, int size) {
 
-    List<String> workflowList;
+    List<String> workflowList = new ArrayList<>();
 
-    try {
-      workflowList = JsonUtil.parseObjectList(workflowName, String.class);
-    } catch (Exception e) {
-      logger.error("des11n workflow list error", e);
-      throw new ParameterException("Workflow name \"{0}\" not valid", workflowName);
+    if (StringUtils.isNotEmpty(workflowName)) {
+      try {
+        workflowList = JsonUtil.parseObjectList(workflowName, String.class);
+      } catch (Exception e) {
+        logger.error("des11n workflow list error", e);
+        throw new ParameterException("Workflow name \"{0}\" not valid", workflowName);
+      }
     }
 
     Project project = projectMapper.queryByName(projectName);
@@ -248,7 +250,8 @@ public class ExecService {
       logger.error("Project does not exist: {}", projectName);
       throw new NotFoundException("Not found project \"{0}\"", projectName);
     }
-    //project 必须有执行权限
+
+    // project 必须有执行权限
     if (!projectService.hasExecPerm(operator.getId(), project)) {
       logger.error("User {} has no right permission for the project {}", operator.getName(), project.getName());
       throw new PermissionException("User \"{0}\" is not has project \"{1}\" exec permission", operator.getName(), project.getName());
@@ -269,7 +272,7 @@ public class ExecService {
     }
 
     int total = executionFlowMapper.sumByFlowIdAndTimesAndStatus(projectName, workflowList, startDate, endDate, flowStatusList);
-    return new ExecWorkflowsDto(total, size, executionFlowResponseList);
+    return new ExecWorkflowsDto(total, from, executionFlowResponseList);
   }
 
   /**

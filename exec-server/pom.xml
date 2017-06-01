@@ -105,6 +105,14 @@
                     <groupId>javax.servlet</groupId>
                     <artifactId>javax.servlet-api</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId>org.eclipse.jetty.orbit</groupId>
+                    <artifactId>javax.servlet</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.glassfish</groupId>
+                    <artifactId>javax.servlet</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
         <dependency>
@@ -124,11 +132,11 @@
                     <artifactId>javax.servlet-api</artifactId>
                 </exclusion>
                 <exclusion>
-                    <groupId>org.glassfish</groupId>
+                    <groupId>org.eclipse.jetty.orbit</groupId>
                     <artifactId>javax.servlet</artifactId>
                 </exclusion>
                 <exclusion>
-                    <groupId>org.eclipse.jetty.orbit</groupId>
+                    <groupId>org.glassfish</groupId>
                     <artifactId>javax.servlet</artifactId>
                 </exclusion>
             </exclusions>

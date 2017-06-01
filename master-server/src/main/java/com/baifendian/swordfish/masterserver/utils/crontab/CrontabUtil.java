@@ -26,20 +26,20 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.*;
 
-import static com.cronutils.model.CronType.QUARTZ;
 import static com.baifendian.swordfish.masterserver.utils.crontab.CycleHelperFactory.*;
+import static com.cronutils.model.CronType.QUARTZ;
 
 /**
  * crontab 工具类
  */
 public class CrontabUtil {
 
-
   private static ZoneId zoneId = ZoneId.of("Asia/Shanghai");
+
   private static CronParser quartzCronParser = new CronParser(CronDefinitionBuilder.instanceDefinitionFor(QUARTZ));
 
   /**
-   * String crontab转换成为一个cron对象
+   * String crontab 转换成为一个 cron 对象
    *
    * @param crontab
    * @return
@@ -49,7 +49,7 @@ public class CrontabUtil {
   }
 
   /**
-   * 把String crontab转换为一个CronExpression对象
+   * 把 String crontab 转换为一个 CronExpression 对象
    *
    * @param crontab
    * @return
@@ -60,7 +60,7 @@ public class CrontabUtil {
   }
 
   /**
-   * 获取一个crontab的周期
+   * 获取一个 crontab 的周期
    *
    * @param cron
    * @return
@@ -69,6 +69,12 @@ public class CrontabUtil {
     return min(cron).next(hour(cron)).next(day(cron)).next(week(cron)).next(month(cron)).getCycle();
   }
 
+  /**
+   * 根据 crontab 得到调度的类型
+   *
+   * @param crontab
+   * @return
+   */
   public static ScheduleType getCycle(String crontab) {
     return getCycle(parseCron(crontab));
   }
@@ -96,7 +102,7 @@ public class CrontabUtil {
   }
 
   /**
-   * 将date转为ZonedDateTime
+   * 将 date 转为 ZonedDateTime
    *
    * @param date
    * @return
@@ -105,6 +111,10 @@ public class CrontabUtil {
     return ZonedDateTime.ofInstant(date.toInstant(), zoneId);
   }
 
+  /**
+   * @param zdt
+   * @return
+   */
   public static Date parseZdtToDate(ZonedDateTime zdt) {
     return Date.from(zdt.toInstant());
   }
@@ -112,6 +122,8 @@ public class CrontabUtil {
   /**
    * 计算上一个周期的时间起始时间和结束时间（起始时间 <= 有效时间 < 结束时间） <p>
    *
+   * @param scheduledFireTime
+   * @param scheduleType
    * @return 周期的起始和结束时间
    */
   public static Map.Entry<Date, Date> getPreCycleDate(Date scheduledFireTime, ScheduleType scheduleType) {
@@ -185,8 +197,8 @@ public class CrontabUtil {
         break;
 
       default:
-        break;
     }
-    return new AbstractMap.SimpleImmutableEntry<Date, Date>(scheduleStartTime.getTime(), scheduleEndTime.getTime());
+
+    return new AbstractMap.SimpleImmutableEntry<>(scheduleStartTime.getTime(), scheduleEndTime.getTime());
   }
 }

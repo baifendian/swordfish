@@ -73,6 +73,7 @@
             <useProjectArtifact>true</useProjectArtifact>
             <excludes>
                 <exclude>javax.servlet:servlet-api</exclude>
+                <exclude>org.glassfish:javax.servlet</exclude>
                 <exclude>org.eclipse.jetty.aggregate:jetty-all</exclude>
             </excludes>
         </dependencySet>

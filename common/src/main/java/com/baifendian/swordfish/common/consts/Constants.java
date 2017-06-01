@@ -44,7 +44,7 @@ public class Constants {
   /**
    * 资源名称正则表达式
    */
-  public static final Pattern REGEX_RES_NAME = Pattern.compile("[a-zA-Z][\\w\\.]{1,63}");
+  public static final Pattern REGEX_RES_NAME = Pattern.compile("[a-zA-Z][\\w\\.-]{1,63}");
 
   /**
    * 数据源名称正则表达式

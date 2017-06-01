@@ -29,7 +29,7 @@ public class SecHelper extends CycleHelper {
 
   @Override
   protected ScheduleType getCycle() {
-    //TODO 先忽略秒周期
+    // 当前还不支持秒周期
     return null;
   }
 }

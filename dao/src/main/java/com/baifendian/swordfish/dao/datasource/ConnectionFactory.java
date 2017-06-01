@@ -62,6 +62,7 @@ public class ConnectionFactory {
     druidDataSource.setUrl(PROPERTIES.getProperty("spring.datasource.url"));
     druidDataSource.setUsername(PROPERTIES.getProperty("spring.datasource.username"));
     druidDataSource.setPassword(PROPERTIES.getProperty("spring.datasource.password"));
+    druidDataSource.setValidationQueryTimeout(Integer.parseInt(PROPERTIES.getProperty("spring.datasource.validationQueryTimeout")));
     druidDataSource.setInitialSize(Integer.parseInt(PROPERTIES.getProperty("spring.datasource.initialSize")));
     druidDataSource.setMinIdle(Integer.parseInt(PROPERTIES.getProperty("spring.datasource.minIdle")));
     druidDataSource.setMaxActive(Integer.parseInt(PROPERTIES.getProperty("spring.datasource.maxActive")));

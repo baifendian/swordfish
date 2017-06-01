@@ -33,14 +33,14 @@ public class HourHelper extends CycleHelper {
 
   @Override
   protected ScheduleType getCycle() {
-    //匹配UDP 小时调度特征值
     if (minField.getExpression() instanceof On
-            && hourField.getExpression() instanceof Every
-            && dayOfMonthField.getExpression() instanceof Always
-            && dayOfWeekField.getExpression() instanceof QuestionMark
-            && monthField.getExpression() instanceof Always) {
+        && hourField.getExpression() instanceof Every
+        && dayOfMonthField.getExpression() instanceof Always
+        && dayOfWeekField.getExpression() instanceof QuestionMark
+        && monthField.getExpression() instanceof Always) {
       return ScheduleType.HOUR;
     }
+
     return null;
   }
 }

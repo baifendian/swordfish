@@ -15,8 +15,28 @@
  */
 package com.baifendian.swordfish.common.job.struct.datasource;
 
-/**
- * ftp数据源测试
- */
+import org.junit.Test;
+
 public class FtpDatasourceTest {
+  @Test
+  public void testIsConnectable() throws Exception {
+//    FtpDatasource ftpDatasource = new FtpDatasource();
+//
+//    ftpDatasource.setHost("10.12.7.10");
+//    ftpDatasource.setPort(21);
+//    ftpDatasource.setUser("bfd_541");
+//    ftpDatasource.setPassword("bfd123456");
+//    ftpDatasource.isConnectable();
+  }
+
+  @Test(expected = Exception.class)
+  public void testIsConnectable2() throws Exception {
+    FtpDatasource ftpDatasource = new FtpDatasource();
+
+    ftpDatasource.setHost("10.12.7.10");
+    ftpDatasource.setPort(21);
+    ftpDatasource.setUser("bfd_541");
+    ftpDatasource.setPassword("bfd1234561111");
+    ftpDatasource.isConnectable();
+  }
 }

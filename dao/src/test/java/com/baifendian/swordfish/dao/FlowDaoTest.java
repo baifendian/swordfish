@@ -15,19 +15,9 @@
  */
 package com.baifendian.swordfish.dao;
 
-import com.baifendian.swordfish.dao.model.ExecutionFlow;
-import com.baifendian.swordfish.dao.model.ExecutionNode;
-import com.baifendian.swordfish.dao.model.ProjectFlow;
-import com.baifendian.swordfish.dao.model.Schedule;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.List;
-
-/**
- * @author : liujin
- * @date : 2017-03-14 9:06
- */
 public class FlowDaoTest {
   FlowDao flowDao;
 
@@ -38,44 +28,29 @@ public class FlowDaoTest {
 
   @Test
   public void testQueryExecutionNodeLastAttempt() {
-    ExecutionNode executionNode = flowDao.queryExecutionNode(411, "test");
-    System.out.println(executionNode.getStatus());
   }
 
   @Test
   public void testQueryAllExecutionFlow() {
-    List<ExecutionFlow> executionNodeList = flowDao.queryAllNoFinishFlow();
-    System.out.println(executionNodeList.size());
   }
 
   @Test
   public void testQueryExecutionFlow() {
-    ExecutionFlow executionFlow = flowDao.queryExecutionFlow(2549);
-    System.out.println(executionFlow);
   }
 
   @Test
   public void testScheduleFlowToExecution() {
-    //ExecutionFlow executionFlow = flowDao.scheduleFlowToExecution(1, 2, 1, new Date(), ExecType.DISPATCH, 3, 5000);
-    //System.out.println(executionFlow);
   }
 
   @Test
   public void testQuerySchedule() {
-    Schedule schedule = flowDao.querySchedule(2);
-    System.out.println(schedule);
   }
 
   @Test
   public void testProjectFlowfindByName() {
-    ProjectFlow projectFlow = flowDao.projectFlowfindByName(1,"bdi_base");
-    System.out.print(projectFlow);
   }
 
   @Test
   public void testProjectFlowfindById() {
-    ProjectFlow flow = flowDao.projectFlowFindById(2);
-    System.out.println(flow);
   }
-
 }

@@ -16,6 +16,7 @@
 package com.baifendian.swordfish.dao.mapper;
 
 import com.baifendian.swordfish.dao.enums.FlowStatus;
+import com.baifendian.swordfish.dao.enums.NotifyType;
 import com.baifendian.swordfish.dao.model.Project;
 import com.baifendian.swordfish.dao.model.StreamingResult;
 import org.apache.ibatis.annotations.*;
@@ -34,7 +35,7 @@ public interface StreamingResultMapper {
    * @param result
    * @return 插入记录数
    */
-  @InsertProvider(type = StreamingResultProvider.class, method = "insert")
+  @InsertProvider(type = StreamingResultMapperProvider.class, method = "insert")
   @SelectKey(statement = "SELECT LAST_INSERT_ID() AS id", keyProperty = "result.execId", resultType = int.class, before = false)
   int insert(@Param("result") StreamingResult result);
 
@@ -56,6 +57,8 @@ public interface StreamingResultMapper {
       @Result(property = "type", column = "type", javaType = String.class, jdbcType = JdbcType.VARCHAR),
       @Result(property = "parameter", column = "parameter", javaType = String.class, jdbcType = JdbcType.VARCHAR),
       @Result(property = "userDefinedParams", column = "user_defined_params", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+      @Result(property = "notifyType", column = "notify_type", typeHandler = EnumOrdinalTypeHandler.class, javaType = NotifyType.class, jdbcType = JdbcType.TINYINT),
+      @Result(property = "notifyMails", column = "notify_mails", javaType = String.class, jdbcType = JdbcType.VARCHAR),
       @Result(property = "submitUserId", column = "submit_user_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
       @Result(property = "submitTime", column = "submit_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE),
       @Result(property = "queue", column = "queue", javaType = String.class, jdbcType = JdbcType.VARCHAR),
@@ -68,7 +71,7 @@ public interface StreamingResultMapper {
       @Result(property = "jobLinks", column = "job_links", javaType = String.class, jdbcType = JdbcType.VARCHAR),
       @Result(property = "jobId", column = "job_id", javaType = String.class, jdbcType = JdbcType.VARCHAR)
   })
-  @SelectProvider(type = StreamingResultProvider.class, method = "selectById")
+  @SelectProvider(type = StreamingResultMapperProvider.class, method = "selectById")
   StreamingResult selectById(@Param("execId") int execId);
 
   /**
@@ -93,6 +96,8 @@ public interface StreamingResultMapper {
       @Result(property = "ownerId", column = "owner_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
       @Result(property = "owner", column = "owner_name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
       @Result(property = "type", column = "type", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+      @Result(property = "notifyType", column = "notify_type", typeHandler = EnumOrdinalTypeHandler.class, javaType = NotifyType.class, jdbcType = JdbcType.TINYINT),
+      @Result(property = "notifyMails", column = "notify_mails", javaType = String.class, jdbcType = JdbcType.VARCHAR),
       @Result(property = "submitTime", column = "submit_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE),
       @Result(property = "startTime", column = "start_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE),
       @Result(property = "endTime", column = "end_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE),
@@ -103,7 +108,7 @@ public interface StreamingResultMapper {
       @Result(property = "jobLinks", column = "job_links", javaType = String.class, jdbcType = JdbcType.VARCHAR),
       @Result(property = "jobId", column = "job_id", javaType = String.class, jdbcType = JdbcType.VARCHAR)
   })
-  @SelectProvider(type = StreamingResultProvider.class, method = "findLatestDetailByStreamingId")
+  @SelectProvider(type = StreamingResultMapperProvider.class, method = "findLatestDetailByStreamingId")
   StreamingResult findLatestDetailByStreamingId(@Param("streamingId") int streamingId);
 
   /**
@@ -114,8 +119,17 @@ public interface StreamingResultMapper {
   @Results(value = {@Result(property = "execId", column = "id", id = true, javaType = int.class, jdbcType = JdbcType.INTEGER),
       @Result(property = "worker", column = "worker", javaType = String.class, jdbcType = JdbcType.VARCHAR),
       @Result(property = "streamingId", column = "streaming_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
+      @Result(property = "name", column = "name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+      @Result(property = "desc", column = "desc", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+      @Result(property = "projectId", column = "project_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
+      @Result(property = "createTime", column = "create_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE),
+      @Result(property = "modifyTime", column = "modify_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE),
+      @Result(property = "ownerId", column = "owner_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
+      @Result(property = "type", column = "type", javaType = String.class, jdbcType = JdbcType.VARCHAR),
       @Result(property = "parameter", column = "parameter", javaType = String.class, jdbcType = JdbcType.VARCHAR),
       @Result(property = "userDefinedParams", column = "user_defined_params", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+      @Result(property = "notifyType", column = "notify_type", typeHandler = EnumOrdinalTypeHandler.class, javaType = NotifyType.class, jdbcType = JdbcType.TINYINT),
+      @Result(property = "notifyMails", column = "notify_mails", javaType = String.class, jdbcType = JdbcType.VARCHAR),
       @Result(property = "submitUserId", column = "submit_user_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
       @Result(property = "submitTime", column = "submit_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE),
       @Result(property = "queue", column = "queue", javaType = String.class, jdbcType = JdbcType.VARCHAR),
@@ -128,7 +142,7 @@ public interface StreamingResultMapper {
       @Result(property = "jobLinks", column = "job_links", javaType = String.class, jdbcType = JdbcType.VARCHAR),
       @Result(property = "jobId", column = "job_id", javaType = String.class, jdbcType = JdbcType.VARCHAR)
   })
-  @SelectProvider(type = StreamingResultProvider.class, method = "findNoFinishedJob")
+  @SelectProvider(type = StreamingResultMapperProvider.class, method = "findNoFinishedJob")
   List<StreamingResult> findNoFinishedJob();
 
   /**
@@ -137,7 +151,7 @@ public interface StreamingResultMapper {
    * @param result
    * @return
    */
-  @UpdateProvider(type = StreamingResultProvider.class, method = "updateResult")
+  @UpdateProvider(type = StreamingResultMapperProvider.class, method = "updateResult")
   int updateResult(@Param("result") StreamingResult result);
 
   /**
@@ -153,7 +167,7 @@ public interface StreamingResultMapper {
       @Result(property = "modifyTime", column = "modify_time", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP),
       @Result(property = "ownerId", column = "owner", javaType = int.class, jdbcType = JdbcType.INTEGER)
   })
-  @SelectProvider(type = StreamingResultProvider.class, method = "queryProject")
+  @SelectProvider(type = StreamingResultMapperProvider.class, method = "queryProject")
   Project queryProject(@Param("execId") int execId);
 
   /**
@@ -178,6 +192,8 @@ public interface StreamingResultMapper {
       @Result(property = "ownerId", column = "owner_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
       @Result(property = "owner", column = "owner_name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
       @Result(property = "type", column = "type", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+      @Result(property = "notifyType", column = "notify_type", typeHandler = EnumOrdinalTypeHandler.class, javaType = NotifyType.class, jdbcType = JdbcType.TINYINT),
+      @Result(property = "notifyMails", column = "notify_mails", javaType = String.class, jdbcType = JdbcType.VARCHAR),
       @Result(property = "submitTime", column = "submit_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE),
       @Result(property = "startTime", column = "start_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE),
       @Result(property = "endTime", column = "end_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE),
@@ -188,7 +204,7 @@ public interface StreamingResultMapper {
       @Result(property = "jobLinks", column = "job_links", javaType = String.class, jdbcType = JdbcType.VARCHAR),
       @Result(property = "jobId", column = "job_id", javaType = String.class, jdbcType = JdbcType.VARCHAR)
   })
-  @SelectProvider(type = StreamingResultProvider.class, method = "findDetailByExecId")
+  @SelectProvider(type = StreamingResultMapperProvider.class, method = "findDetailByExecId")
   StreamingResult findDetailByExecId(@Param("execId") int execId);
 
   /**
@@ -214,6 +230,8 @@ public interface StreamingResultMapper {
       @Result(property = "ownerId", column = "owner_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
       @Result(property = "owner", column = "owner_name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
       @Result(property = "type", column = "type", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+      @Result(property = "notifyType", column = "notify_type", typeHandler = EnumOrdinalTypeHandler.class, javaType = NotifyType.class, jdbcType = JdbcType.TINYINT),
+      @Result(property = "notifyMails", column = "notify_mails", javaType = String.class, jdbcType = JdbcType.VARCHAR),
       @Result(property = "submitTime", column = "submit_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE),
       @Result(property = "startTime", column = "start_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE),
       @Result(property = "endTime", column = "end_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE),
@@ -224,7 +242,7 @@ public interface StreamingResultMapper {
       @Result(property = "jobLinks", column = "job_links", javaType = String.class, jdbcType = JdbcType.VARCHAR),
       @Result(property = "jobId", column = "job_id", javaType = String.class, jdbcType = JdbcType.VARCHAR)
   })
-  @SelectProvider(type = StreamingResultProvider.class, method = "findDetailByProjectAndNames")
+  @SelectProvider(type = StreamingResultMapperProvider.class, method = "findDetailByProjectAndNames")
   List<StreamingResult> findDetailByProjectAndNames(@Param("projectId") int projectId, @Param("nameList") List<String> nameList);
 
   /**
@@ -237,7 +255,7 @@ public interface StreamingResultMapper {
    * @param status
    * @return
    */
-  @SelectProvider(type = StreamingResultProvider.class, method = "findCountByMultiCondition")
+  @SelectProvider(type = StreamingResultMapperProvider.class, method = "findCountByMultiCondition")
   int findCountByMultiCondition(@Param("projectId") int projectId, @Param("name") String name, @Param("startDate") Date startDate, @Param("endDate") Date endDate, @Param("status") Integer status);
 
   /**
@@ -268,6 +286,8 @@ public interface StreamingResultMapper {
       @Result(property = "ownerId", column = "owner_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
       @Result(property = "owner", column = "owner_name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
       @Result(property = "type", column = "type", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+      @Result(property = "notifyType", column = "notify_type", typeHandler = EnumOrdinalTypeHandler.class, javaType = NotifyType.class, jdbcType = JdbcType.TINYINT),
+      @Result(property = "notifyMails", column = "notify_mails", javaType = String.class, jdbcType = JdbcType.VARCHAR),
       @Result(property = "submitTime", column = "submit_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE),
       @Result(property = "startTime", column = "start_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE),
       @Result(property = "endTime", column = "end_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE),
@@ -278,6 +298,6 @@ public interface StreamingResultMapper {
       @Result(property = "jobLinks", column = "job_links", javaType = String.class, jdbcType = JdbcType.VARCHAR),
       @Result(property = "jobId", column = "job_id", javaType = String.class, jdbcType = JdbcType.VARCHAR)
   })
-  @SelectProvider(type = StreamingResultProvider.class, method = "findByMultiCondition")
+  @SelectProvider(type = StreamingResultMapperProvider.class, method = "findByMultiCondition")
   List<StreamingResult> findByMultiCondition(@Param("projectId") int projectId, @Param("name") String name, @Param("startDate") Date startDate, @Param("endDate") Date endDate, @Param("status") Integer status, @Param("start") int start, @Param("limit") int limit);
 }

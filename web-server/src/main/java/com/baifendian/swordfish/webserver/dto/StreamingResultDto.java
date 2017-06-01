@@ -17,6 +17,7 @@ package com.baifendian.swordfish.webserver.dto;
 
 import com.baifendian.swordfish.common.json.JsonOrdinalSerializer;
 import com.baifendian.swordfish.dao.enums.FlowStatus;
+import com.baifendian.swordfish.dao.enums.NotifyType;
 import com.baifendian.swordfish.dao.model.StreamingResult;
 import com.baifendian.swordfish.dao.utils.json.JsonObjectDeserializer;
 import com.fasterxml.jackson.annotation.JsonRawValue;
@@ -70,28 +71,38 @@ public class StreamingResultDto {
   @JsonDeserialize(using = JsonObjectDeserializer.class)
   private String appLinks;
 
+  private NotifyType notifyType;
+
+  @JsonRawValue
+  @JsonDeserialize(using = JsonObjectDeserializer.class)
+  private String notifyMails;
+
   public StreamingResultDto() {
   }
 
   public StreamingResultDto(StreamingResult streamingResult) {
-    this.execId = streamingResult.getExecId();
-    this.name = streamingResult.getName();
-    this.desc = streamingResult.getDesc();
-    this.projectName = streamingResult.getProjectName();
-    this.createTime = streamingResult.getCreateTime();
-    this.modifyTime = streamingResult.getModifyTime();
-    this.owner = streamingResult.getOwner();
-    this.type = streamingResult.getType();
-    this.parameter = streamingResult.getParameter();
-    this.userDefParams = streamingResult.getUserDefinedParams();
-    this.submitTime = streamingResult.getSubmitTime();
-    this.startTime = streamingResult.getStartTime();
-    this.endTime = streamingResult.getEndTime();
-    this.submitUser = streamingResult.getSubmitUser();
-    this.proxyUser = streamingResult.getProxyUser();
-    this.queue = streamingResult.getQueue();
-    this.status = streamingResult.getStatus();
-    this.appLinks = streamingResult.getAppLinks();
+    if (streamingResult != null) {
+      this.execId = streamingResult.getExecId();
+      this.name = streamingResult.getName();
+      this.desc = streamingResult.getDesc();
+      this.projectName = streamingResult.getProjectName();
+      this.createTime = streamingResult.getCreateTime();
+      this.modifyTime = streamingResult.getModifyTime();
+      this.owner = streamingResult.getOwner();
+      this.type = streamingResult.getType();
+      this.parameter = streamingResult.getParameter();
+      this.userDefParams = streamingResult.getUserDefinedParams();
+      this.submitTime = streamingResult.getSubmitTime();
+      this.startTime = streamingResult.getStartTime();
+      this.endTime = streamingResult.getEndTime();
+      this.submitUser = streamingResult.getSubmitUser();
+      this.proxyUser = streamingResult.getProxyUser();
+      this.queue = streamingResult.getQueue();
+      this.status = streamingResult.getStatus();
+      this.appLinks = streamingResult.getAppLinks();
+      this.notifyType = streamingResult.getNotifyType();
+      this.notifyMails = streamingResult.getNotifyMails();
+    }
   }
 
   public int getExecId() {
@@ -236,5 +247,21 @@ public class StreamingResultDto {
 
   public void setAppLinks(String appLinks) {
     this.appLinks = appLinks;
+  }
+
+  public NotifyType getNotifyType() {
+    return notifyType;
+  }
+
+  public void setNotifyType(NotifyType notifyType) {
+    this.notifyType = notifyType;
+  }
+
+  public String getNotifyMails() {
+    return notifyMails;
+  }
+
+  public void setNotifyMails(String notifyMails) {
+    this.notifyMails = notifyMails;
   }
 }

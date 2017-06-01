@@ -15,19 +15,11 @@
  */
 package com.baifendian.swordfish.dao.model.flow;
 
-import com.baifendian.swordfish.dao.DaoFactory;
-import com.baifendian.swordfish.dao.FlowDao;
-import com.baifendian.swordfish.dao.model.ExecutionFlow;
-import com.baifendian.swordfish.dao.utils.json.JsonUtil;
 import org.junit.Test;
 
 public class FlowDagTest {
 
   @Test
-  public void testFlowDag(){
-    FlowDao flowDao = DaoFactory.getDaoInstance(FlowDao.class);
-    ExecutionFlow executionFlow = flowDao.queryExecutionFlow(861);
-    FlowDag flowDag = JsonUtil.parseObject(executionFlow.getWorkflowData(), FlowDag.class);
-    System.out.println(flowDag);
+  public void testFlowDag() {
   }
 }

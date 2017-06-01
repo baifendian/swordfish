@@ -15,8 +15,16 @@
  */
 package com.baifendian.swordfish.common.job.struct.datasource;
 
-/**
- * 测试orcale连接
- */
+import org.junit.Test;
+
 public class OracleDatasourceTest {
+  @Test
+  public void testIsConnectable() throws Exception {
+//    OracleDatasource oracleDatasource = new OracleDatasource();
+//    oracleDatasource.setServerName("172.18.1.112");
+//    oracleDatasource.setDatabaseName("orcl");
+//    oracleDatasource.setUser("test");
+//    oracleDatasource.setPassword("test");
+//    oracleDatasource.isConnectable();
+  }
 }

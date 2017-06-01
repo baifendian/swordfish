@@ -15,6 +15,7 @@
  */
 package com.baifendian.swordfish.webserver.controller;
 
+import com.baifendian.swordfish.dao.enums.NotifyType;
 import com.baifendian.swordfish.dao.model.User;
 import com.baifendian.swordfish.webserver.dto.StreamingJobDto;
 import com.baifendian.swordfish.webserver.service.StreamingService;
@@ -45,6 +46,8 @@ public class StreamingController {
    * @param type
    * @param parameter
    * @param userDefParams
+   * @param notifyType
+   * @param notifyMails
    * @return
    */
   @PostMapping(value = "/streaming/{name}")
@@ -55,11 +58,13 @@ public class StreamingController {
                                             @RequestParam(value = "desc", required = false) String desc,
                                             @RequestParam(value = "type") String type,
                                             @RequestParam(value = "parameter") String parameter,
-                                            @RequestParam(value = "userDefParams", required = false) String userDefParams) {
-    logger.info("Operator user {}, create streaming job, project name: {}, name: {}, desc: {}, type: {}, parameter: {}, user define parameters: {}",
-        operator.getName(), projectName, name, desc, type, parameter, userDefParams);
+                                            @RequestParam(value = "userDefParams", required = false) String userDefParams,
+                                            @RequestParam(value = "notifyType", required = false) NotifyType notifyType,
+                                            @RequestParam(value = "notifyMails", required = false) String notifyMails) {
+    logger.info("Operator user {}, create streaming job, project name: {}, name: {}, desc: {}, type: {}, parameter: {}, user define parameters: {}, notify type: {}, notify mails: {}",
+        operator.getName(), projectName, name, desc, type, parameter, userDefParams, notifyType, notifyMails);
 
-    return new StreamingJobDto(streamingService.createStreamingJob(operator, projectName, name, desc, type, parameter, userDefParams));
+    return new StreamingJobDto(streamingService.createStreamingJob(operator, projectName, name, desc, type, parameter, userDefParams, notifyType, notifyMails));
   }
 
   /**
@@ -72,6 +77,8 @@ public class StreamingController {
    * @param type
    * @param parameter
    * @param userDefParams
+   * @param notifyType
+   * @param notifyMails
    * @return
    */
   @PutMapping(value = "/streaming/{name}")
@@ -81,11 +88,13 @@ public class StreamingController {
                                          @RequestParam(value = "desc", required = false) String desc,
                                          @RequestParam(value = "type") String type,
                                          @RequestParam(value = "parameter") String parameter,
-                                         @RequestParam(value = "userDefParams", required = false) String userDefParams) {
-    logger.info("Operator user {}, modify and create streaming job, project name: {}, name: {}, desc: {}, type: {}, parameter: {}, user define parameters: {}",
-        operator.getName(), projectName, name, desc, type, parameter, userDefParams);
+                                         @RequestParam(value = "userDefParams", required = false) String userDefParams,
+                                         @RequestParam(value = "notifyType", required = false) NotifyType notifyType,
+                                         @RequestParam(value = "notifyMails", required = false) String notifyMails) {
+    logger.info("Operator user {}, modify and create streaming job, project name: {}, name: {}, desc: {}, type: {}, parameter: {}, user define parameters: {}, notify type: {}, notify mails: {}",
+        operator.getName(), projectName, name, desc, type, parameter, userDefParams, notifyType, notifyMails);
 
-    return new StreamingJobDto(streamingService.putStreamingJob(operator, projectName, name, desc, type, parameter, userDefParams));
+    return new StreamingJobDto(streamingService.putStreamingJob(operator, projectName, name, desc, type, parameter, userDefParams, notifyType, notifyMails));
   }
 
   /**
@@ -97,6 +106,8 @@ public class StreamingController {
    * @param desc
    * @param parameter
    * @param userDefParams
+   * @param notifyType
+   * @param notifyMails
    * @return
    */
   @PatchMapping(value = "/streaming/{name}")
@@ -105,11 +116,13 @@ public class StreamingController {
                                            @PathVariable String name,
                                            @RequestParam(value = "desc", required = false) String desc,
                                            @RequestParam(value = "parameter") String parameter,
-                                           @RequestParam(value = "userDefParams", required = false) String userDefParams) {
-    logger.info("Operator user {}, modify streaming job, project name: {}, name: {}, desc: {}, parameter: {}, user define parameters: {}",
-        operator.getName(), projectName, name, desc, parameter, userDefParams);
+                                           @RequestParam(value = "userDefParams", required = false) String userDefParams,
+                                           @RequestParam(value = "notifyType", required = false) NotifyType notifyType,
+                                           @RequestParam(value = "notifyMails", required = false) String notifyMails) {
+    logger.info("Operator user {}, modify streaming job, project name: {}, name: {}, desc: {}, parameter: {}, user define parameters: {}, notify type: {}, notify mails: {}",
+        operator.getName(), projectName, name, desc, parameter, userDefParams, notifyType, notifyMails);
 
-    return new StreamingJobDto(streamingService.patchStreamingJob(operator, projectName, name, desc, parameter, userDefParams));
+    return new StreamingJobDto(streamingService.patchStreamingJob(operator, projectName, name, desc, parameter, userDefParams, notifyType, notifyMails));
   }
 
   /**

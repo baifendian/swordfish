@@ -15,6 +15,7 @@
  */
 package com.baifendian.swordfish.masterserver.master;
 
+import com.baifendian.swordfish.common.mail.EmailManager;
 import com.baifendian.swordfish.dao.FlowDao;
 import com.baifendian.swordfish.dao.enums.FlowStatus;
 import com.baifendian.swordfish.dao.model.ExecutionFlow;
@@ -121,6 +122,10 @@ public class Submit2ExecutorServerThread extends Thread {
         executionFlow.setStatus(FlowStatus.KILL);
 
         flowDao.updateExecutionFlow(executionFlow);
+
+        // 发送报警
+        EmailManager.sendMessageOfExecutionFlow(executionFlow);
+
         continue;
       }
 
@@ -173,6 +178,9 @@ public class Submit2ExecutorServerThread extends Thread {
         } else {
           // 如果是其它的异常情况, 直接更新状态即可
           flowDao.updateExecutionFlowStatus(execId, FlowStatus.FAILED);
+
+          // 发送报警
+          EmailManager.sendMessageOfExecutionFlow(executionFlow);
         }
       }
     }
