@@ -16,156 +16,70 @@
 package com.baifendian.swordfish.common.mail;
 
 import com.baifendian.swordfish.common.utils.DateUtils;
-import com.baifendian.swordfish.dao.DaoFactory;
 import com.baifendian.swordfish.dao.enums.ExecType;
 import com.baifendian.swordfish.dao.enums.FlowStatus;
+import com.baifendian.swordfish.dao.enums.NotifyType;
 import com.baifendian.swordfish.dao.model.ExecutionFlow;
-import com.baifendian.swordfish.dao.model.ExecutionNode;
-import com.baifendian.swordfish.dao.model.ProjectFlow;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.baifendian.swordfish.dao.model.StreamingResult;
 
 import java.text.MessageFormat;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 /**
  * 邮件内容管理 <p>
  */
 public class EmailManager {
 
-  private static final Logger logger = LoggerFactory.getLogger(EmailManager.class);
-
-  /**
-   * {@link MailSendService}
-   */
-  private static MailSendService mailSendService;
-
-  static {
-    mailSendService = DaoFactory.getDaoInstance(MailSendService.class);
-  }
-
   /**
    * 邮件标题格式
    */
-  private static final String TITLE_FORMAT = "[Schedule system] [{0} [{1}]";
+  private static final String TITLE_FORMAT = "[Swordfish system notify] [{0} [{1}]";
 
   /**
    * 获取邮件任务
    */
-  private static final String CONTENT_FORMAT = "<b>{0}</b><hr/>Project：{1}<br/>WORKFLOW name：{2}<br/> execution flow id: {3}<br/>schedule time：{4}<br/>execution time：{5}<br/><br/><I>Note：execution detail see [maintain center] - [schedule logs]</I>";
-
-
-  private static final String CONTENT_NODE_FORMAT = "<br>Long job Node:{0} RUN ERROR";
-
-  /**
-   * 补数据内容头部
-   */
-  private static final String ADD_DATA_HEAD_FORMAT = "<b>{0}</b><hr/>Project：{1}<br/>WORKFLOW name：{2}<br/><br/><b>Add data detail</b>";
-
-  /**
-   * 补数据的每个元素内容
-   */
-  private static final String ADD_DATA_ITEM_FORMAT = "<hr style=\"border:1px dotted #036\" />Schedule time：{0}<br/>Execution result：{1}";
-
-  /**
-   * 补数据的结尾
-   */
-  private static final String ADD_DATA_TAIL_FORMAT = "<br/><br/><I>Note：execution detail see [Maintain center】- [Schedule log]</I>";
+  private static final String CONTENT_FORMAT = "<b>{0}</b>" +
+      "<hr/>Project name：{1}<br/>" +
+      "Job name：{2}<br/> " +
+      "Schedule time: {3}<br/>" +
+      "Proxy user：{4}<br/>" +
+      "Queue：{5}<br/>" +
+      "Start execution time：{6}<br/>" +
+      "End execution time：{7}<br/>" +
+      "Final status：{8}<br/>";
 
   /**
    * 发送 EMAIL(调度)
    *
-   * @param executionFlow
-   */
-  public static void sendEmail(ExecutionFlow executionFlow) {
-    String title = genTitle(executionFlow.getType(), executionFlow.getStatus());
-    String content = genContent(executionFlow.getType(), executionFlow.getProjectName(), executionFlow.getWorkflowName(),
-        executionFlow.getId(), executionFlow.getScheduleTime(), executionFlow.getStatus());
-
-    mailSendService.sendToFlowMails(executionFlow.getFlowId(), title, content, true, executionFlow.getNotifyMailList());
-  }
-
-  /**
-   * 长任务，如果 node 报错，就发邮件通知
-   *
-   * @param executionFlow
-   * @param executionNode
-   */
-  public static void sendEmail(ExecutionFlow executionFlow, ExecutionNode executionNode) {
-    try {
-      String title = genTitle(executionFlow.getType(), executionNode.getStatus());
-      String content = genContent(executionFlow.getType(), executionFlow.getProjectName(), executionFlow.getWorkflowName(),
-          executionFlow.getId(), executionFlow.getScheduleTime(), executionNode.getStatus());
-
-      content += MessageFormat.format(CONTENT_NODE_FORMAT, executionNode.getName());
-      mailSendService.sendToFlowUserMails(executionFlow.getFlowId(), title, content);
-    } catch (Exception e) {
-      logger.error("send mail error", e);
-    }
-  }
-
-  /**
-   * 发送 EMAIL(补数据)
-   *
-   * @param projectFlow
-   * @param isSuccess
-   * @param resultList
-   */
-  public static void sendAddDataEmail(ProjectFlow projectFlow, boolean isSuccess, List<Map.Entry<Date, Boolean>> resultList) {
-    String title = MessageFormat.format(TITLE_FORMAT, "Add data", isSuccess ? "Success" : "Failed");
-    StringBuilder builder = new StringBuilder();
-    String head = MessageFormat.format(ADD_DATA_HEAD_FORMAT, "Add data", projectFlow.getProjectName(), projectFlow.getName());
-    builder.append(head);
-
-    for (Map.Entry<Date, Boolean> entry : resultList) {
-      String item = MessageFormat.format(ADD_DATA_ITEM_FORMAT, DateUtils.defaultFormat(entry.getKey()), getResultStatus(entry.getValue()));
-      builder.append(item);
-    }
-
-    builder.append(ADD_DATA_TAIL_FORMAT);
-    mailSendService.sendToFlowMails(projectFlow.getProjectId(), title, builder.toString(), true, null);
-  }
-
-  /**
-   * 获取结果状态字符串
-   *
-   * @param isSuccess
-   * @return
-   */
-  private static String getResultStatus(Boolean isSuccess) {
-    if (isSuccess == null) {
-      return "Not started";
-    }
-
-    return isSuccess ? "<font color=\"green\">Success</font>" : "<font color=\"red\">Failed</font>";
-  }
-
-  /**
-   * 获取邮件标题
-   *
-   * @param runType
-   * @param flowStatus
-   * @return
-   */
-  public static String genTitle(ExecType runType, FlowStatus flowStatus) {
-    return MessageFormat.format(TITLE_FORMAT, getRunTypeCnName(runType), getFlowStatusCnName(flowStatus));
-  }
-
-  /**
-   * 生成邮件内容
-   *
-   * @param runType
+   * @param type
+   * @param status
    * @param projectName
-   * @param flowName
-   * @param scheduleDate
-   * @param flowStatus
-   * @return
+   * @param jobName
+   * @param scheduleTime
+   * @param proxyUser
+   * @param queue
+   * @param startTime
+   * @param endTime
+   * @param receivers
    */
-  public static String genContent(ExecType runType, String projectName, String flowName, int execId, Date scheduleDate, FlowStatus flowStatus) {
-    return MessageFormat.format(CONTENT_FORMAT, getRunTypeCnName(runType), projectName, flowName, Integer.toString(execId),
-        DateUtils.defaultFormat(scheduleDate), getFlowStatusCnNameH5(flowStatus));
+  public static void sendEmail(String type,
+                               FlowStatus status,
+                               String projectName,
+                               String jobName,
+                               Date scheduleTime,
+                               String proxyUser,
+                               String queue,
+                               Date startTime,
+                               Date endTime,
+                               List<String> receivers) {
+    // 得到标题
+    String title = MessageFormat.format(TITLE_FORMAT, type, getFlowStatusCnName(status));
+
+    String content = MessageFormat.format(CONTENT_FORMAT, type, projectName, jobName, DateUtils.defaultFormat(scheduleTime),
+        proxyUser, queue, DateUtils.defaultFormat(startTime), DateUtils.defaultFormat(endTime), getFlowStatusCnNameH5(status));
+
+    MailSendUtil.sendMails(receivers, title, content);
   }
 
   /**
@@ -175,26 +89,21 @@ public class EmailManager {
    * @return
    */
   private static String getRunTypeCnName(ExecType runType) {
-    String cnName;
 
     switch (runType) {
       case COMPLEMENT_DATA:
-        cnName = "Add data";
-        break;
+        return "Add data workflow job";
 
       case DIRECT:
-        cnName = "Direct run";
-        break;
+        return "Direct run workflow job";
 
       case SCHEDULER:
-        cnName = "Schedule";
-        break;
+        return "Schedule workflow job";
 
       default:
-        cnName = "Unknown";
     }
 
-    return cnName;
+    return "Unknown job";
   }
 
   /**
@@ -208,7 +117,11 @@ public class EmailManager {
       return "Failed";
     }
 
-    return "Success";
+    if (status.typeIsSuccess()) {
+      return "Success";
+    }
+
+    return "Not finish";
   }
 
   /**
@@ -222,6 +135,91 @@ public class EmailManager {
       return "<font color=\"red\">Failed</font>";
     }
 
-    return "<font color=\"green\">Success</font>";
+    if (status.typeIsSuccess()) {
+      return "<font color=\"green\">Success</font>";
+    }
+
+    return "<font color=\"red\">Not finish</font>";
+  }
+
+
+  /**
+   * 发送工作流的 mail 信息
+   *
+   * @param executionFlow
+   */
+  public static void sendMessageOfExecutionFlow(ExecutionFlow executionFlow) {
+    NotifyType notifyType = executionFlow.getNotifyType();
+
+    boolean sendMail = false;
+
+    switch (notifyType) {
+      case SUCCESS:
+        if (executionFlow.getStatus().typeIsSuccess()) {
+          sendMail = true;
+        }
+      case FAILURE:
+        if (executionFlow.getStatus().typeIsFailure()) {
+          sendMail = true;
+        }
+      case ALL:
+        if (executionFlow.getStatus().typeIsFinished()) {
+          sendMail = true;
+        }
+      default:
+    }
+
+    if (sendMail) {
+      sendEmail(getRunTypeCnName(executionFlow.getType()),
+          executionFlow.getStatus(),
+          executionFlow.getProjectName(),
+          executionFlow.getWorkflowName(),
+          executionFlow.getScheduleTime(),
+          executionFlow.getProxyUser(),
+          executionFlow.getQueue(),
+          executionFlow.getStartTime(),
+          executionFlow.getEndTime(),
+          executionFlow.getNotifyMailList());
+    }
+  }
+
+  /**
+   * 发送流任务的报警
+   *
+   * @param streamingResult
+   */
+  public static void sendMessageOfStreamingJob(StreamingResult streamingResult) {
+    NotifyType notifyType = streamingResult.getNotifyType();
+
+    boolean sendMail = false;
+
+    switch (notifyType) {
+      case SUCCESS:
+        if (streamingResult.getStatus().typeIsSuccess()) {
+          sendMail = true;
+        }
+      case FAILURE:
+        if (streamingResult.getStatus().typeIsFailure()) {
+          sendMail = true;
+        }
+      case ALL:
+        if (streamingResult.getStatus().typeIsFailure()) {
+          sendMail = true;
+        }
+      default:
+    }
+
+    if (sendMail) {
+      sendEmail("Streaming job",
+          streamingResult.getStatus(),
+          streamingResult.getProjectName(),
+          streamingResult.getName(),
+          streamingResult.getScheduleTime(),
+          streamingResult.getProxyUser(),
+          streamingResult.getQueue(),
+          streamingResult.getStartTime(),
+          streamingResult.getEndTime(),
+          streamingResult.getNotifyMailList());
+    }
   }
 }

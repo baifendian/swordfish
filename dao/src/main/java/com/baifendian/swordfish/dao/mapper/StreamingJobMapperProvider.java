@@ -15,11 +15,13 @@
  */
 package com.baifendian.swordfish.dao.mapper;
 
+import com.baifendian.swordfish.dao.enums.NotifyType;
+import com.baifendian.swordfish.dao.mapper.utils.EnumFieldUtil;
 import org.apache.ibatis.jdbc.SQL;
 
 import java.util.Map;
 
-public class StreamingJobProvider {
+public class StreamingJobMapperProvider {
 
   private static final String TABLE_NAME = "streaming_job";
 
@@ -43,6 +45,8 @@ public class StreamingJobProvider {
         VALUES("`type`", "#{job.type}");
         VALUES("`parameter`", "#{job.parameter}");
         VALUES("`user_defined_params`", "#{job.userDefinedParams}");
+        VALUES("`notify_type`", EnumFieldUtil.genFieldStr("job.notifyType", NotifyType.class));
+        VALUES("`notify_mails`", "#{job.notifyMails}");
       }
     }.toString();
   }
@@ -88,6 +92,8 @@ public class StreamingJobProvider {
         SET("`owner`=#{job.ownerId}");
         SET("`parameter`=#{job.parameter}");
         SET("`user_defined_params`=#{job.userDefinedParams}");
+        SET("`notify_type`=" + EnumFieldUtil.genFieldStr("job.notifyType", NotifyType.class));
+        SET("`notify_mails`=#{job.notifyMails}");
 
         WHERE("id = #{job.id}");
       }

@@ -15,9 +15,9 @@
  */
 package com.baifendian.swordfish.webserver.dto;
 
+import com.baifendian.swordfish.dao.enums.NotifyType;
 import com.baifendian.swordfish.dao.model.StreamingJob;
 import com.baifendian.swordfish.dao.utils.json.JsonObjectDeserializer;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonRawValue;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
@@ -47,19 +47,29 @@ public class StreamingJobDto {
 
   private String owner;
 
+  private NotifyType notifyType;
+
+  @JsonRawValue
+  @JsonDeserialize(using = JsonObjectDeserializer.class)
+  private String notifyMails;
+
   public StreamingJobDto() {
   }
 
   public StreamingJobDto(StreamingJob streamingJob) {
-    this.name = streamingJob.getName();
-    this.desc = streamingJob.getDesc();
-    this.projectName = streamingJob.getProjectName();
-    this.type = streamingJob.getType();
-    this.parameter = streamingJob.getParameter();
-    this.userDefParams = streamingJob.getUserDefinedParams();
-    this.createTime = streamingJob.getCreateTime();
-    this.modifyTime = streamingJob.getModifyTime();
-    this.owner = streamingJob.getOwner();
+    if (streamingJob != null) {
+      this.name = streamingJob.getName();
+      this.desc = streamingJob.getDesc();
+      this.projectName = streamingJob.getProjectName();
+      this.type = streamingJob.getType();
+      this.parameter = streamingJob.getParameter();
+      this.userDefParams = streamingJob.getUserDefinedParams();
+      this.createTime = streamingJob.getCreateTime();
+      this.modifyTime = streamingJob.getModifyTime();
+      this.owner = streamingJob.getOwner();
+      this.notifyType = streamingJob.getNotifyType();
+      this.notifyMails = streamingJob.getNotifyMails();
+    }
   }
 
   public String getName() {
@@ -132,5 +142,21 @@ public class StreamingJobDto {
 
   public void setOwner(String owner) {
     this.owner = owner;
+  }
+
+  public NotifyType getNotifyType() {
+    return notifyType;
+  }
+
+  public void setNotifyType(NotifyType notifyType) {
+    this.notifyType = notifyType;
+  }
+
+  public String getNotifyMails() {
+    return notifyMails;
+  }
+
+  public void setNotifyMails(String notifyMails) {
+    this.notifyMails = notifyMails;
   }
 }

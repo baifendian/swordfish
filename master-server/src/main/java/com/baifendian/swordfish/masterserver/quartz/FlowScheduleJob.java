@@ -188,7 +188,7 @@ public class FlowScheduleJob implements Job {
 
           // 发送邮件
           if (executionFlow.getNotifyType().typeIsSendFailureMail()) {
-            EmailManager.sendEmail(executionFlow);
+            EmailManager.sendMessageOfExecutionFlow(executionFlow);
           }
 
           return;
@@ -215,7 +215,7 @@ public class FlowScheduleJob implements Job {
 
         // 发送邮件
         if (executionFlow.getNotifyType().typeIsSendFailureMail()) {
-          EmailManager.sendEmail(executionFlow);
+          EmailManager.sendMessageOfExecutionFlow(executionFlow);
         }
 
         return;

@@ -15,8 +15,6 @@
  */
 package com.baifendian.swordfish.common.job.struct.node;
 
-import org.apache.commons.lang.StringUtils;
-
 public class JobType {
 
   public static final String HQL = "HQL";
@@ -30,15 +28,17 @@ public class JobType {
    * 判断是否是长任务
    */
   public static boolean isLongJob(String job) {
-    if (StringUtils.isEmpty(job)) {
-      return false;
-    }
-
     switch (job) {
       case SPARK_STREAMING:
         return true;
-      default:
+      case HQL:
+      case MR:
+      case SHELL:
+      case SPARK:
+      case VIRTUAL:
         return false;
+      default:
+        throw new IllegalArgumentException("job not valid");
     }
   }
 }

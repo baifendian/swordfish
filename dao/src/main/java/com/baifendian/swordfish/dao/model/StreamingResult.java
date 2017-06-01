@@ -16,6 +16,7 @@
 package com.baifendian.swordfish.dao.model;
 
 import com.baifendian.swordfish.dao.enums.FlowStatus;
+import com.baifendian.swordfish.dao.enums.NotifyType;
 import com.baifendian.swordfish.dao.model.flow.Property;
 import com.baifendian.swordfish.dao.utils.json.JsonObjectDeserializer;
 import com.baifendian.swordfish.dao.utils.json.JsonObjectSerializer;
@@ -24,7 +25,6 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.apache.commons.lang.StringUtils;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -136,12 +136,12 @@ public class StreamingResult {
   /**
    * 得到日志链接
    */
-  private List<String> appLinkList = new ArrayList<>();
+  private List<String> appLinkList;
 
   /**
    * 得到 job 的链接
    */
-  private List<String> jobLinkList = new ArrayList<>();
+  private List<String> jobLinkList;
 
   /**
    * 流任务
@@ -196,6 +196,22 @@ public class StreamingResult {
    * 数据库映射字段/DTO需要字段
    */
   private String type;
+
+  /**
+   * 报警类型
+   * 数据库映射字段 notify_type
+   */
+  private NotifyType notifyType;
+
+  /**
+   * 报警邮件列表
+   */
+  private String notifyMails;
+
+  /**
+   * 得到邮件列表
+   */
+  private List<String> notifyMailList;
 
   public int getExecId() {
     return execId;
@@ -441,6 +457,36 @@ public class StreamingResult {
     this.jobLinkList = jobLinkList;
     if (jobLinkList != null) {
       this.jobLinks = JsonUtil.toJsonString(jobLinkList);
+    }
+  }
+
+  public NotifyType getNotifyType() {
+    return notifyType;
+  }
+
+  public void setNotifyType(NotifyType notifyType) {
+    this.notifyType = notifyType;
+  }
+
+  public String getNotifyMails() {
+    return notifyMails;
+  }
+
+  public void setNotifyMails(String notifyMails) {
+    this.notifyMails = notifyMails;
+    if (notifyMails != null) {
+      this.notifyMailList = JsonUtil.parseObjectList(notifyMails, String.class);
+    }
+  }
+
+  public List<String> getNotifyMailList() {
+    return notifyMailList;
+  }
+
+  public void setNotifyMailList(List<String> notifyMailList) {
+    this.notifyMailList = notifyMailList;
+    if (notifyMailList != null) {
+      this.notifyMails = JsonUtil.toJsonString(notifyMailList);
     }
   }
 }

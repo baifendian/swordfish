@@ -16,10 +16,14 @@
 package com.baifendian.swordfish.webserver.service;
 
 import com.baifendian.swordfish.common.job.struct.node.JobType;
+import com.baifendian.swordfish.dao.enums.NotifyType;
 import com.baifendian.swordfish.dao.mapper.ProjectMapper;
 import com.baifendian.swordfish.dao.mapper.StreamingJobMapper;
 import com.baifendian.swordfish.dao.mapper.StreamingResultMapper;
-import com.baifendian.swordfish.dao.model.*;
+import com.baifendian.swordfish.dao.model.Project;
+import com.baifendian.swordfish.dao.model.StreamingJob;
+import com.baifendian.swordfish.dao.model.StreamingResult;
+import com.baifendian.swordfish.dao.model.User;
 import com.baifendian.swordfish.dao.model.flow.Property;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
 import com.baifendian.swordfish.webserver.dto.StreamingJobDto;
@@ -64,6 +68,8 @@ public class StreamingService {
    * @param type
    * @param parameter
    * @param userDefParams
+   * @param notifyType
+   * @param notifyMails
    * @return
    */
   public StreamingJob createStreamingJob(User operator,
@@ -72,11 +78,15 @@ public class StreamingService {
                                          String desc,
                                          String type,
                                          String parameter,
-                                         String userDefParams) {
+                                         String userDefParams,
+                                         NotifyType notifyType,
+                                         String notifyMails) {
 
     // 校验变量
     verifyStreamingName(name);
     verifyDesc(desc);
+
+    verifyEmails(notifyMails, notifyType != null && notifyType != NotifyType.NONE);
 
     // 必须是流任务类型
     if (!JobType.isLongJob(type)) {
@@ -128,6 +138,8 @@ public class StreamingService {
       streamingJob.setType(type);
       streamingJob.setParameter(parameter);
       streamingJob.setUserDefinedParams(userDefParams);
+      streamingJob.setNotifyType(notifyType);
+      streamingJob.setNotifyMails(notifyMails);
     } catch (Exception e) {
       logger.error("Str set value error", e);
       throw new BadRequestException("Project flow set value error", e);
@@ -157,7 +169,8 @@ public class StreamingService {
    * @param type
    * @param parameter
    * @param userDefParams
-   * @param extras
+   * @param notifyType
+   * @param notifyMails
    * @return
    */
   public StreamingJob putStreamingJob(User operator,
@@ -166,14 +179,16 @@ public class StreamingService {
                                       String desc,
                                       String type,
                                       String parameter,
-                                      String userDefParams) {
+                                      String userDefParams,
+                                      NotifyType notifyType,
+                                      String notifyMails) {
     StreamingJob streamingJob = streamingJobMapper.findByProjectNameAndName(projectName, name);
 
     if (streamingJob == null) {
-      return createStreamingJob(operator, projectName, name, desc, type, parameter, userDefParams);
+      return createStreamingJob(operator, projectName, name, desc, type, parameter, userDefParams, notifyType, notifyMails);
     }
 
-    return patchStreamingJob(operator, projectName, name, desc, parameter, userDefParams);
+    return patchStreamingJob(operator, projectName, name, desc, parameter, userDefParams, notifyType, notifyMails);
   }
 
   /**
@@ -185,6 +200,8 @@ public class StreamingService {
    * @param desc
    * @param parameter
    * @param userDefParams
+   * @param notifyType
+   * @param notifyMails
    * @return
    */
   public StreamingJob patchStreamingJob(User operator,
@@ -192,9 +209,12 @@ public class StreamingService {
                                         String name,
                                         String desc,
                                         String parameter,
-                                        String userDefParams) {
+                                        String userDefParams,
+                                        NotifyType notifyType,
+                                        String notifyMails) {
 
     verifyDesc(desc);
+    verifyEmails(notifyMails, notifyType != null && notifyType != NotifyType.NONE);
 
     // 查询项目, 如果不存在, 返回错误
     Project project = projectMapper.queryByName(projectName);
@@ -249,6 +269,14 @@ public class StreamingService {
     streamingJob.setModifyTime(now);
     streamingJob.setOwnerId(operator.getId());
     streamingJob.setOwner(operator.getName());
+
+    if (notifyType != null) {
+      streamingJob.setNotifyType(notifyType);
+    }
+
+    if (StringUtils.isNotEmpty(notifyMails)) {
+      streamingJob.setNotifyMails(notifyMails);
+    }
 
     try {
       streamingJobMapper.updateStreamingJob(streamingJob);
@@ -363,7 +391,9 @@ public class StreamingService {
     List<StreamingJobDto> streamingJobDtos = new ArrayList<>();
     StreamingJob streamingJob = streamingJobMapper.findByProjectNameAndName(projectName, name);
 
-    streamingJobDtos.add(new StreamingJobDto(streamingJob));
+    if (streamingJob != null) {
+      streamingJobDtos.add(new StreamingJobDto(streamingJob));
+    }
 
     return streamingJobDtos;
   }

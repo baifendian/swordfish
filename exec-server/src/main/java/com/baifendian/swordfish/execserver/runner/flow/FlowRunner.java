@@ -26,7 +26,6 @@ import com.baifendian.swordfish.dao.DaoFactory;
 import com.baifendian.swordfish.dao.FlowDao;
 import com.baifendian.swordfish.dao.enums.FailurePolicyType;
 import com.baifendian.swordfish.dao.enums.FlowStatus;
-import com.baifendian.swordfish.dao.enums.NotifyType;
 import com.baifendian.swordfish.dao.model.ExecutionFlow;
 import com.baifendian.swordfish.dao.model.ExecutionNode;
 import com.baifendian.swordfish.dao.model.FlowNode;
@@ -35,8 +34,8 @@ import com.baifendian.swordfish.dao.model.flow.FlowDag;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
 import com.baifendian.swordfish.execserver.exception.ExecTimeoutException;
 import com.baifendian.swordfish.execserver.job.JobContext;
-import com.baifendian.swordfish.execserver.utils.EnvHelper;
 import com.baifendian.swordfish.execserver.runner.node.NodeRunner;
+import com.baifendian.swordfish.execserver.utils.EnvHelper;
 import com.baifendian.swordfish.execserver.utils.LoggerUtil;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.FileUtils;
@@ -672,23 +671,7 @@ public class FlowRunner implements Runnable {
    * flow 执行完的后置处理 <p>
    */
   private void postProcess() {
-    NotifyType notifyType = executionFlow.getNotifyType();
-
-    switch (notifyType) {
-      case SUCCESS:
-        if (executionFlow.getStatus().typeIsSuccess()) {
-          EmailManager.sendEmail(executionFlow);
-        }
-      case FAILURE:
-        if (executionFlow.getStatus().typeIsFailure()) {
-          EmailManager.sendEmail(executionFlow);
-        }
-      case ALL:
-        if (executionFlow.getStatus().typeIsFinished()) {
-          EmailManager.sendEmail(executionFlow);
-        }
-      default:
-    }
+    EmailManager.sendMessageOfExecutionFlow(executionFlow);
   }
 
   /**
