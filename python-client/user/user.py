@@ -55,9 +55,9 @@ if __name__ == '__main__':
 
     print sessionId
 
-    for i in xrange(1, 10):
-        user = "%s_%d" %(settings.g_user, 102)
-        email = "%s_%d" %(settings.g_email, 102)
+    for i in xrange(1, 60):
+        user = "%s_%d" % (settings.g_user, i / 3 + 100)
+        email = "%s_%d" % (settings.g_email, i / 3 + 100)
 
         (status, data) = add_user(sessionId, user, email, None, settings.g_password, None, ["*"])
 
