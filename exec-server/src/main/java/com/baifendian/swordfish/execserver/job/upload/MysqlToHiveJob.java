@@ -13,19 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.baifendian.swordfish.common.job.struct.datasource;
+package com.baifendian.swordfish.execserver.job.upload;
 
-import org.junit.Test;
+/**
+ * mysql 导入 hive 任务
+ */
+public class MysqlToHiveJob implements UploadJob {
 
-public class OracleDatasourceTest {
-  @Test
-  public void testIsConnectable() throws Exception {
-    OracleDatasource oracleDatasource = new OracleDatasource();
-    oracleDatasource.setHost("172.18.1.112");
-    oracleDatasource.setPort(1521);
-    oracleDatasource.setService("orcl");
-    oracleDatasource.setUser("test");
-    oracleDatasource.setPassword("test");
-    oracleDatasource.isConnectable();
+  @Override
+  public String createDataxJson() {
+    return null;
   }
 }
