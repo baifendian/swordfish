@@ -182,6 +182,18 @@ public class StreamingExecService {
       throw new PermissionException("User \"{0}\" is not has project \"{1}\" exec permission", operator.getName(), project.getName());
     }
 
+    // 查询流任务是否运行中
+    StreamingResult streamingResult = streamingResultMapper.selectById(execId);
+
+    if (streamingResult == null) {
+      throw new NotFoundException("streaming not found");
+    }
+
+    // 如果已经完成, 直接返回
+    if (streamingResult.getStatus().typeIsFinished()) {
+      return;
+    }
+
     // kill 流任务
     MasterServer masterServer = masterServerMapper.query();
 
@@ -199,7 +211,7 @@ public class StreamingExecService {
         throw new ServerErrorException("Call master client kill streaming job false , project id: \"{0}\", exec flow id: \"{1}\", host: \"{2}\", port: \"{3}\"", project.getId(), execId, masterServer.getHost(), masterServer.getPort());
       }
     } catch (Exception e) {
-      logger.error("Call master client set schedule error", e);
+      logger.error("Call master client kill streaming job error", e);
       throw e;
     }
   }
@@ -244,6 +256,8 @@ public class StreamingExecService {
     List<StreamingResultDto> streamingResultDtos = new ArrayList<>();
 
     List<StreamingResult> streamingResults = streamingResultMapper.findByMultiCondition(project.getId(), name, startDate, endDate, status, from, size);
+
+    logger.info("size is: {}", streamingResults.size());
 
     for (StreamingResult streamingResult : streamingResults) {
       streamingResultDtos.add(new StreamingResultDto(streamingResult));

@@ -92,7 +92,7 @@ public class StreamingRunnerManager {
     props.setWorkDir(BaseConfig.getStreamingExecDir(streamingResult.getProjectId(), streamingResult.getStreamingId(), streamingResult.getExecId()));
     props.setProxyUser(streamingResult.getProxyUser());
     props.setEnvFile(BaseConfig.getSystemEnvPath());
-    props.setJobAppId(String.format("%s_%s", streamingResult.getJobId()));
+    props.setJobAppId(streamingResult.getJobId());
 
     try {
       AbstractYarnJob.cancelApplication(streamingResult.getAppLinkList(), props, new JobLogger(streamingResult.getJobId(), logger));

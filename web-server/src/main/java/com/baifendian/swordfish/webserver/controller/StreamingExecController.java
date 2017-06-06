@@ -93,8 +93,8 @@ public class StreamingExecController {
    */
   @GetMapping(value = "/streamings")
   public StreamingResultsDto queryStreamingExecs(@RequestAttribute(value = "session.user") User operator,
-                                                 @RequestParam(value = "startDate") long startDate,
-                                                 @RequestParam(value = "endDate") long endDate,
+                                                 @RequestParam(value = "startDate", required = false) Long startDate,
+                                                 @RequestParam(value = "endDate", required = false) Long endDate,
                                                  @RequestParam(value = "projectName") String projectName,
                                                  @RequestParam(value = "name", required = false) String name,
                                                  @RequestParam(value = "status", required = false) Integer status,
@@ -113,7 +113,7 @@ public class StreamingExecController {
       throw new BadRequestException("Argument is not valid, size must be between (0, 1000]");
     }
 
-    return streamingExecService.queryStreamingExecs(operator, projectName, name, new Date(startDate), new Date(endDate), status, from, size);
+    return streamingExecService.queryStreamingExecs(operator, projectName, name, (startDate == null) ? null : new Date(startDate), (endDate == null) ? null : new Date(endDate), status, from, size);
   }
 
   /**
