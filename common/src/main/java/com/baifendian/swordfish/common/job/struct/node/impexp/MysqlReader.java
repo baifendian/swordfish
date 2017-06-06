@@ -13,40 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.baifendian.swordfish.execserver.job.upload;
-
-import com.baifendian.swordfish.common.job.struct.node.BaseParam;
-import com.baifendian.swordfish.execserver.job.JobProps;
-import org.slf4j.Logger;
-
-import java.io.File;
+package com.baifendian.swordfish.common.job.struct.node.impexp;
 
 /**
- * mysql 导入 hive 任务
+ * mysql 读取对象
  */
-public class MysqlToHiveJob extends UploadJob {
-
-  public MysqlToHiveJob(JobProps props, boolean isLongJob, Logger logger) {
-    super(props, isLongJob, logger);
-  }
+public class MysqlReader implements Reader {
 
   @Override
-  public String getDataXJson() {
+  public String getDataXReader() {
     return null;
-  }
-
-  @Override
-  public BaseParam getParam() {
-    return null;
-  }
-
-  @Override
-  public String createCommand() throws Exception {
-    return null;
-  }
-
-  @Override
-  public void initJob() {
-
   }
 }

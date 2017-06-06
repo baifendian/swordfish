@@ -314,7 +314,7 @@ public class ExecutionFlowMapperProvider {
         }
 
         WHERE("schedule_time >= #{startDate}");
-        WHERE("schedule_time < #{endDate}");
+        WHERE("schedule_time <= #{endDate}");
 
         if (CollectionUtils.isNotEmpty(flowStatuses)) {
           WHERE("`status` in (" + where + ") ");
