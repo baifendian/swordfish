@@ -13,19 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.baifendian.swordfish.common.job.struct.datasource;
+package com.baifendian.swordfish.execserver.job.upload;
 
-import org.junit.Test;
+/**
+ * 导入任务接口
+ */
+public interface UploadJob {
 
-public class OracleDatasourceTest {
-  @Test
-  public void testIsConnectable() throws Exception {
-    OracleDatasource oracleDatasource = new OracleDatasource();
-    oracleDatasource.setHost("172.18.1.112");
-    oracleDatasource.setPort(1521);
-    oracleDatasource.setService("orcl");
-    oracleDatasource.setUser("test");
-    oracleDatasource.setPassword("test");
-    oracleDatasource.isConnectable();
-  }
+  /**
+   * 生成datax需要的json文件
+   * @return
+   */
+  String createDataxJson();
 }
