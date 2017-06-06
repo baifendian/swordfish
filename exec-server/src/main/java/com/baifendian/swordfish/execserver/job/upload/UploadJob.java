@@ -15,15 +15,25 @@
  */
 package com.baifendian.swordfish.execserver.job.upload;
 
+import com.baifendian.swordfish.common.job.struct.node.BaseParamFactory;
+import com.baifendian.swordfish.common.job.struct.node.impexp.ImpExpBuilder;
+import com.baifendian.swordfish.common.job.struct.node.impexp.ImpExpParam;
+import com.baifendian.swordfish.common.job.struct.node.impexp.ImpExpParam;
+
+import com.baifendian.swordfish.common.job.struct.node.impexp.MysqlReader;
+import com.baifendian.swordfish.dao.utils.json.JsonUtil;
 import com.baifendian.swordfish.execserver.job.AbstractProcessJob;
 import com.baifendian.swordfish.execserver.job.JobProps;
 import org.apache.commons.io.FileUtils;
+
+import static com.baifendian.swordfish.common.job.struct.node.JobType.*;
+
+import org.json.JSONException;
 import org.slf4j.Logger;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
+import java.io.Writer;
 import java.nio.charset.Charset;
 import java.text.MessageFormat;
 import java.util.UUID;
@@ -33,10 +43,18 @@ import java.util.UUID;
  */
 abstract class UploadJob extends AbstractProcessJob {
 
-  private final String DATAXFILENAME = "dataXJson";
+  protected final String DATAXFILENAME = "dataXJson";
+  protected final String DATAXJSON = "{\"job\":{\"content\":[{\"reader\":{0},\"writer\":{1}}],\"setting\":{2}}}";
+
+  protected ImpExpParam impExpParam;
 
   public UploadJob(JobProps props, boolean isLongJob, Logger logger) {
     super(props, isLongJob, logger);
+  }
+
+  @Override
+  public void initJob() {
+    this.impExpParam = (ImpExpParam) BaseParamFactory.getBaseParam(IMPORT, props.getJobParams());
   }
 
   /**
@@ -44,7 +62,7 @@ abstract class UploadJob extends AbstractProcessJob {
    *
    * @return
    */
-  abstract String getDataXJson();
+  abstract String getDataXJson() throws JSONException;
 
   /**
    * 生成datax 文件

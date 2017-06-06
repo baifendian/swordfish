@@ -6,7 +6,7 @@ import com.baifendian.swordfish.dao.utils.json.JsonUtil;
 import java.util.Set;
 
 /**
- * Created by caojingwei on 2017/6/6.
+ * 导入导出参数构造器
  */
 public class ImpExpBuilder {
   private ImpExpType type;

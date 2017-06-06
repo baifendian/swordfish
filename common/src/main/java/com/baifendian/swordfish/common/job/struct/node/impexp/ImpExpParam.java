@@ -23,10 +23,7 @@ import com.baifendian.swordfish.common.job.struct.node.BaseParam;
  */
 public class ImpExpParam extends BaseParam {
   private ImpExpType type;
-  private Reader readerParam;
-  private Writer writerParam;
   private Setting setting;
-
   private Reader reader;
   private Writer writer;
 
@@ -36,22 +33,6 @@ public class ImpExpParam extends BaseParam {
 
   public void setType(ImpExpType type) {
     this.type = type;
-  }
-
-  public Reader getReaderParam() {
-    return readerParam;
-  }
-
-  public void setReaderParam(Reader readerParam) {
-    this.readerParam = readerParam;
-  }
-
-  public Writer getWriterParam() {
-    return writerParam;
-  }
-
-  public void setWriterParam(Writer writerParam) {
-    this.writerParam = writerParam;
   }
 
   public Setting getSetting() {
