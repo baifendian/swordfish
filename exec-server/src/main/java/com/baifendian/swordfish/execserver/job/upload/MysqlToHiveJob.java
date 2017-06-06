@@ -16,22 +16,39 @@
 package com.baifendian.swordfish.execserver.job.upload;
 
 import com.baifendian.swordfish.common.job.struct.node.BaseParam;
+import com.baifendian.swordfish.common.job.struct.node.BaseParamFactory;
+import com.baifendian.swordfish.common.job.struct.node.impexp.HiveWriter;
+import com.baifendian.swordfish.common.job.struct.node.impexp.ImpExpParam;
+import com.baifendian.swordfish.common.job.struct.node.impexp.MysqlReader;
 import com.baifendian.swordfish.execserver.job.JobProps;
+import com.fasterxml.jackson.databind.util.JSONPObject;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 
 import java.io.File;
+
+import static com.baifendian.swordfish.common.job.struct.node.JobType.IMPORT;
 
 /**
  * mysql 导入 hive 任务
  */
 public class MysqlToHiveJob extends UploadJob {
 
+  private MysqlReader mysqlReader;
+  private HiveWriter hiveWriter;
+
   public MysqlToHiveJob(JobProps props, boolean isLongJob, Logger logger) {
     super(props, isLongJob, logger);
   }
 
   @Override
-  public String getDataXJson() {
+  public String getDataXJson() throws JSONException {
+    //TODO setting json化
+    JSONObject wirter = new JSONObject(this.hiveWriter.getDataXWriter());
+    JSONObject reader = new JSONObject(this.mysqlReader.getDataXReader());
+    JSONObject json = new JSONObject(this.DATAXJSON);
+
     return null;
   }
 
@@ -46,7 +63,14 @@ public class MysqlToHiveJob extends UploadJob {
   }
 
   @Override
-  public void initJob() {
+  public void after() throws Exception {
+    super.after();
+  }
 
+  @Override
+  public void initJob() {
+    super.initJob();
+    this.mysqlReader = (MysqlReader) impExpParam.getReader();
+    this.hiveWriter = (HiveWriter) impExpParam.getWriter();
   }
 }
