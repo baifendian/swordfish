@@ -82,7 +82,7 @@ public class YarnRestClient {
       StatusLine statusLine = response.getStatusLine();
       HttpEntity entity = response.getEntity();
       if (statusLine.getStatusCode() >= 300) {
-        if (statusLine.getStatusCode() == 404) {
+        if (statusLine.getStatusCode() == 404 || statusLine.getStatusCode() == 330) {
           return null;
         }
 

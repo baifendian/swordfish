@@ -83,7 +83,7 @@ public class StreamingResultMapperProvider {
     }.toString() + " limit 1";
 
     return constructCommonDetailSQL().
-        WHERE("r.id in " + "(" + subSql + ")").
+        WHERE("r.id = " + "(" + subSql + ")").
         toString();
   }
 
