@@ -44,68 +44,72 @@ public class StreamingCheckThread implements Runnable {
 
   @Override
   public void run() {
-    // 检测没有完成的任务
-    List<StreamingResult> streamingResults = streamingDao.findNoFinishedJob();
+    try {
+      // 检测没有完成的任务
+      List<StreamingResult> streamingResults = streamingDao.findNoFinishedJob();
 
-    Date now = new Date();
+      Date now = new Date();
 
-    logger.info("find not finish jobs, size: {}", streamingResults.size());
+      logger.info("find not finish jobs, size: {}", streamingResults.size());
 
-    // 如果有没有完成的任务
-    if (CollectionUtils.isNotEmpty(streamingResults)) {
-      // 遍历流任务列表
-      for (StreamingResult streamingResult : streamingResults) {
-        // 得到 app id 列表
-        List<String> appIds = streamingResult.getAppLinkList();
-        // 列表为空, 就不管了
-        if (CollectionUtils.isNotEmpty(appIds)) {
-          FlowStatus status = FlowStatus.SUCCESS;
+      // 如果有没有完成的任务
+      if (CollectionUtils.isNotEmpty(streamingResults)) {
+        // 遍历流任务列表
+        for (StreamingResult streamingResult : streamingResults) {
+          // 得到 app id 列表
+          List<String> appIds = streamingResult.getAppLinkList();
+          // 列表为空, 就不管了
+          if (CollectionUtils.isNotEmpty(appIds)) {
+            FlowStatus status = FlowStatus.SUCCESS;
 
-          // 可能有好多个子任务, 都完成算真的完成, 有一个失败, 算失败
-          String appId = appIds.get(appIds.size() - 1);
+            // 可能有好多个子任务, 都完成算真的完成, 有一个失败, 算失败
+            String appId = appIds.get(appIds.size() - 1);
 
-          try {
-            FlowStatus tmpStatus = YarnRestClient.getInstance().getApplicationStatus(appId);
+            try {
+              FlowStatus tmpStatus = YarnRestClient.getInstance().getApplicationStatus(appId);
 
-            // 任务不存在
-            if (tmpStatus == null) {
-              logger.error("application not exist: {}", appId);
-              status = FlowStatus.KILL;
-            } else if (!tmpStatus.typeIsSuccess()) {// 如果没有完成
-              status = tmpStatus;
+              // 任务不存在
+              if (tmpStatus == null) {
+                logger.error("application not exist: {}", appId);
+                status = FlowStatus.KILL;
+              } else if (!tmpStatus.typeIsSuccess()) {// 如果没有完成
+                status = tmpStatus;
+              }
+            } catch (Exception e) {
+              logger.error(String.format("get application exception: {}", appId), e);
             }
-          } catch (Exception e) {
-            logger.error(String.format("get application exception: {}", appId), e);
-          }
 
-          // 更新状态
-          if (status != streamingResult.getStatus()) {
+            // 更新状态
+            if (status != streamingResult.getStatus()) {
+              // 设置状态和结束时间
+              streamingResult.setStatus(status);
+
+              if (status.typeIsFinished()) {
+                streamingResult.setEndTime(now);
+              }
+
+              streamingDao.updateResult(streamingResult);
+
+              // 发送报警
+              if (status.typeIsFinished()) {
+                EmailManager.sendMessageOfStreamingJob(streamingResult);
+              }
+            }
+          } else if (System.currentTimeMillis() - streamingResult.getScheduleTime().getTime() >=
+              MasterConfig.streamingTimeoutThreshold * 1000) { // 提交很久了, 没有任何执行和接受
             // 设置状态和结束时间
-            streamingResult.setStatus(status);
-
-            if (status.typeIsFinished()) {
-              streamingResult.setEndTime(now);
-            }
+            streamingResult.setStatus(FlowStatus.KILL);
+            streamingResult.setEndTime(now);
 
             streamingDao.updateResult(streamingResult);
 
             // 发送报警
-            if (status.typeIsFinished()) {
-              EmailManager.sendMessageOfStreamingJob(streamingResult);
-            }
+            EmailManager.sendMessageOfStreamingJob(streamingResult);
           }
-        } else if (System.currentTimeMillis() - streamingResult.getScheduleTime().getTime() >=
-            MasterConfig.streamingTimeoutThreshold * 1000) { // 提交很久了, 没有任何执行和接受
-          // 设置状态和结束时间
-          streamingResult.setStatus(FlowStatus.KILL);
-          streamingResult.setEndTime(now);
-
-          streamingDao.updateResult(streamingResult);
-
-          // 发送报警
-          EmailManager.sendMessageOfStreamingJob(streamingResult);
         }
       }
+    } catch (Exception e) {
+      logger.error(e.getMessage(), e);
     }
   }
 }
