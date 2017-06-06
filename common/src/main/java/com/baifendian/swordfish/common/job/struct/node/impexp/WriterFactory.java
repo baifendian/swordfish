@@ -4,7 +4,7 @@ import com.baifendian.swordfish.common.enums.ImpExpType;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
 
 /**
- * Created by caojingwei on 2017/6/6.
+ * 写配置工厂
  */
 public class WriterFactory {
 
