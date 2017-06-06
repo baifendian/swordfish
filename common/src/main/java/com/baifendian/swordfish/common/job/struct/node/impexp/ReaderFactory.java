@@ -4,7 +4,7 @@ import com.baifendian.swordfish.common.enums.ImpExpType;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
 
 /**
- * Created by caojingwei on 2017/6/6.
+ * 读配置工厂
  */
 public class ReaderFactory {
   public static Reader getReader(ImpExpType type, String reader) {

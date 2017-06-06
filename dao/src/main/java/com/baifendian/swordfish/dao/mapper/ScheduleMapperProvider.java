@@ -94,7 +94,8 @@ public class ScheduleMapperProvider {
 
   public String selectByProject(Map<String, Object> parameter) {
     return new SQL() {{
-      SELECT("p_f.name as project_flow_name");
+      SELECT("p_f.name as workflow_name");
+      SELECT("p_f.desc as `desc`");
       SELECT("p.name as project_name");
       SELECT("u.name as owner_name");
       SELECT("s.*");
