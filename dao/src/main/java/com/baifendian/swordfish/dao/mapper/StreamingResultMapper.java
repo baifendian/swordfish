@@ -242,8 +242,8 @@ public interface StreamingResultMapper {
       @Result(property = "jobLinks", column = "job_links", javaType = String.class, jdbcType = JdbcType.VARCHAR),
       @Result(property = "jobId", column = "job_id", javaType = String.class, jdbcType = JdbcType.VARCHAR)
   })
-  @SelectProvider(type = StreamingResultMapperProvider.class, method = "findDetailByProjectAndNames")
-  List<StreamingResult> findDetailByProjectAndNames(@Param("projectId") int projectId, @Param("nameList") List<String> nameList);
+  @SelectProvider(type = StreamingResultMapperProvider.class, method = "findLatestDetailByProjectAndNames")
+  List<StreamingResult> findLatestDetailByProjectAndNames(@Param("projectId") int projectId, @Param("nameList") List<String> nameList);
 
   /**
    * 根据条件查询数目

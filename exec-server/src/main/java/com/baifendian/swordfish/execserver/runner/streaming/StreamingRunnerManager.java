@@ -16,6 +16,7 @@
 package com.baifendian.swordfish.execserver.runner.streaming;
 
 import com.baifendian.swordfish.common.config.BaseConfig;
+import com.baifendian.swordfish.common.hadoop.YarnRestClient;
 import com.baifendian.swordfish.common.utils.DateUtils;
 import com.baifendian.swordfish.dao.DaoFactory;
 import com.baifendian.swordfish.dao.StreamingDao;
@@ -26,11 +27,13 @@ import com.baifendian.swordfish.execserver.job.yarn.AbstractYarnJob;
 import com.baifendian.swordfish.execserver.utils.Constants;
 import com.baifendian.swordfish.execserver.utils.JobLogger;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.configuration.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Date;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
@@ -96,6 +99,19 @@ public class StreamingRunnerManager {
 
     try {
       AbstractYarnJob.cancelApplication(streamingResult.getAppLinkList(), props, new JobLogger(streamingResult.getJobId(), logger));
+
+      // 删除后, 需要更新状态
+      List<String> appLinkList = streamingResult.getAppLinkList();
+      String appId = (CollectionUtils.isEmpty(appLinkList)) ? null : appLinkList.get(0);
+
+      FlowStatus status = YarnRestClient.getInstance().getApplicationStatus(appId);
+
+      if (status != null && status.typeIsFinished()) {
+        streamingResult.setStatus(status);
+        streamingResult.setEndTime(new Date());
+
+        streamingDao.updateResult(streamingResult);
+      }
     } catch (Exception e) {
       logger.error(String.format("cancel streaming job exception: %d", streamingResult.getExecId()), e);
     }

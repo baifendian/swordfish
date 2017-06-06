@@ -257,8 +257,6 @@ public class StreamingExecService {
 
     List<StreamingResult> streamingResults = streamingResultMapper.findByMultiCondition(project.getId(), name, startDate, endDate, status, from, size);
 
-    logger.info("size is: {}", streamingResults.size());
-
     for (StreamingResult streamingResult : streamingResults) {
       streamingResultDtos.add(new StreamingResultDto(streamingResult));
     }
@@ -301,7 +299,7 @@ public class StreamingExecService {
       throw new ParameterException("Parameter name \"{0}\" invalid", names);
     }
 
-    List<StreamingResult> streamingResults = streamingResultMapper.findDetailByProjectAndNames(
+    List<StreamingResult> streamingResults = streamingResultMapper.findLatestDetailByProjectAndNames(
         project.getId(),
         nameList);
 
