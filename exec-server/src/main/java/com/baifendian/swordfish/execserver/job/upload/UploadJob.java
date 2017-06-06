@@ -15,14 +15,53 @@
  */
 package com.baifendian.swordfish.execserver.job.upload;
 
+import com.baifendian.swordfish.execserver.job.AbstractProcessJob;
+import com.baifendian.swordfish.execserver.job.JobProps;
+import org.apache.commons.io.FileUtils;
+import org.slf4j.Logger;
+
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.text.MessageFormat;
+import java.util.UUID;
+
 /**
  * 导入任务接口
  */
-public interface UploadJob {
+abstract class UploadJob extends AbstractProcessJob {
+
+  private final String DATAXFILENAME = "dataXJson";
+
+  public UploadJob(JobProps props, boolean isLongJob, Logger logger) {
+    super(props, isLongJob, logger);
+  }
 
   /**
    * 生成datax需要的json文件
+   *
    * @return
    */
-  String createDataxJson();
+  abstract String getDataXJson();
+
+  /**
+   * 生成datax 文件
+   *
+   * @return
+   */
+  public File createDataXParam(String dataXJson) {
+    // 工作目录
+    String fileName = DATAXFILENAME + UUID.randomUUID() + ".json";
+    String path = MessageFormat.format("{0}/{1}", getWorkingDirectory(), fileName);
+    File file = new File(path);
+    try {
+      FileUtils.writeStringToFile(file, dataXJson, Charset.forName("utf-8"));
+    } catch (IOException e) {
+      logger.error("Create dataX json file error", e);
+      return null;
+    }
+    return file;
+  }
 }
