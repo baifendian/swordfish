@@ -17,6 +17,8 @@ package com.baifendian.swordfish.common.job.struct.node.impexp;
 
 import com.baifendian.swordfish.common.enums.ImpExpType;
 import com.baifendian.swordfish.common.job.struct.node.BaseParam;
+import com.baifendian.swordfish.common.job.struct.node.impexp.reader.Reader;
+import com.baifendian.swordfish.common.job.struct.node.impexp.writer.Writer;
 
 /**
  * 导入导出参数
@@ -67,5 +69,12 @@ public class ImpExpParam extends BaseParam {
     this.reader = impExpBuilder.getReaderParam();
     this.writer = impExpBuilder.getWriterParam();
     this.setting = impExpBuilder.getSettingParam();
+  }
+
+  @Override
+  public boolean checkValid() {
+    return type != null &&
+            reader != null &&
+            writer != null;
   }
 }
