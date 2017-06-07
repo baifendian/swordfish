@@ -102,12 +102,17 @@ public class StreamingRunnerManager {
 
       // 删除后, 需要更新状态
       List<String> appLinkList = streamingResult.getAppLinkList();
-      String appId = (CollectionUtils.isEmpty(appLinkList)) ? null : appLinkList.get(0);
+      String appId = (CollectionUtils.isEmpty(appLinkList)) ? null : appLinkList.get(appLinkList.size() - 1);
 
       FlowStatus status = YarnRestClient.getInstance().getApplicationStatus(appId);
 
-      if (status != null && status.typeIsFinished()) {
-        streamingResult.setStatus(status);
+      if (status == null || (status != null && status.typeIsFinished())) {
+        if (status == null) {
+          streamingResult.setStatus(FlowStatus.KILL);
+        } else {
+          streamingResult.setStatus(status);
+        }
+
         streamingResult.setEndTime(new Date());
 
         streamingDao.updateResult(streamingResult);
