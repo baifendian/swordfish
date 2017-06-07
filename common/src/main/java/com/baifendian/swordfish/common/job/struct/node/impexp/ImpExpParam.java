@@ -75,6 +75,8 @@ public class ImpExpParam extends BaseParam {
   public boolean checkValid() {
     return type != null &&
             reader != null &&
-            writer != null;
+            reader.checkValid() &&
+            writer != null &&
+            writer.checkValid();
   }
 }

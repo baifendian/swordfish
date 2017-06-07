@@ -8,5 +8,7 @@ public interface Reader {
    * 校验reader是否合法
    * @return
    */
-  boolean checkValid();
+  default boolean checkValid(){
+    return true;
+  }
 }

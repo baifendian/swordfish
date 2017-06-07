@@ -8,5 +8,7 @@ public interface Writer {
    * 校验writer是否合法
    * @return
    */
-  boolean checkValid();
+  default boolean checkValid(){
+    return true;
+  }
 }
