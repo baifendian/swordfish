@@ -36,7 +36,7 @@ import java.util.Arrays;
 /**
  * mysql 导入 hive 任务
  */
-public class MysqlToHiveJob extends UploadJob {
+public class MysqlToHiveJob extends ImpExpJob {
 
   private DatasourceDao datasourceDao;
 

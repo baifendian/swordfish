@@ -38,14 +38,14 @@ import java.util.UUID;
 /**
  * 导入任务接口
  */
-abstract class UploadJob extends AbstractProcessJob {
+public abstract class ImpExpJob extends AbstractProcessJob {
 
   protected final String DATAXFILENAME = "dataXJson";
   protected final String DATAXJSON = "{\"job\":{\"content\":[{\"reader\":{0},\"writer\":{1}}],\"setting\":{2}}}";
 
   protected ImpExpParam impExpParam;
 
-  public UploadJob(JobProps props, boolean isLongJob, Logger logger) {
+  public ImpExpJob(JobProps props, boolean isLongJob, Logger logger) {
     super(props, isLongJob, logger);
   }
 
@@ -67,7 +67,7 @@ abstract class UploadJob extends AbstractProcessJob {
    * 获取dataX的reader
    * @return
    */
-  abstract String getDataXReader() throws JSONException, NoSuchFieldException, Exception;
+  abstract String getDataXReader() throws Exception;
 
   /**
    * 获取dataX的writer
