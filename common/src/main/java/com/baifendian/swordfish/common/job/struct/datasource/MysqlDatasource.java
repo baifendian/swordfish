@@ -119,19 +119,24 @@ public class MysqlDatasource extends Datasource {
     this.characterEncoding = characterEncoding;
   }
 
+  /**
+   * 获取 url
+   * @return
+   */
+  public String getJdbcUrl() {
+    String address = this.address;
+    if (address.lastIndexOf("/") != (address.length() - 1)) {
+      address += "/";
+    }
+    return address + this.database;
+  }
+
   @Override
   public void isConnectable() throws Exception {
     Connection con = null;
     try {
       Class.forName("com.mysql.jdbc.Driver");
-
-      String address = this.address;
-      if (address.lastIndexOf("/") != (address.length() - 1)) {
-        address += "/";
-      }
-      String url = address + this.database;
-
-      con = DriverManager.getConnection(url, this.user, this.password);
+      con = DriverManager.getConnection(getJdbcUrl(), this.user, this.password);
     } finally {
       if (con != null) {
         try {

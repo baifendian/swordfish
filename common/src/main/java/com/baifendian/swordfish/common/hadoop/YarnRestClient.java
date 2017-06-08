@@ -16,6 +16,7 @@
 package com.baifendian.swordfish.common.hadoop;
 
 import com.baifendian.swordfish.dao.enums.FlowStatus;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.http.HttpEntity;
 import org.apache.http.StatusLine;
@@ -68,6 +69,10 @@ public class YarnRestClient {
    * @throws IOException
    */
   public FlowStatus getApplicationStatus(String appId) throws JSONException, IOException {
+    if (StringUtils.isEmpty(appId)) {
+      return null;
+    }
+
     String url = ConfigurationUtil.getApplicationStatusAddress(appId);
 
     CloseableHttpClient httpclient = HttpClients.createDefault();
@@ -77,7 +82,7 @@ public class YarnRestClient {
       StatusLine statusLine = response.getStatusLine();
       HttpEntity entity = response.getEntity();
       if (statusLine.getStatusCode() >= 300) {
-        if (statusLine.getStatusCode() == 404) {
+        if (statusLine.getStatusCode() == 404 || statusLine.getStatusCode() == 330) {
           return null;
         }
 

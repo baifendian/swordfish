@@ -15,6 +15,7 @@
  */
 package com.baifendian.swordfish.webserver.dto;
 
+import com.baifendian.swordfish.common.hadoop.ConfigurationUtil;
 import com.baifendian.swordfish.common.json.JsonOrdinalSerializer;
 import com.baifendian.swordfish.dao.enums.FlowStatus;
 import com.baifendian.swordfish.dao.enums.NotifyType;
@@ -23,8 +24,11 @@ import com.baifendian.swordfish.dao.utils.json.JsonObjectDeserializer;
 import com.fasterxml.jackson.annotation.JsonRawValue;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import org.apache.commons.collections.CollectionUtils;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 public class StreamingResultDto {
 
@@ -67,9 +71,7 @@ public class StreamingResultDto {
   @JsonSerialize(using = JsonOrdinalSerializer.class)
   private FlowStatus status;
 
-  @JsonRawValue
-  @JsonDeserialize(using = JsonObjectDeserializer.class)
-  private String appLinks;
+  private List<String> appLinks;
 
   private NotifyType notifyType;
 
@@ -99,7 +101,18 @@ public class StreamingResultDto {
       this.proxyUser = streamingResult.getProxyUser();
       this.queue = streamingResult.getQueue();
       this.status = streamingResult.getStatus();
-      this.appLinks = streamingResult.getAppLinks();
+
+      // link 需要添加前缀
+      List<String> appIds = streamingResult.getAppLinkList();
+
+      if (CollectionUtils.isNotEmpty(appIds)) {
+        this.appLinks = new ArrayList<>();
+
+        for (String appId : appIds) {
+          this.appLinks.add(ConfigurationUtil.getWebappAddress(appId));
+        }
+      }
+
       this.notifyType = streamingResult.getNotifyType();
       this.notifyMails = streamingResult.getNotifyMails();
     }
@@ -241,11 +254,11 @@ public class StreamingResultDto {
     this.status = status;
   }
 
-  public String getAppLinks() {
+  public List<String> getAppLinks() {
     return appLinks;
   }
 
-  public void setAppLinks(String appLinks) {
+  public void setAppLinks(List<String> appLinks) {
     this.appLinks = appLinks;
   }
 

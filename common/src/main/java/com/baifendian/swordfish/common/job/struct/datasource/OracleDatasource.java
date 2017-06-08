@@ -15,12 +15,14 @@
  */
 package com.baifendian.swordfish.common.job.struct.datasource;
 
-import oracle.jdbc.pool.OracleDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.stringtemplate.v4.ST;
 
 import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.text.MessageFormat;
 
 /**
  * Oracle数据源的参数配置
@@ -29,52 +31,45 @@ public class OracleDatasource extends Datasource {
 
   private static Logger logger = LoggerFactory.getLogger(OracleDatasource.class.getName());
 
-  private String driverType = "oci";
-  private String serverName;
-  private String networkProtocol = "tcp";
-  private String databaseName;
-  private int portNumber;
+  private String host;
+
+  private int port;
+
+  private String service;
+
   private String user;
   private String password;
 
-  public String getDriverType() {
-    return driverType;
+  public static Logger getLogger() {
+    return logger;
   }
 
-  public void setDriverType(String driverType) {
-    this.driverType = driverType;
+  public static void setLogger(Logger logger) {
+    OracleDatasource.logger = logger;
   }
 
-  public String getServerName() {
-    return serverName;
+  public String getHost() {
+    return host;
   }
 
-  public void setServerName(String serverName) {
-    this.serverName = serverName;
+  public void setHost(String host) {
+    this.host = host;
   }
 
-  public String getNetworkProtocol() {
-    return networkProtocol;
+  public int getPort() {
+    return port;
   }
 
-  public void setNetworkProtocol(String networkProtocol) {
-    this.networkProtocol = networkProtocol;
+  public void setPort(int port) {
+    this.port = port;
   }
 
-  public String getDatabaseName() {
-    return databaseName;
+  public String getService() {
+    return service;
   }
 
-  public void setDatabaseName(String databaseName) {
-    this.databaseName = databaseName;
-  }
-
-  public int getPortNumber() {
-    return portNumber;
-  }
-
-  public void setPortNumber(int portNumber) {
-    this.portNumber = portNumber;
+  public void setService(String service) {
+    this.service = service;
   }
 
   public String getUser() {
@@ -97,23 +92,17 @@ public class OracleDatasource extends Datasource {
   public void isConnectable() throws Exception {
     Connection con = null;
     try {
-      OracleDataSource ods = new OracleDataSource();
+      Class.forName("oracle.jdbc.driver.OracleDriver");
 
-      ods.setDriverType(this.driverType);
-      ods.setServerName(this.serverName);
-      ods.setNetworkProtocol(this.networkProtocol);
-      ods.setDataSourceName(this.databaseName);
-      ods.setPortNumber(this.portNumber);
-      ods.setUser(this.user);
-      ods.setPassword(this.password);
+      String address = MessageFormat.format("jdbc:oracle:thin:@//{0}:{1}/{2} ", this.host, String.valueOf(this.port), this.service);
 
-      con = ods.getConnection();
+      con = DriverManager.getConnection(address, this.user, this.password);
     } finally {
       if (con != null) {
         try {
           con.close();
         } catch (SQLException e) {
-          logger.error("Oracle datasource try conn close conn error", e);
+          logger.error("Orcale datasource try conn close conn error", e);
           throw e;
         }
       }

@@ -21,6 +21,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.ibatis.jdbc.SQL;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -82,7 +83,7 @@ public class StreamingResultMapperProvider {
     }.toString() + " limit 1";
 
     return constructCommonDetailSQL().
-        WHERE("r.id=" + "(" + subSql + ")").
+        WHERE("r.id = " + "(" + subSql + ")").
         toString();
   }
 
@@ -167,21 +168,29 @@ public class StreamingResultMapperProvider {
    * @param parameter
    * @return
    */
-  public String findDetailByProjectAndNames(Map<String, Object> parameter) {
+  public String findLatestDetailByProjectAndNames(Map<String, Object> parameter) {
     List<String> nameList = (List<String>) parameter.get("nameList");
 
-    if (CollectionUtils.isEmpty(nameList)) {
-      return constructCommonDetailSQL().
-          WHERE("p.id=#{projectId}")
-          .toString();
-    }
+    String subSql = new SQL() {
+      {
+        SELECT("max(id)");
 
-    String names = "\"" + String.join("\", \"", nameList) + "\"";
+        FROM(TABLE_NAME);
+
+        WHERE("p.id=#{projectId}");
+
+        if (CollectionUtils.isNotEmpty(nameList)) {
+          String names = "\"" + String.join("\", \"", nameList) + "\"";
+          WHERE("s.name in (" + names + ")");
+        }
+
+        GROUP_BY("streaming_id");
+      }
+    }.toString();
 
     return constructCommonDetailSQL().
-        WHERE("p.id=#{projectId}").
-        WHERE("s.name in (" + names + ")")
-        .toString();
+        WHERE("r.id in " + "(" + subSql + ")").
+        toString();
   }
 
   /**
@@ -194,28 +203,39 @@ public class StreamingResultMapperProvider {
     Integer status = (Integer) parameter.get("status");
     String name = (String) parameter.get("name");
 
+    Date startDate = (Date) parameter.get("startDate");
+    Date endDate = (Date) parameter.get("endDate");
+
     SQL sql = constructCommonDetailSQL().
-        WHERE("s.project_id=#{projectId}").
-        WHERE("schedule_time >= #{startDate}").
-        WHERE("schedule_time < #{endDate}");
+        WHERE("s.project_id = #{projectId}");
+
+    if (startDate != null) {
+      sql = sql.WHERE("schedule_time >= #{startDate}");
+    }
+
+    if (endDate != null) {
+      sql = sql.WHERE("schedule_time < #{endDate}");
+    }
 
     if (StringUtils.isNotEmpty(name)) {
       sql = sql.WHERE("name = #{name}");
     }
 
     if (status != null) {
-      sql = sql.WHERE("`status`=#{status}");
+      sql = sql.WHERE("`status` = #{status}");
     }
 
     String subClause = sql.toString();
 
-    return new SQL() {
+    String sqlClause = new SQL() {
       {
         SELECT("*");
 
         FROM("(" + subClause + ") e_f");
       }
-    }.toString() + " order by schedule_time DESC limit #{start}, #{limit}";
+    }.toString() + " order by schedule_time DESC limit #{start},#{limit}";
+
+    return sqlClause;
   }
 
   /**
@@ -228,6 +248,9 @@ public class StreamingResultMapperProvider {
     Integer status = (Integer) parameter.get("status");
     String name = (String) parameter.get("name");
 
+    Date startDate = (Date) parameter.get("startDate");
+    Date endDate = (Date) parameter.get("endDate");
+
     return new SQL() {
       {
         SELECT("count(0)");
@@ -236,9 +259,15 @@ public class StreamingResultMapperProvider {
 
         JOIN("streaming_job s on r.streaming_id = s.id");
 
+        if (startDate != null) {
+          WHERE("schedule_time >= #{startDate}");
+        }
+
+        if (endDate != null) {
+          WHERE("schedule_time < #{endDate}");
+        }
+
         WHERE("s.project_id=#{projectId}");
-        WHERE("schedule_time >= #{startDate}");
-        WHERE("schedule_time < #{endDate}");
 
         if (StringUtils.isNotEmpty(name)) {
           WHERE("s.name = #{name}");

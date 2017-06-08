@@ -20,11 +20,12 @@ import org.junit.Test;
 public class OracleDatasourceTest {
   @Test
   public void testIsConnectable() throws Exception {
-//    OracleDatasource oracleDatasource = new OracleDatasource();
-//    oracleDatasource.setServerName("172.18.1.112");
-//    oracleDatasource.setDatabaseName("orcl");
-//    oracleDatasource.setUser("test");
-//    oracleDatasource.setPassword("test");
-//    oracleDatasource.isConnectable();
+    OracleDatasource oracleDatasource = new OracleDatasource();
+    oracleDatasource.setHost("172.18.1.112");
+    oracleDatasource.setPort(1521);
+    oracleDatasource.setService("orcl");
+    oracleDatasource.setUser("test");
+    oracleDatasource.setPassword("test");
+    oracleDatasource.isConnectable();
   }
 }

@@ -17,11 +17,13 @@ package com.baifendian.swordfish.common.job.struct.node;
 
 import com.baifendian.swordfish.common.job.struct.datasource.DatasourceFactory;
 import com.baifendian.swordfish.common.job.struct.node.hql.HqlParam;
+import com.baifendian.swordfish.common.job.struct.node.impexp.ImpExpBuilder;
 import com.baifendian.swordfish.common.job.struct.node.mr.MrParam;
 import com.baifendian.swordfish.common.job.struct.node.shell.ShellParam;
 import com.baifendian.swordfish.common.job.struct.node.spark.SparkParam;
 import com.baifendian.swordfish.common.job.struct.node.virtual.VirtualParam;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
+import org.apache.avro.data.Json;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,6 +51,9 @@ public class BaseParamFactory {
           return JsonUtil.parseObject(parameter, SparkParam.class);
         case SPARK:
           return JsonUtil.parseObject(parameter, SparkParam.class);
+        case IMPORT:
+        case EXPORT:
+          return JsonUtil.parseObject(parameter,ImpExpBuilder.class).buildImpExp();
         default:
           return null;
       }
