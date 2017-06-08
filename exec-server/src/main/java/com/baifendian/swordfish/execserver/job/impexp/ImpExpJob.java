@@ -13,14 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.baifendian.swordfish.execserver.job.upload;
+package com.baifendian.swordfish.execserver.job.impexp;
 
+import com.baifendian.swordfish.common.job.struct.node.BaseParam;
 import com.baifendian.swordfish.common.job.struct.node.BaseParamFactory;
-import com.baifendian.swordfish.common.job.struct.node.impexp.ImpExpBuilder;
-import com.baifendian.swordfish.common.job.struct.node.impexp.ImpExpParam;
 import com.baifendian.swordfish.common.job.struct.node.impexp.ImpExpParam;
 
-import com.baifendian.swordfish.common.job.struct.node.impexp.MysqlReader;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
 import com.baifendian.swordfish.execserver.job.AbstractProcessJob;
 import com.baifendian.swordfish.execserver.job.JobProps;
@@ -33,7 +31,6 @@ import org.slf4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.Writer;
 import java.nio.charset.Charset;
 import java.text.MessageFormat;
 import java.util.UUID;
@@ -41,14 +38,14 @@ import java.util.UUID;
 /**
  * 导入任务接口
  */
-abstract class UploadJob extends AbstractProcessJob {
+public abstract class ImpExpJob extends AbstractProcessJob {
 
   protected final String DATAXFILENAME = "dataXJson";
   protected final String DATAXJSON = "{\"job\":{\"content\":[{\"reader\":{0},\"writer\":{1}}],\"setting\":{2}}}";
 
   protected ImpExpParam impExpParam;
 
-  public UploadJob(JobProps props, boolean isLongJob, Logger logger) {
+  public ImpExpJob(JobProps props, boolean isLongJob, Logger logger) {
     super(props, isLongJob, logger);
   }
 
@@ -62,14 +59,27 @@ abstract class UploadJob extends AbstractProcessJob {
    *
    * @return
    */
-  abstract String getDataXJson() throws JSONException;
+  public String getDataXJson() throws Exception {
+    return MessageFormat.format(getDataXReader(), getDateXWriter(), JsonUtil.toJsonString(impExpParam.getSetting()));
+  }
 
+  /**
+   * 获取dataX的reader
+   * @return
+   */
+  abstract String getDataXReader() throws Exception;
+
+  /**
+   * 获取dataX的writer
+   * @return
+   */
+  abstract String getDateXWriter();
   /**
    * 生成datax 文件
    *
    * @return
    */
-  public File createDataXParam(String dataXJson) {
+  public File createDataXParam(String dataXJson) throws Exception {
     // 工作目录
     String fileName = DATAXFILENAME + UUID.randomUUID() + ".json";
     String path = MessageFormat.format("{0}/{1}", getWorkingDirectory(), fileName);
@@ -78,8 +88,13 @@ abstract class UploadJob extends AbstractProcessJob {
       FileUtils.writeStringToFile(file, dataXJson, Charset.forName("utf-8"));
     } catch (IOException e) {
       logger.error("Create dataX json file error", e);
-      return null;
+      throw e;
     }
     return file;
+  }
+
+  @Override
+  public BaseParam getParam() {
+    return this.impExpParam;
   }
 }
