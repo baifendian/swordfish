@@ -10,7 +10,7 @@ public class WriterFactory {
 
   public static Writer getWriter(ImpExpType type, String writer) {
     switch (type) {
-      case MYSQLTOHIVE:
+      case MYSQL_TO_HIVE:
         return JsonUtil.parseObject(writer, HiveWriter.class);
       default:
         return null;

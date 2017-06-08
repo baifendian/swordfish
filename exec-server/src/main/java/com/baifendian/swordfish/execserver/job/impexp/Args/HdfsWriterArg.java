@@ -13,6 +13,9 @@ public class HdfsWriterArg {
   private String fileName;
   private String fieldDelimiter;
 
+  public HdfsWriterArg() {
+  }
+
   public String getDefaultFS() {
     return defaultFS;
   }

@@ -9,8 +9,8 @@ import com.baifendian.swordfish.dao.utils.json.JsonUtil;
 public class ReaderFactory {
   public static Reader getReader(ImpExpType type, String reader) {
     switch (type) {
-      case MYSQLTOHIVE:
-      case MYSQLTOHDFS:
+      case MYSQL_TO_HIVE:
+      case MYSQL_TO_HDFS:
         return JsonUtil.parseObject(reader, MysqlReader.class);
       default:
         return null;

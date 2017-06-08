@@ -23,8 +23,7 @@ public class JobType {
   public static final String SPARK = "SPARK";
   public static final String VIRTUAL = "VIRTUAL";
   public static final String SPARK_STREAMING = "SPARK_STREAMING"; // 长任务类型
-  public static final String IMPORT = "IMPORT";
-  public static final String EXPORT = "EXPORT";
+  public static final String IMPEXP = "IMPEXP";
 
   /**
    * 判断是否是长任务

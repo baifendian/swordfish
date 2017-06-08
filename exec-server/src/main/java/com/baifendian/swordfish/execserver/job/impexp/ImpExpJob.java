@@ -15,19 +15,27 @@
  */
 package com.baifendian.swordfish.execserver.job.impexp;
 
+import com.baifendian.swordfish.common.hadoop.ConfigurationUtil;
 import com.baifendian.swordfish.common.job.struct.node.BaseParam;
 import com.baifendian.swordfish.common.job.struct.node.BaseParamFactory;
 import com.baifendian.swordfish.common.job.struct.node.impexp.ImpExpParam;
 
+import com.baifendian.swordfish.dao.DaoFactory;
+import com.baifendian.swordfish.dao.DatasourceDao;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
 import com.baifendian.swordfish.execserver.job.AbstractProcessJob;
 import com.baifendian.swordfish.execserver.job.JobProps;
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.io.FileUtils;
 
 import static com.baifendian.swordfish.common.job.struct.node.JobType.*;
 
 import org.json.JSONException;
 import org.slf4j.Logger;
+
+import static com.baifendian.swordfish.execserver.job.impexp.ImpExpJobConst.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -40,18 +48,30 @@ import java.util.UUID;
  */
 public abstract class ImpExpJob extends AbstractProcessJob {
 
-  protected final String DATAXFILENAME = "dataXJson";
-  protected final String DATAXJSON = "{\"job\":{\"content\":[{\"reader\":{0},\"writer\":{1}}],\"setting\":{2}}}";
-
   protected ImpExpParam impExpParam;
 
-  public ImpExpJob(JobProps props, boolean isLongJob, Logger logger) {
+  protected DatasourceDao datasourceDao;
+
+  protected Configuration hadoopConf;
+  protected Configuration workConf;
+  protected Configuration hiveConf;
+
+
+  public ImpExpJob(JobProps props, boolean isLongJob, Logger logger, ImpExpParam impExpParam) {
     super(props, isLongJob, logger);
+    this.impExpParam = impExpParam;
   }
 
   @Override
   public void initJob() {
-    this.impExpParam = (ImpExpParam) BaseParamFactory.getBaseParam(IMPORT, props.getJobParams());
+    datasourceDao = DaoFactory.getDaoInstance(DatasourceDao.class);
+    try {
+      hadoopConf = new PropertiesConfiguration("common/hadoop/hadoop.properties");
+      workConf = new PropertiesConfiguration("worker.properties");
+      hiveConf = new PropertiesConfiguration("common/hive/hive.properties");
+    } catch (ConfigurationException e) {
+      logger.error("Init work conf error", e);
+    }
   }
 
   /**
@@ -65,15 +85,23 @@ public abstract class ImpExpJob extends AbstractProcessJob {
 
   /**
    * 获取dataX的reader
+   *
    * @return
    */
-  abstract String getDataXReader() throws Exception;
+  public abstract String getDataXReader() throws Exception;
 
   /**
    * 获取dataX的writer
+   *
    * @return
    */
-  abstract String getDateXWriter();
+  public abstract String getDateXWriter() throws ConfigurationException, Exception;
+
+  /**
+   * 导入导出完成后清理
+   */
+  public abstract void clean();
+
   /**
    * 生成datax 文件
    *
@@ -81,7 +109,7 @@ public abstract class ImpExpJob extends AbstractProcessJob {
    */
   public File createDataXParam(String dataXJson) throws Exception {
     // 工作目录
-    String fileName = DATAXFILENAME + UUID.randomUUID() + ".json";
+    String fileName = DATAX_FILE_NAME + UUID.randomUUID() + ".json";
     String path = MessageFormat.format("{0}/{1}", getWorkingDirectory(), fileName);
     File file = new File(path);
     try {
@@ -91,6 +119,12 @@ public abstract class ImpExpJob extends AbstractProcessJob {
       throw e;
     }
     return file;
+  }
+
+  @Override
+  public String createCommand() throws Exception {
+    File dataXJson = createDataXParam(getDataXJson());
+    return MessageFormat.format(COMMAND,workConf.getString(""),dataXJson.getAbsolutePath());
   }
 
   @Override
