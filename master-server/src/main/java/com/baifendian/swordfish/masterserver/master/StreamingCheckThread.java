@@ -50,10 +50,10 @@ public class StreamingCheckThread implements Runnable {
 
       Date now = new Date();
 
-      logger.info("find not finish jobs, size: {}", streamingResults.size());
-
       // 如果有没有完成的任务
       if (CollectionUtils.isNotEmpty(streamingResults)) {
+        logger.info("find not finish jobs, size: {}", streamingResults.size());
+
         // 遍历流任务列表
         for (StreamingResult streamingResult : streamingResults) {
           // 得到 app id 列表
