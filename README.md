@@ -33,11 +33,7 @@ $ git clone https://github.com/baifendian/swordfish.git
 [API 说明](https://github.com/baifendian/swordfish/wiki)
 
 # Python client
-该模块当前仅用于测试, 比如我们要测试增加用户的功能, 可以这么运行:
-
-```
-  $ export PYTHONPATH=$PYTHONPATH:.; python user/user.py
-```
+该模块当前仅用于测试, 详情点击 [python client](https://github.com/baifendian/swordfish/wiki/python-client)
 
 # 系统设计参考
 [系统设计参考](https://github.com/baifendian/swordfish/wiki/develop)
