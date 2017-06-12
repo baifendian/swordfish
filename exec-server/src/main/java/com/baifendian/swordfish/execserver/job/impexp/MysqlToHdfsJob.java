@@ -46,6 +46,11 @@ public class MysqlToHdfsJob extends ImpExpJob {
   }
 
   @Override
+  public void beforeWorke() throws Exception {
+    //无前处理
+  }
+
+  @Override
   public MysqlReaderArg getDataXReaderArg() throws Exception {
     logger.info("Start MysqlToHdfsJob get dataX reader arg...");
     MysqlReaderArg mysqlReaderArg = new MysqlReaderArg(mysqlReader);
