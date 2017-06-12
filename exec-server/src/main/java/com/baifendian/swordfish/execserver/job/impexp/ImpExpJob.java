@@ -89,6 +89,7 @@ public abstract class ImpExpJob extends AbstractProcessJob {
 
   @Override
   public void initJob() {
+    logger.info("Start init base job...");
     datasourceDao = DaoFactory.getDaoInstance(DatasourceDao.class);
     try {
       hadoopConf = new PropertiesConfiguration("common/hadoop/hadoop.properties");
@@ -97,6 +98,7 @@ public abstract class ImpExpJob extends AbstractProcessJob {
     } catch (ConfigurationException e) {
       logger.error("Init work conf error", e);
     }
+    logger.info("Finish init base job!");
   }
 
   @Override

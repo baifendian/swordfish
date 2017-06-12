@@ -2,6 +2,7 @@ package com.baifendian.swordfish.common.job.struct.node;
 
 import com.baifendian.swordfish.common.job.struct.node.impexp.ImpExpParam;
 import org.junit.Test;
+import static junit.framework.TestCase.assertTrue;
 
 /**
  * Created by caojingwei on 2017/6/12.
@@ -14,6 +15,6 @@ public class BaseParamFactoryTest {
 
     ImpExpParam impExpParam = (ImpExpParam) BaseParamFactory.getBaseParam(type, parameter);
 
-    impExpParam.getType();
+    assertTrue(impExpParam.checkValid());
   }
 }

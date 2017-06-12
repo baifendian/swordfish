@@ -78,13 +78,13 @@ public class MysqlToHiveJob extends ImpExpJob {
 
   public MysqlToHiveJob(JobProps props, boolean isLongJob, Logger logger, ImpExpParam impExpParam) {
     super(props, isLongJob, logger, impExpParam);
+    mysqlReader = (MysqlReader) impExpParam.getReader();
+    hiveWriter = (HiveWriter) impExpParam.getWriter();
   }
 
 
   public void beforeWorke() throws Exception {
     logger.info("Start MysqlToHiveJob before function...");
-    mysqlReader = (MysqlReader) impExpParam.getReader();
-    hiveWriter = (HiveWriter) impExpParam.getWriter();
     // 构造一个hive服务类，预备使用
     hiveService = new HiveService(hiveConf.getString("hive.thrift.uris"), "", "");
     hiveService.init();
