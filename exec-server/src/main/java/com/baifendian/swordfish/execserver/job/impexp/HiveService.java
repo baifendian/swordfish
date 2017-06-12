@@ -130,7 +130,7 @@ public class HiveService {
     List<String> fieldList = new ArrayList<>();
 
     for (HqlColumn hqlColumn : hqlColumnList) {
-      fieldList.add(MessageFormat.format("`{0}` {1}", hqlColumn.getName(), hqlColumn.getType()));
+      fieldList.add(MessageFormat.format("{0} {1}", hqlColumn.getName(), hqlColumn.getType()));
     }
 
     String sql = "CREATE TEMPORARY EXTERNAL TABLE `{0}`({1}) ROW FORMAT DELIMITED FIELDS TERMINATED BY \"{2}\" STORED AS {3} LOCATION \"{4}\"";
@@ -160,9 +160,8 @@ public class HiveService {
     String insertSql = "INSERT {0} TABLE `{1}` {2}";
 
     List<String> fieldList = new ArrayList<>();
-    for (HqlColumn hqlColumn : hqlColumnList) {
-      fieldList.add(MessageFormat.format("`{0}`", hqlColumn.getName()));
-    }
+
+    //TODO 空字段按照顺序自动填充
 
     selectSql = MessageFormat.format(selectSql, String.join(",", fieldList), srcTableName);
     insertSql = MessageFormat.format(insertSql, writeMode.gethiveSql(), destTableName, selectSql);
