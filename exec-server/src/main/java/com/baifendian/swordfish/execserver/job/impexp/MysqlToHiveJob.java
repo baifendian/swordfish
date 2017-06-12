@@ -16,7 +16,9 @@
 package com.baifendian.swordfish.execserver.job.impexp;
 
 import com.baifendian.swordfish.common.config.BaseConfig;
+import com.baifendian.swordfish.common.enums.WriteHdfsType;
 import com.baifendian.swordfish.common.hadoop.ConfigurationUtil;
+import com.baifendian.swordfish.common.hadoop.HdfsClient;
 import com.baifendian.swordfish.common.job.struct.datasource.DatasourceFactory;
 import com.baifendian.swordfish.common.job.struct.datasource.MysqlDatasource;
 import com.baifendian.swordfish.common.job.struct.node.BaseParam;
@@ -29,8 +31,7 @@ import com.baifendian.swordfish.dao.enums.DbType;
 import com.baifendian.swordfish.dao.model.DataSource;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
 import com.baifendian.swordfish.execserver.job.JobProps;
-import com.baifendian.swordfish.execserver.job.impexp.Args.HdfsWriterArg;
-import com.baifendian.swordfish.execserver.job.impexp.Args.MysqlReaderArg;
+import com.baifendian.swordfish.execserver.job.impexp.Args.*;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
@@ -42,6 +43,7 @@ import java.sql.DriverManager;
 import java.sql.Statement;
 import java.text.MessageFormat;
 import java.util.Arrays;
+import java.util.List;
 
 import static com.baifendian.swordfish.execserver.utils.Constants.*;
 import static com.baifendian.swordfish.execserver.job.impexp.ImpExpJobConst.*;
@@ -52,26 +54,53 @@ import static com.baifendian.swordfish.execserver.job.impexp.ImpExpJobConst.*;
  */
 public class MysqlToHiveJob extends ImpExpJob {
 
-  //默认使用逗号分隔
-  private final String DEFAULT_DELIMITER = ",";
 
+  private HiveService hiveService;
+
+  /**
+   * swordfish reader配置
+   */
   private MysqlReader mysqlReader;
+
+  /**
+   * swordfish wirter配置
+   */
   private HiveWriter hiveWriter;
+  /**
+   * 源 Hql 字段
+   */
+  private List<HqlColumn> srcColumns;
 
-  private String hdfsPath;
-
+  /**
+   * 目标 Hql 字段
+   */
+  private List<HqlColumn> destColumns;
 
   public MysqlToHiveJob(JobProps props, boolean isLongJob, Logger logger, ImpExpParam impExpParam) {
     super(props, isLongJob, logger, impExpParam);
-    this.mysqlReader = (MysqlReader) impExpParam.getReader();
-    this.hiveWriter = (HiveWriter) impExpParam.getWriter();
   }
 
 
   @Override
-  public String getDataXReader() throws Exception {
-    MysqlReaderArg mysqlReaderArg = new MysqlReaderArg(mysqlReader);
+  public void before() throws Exception {
+    super.before();
+    logger.info("Start MysqlToHiveJob before function...");
+    mysqlReader = (MysqlReader) impExpParam.getReader();
+    hiveWriter = (HiveWriter) impExpParam.getWriter();
+    // 构造一个hive服务类，预备使用
+    hiveService = new HiveService(hiveConf.getString("hive.thrift.uris"), "", "");
+    hiveService.init();
+    // 获取源HQL字段
+    destColumns = hiveService.getHiveDesc(hiveWriter.getDatabase(), hiveWriter.getTable());
+    // 获取源字段
+    srcColumns = hiveService.checkHiveColumn(hiveWriter.getColumn(), destColumns);
+    logger.info("Finish MysqlToHiveJob before function!");
+  }
 
+  @Override
+  public MysqlReaderArg getDataXReaderArg() throws Exception {
+    logger.info("Start MysqlToHiveJob get dataX reader arg...");
+    MysqlReaderArg mysqlReaderArg = new MysqlReaderArg(mysqlReader);
     //TODO 增加一个判断根据类型
     DataSource datasource = datasourceDao.queryResource(props.getProjectId(), mysqlReader.getDatasource());
     if (datasource == null) {
@@ -83,12 +112,13 @@ public class MysqlToHiveJob extends ImpExpJob {
     connection.getJSONObject(0).put("jdbcUrl", Arrays.asList(mysqlDatasource.getJdbcUrl()));
     mysqlReaderArg.setUsername(mysqlDatasource.getUser());
     mysqlReaderArg.setPassword(mysqlDatasource.getPassword());
-
-    return JsonUtil.toJsonString(mysqlReaderArg);
+    logger.info("Finish MysqlToHiveJob get dataX reader arg!");
+    return mysqlReaderArg;
   }
 
   @Override
-  public String getDateXWriter() throws Exception {
+  public HdfsWriterArg getDateXWriterArg() throws Exception {
+    logger.info("Start MysqlToHiveJob get dataX writer arg...");
     //由于DataX不能直接写入到hive中，我们这里先生成写入到HDFS的任务。
     String path = BaseConfig.getHdfsImpExpDir(props.getProjectId(), props.getExecId(), props.getExecId(), props.getNodeName());
 
@@ -97,48 +127,48 @@ public class MysqlToHiveJob extends ImpExpJob {
     hdfsWriterArg.setFileName(props.getNodeName());
     hdfsWriterArg.setFieldDelimiter(DEFAULT_DELIMITER);
     hdfsWriterArg.setDefaultFS(hadoopConf.getString("fs.defaultFS"));
-
-    return JsonUtil.toJsonString(hdfsWriterArg);
+    hdfsWriterArg.setColumn(hiveWriter.getColumn());
+    hdfsWriterArg.setFileName(DEFAULT_FILE_TYPE);
+    logger.info("Finish MysqlToHiveJob get dataX writer arg!");
+    return hdfsWriterArg;
   }
 
   @Override
   public void clean() {
-
-  }
-
-
-  @Override
-  public BaseParam getParam() {
-    return null;
-  }
-
-  @Override
-  public String createCommand() throws Exception {
-    return null;
+    //操作完成做一些清理工作
+    logger.info("Start MysqlToHiveJob clean...");
+    HdfsClient hdfsClient = HdfsClient.getInstance();
+    logger.info("delete hdfs path: {}", ((HdfsWriterArg) writerArg).getPath());
+    hdfsClient.delete(((HdfsWriterArg) writerArg).getPath(), true);
+    logger.info("Finish MysqlToHiveJob clean!");
   }
 
   @Override
   public void after() throws Exception {
-    super.after();
+    logger.info("Start MysqlToHiveJob after function...");
     //如果dataX任务执行失败不用做后续操作
-    if (exitCode != 0){
+    if (exitCode != 0) {
+      logger.info("DataX exec failed, job exit!");
       return;
     }
+    //注册临时外部表
+    String srcTableName = "{0}.{1}";
+    srcTableName = MessageFormat.format(srcTableName, hiveService.getTbaleName(props.getProjectId(), props.getNodeName(), props.getNodeName()));
+    logger.info("Start create temp hive table: {}", srcTableName);
+    hiveService.createHiveTmpTable(srcTableName, srcColumns, ((HdfsWriterArg) writerArg).getPath());
+    logger.info("Finsh create temp hive table: {}", srcTableName);
 
-    try {
-      Class.forName(HIVE_DRIVER);
-    } catch (ClassNotFoundException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-      System.exit(1);
-    }
+    //构造目标数据库
+    String destTableName = "{0}.{1}";
+    destTableName = MessageFormat.format(destTableName, hiveWriter.getDatabase(), hiveWriter.getTable());
 
-    Connection con = DriverManager.getConnection(hiveConf.getString("hive.thrift.uris"), "", "");
-    Statement stmt = con.createStatement();
-
-    //TODO 创建外部表，构造插入语句
-
+    //插入数据
+    logger.info("Start insert to hive table: {}", destTableName);
+    hiveService.insertTable(srcTableName, destTableName, srcColumns, hiveWriter.getWriterMode());
+    logger.info("Finish insert to hive table: {}", destTableName);
+    //hive操作完成，关闭连接释放临时表
+    hiveService.close();
+    super.after();
   }
-
 
 }

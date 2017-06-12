@@ -12,7 +12,7 @@ import java.util.List;
 /**
  * DataX 中 mysqlReader的配置
  */
-public class MysqlReaderArg {
+public class MysqlReaderArg implements ReaderArg {
   private String username;
   private String password;
   private List<String> column;
@@ -57,9 +57,6 @@ public class MysqlReaderArg {
 
   public void setConnection(JSONArray connection) {
     this.connection = connection;
-  }
-
-  public MysqlReaderArg() {
   }
 
   public MysqlReaderArg(MysqlReader mysqlReader) throws JSONException {

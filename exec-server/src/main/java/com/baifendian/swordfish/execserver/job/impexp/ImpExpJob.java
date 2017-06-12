@@ -20,11 +20,20 @@ import com.baifendian.swordfish.common.job.struct.node.BaseParam;
 import com.baifendian.swordfish.common.job.struct.node.BaseParamFactory;
 import com.baifendian.swordfish.common.job.struct.node.impexp.ImpExpParam;
 
+import com.baifendian.swordfish.common.job.struct.node.impexp.reader.MysqlReader;
+import com.baifendian.swordfish.common.job.struct.node.impexp.reader.Reader;
+import com.baifendian.swordfish.common.job.struct.node.impexp.writer.HiveWriter;
+import com.baifendian.swordfish.common.job.struct.node.impexp.writer.Writer;
 import com.baifendian.swordfish.dao.DaoFactory;
 import com.baifendian.swordfish.dao.DatasourceDao;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
 import com.baifendian.swordfish.execserver.job.AbstractProcessJob;
 import com.baifendian.swordfish.execserver.job.JobProps;
+import com.baifendian.swordfish.execserver.job.impexp.Args.HdfsWriterArg;
+import com.baifendian.swordfish.execserver.job.impexp.Args.MysqlReaderArg;
+import com.baifendian.swordfish.execserver.job.impexp.Args.ReaderArg;
+import com.baifendian.swordfish.execserver.job.impexp.Args.WriterArg;
+import org.apache.avro.data.Json;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
@@ -48,13 +57,29 @@ import java.util.UUID;
  */
 public abstract class ImpExpJob extends AbstractProcessJob {
 
-  protected ImpExpParam impExpParam;
-
   protected DatasourceDao datasourceDao;
 
+  /**
+   * 读取的配置文件
+   */
   protected Configuration hadoopConf;
   protected Configuration workConf;
   protected Configuration hiveConf;
+
+  /**
+   * swordfish的导入导出配置
+   */
+  protected ImpExpParam impExpParam;
+
+  /**
+   * swordfish 读配置
+   */
+  protected WriterArg writerArg;
+
+  /**
+   * swordfish 写配置
+   */
+  protected ReaderArg readerArg;
 
 
   public ImpExpJob(JobProps props, boolean isLongJob, Logger logger, ImpExpParam impExpParam) {
@@ -74,13 +99,29 @@ public abstract class ImpExpJob extends AbstractProcessJob {
     }
   }
 
+  @Override
+  public void before() throws Exception {
+    super.before();
+    logger.info("Start base before function ...");
+    //预载入待处理的数据
+    readerArg = getDataXReaderArg();
+    writerArg = getDateXWriterArg();
+    logger.info("Finish base before function!");
+  }
+
   /**
    * 生成datax需要的json文件
    *
    * @return
    */
-  public String getDataXJson() throws Exception {
-    return MessageFormat.format(getDataXReader(), getDateXWriter(), JsonUtil.toJsonString(impExpParam.getSetting()));
+  public final String getDataXJson() throws Exception {
+    logger.info("Start get DataX json ...");
+    String readerJson = JsonUtil.toJsonString(readerArg);
+    String writerJson = JsonUtil.toJsonString(writerArg);
+    String settingJson = JsonUtil.toJsonString(impExpParam.getSetting());
+    String json = MessageFormat.format(readerJson, writerJson, settingJson);
+    logger.info("DataX json: {}", json);
+    return json;
   }
 
   /**
@@ -88,29 +129,34 @@ public abstract class ImpExpJob extends AbstractProcessJob {
    *
    * @return
    */
-  public abstract String getDataXReader() throws Exception;
+  public abstract ReaderArg getDataXReaderArg() throws Exception;
 
   /**
    * 获取dataX的writer
    *
    * @return
    */
-  public abstract String getDateXWriter() throws ConfigurationException, Exception;
+  public abstract WriterArg getDateXWriterArg() throws ConfigurationException, Exception;
 
   /**
    * 导入导出完成后清理
    */
-  public abstract void clean();
+  public void clean() {
+  }
+
+  ;
 
   /**
    * 生成datax 文件
    *
    * @return
    */
-  public File createDataXParam(String dataXJson) throws Exception {
+  public final File createDataXParam(String dataXJson) throws Exception {
     // 工作目录
+    logger.info("Start create DataX json file...");
     String fileName = DATAX_FILE_NAME + UUID.randomUUID() + ".json";
     String path = MessageFormat.format("{0}/{1}", getWorkingDirectory(), fileName);
+    logger.info("Datax json file path: {}", path);
     File file = new File(path);
     try {
       FileUtils.writeStringToFile(file, dataXJson, Charset.forName("utf-8"));
@@ -118,13 +164,24 @@ public abstract class ImpExpJob extends AbstractProcessJob {
       logger.error("Create dataX json file error", e);
       throw e;
     }
+    logger.info("Finish create DataX json file!");
     return file;
   }
 
   @Override
-  public String createCommand() throws Exception {
+  public final String createCommand() throws Exception {
+    logger.info("Start create DataX command...");
     File dataXJson = createDataXParam(getDataXJson());
-    return MessageFormat.format(COMMAND,workConf.getString(""),dataXJson.getAbsolutePath());
+    String command = MessageFormat.format(COMMAND, workConf.getString(""), dataXJson.getAbsolutePath());
+    logger.info("Finish create DataX commond: {}", command);
+    return command;
+  }
+
+  @Override
+  public void after() throws Exception {
+    super.after();
+    // 对导入导出做可能的清理
+    clean();
   }
 
   @Override

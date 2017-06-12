@@ -17,6 +17,7 @@ package com.baifendian.swordfish.common.job.struct.node.impexp.writer;
 
 import com.baifendian.swordfish.common.enums.WriteMode;
 import com.baifendian.swordfish.common.job.struct.node.impexp.column.HiveColumn;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
@@ -24,6 +25,7 @@ import java.util.List;
 /**
  * hive 写入对象
  */
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class HiveWriter implements Writer {
 
   private String database;
