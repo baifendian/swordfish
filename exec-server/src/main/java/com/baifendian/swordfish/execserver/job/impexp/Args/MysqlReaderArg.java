@@ -17,7 +17,7 @@ public class MysqlReaderArg implements ReaderArg {
   private String password;
   private List<String> column;
   private String splitPk;
-  private JSONArray connection;
+  private JSONArray connection = new JSONArray();
 
   public String getUsername() {
     return username;
