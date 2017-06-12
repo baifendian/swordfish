@@ -85,7 +85,7 @@ public class MysqlToHdfsJob extends ImpExpJob {
   }
 
   @Override
-  public void clean() {
+  public void clean() throws Exception {
     //不需要做清理
   }
 

@@ -131,7 +131,7 @@ public class MysqlToHiveJob extends ImpExpJob {
     return hdfsWriterArg;
   }
 
-  public void clean() {
+  public void clean() throws Exception {
     //操作完成做一些清理工作
     logger.info("Start MysqlToHiveJob clean...");
     HdfsClient hdfsClient = HdfsClient.getInstance();
@@ -142,11 +142,6 @@ public class MysqlToHiveJob extends ImpExpJob {
 
   public void afterWorke() throws Exception {
     logger.info("Start MysqlToHiveJob after function...");
-    //如果dataX任务执行失败不用做后续操作
-    if (exitCode != 0) {
-      logger.info("DataX exec failed, job exit!");
-      return;
-    }
     //注册临时外部表
     String srcTableName = "{0}.{1}";
     srcTableName = MessageFormat.format(srcTableName, hiveService.getTbaleName(props.getProjectId(), props.getNodeName(), props.getNodeName()));

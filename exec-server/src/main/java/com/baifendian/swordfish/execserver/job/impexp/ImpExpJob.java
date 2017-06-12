@@ -125,7 +125,7 @@ public abstract class ImpExpJob extends AbstractProcessJob {
     String readerJson = JsonUtil.toJsonString(readerArg);
     String writerJson = JsonUtil.toJsonString(writerArg);
     String settingJson = JsonUtil.toJsonString(impExpParam.getSetting());
-    String json = MessageFormat.format(readerJson, writerJson, settingJson);
+    String json = MessageFormat.format(DATAX_JSON, readerJson, writerJson, settingJson);
     logger.info("DataX json: {}", json);
     return json;
   }
@@ -147,7 +147,7 @@ public abstract class ImpExpJob extends AbstractProcessJob {
   /**
    * 导入导出完成后清理
    */
-  public abstract void clean();
+  public abstract void clean() throws Exception;
 
   /**
    * 生成datax 文件
@@ -188,9 +188,13 @@ public abstract class ImpExpJob extends AbstractProcessJob {
   @Override
   public void after() throws Exception {
     super.after();
-    afterWorke();
-    // 对导入导出做可能的清理
-    clean();
+    // 如果正常完成执行后续操作
+    if (exitCode == 0) {
+      afterWorke();
+      clean();
+    } else {
+      logger.info("DataX exec failed, job exit!");
+    }
   }
 
   @Override
