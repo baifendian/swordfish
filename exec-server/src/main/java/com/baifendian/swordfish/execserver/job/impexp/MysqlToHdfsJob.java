@@ -41,13 +41,8 @@ public class MysqlToHdfsJob extends ImpExpJob {
 
   public MysqlToHdfsJob(JobProps props, boolean isLongJob, Logger logger, ImpExpParam impExpParam) {
     super(props, isLongJob, logger, impExpParam);
-  }
-
-  public void beforeWorke() throws Exception {
-    logger.info("Start MysqlToHdfsJob before function...");
     mysqlReader = (MysqlReader) impExpParam.getReader();
     hdfsWriter = (HdfsWriter) impExpParam.getWriter();
-    logger.info("Finish MysqlToHdfsJob before function!");
   }
 
   @Override
