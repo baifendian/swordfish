@@ -43,9 +43,7 @@ public class MysqlToHdfsJob extends ImpExpJob {
     super(props, isLongJob, logger, impExpParam);
   }
 
-  @Override
-  public void before() throws Exception {
-    super.before();
+  public void beforeWorke() throws Exception {
     logger.info("Start MysqlToHdfsJob before function...");
     mysqlReader = (MysqlReader) impExpParam.getReader();
     hdfsWriter = (HdfsWriter) impExpParam.getWriter();
@@ -86,5 +84,13 @@ public class MysqlToHdfsJob extends ImpExpJob {
     return hdfsWriterArg;
   }
 
+  @Override
+  public void clean() {
+    //不需要做清理
+  }
 
+  @Override
+  public void afterWorke() throws Exception {
+    //无相关后处理
+  }
 }

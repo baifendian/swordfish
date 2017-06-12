@@ -107,7 +107,13 @@ public abstract class ImpExpJob extends AbstractProcessJob {
     readerArg = getDataXReaderArg();
     writerArg = getDateXWriterArg();
     logger.info("Finish base before function!");
+    beforeWorke();
   }
+
+  /**
+   * 前处理
+   */
+  public abstract void beforeWorke() throws Exception;
 
   /**
    * 生成datax需要的json文件
@@ -141,10 +147,7 @@ public abstract class ImpExpJob extends AbstractProcessJob {
   /**
    * 导入导出完成后清理
    */
-  public void clean() {
-  }
-
-  ;
+  public abstract void clean();
 
   /**
    * 生成datax 文件
@@ -177,9 +180,15 @@ public abstract class ImpExpJob extends AbstractProcessJob {
     return command;
   }
 
+  /**
+   * 后处理
+   */
+  public abstract void afterWorke() throws Exception;
+
   @Override
   public void after() throws Exception {
     super.after();
+    afterWorke();
     // 对导入导出做可能的清理
     clean();
   }

@@ -81,9 +81,7 @@ public class MysqlToHiveJob extends ImpExpJob {
   }
 
 
-  @Override
-  public void before() throws Exception {
-    super.before();
+  public void beforeWorke() throws Exception {
     logger.info("Start MysqlToHiveJob before function...");
     mysqlReader = (MysqlReader) impExpParam.getReader();
     hiveWriter = (HiveWriter) impExpParam.getWriter();
@@ -133,7 +131,6 @@ public class MysqlToHiveJob extends ImpExpJob {
     return hdfsWriterArg;
   }
 
-  @Override
   public void clean() {
     //操作完成做一些清理工作
     logger.info("Start MysqlToHiveJob clean...");
@@ -143,8 +140,7 @@ public class MysqlToHiveJob extends ImpExpJob {
     logger.info("Finish MysqlToHiveJob clean!");
   }
 
-  @Override
-  public void after() throws Exception {
+  public void afterWorke() throws Exception {
     logger.info("Start MysqlToHiveJob after function...");
     //如果dataX任务执行失败不用做后续操作
     if (exitCode != 0) {
@@ -168,7 +164,6 @@ public class MysqlToHiveJob extends ImpExpJob {
     logger.info("Finish insert to hive table: {}", destTableName);
     //hive操作完成，关闭连接释放临时表
     hiveService.close();
-    super.after();
   }
 
 }
