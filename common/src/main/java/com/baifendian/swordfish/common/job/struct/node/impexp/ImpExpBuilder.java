@@ -6,24 +6,31 @@ import com.baifendian.swordfish.common.job.struct.node.impexp.reader.ReaderFacto
 import com.baifendian.swordfish.common.job.struct.node.impexp.setting.Setting;
 import com.baifendian.swordfish.common.job.struct.node.impexp.writer.Writer;
 import com.baifendian.swordfish.common.job.struct.node.impexp.writer.WriterFactory;
+import com.baifendian.swordfish.dao.utils.json.JsonObjectDeserializer;
+import com.fasterxml.jackson.annotation.JsonRawValue;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 /**
  * 导入导出参数构造器
  */
 public class ImpExpBuilder {
   private ImpExpType type;
+  @JsonRawValue
+  @JsonDeserialize(using = JsonObjectDeserializer.class)
   private String reader;
+  @JsonRawValue
+  @JsonDeserialize(using = JsonObjectDeserializer.class)
   private String writer;
-  private String setting;
+  private Setting setting;
   private Writer writerParam;
   private Reader readerParam;
   private Setting settingParam;
 
-  public String getSetting() {
+  public Setting getSetting() {
     return setting;
   }
 
-  public ImpExpBuilder setSetting(String setting) {
+  public ImpExpBuilder setSetting(Setting setting) {
     this.setting = setting;
     return this;
   }
@@ -67,9 +74,9 @@ public class ImpExpBuilder {
     return settingParam;
   }
 
-  public ImpExpParam buildImpExp(){
-    this.readerParam = ReaderFactory.getReader(this.type,this.reader);
-    this.writerParam = WriterFactory.getWriter(this.type,this.writer);
+  public ImpExpParam buildImpExp() {
+    this.readerParam = ReaderFactory.getReader(this.type, this.reader);
+    this.writerParam = WriterFactory.getWriter(this.type, this.writer);
     //TODO 构造setting
 
     return new ImpExpParam(this);
