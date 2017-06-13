@@ -79,7 +79,7 @@ public class MysqlToHdfsJob extends ImpExpJob {
     hdfsWriterArg.setFieldDelimiter(DEFAULT_DELIMITER);
     hdfsWriterArg.setDefaultFS(hadoopConf.getString("fs.defaultFS"));
     hdfsWriterArg.setColumn(hdfsWriter.getColumn());
-    hdfsWriterArg.setFileType(hdfsWriter.getWriteHdfsType());
+    hdfsWriterArg.setFileType(hdfsWriter.getFileType());
 
     logger.info("Finish MysqlToHdfsJob get dataX writer arg...");
     return hdfsWriterArg;

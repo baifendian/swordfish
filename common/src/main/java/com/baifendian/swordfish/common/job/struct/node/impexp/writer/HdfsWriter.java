@@ -13,7 +13,7 @@ public class HdfsWriter implements Writer {
   private String path;
   private String fileName;
   private WriteMode writeMode;
-  private WriteHdfsType writeHdfsType;
+  private WriteHdfsType fileType;
   private List<HiveColumn> column;
 
   public String getPath() {
@@ -40,12 +40,12 @@ public class HdfsWriter implements Writer {
     this.writeMode = writeMode;
   }
 
-  public WriteHdfsType getWriteHdfsType() {
-    return writeHdfsType;
+  public WriteHdfsType getFileType() {
+    return fileType;
   }
 
-  public void setWriteHdfsType(WriteHdfsType writeHdfsType) {
-    this.writeHdfsType = writeHdfsType;
+  public void setFileType(WriteHdfsType fileType) {
+    this.fileType = fileType;
   }
 
   public List<HiveColumn> getColumn() {
