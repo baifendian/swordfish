@@ -127,7 +127,7 @@ public class MysqlToHiveJob extends ImpExpJob {
     hdfsWriterArg.setFieldDelimiter(DEFAULT_DELIMITER);
     hdfsWriterArg.setDefaultFS(hadoopConf.getString("fs.defaultFS"));
     hdfsWriterArg.setColumn(hiveWriter.getColumn());
-    hdfsWriterArg.setFileName(DEFAULT_FILE_TYPE);
+    hdfsWriterArg.setFileType(DEFAULT_FILE_TYPE);
     logger.info("Finish MysqlToHiveJob get dataX writer arg!");
     return hdfsWriterArg;
   }

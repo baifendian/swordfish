@@ -15,7 +15,7 @@ public class ImpExpJobConst {
   /**
    * 写入hdfs临时文件的默认文件类型
    */
-  public static final String DEFAULT_FILE_TYPE = WriteHdfsType.TEXT.getType();
+  public static final WriteHdfsType DEFAULT_FILE_TYPE = WriteHdfsType.TEXT;
 
   /**
    * 默认创建的 dataX 配置文件文件名
