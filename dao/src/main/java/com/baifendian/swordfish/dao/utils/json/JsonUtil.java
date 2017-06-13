@@ -21,6 +21,8 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.springframework.util.StringUtils;
 
 import java.io.IOException;
@@ -174,6 +176,14 @@ public class JsonUtil {
     }
 
     return readTree(json) != null;
+  }
+
+  public static ArrayNode createArrayNode() {
+    return JSON_MAPPER.createArrayNode();
+  }
+
+  public static ObjectNode createObjectNode() {
+    return JSON_MAPPER.createObjectNode();
   }
 
   /**

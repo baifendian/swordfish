@@ -14,6 +14,7 @@ import com.baifendian.swordfish.execserver.job.impexp.Args.HdfsWriterArg;
 import com.baifendian.swordfish.execserver.job.impexp.Args.MysqlReaderArg;
 import com.baifendian.swordfish.execserver.job.impexp.Args.ReaderArg;
 import com.baifendian.swordfish.execserver.job.impexp.Args.WriterArg;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.configuration.ConfigurationException;
 import org.json.JSONArray;
 import org.slf4j.Logger;
@@ -61,8 +62,8 @@ public class MysqlToHdfsJob extends ImpExpJob {
     }
     MysqlDatasource mysqlDatasource = (MysqlDatasource) DatasourceFactory.getDatasource(DbType.MYSQL, datasource.getParameter());
 
-    JSONArray connection = mysqlReaderArg.getConnection();
-    connection.getJSONObject(0).put("jdbcUrl", Arrays.asList(mysqlDatasource.getJdbcUrl()));
+    ObjectNode connection = (ObjectNode) mysqlReaderArg.getConnection().get(0);
+    connection.putArray("jdbcUrl").add(mysqlDatasource.getJdbcUrl());
     mysqlReaderArg.setUsername(mysqlDatasource.getUser());
     mysqlReaderArg.setPassword(mysqlDatasource.getPassword());
     logger.info("Finish MysqlToHdfsJob get dataX reader arg!");

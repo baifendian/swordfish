@@ -32,6 +32,8 @@ import com.baifendian.swordfish.dao.model.DataSource;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
 import com.baifendian.swordfish.execserver.job.JobProps;
 import com.baifendian.swordfish.execserver.job.impexp.Args.*;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
@@ -105,9 +107,8 @@ public class MysqlToHiveJob extends ImpExpJob {
       throw new NoSuchFieldException(MessageFormat.format("Datasource {0} in project {1} not found!", mysqlReader.getDatasource(), props.getProjectId()));
     }
     MysqlDatasource mysqlDatasource = (MysqlDatasource) DatasourceFactory.getDatasource(DbType.MYSQL, datasource.getParameter());
-
-    JSONArray connection = mysqlReaderArg.getConnection();
-    connection.getJSONObject(0).put("jdbcUrl", Arrays.asList(mysqlDatasource.getJdbcUrl()));
+    ObjectNode connection = (ObjectNode) mysqlReaderArg.getConnection().get(0);
+    connection.putArray("jdbcUrl").add(mysqlDatasource.getJdbcUrl());
     mysqlReaderArg.setUsername(mysqlDatasource.getUser());
     mysqlReaderArg.setPassword(mysqlDatasource.getPassword());
     logger.info("Finish MysqlToHiveJob get dataX reader arg!");
