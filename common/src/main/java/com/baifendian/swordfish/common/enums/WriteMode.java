@@ -11,6 +11,7 @@ public enum WriteMode {
 
   /**
    * 获取写入模式中的hivesql
+   *
    * @return
    */
   public String gethiveSql() {
@@ -19,6 +20,21 @@ public enum WriteMode {
         return "INTO";
       case OVERWRITER:
         return "OVERWRITE";
+      default:
+        return null;
+    }
+  }
+
+  /**
+   * 获取hdfs 对应的写入模式
+   * @return
+   */
+  public String getHdfsType() {
+    switch (this) {
+      case APPEND:
+        return "append";
+      case OVERWRITER:
+        return "nonConflict";
       default:
         return null;
     }

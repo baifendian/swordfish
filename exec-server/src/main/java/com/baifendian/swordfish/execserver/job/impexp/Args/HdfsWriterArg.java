@@ -15,6 +15,7 @@ public class HdfsWriterArg implements WriterArg {
   private String path;
   private String fileName;
   private String fieldDelimiter;
+  private String writeMode;
   private List<HiveColumn> column;
 
   public HdfsWriterArg() {
@@ -66,6 +67,14 @@ public class HdfsWriterArg implements WriterArg {
 
   public void setFieldDelimiter(String fieldDelimiter) {
     this.fieldDelimiter = fieldDelimiter;
+  }
+
+  public String getWriteMode() {
+    return writeMode;
+  }
+
+  public void setWriteMode(String writeMode) {
+    this.writeMode = writeMode;
   }
 
   @Override

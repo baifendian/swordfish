@@ -17,6 +17,7 @@ package com.baifendian.swordfish.execserver.job.impexp;
 
 import com.baifendian.swordfish.common.config.BaseConfig;
 import com.baifendian.swordfish.common.enums.WriteHdfsType;
+import com.baifendian.swordfish.common.enums.WriteMode;
 import com.baifendian.swordfish.common.hadoop.ConfigurationUtil;
 import com.baifendian.swordfish.common.hadoop.HdfsClient;
 import com.baifendian.swordfish.common.job.struct.datasource.DatasourceFactory;
@@ -128,6 +129,7 @@ public class MysqlToHiveJob extends ImpExpJob {
     hdfsWriterArg.setDefaultFS(hadoopConf.getString("fs.defaultFS"));
     hdfsWriterArg.setColumn(hiveWriter.getColumn());
     hdfsWriterArg.setFileType(DEFAULT_FILE_TYPE);
+    hdfsWriterArg.setWriteMode(WriteMode.OVERWRITER.getHdfsType());
     logger.info("Finish MysqlToHiveJob get dataX writer arg!");
     return hdfsWriterArg;
   }
