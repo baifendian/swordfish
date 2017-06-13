@@ -177,7 +177,7 @@ public abstract class ImpExpJob extends AbstractProcessJob {
   public final String createCommand() throws Exception {
     logger.info("Start create DataX command...");
     File dataXJson = createDataXParam(getDataXJson());
-    String command = MessageFormat.format(COMMAND, workConf.getString(""), dataXJson.getAbsolutePath());
+    String command = MessageFormat.format(COMMAND, workConf.getString("executor.datax.mian"), dataXJson.getAbsolutePath());
     logger.info("Finish create DataX commond: {}", command);
     return command;
   }
