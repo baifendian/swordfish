@@ -25,7 +25,7 @@ public class ImpExpJobConst {
   /**
    * dataX 配置文件结构
    */
-  public static final String DATAX_JSON = "'{'\"job\":'{'\"content\":['{'\"reader\":'{'\"name\":{0},\"parameter\":{1}},\"writer\":'{'\"name\":{2},\"parameter\":{3}}}],\"setting\":{4}}}";
+  public static final String DATAX_JSON = "'{'\"job\":'{'\"content\":['{'\"reader\":'{'\"name\":\"{0}\",\"parameter\":{1}},\"writer\":'{'\"name\":\"{2}\",\"parameter\":{3}}}],\"setting\":{4}}}";
 
   /**
    * dataX 命令
