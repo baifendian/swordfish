@@ -120,7 +120,7 @@ public class MysqlToHiveJob extends ImpExpJob {
   public HdfsWriterArg getDateXWriterArg() throws Exception {
     logger.info("Start MysqlToHiveJob get dataX writer arg...");
     //由于DataX不能直接写入到hive中，我们这里先生成写入到HDFS的任务。
-    String path = BaseConfig.getHdfsImpExpDir(props.getProjectId(), props.getExecId(), props.getExecId(), props.getNodeName());
+    String path = BaseConfig.getHdfsImpExpDir(props.getProjectId(), props.getExecId(), props.getNodeName());
 
     HdfsWriterArg hdfsWriterArg = new HdfsWriterArg();
     hdfsWriterArg.setPath(path);
@@ -147,18 +147,18 @@ public class MysqlToHiveJob extends ImpExpJob {
     logger.info("Start MysqlToHiveJob after function...");
     //注册临时外部表
     String srcTableName = "{0}.{1}";
-    srcTableName = MessageFormat.format(srcTableName, hiveService.getTbaleName(props.getProjectId(), props.getNodeName(), props.getNodeName()));
+    srcTableName = MessageFormat.format(srcTableName, DEFAULT_DB, hiveService.getTbaleName(props.getProjectId(), props.getExecJobId(), props.getNodeName()));
     logger.info("Start create temp hive table: {}", srcTableName);
     hiveService.createHiveTmpTable(srcTableName, srcColumns, ((HdfsWriterArg) writerArg).getPath());
     logger.info("Finsh create temp hive table: {}", srcTableName);
 
-    //构造目标数据库
+    //目标数据库名
     String destTableName = "{0}.{1}";
     destTableName = MessageFormat.format(destTableName, hiveWriter.getDatabase(), hiveWriter.getTable());
 
     //插入数据
     logger.info("Start insert to hive table: {}", destTableName);
-    hiveService.insertTable(srcTableName, destTableName, srcColumns, hiveWriter.getWriterMode());
+    hiveService.insertTable(srcTableName, destTableName, srcColumns, destColumns, hiveWriter.getWriterMode());
     logger.info("Finish insert to hive table: {}", destTableName);
     //hive操作完成，关闭连接释放临时表
     hiveService.close();

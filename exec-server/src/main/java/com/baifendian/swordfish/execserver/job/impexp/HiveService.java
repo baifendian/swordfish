@@ -63,8 +63,8 @@ public class HiveService {
    *
    * @return
    */
-  public String getTbaleName(int projectId, String workflowName, String nodeName) {
-    return MessageFormat.format("{0}_{1}_{2}_{3}", String.valueOf(projectId), workflowName, nodeName, UUID.randomUUID());
+  public String getTbaleName(int projectId, int execId, String jobId) {
+    return MessageFormat.format("impexp_{0}_{1}_{2}_{3}", String.valueOf(projectId), String.valueOf(execId), jobId, UUID.randomUUID());
   }
 
   /**
@@ -84,7 +84,9 @@ public class HiveService {
 
       List<HqlColumn> res = new ArrayList<>();
       while (resultSet.next()) {
-        res.add(new HqlColumn(resultSet.getString(1), resultSet.getString(2)));
+        String colName = MessageFormat.format("`{0}`", resultSet.getString(1));
+        String colType = resultSet.getString(2);
+        res.add(new HqlColumn(colName, colType));
       }
       resultSet.close();
       return res;
@@ -155,13 +157,25 @@ public class HiveService {
   /**
    * 把数据插入表中
    */
-  public void insertTable(String srcTableName, String destTableName, List<HqlColumn> hqlColumnList, WriteMode writeMode) throws SQLException {
+  public void insertTable(String srcTableName, String destTableName, List<HqlColumn> srcHqlColumnList, List<HqlColumn> destHqlColumnList, WriteMode writeMode) throws SQLException {
     String selectSql = "SELECT {0} FROM `{1}`";
     String insertSql = "INSERT {0} TABLE `{1}` {2}";
 
     List<String> fieldList = new ArrayList<>();
 
-    //TODO 空字段按照顺序自动填充
+    //预处理字段，如果字段为空就加上NULL
+    for (HqlColumn destHqlColumn : destHqlColumnList) {
+      boolean found = false;
+      for (HqlColumn srcHqlColumn : srcHqlColumnList) {
+        if (StringUtils.containsIgnoreCase(srcHqlColumn.getName(), destHqlColumn.getName())) {
+          fieldList.add(destHqlColumn.getName());
+          break;
+        }
+      }
+      if (!found) {
+        fieldList.add(MessageFormat.format("NULL as {0}", destHqlColumn.getName()));
+      }
+    }
 
     selectSql = MessageFormat.format(selectSql, String.join(",", fieldList), srcTableName);
     insertSql = MessageFormat.format(insertSql, writeMode.gethiveSql(), destTableName, selectSql);

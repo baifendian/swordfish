@@ -18,6 +18,11 @@ public class ImpExpJobConst {
   public static final WriteHdfsType DEFAULT_FILE_TYPE = WriteHdfsType.TEXT;
 
   /**
+   * hive的默认数据库
+   */
+  public static final String DEFAULT_DB = "default";
+
+  /**
    * 默认创建的 dataX 配置文件文件名
    */
   public static final String DATAX_FILE_NAME = "dataXJson";
