@@ -274,19 +274,7 @@ public class HdfsClient implements Closeable {
    * @throws HdfsException
    */
   public void mkdir(String dir) throws HdfsException {
-    Path path = new Path(dir);
-
-    try {
-      if (fileSystem.exists(path)) {
-        LOGGER.error("Dir {} already exists", dir);
-        return;
-      }
-
-      fileSystem.mkdirs(path);
-    } catch (IOException e) {
-      LOGGER.error("Create dir exception", e);
-      throw new HdfsException("Create dir exception", e);
-    }
+    mkdir(dir, FsPermission.getDefault());
   }
 
   /**
@@ -295,7 +283,7 @@ public class HdfsClient implements Closeable {
    * @param dir
    * @throws HdfsException
    */
-  public void mkdir(String dir, short perm) throws HdfsException {
+  public void mkdir(String dir, FsPermission perm) throws HdfsException {
     Path path = new Path(dir);
 
     try {
@@ -303,8 +291,24 @@ public class HdfsClient implements Closeable {
         LOGGER.error("Dir {} already exists", dir);
         return;
       }
+      fileSystem.mkdirs(path, perm);
+    } catch (IOException e) {
+      LOGGER.error("Create dir exception", e);
+      throw new HdfsException("Create dir exception", e);
+    }
+  }
 
-      fileSystem.mkdirs(path, FsPermission.createImmutable(perm));
+  /**
+   * 设置一个目录的所属人
+   *
+   * @param path
+   * @param user
+   * @param group
+   * @throws HdfsException
+   */
+  public void setOwner(Path path, String user, String group) throws HdfsException {
+    try {
+      fileSystem.setOwner(path, user, group);
     } catch (IOException e) {
       LOGGER.error("Create dir exception", e);
       throw new HdfsException("Create dir exception", e);

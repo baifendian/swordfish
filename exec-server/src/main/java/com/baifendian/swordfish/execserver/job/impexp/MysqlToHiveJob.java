@@ -38,8 +38,10 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
+import org.apache.hadoop.fs.permission.FsPermission;
 import org.json.JSONArray;
 import org.slf4j.Logger;
+import org.apache.hadoop.fs.*;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -124,9 +126,14 @@ public class MysqlToHiveJob extends ImpExpJob {
     HdfsClient hdfsClient = HdfsClient.getInstance();
     //如果目录不存在就新建
     if (!hdfsClient.exists(path)) {
-      logger.info("path: {} not exists try create",path);
-      hdfsClient.mkdir(path, (short) 0777);
+      logger.info("path: {} not exists try create", path);
+      hdfsClient.mkdir(path, FsPermission.createImmutable((short) 0777));
     }
+
+    //设置父目录所有人
+    Path dir = new Path(path);
+    hdfsClient.setOwner(dir, props.getProxyUser(), workConf.getString("executor.user.group"));
+    hdfsClient.setOwner(dir.getParent(), props.getProxyUser(), workConf.getString("executor.user.group"));
 
     HdfsWriterArg hdfsWriterArg = new HdfsWriterArg();
     hdfsWriterArg.setPath(path);
