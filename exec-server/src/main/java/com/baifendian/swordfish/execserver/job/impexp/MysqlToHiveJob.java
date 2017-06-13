@@ -121,6 +121,11 @@ public class MysqlToHiveJob extends ImpExpJob {
     logger.info("Start MysqlToHiveJob get dataX writer arg...");
     //由于DataX不能直接写入到hive中，我们这里先生成写入到HDFS的任务。
     String path = BaseConfig.getHdfsImpExpDir(props.getProjectId(), props.getExecId(), props.getNodeName());
+    HdfsClient hdfsClient = HdfsClient.getInstance();
+    //如果目录不存在就新建
+    if (!hdfsClient.exists(path)) {
+      hdfsClient.mkdir(path);
+    }
 
     HdfsWriterArg hdfsWriterArg = new HdfsWriterArg();
     hdfsWriterArg.setPath(path);
