@@ -15,6 +15,14 @@ import java.util.Map;
  */
 public class HiveServiceTest {
   @Test
+  public void testGetHiveDesc() throws SQLException, ClassNotFoundException {
+    HiveService hiveService = new HiveService("jdbc:hive2://172.18.1.22:10000", "shuanghu", "");
+    hiveService.init();
+    List<HqlColumn> hqlColumnList = hiveService.getHiveDesc("swordfish_test","data_test");
+    hqlColumnList.size();
+  }
+
+  @Test
   public void testCreateHiveTmpTable() throws SQLException, ClassNotFoundException, InterruptedException {
     HiveService hiveService = new HiveService("jdbc:hive2://172.18.1.22:10000", "", "");
     hiveService.init();
@@ -50,6 +58,6 @@ public class HiveServiceTest {
     HiveService hiveService = new HiveService("jdbc:hive2://172.18.1.22:10000", "", "");
     hiveService.init();
 
-    hiveService.insertTable(srcTable, destTable, testColumn, WriteMode.APPEND);
+    //hiveService.insertTable(srcTable, destTable, testColumn, WriteMode.APPEND);
   }
 }

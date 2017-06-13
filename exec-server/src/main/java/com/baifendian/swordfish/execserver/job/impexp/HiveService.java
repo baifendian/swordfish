@@ -84,7 +84,7 @@ public class HiveService {
 
       List<HqlColumn> res = new ArrayList<>();
       while (resultSet.next()) {
-        String colName = MessageFormat.format("`{0}`", resultSet.getString(1));
+        String colName = resultSet.getString(1);
         String colType = resultSet.getString(2);
         res.add(new HqlColumn(colName, colType));
       }
@@ -170,7 +170,7 @@ public class HiveService {
       boolean found = false;
       for (HqlColumn srcHqlColumn : srcHqlColumnList) {
         if (StringUtils.containsIgnoreCase(srcHqlColumn.getName(), destHqlColumn.getName())) {
-          fieldList.add(destHqlColumn.getName());
+          fieldList.add(MessageFormat.format("`{0}`", destHqlColumn.getName()));
           found = true;
           break;
         }
