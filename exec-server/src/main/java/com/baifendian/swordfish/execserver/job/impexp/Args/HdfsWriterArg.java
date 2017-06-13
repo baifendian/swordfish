@@ -70,6 +70,6 @@ public class HdfsWriterArg implements WriterArg {
 
   @Override
   public String dataxName() {
-    return "hdfsWriter";
+    return "hdfswriter";
   }
 }
