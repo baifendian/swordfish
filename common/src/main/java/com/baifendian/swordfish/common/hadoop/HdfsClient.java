@@ -290,7 +290,7 @@ public class HdfsClient implements Closeable {
   }
 
   /**
-   * 创建一个目录并设置权限
+   * 创建一个目录并以递归的方式设置权限
    *
    * @param dir
    * @throws HdfsException
@@ -299,10 +299,20 @@ public class HdfsClient implements Closeable {
     mkdir(dir);
     Path path = new Path(dir);
     try {
-      fileSystem.setPermission(path, FsPermission.createImmutable(perm));
+      setPermission(path, FsPermission.createImmutable(perm));
     } catch (IOException e) {
       LOGGER.error("Set dir perm exception", e);
       throw new HdfsException("Set dir perm exception", e);
+    }
+  }
+
+  /**
+   * 递归的方式给所有目录设置指定权限
+   */
+  public void setPermission(Path path, FsPermission perm) throws IOException {
+    fileSystem.setPermission(path, perm);
+    if (path.getParent() != null) {
+      setPermission(path.getParent(), perm);
     }
   }
 
