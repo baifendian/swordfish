@@ -89,7 +89,7 @@ public class MysqlToHiveJob extends ImpExpJob {
   public void beforeWorke() throws Exception {
     logger.info("Start MysqlToHiveJob before function...");
     // 构造一个hive服务类，预备使用
-    hiveService = new HiveService(hiveConf.getString("hive.thrift.uris"), "", "");
+    hiveService = new HiveService(hiveConf.getString("hive.thrift.uris"), props.getProxyUser(), "");
     hiveService.init();
     // 获取源HQL字段
     destColumns = hiveService.getHiveDesc(hiveWriter.getDatabase(), hiveWriter.getTable());

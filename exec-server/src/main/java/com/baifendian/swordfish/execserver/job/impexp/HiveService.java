@@ -76,7 +76,7 @@ public class HiveService {
    */
   public List<HqlColumn> getHiveDesc(String dbName, String tableName) throws SQLException {
     //构造查询SQL
-    String sql = MessageFormat.format("desc {0}.{1}", dbName, tableName);
+    String sql = MessageFormat.format("DESC {0}.{1}", dbName, tableName);
     Statement stmt = null;
     try {
       stmt = con.createStatement();
