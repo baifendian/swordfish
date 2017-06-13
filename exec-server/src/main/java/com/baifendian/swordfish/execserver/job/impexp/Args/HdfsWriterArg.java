@@ -67,4 +67,9 @@ public class HdfsWriterArg implements WriterArg {
   public void setFieldDelimiter(String fieldDelimiter) {
     this.fieldDelimiter = fieldDelimiter;
   }
+
+  @Override
+  public String getName() {
+    return "hdfsWriter";
+  }
 }
