@@ -127,7 +127,7 @@ public abstract class ImpExpJob extends AbstractProcessJob {
     String readerJson = JsonUtil.toJsonString(readerArg);
     String writerJson = JsonUtil.toJsonString(writerArg);
     String settingJson = JsonUtil.toJsonString(impExpParam.getSetting());
-    String json = MessageFormat.format(DATAX_JSON, readerArg.getName(), readerJson, writerArg.getName(), writerJson, settingJson);
+    String json = MessageFormat.format(DATAX_JSON, readerArg.dataxName(), readerJson, writerArg.dataxName(), writerJson, settingJson);
     logger.info("DataX json: {}", json);
     return json;
   }

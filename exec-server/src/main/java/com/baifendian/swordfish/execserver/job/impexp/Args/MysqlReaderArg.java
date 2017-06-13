@@ -90,7 +90,7 @@ public class MysqlReaderArg implements ReaderArg {
 
 
   @Override
-  public String getName() {
+  public String dataxName() {
     return "mysqlreader";
   }
 }
