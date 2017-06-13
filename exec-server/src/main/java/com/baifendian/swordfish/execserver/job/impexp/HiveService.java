@@ -104,11 +104,11 @@ public class HiveService {
    */
   public List<HqlColumn> checkHiveColumn(List<HiveColumn> srcColumn, List<HqlColumn> destColumn) throws Exception {
     List<HqlColumn> hqlColumnList = new ArrayList<>();
-    for (HiveColumn hiveColumn : srcColumn) {
+    for (HiveColumn srcCol : srcColumn) {
       boolean found = false;
-      for (HqlColumn hqlColumn : destColumn) {
-        if (hqlColumn.equals(hiveColumn)) {
-          hqlColumnList.add(hqlColumn);
+      for (HqlColumn destCol : destColumn) {
+        if (StringUtils.containsIgnoreCase(srcCol.getName(), destCol.getName())) {
+          hqlColumnList.add(destCol);
           found = true;
           break;
         }
@@ -117,7 +117,7 @@ public class HiveService {
       if (!found) {
         //如果没有找到匹配的抛出异常
         String msg = "Write hive column {0} not found";
-        throw new Exception(MessageFormat.format(msg, hiveColumn.getName()));
+        throw new Exception(MessageFormat.format(msg, srcCol.getName()));
       }
     }
     return hqlColumnList;
