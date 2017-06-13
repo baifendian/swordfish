@@ -124,7 +124,8 @@ public class MysqlToHiveJob extends ImpExpJob {
     HdfsClient hdfsClient = HdfsClient.getInstance();
     //如果目录不存在就新建
     if (!hdfsClient.exists(path)) {
-      hdfsClient.mkdir(path, (short) 777);
+      logger.info("path: {} not exists try create");
+      hdfsClient.mkdir(path, (short) 0777);
     }
 
     HdfsWriterArg hdfsWriterArg = new HdfsWriterArg();
