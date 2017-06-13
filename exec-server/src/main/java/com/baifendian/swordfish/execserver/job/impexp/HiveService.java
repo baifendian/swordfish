@@ -109,6 +109,8 @@ public class HiveService {
       for (HqlColumn hqlColumn : destColumn) {
         if (hqlColumn.equals(hiveColumn)) {
           hqlColumnList.add(hqlColumn);
+          found = true;
+          break;
         }
       }
 
@@ -169,6 +171,7 @@ public class HiveService {
       for (HqlColumn srcHqlColumn : srcHqlColumnList) {
         if (StringUtils.containsIgnoreCase(srcHqlColumn.getName(), destHqlColumn.getName())) {
           fieldList.add(destHqlColumn.getName());
+          found = true;
           break;
         }
       }
