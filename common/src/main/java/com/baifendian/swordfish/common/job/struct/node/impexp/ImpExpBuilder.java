@@ -24,7 +24,6 @@ public class ImpExpBuilder {
   private Setting setting;
   private Writer writerParam;
   private Reader readerParam;
-  private Setting settingParam;
 
   public Setting getSetting() {
     return setting;
@@ -70,15 +69,9 @@ public class ImpExpBuilder {
     return readerParam;
   }
 
-  public Setting getSettingParam() {
-    return settingParam;
-  }
-
   public ImpExpParam buildImpExp() {
     this.readerParam = ReaderFactory.getReader(this.type, this.reader);
     this.writerParam = WriterFactory.getWriter(this.type, this.writer);
-    //TODO 构造setting
-
     return new ImpExpParam(this);
   }
 }

@@ -32,4 +32,8 @@ public class Setting {
   public void setErrorLimit(ErrorLimit errorLimit) {
     this.errorLimit = errorLimit;
   }
+
+  public boolean checkValid() {
+    return speed != null && speed.checkValid();
+  }
 }

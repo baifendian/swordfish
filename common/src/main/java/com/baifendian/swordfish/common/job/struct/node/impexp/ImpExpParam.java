@@ -71,7 +71,7 @@ public class ImpExpParam extends BaseParam {
     this.type = impExpBuilder.getType();
     this.reader = impExpBuilder.getReaderParam();
     this.writer = impExpBuilder.getWriterParam();
-    this.setting = impExpBuilder.getSettingParam();
+    this.setting = impExpBuilder.getSetting();
   }
 
   @Override
@@ -80,6 +80,8 @@ public class ImpExpParam extends BaseParam {
             reader != null &&
             reader.checkValid() &&
             writer != null &&
-            writer.checkValid();
+            writer.checkValid() &&
+            setting != null &&
+            setting.checkValid();
   }
 }

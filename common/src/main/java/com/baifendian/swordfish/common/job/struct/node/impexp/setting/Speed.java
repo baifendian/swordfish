@@ -11,7 +11,7 @@ public class Speed {
   /**
    * 最大并发数
    */
-  private int channel;
+  private Integer channel;
   /**
    * 最大流量
    */
@@ -32,5 +32,9 @@ public class Speed {
 
   public void setByteInt(Long byteInt) {
     this.byteInt = byteInt;
+  }
+
+  public boolean checkValid() {
+    return channel != null && byteInt != null;
   }
 }
