@@ -296,13 +296,18 @@ public class HdfsClient implements Closeable {
    * @throws HdfsException
    */
   public void mkdir(String dir, short perm) throws HdfsException {
-    mkdir(dir);
     Path path = new Path(dir);
+
     try {
-      setPermission(path, FsPermission.createImmutable(perm));
+      if (fileSystem.exists(path)) {
+        LOGGER.error("Dir {} already exists", dir);
+        return;
+      }
+
+      fileSystem.mkdirs(path, FsPermission.createImmutable(perm));
     } catch (IOException e) {
-      LOGGER.error("Set dir perm exception", e);
-      throw new HdfsException("Set dir perm exception", e);
+      LOGGER.error("Create dir exception", e);
+      throw new HdfsException("Create dir exception", e);
     }
   }
 
