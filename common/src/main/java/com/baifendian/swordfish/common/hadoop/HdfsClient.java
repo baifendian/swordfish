@@ -20,6 +20,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.*;
 import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.permission.FsPermission;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -121,8 +122,8 @@ public class HdfsClient implements Closeable {
     }
 
     try (
-        FSDataOutputStream out = fileSystem.create(path);
-        InputStream in = new BufferedInputStream(new ByteArrayInputStream(content));) {
+            FSDataOutputStream out = fileSystem.create(path);
+            InputStream in = new BufferedInputStream(new ByteArrayInputStream(content));) {
       byte[] b = new byte[1024];
       int numBytes = 0;
       while ((numBytes = in.read(b)) > 0) {
@@ -173,8 +174,8 @@ public class HdfsClient implements Closeable {
     }
 
     try (
-        FSDataInputStream in = fileSystem.open(pathObject);
-        OutputStream out = new BufferedOutputStream(new FileOutputStream(fileObject));) {
+            FSDataInputStream in = fileSystem.open(pathObject);
+            OutputStream out = new BufferedOutputStream(new FileOutputStream(fileObject));) {
       byte[] b = new byte[1024];
       int numBytes = 0;
       while ((numBytes = in.read(b)) > 0) {
@@ -207,7 +208,7 @@ public class HdfsClient implements Closeable {
     }
 
     try (
-        FSDataInputStream in = fileSystem.open(pathObject);) {
+            FSDataInputStream in = fileSystem.open(pathObject);) {
       return IOUtils.toByteArray(in);
     } catch (IOException e) {
       LOGGER.error("Operator Hdfs exception", e);
@@ -285,6 +286,23 @@ public class HdfsClient implements Closeable {
     } catch (IOException e) {
       LOGGER.error("Create dir exception", e);
       throw new HdfsException("Create dir exception", e);
+    }
+  }
+
+  /**
+   * 创建一个目录并设置权限
+   *
+   * @param dir
+   * @throws HdfsException
+   */
+  public void mkdir(String dir, short perm) throws HdfsException {
+    mkdir(dir);
+    Path path = new Path(dir);
+    try {
+      fileSystem.setPermission(path, FsPermission.createImmutable(perm));
+    } catch (IOException e) {
+      LOGGER.error("Set dir perm exception", e);
+      throw new HdfsException("Set dir perm exception", e);
     }
   }
 
