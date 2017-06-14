@@ -139,7 +139,7 @@ public class HiveService {
 
     String sql = "CREATE TEMPORARY EXTERNAL TABLE `{0}`({1}) ROW FORMAT DELIMITED FIELDS TERMINATED BY \"{2}\" STORED AS {3} LOCATION \"{4}\"";
 
-    sql = MessageFormat.format(sql, tableName, String.join(",", fieldList), DEFAULT_DELIMITER, DEFAULT_FILE_TYPE, localtion);
+    sql = MessageFormat.format(sql, tableName, String.join(",", fieldList), DEFAULT_DELIMITER, DEFAULT_FILE_TYPE.getType(), localtion);
 
     logger.info("Create temp hive table sql: {}", sql);
 
