@@ -130,10 +130,12 @@ public class MysqlToHiveJob extends ImpExpJob {
       hdfsClient.mkdir(path, FsPermission.createImmutable((short) 0777));
     }
 
+    //hdfsClient.setPermission(new Path(path), FsPermission.createImmutable((short) 0777));
+
     //设置父目录所有人
-    Path dir = new Path(path);
-    hdfsClient.setOwner(dir, props.getProxyUser(), workConf.getString("executor.user.group"));
-    hdfsClient.setOwner(dir.getParent(), props.getProxyUser(), workConf.getString("executor.user.group"));
+    //Path dir = new Path(path);
+    //hdfsClient.setOwner(dir, props.getProxyUser(), workConf.getString("executor.user.group"));
+    //hdfsClient.setOwner(dir.getParent(), props.getProxyUser(), workConf.getString("executor.user.group"));
 
     HdfsWriterArg hdfsWriterArg = new HdfsWriterArg();
     hdfsWriterArg.setPath(path);
