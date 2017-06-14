@@ -7,7 +7,7 @@ public enum WriteMode {
   /**
    * 0 追加写入，1 覆盖写入
    */
-  APPEND, OVERWRITER;
+  APPEND, OVERWRITE;
 
   /**
    * 获取写入模式中的hivesql
@@ -18,7 +18,7 @@ public enum WriteMode {
     switch (this) {
       case APPEND:
         return "INTO";
-      case OVERWRITER:
+      case OVERWRITE:
         return "OVERWRITE";
       default:
         return null;
@@ -33,7 +33,7 @@ public enum WriteMode {
     switch (this) {
       case APPEND:
         return "append";
-      case OVERWRITER:
+      case OVERWRITE:
         return "nonConflict";
       default:
         return null;
