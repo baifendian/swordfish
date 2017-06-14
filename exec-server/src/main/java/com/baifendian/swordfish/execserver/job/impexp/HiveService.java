@@ -189,8 +189,8 @@ public class HiveService {
     try {
       logger.info("Start insert hive table ...");
       stmt = con.createStatement();
-      int num = stmt.executeUpdate(insertSql);
-      logger.info("Finish insert hive table! insert count: {}", num);
+      stmt.execute(insertSql);
+      logger.info("Finish insert hive table!");
     } finally {
       if (stmt != null) {
         stmt.close();
