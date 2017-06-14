@@ -64,7 +64,8 @@ public class HiveService {
    * @return
    */
   public String getTbaleName(int projectId, int execId, String jobId) {
-    return MessageFormat.format("impexp_{0}_{1}_{2}_{3}", String.valueOf(projectId), String.valueOf(execId), jobId, UUID.randomUUID());
+    String uuidSuffix = UUID.randomUUID().toString().replace('-', '_');
+    return MessageFormat.format("impexp_{0}_{1}_{2}_{3}", String.valueOf(projectId), String.valueOf(execId), jobId, uuidSuffix);
   }
 
   /**
