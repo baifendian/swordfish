@@ -133,6 +133,7 @@ public class MysqlToHiveJob extends ImpExpJob {
     Path dir = new Path(path);
     while (!dir.getName().equalsIgnoreCase("swordfish")) {
       hdfsClient.setPermissionThis(dir, FsPermission.createImmutable((short) 0777));
+      dir = dir.getParent();
     }
 
     //hdfsClient.setPermission(new Path(path), FsPermission.createImmutable((short) 0777));
