@@ -30,7 +30,7 @@ public class HiveWriter implements Writer {
 
   private String database;
   private String table;
-  private WriteMode writerMode;
+  private WriteMode writeMode;
   private List<HiveColumn> column;
 
   public String getDatabase() {
@@ -49,12 +49,12 @@ public class HiveWriter implements Writer {
     this.table = table;
   }
 
-  public WriteMode getWriterMode() {
-    return writerMode;
+  public WriteMode getWriteMode() {
+    return writeMode;
   }
 
-  public void setWriterMode(WriteMode writerMode) {
-    this.writerMode = writerMode;
+  public void setWriteMode(WriteMode writeMode) {
+    this.writeMode = writeMode;
   }
 
   public List<HiveColumn> getColumn() {
