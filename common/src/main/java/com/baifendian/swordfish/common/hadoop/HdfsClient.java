@@ -326,6 +326,17 @@ public class HdfsClient implements Closeable {
   }
 
   /**
+   * 只设置当前目录的权限
+   * @param path
+   * @param perm
+   * @throws IOException
+   */
+  public void setPermissionThis(Path path, FsPermission perm) throws IOException {
+    fileSystem.setPermission(path, perm);
+  }
+
+
+  /**
    * copy 一个文件到另一个目标文件
    *
    * @param srcPath      hdfs 源文件

@@ -238,7 +238,7 @@ public class BaseConfig {
    * @return
    */
   public static String getHdfsImpExpDir(int projectId, int execId, String nodeName) {
-    return MessageFormat.format("{0}/{1}/impexp/{2}/{3}", hdfsDataBasePath, projectId, execId, nodeName);
+    return MessageFormat.format("{0}/{1}/impexp/{2}/{3}", hdfsDataBasePath, String.valueOf(projectId), String.valueOf(execId), nodeName);
   }
 
   /**
