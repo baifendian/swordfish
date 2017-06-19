@@ -27,18 +27,18 @@ import com.baifendian.swordfish.execserver.job.yarn.AbstractYarnJob;
 import com.baifendian.swordfish.execserver.utils.Constants;
 import com.baifendian.swordfish.execserver.utils.JobLogger;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.configuration.Configuration;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.configuration.Configuration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class StreamingRunnerManager {
+
   private static Logger logger = LoggerFactory.getLogger(StreamingRunnerManager.class.getName());
 
   private final ExecutorService streamingExecutorService;
@@ -48,16 +48,16 @@ public class StreamingRunnerManager {
   public StreamingRunnerManager(Configuration conf) {
     streamingDao = DaoFactory.getDaoInstance(StreamingDao.class);
 
-    int threads = conf.getInt(Constants.EXECUTOR_STREAMING_THREADS, Constants.defaultStreamingThreadNum);
+    int threads = conf
+        .getInt(Constants.EXECUTOR_STREAMING_THREADS, Constants.defaultStreamingThreadNum);
 
-    ThreadFactory flowThreadFactory = new ThreadFactoryBuilder().setNameFormat("Exec-Server-StreamingRunner").build();
+    ThreadFactory flowThreadFactory = new ThreadFactoryBuilder()
+        .setNameFormat("Exec-Server-StreamingRunner").build();
     streamingExecutorService = Executors.newFixedThreadPool(threads, flowThreadFactory);
   }
 
   /**
    * 提交一个流任务
-   *
-   * @param streamingResult
    */
   public void submitJob(StreamingResult streamingResult) {
 
@@ -66,7 +66,8 @@ public class StreamingRunnerManager {
       return;
     }
 
-    String jobId = String.format("STREAMING_JOB_%s_%s", streamingResult.getExecId(), DateUtils.now(Constants.DATETIME_FORMAT));
+    String jobId = String.format("STREAMING_JOB_%s_%s", streamingResult.getExecId(),
+        DateUtils.now(Constants.DATETIME_FORMAT));
 
     Date now = new Date();
 
@@ -86,23 +87,25 @@ public class StreamingRunnerManager {
 
   /**
    * 取消一个流任务, 读取里面的 application, 然后发起关闭请求
-   *
-   * @param streamingResult
    */
   public void cancelJob(StreamingResult streamingResult) {
     JobProps props = new JobProps();
 
-    props.setWorkDir(BaseConfig.getStreamingExecDir(streamingResult.getProjectId(), streamingResult.getStreamingId(), streamingResult.getExecId()));
+    props.setWorkDir(BaseConfig
+        .getStreamingExecDir(streamingResult.getProjectId(), streamingResult.getStreamingId(),
+            streamingResult.getExecId()));
     props.setProxyUser(streamingResult.getProxyUser());
     props.setEnvFile(BaseConfig.getSystemEnvPath());
     props.setJobAppId(streamingResult.getJobId());
 
     try {
-      AbstractYarnJob.cancelApplication(streamingResult.getAppLinkList(), props, new JobLogger(streamingResult.getJobId(), logger));
+      AbstractYarnJob.cancelApplication(streamingResult.getAppLinkList(), props,
+          new JobLogger(streamingResult.getJobId(), logger));
 
       // 删除后, 需要更新状态
       List<String> appLinkList = streamingResult.getAppLinkList();
-      String appId = (CollectionUtils.isEmpty(appLinkList)) ? null : appLinkList.get(appLinkList.size() - 1);
+      String appId =
+          (CollectionUtils.isEmpty(appLinkList)) ? null : appLinkList.get(appLinkList.size() - 1);
 
       FlowStatus status = YarnRestClient.getInstance().getApplicationStatus(appId);
 
@@ -118,7 +121,8 @@ public class StreamingRunnerManager {
         streamingDao.updateResult(streamingResult);
       }
     } catch (Exception e) {
-      logger.error(String.format("cancel streaming job exception: %d", streamingResult.getExecId()), e);
+      logger.error(String.format("cancel streaming job exception: %d", streamingResult.getExecId()),
+          e);
     }
   }
 
