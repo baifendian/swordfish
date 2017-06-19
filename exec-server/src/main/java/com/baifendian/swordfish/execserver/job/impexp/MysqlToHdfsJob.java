@@ -61,10 +61,6 @@ public class MysqlToHdfsJob extends ImpExpJob {
     hdfsWriter = (HdfsWriter) impExpParam.getWriter();
   }
 
-  @Override
-  public void beforeWorke() throws Exception {
-    //无前处理
-  }
 
   @Override
   public MysqlReaderArg getDataXReaderArg() throws Exception {
@@ -101,13 +97,4 @@ public class MysqlToHdfsJob extends ImpExpJob {
     return hdfsWriterArg;
   }
 
-  @Override
-  public void clean() throws Exception {
-    //不需要做清理
-  }
-
-  @Override
-  public void afterWorke() throws Exception {
-    //无相关后处理
-  }
 }

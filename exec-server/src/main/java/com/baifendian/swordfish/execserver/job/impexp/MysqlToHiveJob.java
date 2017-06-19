@@ -87,8 +87,8 @@ public class MysqlToHiveJob extends ImpExpJob {
     hiveWriter = (HiveWriter) impExpParam.getWriter();
   }
 
-
-  public void beforeWorke() throws Exception {
+  @Override
+  public void before() throws Exception {
     logger.info("Start MysqlToHiveJob before function...");
     // 构造一个hive服务类，预备使用
     hiveService = new HiveService(hiveConf.getString("hive.thrift.uris"), props.getProxyUser(), "");
@@ -164,7 +164,13 @@ public class MysqlToHiveJob extends ImpExpJob {
     logger.info("Finish MysqlToHiveJob clean!");
   }
 
-  public void afterWorke() throws Exception {
+  @Override
+  public void after() throws Exception {
+    if (exitCode != 0){
+      logger.info("DataX exec failed, job exit!");
+      return;
+    }
+
     logger.info("Start MysqlToHiveJob after function...");
     //注册临时外部表
     String srcTableName = "{0}.{1}";
@@ -183,6 +189,9 @@ public class MysqlToHiveJob extends ImpExpJob {
     logger.info("Finish insert to hive table: {}", destTableName);
     //hive操作完成，关闭连接释放临时表
     hiveService.close();
+
+    //完成进行清理
+    clean();
   }
 
 }

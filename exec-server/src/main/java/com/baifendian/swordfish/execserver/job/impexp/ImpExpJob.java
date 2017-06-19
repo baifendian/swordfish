@@ -101,22 +101,6 @@ public abstract class ImpExpJob extends AbstractProcessJob {
     logger.info("Finish init base job!");
   }
 
-  @Override
-  public void before() throws Exception {
-    super.before();
-    logger.info("Start base before function ...");
-    //预载入待处理的数据
-    readerArg = getDataXReaderArg();
-    writerArg = getDateXWriterArg();
-    logger.info("Finish base before function!");
-    beforeWorke();
-  }
-
-  /**
-   * 前处理
-   */
-  public abstract void beforeWorke() throws Exception;
-
   /**
    * 生成datax需要的json文件
    *
@@ -124,11 +108,13 @@ public abstract class ImpExpJob extends AbstractProcessJob {
    */
   public final String getDataXJson() throws Exception {
     logger.info("Start get DataX json ...");
+    readerArg = getDataXReaderArg();
+    writerArg = getDateXWriterArg();
     String readerJson = JsonUtil.toJsonString(readerArg);
     String writerJson = JsonUtil.toJsonString(writerArg);
     String settingJson = JsonUtil.toJsonString(impExpParam.getSetting());
     String json = MessageFormat.format(DATAX_JSON, readerArg.dataxName(), readerJson, writerArg.dataxName(), writerJson, settingJson);
-    logger.info("DataX json: {}", json);
+    logger.info("Finish get DataX json: {}", json);
     return json;
   }
 
@@ -145,11 +131,6 @@ public abstract class ImpExpJob extends AbstractProcessJob {
    * @return
    */
   public abstract WriterArg getDateXWriterArg() throws ConfigurationException, Exception;
-
-  /**
-   * 导入导出完成后清理
-   */
-  public abstract void clean() throws Exception;
 
   /**
    * 生成datax 文件
@@ -180,23 +161,6 @@ public abstract class ImpExpJob extends AbstractProcessJob {
     String command = MessageFormat.format(COMMAND, workConf.getString("executor.datax.mian"), dataXJson.getAbsolutePath());
     logger.info("Finish create DataX commond: {}", command);
     return command;
-  }
-
-  /**
-   * 后处理
-   */
-  public abstract void afterWorke() throws Exception;
-
-  @Override
-  public void after() throws Exception {
-    super.after();
-    // 如果正常完成执行后续操作
-    if (exitCode == 0) {
-      afterWorke();
-      clean();
-    } else {
-      logger.info("DataX exec failed, job exit!");
-    }
   }
 
   @Override
