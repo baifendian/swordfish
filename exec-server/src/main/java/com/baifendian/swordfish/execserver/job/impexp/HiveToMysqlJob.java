@@ -69,6 +69,9 @@ public class HiveToMysqlJob extends ImpExpJob {
 
     ObjectNode connection = (ObjectNode) mysqlWriterArg.getConnection().get(0);
     connection.put("jdbcUrl", mysqlDatasource.getJdbcUrl());
+
+    mysqlWriterArg.setUsername(mysqlDatasource.getUser());
+    mysqlWriterArg.setPassword(mysqlDatasource.getPassword());
     logger.info("Finish HiveToMysqlJob get dataX writer arg...");
     return mysqlWriterArg;
   }
