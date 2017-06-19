@@ -218,7 +218,7 @@ public class StreamingResultMapperProvider {
     }
 
     if (StringUtils.isNotEmpty(name)) {
-      sql = sql.WHERE("name = #{name}");
+      sql = sql.WHERE("s.name = #{name}");
     }
 
     if (status != null) {

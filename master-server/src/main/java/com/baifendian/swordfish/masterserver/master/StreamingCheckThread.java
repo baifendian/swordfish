@@ -71,7 +71,7 @@ public class StreamingCheckThread implements Runnable {
               // 任务不存在
               if (tmpStatus == null) {
                 logger.error("application not exist: {}", appId);
-                status = FlowStatus.KILL;
+                status = FlowStatus.FAILED;
               } else if (!tmpStatus.typeIsSuccess()) {// 如果没有完成
                 status = tmpStatus;
               }
@@ -98,7 +98,7 @@ public class StreamingCheckThread implements Runnable {
           } else if (System.currentTimeMillis() - streamingResult.getScheduleTime().getTime() >=
               MasterConfig.streamingTimeoutThreshold * 1000) { // 提交很久了, 没有任何执行和接受
             // 设置状态和结束时间
-            streamingResult.setStatus(FlowStatus.KILL);
+            streamingResult.setStatus(FlowStatus.FAILED);
             streamingResult.setEndTime(now);
 
             streamingDao.updateResult(streamingResult);
