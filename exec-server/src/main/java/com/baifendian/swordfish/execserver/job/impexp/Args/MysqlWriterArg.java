@@ -3,6 +3,7 @@ package com.baifendian.swordfish.execserver.job.impexp.Args;
 import com.baifendian.swordfish.common.enums.MysqlWriteMode;
 import com.baifendian.swordfish.common.job.struct.node.impexp.writer.MysqlWriter;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.collections4.CollectionUtils;
@@ -13,6 +14,7 @@ import java.util.List;
 /**
  * mysql writer
  */
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class MysqlWriterArg implements WriterArg {
 
   private MysqlWriteMode writeMode;
