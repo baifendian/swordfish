@@ -123,7 +123,7 @@ public class HiveService {
     for (HiveColumn srcCol : srcColumn) {
       boolean found = false;
       for (HqlColumn destCol : destColumn) {
-        if (StringUtils.containsIgnoreCase(srcCol.getName(), destCol.getName())) {
+        if (StringUtils.equalsIgnoreCase(srcCol.getName(), destCol.getName())) {
           hqlColumnList.add(destCol);
           found = true;
           break;
