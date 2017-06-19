@@ -7,5 +7,5 @@ public enum ImpExpType {
   /**
    * 0 mysql 到 hive ,1 mysql 到 hdfs
    */
-  MYSQLTOHIVE, MYSQLTOHDFS;
+  MYSQL_TO_HIVE, MYSQL_TO_HDFS, HIVE_TO_MYSQL;
 }

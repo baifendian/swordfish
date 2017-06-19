@@ -13,46 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.baifendian.swordfish.execserver.job.impexp.Args;
+package com.baifendian.swordfish.common.job.struct.node.impexp.writer;
 
 import com.baifendian.swordfish.common.enums.WriteHdfsType;
 import com.baifendian.swordfish.common.enums.WriteMode;
 import com.baifendian.swordfish.common.job.struct.node.impexp.column.HiveColumn;
-import com.fasterxml.jackson.annotation.JsonInclude;
 
 import java.util.List;
 
 /**
- * HDFS 写参数
+ * Hdfs 写入参数
  */
-@JsonInclude(JsonInclude.Include.NON_NULL)
-public class HdfsWriterArg implements WriterArg {
-  private String defaultFS;
-  private WriteHdfsType fileType;
+public class HdfsWriter implements Writer {
   private String path;
   private String fileName;
-  private String fieldDelimiter;
-  private String writeMode;
+  private WriteMode writeMode;
+  private WriteHdfsType fileType;
   private List<HiveColumn> column;
-
-  public HdfsWriterArg() {
-  }
-
-  public String getDefaultFS() {
-    return defaultFS;
-  }
-
-  public void setDefaultFS(String defaultFS) {
-    this.defaultFS = defaultFS;
-  }
-
-  public WriteHdfsType getFileType() {
-    return fileType;
-  }
-
-  public void setFileType(WriteHdfsType fileType) {
-    this.fileType = fileType;
-  }
 
   public String getPath() {
     return path;
@@ -70,8 +47,20 @@ public class HdfsWriterArg implements WriterArg {
     this.fileName = fileName;
   }
 
-  public String getFieldDelimiter() {
-    return fieldDelimiter;
+  public WriteMode getWriteMode() {
+    return writeMode;
+  }
+
+  public void setWriteMode(WriteMode writeMode) {
+    this.writeMode = writeMode;
+  }
+
+  public WriteHdfsType getFileType() {
+    return fileType;
+  }
+
+  public void setFileType(WriteHdfsType fileType) {
+    this.fileType = fileType;
   }
 
   public List<HiveColumn> getColumn() {
@@ -80,22 +69,5 @@ public class HdfsWriterArg implements WriterArg {
 
   public void setColumn(List<HiveColumn> column) {
     this.column = column;
-  }
-
-  public void setFieldDelimiter(String fieldDelimiter) {
-    this.fieldDelimiter = fieldDelimiter;
-  }
-
-  public String getWriteMode() {
-    return writeMode;
-  }
-
-  public void setWriteMode(String writeMode) {
-    this.writeMode = writeMode;
-  }
-
-  @Override
-  public String dataxName() {
-    return "hdfswriter";
   }
 }

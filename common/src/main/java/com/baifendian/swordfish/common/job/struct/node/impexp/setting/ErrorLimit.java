@@ -13,17 +13,37 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.baifendian.swordfish.common.job.struct.node.impexp.writer;
+package com.baifendian.swordfish.common.job.struct.node.impexp.setting;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 /**
- * 写接口
+ * 异常阈值
  */
-public interface Writer {
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public class ErrorLimit {
   /**
-   * 校验writer是否合法
-   * @return
+   * 数据错误数阈值
    */
-  default boolean checkValid(){
-    return true;
+  private Long recod;
+  /**
+   * 数据错误百分比阈值
+   */
+  private Double percentage;
+
+  public Long getRecod() {
+    return recod;
+  }
+
+  public void setRecod(Long recod) {
+    this.recod = recod;
+  }
+
+  public Double getPercentage() {
+    return percentage;
+  }
+
+  public void setPercentage(Double percentage) {
+    this.percentage = percentage;
   }
 }

@@ -231,6 +231,17 @@ public class BaseConfig {
   }
 
   /**
+   * 获取 ImpExp 缓存的路径
+   *
+   * @param projectId
+   * @param execId
+   * @return
+   */
+  public static String getHdfsImpExpDir(int projectId, int execId, String nodeName) {
+    return MessageFormat.format("{0}/{1}/impexp/{2}/{3}", hdfsDataBasePath, String.valueOf(projectId), String.valueOf(execId), nodeName);
+  }
+
+  /**
    * 流任务执行的目录
    *
    * @param projectId

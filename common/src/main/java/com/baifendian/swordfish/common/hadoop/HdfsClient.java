@@ -20,6 +20,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.*;
 import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.permission.FsPermission;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -121,8 +122,8 @@ public class HdfsClient implements Closeable {
     }
 
     try (
-        FSDataOutputStream out = fileSystem.create(path);
-        InputStream in = new BufferedInputStream(new ByteArrayInputStream(content));) {
+            FSDataOutputStream out = fileSystem.create(path);
+            InputStream in = new BufferedInputStream(new ByteArrayInputStream(content));) {
       byte[] b = new byte[1024];
       int numBytes = 0;
       while ((numBytes = in.read(b)) > 0) {
@@ -173,8 +174,8 @@ public class HdfsClient implements Closeable {
     }
 
     try (
-        FSDataInputStream in = fileSystem.open(pathObject);
-        OutputStream out = new BufferedOutputStream(new FileOutputStream(fileObject));) {
+            FSDataInputStream in = fileSystem.open(pathObject);
+            OutputStream out = new BufferedOutputStream(new FileOutputStream(fileObject));) {
       byte[] b = new byte[1024];
       int numBytes = 0;
       while ((numBytes = in.read(b)) > 0) {
@@ -207,7 +208,7 @@ public class HdfsClient implements Closeable {
     }
 
     try (
-        FSDataInputStream in = fileSystem.open(pathObject);) {
+            FSDataInputStream in = fileSystem.open(pathObject);) {
       return IOUtils.toByteArray(in);
     } catch (IOException e) {
       LOGGER.error("Operator Hdfs exception", e);
@@ -273,6 +274,16 @@ public class HdfsClient implements Closeable {
    * @throws HdfsException
    */
   public void mkdir(String dir) throws HdfsException {
+    mkdir(dir, FsPermission.getDefault());
+  }
+
+  /**
+   * 创建一个目录并以递归的方式设置权限
+   *
+   * @param dir
+   * @throws HdfsException
+   */
+  public void mkdir(String dir, FsPermission perm) throws HdfsException {
     Path path = new Path(dir);
 
     try {
@@ -280,13 +291,50 @@ public class HdfsClient implements Closeable {
         LOGGER.error("Dir {} already exists", dir);
         return;
       }
-
-      fileSystem.mkdirs(path);
+      fileSystem.mkdirs(path, perm);
     } catch (IOException e) {
       LOGGER.error("Create dir exception", e);
       throw new HdfsException("Create dir exception", e);
     }
   }
+
+  /**
+   * 设置一个目录的所属人
+   *
+   * @param path
+   * @param user
+   * @param group
+   * @throws HdfsException
+   */
+  public void setOwner(Path path, String user, String group) throws HdfsException {
+    try {
+      fileSystem.setOwner(path, user, group);
+    } catch (IOException e) {
+      LOGGER.error("Create dir exception", e);
+      throw new HdfsException("Create dir exception", e);
+    }
+  }
+
+  /**
+   * 递归的方式给所有目录设置指定权限
+   */
+  public void setPermission(Path path, FsPermission perm) throws IOException {
+    fileSystem.setPermission(path, perm);
+    if (path.getParent() != null) {
+      setPermission(path.getParent(), perm);
+    }
+  }
+
+  /**
+   * 只设置当前目录的权限
+   * @param path
+   * @param perm
+   * @throws IOException
+   */
+  public void setPermissionThis(Path path, FsPermission perm) throws IOException {
+    fileSystem.setPermission(path, perm);
+  }
+
 
   /**
    * copy 一个文件到另一个目标文件

@@ -13,17 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.baifendian.swordfish.common.job.struct.node.impexp.writer;
+package com.baifendian.swordfish.execserver.job.impexp.Args;
 
 /**
- * 写接口
+ * 读参数接口
  */
-public interface Writer {
-  /**
-   * 校验writer是否合法
-   * @return
-   */
-  default boolean checkValid(){
-    return true;
-  }
+public interface ReaderArg {
+  String dataxName();
 }

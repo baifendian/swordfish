@@ -13,25 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.baifendian.swordfish.common.job.struct.node.impexp.writer;
+package com.baifendian.swordfish.common.job.struct.node.impexp.reader;
 
-import com.baifendian.swordfish.common.enums.WriteMode;
-import com.baifendian.swordfish.common.job.struct.node.impexp.column.HiveColumn;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 
 import java.util.List;
 
 /**
- * hive 写入对象
+ * Hive reader
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class HiveWriter implements Writer {
-
+public class HiveReader implements Reader {
   private String database;
   private String table;
-  private WriteMode writeMode;
-  private List<HiveColumn> column;
+  private String where;
+  private String querySql;
+  private List<String> column;
 
   public String getDatabase() {
     return database;
@@ -49,24 +48,34 @@ public class HiveWriter implements Writer {
     this.table = table;
   }
 
-  public WriteMode getWriteMode() {
-    return writeMode;
+  public String getWhere() {
+    return where;
   }
 
-  public void setWriteMode(WriteMode writeMode) {
-    this.writeMode = writeMode;
+  public void setWhere(String where) {
+    this.where = where;
   }
 
-  public List<HiveColumn> getColumn() {
+  public String getQuerySql() {
+    return querySql;
+  }
+
+  public void setQuerySql(String querySql) {
+    this.querySql = querySql;
+  }
+
+  public List<String> getColumn() {
     return column;
   }
 
-  public void setColumn(List<HiveColumn> column) {
+  public void setColumn(List<String> column) {
     this.column = column;
   }
 
   @Override
   public boolean checkValid() {
-    return StringUtils.isNotEmpty(database) && StringUtils.isNotEmpty(table);
+    return StringUtils.isNotEmpty(database) &&
+            (StringUtils.isNotEmpty(table) || StringUtils.isNotEmpty(querySql)) &&
+            CollectionUtils.isNotEmpty(column);
   }
 }
