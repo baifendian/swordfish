@@ -70,8 +70,8 @@ public class ExecController {
                                           @RequestParam(value = "notifyMails", required = false) String notifyMails,
                                           @RequestParam(value = "timeout", required = false, defaultValue = "1800") int timeout) {
     logger.info("Operator user {}, exec workflow, project name: {}, workflow name: {}, schedule: {}, node name: {}, node dep: {}, notify type: {}, " +
-            "notify mails: {}, timeout: {}",
-        operator.getName(), projectName, workflowName, schedule, nodeName, nodeDep, notifyType, notifyMails, timeout);
+                    "notify mails: {}, timeout: {}",
+            operator.getName(), projectName, workflowName, schedule, nodeName, nodeDep, notifyType, notifyMails, timeout);
 
     return execService.postExecWorkflow(operator, projectName, workflowName, schedule, execType, nodeName, nodeDep, notifyType, notifyMails, timeout);
   }
@@ -107,7 +107,7 @@ public class ExecController {
                                           @RequestParam(value = "timeout", required = false, defaultValue = "18000") int timeout,
                                           @RequestParam(value = "extras", required = false) String extras) {
     logger.info("Operator user {}, exec workflow, project name: {}, workflow name: {}, proxy user: {}, queue: {}, data: {}, file: {}," +
-        "notify type: {}, notify mails: {}, timeout: {}, extras: {}", operator.getName(), projectName, workflowName, proxyUser, queue, data, file.getName(), notifyType, notifyMails, timeout, extras);
+            "notify type: {}, notify mails: {}, timeout: {}, extras: {}", operator.getName(), projectName, workflowName, proxyUser, queue, data, file.getName(), notifyType, notifyMails, timeout, extras);
 
     return execService.postExecWorkflowDirect(operator, projectName, workflowName, desc, proxyUser, queue, data, file, notifyType, notifyMails, timeout, extras);
   }
@@ -127,15 +127,15 @@ public class ExecController {
    */
   @GetMapping(value = "")
   public ExecWorkflowsDto queryExecs(@RequestAttribute(value = "session.user") User operator,
-                                     @RequestParam(value = "startDate") long startDate,
-                                     @RequestParam(value = "endDate") long endDate,
+                                     @RequestParam(value = "startDate", required = false) Long startDate,
+                                     @RequestParam(value = "endDate", required = false) Long endDate,
                                      @RequestParam(value = "projectName") String projectName,
                                      @RequestParam(value = "workflowName", required = false) String workflowName,
                                      @RequestParam(value = "status", required = false) String status,
                                      @RequestParam(value = "from", required = false, defaultValue = "0") int from,
                                      @RequestParam(value = "size", required = false, defaultValue = "100") int size) {
     logger.info("Operator user {}, query exec list, start date: {}, end date: {}, project name: {}, workflow name: {}, status: {}, from: {}, size: {}",
-        operator.getName(), startDate, endDate, projectName, workflowName, status, from, size);
+            operator.getName(), startDate, endDate, projectName, workflowName, status, from, size);
 
     // from 的限制
     if (from < 0) {
@@ -147,7 +147,18 @@ public class ExecController {
       throw new BadRequestException("Argument is not valid, size must be between (0, 1000]");
     }
 
-    return execService.getExecWorkflow(operator, projectName, workflowName, new Date(startDate), new Date(endDate), status, from, size);
+    Date startTime = null;
+    if (startDate != null) {
+      startTime = new Date(startDate);
+    }
+
+    Date endTime = null;
+    if (endDate != null) {
+      endTime = new Date(endDate);
+    }
+
+
+    return execService.getExecWorkflow(operator, projectName, workflowName, startTime, endTime, status, from, size);
   }
 
   /**
@@ -161,7 +172,7 @@ public class ExecController {
   public ExecutionFlowDto queryExecDetail(@RequestAttribute(value = "session.user") User operator,
                                           @PathVariable(value = "execId") int execId) {
     logger.info("Operator user {}, query exec detail, exec id: {}",
-        operator.getName(), execId);
+            operator.getName(), execId);
 
     return execService.getExecWorkflow(operator, execId);
   }
@@ -181,7 +192,7 @@ public class ExecController {
                              @RequestParam(value = "from", required = false, defaultValue = "0") int from,
                              @RequestParam(value = "size", required = false, defaultValue = "100") int size) {
     logger.info("Operator user {}, query log, job id: {}, from: {}, size: {}",
-        operator.getName(), jobId, from, size);
+            operator.getName(), jobId, from, size);
 
     // from 的限制
     if (from < 0) {
@@ -206,7 +217,7 @@ public class ExecController {
   public void killExec(@RequestAttribute(value = "session.user") User operator,
                        @PathVariable int execId) {
     logger.info("Operator user {}, kill exec, exec id: {}",
-        operator.getName(), execId);
+            operator.getName(), execId);
 
     execService.postKillWorkflow(operator, execId);
   }
