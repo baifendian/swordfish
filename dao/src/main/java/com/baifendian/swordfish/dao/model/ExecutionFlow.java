@@ -108,11 +108,6 @@ public class ExecutionFlow {
   private String workflowName;
 
   /**
-   * 执行时间
-   */
-  private Integer duration;
-
-  /**
    * 调度时间
    **/
   private Date scheduleTime;
@@ -167,22 +162,6 @@ public class ExecutionFlow {
    * 作业提交队列
    **/
   private String queue;
-
-  public Integer getDuration() {
-    if (duration != null) {
-      return duration;
-    }
-
-    if (startTime != null && endTime != null) {
-      duration = Math.toIntExact((endTime.getTime() - startTime.getTime()) / 1000);
-    }
-
-    return duration;
-  }
-
-  public void setDuration(Integer duration) {
-    this.duration = duration;
-  }
 
   public String getWorkflowName() {
     return workflowName;
