@@ -58,6 +58,8 @@ public class StreamingRunnerManager {
 
   /**
    * 提交一个流任务
+   *
+   * @param streamingResult 流任务的结果
    */
   public void submitJob(StreamingResult streamingResult) {
 
@@ -87,6 +89,8 @@ public class StreamingRunnerManager {
 
   /**
    * 取消一个流任务, 读取里面的 application, 然后发起关闭请求
+   *
+   * @param streamingResult 流任务的结果
    */
   public void cancelJob(StreamingResult streamingResult) {
     JobProps props = new JobProps();

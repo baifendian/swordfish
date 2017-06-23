@@ -17,6 +17,9 @@ package com.baifendian.swordfish.execserver.runner.node;
 
 import com.baifendian.swordfish.common.config.BaseConfig;
 import com.baifendian.swordfish.common.utils.http.HttpUtil;
+import com.baifendian.swordfish.dao.DaoFactory;
+import com.baifendian.swordfish.dao.FlowDao;
+import com.baifendian.swordfish.dao.enums.FlowStatus;
 import com.baifendian.swordfish.dao.model.ExecutionFlow;
 import com.baifendian.swordfish.dao.model.ExecutionNode;
 import com.baifendian.swordfish.dao.model.FlowNode;
@@ -57,7 +60,10 @@ public class NodeRunner implements Callable<Boolean> {
 
   private Semaphore semaphore;
 
+  private final FlowDao flowDao;
+
   public NodeRunner(JobContext jobContext) {
+    this.flowDao = DaoFactory.getDaoInstance(FlowDao.class);
     this.executionFlow = jobContext.getExecutionFlow();
     this.executionNode = jobContext.getExecutionNode();
     this.flowNode = jobContext.getFlowNode();
@@ -86,6 +92,11 @@ public class NodeRunner implements Callable<Boolean> {
 
   @Override
   public Boolean call() {
+    // 更新结点状态为正在运行
+    executionNode.setStatus(FlowStatus.RUNNING);
+
+    flowDao.updateExecutionNode(executionNode);
+
     // "项目id/flowId/执行id"
     String jobScriptPath = BaseConfig.getFlowExecDir(executionFlow.getProjectId(), executionFlow.getFlowId(), executionFlow.getId());
 

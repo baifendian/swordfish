@@ -297,11 +297,13 @@ public class StreamingResultMapperProvider {
       SELECT("s.notify_type");
       SELECT("s.notify_mails");
       SELECT("s.type");
+      SELECT("p.name as project_name");
       SELECT("r.*");
 
       FROM(TABLE_NAME + " as r");
 
       JOIN("streaming_job s on r.streaming_id = s.id");
+      JOIN("project p on s.project_id = p.id");
     }};
   }
 

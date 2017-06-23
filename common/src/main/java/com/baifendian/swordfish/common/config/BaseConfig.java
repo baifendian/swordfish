@@ -15,12 +15,6 @@
  */
 package com.baifendian.swordfish.common.config;
 
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.util.ResourceUtils;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -30,6 +24,11 @@ import java.util.HashSet;
 import java.util.Properties;
 import java.util.Set;
 import java.util.UUID;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.util.ResourceUtils;
 
 public class BaseConfig {
 
@@ -41,14 +40,17 @@ public class BaseConfig {
   // 本地目录, 用于存放下载的临时文件
   private static String localDownloadBasePath;
 
-  // hdfs 目录, 用于存放 资源和工作流 的数据
-  private static String hdfsDataBasePath;
-
   // 本地目录, 用于执行工作流
   private static String localExecBasePath;
 
-  // 本地目录, udf jar 目录
-  private static String jobHiveUdfJarBasePath;
+  // hdfs 目录, 用于存放 资源和工作流 的数据
+  private static String hdfsDataBasePath;
+
+  // hdfs udf jar 目录
+  private static String hdfsUdfJarBasePath;
+
+  // hdfs 导入导出的临时目录
+  private static String hdfsImpexpBasePath;
 
   // 禁用用户列表
   private static Set<String> prohibitUserSet;
@@ -68,11 +70,13 @@ public class BaseConfig {
 
       properties.load(is);
 
-      localDataBasePath = properties.getProperty("local.data.base.path");
-      localDownloadBasePath = properties.getProperty("local.download.base.path");
-      hdfsDataBasePath = properties.getProperty("hdfs.data.base.path");
-      localExecBasePath = properties.getProperty("local.exec.base.path");
-      jobHiveUdfJarBasePath = properties.getProperty("job.hive.udfjar.hdfs.basepath");
+      localDataBasePath = properties.getProperty("local.data.basepath");
+      localDownloadBasePath = properties.getProperty("local.download.basepath");
+      localExecBasePath = properties.getProperty("local.exec.basepath");
+
+      hdfsDataBasePath = properties.getProperty("hdfs.data.basepath");
+      hdfsUdfJarBasePath = properties.getProperty("hdfs.udfjar.basepath");
+      hdfsImpexpBasePath = properties.getProperty("hdfs.impexp.basepath");
 
       systemEnvPath = properties.getProperty("sf.env.file");
 
@@ -95,19 +99,14 @@ public class BaseConfig {
 
   /**
    * 得到下载到本地的文件名称, 能保证区分开来名称
-   *
-   * @param filename
-   * @return
    */
   public static String getLocalDownloadFilename(String filename) {
-    return MessageFormat.format("{0}/{1}/{2}", localDownloadBasePath, UUID.randomUUID().toString(), filename);
+    return MessageFormat
+        .format("{0}/{1}/{2}", localDownloadBasePath, UUID.randomUUID().toString(), filename);
   }
 
   /**
    * local 上项目的文件目录
-   *
-   * @param projectId
-   * @return
    */
   public static String getLocalProjectDir(int projectId) {
     return MessageFormat.format("{0}/{1}", localDataBasePath, projectId);
@@ -115,9 +114,6 @@ public class BaseConfig {
 
   /**
    * 本地的资源数据缓存文件目录
-   *
-   * @param projectId
-   * @return
    */
   public static String getLocalResourceDir(int projectId) {
     return MessageFormat.format("{0}/resources", getLocalProjectDir(projectId));
@@ -125,10 +121,6 @@ public class BaseConfig {
 
   /**
    * 本地的资源数据缓存文件名称
-   *
-   * @param projectId
-   * @param filename
-   * @return
    */
   public static String getLocalResourceFilename(int projectId, String filename) {
     return MessageFormat.format("{0}/{1}", getLocalResourceDir(projectId), filename);
@@ -136,9 +128,6 @@ public class BaseConfig {
 
   /**
    * 本地的工作流数据缓存文件目录
-   *
-   * @param projectId
-   * @return
    */
   public static String getLocalWorkflowDir(int projectId) {
     return MessageFormat.format("{0}/workflows", getLocalProjectDir(projectId));
@@ -146,10 +135,6 @@ public class BaseConfig {
 
   /**
    * 本地的工作流数据缓存文件名称
-   *
-   * @param projectId
-   * @param filename
-   * @return
    */
   public static String getLocalWorkflowFilename(int projectId, String filename) {
     return MessageFormat.format("{0}/{1}.{2}", getLocalWorkflowDir(projectId), filename, ".zip");
@@ -157,10 +142,6 @@ public class BaseConfig {
 
   /**
    * 本地工作流数据缓存解压文件夹名
-   *
-   * @param projectId
-   * @param filename
-   * @return
    */
   public static String getLocalWorkflowExtractDir(int projectId, String filename) {
     return MessageFormat.format("{0}/{1}", getLocalWorkflowDir(projectId), filename);
@@ -168,9 +149,6 @@ public class BaseConfig {
 
   /**
    * hdfs 上项目的文件目录
-   *
-   * @param projectId
-   * @return
    */
   public static String getHdfsProjectDir(int projectId) {
     return MessageFormat.format("{0}/{1}", hdfsDataBasePath, projectId);
@@ -178,9 +156,6 @@ public class BaseConfig {
 
   /**
    * hdfs 上资源的文件目录
-   *
-   * @param projectId
-   * @return
    */
   public static String getHdfsResourcesDir(int projectId) {
     return MessageFormat.format("{0}/resources", getHdfsProjectDir(projectId));
@@ -188,10 +163,6 @@ public class BaseConfig {
 
   /**
    * hdfs 上资源的文件名称
-   *
-   * @param projectId
-   * @param filename
-   * @return
    */
   public static String getHdfsResourcesFilename(int projectId, String filename) {
     return MessageFormat.format("{0}/{1}", getHdfsResourcesDir(projectId), filename);
@@ -199,9 +170,6 @@ public class BaseConfig {
 
   /**
    * hdfs 上工作流数据的文件目录
-   *
-   * @param projectId
-   * @return
    */
   public static String getHdfsWorkflowDir(int projectId) {
     return MessageFormat.format("{0}/workflows", getHdfsProjectDir(projectId));
@@ -209,10 +177,6 @@ public class BaseConfig {
 
   /**
    * hdfs 上工作流数据的文件名称
-   *
-   * @param projectId
-   * @param filename
-   * @return
    */
   public static String getHdfsWorkflowFilename(int projectId, String filename) {
     return MessageFormat.format("{0}/{1}.{2}", getHdfsWorkflowDir(projectId), filename, "zip");
@@ -220,62 +184,42 @@ public class BaseConfig {
 
   /**
    * 工作流执行的目录
-   *
-   * @param projectId
-   * @param workflowId
-   * @param execId
-   * @return
    */
   public static String getFlowExecDir(int projectId, int workflowId, long execId) {
-    return String.format("%s/flow/%d/%d/%d", localExecBasePath, projectId, workflowId, execId);
-  }
-
-  /**
-   * 获取 ImpExp 缓存的路径
-   *
-   * @param projectId
-   * @param execId
-   * @return
-   */
-  public static String getHdfsImpExpDir(int projectId, int execId, String nodeName) {
-    return MessageFormat.format("{0}/{1}/impexp/{2}/{3}", hdfsDataBasePath, String.valueOf(projectId), String.valueOf(execId), nodeName);
+    return MessageFormat.format("{0}/flow/{1}/{2}/{3}", localExecBasePath, projectId, workflowId, execId);
   }
 
   /**
    * 流任务执行的目录
-   *
-   * @param projectId
-   * @param jobId
-   * @param execId
-   * @return
    */
   public static String getStreamingExecDir(int projectId, int jobId, long execId) {
-    return String.format("%s/streaming/%d/%d/%d", localExecBasePath, projectId, jobId, execId);
+    return MessageFormat.format("{0}/streaming/{1}/{2}/{3}", localExecBasePath, projectId, jobId, execId);
+  }
+
+  /**
+   * 获取 ImpExp 缓存的路径
+   */
+  public static String getHdfsImpExpDir(int projectId, int execId, String nodeName) {
+    return MessageFormat
+        .format("{0}/{1}/{2}/{3}", hdfsImpexpBasePath, projectId, execId, nodeName);
+  }
+
+  /**
+   * 返回 hive 的 udf jar 路径
+   */
+  public static String getJobHiveUdfJarBasePath() {
+    return hdfsUdfJarBasePath;
   }
 
   /**
    * 得到系统环境变量路径
-   *
-   * @return
    */
   public static String getSystemEnvPath() {
     return systemEnvPath;
   }
 
   /**
-   * 返回 hive 的 udf jar 路径
-   *
-   * @return
-   */
-  public static String getJobHiveUdfJarBasePath() {
-    return jobHiveUdfJarBasePath;
-  }
-
-  /**
    * 是否禁用用户
-   *
-   * @param user
-   * @return
    */
   public static boolean isProhibitUser(String user) {
     return prohibitUserSet.contains(user);
