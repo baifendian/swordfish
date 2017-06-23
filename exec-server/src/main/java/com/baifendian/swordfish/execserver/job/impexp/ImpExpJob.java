@@ -130,7 +130,7 @@ public abstract class ImpExpJob extends AbstractProcessJob {
    *
    * @return
    */
-  public abstract WriterArg getDateXWriterArg() throws ConfigurationException, Exception;
+  public abstract WriterArg getDateXWriterArg() throws Exception;
 
   /**
    * 生成datax 文件
@@ -158,7 +158,9 @@ public abstract class ImpExpJob extends AbstractProcessJob {
   public final String createCommand() throws Exception {
     logger.info("Start create DataX command...");
     File dataXJson = createDataXParam(getDataXJson());
-    String command = MessageFormat.format(COMMAND, workConf.getString("executor.datax.mian"), dataXJson.getAbsolutePath());
+
+    String dataxMian = MessageFormat.format("{0}/bin/datax.py", workConf.getString("executor.datax.home"));
+    String command = MessageFormat.format(COMMAND, dataxMian, dataXJson.getAbsolutePath());
     logger.info("Finish create DataX commond: {}", command);
     return command;
   }

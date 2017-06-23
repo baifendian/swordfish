@@ -37,7 +37,7 @@ hadoopYarnAddress="172.24.5.149"
 envFile="/home/baseline/.sf_env.sh"
 
 # datax home path
-dataxHome="/home/baseline/DataX/target/datax/datax/bin/datax.py"
+dataxHome="/home/baseline/DataX/target/datax/datax"
 
 # 使用示例
 function usage() {
@@ -94,7 +94,7 @@ function file_replace()
     sed -i "s#hive.uris.*#hive.uris = jdbc:hive2://${hiveAddress}:10000#g" conf/common/hive/hive.properties
 
     # 6. worker.properties
-    sed -i "s#executor.datax.mian.*#executor.datax.mian = ${dataxHome}#g" conf/worker.properties
+    sed -i "s#executor.datax.home.*#executor.datax.home = ${dataxHome}#g" conf/worker.properties
 }
 
 function process_check()
