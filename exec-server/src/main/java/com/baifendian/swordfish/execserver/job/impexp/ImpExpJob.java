@@ -88,7 +88,7 @@ public abstract class ImpExpJob extends AbstractProcessJob {
   }
 
   @Override
-  public void initJob() {
+  public void init() {
     logger.info("Start init base job...");
     datasourceDao = DaoFactory.getDaoInstance(DatasourceDao.class);
     try {

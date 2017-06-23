@@ -124,6 +124,9 @@ public class StreamingRunner implements Callable<Boolean> {
       // 可以运行了
       job = JobManager.newJob(streamingResult.getType(), props, jobLogger);
 
+      // job 的初始化
+      job.init();
+
       // job 的前处理
       job.before();
 

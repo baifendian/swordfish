@@ -137,6 +137,9 @@ public class NodeRunner implements Callable<Boolean> {
     try {
       job = JobManager.newJob(flowNode.getType(), props, jobLogger);
 
+      // job 的初始化
+      job.init();
+
       // job 的前处理
       job.before();
 

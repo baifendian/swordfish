@@ -57,7 +57,7 @@ public class MrJob extends AbstractYarnJob {
   }
 
   @Override
-  public void initJob() {
+  public void init() {
     mrParam = JsonUtil.parseObject(props.getJobParams(), MrParam.class);
     mrParam.setQueue(props.getQueue());
   }

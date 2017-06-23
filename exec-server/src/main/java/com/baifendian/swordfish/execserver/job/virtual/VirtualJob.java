@@ -39,10 +39,6 @@ public class VirtualJob extends AbstractProcessJob {
   }
 
   @Override
-  public void initJob() {
-  }
-
-  @Override
   public BaseParam getParam() {
     return null;
   }

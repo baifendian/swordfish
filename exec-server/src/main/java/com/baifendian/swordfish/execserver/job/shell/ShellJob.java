@@ -49,7 +49,7 @@ public class ShellJob extends AbstractProcessJob {
   }
 
   @Override
-  public void initJob() {
+  public void init() {
     logger.debug("job params {}", props.getJobParams());
 
     shellParam = JsonUtil.parseObject(props.getJobParams(), ShellParam.class);
