@@ -18,9 +18,11 @@ package com.baifendian.swordfish.execserver.job.impexp.Args;
 import com.baifendian.swordfish.common.enums.WriteHdfsType;
 import com.baifendian.swordfish.common.enums.WriteMode;
 import com.baifendian.swordfish.common.job.struct.node.impexp.column.HiveColumn;
+import com.baifendian.swordfish.execserver.parameter.ParamHelper;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * HDFS 写参数
@@ -98,4 +100,5 @@ public class HdfsWriterArg implements WriterArg {
   public String dataxName() {
     return "hdfswriter";
   }
+
 }
