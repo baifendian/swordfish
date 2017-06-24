@@ -33,7 +33,7 @@ public class EmailManager {
   /**
    * 邮件标题格式
    */
-  private static final String TITLE_FORMAT = "[Swordfish system notify, {0} [{1}]]";
+  private static final String TITLE_FORMAT = "[{0}]Swordfish system notify, {1}";
 
   /**
    * 获取邮件任务
@@ -62,7 +62,7 @@ public class EmailManager {
       Date endTime,
       List<String> receivers) {
     // 得到标题
-    String title = MessageFormat.format(TITLE_FORMAT, type, getFlowStatusCnName(status));
+    String title = MessageFormat.format(TITLE_FORMAT, getFlowStatusCnName(status), type);
 
     String content = MessageFormat.format(CONTENT_FORMAT, type, projectName, jobName,
         proxyUser, queue, DateUtils.defaultFormat(scheduleTime), DateUtils.defaultFormat(startTime),
