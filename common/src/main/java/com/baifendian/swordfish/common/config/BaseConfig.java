@@ -109,7 +109,7 @@ public class BaseConfig {
    * local 上项目的文件目录
    */
   public static String getLocalProjectDir(int projectId) {
-    return MessageFormat.format("{0}/{1}", localDataBasePath, projectId);
+    return MessageFormat.format("{0}/{1}", localDataBasePath, Integer.toString(projectId));
   }
 
   /**
@@ -151,7 +151,7 @@ public class BaseConfig {
    * hdfs 上项目的文件目录
    */
   public static String getHdfsProjectDir(int projectId) {
-    return MessageFormat.format("{0}/{1}", hdfsDataBasePath, projectId);
+    return MessageFormat.format("{0}/{1}", hdfsDataBasePath, Integer.toString(projectId));
   }
 
   /**
@@ -186,22 +186,28 @@ public class BaseConfig {
    * 工作流执行的目录
    */
   public static String getFlowExecDir(int projectId, int workflowId, long execId) {
-    return MessageFormat.format("{0}/flow/{1}/{2}/{3}", localExecBasePath, projectId, workflowId, execId);
+    return MessageFormat
+        .format("{0}/flow/{1}/{2}/{3}", localExecBasePath, Integer.toString(projectId),
+            Integer.toString(workflowId), Long.toString(execId));
   }
 
   /**
    * 流任务执行的目录
    */
   public static String getStreamingExecDir(int projectId, int jobId, long execId) {
-    return MessageFormat.format("{0}/streaming/{1}/{2}/{3}", localExecBasePath, projectId, jobId, execId);
+    return MessageFormat
+        .format("{0}/streaming/{1}/{2}/{3}", localExecBasePath, Integer.toString(projectId),
+            Integer.toString(jobId),
+            Long.toString(execId));
   }
 
   /**
    * 获取 ImpExp 缓存的路径
    */
-  public static String getHdfsImpExpDir(int projectId, int execId, String nodeName) {
+  public static String getHdfsImpExpDir(int projectId, long execId, String nodeName) {
     return MessageFormat
-        .format("{0}/{1}/{2}/{3}", hdfsImpexpBasePath, projectId, execId, nodeName);
+        .format("{0}/{1}/{2}/{3}", hdfsImpexpBasePath, Integer.toString(projectId),
+            Long.toString(execId), nodeName);
   }
 
   /**
@@ -223,5 +229,9 @@ public class BaseConfig {
    */
   public static boolean isProhibitUser(String user) {
     return prohibitUserSet.contains(user);
+  }
+
+  public static void main(String[] args) {
+    System.out.println(BaseConfig.getFlowExecDir(1111111, 2222222, 3333333));
   }
 }
