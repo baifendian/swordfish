@@ -31,6 +31,8 @@ public class ReaderFactory {
         return JsonUtil.parseObject(reader, MysqlReader.class);
       case HIVE_TO_MYSQL:
         return JsonUtil.parseObject(reader, HiveReader.class);
+      case HIVE_TO_MONGO:
+        return JsonUtil.parseObject(reader, HiveReader.class);
       default:
         return null;
     }
