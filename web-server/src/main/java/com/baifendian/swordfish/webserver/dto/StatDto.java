@@ -60,7 +60,7 @@ public class StatDto {
   }
 
   public StatDto(ExecutionState executionState) {
-    if (executionState != null){
+    if (executionState != null) {
       this.hour = executionState.getHour();
       this.date = executionState.getDay();
       this.info = new Info(executionState);
@@ -69,25 +69,28 @@ public class StatDto {
 
   public static class Info {
     private int init;
-    private int waiting_dep;
-    private int waiting_res;
+    private int waitingDep;
+    private int waitingRes;
     private int running;
     private int success;
     private int kill;
     private int failed;
+    private int depFailed;
     private int total;
 
-    public Info(){}
+    public Info() {
+    }
 
-    public Info(ExecutionState executionState){
-      if (executionState!=null){
+    public Info(ExecutionState executionState) {
+      if (executionState != null) {
         this.init = executionState.getInit();
-        this.waiting_dep = executionState.getWaitingDep();
-        this.waiting_res = executionState.getWaitingRes();
+        this.waitingDep = executionState.getWaitingDep();
+        this.waitingRes = executionState.getWaitingRes();
         this.running = executionState.getRunning();
         this.success = executionState.getSuccess();
         this.kill = executionState.getKill();
         this.failed = executionState.getFailed();
+        this.depFailed = executionState.getDepFailed();
       }
     }
 
@@ -99,20 +102,32 @@ public class StatDto {
       this.init = init;
     }
 
-    public int getWaiting_dep() {
-      return waiting_dep;
+    public int getWaitingDep() {
+      return waitingDep;
     }
 
-    public void setWaiting_dep(int waiting_dep) {
-      this.waiting_dep = waiting_dep;
+    public void setWaitingDep(int waitingDep) {
+      this.waitingDep = waitingDep;
     }
 
-    public int getWaiting_res() {
-      return waiting_res;
+    public int getWaitingRes() {
+      return waitingRes;
     }
 
-    public void setWaiting_res(int waiting_res) {
-      this.waiting_res = waiting_res;
+    public void setWaitingRes(int waitingRes) {
+      this.waitingRes = waitingRes;
+    }
+
+    public int getDepFailed() {
+      return depFailed;
+    }
+
+    public void setDepFailed(int depFailed) {
+      this.depFailed = depFailed;
+    }
+
+    public void setTotal(int total) {
+      this.total = total;
     }
 
     public int getRunning() {
@@ -148,7 +163,7 @@ public class StatDto {
     }
 
     public int getTotal() {
-      return this.init+this.waiting_dep+this.waiting_res+this.running+this.success+this.kill+this.failed;
+      return this.init + this.waitingDep + this.waitingRes + this.running + this.success + this.kill + this.failed + this.depFailed;
     }
 
   }
