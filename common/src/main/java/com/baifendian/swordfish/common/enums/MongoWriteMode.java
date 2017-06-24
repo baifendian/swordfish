@@ -13,14 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.baifendian.swordfish.execserver.job.impexp.Args;
-
-import java.util.Map;
+package com.baifendian.swordfish.common.enums;
 
 /**
- * 写参数接口
+ * mongo 写入模式枚举
  */
-public interface WriterArg {
-  String dataxName();
+public enum MongoWriteMode {
+  INSERT, UPDATE, UPSET;
 
+  /**
+   * 判断是否需要upsetKey
+   * @return
+   */
+  public boolean hasUpsetKey(){
+    return this == UPDATE || this == UPDATE;
+  }
 }

@@ -33,6 +33,7 @@ import com.baifendian.swordfish.execserver.job.impexp.Args.HdfsWriterArg;
 import com.baifendian.swordfish.execserver.job.impexp.Args.MysqlReaderArg;
 import com.baifendian.swordfish.execserver.job.impexp.Args.ReaderArg;
 import com.baifendian.swordfish.execserver.job.impexp.Args.WriterArg;
+import com.baifendian.swordfish.execserver.parameter.ParamHelper;
 import org.apache.avro.data.Json;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
@@ -102,7 +103,7 @@ public abstract class ImpExpJob extends AbstractProcessJob {
   }
 
   /**
-   * 生成datax需要的json文件
+   * 生成datax需要的json
    *
    * @return
    */
@@ -115,6 +116,9 @@ public abstract class ImpExpJob extends AbstractProcessJob {
     String settingJson = JsonUtil.toJsonString(impExpParam.getSetting());
     String json = MessageFormat.format(DATAX_JSON, readerArg.dataxName(), readerJson, writerArg.dataxName(), writerJson, settingJson);
     logger.info("Finish get DataX json: {}", json);
+    logger.info("Start parameter replacement...");
+    json = ParamHelper.resolvePlaceholders(json, props.getDefinedParams());
+    logger.info("Finish parameter replacement, json:{}", json);
     return json;
   }
 

@@ -107,7 +107,7 @@ public class MysqlToHiveJob extends ImpExpJob {
     //TODO 增加一个判断根据类型
     DataSource datasource = datasourceDao.queryResource(props.getProjectId(), mysqlReader.getDatasource());
     if (datasource == null) {
-      throw new NoSuchFieldException(MessageFormat.format("Datasource {0} in project {1} not found!", mysqlReader.getDatasource(), props.getProjectId()));
+      throw new NoSuchFieldException(MessageFormat.format("Datasource {0} in project {1} not found!", mysqlReader.getDatasource(), String.valueOf(props.getProjectId())));
     }
     MysqlDatasource mysqlDatasource = (MysqlDatasource) DatasourceFactory.getDatasource(DbType.MYSQL, datasource.getParameter());
     ObjectNode connection = (ObjectNode) mysqlReaderArg.getConnection().get(0);

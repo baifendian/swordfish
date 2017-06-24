@@ -13,14 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.baifendian.swordfish.execserver.job.impexp.Args;
-
-import java.util.Map;
+package com.baifendian.swordfish.common.job.struct.node.impexp.column;
 
 /**
- * 写参数接口
+ * Mongo Column
  */
-public interface WriterArg {
-  String dataxName();
+public class MongoColumn {
+  private String name;
+  private String type;
 
+  public String getName() {
+    return name;
+  }
+
+  public void setName(String name) {
+    this.name = name;
+  }
+
+  public String getType() {
+    return type;
+  }
+
+  public void setType(String type) {
+    this.type = type;
+  }
 }

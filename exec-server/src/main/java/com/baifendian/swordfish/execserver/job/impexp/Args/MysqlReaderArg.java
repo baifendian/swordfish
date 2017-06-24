@@ -17,7 +17,9 @@ package com.baifendian.swordfish.execserver.job.impexp.Args;
 
 import com.baifendian.swordfish.common.job.struct.node.impexp.reader.MysqlReader;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
+import com.baifendian.swordfish.execserver.parameter.ParamHelper;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.avro.data.Json;
@@ -29,6 +31,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * DataX 中 mysqlReader的配置
@@ -110,4 +113,5 @@ public class MysqlReaderArg implements ReaderArg {
   public String dataxName() {
     return "mysqlreader";
   }
+
 }

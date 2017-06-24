@@ -43,6 +43,8 @@ public class ImpExpJobManager {
         return new MysqlToHdfsJob(props, false, logger, impExpParam);
       case HIVE_TO_MYSQL:
         return new HiveToMysqlJob(props, false, logger, impExpParam);
+      case HIVE_TO_MONGO:
+        return new HiveToMongoJob(props, false, logger, impExpParam);
       default:
         logger.error("unsupport ImpExp job type: {}", jobTypeStr);
         throw new IllegalArgumentException("Not support job type");
