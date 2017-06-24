@@ -102,7 +102,7 @@ public class MongoWriterArg implements WriterArg {
 
   public MongoWriterArg(MongoWriter mongoWriter) {
     this.upsertKey = mongoWriter.getUpsetKey();
-    this.writeMode = mongoWriter.getWirteMode();
+    this.writeMode = mongoWriter.getWriteMode();
     this.collectionName = mongoWriter.getTable();
     this.column = mongoWriter.getColumn();
   }

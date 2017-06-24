@@ -28,7 +28,7 @@ import java.util.List;
 public class MongoWriter implements Writer {
   private String datasource;
   private String table;
-  private MongoWriteMode wirteMode;
+  private MongoWriteMode writeMode;
   private List<MongoColumn> column;
   private String upsetKey;
 
@@ -48,12 +48,12 @@ public class MongoWriter implements Writer {
     this.table = table;
   }
 
-  public MongoWriteMode getWirteMode() {
-    return wirteMode;
+  public MongoWriteMode getWriteMode() {
+    return writeMode;
   }
 
-  public void setWirteMode(MongoWriteMode wirteMode) {
-    this.wirteMode = wirteMode;
+  public void setWriteMode(MongoWriteMode writeMode) {
+    this.writeMode = writeMode;
   }
 
   public List<MongoColumn> getColumn() {
@@ -77,6 +77,6 @@ public class MongoWriter implements Writer {
     return StringUtils.isNotEmpty(datasource) &&
             StringUtils.isNotEmpty(table) &&
             CollectionUtils.isNotEmpty(column) &&
-            !(wirteMode.hasUpsetKey() && StringUtils.isEmpty(upsetKey));
+            !(writeMode.hasUpsetKey() && StringUtils.isEmpty(upsetKey));
   }
 }
