@@ -207,8 +207,7 @@ public class HiveService {
    * 把数据插入表中
    */
   public void insertTable(String srcDbNmae, String srcTableName, String destDbName, String destTableName, List<HqlColumn> srcHqlColumnList, List<HqlColumn> destHqlColumnList, WriteMode writeMode) throws SQLException, TException {
-    String hiveSet = "hive.exec.dynamic.partition.mode=nonstrict;";
-    String insertSql = "INSERT {0} TABLE {1}.{2} {3} SELECT {4} FROM {5}.{6}";
+    String insertSql = "hive.exec.dynamic.partition.mode=nonstrict;INSERT {0} TABLE {1}.{2} {3} SELECT {4} FROM {5}.{6}";
     String partFieldSql = "";
 
     // 所有的分区都是必传字段先整理出分区字段
