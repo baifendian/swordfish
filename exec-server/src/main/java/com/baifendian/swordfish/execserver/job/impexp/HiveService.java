@@ -206,9 +206,9 @@ public class HiveService {
   /**
    * 把数据插入表中
    */
-  public void insertTable(String srcDbNmae, String srcTableName, String destDbName, String destTableName, WriteMode writeMode) throws SQLException, TException {
+  public void insertTable(String srcDbNmae, String srcTableName, String destDbName, String destTableName, List<HqlColumn> srcHqlColumnList, List<HqlColumn> destHqlColumnList, WriteMode writeMode) throws SQLException, TException {
     String hiveSet = "hive.exec.dynamic.partition.mode=nonstrict;";
-    String insertSql = "INSERT {0} TABLE {1}.{2} {3} SELECT * FROM {4}.{5}";
+    String insertSql = "INSERT {0} TABLE {1}.{2} {3} SELECT {4} FROM {5}.{6}";
     String partFieldSql = "";
 
     // 所有的分区都是必传字段先整理出分区字段
@@ -224,7 +224,7 @@ public class HiveService {
 
       partFieldSql = MessageFormat.format("PARTITION({0})", String.join(",", partNameList));
     }
-/*
+
 
     List<String> fieldList = new ArrayList<>();
 
@@ -239,11 +239,11 @@ public class HiveService {
         }
       }
       if (!found) {
-        fieldList.add(MessageFormat.format("NULL as {0}", destHqlColumn.getName()));
+        fieldList.add(MessageFormat.format("null as `{0}`", destHqlColumn.getName()));
       }
     }
-*/
-    insertSql = MessageFormat.format(insertSql, writeMode.gethiveSql(), destDbName, destTableName, partFieldSql, srcDbNmae, srcTableName);
+
+    insertSql = MessageFormat.format(insertSql, writeMode.gethiveSql(), destDbName, destTableName, partFieldSql, String.join(",", fieldList), srcDbNmae, srcTableName);
     logger.info("Insert table sql: {}", insertSql);
 
     Statement stmt = null;
