@@ -249,7 +249,7 @@ public class HiveService {
     try {
       logger.info("Start insert hive table ...");
       stmt = con.createStatement();
-      stmt.execute("hive.exec.dynamic.partition.mode=nonstrict");
+      stmt.execute("SET hive.exec.dynamic.partition.mode=nonstrict");
       stmt.execute(insertSql);
       logger.info("Finish insert hive table!");
     } finally {
