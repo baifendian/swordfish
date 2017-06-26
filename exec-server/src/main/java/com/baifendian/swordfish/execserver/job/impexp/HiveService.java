@@ -24,6 +24,13 @@ import com.baifendian.swordfish.execserver.job.impexp.Args.HqlColumn;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.hive.conf.HiveConf;
+import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
+import org.apache.hadoop.hive.metastore.api.FieldSchema;
+import org.apache.hadoop.hive.metastore.api.MetaException;
+import org.apache.hadoop.hive.metastore.api.Table;
+import org.apache.thrift.TException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,16 +52,21 @@ public class HiveService {
 
   private String url;
 
+  private String metaUrl;
+
   private String username;
+
+  private HiveMetaStoreClient hiveMetaStoreClient;
 
   private String password;
 
-  public HiveService(String url, String username, String password) {
-    if (StringUtils.isEmpty(url)) {
+  public HiveService(String url, String metaUrl, String username, String password) {
+    if (StringUtils.isEmpty(url) || StringUtils.isEmpty(metaUrl)) {
       logger.error("Url must not be null!");
       throw new IllegalArgumentException("Url must not be null!");
     }
     this.url = url;
+    this.metaUrl = metaUrl;
     this.username = username;
     this.password = password;
   }
@@ -65,11 +77,16 @@ public class HiveService {
    * @throws ClassNotFoundException
    * @throws SQLException
    */
-  public void init() throws ClassNotFoundException, SQLException {
+  public void init() throws ClassNotFoundException, SQLException, MetaException {
+    Class.forName(HIVE_DRIVER);
     //防止重复初始化
     if (con == null) {
-      Class.forName(HIVE_DRIVER);
       con = DriverManager.getConnection(url, username, password);
+    }
+    if (hiveMetaStoreClient == null) {
+      Configuration hiveConf = new Configuration();
+      hiveConf.set("hive.metastore.uris", metaUrl);
+      hiveMetaStoreClient = new HiveMetaStoreClient(new HiveConf(hiveConf, HiveConf.class));
     }
   }
 
@@ -90,7 +107,19 @@ public class HiveService {
    * @param tableName
    * @return
    */
-  public List<HqlColumn> getHiveDesc(String dbName, String tableName) throws SQLException {
+  public List<HqlColumn> getHiveDesc(String dbName, String tableName) throws SQLException, TException {
+    List<HqlColumn> res = new ArrayList<>();
+    List<FieldSchema> fieldSchemaList = hiveMetaStoreClient.getFields(dbName, tableName);
+    Table table = hiveMetaStoreClient.getTable(dbName, tableName);
+    fieldSchemaList.addAll(table.getPartitionKeys());
+
+    for (FieldSchema fieldSchema : fieldSchemaList) {
+      res.add(new HqlColumn(fieldSchema.getName(), fieldSchema.getType()));
+    }
+
+    return res;
+
+/*
     //构造查询SQL
     String sql = MessageFormat.format("DESC {0}.{1}", dbName, tableName);
     Statement stmt = null;
@@ -111,6 +140,8 @@ public class HiveService {
         stmt.close();
       }
     }
+
+*/
   }
 
   /**
@@ -145,7 +176,7 @@ public class HiveService {
    * @param
    * @return
    */
-  public void createHiveTmpTable(String tableName, List<HqlColumn> hqlColumnList, String localtion) throws SQLException {
+  public void createHiveTmpTable(String dbName, String tableName, List<HqlColumn> hqlColumnList, String localtion) throws SQLException {
 
     List<String> fieldList = new ArrayList<>();
 
@@ -153,9 +184,9 @@ public class HiveService {
       fieldList.add(MessageFormat.format("{0} {1}", hqlColumn.getName(), hqlColumn.getType()));
     }
 
-    String sql = "CREATE TEMPORARY EXTERNAL TABLE `{0}`({1}) ROW FORMAT DELIMITED FIELDS TERMINATED BY \"{2}\" STORED AS {3} LOCATION \"{4}\"";
+    String sql = "CREATE TEMPORARY EXTERNAL TABLE {0}.{1}({2}) ROW FORMAT DELIMITED FIELDS TERMINATED BY \"{3}\" STORED AS {4} LOCATION \"{5}\"";
 
-    sql = MessageFormat.format(sql, tableName, String.join(",", fieldList), DEFAULT_DELIMITER, DEFAULT_FILE_TYPE.getType(), localtion);
+    sql = MessageFormat.format(sql, dbName, tableName, String.join(",", fieldList), DEFAULT_DELIMITER, DEFAULT_FILE_TYPE.getType(), localtion);
 
     logger.info("Create temp hive table sql: {}", sql);
 
@@ -175,9 +206,25 @@ public class HiveService {
   /**
    * 把数据插入表中
    */
-  public void insertTable(String srcTableName, String destTableName, List<HqlColumn> srcHqlColumnList, List<HqlColumn> destHqlColumnList, WriteMode writeMode) throws SQLException {
-    String selectSql = "SELECT {0} FROM `{1}`";
-    String insertSql = "INSERT {0} TABLE `{1}` {2}";
+  public void insertTable(String srcDbNmae, String srcTableName, String destDbName, String destTableName, WriteMode writeMode) throws SQLException, TException {
+    String hiveSet = "hive.exec.dynamic.partition.mode=nonstrict;";
+    String insertSql = "INSERT {0} TABLE {1}.{2} {3} SELECT * FROM {4}.{5}";
+    String partFieldSql = "";
+
+    // 所有的分区都是必传字段先整理出分区字段
+
+    Table destTable = hiveMetaStoreClient.getTable(destDbName, destTableName);
+    List<FieldSchema> partFieldList = destTable.getPartitionKeys();
+
+    if (CollectionUtils.isNotEmpty(partFieldList)) {
+      List<String> partNameList = new ArrayList<>();
+      for (FieldSchema fieldSchema : partFieldList) {
+        partNameList.add(fieldSchema.getName());
+      }
+
+      partFieldSql = MessageFormat.format("PARTITION({0})", String.join(",", partNameList));
+    }
+/*
 
     List<String> fieldList = new ArrayList<>();
 
@@ -195,9 +242,8 @@ public class HiveService {
         fieldList.add(MessageFormat.format("NULL as {0}", destHqlColumn.getName()));
       }
     }
-
-    selectSql = MessageFormat.format(selectSql, String.join(",", fieldList), srcTableName);
-    insertSql = MessageFormat.format(insertSql, writeMode.gethiveSql(), destTableName, selectSql);
+*/
+    insertSql = MessageFormat.format(insertSql, writeMode.gethiveSql(), destDbName, destTableName, partFieldSql, srcDbNmae, srcTableName);
     logger.info("Insert table sql: {}", insertSql);
 
     Statement stmt = null;
@@ -224,6 +270,9 @@ public class HiveService {
       } catch (SQLException e) {
         logger.error("Hive con close error", e);
       }
+    }
+    if (hiveMetaStoreClient != null) {
+      hiveMetaStoreClient.close();
     }
   }
 }
