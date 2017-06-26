@@ -181,7 +181,7 @@ public class MysqlToHiveJob extends ImpExpJob {
 
     //插入数据
     logger.info("Start insert to hive table: {}", hiveWriter.getTable());
-    hiveService.insertTable(DEFAULT_DB, srcTableName, hiveWriter.getDatabase(), hiveWriter.getTable(), hiveWriter.getWriteMode());
+    hiveService.insertTable(DEFAULT_DB, srcTableName, hiveWriter.getDatabase(), hiveWriter.getTable(), srcColumns, destColumns, hiveWriter.getWriteMode());
     logger.info("Finish insert to hive table: {}", hiveWriter.getTable());
     //hive操作完成，关闭连接释放临时表
     hiveService.close();
