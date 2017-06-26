@@ -42,6 +42,7 @@ public class MysqlReaderArg implements ReaderArg {
   private String password;
   private List<String> column;
   private String splitPk;
+  private String where;
   private ArrayNode connection = JsonUtil.createArrayNode();
 
   public String getUsername() {
@@ -84,6 +85,14 @@ public class MysqlReaderArg implements ReaderArg {
     this.connection = connection;
   }
 
+  public String getWhere() {
+    return where;
+  }
+
+  public void setWhere(String where) {
+    this.where = where;
+  }
+
   public MysqlReaderArg(MysqlReader mysqlReader) throws JSONException {
     ObjectNode connObject = JsonUtil.createObjectNode();
 
@@ -104,6 +113,10 @@ public class MysqlReaderArg implements ReaderArg {
     }
 
     connection.add(connObject);
+
+    if (StringUtils.isNotEmpty(mysqlReader.getWhere())){
+      where = mysqlReader.getWhere();
+    }
 
     column = mysqlReader.getColumn();
   }

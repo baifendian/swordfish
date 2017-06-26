@@ -18,6 +18,8 @@ package com.baifendian.swordfish.common.job.struct.node.impexp.writer;
 import com.baifendian.swordfish.common.enums.WriteHdfsType;
 import com.baifendian.swordfish.common.enums.WriteMode;
 import com.baifendian.swordfish.common.job.struct.node.impexp.column.HiveColumn;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
 
@@ -29,6 +31,7 @@ public class HdfsWriter implements Writer {
   private String fileName;
   private WriteMode writeMode;
   private WriteHdfsType fileType;
+  private String fieldDelimiter;
   private List<HiveColumn> column;
 
   public String getPath() {
@@ -67,7 +70,34 @@ public class HdfsWriter implements Writer {
     return column;
   }
 
+  public String getFieldDelimiter() {
+    return fieldDelimiter;
+  }
+
+  public void setFieldDelimiter(String fieldDelimiter) {
+    this.fieldDelimiter = fieldDelimiter;
+  }
+
   public void setColumn(List<HiveColumn> column) {
     this.column = column;
+  }
+
+  /**
+   * 检测fieldDelimiter是否合法
+   *
+   * @return
+   */
+  private boolean checkFieldDelimiter(String fieldDelimiter) {
+    return StringUtils.isNotEmpty(fieldDelimiter) && !StringUtils.equalsIgnoreCase(fieldDelimiter, "\n");
+  }
+
+  @Override
+  public boolean checkValid() {
+    boolean checkFieldDelimiter = true;
+    if (fileType == WriteHdfsType.TEXT) {
+      checkFieldDelimiter = checkFieldDelimiter(fieldDelimiter);
+    }
+
+    return StringUtils.isNotEmpty(path) && StringUtils.isNotEmpty(fileName) && checkFieldDelimiter && writeMode != null && CollectionUtils.isNotEmpty(column);
   }
 }
