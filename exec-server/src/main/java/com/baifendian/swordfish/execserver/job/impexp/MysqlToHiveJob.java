@@ -91,7 +91,7 @@ public class MysqlToHiveJob extends ImpExpJob {
   public void before() throws Exception {
     logger.info("Start MysqlToHiveJob before function...");
     // 构造一个hive服务类，预备使用
-    hiveService = new HiveService(hiveConf.getString("hive.thrift.uris"), props.getProxyUser(), "");
+    hiveService = new HiveService(hiveConf.getString("hive.thrift.uris"), hiveConf.getString("hive.metastore.uris"), props.getProxyUser(), "");
     hiveService.init();
     // 获取源HQL字段
     destColumns = hiveService.getHiveDesc(hiveWriter.getDatabase(), hiveWriter.getTable());
@@ -166,27 +166,23 @@ public class MysqlToHiveJob extends ImpExpJob {
 
   @Override
   public void after() throws Exception {
-    if (exitCode != 0){
+    if (exitCode != 0) {
       logger.info("DataX exec failed, job exit!");
       return;
     }
 
     logger.info("Start MysqlToHiveJob after function...");
     //注册临时外部表
-    String srcTableName = "{0}.{1}";
-    srcTableName = MessageFormat.format(srcTableName, DEFAULT_DB, hiveService.getTbaleName(props.getProjectId(), props.getExecJobId(), props.getNodeName()));
+    String srcTableName = hiveService.getTbaleName(props.getProjectId(), props.getExecJobId(), props.getNodeName());
     logger.info("Start create temp hive table: {}", srcTableName);
-    hiveService.createHiveTmpTable(srcTableName, srcColumns, ((HdfsWriterArg) writerArg).getPath());
+    hiveService.createHiveTmpTable(DEFAULT_DB, srcTableName, srcColumns, ((HdfsWriterArg) writerArg).getPath());
     logger.info("Finsh create temp hive table: {}", srcTableName);
 
-    //目标数据库名
-    String destTableName = "{0}.{1}";
-    destTableName = MessageFormat.format(destTableName, hiveWriter.getDatabase(), hiveWriter.getTable());
 
     //插入数据
-    logger.info("Start insert to hive table: {}", destTableName);
-    hiveService.insertTable(srcTableName, destTableName, srcColumns, destColumns, hiveWriter.getWriteMode());
-    logger.info("Finish insert to hive table: {}", destTableName);
+    logger.info("Start insert to hive table: {}", hiveWriter.getTable());
+    hiveService.insertTable(DEFAULT_DB, srcTableName, hiveWriter.getDatabase(), hiveWriter.getTable(), srcColumns, destColumns, hiveWriter.getWriteMode());
+    logger.info("Finish insert to hive table: {}", hiveWriter.getTable());
     //hive操作完成，关闭连接释放临时表
     hiveService.close();
 
