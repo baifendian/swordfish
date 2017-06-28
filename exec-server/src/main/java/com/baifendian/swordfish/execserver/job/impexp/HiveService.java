@@ -176,7 +176,7 @@ public class HiveService {
    * @param
    * @return
    */
-  public void createHiveTmpTable(String dbName, String tableName, List<HqlColumn> hqlColumnList, String localtion) throws SQLException {
+  public void createHiveTmpTable(String dbName, String tableName, List<HqlColumn> hqlColumnList, String localtion,String fieldDelimiter) throws SQLException {
 
     List<String> fieldList = new ArrayList<>();
 
@@ -186,7 +186,7 @@ public class HiveService {
 
     String sql = "CREATE TEMPORARY EXTERNAL TABLE {0}.{1}({2}) ROW FORMAT DELIMITED FIELDS TERMINATED BY \"{3}\" STORED AS {4} LOCATION \"{5}\"";
 
-    sql = MessageFormat.format(sql, dbName, tableName, String.join(",", fieldList), DEFAULT_DELIMITER, DEFAULT_FILE_TYPE.getType(), localtion);
+    sql = MessageFormat.format(sql, dbName, tableName, String.join(",", fieldList), fieldDelimiter, DEFAULT_FILE_TYPE.getType(), localtion);
 
     logger.info("Create temp hive table sql: {}", sql);
 
