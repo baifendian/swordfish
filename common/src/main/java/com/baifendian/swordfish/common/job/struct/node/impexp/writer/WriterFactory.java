@@ -34,6 +34,8 @@ public class WriterFactory {
         return JsonUtil.parseObject(writer, MysqlWriter.class);
       case HIVE_TO_MONGODB:
         return JsonUtil.parseObject(writer, MongoWriter.class);
+      case FILE_TO_HIVE:
+        return JsonUtil.parseObject(writer, HiveWriter.class);
       default:
         return null;
     }
