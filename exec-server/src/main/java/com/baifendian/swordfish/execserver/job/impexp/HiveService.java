@@ -260,6 +260,56 @@ public class HiveService {
 
   }
 
+  public Connection getCon() {
+    return con;
+  }
+
+  public HiveMetaStoreClient getHiveMetaStoreClient() {
+    return hiveMetaStoreClient;
+  }
+
+  /**
+   * 获取一个表的分区字段
+   *
+   * @param dbName
+   * @param table
+   * @return
+   */
+  public List<FieldSchema> getPartionField(String dbName, String table) throws TException {
+    Table destTable = hiveMetaStoreClient.getTable(dbName, table);
+    return destTable.getPartitionKeys();
+  }
+
+  /**
+   * 获取一个表的普通字段
+   * @param dbName
+   * @param table
+   * @return
+   * @throws TException
+   */
+  public List<FieldSchema> getGeneralField(String dbName, String table) throws TException {
+    return hiveMetaStoreClient.getFields(dbName, table);
+  }
+
+  /**
+   * 执行一些sql
+   */
+  public void execSql(String[] sqlList) throws SQLException {
+    Statement stmt = null;
+    try {
+      logger.info("Start execsql sql list ...");
+      stmt = con.createStatement();
+      for (String sql:sqlList){
+        stmt.execute(sql);
+      }
+      logger.info("Finish exec sql!");
+    } finally {
+      if (stmt != null) {
+        stmt.close();
+      }
+    }
+  }
+
   /**
    * 使用完毕关闭连接
    */

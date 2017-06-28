@@ -26,6 +26,6 @@ public enum MongoWriteMode {
    * @return
    */
   public boolean hasUpsetKey(){
-    return this == UPDATE || this == UPDATE;
+    return this == UPDATE || this == UPSET;
   }
 }

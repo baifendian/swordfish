@@ -13,37 +13,39 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.baifendian.swordfish.common.job.struct.node.impexp.setting;
+package com.baifendian.swordfish.common.job.struct.node.impexp.column;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
+import com.baifendian.swordfish.common.enums.FileColumnType;
 
 /**
- * 异常阈值
+ * 文件列
  */
-@JsonInclude(JsonInclude.Include.NON_NULL)
-public class ErrorLimit {
-  /**
-   * 数据错误数阈值
-   */
-  private Long record;
-  /**
-   * 数据错误百分比阈值
-   */
-  private Double percentage;
+public class FileColumn {
+  private String name;
+  private FileColumnType type;
+  private String dateFormat;
 
-  public Long getRecord() {
-    return record;
+  public String getName() {
+    return name;
   }
 
-  public void setRecord(Long record) {
-    this.record = record;
+  public void setName(String name) {
+    this.name = name;
   }
 
-  public Double getPercentage() {
-    return percentage;
+  public FileColumnType getType() {
+    return type;
   }
 
-  public void setPercentage(Double percentage) {
-    this.percentage = percentage;
+  public void setType(FileColumnType type) {
+    this.type = type;
+  }
+
+  public String getDateFormat() {
+    return dateFormat;
+  }
+
+  public void setDateFormat(String dateFormat) {
+    this.dateFormat = dateFormat;
   }
 }
