@@ -15,14 +15,14 @@
  */
 package com.baifendian.swordfish.execserver.parameter;
 
-import com.baifendian.swordfish.dao.enums.ExecType;
+import static com.baifendian.swordfish.common.utils.DateUtils.format;
+import static org.apache.commons.lang.time.DateUtils.addDays;
 
+import com.baifendian.swordfish.dao.enums.ExecType;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-
-import static com.baifendian.swordfish.common.utils.DateUtils.format;
-import static org.apache.commons.lang.time.DateUtils.addDays;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * 系统参数管理 <p>
@@ -55,13 +55,25 @@ public class SystemParamManager {
   public static final String CYC_TIME = "sf.system.cyctime";
 
   /**
+   * 日志 id
+   */
+  public static final String JOB_ID = "sf.system.jobId";
+
+  /**
+   * 构造系统参数
+   */
+  public static Map<String, String> buildSystemParam(ExecType execType, Date time) {
+    return buildSystemParam(execType, time, null);
+  }
+
+  /**
    * 构造系统参数
    *
    * @param execType 执行方式, 比如是直接执行, 还是补数据, 还是调度执行
-   * @param time     对于直接执行, 指的是运行的时间, 对于调度执行, 指的是调度时间, 对于补数据, 指业务补数据的时间
-   * @return
+   * @param time 对于直接执行, 指的是运行的时间, 对于调度执行, 指的是调度时间, 对于补数据, 指业务补数据的时间
+   * @param jobId 日志 id
    */
-  public static Map<String, String> buildSystemParam(ExecType execType, Date time) {
+  public static Map<String, String> buildSystemParam(ExecType execType, Date time, String jobId) {
     Date bizDate;
 
     switch (execType) {
@@ -81,6 +93,10 @@ public class SystemParamManager {
     valueMap.put(BIZ_DATE, formatDate(bizDate));
     valueMap.put(BIZ_CUR_DATE, formatDate(bizCurDate));
     valueMap.put(CYC_TIME, formatTime(bizCurDate));
+
+    if (StringUtils.isNotEmpty(jobId)) {
+      valueMap.put(JOB_ID, jobId);
+    }
 
     return valueMap;
   }
