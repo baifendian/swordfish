@@ -7,6 +7,7 @@ import org.apache.thrift.TException;
 import org.junit.Test;
 
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -61,5 +62,15 @@ public class HiveServiceTest {
     hiveService.init();
 
     //hiveService.insertTable(srcTable, destTable, testColumn, WriteMode.APPEND);
+  }
+
+  @Test
+  public void test() throws MetaException, SQLException, ClassNotFoundException {
+    String sql = "INSERT INTO TABLE swordfish_test.data_test221  SELECT `id`,`name`,`desc`,null as `email`,`create_time` FROM swordfish_test.data_test2";
+    HiveService hiveService = new HiveService("jdbc:hive2://172.18.1.22:10000", "thrift://172.18.1.22:9083", "shuanghu", "");
+    hiveService.init();
+    Statement stmt = hiveService.getCon().createStatement();
+    stmt.execute(sql);
+    hiveService.close();
   }
 }

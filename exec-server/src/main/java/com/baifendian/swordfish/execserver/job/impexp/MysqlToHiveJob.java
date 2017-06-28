@@ -173,7 +173,7 @@ public class MysqlToHiveJob extends ImpExpJob {
 
     logger.info("Start MysqlToHiveJob after function...");
     //注册临时外部表
-    String srcTableName = hiveService.getTbaleName(props.getProjectId(), props.getExecJobId(), props.getNodeName());
+    String srcTableName = hiveService.getTbaleName(props.getProjectId(), props.getExecId(), props.getJobAppId());
     logger.info("Start create temp hive table: {}", srcTableName);
     hiveService.createHiveTmpTable(DEFAULT_DB, srcTableName, srcColumns, ((HdfsWriterArg) writerArg).getPath());
     logger.info("Finsh create temp hive table: {}", srcTableName);

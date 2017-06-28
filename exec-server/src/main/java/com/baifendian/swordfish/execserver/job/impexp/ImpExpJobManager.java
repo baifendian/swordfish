@@ -23,6 +23,8 @@ import com.baifendian.swordfish.execserver.job.hql.EtlSqlJob;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 
+import java.util.concurrent.RecursiveTask;
+
 import static com.baifendian.swordfish.common.job.struct.node.JobType.*;
 
 /**
@@ -45,6 +47,8 @@ public class ImpExpJobManager {
         return new HiveToMysqlJob(props, false, logger, impExpParam);
       case HIVE_TO_MONGO:
         return new HiveToMongoJob(props, false, logger, impExpParam);
+      case FILE_TO_HIVE:
+        return new FileToHiveJob(props, false, logger, impExpParam);
       default:
         logger.error("unsupport ImpExp job type: {}", jobTypeStr);
         throw new IllegalArgumentException("Not support job type");

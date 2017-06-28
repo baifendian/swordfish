@@ -33,6 +33,14 @@ public class Speed {
   @JsonProperty("byte")
   private Long byteInt;
 
+  public Speed(Integer channel, Long byteInt) {
+    this.channel = channel;
+    this.byteInt = byteInt;
+  }
+
+  public Speed() {
+  }
+
   public int getChannel() {
     return channel;
   }
