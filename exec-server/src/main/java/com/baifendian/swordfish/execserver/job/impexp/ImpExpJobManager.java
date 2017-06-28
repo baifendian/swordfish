@@ -45,7 +45,7 @@ public class ImpExpJobManager {
         return new MysqlToHdfsJob(props, false, logger, impExpParam);
       case HIVE_TO_MYSQL:
         return new HiveToMysqlJob(props, false, logger, impExpParam);
-      case HIVE_TO_MONGO:
+      case HIVE_TO_MONGODB:
         return new HiveToMongoJob(props, false, logger, impExpParam);
       case FILE_TO_HIVE:
         return new FileToHiveJob(props, false, logger, impExpParam);

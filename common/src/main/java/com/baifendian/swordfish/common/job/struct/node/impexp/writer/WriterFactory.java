@@ -32,7 +32,7 @@ public class WriterFactory {
         return JsonUtil.parseObject(writer, HiveWriter.class);
       case HIVE_TO_MYSQL:
         return JsonUtil.parseObject(writer, MysqlWriter.class);
-      case HIVE_TO_MONGO:
+      case HIVE_TO_MONGODB:
         return JsonUtil.parseObject(writer, MongoWriter.class);
       default:
         return null;
