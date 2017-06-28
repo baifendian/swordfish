@@ -111,13 +111,6 @@ public class FlowRunnerManager {
       return;
     }
 
-    // 系统参数, 注意 schedule time 是真正调度运行的时刻
-    Map<String, String> systemParamMap = SystemParamManager
-        .buildSystemParam(executionFlow.getType(), executionFlow.getScheduleTime());
-
-    // 构建自定义参数, 比如定义了 ${abc} = ${sf.system.bizdate}, $[yyyyMMdd] 等情况
-    Map<String, String> customParamMap = executionFlow.getUserDefinedParamMap();
-
     int maxTryTimes = executionFlow.getMaxTryTimes() != null ? executionFlow.getMaxTryTimes()
         : Constants.defaultMaxTryTimes;
     int timeout = executionFlow.getTimeout() != null ? executionFlow.getTimeout()
@@ -131,8 +124,6 @@ public class FlowRunnerManager {
     context.setMaxTryTimes(maxTryTimes);
     context.setTimeout(timeout);
     context.setFailurePolicyType(defaultFailurePolicyType);
-    context.setSystemParamMap(systemParamMap);
-    context.setCustomParamMap(customParamMap);
 
     FlowRunner flowRunner = new FlowRunner(context);
 

@@ -75,7 +75,8 @@ public class StreamingRunner implements Callable<Boolean> {
     // 作业参数配置
     // 系统参数, 注意 schedule time 是真正调度运行的时刻
     Map<String, String> systemParamMap = SystemParamManager
-        .buildSystemParam(ExecType.DIRECT, streamingResult.getScheduleTime());
+        .buildSystemParam(ExecType.DIRECT, streamingResult.getScheduleTime(),
+            streamingResult.getJobId());
 
     // 自定义参数
     Map<String, String> customParamMap = streamingResult.getUserDefinedParamMap();
@@ -103,11 +104,9 @@ public class StreamingRunner implements Callable<Boolean> {
     props.setEnvFile(BaseConfig.getSystemEnvPath());
     props.setQueue(streamingResult.getQueue());
     props.setExecJobStartTime(streamingResult.getScheduleTime());
-    props.setJobAppId(streamingResult.getJobId());
+    props.setJobAppId(streamingResult.getJobId()); // 这是设置为和 job id 一样
 
     JobLogger jobLogger = new JobLogger(streamingResult.getJobId(), logger);
-
-    // 得到 job 就可以指向了
 
     boolean success = false;
 

@@ -105,16 +105,6 @@ public class FlowRunner implements Runnable {
   private final long scheduleTime;
 
   /**
-   * 系统参数
-   */
-  private final Map<String, String> systemParamMap;
-
-  /**
-   * 自定义参数
-   */
-  private final Map<String, String> customParamMap;
-
-  /**
    * @param context
    */
   public FlowRunner(FlowRunnerContext context) {
@@ -124,8 +114,6 @@ public class FlowRunner implements Runnable {
     this.maxTryTimes = context.getMaxTryTimes();
     this.timeout = context.getTimeout();
     this.failurePolicyType = context.getFailurePolicyType();
-    this.systemParamMap = context.getSystemParamMap();
-    this.customParamMap = context.getCustomParamMap();
     this.scheduleTime = executionFlow.getScheduleTime().getTime();
   }
 
@@ -508,8 +496,8 @@ public class FlowRunner implements Runnable {
     jobContext.setExecutionFlow(executionFlow);
     jobContext.setExecutionNode(executionNode);
     jobContext.setFlowNode(flowNode);
-    jobContext.setSystemParamMap(systemParamMap);
-    jobContext.setCustomParamMap(customParamMap);
+//    jobContext.setSystemParamMap(systemParamMap);
+//    jobContext.setCustomParamMap(customParamMap);
     jobContext.setSemaphore(semaphore);
 
     // 构建 node runner
