@@ -17,6 +17,7 @@ package com.baifendian.swordfish.webserver.controller;
 
 import com.baifendian.swordfish.dao.model.ProjectFlow;
 import com.baifendian.swordfish.dao.model.User;
+import com.baifendian.swordfish.webserver.dto.ExecutorIdDto;
 import com.baifendian.swordfish.webserver.dto.WorkflowDto;
 import com.baifendian.swordfish.webserver.service.WorkflowService;
 import org.slf4j.Logger;
@@ -265,17 +266,17 @@ public class WorkflowController {
    * @param data
    */
   @PostMapping(value = "/file-to-hive")
-  public void fileToHive(@RequestAttribute(value = "session.user") User operator,
-                         @PathVariable String projectName,
-                         @RequestParam(value = "file") MultipartFile file,
-                         @RequestParam(value = "data") String data,
-                         @RequestParam(value = "userDefParams", required = false) String userDefParams,
-                         @RequestParam(value = "proxyUser") String proxyUser,
-                         @RequestParam(value = "queue") String queue) {
+  public ExecutorIdDto fileToHive(@RequestAttribute(value = "session.user") User operator,
+                                  @PathVariable String projectName,
+                                  @RequestParam(value = "file") MultipartFile file,
+                                  @RequestParam(value = "data") String data,
+                                  @RequestParam(value = "userDefParams", required = false) String userDefParams,
+                                  @RequestParam(value = "proxyUser") String proxyUser,
+                                  @RequestParam(value = "queue") String queue) {
 
     logger.info("Operator user {}, project:{}, data:{}, file: [{},{}]",
             operator.getName(), projectName, data, (file == null) ? null : file.getName(), (file == null) ? null : file.getOriginalFilename());
 
-    workflowService.fileToHive(operator, projectName, data, userDefParams, file, proxyUser, queue);
+    return workflowService.fileToHive(operator, projectName, data, userDefParams, file, proxyUser, queue);
   }
 }
