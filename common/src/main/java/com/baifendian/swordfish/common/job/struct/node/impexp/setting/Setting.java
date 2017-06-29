@@ -32,6 +32,18 @@ public class Setting {
    */
   private ErrorLimit errorLimit;
 
+  public Setting(Speed speed, ErrorLimit errorLimit) {
+    this.speed = speed;
+    this.errorLimit = errorLimit;
+  }
+
+  public Setting(Speed speed) {
+    this.speed = speed;
+  }
+
+  public Setting() {
+  }
+
   public Speed getSpeed() {
     return speed;
   }

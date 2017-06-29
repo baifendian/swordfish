@@ -203,7 +203,7 @@ public class FileToHiveJob extends AbstractJob {
 
       if (srcCol != null) {
         if (srcCol.getType() == FileColumnType.DATE) {
-          srcColVal = MessageFormat.format("CAST(TO_DATE(from_unixtime(UNIX_TIMESTAMP({0},\"{1}\"))) AS {2})", srcCol.getName(), srcCol.getDateFormat(), destHqlColumn.getType());
+          srcColVal = MessageFormat.format("CAST(TO_DATE(from_unixtime(UNIX_TIMESTAMP({0},\"{1}\"))) AS DATE)", srcCol.getName(), srcCol.getDateFormat());
         } else {
           srcColVal = srcCol.getName();
         }

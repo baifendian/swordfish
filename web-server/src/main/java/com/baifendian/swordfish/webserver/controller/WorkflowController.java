@@ -270,11 +270,12 @@ public class WorkflowController {
     logger.info("Operator user {}, project:{}, hdfsPath:{}, file: [{},{}]",
             operator.getName(), projectName, hdfsPath, (file == null) ? null : file.getName(), (file == null) ? null : file.getOriginalFilename());
 
-    workflowService.fileToHdfs(projectName, hdfsPath, file);
+    workflowService.fileToHdfs(operator, projectName, hdfsPath, file);
   }
 
   /**
    * 本地文件上传到hvie
+   *
    * @param operator
    * @param projectName
    * @param file
