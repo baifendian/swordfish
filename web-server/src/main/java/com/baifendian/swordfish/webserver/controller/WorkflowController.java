@@ -255,23 +255,6 @@ public class WorkflowController {
 
   }
 
-  /**
-   * 上传本地文件到hdfs
-   *
-   * @param file
-   * @param hdfsPath
-   */
-  @GetMapping(value = "/workflows/file-to-hdfs")
-  public void fileToHDFS(@RequestAttribute(value = "session.user") User operator,
-                         @PathVariable String projectName,
-                         @RequestParam(value = "file") MultipartFile file,
-                         @RequestParam(value = "hdfsPath") String hdfsPath) {
-
-    logger.info("Operator user {}, project:{}, hdfsPath:{}, file: [{},{}]",
-            operator.getName(), projectName, hdfsPath, (file == null) ? null : file.getName(), (file == null) ? null : file.getOriginalFilename());
-
-    workflowService.fileToHdfs(operator, projectName, hdfsPath, file);
-  }
 
   /**
    * 本地文件上传到hvie
@@ -285,11 +268,14 @@ public class WorkflowController {
   public void fileToHive(@RequestAttribute(value = "session.user") User operator,
                          @PathVariable String projectName,
                          @RequestParam(value = "file") MultipartFile file,
-                         @RequestParam(value = "data") String data) {
+                         @RequestParam(value = "data") String data,
+                         @RequestParam(value = "userDefParams") String userDefParams,
+                         @RequestParam(value = "proxyUser") String proxyUser,
+                         @RequestParam(value = "queue") String queue) {
 
     logger.info("Operator user {}, project:{}, data:{}, file: [{},{}]",
             operator.getName(), projectName, data, (file == null) ? null : file.getName(), (file == null) ? null : file.getOriginalFilename());
 
-    workflowService.fileToHive(projectName, data, file);
+    workflowService.fileToHive(operator, projectName, data, userDefParams, file, proxyUser, queue);
   }
 }
