@@ -130,6 +130,7 @@ public class FileToHiveJob extends AbstractJob {
       hiveService.close();
     }
     logger.info("Finish close hive conn!");
+    exitCode = 0;
   }
 
   @Override
