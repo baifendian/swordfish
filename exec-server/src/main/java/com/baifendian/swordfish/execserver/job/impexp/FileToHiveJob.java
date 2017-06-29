@@ -15,6 +15,7 @@ import com.baifendian.swordfish.dao.DatasourceDao;
 import com.baifendian.swordfish.execserver.job.AbstractJob;
 import com.baifendian.swordfish.execserver.job.JobProps;
 import com.baifendian.swordfish.execserver.job.impexp.Args.HqlColumn;
+import com.baifendian.swordfish.execserver.parameter.ParamHelper;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
@@ -95,6 +96,11 @@ public class FileToHiveJob extends AbstractJob {
   public void before() throws Exception {
     super.before();
     logger.info("Start FileToHiveJob before function...");
+    //变量替换
+    for (FileColumn fileColumn : fileReader.getTargetColumn()) {
+      fileColumn.setName(ParamHelper.resolvePlaceholders(fileColumn.getName(), props.getDefinedParams()));
+    }
+
     // 构造一个hive服务类，预备使用
     hiveService = new HiveService(hiveConf.getString("hive.thrift.uris"), hiveConf.getString("hive.metastore.uris"), props.getProxyUser(), "");
     hiveService.init();
@@ -102,6 +108,7 @@ public class FileToHiveJob extends AbstractJob {
     destHiveColumns = hiveService.getHiveDesc(hiveWriter.getDatabase(), hiveWriter.getTable());
     // 获取源字段
     srcHiveColumns = hiveService.checkHiveColumn(hiveWriter.getColumn(), destHiveColumns);
+
     logger.info("Finish FileToHiveJob before function!");
   }
 
