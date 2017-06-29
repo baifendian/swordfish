@@ -737,7 +737,7 @@ public class WorkflowService {
     //伪造execId
     long execId = uuid.hashCode();
     //自动生成工作流名称
-    String workflowName = uuid.replace("-","_");
+    String workflowName = "impexp_" + uuid.replace("-", "_").substring(0, 8);
     String nodeName = uuid;
     String hdfsPath = BaseConfig.getHdfsImpExpDir(project.getId(), execId, nodeName);
     logger.info("Create execId: {}, nodeName: {},hdfsPath: {}", workflowName, nodeName, hdfsPath);
@@ -768,7 +768,7 @@ public class WorkflowService {
     ((FileReader) impExpParam.getReader()).setHdfsPath(hdfsPath);
     impExpParam.setSetting(new Setting(new Speed()));
 
-    if (StringUtils.isEmpty(userDefParams)){
+    if (StringUtils.isEmpty(userDefParams)) {
       userDefParams = "[]";
     }
 
