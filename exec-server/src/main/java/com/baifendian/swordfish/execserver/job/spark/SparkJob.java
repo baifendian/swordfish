@@ -45,7 +45,7 @@ public class SparkJob extends AbstractYarnJob {
   }
 
   @Override
-  public void initJob() {
+  public void init() {
     sparkParam = JsonUtil.parseObject(props.getJobParams(), SparkParam.class);
     sparkParam.setQueue(props.getQueue());
 

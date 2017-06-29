@@ -37,18 +37,29 @@ import com.baifendian.swordfish.execserver.job.JobContext;
 import com.baifendian.swordfish.execserver.runner.node.NodeRunner;
 import com.baifendian.swordfish.execserver.utils.EnvHelper;
 import com.baifendian.swordfish.execserver.utils.LoggerUtil;
+import java.io.File;
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.CancellationException;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
+import java.util.concurrent.Semaphore;
+import java.util.concurrent.TimeUnit;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.File;
-import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.nio.charset.Charset;
-import java.util.*;
-import java.util.concurrent.*;
 
 /**
  * flow 执行器 <p>
@@ -105,16 +116,6 @@ public class FlowRunner implements Runnable {
   private final long scheduleTime;
 
   /**
-   * 系统参数
-   */
-  private final Map<String, String> systemParamMap;
-
-  /**
-   * 自定义参数
-   */
-  private final Map<String, String> customParamMap;
-
-  /**
    * @param context
    */
   public FlowRunner(FlowRunnerContext context) {
@@ -124,8 +125,6 @@ public class FlowRunner implements Runnable {
     this.maxTryTimes = context.getMaxTryTimes();
     this.timeout = context.getTimeout();
     this.failurePolicyType = context.getFailurePolicyType();
-    this.systemParamMap = context.getSystemParamMap();
-    this.customParamMap = context.getCustomParamMap();
     this.scheduleTime = executionFlow.getScheduleTime().getTime();
   }
 
@@ -153,10 +152,13 @@ public class FlowRunner implements Runnable {
     FlowStatus status = null;
 
     // 得到执行的目录
-    String execLocalPath = BaseConfig.getFlowExecDir(executionFlow.getProjectId(), executionFlow.getFlowId(),
-        executionFlow.getId());
+    String execLocalPath = BaseConfig
+        .getFlowExecDir(executionFlow.getProjectId(), executionFlow.getFlowId(),
+            executionFlow.getId());
 
-    logger.info("exec id:{}, current execution dir:{}, max try times:{}, timeout:{}, failure policy type:{}", executionFlow.getId(), execLocalPath, maxTryTimes, timeout, failurePolicyType);
+    logger.info(
+        "exec id:{}, current execution dir:{}, max try times:{}, timeout:{}, failure policy type:{}",
+        executionFlow.getId(), execLocalPath, maxTryTimes, timeout, failurePolicyType);
 
     try {
       // 创建工作目录和用户
@@ -166,7 +168,8 @@ public class FlowRunner implements Runnable {
       FlowDag flowDag = JsonUtil.parseObject(executionFlow.getWorkflowData(), FlowDag.class);
 
       // 下载 workflow 的资源文件到本地 exec 目录
-      String workflowHdfsFile = BaseConfig.getHdfsWorkflowFilename(executionFlow.getProjectId(), executionFlow.getWorkflowName());
+      String workflowHdfsFile = BaseConfig
+          .getHdfsWorkflowFilename(executionFlow.getProjectId(), executionFlow.getWorkflowName());
       HdfsClient hdfsClient = HdfsClient.getInstance();
 
       if (hdfsClient.exists(workflowHdfsFile)) {
@@ -220,13 +223,6 @@ public class FlowRunner implements Runnable {
         updateExecutionFlow(status);
       }
 
-      // 执行完后, 清理目录, 避免文件过大
-      try {
-        FileUtils.deleteDirectory(new File(execLocalPath));
-      } catch (IOException e) {
-        logger.error(String.format("delete dir exception: %s", execLocalPath), e);
-      }
-
       // 后置处理
       postProcess();
     }
@@ -235,7 +231,6 @@ public class FlowRunner implements Runnable {
   /**
    * 生成flow的 DAG <p>
    *
-   * @param flowDag
    * @return DAG
    */
   private Graph<String, FlowNode, FlowNodeRelation> genDagGraph(FlowDag flowDag) {
@@ -258,14 +253,6 @@ public class FlowRunner implements Runnable {
 
   /**
    * 生成项目的资源文件
-   *
-   * @param flowDag
-   * @return
-   * @throws IllegalArgumentException
-   * @throws InvocationTargetException
-   * @throws NoSuchMethodException
-   * @throws InstantiationException
-   * @throws IllegalAccessException
    */
   private List<String> genProjectResFiles(FlowDag flowDag) throws
       IllegalArgumentException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
@@ -289,18 +276,9 @@ public class FlowRunner implements Runnable {
   }
 
   /**
-   * 运行一个具体的 DAG:
-   * 1. 首先取出 start 结点
-   * 2. 得到结点, 提交并运行
-   * 3. 设置门闩, 满足门闩的话, 如果超时, 调到 END, 如果没超时, 调到 4
-   * 4. 如果是失败的化, 重试, 如果重试够多则直接失败, 如果是成功, 则调到 5
-   * 5. 看该节点的后继, 运行其后继, 提交, 跑到 2
-   * 6. 如果都运行完了, 到 SUCCESS
-   * <p>
+   * 运行一个具体的 DAG: 1. 首先取出 start 结点 2. 得到结点, 提交并运行 3. 设置门闩, 满足门闩的话, 如果超时, 调到 END, 如果没超时, 调到 4 4.
+   * 如果是失败的化, 重试, 如果重试够多则直接失败, 如果是成功, 则调到 5 5. 看该节点的后继, 运行其后继, 提交, 跑到 2 6. 如果都运行完了, 到 SUCCESS <p>
    * END: 失败状态的话, 错误; 否则认为成功
-   *
-   * @param dagGraph
-   * @return
    */
 
   private FlowStatus runFlow(Graph<String, FlowNode, FlowNodeRelation> dagGraph) {
@@ -413,7 +391,8 @@ public class FlowRunner implements Runnable {
                 flowDao.updateExecutionNode(executionNode);
 
                 // 重新提交
-                submitNodeRunner(dagGraph.getVertex(nodeRunner.getNodename()), executionNode, semaphore);
+                submitNodeRunner(dagGraph.getVertex(nodeRunner.getNodename()), executionNode,
+                    semaphore);
               } else {
                 // 不能继续尝试了
                 status = FlowStatus.FAILED;
@@ -440,7 +419,8 @@ public class FlowRunner implements Runnable {
 
               // 成功, 看后继, 提交后继
               for (String nodeName : dagGraph.getPostNode(nodeRunner.getNodename())) {
-                if (!executionNodeMap.containsKey(nodeName) && isPreNodesAllSuccess(dagGraph.getPreNode(nodeName))) {
+                if (!executionNodeMap.containsKey(nodeName) && isPreNodesAllSuccess(
+                    dagGraph.getPreNode(nodeName))) {
                   // 插入一个结点
                   ExecutionNode newExecutionNode = insertExecutionNode(executionFlow, nodeName);
 
@@ -464,10 +444,6 @@ public class FlowRunner implements Runnable {
 
   /**
    * 插入一个结点
-   *
-   * @param executionFlow
-   * @param nodeName
-   * @return
    */
   private ExecutionNode insertExecutionNode(ExecutionFlow executionFlow, String nodeName) {
     // 创建新结点并插入
@@ -497,19 +473,14 @@ public class FlowRunner implements Runnable {
 
   /**
    * 提交 NodeRunner 执行
-   *
-   * @param flowNode
-   * @param executionNode
-   * @param semaphore
    */
-  private void submitNodeRunner(FlowNode flowNode, ExecutionNode executionNode, Semaphore semaphore) {
+  private void submitNodeRunner(FlowNode flowNode, ExecutionNode executionNode,
+      Semaphore semaphore) {
     JobContext jobContext = new JobContext();
 
     jobContext.setExecutionFlow(executionFlow);
     jobContext.setExecutionNode(executionNode);
     jobContext.setFlowNode(flowNode);
-    jobContext.setSystemParamMap(systemParamMap);
-    jobContext.setCustomParamMap(customParamMap);
     jobContext.setSemaphore(semaphore);
 
     // 构建 node runner
@@ -539,8 +510,6 @@ public class FlowRunner implements Runnable {
 
   /**
    * 更新 ExecutionFlow <p>
-   *
-   * @param status
    */
   private void updateExecutionFlow(FlowStatus status) {
     Date now = new Date();
@@ -646,7 +615,8 @@ public class FlowRunner implements Runnable {
         return;
       }
 
-      logger.info("Kill has been called on exec id: {}, num: {}", executionFlow.getId(), activeNodeRunners.size());
+      logger.info("Kill has been called on exec id: {}, num: {}", executionFlow.getId(),
+          activeNodeRunners.size());
 
       // 正在运行中的
       for (Map.Entry<NodeRunner, Future<Boolean>> entry : activeNodeRunners.entrySet()) {
@@ -655,7 +625,8 @@ public class FlowRunner implements Runnable {
 
         if (!future.isDone()) {
           // 记录 kill 的信息
-          logger.info("kill exec, id: {}, node: {}", executionFlow.getId(), nodeRunner.getNodename());
+          logger
+              .info("kill exec, id: {}, node: {}", executionFlow.getId(), nodeRunner.getNodename());
 
           // 结点运行
           nodeRunner.kill();
@@ -671,14 +642,41 @@ public class FlowRunner implements Runnable {
    * flow 执行完的后置处理 <p>
    */
   private void postProcess() {
+    // 执行完后, 清理目录, 避免文件过大
+    String execLocalPath = BaseConfig
+        .getFlowExecDir(executionFlow.getProjectId(), executionFlow.getFlowId(),
+            executionFlow.getId());
+
+    try {
+      FileUtils.deleteDirectory(new File(execLocalPath));
+    } catch (IOException e) {
+      logger.error(String.format("delete exec dir exception: %s", execLocalPath), e);
+    }
+
+    // 执行完后, 清理 udf 目录
+    hdfsCleanUp(BaseConfig.getJobHiveUdfJarPath(executionFlow.getId()));
+
+    // 执行完后, 清理 import/export 目录
+    hdfsCleanUp(BaseConfig.getHdfsImpExpDir(executionFlow.getProjectId(), executionFlow.getId()));
+
     EmailManager.sendMessageOfExecutionFlow(executionFlow);
   }
 
   /**
+   * 清理 hdfs 上的目录
+   */
+  private void hdfsCleanUp(String path) {
+    try {
+      if (HdfsClient.getInstance().exists(path)) {
+        HdfsClient.getInstance().delete(path, true);
+      }
+    } catch (Exception e) {
+      logger.error(String.format("cleanup hdfs dir exception: %s", path), e);
+    }
+  }
+
+  /**
    * 查看前驱是否都 OK
-   *
-   * @param preNodes
-   * @return
    */
   private boolean isPreNodesAllSuccess(Set<String> preNodes) {
     // 没有前驱节点，认为全部执行成功
@@ -695,7 +693,8 @@ public class FlowRunner implements Runnable {
       }
 
       // 如果失败了, 且应该是停止的
-      if (!preFinishedNode.getStatus().typeIsSuccess() && failurePolicyType == FailurePolicyType.END) {
+      if (!preFinishedNode.getStatus().typeIsSuccess()
+          && failurePolicyType == FailurePolicyType.END) {
         return false;
       }
     }

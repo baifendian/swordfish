@@ -36,6 +36,9 @@ hadoopYarnAddress="172.24.5.149"
 # env config file
 envFile="/home/baseline/.sf_env.sh"
 
+# datax home path
+dataxHome="/home/baseline/DataX/target/datax/datax"
+
 # 使用示例
 function usage() {
     echo "Usage: $0 -r <true|false>" 1>&2;
@@ -89,6 +92,9 @@ function file_replace()
     sed -i "s#hive.metastore.uris.*#hive.metastore.uris = thrift://${hiveAddress}:9083#g" conf/common/hive/hive.properties
     sed -i "s#hive.thrift.uris.*#hive.thrift.uris = jdbc:hive2://${hiveAddress}:10000#g" conf/common/hive/hive.properties
     sed -i "s#hive.uris.*#hive.uris = jdbc:hive2://${hiveAddress}:10000#g" conf/common/hive/hive.properties
+
+    # 6. worker.properties
+    sed -i "s#executor.datax.home.*#executor.datax.home = ${dataxHome}#g" conf/worker.properties
 }
 
 function process_check()

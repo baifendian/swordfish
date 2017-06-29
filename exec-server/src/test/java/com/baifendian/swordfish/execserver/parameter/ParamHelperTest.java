@@ -24,7 +24,7 @@ import java.util.Map;
 public class ParamHelperTest {
   @Test
   public void testResolvePlaceholders() {
-    Map<String, String> definedParamMap = SystemParamManager.buildSystemParam(ExecType.DIRECT, new Date());
+    Map<String, String> definedParamMap = SystemParamManager.buildSystemParam(ExecType.DIRECT, new Date(), "job id 001");
 
     // 解析参数
     String sqls = "${sf.system.bizdate}";
@@ -37,6 +37,9 @@ public class ParamHelperTest {
     System.out.println(ParamHelper.resolvePlaceholders(sqls, definedParamMap));
 
     sqls = "$[yyyyMMdd]";
+    System.out.println(ParamHelper.resolvePlaceholders(sqls, definedParamMap));
+
+    sqls = "${sf.system.jobId}";
     System.out.println(ParamHelper.resolvePlaceholders(sqls, definedParamMap));
   }
 }

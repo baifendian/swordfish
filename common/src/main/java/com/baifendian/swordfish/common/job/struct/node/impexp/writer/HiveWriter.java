@@ -17,6 +17,7 @@ package com.baifendian.swordfish.common.job.struct.node.impexp.writer;
 
 import com.baifendian.swordfish.common.enums.WriteMode;
 import com.baifendian.swordfish.common.job.struct.node.impexp.column.HiveColumn;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
@@ -24,11 +25,12 @@ import java.util.List;
 /**
  * hive 写入对象
  */
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class HiveWriter implements Writer {
 
   private String database;
   private String table;
-  private WriteMode writerMode;
+  private WriteMode writeMode;
   private List<HiveColumn> column;
 
   public String getDatabase() {
@@ -47,12 +49,12 @@ public class HiveWriter implements Writer {
     this.table = table;
   }
 
-  public WriteMode getWriterMode() {
-    return writerMode;
+  public WriteMode getWriteMode() {
+    return writeMode;
   }
 
-  public void setWriterMode(WriteMode writerMode) {
-    this.writerMode = writerMode;
+  public void setWriteMode(WriteMode writeMode) {
+    this.writeMode = writeMode;
   }
 
   public List<HiveColumn> getColumn() {

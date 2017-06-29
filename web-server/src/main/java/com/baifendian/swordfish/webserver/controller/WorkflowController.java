@@ -68,7 +68,7 @@ public class WorkflowController {
                                     @RequestParam(value = "file", required = false) MultipartFile file,
                                     @RequestParam(value = "extras", required = false) String extras) {
     logger.info("Operator user {}, create workflow, project name: {}, workflow name: {}, desc: {}, proxyUser: {}, queue: {}, data: {}, file: [{},{}]",
-        operator.getName(), projectName, name, desc, proxyUser, queue, data, (file == null) ? null : file.getName(), (file == null) ? null : file.getOriginalFilename());
+            operator.getName(), projectName, name, desc, proxyUser, queue, data, (file == null) ? null : file.getName(), (file == null) ? null : file.getOriginalFilename());
 
     return new WorkflowDto(workflowService.createWorkflow(operator, projectName, name, desc, proxyUser, queue, data, file, extras, null));
   }
@@ -96,7 +96,7 @@ public class WorkflowController {
                                  @RequestParam(value = "file", required = false) MultipartFile file,
                                  @RequestParam(value = "extras", required = false) String extras) {
     logger.info("Operator user {}, put workflow, project name: {}, workflow name: {}, desc: {}, proxyUser: {}, queue: {}, data: {}, file: [{},{}]",
-        operator.getName(), projectName, name, desc, proxyUser, queue, data, (file == null) ? null : file.getName(), (file == null) ? null : file.getOriginalFilename());
+            operator.getName(), projectName, name, desc, proxyUser, queue, data, (file == null) ? null : file.getName(), (file == null) ? null : file.getOriginalFilename());
 
     return new WorkflowDto(workflowService.putWorkflow(operator, projectName, name, desc, proxyUser, queue, data, file, extras));
   }
@@ -124,7 +124,7 @@ public class WorkflowController {
                                    @RequestParam(value = "file", required = false) MultipartFile file,
                                    @RequestParam(value = "extras", required = false) String extras) {
     logger.info("Operator user {}, modify workflow, project name: {}, workflow name: {}, desc: {}, proxyUser: {}, queue: {}, data: {}, file: [{},{}]",
-        operator.getName(), projectName, name, desc, proxyUser, queue, data, (file == null) ? null : file.getName(), (file == null) ? null : file.getOriginalFilename());
+            operator.getName(), projectName, name, desc, proxyUser, queue, data, (file == null) ? null : file.getName(), (file == null) ? null : file.getOriginalFilename());
 
     return new WorkflowDto(workflowService.patchWorkflow(operator, projectName, name, desc, proxyUser, queue, data, file, extras));
   }
@@ -161,7 +161,7 @@ public class WorkflowController {
                              @PathVariable String projectName,
                              @PathVariable String name) {
     logger.info("Operator user {}, delete workflow, project name: {}, workflow name: {}",
-        operator.getName(), projectName, name);
+            operator.getName(), projectName, name);
 
     workflowService.deleteProjectFlow(operator, projectName, name);
   }
@@ -180,7 +180,7 @@ public class WorkflowController {
                                  @RequestParam(value = "queue", required = false) String queue,
                                  @RequestParam(value = "proxyUser", required = false) String proxyUser) {
     logger.info("Operator user {}, modify workflow conf, project name: {}, proxyUser: {}, queue: {}",
-        operator.getName(), projectName, proxyUser, queue);
+            operator.getName(), projectName, proxyUser, queue);
 
     workflowService.modifyWorkflowConf(operator, projectName, queue, proxyUser);
   }
@@ -196,7 +196,7 @@ public class WorkflowController {
   public List<WorkflowDto> queryWorkflow(@RequestAttribute(value = "session.user") User operator,
                                          @PathVariable String projectName) {
     logger.info("Operator user {}, query workflow list of project, project name: {}",
-        operator.getName(), projectName);
+            operator.getName(), projectName);
 
     List<ProjectFlow> projectFlowList = workflowService.queryAllProjectFlow(operator, projectName);
     List<WorkflowDto> workflowDtoList = new ArrayList<>();
@@ -221,7 +221,7 @@ public class WorkflowController {
                                          @PathVariable String projectName,
                                          @PathVariable String name) {
     logger.info("Operator user {}, query workflow detail, project name: {}, workflow name: {}",
-        operator.getName(), projectName, name);
+            operator.getName(), projectName, name);
 
     return new WorkflowDto(workflowService.queryProjectFlow(operator, projectName, name));
   }
@@ -239,19 +239,56 @@ public class WorkflowController {
                                                          @PathVariable String projectName,
                                                          @PathVariable String name) {
     logger.info("Operator user {}, download workflow, project name: {}, workflow name: {}",
-        operator.getName(), projectName, name);
+            operator.getName(), projectName, name);
 
     org.springframework.core.io.Resource file = workflowService.downloadProjectFlowFile(operator, projectName, name);
 
     if (file == null) {
       return ResponseEntity
-          .noContent().build();
+              .noContent().build();
     }
 
     return ResponseEntity
-        .ok()
-        .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getFilename() + "\"")
-        .body(file);
+            .ok()
+            .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getFilename() + "\"")
+            .body(file);
 
+  }
+
+  /**
+   * 上传本地文件到hdfs
+   *
+   * @param file
+   * @param hdfsPath
+   */
+  @GetMapping(value = "/workflows/file-to-hdfs")
+  public void fileToHDFS(@RequestAttribute(value = "session.user") User operator,
+                         @PathVariable String projectName,
+                         @RequestParam(value = "file") MultipartFile file,
+                         @RequestParam(value = "hdfsPath") String hdfsPath) {
+
+    logger.info("Operator user {}, project:{}, hdfsPath:{}, file: [{},{}]",
+            operator.getName(), projectName, hdfsPath, (file == null) ? null : file.getName(), (file == null) ? null : file.getOriginalFilename());
+
+    workflowService.fileToHdfs(projectName, hdfsPath, file);
+  }
+
+  /**
+   * 本地文件上传到hvie
+   * @param operator
+   * @param projectName
+   * @param file
+   * @param data
+   */
+  @GetMapping(value = "/workflows/file-to-hive")
+  public void fileToHive(@RequestAttribute(value = "session.user") User operator,
+                         @PathVariable String projectName,
+                         @RequestParam(value = "file") MultipartFile file,
+                         @RequestParam(value = "data") String data) {
+
+    logger.info("Operator user {}, project:{}, data:{}, file: [{},{}]",
+            operator.getName(), projectName, data, (file == null) ? null : file.getName(), (file == null) ? null : file.getOriginalFilename());
+
+    workflowService.fileToHive(projectName, data, file);
   }
 }

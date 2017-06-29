@@ -17,13 +17,18 @@ package com.baifendian.swordfish.execserver.job;
 
 import com.baifendian.swordfish.common.job.struct.node.BaseParam;
 import com.baifendian.swordfish.execserver.common.ExecResult;
-
 import java.util.List;
 
 /**
  * 执行的 Job (用于执行某个具体任务，如 MR/Spark 等) <p>
  */
 public interface Job {
+
+  /**
+   * 初始化
+   */
+  void init() throws Exception;
+
   /**
    * 作业前处理
    */
@@ -46,8 +51,6 @@ public interface Job {
 
   /**
    * 作业是否已经启动
-   *
-   * @return
    */
   boolean isStarted();
 
@@ -60,8 +63,6 @@ public interface Job {
 
   /**
    * 是否长任务类型
-   *
-   * @return
    */
   boolean isLongJob();
 
@@ -79,15 +80,11 @@ public interface Job {
 
   /**
    * 获取 job 执行返回的结果
-   *
-   * @return
    */
   List<ExecResult> getResults();
 
   /**
    * 获取 job 参数
-   *
-   * @return
    */
   BaseParam getParam();
 }

@@ -19,10 +19,6 @@ import com.baifendian.swordfish.execserver.exception.ExecException;
 import com.baifendian.swordfish.execserver.exception.ExecTimeoutException;
 import com.baifendian.swordfish.execserver.utils.Constants;
 import com.baifendian.swordfish.execserver.utils.ProcessUtil;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -34,6 +30,9 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
 
 public abstract class AbstractProcessJob extends AbstractJob {
 
@@ -53,16 +52,11 @@ public abstract class AbstractProcessJob extends AbstractJob {
 
   /**
    * 创建命令语句
-   *
-   * @return
-   * @throws Exception
    */
   public abstract String createCommand() throws Exception;
 
   /**
    * 日志处理
-   *
-   * @param logs
    */
   protected void logProcess(List<String> logs) {
     logger.info("(stdout, stderr) -> \n{}", String.join("\n", logs));
@@ -134,7 +128,8 @@ public abstract class AbstractProcessJob extends AbstractJob {
         stringBuilder.append(command);
 
         // 写数据到文件
-        FileUtils.writeStringToFile(new File(commandFile), stringBuilder.toString(), Charset.forName("UTF-8"));
+        FileUtils.writeStringToFile(new File(commandFile), stringBuilder.toString(),
+            Charset.forName("UTF-8"));
       }
 
       // 设置运行命令
@@ -171,10 +166,16 @@ public abstract class AbstractProcessJob extends AbstractJob {
 
         exitCode = (isCompleted()) ? 0 : -1;
       } else {// 等待运行完毕
-        process.waitFor(remainTime, TimeUnit.SECONDS);
-        exitCode = process.exitValue();
+        boolean status = process.waitFor(remainTime, TimeUnit.SECONDS);
 
-        logger.info("job has exit, work dir:{}, pid:{}", workDir, pid);
+        if (status) {
+          exitCode = process.exitValue();
+          logger.info("job has exit, work dir:{}, pid:{}", workDir, pid);
+        } else {
+          cancel(true);
+          exitCode = -1;
+          logger.info("job has timeout, work dir:{}, pid:{}", workDir, pid);
+        }
       }
     } catch (InterruptedException e) {
       logger.error("interrupt exception, maybe task has been cancel or killed.");
@@ -229,7 +230,8 @@ public abstract class AbstractProcessJob extends AbstractJob {
    * @return
    * @throws InterruptedException
    */
-  private boolean softKill(int processId, final long time, final TimeUnit unit) throws InterruptedException {
+  private boolean softKill(int processId, final long time, final TimeUnit unit)
+      throws InterruptedException {
     checkStarted();
 
     if (processId != 0 && process.isAlive()) {
@@ -255,22 +257,12 @@ public abstract class AbstractProcessJob extends AbstractJob {
 
   /**
    * 直接 kill
-   *
-   * @param processId
    */
   public void hardKill(int processId) {
     checkStarted();
 
     if (processId != 0 && process.isAlive()) {
       try {
-//        String cmd;
-//
-//        if (props.getProxyUser() != null) {
-//          cmd = String.format("sudo -u %s kill -9 %d", props.getProxyUser(), processId);
-//        } else {
-//          cmd = String.format("kill -9 %d", processId);
-//        }
-
         String cmd = String.format("sudo kill -9 %d", processId);
 
         logger.info("hardKill job:{}, process id:{}, cmd:{}", props.getJobAppId(), processId, cmd);
@@ -284,8 +276,6 @@ public abstract class AbstractProcessJob extends AbstractJob {
 
   /**
    * 打印命令
-   *
-   * @param processBuilder
    */
   private void printCommand(ProcessBuilder processBuilder) {
     String cmdStr;
@@ -300,9 +290,6 @@ public abstract class AbstractProcessJob extends AbstractJob {
 
   /**
    * 得到进程 id
-   *
-   * @param process
-   * @return
    */
   private int getProcessId(Process process) {
     int processId = 0;
@@ -342,7 +329,8 @@ public abstract class AbstractProcessJob extends AbstractJob {
           long now = System.currentTimeMillis();
 
           // 到一定日志量就输出处理
-          if (logs.size() >= Constants.defaultLogBufferSize || now - preFlushTime > Constants.defaultLogFlushInterval) {
+          if (logs.size() >= Constants.defaultLogBufferSize
+              || now - preFlushTime > Constants.defaultLogFlushInterval) {
             preFlushTime = now;
             logProcess(logs);
             logs.clear();

@@ -22,14 +22,17 @@ import com.baifendian.swordfish.dao.model.ExecutionFlow;
 import com.baifendian.swordfish.execserver.parameter.SystemParamManager;
 import com.baifendian.swordfish.execserver.utils.Constants;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import org.apache.commons.configuration.Configuration;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.TimeUnit;
+import org.apache.commons.configuration.Configuration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Flow 执行管理器 <p>
@@ -66,12 +69,16 @@ public class FlowRunnerManager {
   public FlowRunnerManager(Configuration conf) {
     this.flowDao = DaoFactory.getDaoInstance(FlowDao.class);
 
-    int flowThreads = conf.getInt(Constants.EXECUTOR_FLOWRUNNER_THREADS, Constants.defaultFlowRunnerThreadNum);
-    ThreadFactory flowThreadFactory = new ThreadFactoryBuilder().setNameFormat("Exec-Worker-FlowRunner").build();
+    int flowThreads = conf
+        .getInt(Constants.EXECUTOR_FLOWRUNNER_THREADS, Constants.defaultFlowRunnerThreadNum);
+    ThreadFactory flowThreadFactory = new ThreadFactoryBuilder()
+        .setNameFormat("Exec-Worker-FlowRunner").build();
     flowExecutorService = Executors.newFixedThreadPool(flowThreads, flowThreadFactory);
 
-    int nodeThreads = conf.getInt(Constants.EXECUTOR_NODERUNNER_THREADS, Constants.defaultNodeRunnerThreadNum);
-    ThreadFactory nodeThreadFactory = new ThreadFactoryBuilder().setNameFormat("Exec-Worker-NodeRunner").build();
+    int nodeThreads = conf
+        .getInt(Constants.EXECUTOR_NODERUNNER_THREADS, Constants.defaultNodeRunnerThreadNum);
+    ThreadFactory nodeThreadFactory = new ThreadFactoryBuilder()
+        .setNameFormat("Exec-Worker-NodeRunner").build();
     nodeExecutorService = Executors.newFixedThreadPool(nodeThreads, nodeThreadFactory);
 
     // 主要指清理 runningFlows 中运行完成的任务
@@ -97,8 +104,6 @@ public class FlowRunnerManager {
 
   /**
    * 提交 workflow 执行 <p>
-   *
-   * @param executionFlow
    */
   public void submitFlow(ExecutionFlow executionFlow) {
     if (runningFlows.containsKey(executionFlow.getId())) {
@@ -106,14 +111,10 @@ public class FlowRunnerManager {
       return;
     }
 
-    // 系统参数, 注意 schedule time 是真正调度运行的时刻
-    Map<String, String> systemParamMap = SystemParamManager.buildSystemParam(executionFlow.getType(), executionFlow.getScheduleTime());
-
-    // 构建自定义参数, 比如定义了 ${abc} = ${sf.system.bizdate}, $[yyyyMMdd] 等情况
-    Map<String, String> customParamMap = executionFlow.getUserDefinedParamMap();
-
-    int maxTryTimes = executionFlow.getMaxTryTimes() != null ? executionFlow.getMaxTryTimes() : Constants.defaultMaxTryTimes;
-    int timeout = executionFlow.getTimeout() != null ? executionFlow.getTimeout() : Constants.defaultMaxTimeout;
+    int maxTryTimes = executionFlow.getMaxTryTimes() != null ? executionFlow.getMaxTryTimes()
+        : Constants.defaultMaxTryTimes;
+    int timeout = executionFlow.getTimeout() != null ? executionFlow.getTimeout()
+        : Constants.defaultMaxTimeout;
 
     // 构造 flow runner 的上下文信息
     FlowRunnerContext context = new FlowRunnerContext();
@@ -123,19 +124,20 @@ public class FlowRunnerManager {
     context.setMaxTryTimes(maxTryTimes);
     context.setTimeout(timeout);
     context.setFailurePolicyType(defaultFailurePolicyType);
-    context.setSystemParamMap(systemParamMap);
-    context.setCustomParamMap(customParamMap);
 
     FlowRunner flowRunner = new FlowRunner(context);
 
-    synchronized (this) {
+    // 如果没有运行, 则提交
+    if (!runningFlows.containsKey(executionFlow.getId())) {
       runningFlows.putIfAbsent(executionFlow.getId(), flowRunner);
+
+      logger.info(
+          "submit flow, exec id: {}, project name: {}, workflow name: {}, max try times: {}, timeout: {}",
+          executionFlow.getId(), executionFlow.getProjectName(), executionFlow.getWorkflowName(),
+          maxTryTimes, timeout);
+
+      flowExecutorService.submit(flowRunner);
     }
-
-    logger.info("submit flow, exec id: {}, project name: {}, workflow name: {}, max try times: {}, timeout: {}",
-        executionFlow.getId(), executionFlow.getProjectName(), executionFlow.getWorkflowName(), maxTryTimes, timeout);
-
-    flowExecutorService.submit(flowRunner);
   }
 
   /**
@@ -192,9 +194,6 @@ public class FlowRunnerManager {
 
   /**
    * 关闭 executor service
-   *
-   * @param executorService
-   * @param shutdownNow
    */
   private void shutdownExecutorService(ExecutorService executorService, boolean shutdownNow) {
     if (!executorService.isShutdown()) {
@@ -214,8 +213,6 @@ public class FlowRunnerManager {
 
   /**
    * 取消执行的 flow
-   *
-   * @param executionFlow
    */
   public void cancelFlow(ExecutionFlow executionFlow) {
     int execId = executionFlow.getId();

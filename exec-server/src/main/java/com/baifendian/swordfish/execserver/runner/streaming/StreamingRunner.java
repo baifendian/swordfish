@@ -18,7 +18,7 @@ package com.baifendian.swordfish.execserver.runner.streaming;
 import com.baifendian.swordfish.common.config.BaseConfig;
 import com.baifendian.swordfish.common.job.struct.node.BaseParam;
 import com.baifendian.swordfish.common.job.struct.node.BaseParamFactory;
-import com.baifendian.swordfish.dao.StreamingDao;
+import com.baifendian.swordfish.common.mail.EmailManager;
 import com.baifendian.swordfish.dao.enums.ExecType;
 import com.baifendian.swordfish.dao.model.StreamingResult;
 import com.baifendian.swordfish.execserver.job.Job;
@@ -27,14 +27,18 @@ import com.baifendian.swordfish.execserver.job.JobProps;
 import com.baifendian.swordfish.execserver.parameter.SystemParamManager;
 import com.baifendian.swordfish.execserver.utils.EnvHelper;
 import com.baifendian.swordfish.execserver.utils.JobLogger;
-import org.apache.commons.io.FileUtils;
-import org.slf4j.Logger;
-
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.Callable;
+import org.apache.commons.io.FileUtils;
+import org.slf4j.Logger;
 
 public class StreamingRunner implements Callable<Boolean> {
 
@@ -61,13 +65,18 @@ public class StreamingRunner implements Callable<Boolean> {
   @Override
   public Boolean call() {
     // "项目id/streamingId/执行id"
-    String jobScriptPath = BaseConfig.getStreamingExecDir(streamingResult.getProjectId(), streamingResult.getStreamingId(), streamingResult.getExecId());
+    String jobScriptPath = BaseConfig
+        .getStreamingExecDir(streamingResult.getProjectId(), streamingResult.getStreamingId(),
+            streamingResult.getExecId());
 
-    logger.info("streaming id:{}, exec id:{}, script path:{}", streamingResult.getStreamingId(), streamingResult.getExecId(), jobScriptPath);
+    logger.info("streaming id:{}, exec id:{}, script path:{}", streamingResult.getStreamingId(),
+        streamingResult.getExecId(), jobScriptPath);
 
     // 作业参数配置
     // 系统参数, 注意 schedule time 是真正调度运行的时刻
-    Map<String, String> systemParamMap = SystemParamManager.buildSystemParam(ExecType.DIRECT, streamingResult.getScheduleTime());
+    Map<String, String> systemParamMap = SystemParamManager
+        .buildSystemParam(ExecType.DIRECT, streamingResult.getScheduleTime(),
+            streamingResult.getJobId());
 
     // 自定义参数
     Map<String, String> customParamMap = streamingResult.getUserDefinedParamMap();
@@ -95,11 +104,9 @@ public class StreamingRunner implements Callable<Boolean> {
     props.setEnvFile(BaseConfig.getSystemEnvPath());
     props.setQueue(streamingResult.getQueue());
     props.setExecJobStartTime(streamingResult.getScheduleTime());
-    props.setJobAppId(streamingResult.getJobId());
+    props.setJobAppId(streamingResult.getJobId()); // 这是设置为和 job id 一样
 
     JobLogger jobLogger = new JobLogger(streamingResult.getJobId(), logger);
-
-    // 得到 job 就可以指向了
 
     boolean success = false;
 
@@ -116,6 +123,9 @@ public class StreamingRunner implements Callable<Boolean> {
       // 可以运行了
       job = JobManager.newJob(streamingResult.getType(), props, jobLogger);
 
+      // job 的初始化
+      job.init();
+
       // job 的前处理
       job.before();
 
@@ -129,7 +139,8 @@ public class StreamingRunner implements Callable<Boolean> {
     } catch (Exception e) {
       success = false;
 
-      logger.error(String.format("job process exception, streaming job id: %s, exec id: %s", streamingResult.getStreamingId(), streamingResult.getExecId()), e);
+      logger.error(String.format("job process exception, streaming job id: %s, exec id: %s",
+          streamingResult.getStreamingId(), streamingResult.getExecId()), e);
     } finally {
       kill();
 
@@ -140,21 +151,18 @@ public class StreamingRunner implements Callable<Boolean> {
         logger.error(String.format("delete dir exception: %s", jobScriptPath), e);
       }
 
-      logger.info("job process done, streaming job id: {}, exec id: {}, success: {}", streamingResult.getStreamingId(), streamingResult.getExecId(), success);
+      logger.info("job process done, streaming job id: {}, exec id: {}, success: {}",
+          streamingResult.getStreamingId(), streamingResult.getExecId(), success);
     }
+
+    // 运行完后发送报警
+    EmailManager.sendMessageOfStreamingJob(streamingResult);
 
     return success;
   }
 
   /**
    * 得到资源文件
-   *
-   * @return
-   * @throws IllegalArgumentException
-   * @throws InvocationTargetException
-   * @throws NoSuchMethodException
-   * @throws InstantiationException
-   * @throws IllegalAccessException
    */
   private List<String> genProjectResFiles() throws
       IllegalArgumentException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
@@ -163,7 +171,8 @@ public class StreamingRunner implements Callable<Boolean> {
     Set<String> projectFiles = new HashSet<>();
 
     // 得到结点参数信息
-    BaseParam baseParam = BaseParamFactory.getBaseParam(streamingResult.getType(), streamingResult.getParameter());
+    BaseParam baseParam = BaseParamFactory
+        .getBaseParam(streamingResult.getType(), streamingResult.getParameter());
 
     // 结点参数中获取资源文件
     if (baseParam != null) {

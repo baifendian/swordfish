@@ -18,11 +18,14 @@ package com.baifendian.swordfish.common.job.struct.node.impexp;
 import com.baifendian.swordfish.common.enums.ImpExpType;
 import com.baifendian.swordfish.common.job.struct.node.BaseParam;
 import com.baifendian.swordfish.common.job.struct.node.impexp.reader.Reader;
+import com.baifendian.swordfish.common.job.struct.node.impexp.setting.Setting;
 import com.baifendian.swordfish.common.job.struct.node.impexp.writer.Writer;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 /**
  * 导入导出参数
  */
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class ImpExpParam extends BaseParam {
   private ImpExpType type;
   private Setting setting;
@@ -68,15 +71,18 @@ public class ImpExpParam extends BaseParam {
     this.type = impExpBuilder.getType();
     this.reader = impExpBuilder.getReaderParam();
     this.writer = impExpBuilder.getWriterParam();
-    this.setting = impExpBuilder.getSettingParam();
+    this.setting = impExpBuilder.getSetting();
   }
 
   @Override
   public boolean checkValid() {
+
     return type != null &&
             reader != null &&
             reader.checkValid() &&
             writer != null &&
-            writer.checkValid();
+            writer.checkValid() &&
+            setting != null &&
+            setting.checkValid();
   }
 }

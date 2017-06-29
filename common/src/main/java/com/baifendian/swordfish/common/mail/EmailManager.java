@@ -21,7 +21,6 @@ import com.baifendian.swordfish.dao.enums.FlowStatus;
 import com.baifendian.swordfish.dao.enums.NotifyType;
 import com.baifendian.swordfish.dao.model.ExecutionFlow;
 import com.baifendian.swordfish.dao.model.StreamingResult;
-
 import java.text.MessageFormat;
 import java.util.Date;
 import java.util.List;
@@ -34,83 +33,67 @@ public class EmailManager {
   /**
    * 邮件标题格式
    */
-  private static final String TITLE_FORMAT = "[Swordfish system notify] [{0} [{1}]";
+  private static final String TITLE_FORMAT = "[{0}]Swordfish system notify, {1}";
 
   /**
    * 获取邮件任务
    */
   private static final String CONTENT_FORMAT = "<b>{0}</b>" +
       "<hr/>Project name：{1}<br/>" +
-      "Job name：{2}<br/> " +
-      "Schedule time: {3}<br/>" +
-      "Proxy user：{4}<br/>" +
-      "Queue：{5}<br/>" +
+      "Job name：{2}<br/>" +
+      "Proxy user：{3}<br/>" +
+      "Queue：{4}<br/>" +
+      "Schedule time: {5}<br/>" +
       "Start execution time：{6}<br/>" +
       "End execution time：{7}<br/>" +
       "Final status：{8}<br/>";
 
   /**
    * 发送 EMAIL(调度)
-   *
-   * @param type
-   * @param status
-   * @param projectName
-   * @param jobName
-   * @param scheduleTime
-   * @param proxyUser
-   * @param queue
-   * @param startTime
-   * @param endTime
-   * @param receivers
    */
   public static void sendEmail(String type,
-                               FlowStatus status,
-                               String projectName,
-                               String jobName,
-                               Date scheduleTime,
-                               String proxyUser,
-                               String queue,
-                               Date startTime,
-                               Date endTime,
-                               List<String> receivers) {
+      FlowStatus status,
+      String projectName,
+      String jobName,
+      String proxyUser,
+      String queue,
+      Date scheduleTime,
+      Date startTime,
+      Date endTime,
+      List<String> receivers) {
     // 得到标题
-    String title = MessageFormat.format(TITLE_FORMAT, type, getFlowStatusCnName(status));
+    String title = MessageFormat.format(TITLE_FORMAT, getFlowStatusCnName(status), type);
 
-    String content = MessageFormat.format(CONTENT_FORMAT, type, projectName, jobName, DateUtils.defaultFormat(scheduleTime),
-        proxyUser, queue, DateUtils.defaultFormat(startTime), DateUtils.defaultFormat(endTime), getFlowStatusCnNameH5(status));
+    String content = MessageFormat.format(CONTENT_FORMAT, type, projectName, jobName,
+        proxyUser, queue, DateUtils.defaultFormat(scheduleTime), DateUtils.defaultFormat(startTime),
+        DateUtils.defaultFormat(endTime), getFlowStatusCnNameH5(status));
 
     MailSendUtil.sendMails(receivers, title, content);
   }
 
   /**
    * 获取执行类型的描述 <p>
-   *
-   * @param runType
-   * @return
    */
   private static String getRunTypeCnName(ExecType runType) {
 
     switch (runType) {
       case COMPLEMENT_DATA:
-        return "Add data workflow job";
+        return "add data workflow job";
 
       case DIRECT:
-        return "Direct run workflow job";
+        return "direct run workflow job";
 
       case SCHEDULER:
-        return "Schedule workflow job";
+        return "schedule workflow job";
 
       default:
     }
 
-    return "Unknown job";
+    return "unknown job";
   }
 
   /**
    * 获取执行状态的描述 <p>
-   *
-   * @param status
-   * @return
    */
   private static String getFlowStatusCnName(FlowStatus status) {
     if (status.typeIsFailure()) {
@@ -126,9 +109,6 @@ public class EmailManager {
 
   /**
    * 获取执行状态的描述 <p>
-   *
-   * @param status
-   * @return
    */
   private static String getFlowStatusCnNameH5(FlowStatus status) {
     if (status.typeIsFailure()) {
@@ -145,8 +125,6 @@ public class EmailManager {
 
   /**
    * 发送工作流的 mail 信息
-   *
-   * @param executionFlow
    */
   public static void sendMessageOfExecutionFlow(ExecutionFlow executionFlow) {
     NotifyType notifyType = executionFlow.getNotifyType();
@@ -174,9 +152,9 @@ public class EmailManager {
           executionFlow.getStatus(),
           executionFlow.getProjectName(),
           executionFlow.getWorkflowName(),
-          executionFlow.getScheduleTime(),
           executionFlow.getProxyUser(),
           executionFlow.getQueue(),
+          executionFlow.getScheduleTime(),
           executionFlow.getStartTime(),
           executionFlow.getEndTime(),
           executionFlow.getNotifyMailList());
@@ -185,8 +163,6 @@ public class EmailManager {
 
   /**
    * 发送流任务的报警
-   *
-   * @param streamingResult
    */
   public static void sendMessageOfStreamingJob(StreamingResult streamingResult) {
     NotifyType notifyType = streamingResult.getNotifyType();
@@ -210,13 +186,13 @@ public class EmailManager {
     }
 
     if (sendMail) {
-      sendEmail("Streaming job",
+      sendEmail("streaming job",
           streamingResult.getStatus(),
           streamingResult.getProjectName(),
           streamingResult.getName(),
-          streamingResult.getScheduleTime(),
           streamingResult.getProxyUser(),
           streamingResult.getQueue(),
+          streamingResult.getScheduleTime(),
           streamingResult.getStartTime(),
           streamingResult.getEndTime(),
           streamingResult.getNotifyMailList());

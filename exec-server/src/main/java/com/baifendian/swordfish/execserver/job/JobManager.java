@@ -16,6 +16,7 @@
 package com.baifendian.swordfish.execserver.job;
 
 import com.baifendian.swordfish.execserver.job.hql.EtlSqlJob;
+import com.baifendian.swordfish.execserver.job.impexp.ImpExpJobManager;
 import com.baifendian.swordfish.execserver.job.mr.MrJob;
 import com.baifendian.swordfish.execserver.job.shell.ShellJob;
 import com.baifendian.swordfish.execserver.job.spark.SparkJob;
@@ -39,6 +40,8 @@ public class JobManager {
         return new VirtualJob(props, false, logger);
       case SPARK_STREAMING:
         return new SparkJob(props, true, logger);
+      case IMPEXP:
+        return ImpExpJobManager.newJob(jobTypeStr, props, logger);
       default:
         logger.error("unsupport job type: {}", jobTypeStr);
         throw new IllegalArgumentException("Not support job type");

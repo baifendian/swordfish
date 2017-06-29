@@ -25,12 +25,12 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonRawValue;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import org.apache.commons.lang.StringUtils;
-
 import java.util.Date;
+import org.apache.commons.lang.StringUtils;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ExecutionFlowDto {
+
   private int execId;
 
   private String projectName;
@@ -76,13 +76,16 @@ public class ExecutionFlowDto {
       this.submitTime = executionFlow.getSubmitTime();
       this.startTime = executionFlow.getStartTime();
       this.endTime = executionFlow.getEndTime();
-      this.duration = executionFlow.getDuration();
       this.submitUser = executionFlow.getSubmitUser();
       this.proxyUser = executionFlow.getProxyUser();
       this.queue = executionFlow.getQueue();
       this.status = executionFlow.getStatus();
       this.owner = executionFlow.getOwner();
       this.extras = executionFlow.getExtras();
+      this.duration = (startTime == null) ? 0 :
+          Math.toIntExact((
+              (endTime == null) ? System.currentTimeMillis() - startTime
+                  .getTime() : endTime.getTime() - startTime.getTime()) / 1000);
 
       if (StringUtils.isNotEmpty(executionFlow.getWorkflowData())) {
         this.data = JsonUtil.parseObject(executionFlow.getWorkflowData(), ExecutionFlowData.class);

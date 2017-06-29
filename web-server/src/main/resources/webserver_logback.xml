@@ -16,12 +16,11 @@
         <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
             <!-- rollover daily -->
             <fileNamePattern>logs/web-server-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
-            <!-- each file should be at most 100MB, keep 60 days worth of history, but at most 20GB -->
             <maxFileSize>128MB</maxFileSize>
             <maxHistory>14</maxHistory>
             <totalSizeCap>6GB</totalSizeCap>
         </rollingPolicy>
-
+        <!-- Log level filter -->
         <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
             <level>INFO</level>
         </filter>
@@ -38,22 +37,16 @@
             </pattern>
             <charset>UTF-8</charset> <!-- 此处设置字符集 -->
         </encoder>
-        <!-- Only log level WARN and above -->
+        <!-- Log level filter -->
         <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
             <level>DEBUG</level>
         </filter>
     </appender>
 
-    <!-- Enable FILE and STDOUT appenders for all log messages.
-         By default, only log at level INFO and above. -->
+    <!-- Enable FILE and STDOUT appenders for all log messages. -->
     <root level="TRACE">
         <appender-ref ref="FILE"/>
-        <appender-ref ref="STDOUT"/>
+        <!--<appender-ref ref="STDOUT"/>-->
     </root>
-
-    <!-- For loggers in the these namespaces, log at all levels. -->
-    <logger name="pedestal" level="ALL"/>
-    <logger name="hammock-cafe" level="ALL"/>
-    <logger name="user" level="ALL"/>
 
 </configuration>

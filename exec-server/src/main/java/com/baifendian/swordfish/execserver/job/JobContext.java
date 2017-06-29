@@ -39,16 +39,6 @@ public class JobContext {
   private FlowNode flowNode;
 
   /**
-   * 系统参数
-   */
-  private Map<String, String> systemParamMap;
-
-  /**
-   * 自定义参数
-   */
-  private Map<String, String> customParamMap;
-
-  /**
    * 信号量
    */
   private Semaphore semaphore;
@@ -75,22 +65,6 @@ public class JobContext {
 
   public void setFlowNode(FlowNode flowNode) {
     this.flowNode = flowNode;
-  }
-
-  public Map<String, String> getSystemParamMap() {
-    return systemParamMap;
-  }
-
-  public void setSystemParamMap(Map<String, String> systemParamMap) {
-    this.systemParamMap = systemParamMap;
-  }
-
-  public Map<String, String> getCustomParamMap() {
-    return customParamMap;
-  }
-
-  public void setCustomParamMap(Map<String, String> customParamMap) {
-    this.customParamMap = customParamMap;
   }
 
   public Semaphore getSemaphore() {

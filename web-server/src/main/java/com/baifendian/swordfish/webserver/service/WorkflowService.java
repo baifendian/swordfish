@@ -17,6 +17,7 @@ package com.baifendian.swordfish.webserver.service;
 
 import com.baifendian.swordfish.common.config.BaseConfig;
 import com.baifendian.swordfish.common.hadoop.HdfsClient;
+import com.baifendian.swordfish.common.utils.CommonUtil;
 import com.baifendian.swordfish.common.utils.graph.Graph;
 import com.baifendian.swordfish.dao.FlowDao;
 import com.baifendian.swordfish.dao.mapper.ProjectFlowMapper;
@@ -45,6 +46,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -642,5 +644,66 @@ public class WorkflowService {
     }
 
     return graph.hasCycle();
+  }
+
+  /**
+   * 本地文件上传到hdfs
+   *
+   * @param hdfsPath
+   * @param file
+   */
+  public void fileToHdfs(String projectName, String hdfsPath, MultipartFile file) {
+
+    Project project = projectMapper.queryByName(projectName);
+
+    if (project == null) {
+      logger.error("Project does not exist: {}", projectName);
+      throw new NotFoundException("Not found project \"{0}\"", projectName);
+    }
+
+    if (StringUtils.isEmpty(hdfsPath)) {
+      logger.error("HdfsPath:{} not valid!", hdfsPath);
+      throw new BadRequestException("HdfsPath:\"{0}\" not valid!", hdfsPath);
+    }
+
+    if (file == null || file.isEmpty()) {
+      logger.error("File must be not null!");
+      throw new BadRequestException("File must be not null!");
+    }
+
+    String fileSuffix = CommonUtil.fileSuffix(file.getOriginalFilename());
+
+
+    // 生成路径
+    String filename = MessageFormat.format("{0}.{1}", UUID.randomUUID().toString(), fileSuffix);
+    // 下载到本地的路径, 使用本地资源的缓存文件夹
+    String localFilename = BaseConfig.getLocalResourceFilename(project.getId(), filename);
+
+    try {
+      logger.info("Start save file in local cache: {}", localFilename);
+      //先把文件缓存在本地
+      fileSystemStorageService.store(file, localFilename);
+      logger.info("Finish save file in local cache");
+
+      logger.info("Start upload local file: {} to hdfs: {} ", localFilename, hdfsPath);
+      //再上传到hdfs
+      HdfsClient.getInstance().copyLocalToHdfs(localFilename, hdfsPath, true, true);
+      logger.info("Finish upload local file to hdfs");
+    } catch (Exception e) {
+      logger.error("workflow file process error", e);
+      throw new ServerErrorException("workflow file process error:{0}", e.getMessage());
+    }
+  }
+
+  /**
+   * 本地文件上传到hive中
+   * @param projectName
+   * @param data
+   * @param file
+   */
+  public void fileToHive(String projectName, String data, MultipartFile file) {
+    // 1.上传文件到hdfs
+    // 2.创建一个工作流
+    // 3.执行工作流
   }
 }

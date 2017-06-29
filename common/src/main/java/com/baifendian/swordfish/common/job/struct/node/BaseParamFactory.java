@@ -51,8 +51,7 @@ public class BaseParamFactory {
           return JsonUtil.parseObject(parameter, SparkParam.class);
         case SPARK:
           return JsonUtil.parseObject(parameter, SparkParam.class);
-        case IMPORT:
-        case EXPORT:
+        case IMPEXP:
           return JsonUtil.parseObject(parameter,ImpExpBuilder.class).buildImpExp();
         default:
           return null;

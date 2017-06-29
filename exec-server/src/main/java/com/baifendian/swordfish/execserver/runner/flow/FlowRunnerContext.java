@@ -57,16 +57,6 @@ public class FlowRunnerContext {
   private int timeout;
 
   /**
-   * 系统参数
-   */
-  private Map<String, String> systemParamMap;
-
-  /**
-   * 自定义参数
-   */
-  private Map<String, String> customParamMap;
-
-  /**
    * getter method
    *
    * @return the executionFlow
@@ -184,45 +174,5 @@ public class FlowRunnerContext {
    */
   public void setTimeout(int timeout) {
     this.timeout = timeout;
-  }
-
-  /**
-   * getter method
-   *
-   * @return the systemParamMap
-   * @see FlowRunnerContext#systemParamMap
-   */
-  public Map<String, String> getSystemParamMap() {
-    return systemParamMap;
-  }
-
-  /**
-   * setter method
-   *
-   * @param systemParamMap the systemParamMap to set
-   * @see FlowRunnerContext#systemParamMap
-   */
-  public void setSystemParamMap(Map<String, String> systemParamMap) {
-    this.systemParamMap = systemParamMap;
-  }
-
-  /**
-   * getter method
-   *
-   * @return the customParamMap
-   * @see FlowRunnerContext#customParamMap
-   */
-  public Map<String, String> getCustomParamMap() {
-    return customParamMap;
-  }
-
-  /**
-   * setter method
-   *
-   * @param customParamMap the customParamMap to set
-   * @see FlowRunnerContext#customParamMap
-   */
-  public void setCustomParamMap(Map<String, String> customParamMap) {
-    this.customParamMap = customParamMap;
   }
 }

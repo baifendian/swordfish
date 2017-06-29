@@ -17,6 +17,9 @@ package com.baifendian.swordfish.execserver.runner.node;
 
 import com.baifendian.swordfish.common.config.BaseConfig;
 import com.baifendian.swordfish.common.utils.http.HttpUtil;
+import com.baifendian.swordfish.dao.DaoFactory;
+import com.baifendian.swordfish.dao.FlowDao;
+import com.baifendian.swordfish.dao.enums.FlowStatus;
 import com.baifendian.swordfish.dao.model.ExecutionFlow;
 import com.baifendian.swordfish.dao.model.ExecutionNode;
 import com.baifendian.swordfish.dao.model.FlowNode;
@@ -24,14 +27,14 @@ import com.baifendian.swordfish.execserver.job.Job;
 import com.baifendian.swordfish.execserver.job.JobContext;
 import com.baifendian.swordfish.execserver.job.JobManager;
 import com.baifendian.swordfish.execserver.job.JobProps;
+import com.baifendian.swordfish.execserver.parameter.SystemParamManager;
 import com.baifendian.swordfish.execserver.utils.JobLogger;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Semaphore;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * 节点执行器 <p>
@@ -49,27 +52,22 @@ public class NodeRunner implements Callable<Boolean> {
 
   private final FlowNode flowNode;
 
-  private final Map<String, String> systemParamMap;
-
-  private final Map<String, String> customParamMap;
-
   private Job job;
 
   private Semaphore semaphore;
 
+  private final FlowDao flowDao;
+
   public NodeRunner(JobContext jobContext) {
+    this.flowDao = DaoFactory.getDaoInstance(FlowDao.class);
     this.executionFlow = jobContext.getExecutionFlow();
     this.executionNode = jobContext.getExecutionNode();
     this.flowNode = jobContext.getFlowNode();
-    this.systemParamMap = jobContext.getSystemParamMap();
-    this.customParamMap = jobContext.getCustomParamMap();
     this.semaphore = jobContext.getSemaphore();
   }
 
   /**
    * 得到执行的结点
-   *
-   * @return
    */
   public ExecutionNode getExecutionNode() {
     return executionNode;
@@ -77,8 +75,6 @@ public class NodeRunner implements Callable<Boolean> {
 
   /**
    * 返回结点名称
-   *
-   * @return
    */
   public String getNodename() {
     return flowNode.getName();
@@ -86,12 +82,28 @@ public class NodeRunner implements Callable<Boolean> {
 
   @Override
   public Boolean call() {
-    // "项目id/flowId/执行id"
-    String jobScriptPath = BaseConfig.getFlowExecDir(executionFlow.getProjectId(), executionFlow.getFlowId(), executionFlow.getId());
+    // 更新结点状态为正在运行
+    executionNode.setStatus(FlowStatus.RUNNING);
 
-    logger.info("exec id:{}, node:{}, script path:{}", executionFlow.getId(), executionNode.getName(), jobScriptPath);
+    flowDao.updateExecutionNode(executionNode);
+
+    // "项目id/flowId/执行id"
+    String jobScriptPath = BaseConfig
+        .getFlowExecDir(executionFlow.getProjectId(), executionFlow.getFlowId(),
+            executionFlow.getId());
+
+    logger
+        .info("exec id:{}, node:{}, script path:{}", executionFlow.getId(), executionNode.getName(),
+            jobScriptPath);
 
     // 作业参数配置
+    Map<String, String> systemParamMap = SystemParamManager
+        .buildSystemParam(executionFlow.getType(), executionFlow.getScheduleTime(),
+            executionNode.getJobId());
+
+    // 构建自定义参数, 比如定义了 ${abc} = ${sf.system.bizdate}, $[yyyyMMdd] 等情况
+    Map<String, String> customParamMap = executionFlow.getUserDefinedParamMap();
+
     Map<String, String> allParamMap = new HashMap<>();
 
     if (systemParamMap != null) {
@@ -117,7 +129,8 @@ public class NodeRunner implements Callable<Boolean> {
     props.setExecJobStartTime(executionFlow.getScheduleTime());
     props.setExecJobTimeout(executionFlow.getTimeout());
 
-    props.setJobAppId(String.format("%s_%s", executionNode.getJobId(), HttpUtil.getMd5(executionNode.getName()).substring(0, 8)));
+    props.setJobAppId(String.format("%s_%s", executionNode.getJobId(),
+        HttpUtil.getMd5(executionNode.getName()).substring(0, 8)));
 
     JobLogger jobLogger = new JobLogger(executionNode.getJobId(), logger);
 
@@ -125,6 +138,9 @@ public class NodeRunner implements Callable<Boolean> {
 
     try {
       job = JobManager.newJob(flowNode.getType(), props, jobLogger);
+
+      // job 的初始化
+      job.init();
 
       // job 的前处理
       job.before();
@@ -139,13 +155,16 @@ public class NodeRunner implements Callable<Boolean> {
     } catch (Exception e) {
       success = false;
 
-      logger.error(String.format("job process exception, exec id: %s, node: %s", executionFlow.getId(), executionNode.getName()), e);
+      logger.error(String
+          .format("job process exception, exec id: %s, node: %s", executionFlow.getId(),
+              executionNode.getName()), e);
 
       kill();
     } finally {
       semaphore.release();
 
-      logger.info("job process done, exec id: {}, node: {}, success: {}", executionFlow.getId(), executionNode.getName(), success);
+      logger.info("job process done, exec id: {}, node: {}, success: {}", executionFlow.getId(),
+          executionNode.getName(), success);
     }
 
     return success;

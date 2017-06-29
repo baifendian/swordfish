@@ -23,16 +23,16 @@ import com.baifendian.swordfish.dao.utils.json.JsonObjectDeserializer;
 import com.fasterxml.jackson.annotation.JsonRawValue;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import org.apache.commons.collections.CollectionUtils;
-
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import org.apache.commons.collections.CollectionUtils;
 
 /**
  * 工作流调度节点返回结果
  */
 public class ExecutionNodeDto {
+
   private String name;
   private String desc;
   private String type;
@@ -55,18 +55,17 @@ public class ExecutionNodeDto {
   }
 
   /**
-   * 与executionNode 实体的信息合并
-   *
-   * @param executionNode
+   * 与 executionNode 实体的信息合并
    */
   public void mergeExecutionNode(ExecutionNode executionNode) {
     if (executionNode != null) {
       this.startTime = executionNode.getStartTime();
       this.endTime = executionNode.getEndTime();
 
-      if (this.startTime != null && this.endTime != null) {
-        this.duration = Math.toIntExact((this.endTime.getTime() - this.startTime.getTime()) / 1000);
-      }
+      this.duration = (startTime == null) ? 0 :
+          Math.toIntExact((
+              (endTime == null) ? System.currentTimeMillis() - startTime
+                  .getTime() : endTime.getTime() - startTime.getTime()) / 1000);
 
       this.status = executionNode.getStatus();
 
