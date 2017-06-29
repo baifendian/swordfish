@@ -773,7 +773,7 @@ public class WorkflowService {
     }
 
     //生成一个工作流
-    String workflowData = "{\"nodes\":[{\"name\":\"{0}\",\"desc\":\"file to hive temp workflow\",\"type\":\"IMPEXP\",\"parameter\":{1}}],\"userDefParams\":{2}}";
+    String workflowData = "'{'\"nodes\":['{'\"name\":\"{0}\",\"desc\":\"file to hive temp workflow\",\"type\":\"IMPEXP\",\"parameter\":{1}}],\"userDefParams\":{2}}";
     workflowData = MessageFormat.format(workflowData, nodeName, JsonUtil.toJsonString(impExpParam), userDefParams);
 
     logger.info("Create workflow data: {}", workflowData);
