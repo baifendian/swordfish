@@ -15,6 +15,7 @@
  */
 package com.baifendian.swordfish.common.config;
 
+import com.baifendian.swordfish.common.utils.http.HttpUtil;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -202,19 +203,29 @@ public class BaseConfig {
   }
 
   /**
+   * 获取 ImpExp 执行的根目录
+   */
+  public static String getHdfsImpExpDir(int projectId, long execId) {
+    return MessageFormat
+        .format("{0}/{1}/{2}", hdfsImpexpBasePath, Integer.toString(projectId),
+            Long.toString(execId));
+  }
+
+  /**
    * 获取 ImpExp 缓存的路径
    */
   public static String getHdfsImpExpDir(int projectId, long execId, String nodeName) {
     return MessageFormat
-        .format("{0}/{1}/{2}/{3}", hdfsImpexpBasePath, Integer.toString(projectId),
-            Long.toString(execId), nodeName);
+        .format("{0}/{1}", getHdfsImpExpDir(projectId, execId),
+            HttpUtil.getMd5(nodeName).substring(0, 8));
   }
 
   /**
-   * 返回 hive 的 udf jar 路径
+   * 返回 hive 的 udf jar 路径, 注意, 这里没有 project 的信息(其实应该用 project id)
    */
-  public static String getJobHiveUdfJarBasePath() {
-    return hdfsUdfJarBasePath;
+  public static String getJobHiveUdfJarPath(long execId) {
+    return MessageFormat
+        .format("{0}/{1}", hdfsUdfJarBasePath, Long.toString(execId));
   }
 
   /**
