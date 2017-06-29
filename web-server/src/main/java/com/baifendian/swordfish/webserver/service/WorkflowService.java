@@ -45,6 +45,8 @@ import net.lingala.zip4j.core.ZipFile;
 import net.lingala.zip4j.exception.ZipException;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.fs.permission.FsPermission;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -741,6 +743,28 @@ public class WorkflowService {
     String nodeName = uuid;
     String hdfsPath = BaseConfig.getHdfsImpExpDir(project.getId(), execId, nodeName);
     logger.info("Create execId: {}, nodeName: {},hdfsPath: {}", workflowName, nodeName, hdfsPath);
+
+
+    logger.info("Start create temp dir...");
+    try {
+      //如果目录不存在就新建
+      if (!HdfsClient.getInstance().exists(hdfsPath)) {
+        logger.info("path: {} not exists try create", hdfsPath);
+        HdfsClient.getInstance().mkdir(hdfsPath, FsPermission.createImmutable((short) 0777));
+      }
+      //设置权限
+      Path dir = new Path(hdfsPath);
+      while (!dir.getName().equalsIgnoreCase("swordfish")) {
+        HdfsClient.getInstance().setPermissionThis(dir, FsPermission.createImmutable((short) 0777));
+        dir = dir.getParent();
+      }
+    } catch (Exception e) {
+      logger.error("Create temp dir error: {}",e);
+      throw new PreFailedException("Create temp dir: \"{0}\" error: {1}", hdfsPath, e.getMessage());
+    }
+    logger.info("Finish create temp dir!");
+
+
     // 1.上传文件到hdfs
     // 生成路径
     String fileSuffix = CommonUtil.fileSuffix(file.getOriginalFilename());
