@@ -269,7 +269,7 @@ public class WorkflowController {
                          @PathVariable String projectName,
                          @RequestParam(value = "file") MultipartFile file,
                          @RequestParam(value = "data") String data,
-                         @RequestParam(value = "userDefParams") String userDefParams,
+                         @RequestParam(value = "userDefParams", required = false) String userDefParams,
                          @RequestParam(value = "proxyUser") String proxyUser,
                          @RequestParam(value = "queue") String queue) {
 

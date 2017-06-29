@@ -768,6 +768,10 @@ public class WorkflowService {
     ((FileReader) impExpParam.getReader()).setHdfsPath(hdfsPath);
     impExpParam.setSetting(new Setting(new Speed()));
 
+    if (StringUtils.isEmpty(userDefParams)){
+      userDefParams = "[]";
+    }
+
     //生成一个工作流
     String workflowData = "{\"nodes\":[{\"name\":\"{0}\",\"desc\":\"file to hive temp workflow\",\"type\":\"IMPEXP\",\"parameter\":{1}}],\"userDefParams\":{2}}";
     workflowData = MessageFormat.format(workflowData, nodeName, JsonUtil.toJsonString(impExpParam), userDefParams);
