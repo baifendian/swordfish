@@ -264,7 +264,7 @@ public class WorkflowController {
    * @param file
    * @param data
    */
-  @GetMapping(value = "/workflows/file-to-hive")
+  @GetMapping(value = "/file-to-hive")
   public void fileToHive(@RequestAttribute(value = "session.user") User operator,
                          @PathVariable String projectName,
                          @RequestParam(value = "file") MultipartFile file,
