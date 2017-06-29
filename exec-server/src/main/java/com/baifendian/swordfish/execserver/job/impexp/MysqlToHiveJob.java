@@ -175,7 +175,7 @@ public class MysqlToHiveJob extends ImpExpJob {
     //注册临时外部表
     String srcTableName = hiveService.getTbaleName(props.getProjectId(), props.getExecId(), props.getJobAppId());
     logger.info("Start create temp hive table: {}", srcTableName);
-    hiveService.createHiveTmpTable(DEFAULT_DB, srcTableName, srcColumns, ((HdfsWriterArg) writerArg).getPath());
+    hiveService.createHiveTmpTable(DEFAULT_DB, srcTableName, srcColumns, ((HdfsWriterArg) writerArg).getPath(), DEFAULT_DELIMITER);
     logger.info("Finsh create temp hive table: {}", srcTableName);
 
 
