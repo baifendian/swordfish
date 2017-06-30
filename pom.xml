@@ -22,6 +22,7 @@
         <spring.version>4.3.7.RELEASE</spring.version>
         <spring.boot.version>1.4.5.RELEASE</spring.boot.version>
         <tomcat.version>7.0.63</tomcat.version>
+        <logback.version>1.2.3</logback.version>
 
         <!-- big data related version -->
         <hadoop.version>2.7.3</hadoop.version>
@@ -65,17 +66,17 @@
             <dependency>
                 <groupId>ch.qos.logback</groupId>
                 <artifactId>logback-classic</artifactId>
-                <version>1.1.7</version>
+                <version>${logback.version}</version>
             </dependency>
             <dependency>
                 <groupId>ch.qos.logback</groupId>
                 <artifactId>logback-core</artifactId>
-                <version>1.1.7</version>
+                <version>${logback.version}</version>
             </dependency>
             <dependency>
                 <groupId>ch.qos.logback</groupId>
                 <artifactId>logback-access</artifactId>
-                <version>1.1.7</version>
+                <version>${logback.version}</version>
             </dependency>
             <dependency>
                 <groupId>avalon-logkit</groupId>
