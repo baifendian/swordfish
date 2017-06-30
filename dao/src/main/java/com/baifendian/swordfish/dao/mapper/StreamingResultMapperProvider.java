@@ -217,8 +217,9 @@ public class StreamingResultMapperProvider {
       sql = sql.WHERE("schedule_time < #{endDate}");
     }
 
+    // 模糊匹配
     if (StringUtils.isNotEmpty(name)) {
-      sql = sql.WHERE("s.name = #{name}");
+      sql = sql.WHERE("s.name like '" + name + "%'");
     }
 
     if (status != null) {
@@ -269,8 +270,9 @@ public class StreamingResultMapperProvider {
 
         WHERE("s.project_id=#{projectId}");
 
+        // 模糊匹配
         if (StringUtils.isNotEmpty(name)) {
-          WHERE("s.name = #{name}");
+          WHERE("s.name like '" + name + "%'");
         }
 
         if (status != null) {
