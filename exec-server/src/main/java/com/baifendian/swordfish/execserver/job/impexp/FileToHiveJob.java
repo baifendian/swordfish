@@ -1,7 +1,9 @@
 package com.baifendian.swordfish.execserver.job.impexp;
 
+import com.baifendian.swordfish.common.config.BaseConfig;
 import com.baifendian.swordfish.common.enums.FileColumnType;
 import com.baifendian.swordfish.common.enums.WriteMode;
+import com.baifendian.swordfish.common.hadoop.HdfsClient;
 import com.baifendian.swordfish.common.job.struct.node.BaseParam;
 import com.baifendian.swordfish.common.job.struct.node.impexp.ImpExpParam;
 import com.baifendian.swordfish.common.job.struct.node.impexp.column.FileColumn;
@@ -21,11 +23,14 @@ import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.lang.StringUtils;
+import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.fs.permission.FsPermission;
 import org.apache.hadoop.hive.metastore.api.FieldSchema;
 import org.apache.hadoop.hive.metastore.api.Table;
 import org.apache.thrift.TException;
 import org.slf4j.Logger;
 
+import java.io.File;
 import java.text.MessageFormat;
 import java.util.*;
 
@@ -101,6 +106,9 @@ public class FileToHiveJob extends AbstractJob {
       fileColumn.setName(ParamHelper.resolvePlaceholders(fileColumn.getName(), props.getDefinedParams()));
     }
 
+    //进行参数合理性检测
+    checkParam();
+
     // 构造一个hive服务类，预备使用
     hiveService = new HiveService(hiveConf.getString("hive.thrift.uris"), hiveConf.getString("hive.metastore.uris"), props.getProxyUser(), "");
     hiveService.init();
@@ -115,6 +123,41 @@ public class FileToHiveJob extends AbstractJob {
   @Override
   public void process() throws Exception {
     super.process();
+
+    String hdfsPath = fileReader.getHdfsPath();
+    String fileName = fileReader.getFileName();
+
+
+    // 判断文件是否需要上传
+    if (StringUtils.isNotEmpty(fileName)) {
+      //1. 下载文件到本地
+      logger.info("Has file name try to process file");
+      String filePath = MessageFormat.format("{0}/{1}", props.getWorkDir(), fileName);
+      File file = new File(filePath);
+      if (!file.exists()) {
+        logger.error("file {} not exists!", file.getAbsoluteFile());
+        throw new Exception("file not exists!");
+      }
+      hdfsPath = BaseConfig.getHdfsImpExpDir(props.getProjectId(), props.getExecId(), props.getNodeName());
+      logger.info("Start upload file to temp hdfs dir: {} ...", hdfsPath);
+      //设置目录
+      if (!HdfsClient.getInstance().exists(hdfsPath)) {
+        logger.info("path: {} not exists try create", hdfsPath);
+        HdfsClient.getInstance().mkdir(hdfsPath, FsPermission.createImmutable((short) 0777));
+      }
+
+      HdfsClient.getInstance().copyLocalToHdfs(filePath, hdfsPath, true, true);
+
+      String fileHdfsPath = MessageFormat.format("{0}/{1}",hdfsPath,fileName);
+      //设置权限
+      Path dir = new Path(fileHdfsPath);
+      while (!dir.getName().equalsIgnoreCase("swordfish")) {
+        HdfsClient.getInstance().setPermissionThis(dir, FsPermission.createImmutable((short) 0777));
+        dir = dir.getParent();
+      }
+      logger.info("Finish upload file to temp hdfs dir!");
+    }
+
     // 1.创建临时表
     logger.info("First, create temp table...");
     String srcTable = hiveService.getTbaleName(props.getProjectId(), props.getExecId(), props.getJobAppId());
@@ -142,6 +185,17 @@ public class FileToHiveJob extends AbstractJob {
 
   @Override
   public void cancel(boolean cancelApplication) throws Exception {
+
+  }
+
+  /**
+   * 参数校验
+   */
+  public void checkParam() {
+    //TODO 参数校验
+  }
+
+  public String uploadFileToHDFS() {
 
   }
 

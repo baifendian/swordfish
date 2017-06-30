@@ -18,6 +18,7 @@ package com.baifendian.swordfish.common.job.struct.node.impexp.reader;
 import com.baifendian.swordfish.common.job.struct.node.impexp.column.FileColumn;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
+import org.stringtemplate.v4.ST;
 
 import java.util.List;
 
@@ -29,6 +30,7 @@ public class FileReader implements Reader {
   private List<FileColumn> targetColumn;
   private String hdfsPath;
   private String fieldDelimiter;
+  private String fileName;
 
   public List<FileColumn> getSrcColumn() {
     return srcColumn;
@@ -62,8 +64,20 @@ public class FileReader implements Reader {
     this.fieldDelimiter = fieldDelimiter;
   }
 
+  public String getFileName() {
+    return fileName;
+  }
+
+  public void setFileName(String fileName) {
+    this.fileName = fileName;
+  }
+
   @Override
   public boolean checkValid() {
-    return CollectionUtils.isNotEmpty(srcColumn) && CollectionUtils.isNotEmpty(targetColumn) && StringUtils.isNotEmpty(fieldDelimiter) && !StringUtils.equalsIgnoreCase(fieldDelimiter, "\n");
+    return CollectionUtils.isNotEmpty(srcColumn) &&
+            CollectionUtils.isNotEmpty(targetColumn) &&
+            StringUtils.isNotEmpty(fieldDelimiter) &&
+            !StringUtils.equalsIgnoreCase(fieldDelimiter, "\n") &&
+            (StringUtils.isNotEmpty(hdfsPath) || StringUtils.isNotEmpty(fileName));
   }
 }
