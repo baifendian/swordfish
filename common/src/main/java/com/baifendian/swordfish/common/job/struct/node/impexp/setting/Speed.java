@@ -26,12 +26,12 @@ public class Speed {
   /**
    * 最大并发数
    */
-  private Integer channel;
+  private Integer channel = 1;
   /**
    * 最大流量
    */
   @JsonProperty("byte")
-  private Long byteInt;
+  private Long byteInt = 104857600L;
 
   public Speed(Integer channel, Long byteInt) {
     this.channel = channel;

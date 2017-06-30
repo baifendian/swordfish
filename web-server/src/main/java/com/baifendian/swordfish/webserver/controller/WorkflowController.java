@@ -17,6 +17,7 @@ package com.baifendian.swordfish.webserver.controller;
 
 import com.baifendian.swordfish.dao.model.ProjectFlow;
 import com.baifendian.swordfish.dao.model.User;
+import com.baifendian.swordfish.webserver.dto.ExecutorIdDto;
 import com.baifendian.swordfish.webserver.dto.WorkflowDto;
 import com.baifendian.swordfish.webserver.service.WorkflowService;
 import org.slf4j.Logger;
@@ -255,40 +256,27 @@ public class WorkflowController {
 
   }
 
-  /**
-   * 上传本地文件到hdfs
-   *
-   * @param file
-   * @param hdfsPath
-   */
-  @GetMapping(value = "/workflows/file-to-hdfs")
-  public void fileToHDFS(@RequestAttribute(value = "session.user") User operator,
-                         @PathVariable String projectName,
-                         @RequestParam(value = "file") MultipartFile file,
-                         @RequestParam(value = "hdfsPath") String hdfsPath) {
-
-    logger.info("Operator user {}, project:{}, hdfsPath:{}, file: [{},{}]",
-            operator.getName(), projectName, hdfsPath, (file == null) ? null : file.getName(), (file == null) ? null : file.getOriginalFilename());
-
-    workflowService.fileToHdfs(projectName, hdfsPath, file);
-  }
 
   /**
    * 本地文件上传到hvie
+   *
    * @param operator
    * @param projectName
    * @param file
    * @param data
    */
-  @GetMapping(value = "/workflows/file-to-hive")
-  public void fileToHive(@RequestAttribute(value = "session.user") User operator,
-                         @PathVariable String projectName,
-                         @RequestParam(value = "file") MultipartFile file,
-                         @RequestParam(value = "data") String data) {
+  @PostMapping(value = "/file-to-hive")
+  public ExecutorIdDto fileToHive(@RequestAttribute(value = "session.user") User operator,
+                                  @PathVariable String projectName,
+                                  @RequestParam(value = "file") MultipartFile file,
+                                  @RequestParam(value = "data") String data,
+                                  @RequestParam(value = "userDefParams", required = false) String userDefParams,
+                                  @RequestParam(value = "proxyUser") String proxyUser,
+                                  @RequestParam(value = "queue") String queue) {
 
     logger.info("Operator user {}, project:{}, data:{}, file: [{},{}]",
             operator.getName(), projectName, data, (file == null) ? null : file.getName(), (file == null) ? null : file.getOriginalFilename());
 
-    workflowService.fileToHive(projectName, data, file);
+    return workflowService.fileToHive(operator, projectName, data, userDefParams, file, proxyUser, queue);
   }
 }
