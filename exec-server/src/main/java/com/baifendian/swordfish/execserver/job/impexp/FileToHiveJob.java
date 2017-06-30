@@ -195,9 +195,6 @@ public class FileToHiveJob extends AbstractJob {
     //TODO 参数校验
   }
 
-  public String uploadFileToHDFS() {
-
-  }
 
   /**
    * 获取导入导出字段关系
