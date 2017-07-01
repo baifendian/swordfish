@@ -40,7 +40,7 @@ public class ParamHelperTest {
     sqls = "$[yyyyMMdd]";
     System.out.println(ParamHelper.resolvePlaceholders(sqls, definedParamMap));
 
-    sqls = "${sf.system.execId";
+    sqls = "${sf.system.execId}";
     System.out.println(ParamHelper.resolvePlaceholders(sqls, definedParamMap));
 
     sqls = "${sf.system.jobId}";

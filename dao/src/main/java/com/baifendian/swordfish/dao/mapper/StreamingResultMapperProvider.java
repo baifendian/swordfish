@@ -219,7 +219,7 @@ public class StreamingResultMapperProvider {
 
     // 模糊匹配
     if (StringUtils.isNotEmpty(name)) {
-      sql = sql.WHERE("s.name like '" + name + "%'");
+      sql = sql.WHERE("s.name like '{name}%'");
     }
 
     if (status != null) {
@@ -272,7 +272,7 @@ public class StreamingResultMapperProvider {
 
         // 模糊匹配
         if (StringUtils.isNotEmpty(name)) {
-          WHERE("s.name like '" + name + "%'");
+          WHERE("s.name like '{name}%'");
         }
 
         if (status != null) {
