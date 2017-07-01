@@ -40,8 +40,6 @@ public class HiveServiceTest {
 
     String tableName = "debug_swordfish_impexp";
 
-    hiveService.createHiveTmpTable("defualt", tableName, testColumn, localtion);
-
     Thread.sleep(60000L);
 
     hiveService.close();
