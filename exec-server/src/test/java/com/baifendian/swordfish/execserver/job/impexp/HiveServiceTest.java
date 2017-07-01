@@ -1,17 +1,13 @@
 package com.baifendian.swordfish.execserver.job.impexp;
 
-import com.baifendian.swordfish.common.enums.WriteMode;
 import com.baifendian.swordfish.execserver.job.impexp.Args.HqlColumn;
-import org.apache.hadoop.hive.metastore.api.MetaException;
-import org.apache.thrift.TException;
-import org.junit.Test;
-
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import org.apache.hadoop.hive.metastore.api.MetaException;
+import org.apache.thrift.TException;
+import org.junit.Test;
 
 /**
  * hive 服务类测试工具

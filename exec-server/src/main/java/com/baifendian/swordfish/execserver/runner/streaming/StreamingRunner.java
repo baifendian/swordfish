@@ -76,7 +76,7 @@ public class StreamingRunner implements Callable<Boolean> {
     // 系统参数, 注意 schedule time 是真正调度运行的时刻
     Map<String, String> systemParamMap = SystemParamManager
         .buildSystemParam(ExecType.DIRECT, streamingResult.getScheduleTime(),
-            streamingResult.getJobId());
+            streamingResult.getExecId(), streamingResult.getJobId());
 
     // 自定义参数
     Map<String, String> customParamMap = streamingResult.getUserDefinedParamMap();

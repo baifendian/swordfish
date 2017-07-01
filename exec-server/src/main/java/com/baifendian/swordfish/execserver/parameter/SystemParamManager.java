@@ -55,6 +55,11 @@ public class SystemParamManager {
   public static final String CYC_TIME = "sf.system.cyctime";
 
   /**
+   * 执行 id
+   */
+  public static final String EXEC_ID = "sf.system.execId";
+
+  /**
    * 日志 id
    */
   public static final String JOB_ID = "sf.system.jobId";
@@ -63,7 +68,7 @@ public class SystemParamManager {
    * 构造系统参数
    */
   public static Map<String, String> buildSystemParam(ExecType execType, Date time) {
-    return buildSystemParam(execType, time, null);
+    return buildSystemParam(execType, time, null, null);
   }
 
   /**
@@ -71,9 +76,11 @@ public class SystemParamManager {
    *
    * @param execType 执行方式, 比如是直接执行, 还是补数据, 还是调度执行
    * @param time 对于直接执行, 指的是运行的时间, 对于调度执行, 指的是调度时间, 对于补数据, 指业务补数据的时间
+   * @param execId 执行的 id
    * @param jobId 日志 id
    */
-  public static Map<String, String> buildSystemParam(ExecType execType, Date time, String jobId) {
+  public static Map<String, String> buildSystemParam(ExecType execType, Date time, Integer execId,
+      String jobId) {
     Date bizDate;
 
     switch (execType) {
@@ -93,6 +100,10 @@ public class SystemParamManager {
     valueMap.put(BIZ_DATE, formatDate(bizDate));
     valueMap.put(BIZ_CUR_DATE, formatDate(bizCurDate));
     valueMap.put(CYC_TIME, formatTime(bizCurDate));
+
+    if (execId != null) {
+      valueMap.put(EXEC_ID, Long.toString(execId));
+    }
 
     if (StringUtils.isNotEmpty(jobId)) {
       valueMap.put(JOB_ID, jobId);
