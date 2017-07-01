@@ -102,7 +102,7 @@ public class ExecController {
                                           @RequestParam(value = "desc", required = false) String desc,
                                           @RequestParam(value = "data", required = false) String data,
                                           @RequestParam(value = "file", required = false) MultipartFile file,
-                                          @RequestParam(value = "notifyType", required = false, defaultValue = "NONE") NotifyType notifyType,
+                                          @RequestParam(value = "notifyType", required = false) NotifyType notifyType,
                                           @RequestParam(value = "notifyMails", required = false) String notifyMails,
                                           @RequestParam(value = "timeout", required = false, defaultValue = "18000") int timeout,
                                           @RequestParam(value = "extras", required = false) String extras) {

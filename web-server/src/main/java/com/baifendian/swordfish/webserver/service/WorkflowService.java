@@ -609,9 +609,11 @@ public class WorkflowService {
         ZipFile zipFile = new ZipFile(localFilename);
         logger.info("ext file {} to {}", localFilename, localExtractDir);
         zipFile.extractAll(localExtractDir);
-
-        String jsonString = fileSystemStorageService.readFileToString(WorkflowJson);
+        String workflowJsonPath = MessageFormat.format("{0}/{1}", localExtractDir, WorkflowJson);
+        logger.info("Start reader workflow.json: {}", workflowJsonPath);
+        String jsonString = fileSystemStorageService.readFileToString(workflowJsonPath);
         workflowData = JsonUtil.parseObject(jsonString, WorkflowData.class);
+        logger.info("Finish reader workflow.json!");
 
         // 上传文件到 HDFS
         if (workflowData != null) {
@@ -759,7 +761,7 @@ public class WorkflowService {
         dir = dir.getParent();
       }
     } catch (Exception e) {
-      logger.error("Create temp dir error: {}",e);
+      logger.error("Create temp dir error: {}", e);
       throw new PreFailedException("Create temp dir: \"{0}\" error: {1}", hdfsPath, e.getMessage());
     }
     logger.info("Finish create temp dir!");
