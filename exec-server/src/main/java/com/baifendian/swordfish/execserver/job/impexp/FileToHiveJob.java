@@ -148,7 +148,7 @@ public class FileToHiveJob extends AbstractJob {
 
       HdfsClient.getInstance().copyLocalToHdfs(filePath, hdfsPath, true, true);
 
-      String fileHdfsPath = MessageFormat.format("{0}/{1}",hdfsPath,fileName);
+      String fileHdfsPath = MessageFormat.format("{0}/{1}", hdfsPath, fileName);
       //设置权限
       Path dir = new Path(fileHdfsPath);
       while (!dir.getName().equalsIgnoreCase("swordfish")) {
@@ -162,7 +162,7 @@ public class FileToHiveJob extends AbstractJob {
     logger.info("First, create temp table...");
     String srcTable = hiveService.getTbaleName(props.getProjectId(), props.getExecId(), props.getJobAppId());
     logger.info("Temp table name: {}", srcTable);
-    hiveService.createHiveTmpTable(DEFAULT_DB, srcTable, getFileHqlColumn(), fileReader.getHdfsPath(), fileReader.getFieldDelimiter());
+    hiveService.createHiveTmpTable(DEFAULT_DB, srcTable, getFileHqlColumn(), hdfsPath, fileReader.getFieldDelimiter());
     logger.info("Finish first, create temp table!");
 
     // 2.插入数据

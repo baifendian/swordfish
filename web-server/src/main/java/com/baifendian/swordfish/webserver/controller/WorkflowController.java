@@ -255,28 +255,4 @@ public class WorkflowController {
             .body(file);
 
   }
-
-
-  /**
-   * 本地文件上传到hvie
-   *
-   * @param operator
-   * @param projectName
-   * @param file
-   * @param data
-   */
-  @PostMapping(value = "/file-to-hive")
-  public ExecutorIdDto fileToHive(@RequestAttribute(value = "session.user") User operator,
-                                  @PathVariable String projectName,
-                                  @RequestParam(value = "file") MultipartFile file,
-                                  @RequestParam(value = "data") String data,
-                                  @RequestParam(value = "userDefParams", required = false) String userDefParams,
-                                  @RequestParam(value = "proxyUser") String proxyUser,
-                                  @RequestParam(value = "queue") String queue) {
-
-    logger.info("Operator user {}, project:{}, data:{}, file: [{},{}]",
-            operator.getName(), projectName, data, (file == null) ? null : file.getName(), (file == null) ? null : file.getOriginalFilename());
-
-    return workflowService.fileToHive(operator, projectName, data, userDefParams, file, proxyUser, queue);
-  }
 }
