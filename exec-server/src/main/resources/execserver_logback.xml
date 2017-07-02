@@ -1,5 +1,5 @@
 <!-- Logback configuration. See http://logback.qos.ch/manual/index.html -->
-<configuration scan="true" scanPeriod="120 seconds" debug="true">
+<configuration scan="true" scanPeriod="120 seconds"> <!--debug="true"-->
 
     <conversionRule conversionWord="nanos"
                     converterClass="com.baifendian.swordfish.common.utils.NanoSampleConverter"/>
@@ -25,7 +25,7 @@
             <level>INFO</level>
         </filter>
         <!-- Safely log to the same file from multiple JVMs. Degrades performance! -->
-        <prudent>true</prudent>
+        <!--<prudent>true</prudent>-->
     </appender>
 
     <!-- Console output -->
