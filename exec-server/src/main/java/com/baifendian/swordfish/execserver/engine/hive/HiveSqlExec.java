@@ -15,29 +15,29 @@
  */
 package com.baifendian.swordfish.execserver.engine.hive;
 
-import com.baifendian.swordfish.common.hive.ConnectionInfo;
-import com.baifendian.swordfish.common.hive.HiveConnectionClient;
+import com.baifendian.swordfish.common.hive.service2.HiveService2ConnectionInfo;
+import com.baifendian.swordfish.common.hive.service2.HiveService2Client;
 import com.baifendian.swordfish.dao.DaoFactory;
 import com.baifendian.swordfish.dao.enums.FlowStatus;
 import com.baifendian.swordfish.dao.exception.DaoSemanticException;
 import com.baifendian.swordfish.execserver.common.ExecResult;
 import com.baifendian.swordfish.execserver.common.ResultCallback;
-import org.apache.hive.jdbc.HiveConnection;
-import org.apache.hive.jdbc.HiveStatement;
-import org.apache.hive.service.cli.HiveSQLException;
-import org.slf4j.Logger;
-
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import org.apache.hive.jdbc.HiveConnection;
+import org.apache.hive.jdbc.HiveStatement;
+import org.apache.hive.service.cli.HiveSQLException;
+import org.slf4j.Logger;
 
 /**
  * Hive sql执行 <p>
  */
 public class HiveSqlExec {
+
   /**
    * 查询限制，默认为 1000
    */
@@ -74,9 +74,9 @@ public class HiveSqlExec {
   private final Integer queryLimit;
 
   /**
-   * {@link HiveJdbcExec}
+   * {@link HiveUtil}
    */
-  private final HiveJdbcExec hiveJdbcExec;
+  private final HiveUtil hiveUtil;
 
   /**
    * 记录日志的实例
@@ -88,7 +88,8 @@ public class HiveSqlExec {
    */
   private List<ExecResult> results;
 
-  public HiveSqlExec(List<String> createFuncs, List<String> sqls, String userName, boolean isContinue, ResultCallback resultCallback, Integer queryLimit, Logger logger) {
+  public HiveSqlExec(List<String> createFuncs, List<String> sqls, String userName,
+      boolean isContinue, ResultCallback resultCallback, Integer queryLimit, Logger logger) {
     this.createFuncs = createFuncs;
     this.sqls = sqls;
     this.userName = userName;
@@ -97,15 +98,13 @@ public class HiveSqlExec {
     this.resultCallback = resultCallback;
     this.queryLimit = (queryLimit != null) ? queryLimit : defualtQueryLimit;
 
-    this.hiveJdbcExec = DaoFactory.getDaoInstance(HiveJdbcExec.class);
+    this.hiveUtil = DaoFactory.getDaoInstance(HiveUtil.class);
 
     this.logger = logger;
   }
 
   /**
    * 执行多个sql 语句 并返回查询的语句
-   *
-   * @return
    */
   public boolean execute() {
     HiveConnection hiveConnection = null;
@@ -113,17 +112,17 @@ public class HiveSqlExec {
     Thread logThread = null;
 
     // 得到 hive 的连接信息
-    ConnectionInfo connectionInfo = hiveJdbcExec.getConnectionInfo(userName);
+    HiveService2ConnectionInfo hiveService2ConnectionInfo = hiveUtil.getHiveService2ConnectionInfo(userName);
 
-    logger.info("execution connection information:{}", connectionInfo);
+    logger.info("execution connection information:{}", hiveService2ConnectionInfo);
 
-    HiveConnectionClient hiveConnectionClient = hiveJdbcExec.getHiveConnectionClient();
+    HiveService2Client hiveService2Client = hiveUtil.getHiveService2Client();
 
     results = new ArrayList<>();
 
     try {
       try {
-        hiveConnection = hiveConnectionClient.borrowClient(connectionInfo);
+        hiveConnection = hiveService2Client.borrowClient(hiveService2ConnectionInfo);
         sta = hiveConnection.createStatement();
 
         // 日志线程
@@ -161,7 +160,7 @@ public class HiveSqlExec {
 
         try {
           // 只对 query 和 show 语句显示结果
-          if (HiveJdbcExec.isTokQuery(sql) || HiveJdbcExec.isLikeShowStm(sql)) {
+          if (HiveUtil.isTokQuery(sql) || HiveUtil.isLikeShowStm(sql)) {
             sta.setMaxRows(queryLimit);
             ResultSet res = sta.executeQuery(sql);
 
@@ -214,7 +213,7 @@ public class HiveSqlExec {
           // TTransport 异常
           if (e.toString().contains("TTransportException")) {
             logger.error("Get TTransportException return a client", e);
-            hiveConnectionClient.invalidateObject(connectionInfo, hiveConnection);
+            hiveService2Client.invalidateObject(hiveService2ConnectionInfo, hiveConnection);
             handlerResults(index, sqls, FlowStatus.FAILED);
             return false;
           }
@@ -222,7 +221,7 @@ public class HiveSqlExec {
           // socket 异常
           if (e.toString().contains("SocketException")) {
             logger.error("SocketException clear pool", e);
-            hiveConnectionClient.clear();
+            hiveService2Client.clear();
             handlerResults(index, sqls, FlowStatus.FAILED);
             return false;
           }
@@ -241,7 +240,7 @@ public class HiveSqlExec {
       try {
         if (logThread != null) {
           logThread.interrupt();
-          logThread.join(HiveJdbcExec.DEFAULT_QUERY_PROGRESS_THREAD_TIMEOUT);
+          logThread.join(HiveUtil.DEFAULT_QUERY_PROGRESS_THREAD_TIMEOUT);
         }
       } catch (Exception e) {
         logger.error("Catch an exception", e);
@@ -257,7 +256,7 @@ public class HiveSqlExec {
 
       // 返回连接
       if (hiveConnection != null) {
-        hiveConnectionClient.returnClient(connectionInfo, hiveConnection);
+        hiveService2Client.returnClient(hiveService2ConnectionInfo, hiveConnection);
       }
     }
 
@@ -266,10 +265,6 @@ public class HiveSqlExec {
 
   /**
    * 处理结果, 从 fromIndex 开始
-   *
-   * @param fromIndex
-   * @param sqls
-   * @param status
    */
   private void handlerResults(int fromIndex, List<String> sqls, FlowStatus status) {
     for (int i = fromIndex; i < sqls.size(); ++i) {
@@ -281,10 +276,6 @@ public class HiveSqlExec {
 
   /**
    * 处理单条记录
-   *
-   * @param index
-   * @param sql
-   * @param status
    */
   private void handlerResult(int index, String sql, FlowStatus status) {
     Date now = new Date();

@@ -15,7 +15,8 @@
  */
 package com.baifendian.swordfish.execserver.engine.hive;
 
-import com.baifendian.swordfish.common.hive.HiveConnectionClient;
+import com.baifendian.swordfish.common.hive.metastore.HiveMetaPoolClient;
+import com.baifendian.swordfish.common.hive.service2.HiveService2Client;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -32,8 +33,14 @@ public class HiveConfig {
   private String thriftUris;
 
   @Bean
-  public HiveConnectionClient hiveConnectionClient() {
-    return HiveConnectionClient.getInstance();
+  public HiveService2Client hiveService2Client() {
+    return HiveService2Client.getInstance();
+  }
+
+  @Bean
+  HiveMetaPoolClient hiveMetaPoolClient() {
+    HiveMetaPoolClient.init(getMetastoreUris());
+    return HiveMetaPoolClient.getInstance();
   }
 
   public String getMetastoreUris() {

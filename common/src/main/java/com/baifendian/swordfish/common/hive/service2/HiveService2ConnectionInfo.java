@@ -13,14 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.baifendian.swordfish.common.hive;
+package com.baifendian.swordfish.common.hive.service2;
 
 import com.google.common.base.Objects;
 
 /**
  * Hive 连接参数信息
  */
-public class ConnectionInfo {
+public class HiveService2ConnectionInfo {
 
   private String user;
 
@@ -34,8 +34,8 @@ public class ConnectionInfo {
       return true;
     }
 
-    if (other instanceof ConnectionInfo) {
-      ConnectionInfo that = (ConnectionInfo) other;
+    if (other instanceof HiveService2ConnectionInfo) {
+      HiveService2ConnectionInfo that = (HiveService2ConnectionInfo) other;
       return Objects.equal(this.user, that.user) && this.password == that.password && Objects.equal(this.uri, that.uri);
     }
 
@@ -73,7 +73,7 @@ public class ConnectionInfo {
 
   @Override
   public String toString() {
-    return "ConnectionInfo{" +
+    return "HiveService2ConnectionInfo{" +
         "user='" + user + '\'' +
         ", password='" + password + '\'' +
         ", uri='" + uri + '\'' +

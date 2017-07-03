@@ -95,6 +95,7 @@ public class HiveService {
    *
    * @return
    */
+  @Deprecated
   public String getTbaleName(int projectId, int execId, String jobId) {
     String uuidSuffix = UUID.randomUUID().toString().replace('-', '_');
     return MessageFormat.format("impexp_{0}_{1}_{2}_{3}", String.valueOf(projectId), String.valueOf(execId), jobId, uuidSuffix);
@@ -107,6 +108,7 @@ public class HiveService {
    * @param tableName
    * @return
    */
+  @Deprecated
   public List<HqlColumn> getHiveDesc(String dbName, String tableName) throws SQLException, TException {
     List<HqlColumn> res = new ArrayList<>();
     List<FieldSchema> fieldSchemaList = hiveMetaStoreClient.getFields(dbName, tableName);
@@ -149,6 +151,7 @@ public class HiveService {
    *
    * @return
    */
+  @Deprecated
   public List<HqlColumn> checkHiveColumn(List<HiveColumn> srcColumn, List<HqlColumn> destColumn) throws Exception {
     List<HqlColumn> hqlColumnList = new ArrayList<>();
     for (HiveColumn srcCol : srcColumn) {
@@ -264,6 +267,7 @@ public class HiveService {
     return con;
   }
 
+  @Deprecated
   public HiveMetaStoreClient getHiveMetaStoreClient() {
     return hiveMetaStoreClient;
   }
@@ -275,6 +279,7 @@ public class HiveService {
    * @param table
    * @return
    */
+  @Deprecated
   public List<FieldSchema> getPartionField(String dbName, String table) throws TException {
     Table destTable = hiveMetaStoreClient.getTable(dbName, table);
     return destTable.getPartitionKeys();
@@ -287,6 +292,7 @@ public class HiveService {
    * @return
    * @throws TException
    */
+  @Deprecated
   public List<FieldSchema> getGeneralField(String dbName, String table) throws TException {
     return hiveMetaStoreClient.getFields(dbName, table);
   }

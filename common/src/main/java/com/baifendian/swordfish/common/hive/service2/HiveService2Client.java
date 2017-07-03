@@ -13,36 +13,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.baifendian.swordfish.common.hive;
+package com.baifendian.swordfish.common.hive.service2;
 
 import org.apache.commons.pool.impl.GenericKeyedObjectPool;
 import org.apache.hive.jdbc.HiveConnection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class HiveConnectionClient {
+public class HiveService2Client {
 
   private final Logger logger = LoggerFactory.getLogger(getClass());
 
   private GenericKeyedObjectPool pool;
 
   /**
-   * 超时时间，单位为 ms，默认为 3s
-   */
-  private int timeout = 3000;
-
-  /**
    * 最大活跃连接数
    */
-  private int maxActive = 1024;
+  private int maxActive = 512;
 
   /**
-   * 链接池中最大空闲的连接数, 默认为 100
+   * 链接池中最大空闲的连接数
    */
-  private int maxIdle = 100;
+  private int maxIdle = 128;
 
   /**
-   * 连接池中最少空闲的连接数, 默认为 0
+   * 连接池中最少空闲的连接数
    */
   private int minIdle = 0;
 
@@ -52,7 +47,7 @@ public class HiveConnectionClient {
   private int maxWait = 2000;
 
   /**
-   * 空闲链接检测线程，检测的周期，毫秒数，默认为 3 min，-1 表示关闭空闲检测
+   * 空闲链接检测线程，检测的周期，毫秒数，-1 表示关闭空闲检测
    */
   private int timeBetweenEvictionRunsMillis = 180000;
 
@@ -64,9 +59,9 @@ public class HiveConnectionClient {
   /**
    * hive 的连接客户端
    */
-  private static HiveConnectionClient hiveConnectionClient;
+  private static HiveService2Client hiveService2Client;
 
-  private HiveConnectionClient() {
+  private HiveService2Client() {
     try {
       pool = bulidClientPool();
     } catch (Exception e) {
@@ -79,16 +74,16 @@ public class HiveConnectionClient {
    *
    * @return
    */
-  public static HiveConnectionClient getInstance() {
-    if (hiveConnectionClient == null) {
-      synchronized (HiveConnectionClient.class) {
-        if (hiveConnectionClient == null) {
-          hiveConnectionClient = new HiveConnectionClient();
+  public static HiveService2Client getInstance() {
+    if (hiveService2Client == null) {
+      synchronized (HiveService2Client.class) {
+        if (hiveService2Client == null) {
+          hiveService2Client = new HiveService2Client();
         }
       }
     }
 
-    return hiveConnectionClient;
+    return hiveService2Client;
   }
 
   /**
@@ -106,7 +101,7 @@ public class HiveConnectionClient {
     poolConfig.timeBetweenEvictionRunsMillis = timeBetweenEvictionRunsMillis;
     poolConfig.testWhileIdle = testWhileIdle;
 
-    HiveConnectionPoolFactory clientFactory = new HiveConnectionPoolFactory();
+    HiveService2PoolFactory clientFactory = new HiveService2PoolFactory();
 
     return new GenericKeyedObjectPool(clientFactory, poolConfig);
   }
@@ -114,26 +109,26 @@ public class HiveConnectionClient {
   /**
    * 从连接池获取一个具体的 hive 连接
    *
-   * @param connectionInfo
+   * @param hiveService2ConnectionInfo
    * @return
    * @throws Exception
    */
-  public HiveConnection borrowClient(ConnectionInfo connectionInfo) throws Exception {
-    return (HiveConnection) pool.borrowObject(connectionInfo);
+  public HiveConnection borrowClient(HiveService2ConnectionInfo hiveService2ConnectionInfo) throws Exception {
+    return (HiveConnection) pool.borrowObject(hiveService2ConnectionInfo);
   }
 
   /**
    * 返回一个 hive 连接对象
    *
-   * @param connectionInfo
+   * @param hiveService2ConnectionInfo
    * @param client
    */
-  public void returnClient(ConnectionInfo connectionInfo, HiveConnection client) {
+  public void returnClient(HiveService2ConnectionInfo hiveService2ConnectionInfo, HiveConnection client) {
     if (client != null) {
       try {
-        pool.returnObject(connectionInfo, client);
+        pool.returnObject(hiveService2ConnectionInfo, client);
       } catch (Exception e) {
-        logger.warn("HiveConnectionClient returnClient exception", e);
+        logger.warn("HiveService2Client returnClient exception", e);
       }
     }
   }
@@ -141,14 +136,14 @@ public class HiveConnectionClient {
   /**
    * 校验连接信息是否合法
    *
-   * @param connectionInfo
+   * @param hiveService2ConnectionInfo
    * @param client
    */
-  public void invalidateObject(ConnectionInfo connectionInfo, HiveConnection client) {
+  public void invalidateObject(HiveService2ConnectionInfo hiveService2ConnectionInfo, HiveConnection client) {
     try {
-      pool.invalidateObject(connectionInfo, client);
+      pool.invalidateObject(hiveService2ConnectionInfo, client);
     } catch (Exception e) {
-      logger.error("HiveConnectionClient invalidateObject error", e);
+      logger.error("HiveService2Client invalidateObject error", e);
     }
   }
 
