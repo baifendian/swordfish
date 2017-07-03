@@ -179,7 +179,7 @@ public class HiveService {
    * @param
    * @return
    */
-  public void createHiveTmpTable(String dbName, String tableName, List<HqlColumn> hqlColumnList, String localtion,String fieldDelimiter) throws SQLException {
+  public void createHiveTmpTable(String dbName, String tableName, List<HqlColumn> hqlColumnList, String localtion, String fieldDelimiter, String fileCode) throws SQLException {
 
     List<String> fieldList = new ArrayList<>();
 
@@ -187,9 +187,9 @@ public class HiveService {
       fieldList.add(MessageFormat.format("{0} {1}", hqlColumn.getName(), hqlColumn.getType()));
     }
 
-    String sql = "CREATE TEMPORARY EXTERNAL TABLE {0}.{1}({2}) ROW FORMAT DELIMITED FIELDS TERMINATED BY \"{3}\" STORED AS {4} LOCATION \"{5}\"";
+    String sql = "CREATE TEMPORARY EXTERNAL TABLE {0}.{1}({2}) ROW FORMAT SERDE \"org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe\" WITH SERDEPROPERTIES(\"field.delim\"=\"{3}\",\"serialization.encoding\"=\"{4}\") STORED AS {5} LOCATION \"{6}\"";
 
-    sql = MessageFormat.format(sql, dbName, tableName, String.join(",", fieldList), fieldDelimiter, DEFAULT_FILE_TYPE.getType(), localtion);
+    sql = MessageFormat.format(sql, dbName, tableName, String.join(",", fieldList), fieldDelimiter, fileCode, DEFAULT_FILE_TYPE.getType(), localtion);
 
     logger.info("Create temp hive table sql: {}", sql);
 
@@ -287,6 +287,7 @@ public class HiveService {
 
   /**
    * 获取一个表的普通字段
+   *
    * @param dbName
    * @param table
    * @return
@@ -305,7 +306,7 @@ public class HiveService {
     try {
       logger.info("Start execsql sql list ...");
       stmt = con.createStatement();
-      for (String sql:sqlList){
+      for (String sql : sqlList) {
         stmt.execute(sql);
       }
       logger.info("Finish exec sql!");

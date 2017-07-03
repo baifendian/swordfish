@@ -31,6 +31,7 @@ public class FileReader implements Reader {
   private String hdfsPath;
   private String fieldDelimiter;
   private String fileName;
+  private String fileCode = "UTF-8";
 
   public List<FileColumn> getSrcColumn() {
     return srcColumn;
@@ -70,6 +71,14 @@ public class FileReader implements Reader {
 
   public void setFileName(String fileName) {
     this.fileName = fileName;
+  }
+
+  public String getFileCode() {
+    return fileCode;
+  }
+
+  public void setFileCode(String fileCode) {
+    this.fileCode = fileCode;
   }
 
   @Override

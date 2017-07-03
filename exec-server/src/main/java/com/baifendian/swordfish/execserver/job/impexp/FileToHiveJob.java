@@ -162,7 +162,7 @@ public class FileToHiveJob extends AbstractJob {
     logger.info("First, create temp table...");
     String srcTable = hiveService.getTbaleName(props.getProjectId(), props.getExecId(), props.getJobAppId());
     logger.info("Temp table name: {}", srcTable);
-    hiveService.createHiveTmpTable(DEFAULT_DB, srcTable, getFileHqlColumn(), hdfsPath, fileReader.getFieldDelimiter());
+    hiveService.createHiveTmpTable(DEFAULT_DB, srcTable, getFileHqlColumn(), hdfsPath, fileReader.getFieldDelimiter(), fileReader.getFileCode());
     logger.info("Finish first, create temp table!");
 
     // 2.插入数据
@@ -262,14 +262,14 @@ public class FileToHiveJob extends AbstractJob {
 
       if (srcCol != null) {
         if (srcCol.getType() == FileColumnType.DATE) {
-          srcColVal = MessageFormat.format("CAST(TO_DATE(from_unixtime(UNIX_TIMESTAMP({0},\"{1}\"))) AS DATE)", srcCol.getName(), srcCol.getDateFormat());
+          //srcColVal = MessageFormat.format("CAST(TO_DATE(from_unixtime(UNIX_TIMESTAMP({0},\"{1}\"))) AS DATE)", srcCol.getName(), srcCol.getDateFormat());
+          srcColVal = MessageFormat.format("CAST(date_format({0},\"{1}\") AS {2})", srcCol.getName(), srcCol.getDateFormat(), destHqlColumn.getType());
         } else {
           srcColVal = srcCol.getName();
         }
       }
 
 
-      //todo 这里的dest需要加上反引号
       fieldList.add(MessageFormat.format("{0} as {1}", srcColVal, ImpExpUtil.addBackQuota(destCol)));
     }
 
