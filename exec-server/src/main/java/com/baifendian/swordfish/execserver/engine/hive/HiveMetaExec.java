@@ -70,6 +70,9 @@ public class HiveMetaExec {
       for (FieldSchema fieldSchema : fieldSchemaList) {
         res.add(new HqlColumn(fieldSchema.getName(), fieldSchema.getType()));
       }
+    } catch (Exception e) {
+      doWithException(hiveMetaStoreClient, e);
+      throw e;
     } finally {
       if (hiveMetaStoreClient != null) {
         hiveMetaPoolClient.returnClient(hiveMetaStoreClient);
@@ -106,6 +109,9 @@ public class HiveMetaExec {
               MessageFormat.format("Write hive column {0} not found", srcCol.getName()));
         }
       }
+    } catch (Exception e) {
+      doWithException(hiveMetaStoreClient, e);
+      throw e;
     } finally {
       if (hiveMetaStoreClient != null) {
         hiveMetaPoolClient.returnClient(hiveMetaStoreClient);
@@ -128,6 +134,9 @@ public class HiveMetaExec {
       Table destTable = hiveMetaStoreClient.getTable(dbName, table);
 
       return destTable.getPartitionKeys();
+    } catch (Exception e) {
+      doWithException(hiveMetaStoreClient, e);
+      throw e;
     } finally {
       if (hiveMetaStoreClient != null) {
         hiveMetaPoolClient.returnClient(hiveMetaStoreClient);
@@ -146,10 +155,35 @@ public class HiveMetaExec {
 
     try {
       return hiveMetaStoreClient.getFields(dbName, table);
+    } catch (Exception e) {
+      doWithException(hiveMetaStoreClient, e);
+      throw e;
     } finally {
       if (hiveMetaStoreClient != null) {
         hiveMetaPoolClient.returnClient(hiveMetaStoreClient);
       }
+    }
+  }
+
+  /**
+   * 处理异常
+   */
+  private void doWithException(HiveMetaStoreClient hiveMetaStoreClient, Exception e) {
+    logger.error("Catch an exception", e);
+
+    if (e == null) {
+      return;
+    }
+
+    if (e.toString().contains("TTransportException")) {
+      logger.error("Get TTransportException return a client", e);
+      hiveMetaPoolClient.invalidateObject(hiveMetaStoreClient);
+    }
+
+    // socket 异常
+    if (e.toString().contains("SocketException")) {
+      logger.error("SocketException clear pool", e);
+      hiveMetaPoolClient.clear();
     }
   }
 }
