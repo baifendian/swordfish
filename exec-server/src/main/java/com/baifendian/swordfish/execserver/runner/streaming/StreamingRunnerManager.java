@@ -81,7 +81,7 @@ public class StreamingRunnerManager {
     streamingDao.updateResult(streamingResult);
 
     // 提交执行
-    Logger jobLogger = new JobLogger(jobId, logger);
+    Logger jobLogger = new JobLogger(jobId);
 
     StreamingRunner runner = new StreamingRunner(streamingResult, jobLogger);
     streamingExecutorService.submit(runner);
@@ -104,7 +104,7 @@ public class StreamingRunnerManager {
 
     try {
       AbstractYarnJob.cancelApplication(streamingResult.getAppLinkList(), props,
-          new JobLogger(streamingResult.getJobId(), logger));
+          new JobLogger(streamingResult.getJobId()));
 
       // 删除后, 需要更新状态
       List<String> appLinkList = streamingResult.getAppLinkList();

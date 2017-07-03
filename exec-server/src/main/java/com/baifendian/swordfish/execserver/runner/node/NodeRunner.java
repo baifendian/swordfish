@@ -133,7 +133,7 @@ public class NodeRunner implements Callable<Boolean> {
     props.setJobAppId(String.format("%s_%s", executionNode.getJobId(),
         HttpUtil.getMd5(executionNode.getName()).substring(0, 8)));
 
-    JobLogger jobLogger = new JobLogger(executionNode.getJobId(), logger);
+    JobLogger jobLogger = new JobLogger(executionNode.getJobId());
 
     boolean success = false;
 
