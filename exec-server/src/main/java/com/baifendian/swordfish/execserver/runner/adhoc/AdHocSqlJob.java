@@ -31,14 +31,14 @@ import com.baifendian.swordfish.execserver.engine.hive.HiveSqlExec;
 import com.baifendian.swordfish.execserver.job.JobProps;
 import com.baifendian.swordfish.execserver.parameter.ParamHelper;
 import com.baifendian.swordfish.execserver.parameter.SystemParamManager;
-import org.slf4j.Logger;
-
 import java.util.List;
+import org.slf4j.Logger;
 
 /**
  * 即席查询作业
  */
 public class AdHocSqlJob {
+
   /**
    * job 通用参数
    */
@@ -68,8 +68,6 @@ public class AdHocSqlJob {
 
   /**
    * 具体执行的过程
-   *
-   * @throws Exception
    */
   public FlowStatus process() throws Exception {
     logger.debug("process job: {}", props.getJobParams());
@@ -78,10 +76,12 @@ public class AdHocSqlJob {
     String sqls = param.getStms();
 
     // 解析参数
-    sqls = ParamHelper.resolvePlaceholders(sqls, SystemParamManager.buildSystemParam(ExecType.DIRECT, props.getCycTime()));
+    sqls = ParamHelper.resolvePlaceholders(sqls,
+        SystemParamManager.buildSystemParam(ExecType.DIRECT, props.getCycTime()));
 
     // 创建自定义函数
-    List<String> funcs = FunctionUtil.createFuncs(param.getUdfs(), props.getExecId(), logger, BaseConfig.getHdfsResourcesDir(props.getProjectId()), true);
+    List<String> funcs = FunctionUtil.createFuncs(param.getUdfs(), props.getExecId(), logger,
+        BaseConfig.getHdfsResourcesDir(props.getProjectId()), true);
 
     logger.info("exec sql: {}, funcs: {}", sqls, funcs);
 
@@ -89,7 +89,8 @@ public class AdHocSqlJob {
     ResultCallback resultCallback = (execResult, startTime, endTime) -> {
       AdHocResult adHocResult = new AdHocResult();
 
-      logger.info("update adhoc result sql: {}, index: {}, status: {}", execResult.getStm(), execResult.getIndex(), execResult.getStatus());
+      logger.info("update adhoc result sql: {}, index: {}, status: {}", execResult.getStm(),
+          execResult.getIndex(), execResult.getStatus());
 
       adHocResult.setExecId(props.getExecJobId());
 
@@ -113,8 +114,9 @@ public class AdHocSqlJob {
     // 切分 sql
     List<String> execSqls = CommonUtil.sqlSplit(sqls);
 
-    HiveSqlExec hiveSqlExec = new HiveSqlExec(funcs, execSqls, props.getProxyUser(), true, resultCallback, param.getLimit(), logger);
+    HiveSqlExec hiveSqlExec = new HiveSqlExec(props.getProxyUser(), logger);
 
-    return hiveSqlExec.execute() ? FlowStatus.SUCCESS : FlowStatus.FAILED;
+    return hiveSqlExec.execute(funcs, execSqls, true, resultCallback, param.getLimit())
+        ? FlowStatus.SUCCESS : FlowStatus.FAILED;
   }
 }

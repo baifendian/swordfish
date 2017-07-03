@@ -15,8 +15,8 @@
  */
 package com.baifendian.swordfish.execserver.engine.hive;
 
-import com.baifendian.swordfish.common.hive.service2.HiveService2ConnectionInfo;
 import com.baifendian.swordfish.common.hive.service2.HiveService2Client;
+import com.baifendian.swordfish.common.hive.service2.HiveService2ConnectionInfo;
 import com.baifendian.swordfish.dao.DaoFactory;
 import com.baifendian.swordfish.dao.enums.FlowStatus;
 import com.baifendian.swordfish.dao.exception.DaoSemanticException;
@@ -44,34 +44,9 @@ public class HiveSqlExec {
   private static int defualtQueryLimit = 1000;
 
   /**
-   * create function 语句
-   */
-  private final List<String> createFuncs;
-
-  /**
-   * sql 语句
-   */
-  private final List<String> sqls;
-
-  /**
    * 执行用户
    */
   private String userName;
-
-  /**
-   * 某一句执行失败，是否继续
-   */
-  private final boolean isContinue;
-
-  /**
-   * 执行结果回调处理
-   */
-  private final ResultCallback resultCallback;
-
-  /**
-   * 查询限制
-   */
-  private final Integer queryLimit;
 
   /**
    * {@link HiveUtil}
@@ -83,42 +58,38 @@ public class HiveSqlExec {
    */
   private Logger logger;
 
-  /**
-   * 执行的结果
-   */
-  private List<ExecResult> results;
-
-  public HiveSqlExec(List<String> createFuncs, List<String> sqls, String userName,
-      boolean isContinue, ResultCallback resultCallback, Integer queryLimit, Logger logger) {
-    this.createFuncs = createFuncs;
-    this.sqls = sqls;
+  public HiveSqlExec(String userName, Logger logger) {
     this.userName = userName;
-
-    this.isContinue = isContinue;
-    this.resultCallback = resultCallback;
-    this.queryLimit = (queryLimit != null) ? queryLimit : defualtQueryLimit;
+    this.logger = logger;
 
     this.hiveUtil = DaoFactory.getDaoInstance(HiveUtil.class);
-
-    this.logger = logger;
   }
 
   /**
-   * 执行多个sql 语句 并返回查询的语句
+   * 执行多个 sql 语句 并返回查询的语句, 注意, 多次调用 execute, 上下文是不相关的
+   *
+   * @param createFuncs 创建自定义函数语句
+   * @param sqls 执行的 sql
+   * @param isContinue 遇到错误, 是否继续执行下一条语句
+   * @param resultCallback 回调, 执行的结果处理
+   * @param queryLimit 结果限制
    */
-  public boolean execute() {
+  public boolean execute(List<String> createFuncs, List<String> sqls,
+      boolean isContinue, ResultCallback resultCallback, Integer queryLimit) {
+    // 查询结果限制
+    queryLimit = (queryLimit != null) ? queryLimit : defualtQueryLimit;
+
     HiveConnection hiveConnection = null;
     Statement sta = null;
     Thread logThread = null;
 
     // 得到 hive 的连接信息
-    HiveService2ConnectionInfo hiveService2ConnectionInfo = hiveUtil.getHiveService2ConnectionInfo(userName);
+    HiveService2ConnectionInfo hiveService2ConnectionInfo = hiveUtil
+        .getHiveService2ConnectionInfo(userName);
 
     logger.info("execution connection information:{}", hiveService2ConnectionInfo);
 
     HiveService2Client hiveService2Client = hiveUtil.getHiveService2Client();
-
-    results = new ArrayList<>();
 
     try {
       try {
@@ -141,7 +112,7 @@ public class HiveSqlExec {
         logger.error("execute query exception", e);
 
         // 这里就失败了, 会记录下错误记录, 然后返回
-        handlerResults(0, sqls, FlowStatus.FAILED);
+        handlerResults(0, sqls, FlowStatus.FAILED, resultCallback);
 
         return false;
       }
@@ -197,16 +168,14 @@ public class HiveSqlExec {
             Date endTime = new Date();
             resultCallback.handleResult(execResult, startTime, endTime);
           }
-
-          results.add(execResult);
         } catch (DaoSemanticException | HiveSQLException e) {
           // 语义异常
           logger.error("executeQuery exception", e);
 
           if (isContinue) {
-            handlerResult(index, sql, FlowStatus.FAILED);
+            handlerResult(index, sql, FlowStatus.FAILED, resultCallback);
           } else {
-            handlerResults(index, sqls, FlowStatus.FAILED);
+            handlerResults(index, sqls, FlowStatus.FAILED, resultCallback);
             return false;
           }
         } catch (Exception e) {
@@ -214,7 +183,7 @@ public class HiveSqlExec {
           if (e.toString().contains("TTransportException")) {
             logger.error("Get TTransportException return a client", e);
             hiveService2Client.invalidateObject(hiveService2ConnectionInfo, hiveConnection);
-            handlerResults(index, sqls, FlowStatus.FAILED);
+            handlerResults(index, sqls, FlowStatus.FAILED, resultCallback);
             return false;
           }
 
@@ -222,16 +191,16 @@ public class HiveSqlExec {
           if (e.toString().contains("SocketException")) {
             logger.error("SocketException clear pool", e);
             hiveService2Client.clear();
-            handlerResults(index, sqls, FlowStatus.FAILED);
+            handlerResults(index, sqls, FlowStatus.FAILED, resultCallback);
             return false;
           }
 
           logger.error("executeQuery exception", e);
 
           if (isContinue) {
-            handlerResult(index, sql, FlowStatus.FAILED);
+            handlerResult(index, sql, FlowStatus.FAILED, resultCallback);
           } else {
-            handlerResults(index, sqls, FlowStatus.FAILED);
+            handlerResults(index, sqls, FlowStatus.FAILED, resultCallback);
             return false;
           }
         }
@@ -266,18 +235,20 @@ public class HiveSqlExec {
   /**
    * 处理结果, 从 fromIndex 开始
    */
-  private void handlerResults(int fromIndex, List<String> sqls, FlowStatus status) {
+  private void handlerResults(int fromIndex, List<String> sqls, FlowStatus status,
+      ResultCallback resultCallback) {
     for (int i = fromIndex; i < sqls.size(); ++i) {
       String sql = sqls.get(i);
 
-      handlerResult(i, sql, status);
+      handlerResult(i, sql, status, resultCallback);
     }
   }
 
   /**
    * 处理单条记录
    */
-  private void handlerResult(int index, String sql, FlowStatus status) {
+  private void handlerResult(int index, String sql, FlowStatus status,
+      ResultCallback resultCallback) {
     Date now = new Date();
 
     ExecResult execResult = new ExecResult();
@@ -286,16 +257,10 @@ public class HiveSqlExec {
     execResult.setStm(sql);
     execResult.setStatus(status);
 
-    results.add(execResult);
-
     if (resultCallback != null) {
       // 执行结果回调处理
       resultCallback.handleResult(execResult, now, now);
     }
-  }
-
-  public List<ExecResult> getResults() {
-    return results;
   }
 
   /**
