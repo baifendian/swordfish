@@ -31,6 +31,7 @@ import com.baifendian.swordfish.dao.DatasourceDao;
 import com.baifendian.swordfish.dao.enums.DbType;
 import com.baifendian.swordfish.dao.model.DataSource;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
+import com.baifendian.swordfish.execserver.engine.hive.HiveMetaExec;
 import com.baifendian.swordfish.execserver.job.JobProps;
 import com.baifendian.swordfish.execserver.job.impexp.Args.*;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -59,6 +60,7 @@ import static com.baifendian.swordfish.execserver.job.impexp.ImpExpJobConst.*;
  */
 public class MysqlToHiveJob extends ImpExpJob {
 
+  private HiveMetaExec hiveMetaExec;
 
   private HiveService hiveService;
 
@@ -71,6 +73,8 @@ public class MysqlToHiveJob extends ImpExpJob {
    * swordfish wirter配置
    */
   private HiveWriter hiveWriter;
+
+
   /**
    * 源 Hql 字段
    */
@@ -93,10 +97,12 @@ public class MysqlToHiveJob extends ImpExpJob {
     // 构造一个hive服务类，预备使用
     hiveService = new HiveService(hiveConf.getString("hive.thrift.uris"), hiveConf.getString("hive.metastore.uris"), props.getProxyUser(), "");
     hiveService.init();
+
+    hiveMetaExec = new HiveMetaExec(logger);
     // 获取源HQL字段
-    destColumns = hiveService.getHiveDesc(hiveWriter.getDatabase(), hiveWriter.getTable());
+    destColumns = hiveMetaExec.getHiveDesc(hiveWriter.getDatabase(), hiveWriter.getTable());
     // 获取源字段
-    srcColumns = hiveService.checkHiveColumn(hiveWriter.getColumn(), destColumns);
+    srcColumns = hiveMetaExec.checkHiveColumn(hiveWriter.getColumn(), destColumns);
     logger.info("Finish MysqlToHiveJob before function!");
   }
 
