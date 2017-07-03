@@ -14,6 +14,7 @@ import com.baifendian.swordfish.common.job.struct.node.impexp.reader.MysqlReader
 import com.baifendian.swordfish.common.job.struct.node.impexp.writer.HiveWriter;
 import com.baifendian.swordfish.dao.DaoFactory;
 import com.baifendian.swordfish.dao.DatasourceDao;
+import com.baifendian.swordfish.execserver.engine.hive.HiveMetaExec;
 import com.baifendian.swordfish.execserver.job.AbstractJob;
 import com.baifendian.swordfish.execserver.job.JobProps;
 import com.baifendian.swordfish.execserver.job.impexp.Args.HqlColumn;
@@ -51,6 +52,8 @@ public class FileToHiveJob extends AbstractJob {
   private ImpExpParam impExpParam;
 
   private HiveService hiveService;
+
+  private HiveMetaExec hiveMetaExec;
 
   /**
    * swordfish reader配置
@@ -112,10 +115,13 @@ public class FileToHiveJob extends AbstractJob {
     // 构造一个hive服务类，预备使用
     hiveService = new HiveService(hiveConf.getString("hive.thrift.uris"), hiveConf.getString("hive.metastore.uris"), props.getProxyUser(), "");
     hiveService.init();
+    //构造一个hive元数据服务类
+    hiveMetaExec = new HiveMetaExec(logger);
+
     // 获取源HQL字段
-    destHiveColumns = hiveService.getHiveDesc(hiveWriter.getDatabase(), hiveWriter.getTable());
+    destHiveColumns = hiveMetaExec.getHiveDesc(hiveWriter.getDatabase(), hiveWriter.getTable());
     // 获取源字段
-    srcHiveColumns = hiveService.checkHiveColumn(hiveWriter.getColumn(), destHiveColumns);
+    srcHiveColumns = hiveMetaExec.checkHiveColumn(hiveWriter.getColumn(), destHiveColumns);
 
     logger.info("Finish FileToHiveJob before function!");
   }
@@ -232,14 +238,14 @@ public class FileToHiveJob extends AbstractJob {
    *
    * @return
    */
-  public String getInsertSql(String srcDbName, String srcTable, String destDbName, String destTable, List<HqlColumn> destHiveColumns, Map<String, FileColumn> columnRet, WriteMode writeMode) throws TException {
+  public String getInsertSql(String srcDbName, String srcTable, String destDbName, String destTable, List<HqlColumn> destHiveColumns, Map<String, FileColumn> columnRet, WriteMode writeMode) throws Exception {
     logger.info("Start create insert sql...");
     String insertSql = "INSERT {0} TABLE {1}.{2} {3} SELECT {4} FROM {5}.{6}";
     String partFieldSql = "";
 
     // 所有的分区都是必传字段先整理出分区字段
 
-    List<FieldSchema> partFieldList = hiveService.getPartionField(destDbName, destTable);
+    List<FieldSchema> partFieldList = hiveMetaExec.getPartionField(destDbName, destTable);
 
     if (CollectionUtils.isNotEmpty(partFieldList)) {
       List<String> partNameList = new ArrayList<>();
