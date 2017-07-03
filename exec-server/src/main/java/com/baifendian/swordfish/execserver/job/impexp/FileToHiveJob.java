@@ -162,7 +162,7 @@ public class FileToHiveJob extends AbstractJob {
     logger.info("First, create temp table...");
     String srcTable = hiveService.getTbaleName(props.getProjectId(), props.getExecId(), props.getJobAppId());
     logger.info("Temp table name: {}", srcTable);
-    hiveService.createHiveTmpTable(DEFAULT_DB, srcTable, getFileHqlColumn(), hdfsPath, fileReader.getFieldDelimiter());
+    hiveService.createHiveTmpTable(DEFAULT_DB, srcTable, getFileHqlColumn(), hdfsPath, fileReader.getFieldDelimiter(), fileReader.getFileCode());
     logger.info("Finish first, create temp table!");
 
     // 2.插入数据
@@ -269,7 +269,6 @@ public class FileToHiveJob extends AbstractJob {
       }
 
 
-      //todo 这里的dest需要加上反引号
       fieldList.add(MessageFormat.format("{0} as {1}", srcColVal, ImpExpUtil.addBackQuota(destCol)));
     }
 
