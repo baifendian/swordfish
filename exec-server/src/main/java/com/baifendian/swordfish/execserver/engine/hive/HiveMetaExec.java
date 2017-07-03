@@ -72,7 +72,7 @@ public class HiveMetaExec {
       }
     } finally {
       if (hiveMetaStoreClient != null) {
-        HiveMetaPoolClient.getInstance().returnClient(hiveMetaStoreClient);
+        hiveMetaPoolClient.returnClient(hiveMetaStoreClient);
       }
     }
 
@@ -108,7 +108,7 @@ public class HiveMetaExec {
       }
     } finally {
       if (hiveMetaStoreClient != null) {
-        HiveMetaPoolClient.getInstance().returnClient(hiveMetaStoreClient);
+        hiveMetaPoolClient.returnClient(hiveMetaStoreClient);
       }
     }
 
@@ -130,7 +130,7 @@ public class HiveMetaExec {
       return destTable.getPartitionKeys();
     } finally {
       if (hiveMetaStoreClient != null) {
-        HiveMetaPoolClient.getInstance().returnClient(hiveMetaStoreClient);
+        hiveMetaPoolClient.returnClient(hiveMetaStoreClient);
       }
     }
   }
@@ -148,7 +148,7 @@ public class HiveMetaExec {
       return hiveMetaStoreClient.getFields(dbName, table);
     } finally {
       if (hiveMetaStoreClient != null) {
-        HiveMetaPoolClient.getInstance().returnClient(hiveMetaStoreClient);
+        hiveMetaPoolClient.returnClient(hiveMetaStoreClient);
       }
     }
   }
