@@ -68,10 +68,15 @@ public class ExecController {
                                           @RequestParam(value = "nodeDep", required = false) NodeDepType nodeDep,
                                           @RequestParam(value = "notifyType", required = false) NotifyType notifyType,
                                           @RequestParam(value = "notifyMails", required = false) String notifyMails,
-                                          @RequestParam(value = "timeout", required = false, defaultValue = "1800") int timeout) {
+                                          @RequestParam(value = "timeout", required = false, defaultValue = "43200") int timeout) {
     logger.info("Operator user {}, exec workflow, project name: {}, workflow name: {}, schedule: {}, node name: {}, node dep: {}, notify type: {}, " +
                     "notify mails: {}, timeout: {}",
             operator.getName(), projectName, workflowName, schedule, nodeName, nodeDep, notifyType, notifyMails, timeout);
+
+    // timeout 的限制
+    if (timeout <= 0 || timeout > 43200) {
+      throw new BadRequestException("Argument is not valid, timeout must be between (0, 43200]");
+    }
 
     return execService.postExecWorkflow(operator, projectName, workflowName, schedule, execType, nodeName, nodeDep, notifyType, notifyMails, timeout);
   }
@@ -102,12 +107,17 @@ public class ExecController {
                                           @RequestParam(value = "desc", required = false) String desc,
                                           @RequestParam(value = "data", required = false) String data,
                                           @RequestParam(value = "file", required = false) MultipartFile file,
-                                          @RequestParam(value = "notifyType", required = false, defaultValue = "None") NotifyType notifyType,
+                                          @RequestParam(value = "notifyType", required = false) NotifyType notifyType,
                                           @RequestParam(value = "notifyMails", required = false) String notifyMails,
-                                          @RequestParam(value = "timeout", required = false, defaultValue = "18000") int timeout,
+                                          @RequestParam(value = "timeout", required = false, defaultValue = "43200") int timeout,
                                           @RequestParam(value = "extras", required = false) String extras) {
     logger.info("Operator user {}, exec workflow, project name: {}, workflow name: {}, proxy user: {}, queue: {}, data: {}, file: {}," +
             "notify type: {}, notify mails: {}, timeout: {}, extras: {}", operator.getName(), projectName, workflowName, proxyUser, queue, data, file.getName(), notifyType, notifyMails, timeout, extras);
+
+    // timeout 的限制
+    if (timeout <= 0 || timeout > 43200) {
+      throw new BadRequestException("Argument is not valid, timeout must be between (0, 43200]");
+    }
 
     return execService.postExecWorkflowDirect(operator, projectName, workflowName, desc, proxyUser, queue, data, file, notifyType, notifyMails, timeout, extras);
   }
@@ -156,7 +166,6 @@ public class ExecController {
     if (endDate != null) {
       endTime = new Date(endDate);
     }
-
 
     return execService.getExecWorkflow(operator, projectName, workflowName, startTime, endTime, status, from, size);
   }

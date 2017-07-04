@@ -221,7 +221,7 @@ public class ExecutionFlowMapperProvider {
 
     if (CollectionUtils.isNotEmpty(workflowList)) {
       for (String workflow : workflowList) {
-        workflowList2.add("\"" + workflow + "\"");
+        workflowList2.add("p_f.name like '" + workflow + "%'");
       }
     }
 
@@ -250,7 +250,7 @@ public class ExecutionFlowMapperProvider {
         WHERE("p.name = #{projectName}");
 
         if (CollectionUtils.isNotEmpty(workflowList)) {
-          WHERE("p_f.name in (" + String.join(",", workflowList2) + ")");
+          WHERE(" ( " + String.join(" or ", workflowList2) + " ) ");
         }
 
         if (startDate != null && endDate != null) {

@@ -67,7 +67,7 @@ public class AdhocController {
                                  @RequestParam(value = "proxyUser") String proxyUser,
                                  @RequestParam(value = "queue") String queue,
                                  @RequestParam(value = "udfs", required = false) String udfs,
-                                 @RequestParam(value = "timeout", required = false, defaultValue = "1800") int timeout
+                                 @RequestParam(value = "timeout", required = false, defaultValue = "43200") int timeout
                                  ) {
     logger.info("Operator user {}, exec adhoc, project name: {}, stms: {}, limit: {}, proxyUser: {}, queue: {}, udfs: {}, timeout: {}",
             operator.getName(), projectName, stms, limit, proxyUser, queue, udfs, timeout);
@@ -78,8 +78,8 @@ public class AdhocController {
     }
 
     // timeout 的限制
-    if (timeout <= 0 || timeout > 14400) {
-      throw new BadRequestException("Argument is not valid, timeout must be between (0, 14400]");
+    if (timeout <= 0 || timeout > 43200) {
+      throw new BadRequestException("Argument is not valid, timeout must be between (0, 43200]");
     }
 
     // 检验 udfs, 生成对象

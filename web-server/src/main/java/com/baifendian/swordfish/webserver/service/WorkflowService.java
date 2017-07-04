@@ -17,9 +17,17 @@ package com.baifendian.swordfish.webserver.service;
 
 import com.baifendian.swordfish.common.config.BaseConfig;
 import com.baifendian.swordfish.common.hadoop.HdfsClient;
+import com.baifendian.swordfish.common.job.struct.node.BaseParam;
+import com.baifendian.swordfish.common.job.struct.node.BaseParamFactory;
+import com.baifendian.swordfish.common.job.struct.node.impexp.ImpExpBuilder;
+import com.baifendian.swordfish.common.job.struct.node.impexp.ImpExpParam;
+import com.baifendian.swordfish.common.job.struct.node.impexp.reader.FileReader;
+import com.baifendian.swordfish.common.job.struct.node.impexp.setting.Setting;
+import com.baifendian.swordfish.common.job.struct.node.impexp.setting.Speed;
 import com.baifendian.swordfish.common.utils.CommonUtil;
 import com.baifendian.swordfish.common.utils.graph.Graph;
 import com.baifendian.swordfish.dao.FlowDao;
+import com.baifendian.swordfish.dao.enums.NotifyType;
 import com.baifendian.swordfish.dao.mapper.ProjectFlowMapper;
 import com.baifendian.swordfish.dao.mapper.ProjectMapper;
 import com.baifendian.swordfish.dao.model.FlowNode;
@@ -27,6 +35,7 @@ import com.baifendian.swordfish.dao.model.Project;
 import com.baifendian.swordfish.dao.model.ProjectFlow;
 import com.baifendian.swordfish.dao.model.User;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
+import com.baifendian.swordfish.webserver.dto.ExecutorIdDto;
 import com.baifendian.swordfish.webserver.dto.WorkflowData;
 import com.baifendian.swordfish.webserver.dto.WorkflowNodeDto;
 import com.baifendian.swordfish.webserver.exception.*;
@@ -36,6 +45,8 @@ import net.lingala.zip4j.core.ZipFile;
 import net.lingala.zip4j.exception.ZipException;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.fs.permission.FsPermission;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,6 +63,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
+import static com.baifendian.swordfish.common.job.struct.node.JobType.IMPEXP;
 import static com.baifendian.swordfish.webserver.utils.ParamVerify.*;
 
 @Service
@@ -72,6 +84,9 @@ public class WorkflowService {
 
   @Autowired
   private FileSystemStorageService fileSystemStorageService;
+
+  @Autowired
+  private ExecService execService;
 
   @Autowired
   private FlowDao flowDao;
@@ -594,9 +609,11 @@ public class WorkflowService {
         ZipFile zipFile = new ZipFile(localFilename);
         logger.info("ext file {} to {}", localFilename, localExtractDir);
         zipFile.extractAll(localExtractDir);
-
-        String jsonString = fileSystemStorageService.readFileToString(WorkflowJson);
+        String workflowJsonPath = MessageFormat.format("{0}/{1}", localExtractDir, WorkflowJson);
+        logger.info("Start reader workflow.json: {}", workflowJsonPath);
+        String jsonString = fileSystemStorageService.readFileToString(workflowJsonPath);
         workflowData = JsonUtil.parseObject(jsonString, WorkflowData.class);
+        logger.info("Finish reader workflow.json!");
 
         // 上传文件到 HDFS
         if (workflowData != null) {
@@ -652,9 +669,20 @@ public class WorkflowService {
    * @param hdfsPath
    * @param file
    */
-  public void fileToHdfs(String projectName, String hdfsPath, MultipartFile file) {
+  public void fileToHdfs(User operator, String projectName, String hdfsPath, MultipartFile file, String proxyUser) {
 
     Project project = projectMapper.queryByName(projectName);
+
+    if (project == null) {
+      logger.error("Project does not exist: {}", projectName);
+      throw new NotFoundException("Not found project \"{0}\"", projectName);
+    }
+
+    // 必须有 project 读权限
+    if (!projectService.hasExecPerm(operator.getId(), project)) {
+      logger.error("User {} has no right permission for the project {}", operator.getName(), project.getName());
+      throw new PermissionException("User \"{0}\" is not has project \"{1}\" read permission", operator.getName(), project.getName());
+    }
 
     if (project == null) {
       logger.error("Project does not exist: {}", projectName);
@@ -679,31 +707,6 @@ public class WorkflowService {
     // 下载到本地的路径, 使用本地资源的缓存文件夹
     String localFilename = BaseConfig.getLocalResourceFilename(project.getId(), filename);
 
-    try {
-      logger.info("Start save file in local cache: {}", localFilename);
-      //先把文件缓存在本地
-      fileSystemStorageService.store(file, localFilename);
-      logger.info("Finish save file in local cache");
 
-      logger.info("Start upload local file: {} to hdfs: {} ", localFilename, hdfsPath);
-      //再上传到hdfs
-      HdfsClient.getInstance().copyLocalToHdfs(localFilename, hdfsPath, true, true);
-      logger.info("Finish upload local file to hdfs");
-    } catch (Exception e) {
-      logger.error("workflow file process error", e);
-      throw new ServerErrorException("workflow file process error:{0}", e.getMessage());
-    }
-  }
-
-  /**
-   * 本地文件上传到hive中
-   * @param projectName
-   * @param data
-   * @param file
-   */
-  public void fileToHive(String projectName, String data, MultipartFile file) {
-    // 1.上传文件到hdfs
-    // 2.创建一个工作流
-    // 3.执行工作流
   }
 }

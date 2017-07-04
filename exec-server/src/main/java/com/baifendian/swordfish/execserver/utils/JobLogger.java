@@ -16,16 +16,19 @@
 package com.baifendian.swordfish.execserver.utils;
 
 import com.baifendian.swordfish.common.utils.StructuredArguments;
+import com.baifendian.swordfish.execserver.runner.adhoc.AdHocRunnerManager;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.slf4j.Marker;
 
 public class JobLogger implements Logger {
-  private Logger logger;
+
+  private static Logger logger = LoggerFactory.getLogger(JobLogger.class.getName());
+
   private String jobId;
 
-  public JobLogger(String jobId, Logger logger) {
+  public JobLogger(String jobId) {
     this.jobId = jobId;
-    this.logger = logger;
   }
 
   private String addJobId(String msg) {

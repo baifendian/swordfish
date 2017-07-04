@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.baifendian.swordfish.common.hive;
+package com.baifendian.swordfish.common.hive.service2;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.pool.BaseKeyedPoolableObjectFactory;
@@ -24,7 +24,7 @@ import org.slf4j.LoggerFactory;
 import java.sql.SQLException;
 import java.util.Properties;
 
-public class HiveConnectionPoolFactory extends BaseKeyedPoolableObjectFactory {
+public class HiveService2PoolFactory extends BaseKeyedPoolableObjectFactory {
 
   private final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -39,19 +39,19 @@ public class HiveConnectionPoolFactory extends BaseKeyedPoolableObjectFactory {
   public HiveConnection makeObject(Object object) throws Exception {
     // 生成 client 对象
     if (object != null) {
-      ConnectionInfo connectionInfo = (ConnectionInfo) object;
+      HiveService2ConnectionInfo hiveService2ConnectionInfo = (HiveService2ConnectionInfo) object;
       Properties info = new Properties();
 
-      if (StringUtils.isNotEmpty(connectionInfo.getUser())) {
-        info.put("user", connectionInfo.getUser());
+      if (StringUtils.isNotEmpty(hiveService2ConnectionInfo.getUser())) {
+        info.put("user", hiveService2ConnectionInfo.getUser());
       }
 
-      if (StringUtils.isNotEmpty(connectionInfo.getPassword())) {
-        info.put("password", connectionInfo.getPassword());
+      if (StringUtils.isNotEmpty(hiveService2ConnectionInfo.getPassword())) {
+        info.put("password", hiveService2ConnectionInfo.getPassword());
       }
 
       try {
-        HiveConnection connection = new HiveConnection(connectionInfo.getUri(), info);
+        HiveConnection connection = new HiveConnection(hiveService2ConnectionInfo.getUri(), info);
         return connection;
       } catch (SQLException e) {
         logger.error("Connection hive exception", e);

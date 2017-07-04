@@ -23,7 +23,7 @@ import com.baifendian.swordfish.common.enums.FileColumnType;
 public class FileColumn {
   private String name;
   private FileColumnType type;
-  private String dateFormat;
+  private String dateFormat = "yyyy-MM-dd";
 
   public String getName() {
     return name;

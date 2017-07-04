@@ -56,12 +56,11 @@ public class EtlSqlJob extends AbstractJob {
       logger.info("\nhql:\n{}\nfuncs:\n{}", sqls, funcs);
 
       List<String> execSqls = CommonUtil.sqlSplit(sqls);
-      HiveSqlExec hiveSqlExec = new HiveSqlExec(funcs, execSqls, props.getProxyUser(), false, null,
-          null, logger);
+      HiveSqlExec hiveSqlExec = new HiveSqlExec(props.getProxyUser(), logger);
 
       started = true;
 
-      exitCode = (hiveSqlExec.execute()) ? 0 : -1;
+      exitCode = (hiveSqlExec.execute(funcs, execSqls, false, null, null)) ? 0 : -1;
     } catch (Exception e) {
       logger.error(String.format("hql process exception, sql: %s", param.getSql()), e);
       exitCode = -1;

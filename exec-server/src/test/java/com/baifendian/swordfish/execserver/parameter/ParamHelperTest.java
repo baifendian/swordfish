@@ -16,15 +16,16 @@
 package com.baifendian.swordfish.execserver.parameter;
 
 import com.baifendian.swordfish.dao.enums.ExecType;
-import org.junit.Test;
-
 import java.util.Date;
 import java.util.Map;
+import org.junit.Test;
 
 public class ParamHelperTest {
+
   @Test
   public void testResolvePlaceholders() {
-    Map<String, String> definedParamMap = SystemParamManager.buildSystemParam(ExecType.DIRECT, new Date(), "job id 001");
+    Map<String, String> definedParamMap = SystemParamManager
+        .buildSystemParam(ExecType.DIRECT, new Date(), 200, "job id 001");
 
     // 解析参数
     String sqls = "${sf.system.bizdate}";
@@ -37,6 +38,9 @@ public class ParamHelperTest {
     System.out.println(ParamHelper.resolvePlaceholders(sqls, definedParamMap));
 
     sqls = "$[yyyyMMdd]";
+    System.out.println(ParamHelper.resolvePlaceholders(sqls, definedParamMap));
+
+    sqls = "${sf.system.execId}";
     System.out.println(ParamHelper.resolvePlaceholders(sqls, definedParamMap));
 
     sqls = "${sf.system.jobId}";

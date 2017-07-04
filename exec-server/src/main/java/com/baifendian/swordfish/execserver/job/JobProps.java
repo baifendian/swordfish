@@ -26,7 +26,7 @@ public class JobProps {
   private int projectId;
 
   /**
-   * 一个具体任务的 id, 注意, 即席查询没有 exec id, 它的 exec id 实际上该 id
+   * 一个具体任务的 id, 注意不是执行 id
    **/
   private int execJobId;
 

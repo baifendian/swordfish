@@ -37,6 +37,7 @@ import com.baifendian.swordfish.execserver.job.JobContext;
 import com.baifendian.swordfish.execserver.runner.node.NodeRunner;
 import com.baifendian.swordfish.execserver.utils.EnvHelper;
 import com.baifendian.swordfish.execserver.utils.LoggerUtil;
+
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -55,6 +56,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
+
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -153,12 +155,12 @@ public class FlowRunner implements Runnable {
 
     // 得到执行的目录
     String execLocalPath = BaseConfig
-        .getFlowExecDir(executionFlow.getProjectId(), executionFlow.getFlowId(),
-            executionFlow.getId());
+            .getFlowExecDir(executionFlow.getProjectId(), executionFlow.getFlowId(),
+                    executionFlow.getId());
 
     logger.info(
-        "exec id:{}, current execution dir:{}, max try times:{}, timeout:{}, failure policy type:{}",
-        executionFlow.getId(), execLocalPath, maxTryTimes, timeout, failurePolicyType);
+            "exec id:{}, current execution dir:{}, max try times:{}, timeout:{}, failure policy type:{}",
+            executionFlow.getId(), execLocalPath, maxTryTimes, timeout, failurePolicyType);
 
     try {
       // 创建工作目录和用户
@@ -169,18 +171,21 @@ public class FlowRunner implements Runnable {
 
       // 下载 workflow 的资源文件到本地 exec 目录
       String workflowHdfsFile = BaseConfig
-          .getHdfsWorkflowFilename(executionFlow.getProjectId(), executionFlow.getWorkflowName());
+              .getHdfsWorkflowFilename(executionFlow.getProjectId(), executionFlow.getWorkflowName());
       HdfsClient hdfsClient = HdfsClient.getInstance();
 
       if (hdfsClient.exists(workflowHdfsFile)) {
         logger.info("get hdfs workflow file:{}", workflowHdfsFile);
 
-        HdfsClient.getInstance().copyHdfsToLocal(workflowHdfsFile, execLocalPath, false, true);
+        String destPath = execLocalPath + File.separator + executionFlow.getWorkflowName() + ".zip";
+        logger.info("Copy hdfs workflow: {} to local: {}", workflowHdfsFile, destPath);
+
+        HdfsClient.getInstance().copyHdfsToLocal(workflowHdfsFile, destPath, false, true);
 
         // 资源文件解压缩处理 workflow 下的文件为 workflowName.zip
-        File zipFile = new File(execLocalPath, executionFlow.getWorkflowName() + ".zip");
+        File zipFile = new File(destPath);
         if (zipFile.exists()) {
-          String cmd = String.format("unzip -o %s -d %s", zipFile.getPath(), execLocalPath);
+          String cmd = String.format("unzip -o %s -d %s", destPath, execLocalPath);
 
           logger.info("call cmd:{}", cmd);
 
@@ -255,7 +260,7 @@ public class FlowRunner implements Runnable {
    * 生成项目的资源文件
    */
   private List<String> genProjectResFiles(FlowDag flowDag) throws
-      IllegalArgumentException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
+          IllegalArgumentException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
     List<FlowNode> nodes = flowDag.getNodes();
     Set<String> projectFiles = new HashSet<>();
 
@@ -392,7 +397,7 @@ public class FlowRunner implements Runnable {
 
                 // 重新提交
                 submitNodeRunner(dagGraph.getVertex(nodeRunner.getNodename()), executionNode,
-                    semaphore);
+                        semaphore);
               } else {
                 // 不能继续尝试了
                 status = FlowStatus.FAILED;
@@ -420,7 +425,7 @@ public class FlowRunner implements Runnable {
               // 成功, 看后继, 提交后继
               for (String nodeName : dagGraph.getPostNode(nodeRunner.getNodename())) {
                 if (!executionNodeMap.containsKey(nodeName) && isPreNodesAllSuccess(
-                    dagGraph.getPreNode(nodeName))) {
+                        dagGraph.getPreNode(nodeName))) {
                   // 插入一个结点
                   ExecutionNode newExecutionNode = insertExecutionNode(executionFlow, nodeName);
 
@@ -459,11 +464,11 @@ public class FlowRunner implements Runnable {
     executionNode.setJobId(LoggerUtil.genJobId(JOB_PREFIX, executionFlow.getId(), nodeName));
 
     logger.info("insert execution node, id: {}, name: {}, start time: {}, status: {}, job id: {}",
-        executionNode.getExecId(),
-        nodeName,
-        now,
-        FlowStatus.INIT,
-        LoggerUtil.genJobId(JOB_PREFIX, executionFlow.getId(), nodeName));
+            executionNode.getExecId(),
+            nodeName,
+            now,
+            FlowStatus.INIT,
+            LoggerUtil.genJobId(JOB_PREFIX, executionFlow.getId(), nodeName));
 
     // 更新数据库
     flowDao.insertExecutionNode(executionNode);
@@ -475,7 +480,7 @@ public class FlowRunner implements Runnable {
    * 提交 NodeRunner 执行
    */
   private void submitNodeRunner(FlowNode flowNode, ExecutionNode executionNode,
-      Semaphore semaphore) {
+                                Semaphore semaphore) {
     JobContext jobContext = new JobContext();
 
     jobContext.setExecutionFlow(executionFlow);
@@ -616,7 +621,7 @@ public class FlowRunner implements Runnable {
       }
 
       logger.info("Kill has been called on exec id: {}, num: {}", executionFlow.getId(),
-          activeNodeRunners.size());
+              activeNodeRunners.size());
 
       // 正在运行中的
       for (Map.Entry<NodeRunner, Future<Boolean>> entry : activeNodeRunners.entrySet()) {
@@ -626,7 +631,7 @@ public class FlowRunner implements Runnable {
         if (!future.isDone()) {
           // 记录 kill 的信息
           logger
-              .info("kill exec, id: {}, node: {}", executionFlow.getId(), nodeRunner.getNodename());
+                  .info("kill exec, id: {}, node: {}", executionFlow.getId(), nodeRunner.getNodename());
 
           // 结点运行
           nodeRunner.kill();
@@ -644,8 +649,8 @@ public class FlowRunner implements Runnable {
   private void postProcess() {
     // 执行完后, 清理目录, 避免文件过大
     String execLocalPath = BaseConfig
-        .getFlowExecDir(executionFlow.getProjectId(), executionFlow.getFlowId(),
-            executionFlow.getId());
+            .getFlowExecDir(executionFlow.getProjectId(), executionFlow.getFlowId(),
+                    executionFlow.getId());
 
     try {
       FileUtils.deleteDirectory(new File(execLocalPath));
@@ -694,7 +699,7 @@ public class FlowRunner implements Runnable {
 
       // 如果失败了, 且应该是停止的
       if (!preFinishedNode.getStatus().typeIsSuccess()
-          && failurePolicyType == FailurePolicyType.END) {
+              && failurePolicyType == FailurePolicyType.END) {
         return false;
       }
     }

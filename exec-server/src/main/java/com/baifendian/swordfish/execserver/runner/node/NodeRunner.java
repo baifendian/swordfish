@@ -99,6 +99,7 @@ public class NodeRunner implements Callable<Boolean> {
     // 作业参数配置
     Map<String, String> systemParamMap = SystemParamManager
         .buildSystemParam(executionFlow.getType(), executionFlow.getScheduleTime(),
+            executionNode.getExecId(),
             executionNode.getJobId());
 
     // 构建自定义参数, 比如定义了 ${abc} = ${sf.system.bizdate}, $[yyyyMMdd] 等情况
@@ -132,7 +133,7 @@ public class NodeRunner implements Callable<Boolean> {
     props.setJobAppId(String.format("%s_%s", executionNode.getJobId(),
         HttpUtil.getMd5(executionNode.getName()).substring(0, 8)));
 
-    JobLogger jobLogger = new JobLogger(executionNode.getJobId(), logger);
+    JobLogger jobLogger = new JobLogger(executionNode.getJobId());
 
     boolean success = false;
 
