@@ -78,7 +78,7 @@ public class HiveUtil extends BaseDao {
     String uuidSuffix = UUID.randomUUID().toString().replace('-', '_');
 
     return MessageFormat
-        .format("impexp_{0}_{1}_{3}", String.valueOf(projectId), String.valueOf(execId),
+        .format("impexp_{0}_{1}_{2}", String.valueOf(projectId), String.valueOf(execId),
             uuidSuffix);
   }
 
