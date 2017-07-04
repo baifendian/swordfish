@@ -16,42 +16,34 @@
 package com.baifendian.swordfish.execserver.job.impexp;
 
 import com.baifendian.swordfish.common.config.BaseConfig;
-import com.baifendian.swordfish.common.enums.WriteHdfsType;
 import com.baifendian.swordfish.common.enums.WriteMode;
-import com.baifendian.swordfish.common.hadoop.ConfigurationUtil;
 import com.baifendian.swordfish.common.hadoop.HdfsClient;
 import com.baifendian.swordfish.common.job.struct.datasource.DatasourceFactory;
 import com.baifendian.swordfish.common.job.struct.datasource.MysqlDatasource;
-import com.baifendian.swordfish.common.job.struct.node.BaseParam;
 import com.baifendian.swordfish.common.job.struct.node.impexp.ImpExpParam;
 import com.baifendian.swordfish.common.job.struct.node.impexp.writer.HiveWriter;
 import com.baifendian.swordfish.common.job.struct.node.impexp.reader.MysqlReader;
-import com.baifendian.swordfish.dao.DaoFactory;
-import com.baifendian.swordfish.dao.DatasourceDao;
 import com.baifendian.swordfish.dao.enums.DbType;
 import com.baifendian.swordfish.dao.model.DataSource;
-import com.baifendian.swordfish.dao.utils.json.JsonUtil;
+import com.baifendian.swordfish.execserver.common.FunctionUtil;
 import com.baifendian.swordfish.execserver.engine.hive.HiveMetaExec;
+import com.baifendian.swordfish.execserver.engine.hive.HiveSqlExec;
+import com.baifendian.swordfish.execserver.engine.hive.HiveUtil;
 import com.baifendian.swordfish.execserver.job.JobProps;
 import com.baifendian.swordfish.execserver.job.impexp.Args.*;
-import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.configuration.ConfigurationException;
-import org.apache.commons.configuration.PropertiesConfiguration;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.fs.permission.FsPermission;
-import org.json.JSONArray;
+import org.apache.hadoop.hive.metastore.api.FieldSchema;
 import org.slf4j.Logger;
 import org.apache.hadoop.fs.*;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.Statement;
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static com.baifendian.swordfish.execserver.utils.Constants.*;
 import static com.baifendian.swordfish.execserver.job.impexp.ImpExpJobConst.*;
 
 
@@ -61,8 +53,6 @@ import static com.baifendian.swordfish.execserver.job.impexp.ImpExpJobConst.*;
 public class MysqlToHiveJob extends ImpExpJob {
 
   private HiveMetaExec hiveMetaExec;
-
-  private HiveService hiveService;
 
   /**
    * swordfish reader配置
@@ -95,9 +85,6 @@ public class MysqlToHiveJob extends ImpExpJob {
   public void before() throws Exception {
     logger.info("Start MysqlToHiveJob before function...");
     // 构造一个hive服务类，预备使用
-    hiveService = new HiveService(hiveConf.getString("hive.thrift.uris"), hiveConf.getString("hive.metastore.uris"), props.getProxyUser(), "");
-    hiveService.init();
-
     hiveMetaExec = new HiveMetaExec(logger);
     // 获取源HQL字段
     destColumns = hiveMetaExec.getHiveDesc(hiveWriter.getDatabase(), hiveWriter.getTable());
@@ -162,38 +149,87 @@ public class MysqlToHiveJob extends ImpExpJob {
   }
 
   public void clean() throws Exception {
-    //操作完成做一些清理工作
-    logger.info("Start MysqlToHiveJob clean...");
-    HdfsClient hdfsClient = HdfsClient.getInstance();
-    logger.info("delete hdfs path: {}", ((HdfsWriterArg) writerArg).getPath());
-    hdfsClient.delete(((HdfsWriterArg) writerArg).getPath(), true);
-    logger.info("Finish MysqlToHiveJob clean!");
   }
 
   @Override
   public void after() throws Exception {
-    if (exitCode != 0) {
-      logger.info("DataX exec failed, job exit!");
-      return;
+    List<String> execSqls = new ArrayList<>();
+    try {
+      if (exitCode != 0) {
+        logger.info("DataX exec failed, job exit!");
+        return;
+      }
+
+      logger.info("Start MysqlToHiveJob after function...");
+      //注册临时外部表
+      String srcTableName = HiveUtil.getTmpTableName(props.getProjectId(), props.getExecId());
+      //构造生成临时表sql
+      String ddl = HiveUtil.getTmpTableDDL(DEFAULT_DB, srcTableName, srcColumns, ((HdfsWriterArg) writerArg).getPath(), DEFAULT_DELIMITER, "UTF-8");
+      logger.info("Create temp hive table ddl: {}", ddl);
+
+
+      //构造插入数据sql
+      String insertSql = insertTable(DEFAULT_DB, srcTableName, hiveWriter.getDatabase(), hiveWriter.getTable(), srcColumns, destColumns, hiveWriter.getWriteMode());
+      logger.info("Insert to hive table sql: {}", insertSql);
+
+      logger.info("Start exec sql to hive...");
+      execSqls = Arrays.asList(ddl, "SET hive.exec.dynamic.partition.mode=nonstrict", insertSql);
+
+      //执行sql
+      HiveSqlExec hiveSqlExec = new HiveSqlExec(props.getProxyUser(), logger);
+
+      exitCode = (hiveSqlExec.execute(null, execSqls, false, null, null)) ? 0 : -1;
+
+      logger.info("Finish exec sql!");
+    } catch (Exception e) {
+      logger.error(String.format("hql process exception, sql: %s", String.join(";", execSqls)), e);
+      exitCode = -1;
+    } finally {
+      complete = true;
+    }
+  }
+
+  /**
+   * 生成insert sql
+   */
+  public String insertTable(String srcDbNmae, String srcTableName, String destDbName, String destTableName, List<HqlColumn> srcHqlColumnList, List<HqlColumn> destHqlColumnList, WriteMode writeMode) throws Exception {
+    String insertSql = "INSERT {0} TABLE {1}.{2} {3} SELECT {4} FROM {5}.{6}";
+    String partFieldSql = "";
+
+    // 所有的分区都是必传字段先整理出分区字段
+
+    List<FieldSchema> partFieldList = hiveMetaExec.getPartionField(destDbName, destTableName);
+
+    if (CollectionUtils.isNotEmpty(partFieldList)) {
+      List<String> partNameList = new ArrayList<>();
+      for (FieldSchema fieldSchema : partFieldList) {
+        partNameList.add(fieldSchema.getName());
+      }
+
+      partFieldSql = MessageFormat.format("PARTITION({0})", String.join(",", partNameList));
     }
 
-    logger.info("Start MysqlToHiveJob after function...");
-    //注册临时外部表
-    String srcTableName = hiveService.getTbaleName(props.getProjectId(), props.getExecId(), props.getJobAppId());
-    logger.info("Start create temp hive table: {}", srcTableName);
-    hiveService.createHiveTmpTable(DEFAULT_DB, srcTableName, srcColumns, ((HdfsWriterArg) writerArg).getPath(), DEFAULT_DELIMITER, "UTF-8");
-    logger.info("Finsh create temp hive table: {}", srcTableName);
 
+    List<String> fieldList = new ArrayList<>();
 
-    //插入数据
-    logger.info("Start insert to hive table: {}", hiveWriter.getTable());
-    hiveService.insertTable(DEFAULT_DB, srcTableName, hiveWriter.getDatabase(), hiveWriter.getTable(), srcColumns, destColumns, hiveWriter.getWriteMode());
-    logger.info("Finish insert to hive table: {}", hiveWriter.getTable());
-    //hive操作完成，关闭连接释放临时表
-    hiveService.close();
+    //预处理字段，如果字段为空就加上NULL
+    for (HqlColumn destHqlColumn : destHqlColumnList) {
+      boolean found = false;
+      for (HqlColumn srcHqlColumn : srcHqlColumnList) {
+        if (StringUtils.containsIgnoreCase(srcHqlColumn.getName(), destHqlColumn.getName())) {
+          fieldList.add(MessageFormat.format("`{0}`", destHqlColumn.getName()));
+          found = true;
+          break;
+        }
+      }
+      if (!found) {
+        fieldList.add(MessageFormat.format("null as `{0}`", destHqlColumn.getName()));
+      }
+    }
 
-    //完成进行清理
-    clean();
+    insertSql = MessageFormat.format(insertSql, writeMode.gethiveSql(), destDbName, destTableName, partFieldSql, String.join(",", fieldList), srcDbNmae, srcTableName);
+    logger.info("Insert table sql: {}", insertSql);
+    return insertSql;
   }
 
 }

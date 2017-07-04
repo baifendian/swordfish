@@ -15,6 +15,8 @@ import com.baifendian.swordfish.common.job.struct.node.impexp.writer.HiveWriter;
 import com.baifendian.swordfish.dao.DaoFactory;
 import com.baifendian.swordfish.dao.DatasourceDao;
 import com.baifendian.swordfish.execserver.engine.hive.HiveMetaExec;
+import com.baifendian.swordfish.execserver.engine.hive.HiveSqlExec;
+import com.baifendian.swordfish.execserver.engine.hive.HiveUtil;
 import com.baifendian.swordfish.execserver.job.AbstractJob;
 import com.baifendian.swordfish.execserver.job.JobProps;
 import com.baifendian.swordfish.execserver.job.impexp.Args.HqlColumn;
@@ -50,8 +52,6 @@ public class FileToHiveJob extends AbstractJob {
   protected Configuration hiveConf;
 
   private ImpExpParam impExpParam;
-
-  private HiveService hiveService;
 
   private HiveMetaExec hiveMetaExec;
 
@@ -112,9 +112,6 @@ public class FileToHiveJob extends AbstractJob {
     //进行参数合理性检测
     checkParam();
 
-    // 构造一个hive服务类，预备使用
-    hiveService = new HiveService(hiveConf.getString("hive.thrift.uris"), hiveConf.getString("hive.metastore.uris"), props.getProxyUser(), "");
-    hiveService.init();
     //构造一个hive元数据服务类
     hiveMetaExec = new HiveMetaExec(logger);
 
@@ -129,64 +126,73 @@ public class FileToHiveJob extends AbstractJob {
   @Override
   public void process() throws Exception {
     super.process();
+    List<String> execSqls = new ArrayList<>();
+    try {
+      String hdfsPath = fileReader.getHdfsPath();
+      String fileName = fileReader.getFileName();
 
-    String hdfsPath = fileReader.getHdfsPath();
-    String fileName = fileReader.getFileName();
 
+      // 判断文件是否需要上传
+      if (StringUtils.isNotEmpty(fileName)) {
+        //1. 下载文件到本地
+        logger.info("Has file name try to process file");
+        String filePath = MessageFormat.format("{0}/{1}", props.getWorkDir(), fileName);
+        File file = new File(filePath);
+        if (!file.exists()) {
+          logger.error("file {} not exists!", file.getAbsoluteFile());
+          throw new Exception("file not exists!");
+        }
+        hdfsPath = BaseConfig.getHdfsImpExpDir(props.getProjectId(), props.getExecId(), props.getNodeName());
+        logger.info("Start upload file to temp hdfs dir: {} ...", hdfsPath);
+        //设置目录
+        if (!HdfsClient.getInstance().exists(hdfsPath)) {
+          logger.info("path: {} not exists try create", hdfsPath);
+          HdfsClient.getInstance().mkdir(hdfsPath, FsPermission.createImmutable((short) 0777));
+        }
 
-    // 判断文件是否需要上传
-    if (StringUtils.isNotEmpty(fileName)) {
-      //1. 下载文件到本地
-      logger.info("Has file name try to process file");
-      String filePath = MessageFormat.format("{0}/{1}", props.getWorkDir(), fileName);
-      File file = new File(filePath);
-      if (!file.exists()) {
-        logger.error("file {} not exists!", file.getAbsoluteFile());
-        throw new Exception("file not exists!");
+        HdfsClient.getInstance().copyLocalToHdfs(filePath, hdfsPath, true, true);
+
+        String fileHdfsPath = MessageFormat.format("{0}/{1}", hdfsPath, fileName);
+        //设置权限
+        Path dir = new Path(fileHdfsPath);
+        while (!dir.getName().equalsIgnoreCase("swordfish")) {
+          HdfsClient.getInstance().setPermissionThis(dir, FsPermission.createImmutable((short) 0777));
+          dir = dir.getParent();
+        }
+        logger.info("Finish upload file to temp hdfs dir!");
       }
-      hdfsPath = BaseConfig.getHdfsImpExpDir(props.getProjectId(), props.getExecId(), props.getNodeName());
-      logger.info("Start upload file to temp hdfs dir: {} ...", hdfsPath);
-      //设置目录
-      if (!HdfsClient.getInstance().exists(hdfsPath)) {
-        logger.info("path: {} not exists try create", hdfsPath);
-        HdfsClient.getInstance().mkdir(hdfsPath, FsPermission.createImmutable((short) 0777));
-      }
 
-      HdfsClient.getInstance().copyLocalToHdfs(filePath, hdfsPath, true, true);
+      // 1.创建临时表
+      logger.info("First, create temp table...");
+      String srcTable = HiveUtil.getTmpTableName(props.getProjectId(), props.getExecId());
+      logger.info("Temp table name: {}", srcTable);
 
-      String fileHdfsPath = MessageFormat.format("{0}/{1}", hdfsPath, fileName);
-      //设置权限
-      Path dir = new Path(fileHdfsPath);
-      while (!dir.getName().equalsIgnoreCase("swordfish")) {
-        HdfsClient.getInstance().setPermissionThis(dir, FsPermission.createImmutable((short) 0777));
-        dir = dir.getParent();
-      }
-      logger.info("Finish upload file to temp hdfs dir!");
+      //生成临时表ddl
+      String ddl = HiveUtil.getTmpTableDDL(DEFAULT_DB, srcTable, getFileHqlColumn(), hdfsPath, fileReader.getFieldDelimiter(), fileReader.getFileCode());
+      logger.info("Create temp hive table ddl: {}", ddl);
+
+      // 2.插入数据
+      logger.info("Second, insert into target table...");
+      String sql = getInsertSql(DEFAULT_DB, srcTable, hiveWriter.getDatabase(), hiveWriter.getTable(), destHiveColumns, getFileHiveColumnRel(fileReader.getTargetColumn(), hiveWriter.getColumn()), hiveWriter.getWriteMode());
+
+      logger.info("Start exec sql to hive...");
+      execSqls = Arrays.asList(ddl, "SET hive.exec.dynamic.partition.mode=nonstrict", sql);
+      HiveSqlExec hiveSqlExec = new HiveSqlExec(props.getProxyUser(), logger);
+
+      exitCode = (hiveSqlExec.execute(null, execSqls, false, null, null)) ? 0 : -1;
+
+      logger.info("Finish exec sql!");
+    } catch (Exception e) {
+      logger.error(String.format("hql process exception, sql: %s", String.join(";", execSqls)), e);
+      exitCode = -1;
+    } finally {
+      complete = true;
     }
-
-    // 1.创建临时表
-    logger.info("First, create temp table...");
-    String srcTable = hiveService.getTbaleName(props.getProjectId(), props.getExecId(), props.getJobAppId());
-    logger.info("Temp table name: {}", srcTable);
-    hiveService.createHiveTmpTable(DEFAULT_DB, srcTable, getFileHqlColumn(), hdfsPath, fileReader.getFieldDelimiter(), fileReader.getFileCode());
-    logger.info("Finish first, create temp table!");
-
-    // 2.插入数据
-    logger.info("Second, insert into target table...");
-    String sql = getInsertSql(DEFAULT_DB, srcTable, hiveWriter.getDatabase(), hiveWriter.getTable(), destHiveColumns, getFileHiveColumnRel(fileReader.getTargetColumn(), hiveWriter.getColumn()), hiveWriter.getWriteMode());
-    hiveService.execSql(new String[]{"SET hive.exec.dynamic.partition.mode=nonstrict", sql});
-    logger.info("Finish second! all fine!");
   }
 
   @Override
   public void after() throws Exception {
     super.after();
-    logger.info("Close hive conn...");
-    if (hiveService != null) {
-      hiveService.close();
-    }
-    logger.info("Finish close hive conn!");
-    exitCode = 0;
   }
 
   @Override

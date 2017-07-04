@@ -19,13 +19,22 @@ import com.baifendian.swordfish.common.hive.metastore.HiveMetaPoolClient;
 import com.baifendian.swordfish.common.hive.service2.HiveService2Client;
 import com.baifendian.swordfish.common.hive.service2.HiveService2ConnectionInfo;
 import com.baifendian.swordfish.dao.BaseDao;
+
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
+
+import com.baifendian.swordfish.execserver.job.impexp.Args.HqlColumn;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import static com.baifendian.swordfish.execserver.job.impexp.ImpExpJobConst.DEFAULT_FILE_TYPE;
 
 @Component
 public class HiveUtil extends BaseDao {
@@ -64,15 +73,38 @@ public class HiveUtil extends BaseDao {
    *
    * @param projectId 项目 id
    * @param execId 执行 id
-   * @param jobId job 的 id
    */
-  public static String getTmpTableName(int projectId, int execId, String jobId) {
+  public static String getTmpTableName(int projectId, int execId) {
     String uuidSuffix = UUID.randomUUID().toString().replace('-', '_');
 
     return MessageFormat
-        .format("impexp_{0}_{1}_{2}_{3}", String.valueOf(projectId), String.valueOf(execId), jobId,
+        .format("impexp_{0}_{1}_{3}", String.valueOf(projectId), String.valueOf(execId),
             uuidSuffix);
   }
+
+
+  /**
+   * 组装一个临时外部表
+   *
+   * @param
+   * @return
+   */
+  public static String getTmpTableDDL(String dbName, String tableName, List<HqlColumn> hqlColumnList, String localtion, String fieldDelimiter, String fileCode) throws SQLException {
+
+    List<String> fieldList = new ArrayList<>();
+
+    for (HqlColumn hqlColumn : hqlColumnList) {
+      fieldList.add(MessageFormat.format("{0} {1}", hqlColumn.getName(), hqlColumn.getType()));
+    }
+
+    String sql = "CREATE TEMPORARY EXTERNAL TABLE {0}.{1}({2}) ROW FORMAT SERDE \"org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe\" WITH SERDEPROPERTIES(\"field.delim\"=\"{3}\",\"serialization.encoding\"=\"{4}\") STORED AS {5} LOCATION \"{6}\"";
+
+    sql = MessageFormat.format(sql, dbName, tableName, String.join(",", fieldList), fieldDelimiter, fileCode, DEFAULT_FILE_TYPE.getType(), localtion);
+
+    return sql;
+  }
+
+
 
   /**
    * 判断是否是查询请求
