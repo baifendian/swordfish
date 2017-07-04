@@ -226,7 +226,7 @@ CREATE TABLE `ad_hoc_results` (
   `exec_id` int(11) NOT NULL COMMENT 'exec id of ad hoc query',
   `index` int(11) NOT NULL COMMENT 'index of the stm',
   `stm` text NOT NULL COMMENT 'sql clause',
-  `result` mediumText DEFAULT NULL COMMENT 'result of this exec',
+  `result` mediumText CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT 'result of this exec',
   `status` tinyint(4) NOT NULL COMMENT 'status of this exec',
   `create_time` datetime NOT NULL COMMENT 'create time of the records',
   `start_time` datetime DEFAULT NULL COMMENT 'start time of this exec',
