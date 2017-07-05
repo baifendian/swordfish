@@ -107,4 +107,12 @@ public class AdHocDto {
   public void setQueue(String queue) {
     this.queue = queue;
   }
+
+  public AdHocType getType() {
+    return type;
+  }
+
+  public void setType(AdHocType type) {
+    this.type = type;
+  }
 }
