@@ -79,8 +79,10 @@ public interface AdHocMapper {
   @Results(value = {
           @Result(property = "id", column = "id", id = true, javaType = int.class, jdbcType = JdbcType.INTEGER),
           @Result(property = "projectId", column = "project_id", id = true, javaType = int.class, jdbcType = JdbcType.INTEGER),
+          @Result(property = "name", column = "name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
           @Result(property = "proxyUser", column = "proxy_user", javaType = String.class, jdbcType = JdbcType.VARCHAR),
           @Result(property = "queue", column = "queue", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+          @Result(property = "type", column = "type", typeHandler = EnumOrdinalTypeHandler.class, jdbcType = JdbcType.TINYINT),
           @Result(property = "status", column = "status", typeHandler = EnumOrdinalTypeHandler.class, jdbcType = JdbcType.TINYINT),
           @Result(property = "owner", column = "owner", javaType = int.class, jdbcType = JdbcType.INTEGER),
           @Result(property = "parameter", column = "parameter", javaType = String.class, jdbcType = JdbcType.VARCHAR),
