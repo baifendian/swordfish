@@ -18,19 +18,18 @@ package com.baifendian.swordfish.execserver.job.mr;
 import com.baifendian.swordfish.common.job.struct.node.BaseParam;
 import com.baifendian.swordfish.common.job.struct.node.mr.MrParam;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
+import com.baifendian.swordfish.execserver.job.AbstractYarnProcessJob;
 import com.baifendian.swordfish.execserver.job.JobProps;
-import com.baifendian.swordfish.execserver.job.yarn.AbstractYarnJob;
 import com.baifendian.swordfish.execserver.parameter.ParamHelper;
-import org.slf4j.Logger;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import org.slf4j.Logger;
 
 /**
  * mr 作业 <p>
  */
-public class MrJob extends AbstractYarnJob {
+public class MrJob extends AbstractYarnProcessJob {
 
   /**
    * hadoop
@@ -57,21 +56,20 @@ public class MrJob extends AbstractYarnJob {
   }
 
   @Override
-  public void init() {
+  public void init() throws Exception {
     mrParam = JsonUtil.parseObject(props.getJobParams(), MrParam.class);
     mrParam.setQueue(props.getQueue());
   }
 
   /**
-   * hadoop 命令示例为:
-   * hadoop jar hadoop-mapreduce-examples-<ver>.jar wordcount \
-   * -files dir1/dict.txt#dict1,dir2/dict.txt#dict2 \
-   * -archives mytar.tgz#tgzdir \
-   * -Dwordcount.case.sensitive=true \
-   * input output
+   * hadoop 命令示例为: hadoop jar hadoop-mapreduce-examples-<ver>.jar wordcount \ -files
+   * dir1/dict.txt#dict1,dir2/dict.txt#dict2 \ -archives mytar.tgz#tgzdir \
+   * -Dwordcount.case.sensitive=true \ input output
+   *
+   * @return 返回构建的命令
    */
   @Override
-  public String createCommand() throws Exception {
+  protected String createCommand() {
     List<String> args = new ArrayList<>();
 
     args.add(HADOOP_COMMAND);
@@ -80,7 +78,8 @@ public class MrJob extends AbstractYarnJob {
     // 添加其它参数
     args.addAll(HadoopJarArgsUtil.buildArgs(mrParam));
 
-    String command = ParamHelper.resolvePlaceholders(String.join(" ", args), props.getDefinedParams());
+    String command = ParamHelper
+        .resolvePlaceholders(String.join(" ", args), props.getDefinedParams());
 
     logger.info("mr job command:\n{}", command);
 

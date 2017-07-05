@@ -19,11 +19,10 @@ import com.baifendian.swordfish.common.job.struct.node.BaseParam;
 import com.baifendian.swordfish.common.job.struct.node.shell.ShellParam;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
 import com.baifendian.swordfish.execserver.exception.ExecException;
-import com.baifendian.swordfish.execserver.job.AbstractProcessJob;
+import com.baifendian.swordfish.execserver.job.Job;
 import com.baifendian.swordfish.execserver.job.JobProps;
+import com.baifendian.swordfish.execserver.job.ProcessJob;
 import com.baifendian.swordfish.execserver.parameter.ParamHelper;
-import org.slf4j.Logger;
-
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -32,8 +31,9 @@ import java.nio.file.attribute.FileAttribute;
 import java.nio.file.attribute.PosixFilePermission;
 import java.nio.file.attribute.PosixFilePermissions;
 import java.util.Set;
+import org.slf4j.Logger;
 
-public class ShellJob extends AbstractProcessJob {
+public class ShellJob extends Job {
 
   private ShellParam shellParam;
 
@@ -42,10 +42,17 @@ public class ShellJob extends AbstractProcessJob {
    */
   private String currentPath;
 
+  private ProcessJob processJob;
+
   public ShellJob(JobProps props, boolean isLongJob, Logger logger) {
     super(props, isLongJob, logger);
 
-    this.currentPath = getWorkingDirectory();
+    this.currentPath = props.getWorkDir();
+
+    this.processJob = new ProcessJob(this::logProcess, this::isCompleted, isLongJob,
+        props.getWorkDir(), props.getJobAppId(),
+        props.getProxyUser(), props.getEnvFile(), props.getExecJobStartTime(),
+        props.getExecJobTimeout(), logger);
   }
 
   @Override
@@ -60,7 +67,32 @@ public class ShellJob extends AbstractProcessJob {
   }
 
   @Override
-  public String createCommand() throws Exception {
+  public void process() throws Exception {
+    try {
+      started = true;
+
+      // 构造进程
+      exitCode = processJob.runCommand(createCommand());
+    } catch (Exception e) {
+      logger.error("Shell process exception", e);
+      exitCode = -1;
+    } finally {
+      complete = true;
+    }
+  }
+
+  @Override
+  public void cancel(boolean cancelApplication) throws Exception {
+    // 关闭进程
+    processJob.cancel();
+  }
+
+  /**
+   * 构建 shell 命令
+   *
+   * @return 返回构建的 shell 命令
+   */
+  private String createCommand() throws Exception {
     // 生成的脚本文件
     String fileName = String.format("%s/%s_node.sh", currentPath, props.getJobAppId());
     Path path = new File(fileName).toPath();

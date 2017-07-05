@@ -19,44 +19,44 @@ import com.baifendian.swordfish.common.job.struct.node.BaseParam;
 import com.baifendian.swordfish.common.job.struct.node.hql.HqlParam;
 import com.baifendian.swordfish.common.utils.CommonUtil;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
-import com.baifendian.swordfish.execserver.common.ExecResult;
 import com.baifendian.swordfish.execserver.common.FunctionUtil;
 import com.baifendian.swordfish.execserver.engine.hive.HiveSqlExec;
-import com.baifendian.swordfish.execserver.job.AbstractJob;
+import com.baifendian.swordfish.execserver.job.AbstractYarnJob;
+import com.baifendian.swordfish.execserver.job.Job;
 import com.baifendian.swordfish.execserver.job.JobProps;
 import com.baifendian.swordfish.execserver.parameter.ParamHelper;
 import java.util.List;
 import org.slf4j.Logger;
 
-public class EtlSqlJob extends AbstractJob {
+public class EtlSqlJob extends AbstractYarnJob {
 
   protected HqlParam param;
-
-  protected List<ExecResult> results;
 
   public EtlSqlJob(JobProps props, boolean isLongJob, Logger logger) {
     super(props, isLongJob, logger);
   }
 
   @Override
-  public void init() {
+  public void init() throws Exception {
     this.param = JsonUtil.parseObject(props.getJobParams(), HqlParam.class);
   }
 
   @Override
   public void process() throws Exception {
     try {
+      started = true;
+
       String sqls = param.getSql();
 
       // 解析其中的变量
       sqls = ParamHelper.resolvePlaceholders(sqls, props.getDefinedParams());
       List<String> funcs = FunctionUtil
-          .createFuncs(param.getUdfs(), props.getExecId(), logger, getWorkingDirectory(), false);
+          .createFuncs(param.getUdfs(), props.getExecId(), logger, props.getWorkDir(), false);
 
       logger.info("\nhql:\n{}\nfuncs:\n{}", sqls, funcs);
 
       List<String> execSqls = CommonUtil.sqlSplit(sqls);
-      HiveSqlExec hiveSqlExec = new HiveSqlExec(props.getProxyUser(), logger);
+      HiveSqlExec hiveSqlExec = new HiveSqlExec(this::logProcess, props.getProxyUser(), logger);
 
       started = true;
 
@@ -67,15 +67,6 @@ public class EtlSqlJob extends AbstractJob {
     } finally {
       complete = true;
     }
-  }
-
-  @Override
-  public void cancel(boolean cancelApplication) throws Exception {
-  }
-
-  @Override
-  public List<ExecResult> getResults() {
-    return results;
   }
 
   @Override

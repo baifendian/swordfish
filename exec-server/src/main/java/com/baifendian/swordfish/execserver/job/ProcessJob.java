@@ -28,13 +28,19 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.function.BooleanSupplier;
+import java.util.function.Consumer;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 
-public abstract class AbstractProcessJob extends AbstractJob {
+/**
+ * 以 shell 命令的方式运行一个 job
+ */
+public class ProcessJob {
 
   /**
    * 构建 process 工具
@@ -44,26 +50,71 @@ public abstract class AbstractProcessJob extends AbstractJob {
   /**
    * 具体的进程
    */
-  protected Process process;
-
-  public AbstractProcessJob(JobProps props, boolean isLongJob, Logger logger) {
-    super(props, isLongJob, logger);
-  }
+  private Process process;
 
   /**
-   * 创建命令语句
+   * 日志处理器
    */
-  public abstract String createCommand() throws Exception;
+  private Consumer<List<String>> logHandler;
 
   /**
-   * 日志处理
-   */
-  protected void logProcess(List<String> logs) {
-    logger.info("(stdout, stderr) -> \n{}", String.join("\n", logs));
-  }
+   * 长任务是否完成
+   **/
+  private BooleanSupplier isCompleted;
 
-  @Override
-  public void before() throws Exception {
+  /**
+   * 是否长任务
+   */
+  private boolean isLongJob;
+
+  /**
+   * 工作目录
+   */
+  private String workDir;
+
+  /**
+   * 任务的运行 id, 和 workDir 一起构成了 command 文件名称
+   */
+  private String jobAppId;
+
+  /**
+   * 代理用户名称
+   */
+  private String proxyUser;
+
+  /**
+   * 环境文件
+   */
+  private String envFile;
+
+  /**
+   * 起始运行时间
+   */
+  private Date startTime;
+
+  /**
+   * 超时时间
+   */
+  private int timeout;
+
+  /**
+   * 日志记录
+   */
+  private Logger logger;
+
+  public ProcessJob(Consumer<List<String>> logHandler, BooleanSupplier isCompleted,
+      boolean isLongJob, String workDir, String jobAppId, String proxyUser, String envFile,
+      Date startTime, int timeout, Logger logger) {
+    this.logHandler = logHandler;
+    this.isCompleted = isCompleted;
+    this.isLongJob = isLongJob;
+    this.workDir = workDir;
+    this.jobAppId = jobAppId;
+    this.proxyUser = proxyUser;
+    this.envFile = envFile;
+    this.startTime = startTime;
+    this.timeout = timeout;
+    this.logger = logger;
   }
 
   /**
@@ -72,44 +123,41 @@ public abstract class AbstractProcessJob extends AbstractJob {
    * @return 超时时间
    */
   private long calcNodeTimeout() {
-    long usedTime = (System.currentTimeMillis() - props.getExecJobStartTime().getTime()) / 1000;
-    long remainTime = props.getExecJobTimeout() - usedTime;
+    long usedTime = (System.currentTimeMillis() - startTime.getTime()) / 1000;
+    long remainTime = timeout - usedTime;
 
-    if (remainTime <= 0 && !isLongJob()) {
+    if (remainTime <= 0 && !isLongJob) {
       throw new ExecTimeoutException("workflow or streaming job execution time out");
     }
 
     return remainTime;
   }
 
-  @Override
-  public void process() throws Exception {
+  /**
+   * 具体的任务处理, 这里是获取 shell 命令得到执行
+   *
+   * @param command 待运行的命令
+   * @return 返回运行的退出码, 0 表示成功, 其它表示失败
+   */
+  public int runCommand(String command) {
     // 如果超时, 直接退出
     long remainTime = calcNodeTimeout();
+    int exitCode;
 
     try {
       // 初始化
       processBuilder = new ProcessBuilder();
 
       // 得到每个具体 job 的具体构建方式
-      String command = createCommand();
-
       if (StringUtils.isEmpty(command)) {
         exitCode = 0;
-        complete = true;
-        return;
+        return exitCode;
       }
 
-      // 工作目录
-      String workDir = getWorkingDirectory();
-
       // 命令语句
-      String commandFile = String.format("%s/%s.command", workDir, props.getJobAppId());
+      String commandFile = String.format("%s/%s.command", workDir, jobAppId);
 
-      // 得到代理执行用户和工作目录
-      String proxyUser = props.getProxyUser();
-
-      logger.info("proxyUser:{}, workDir:{}", proxyUser, workDir);
+      logger.info("proxy user:{}, work dir:{}", proxyUser, workDir);
 
       // 不存在则创建, 因为可能重试任务
       if (!Files.exists(Paths.get(commandFile))) {
@@ -120,8 +168,8 @@ public abstract class AbstractProcessJob extends AbstractJob {
         stringBuilder.append("BASEDIR=$(cd `dirname $0`; pwd)\n");
         stringBuilder.append("cd $BASEDIR\n");
 
-        if (props.getEnvFile() != null) {
-          stringBuilder.append("source " + props.getEnvFile() + "\n");
+        if (envFile != null) {
+          stringBuilder.append("source " + envFile + "\n");
         }
 
         stringBuilder.append("\n\n");
@@ -142,8 +190,6 @@ public abstract class AbstractProcessJob extends AbstractJob {
       processBuilder.redirectErrorStream(true);
       process = processBuilder.start();
 
-      started = true;
-
       // 打印进程的启动命令行
       printCommand(processBuilder);
 
@@ -155,16 +201,16 @@ public abstract class AbstractProcessJob extends AbstractJob {
       logger.info("Process start, process id is: {}", pid);
 
       // 长任务是比较特殊的
-      if (isLongJob()) {
+      if (isLongJob) {
         // 如果没有完成, 会循环, 认为是没有提交
         // 对于流任务, 最多等待 10 分钟, 不然会认为超时退出
-        while (!isCompleted() && process.isAlive()) {
+        while (!isCompleted.getAsBoolean() && process.isAlive()) {
           Thread.sleep(3000);
         }
 
         logger.info("streaming job has exit, work dir:{}, pid:{}", workDir, pid);
 
-        exitCode = (isCompleted()) ? 0 : -1;
+        exitCode = (isCompleted.getAsBoolean()) ? 0 : -1;
       } else {// 等待运行完毕
         boolean status = process.waitFor(remainTime, TimeUnit.SECONDS);
 
@@ -172,7 +218,7 @@ public abstract class AbstractProcessJob extends AbstractJob {
           exitCode = process.exitValue();
           logger.info("job has exit, work dir:{}, pid:{}", workDir, pid);
         } else {
-          cancel(true);
+          cancel();
           exitCode = -1;
           logger.info("job has timeout, work dir:{}, pid:{}", workDir, pid);
         }
@@ -185,25 +231,23 @@ public abstract class AbstractProcessJob extends AbstractJob {
       logger.error(e.getMessage(), e);
       exitCode = -1;
       throw new ExecException("Process error. Exit code is " + exitCode);
-    } finally {
-      complete = true;
     }
+
+    return exitCode;
   }
 
-  @Override
-  public void after() throws Exception {
-  }
-
-  @Override
-  public void cancel(boolean cancelApplication) throws Exception {
+  /**
+   * 取消一个具体的 shell 任务
+   */
+  public void cancel() throws Exception {
     if (process == null) {
-      throw new IllegalStateException("not started.");
+      return;
     }
 
     int processId = getProcessId(process);
 
     // kill, 等待完成
-    boolean killed = softKill(processId, 500, TimeUnit.MILLISECONDS);
+    boolean killed = softKill(processId);
 
     if (!killed) {
       // 强制关闭
@@ -211,40 +255,24 @@ public abstract class AbstractProcessJob extends AbstractJob {
 
       // destory
       process.destroy();
+
+      // 强制为 null
+      process = null;
     }
   }
 
   /**
-   * 检测是否启动过了
+   * @param processId 进程 id
    */
-  private void checkStarted() {
-    if (!isStarted()) {
-      throw new IllegalStateException("process has not yet started.");
-    }
-  }
-
-  /**
-   * @param processId
-   * @param time
-   * @param unit
-   * @return
-   * @throws InterruptedException
-   */
-  private boolean softKill(int processId, final long time, final TimeUnit unit)
+  private boolean softKill(int processId)
       throws InterruptedException {
-    checkStarted();
-
+    // 不是 0 号进程, 且进程存在
     if (processId != 0 && process.isAlive()) {
       try {
-//        if (props.getProxyUser() != null) {
-//          cmd = String.format("sudo -u %s kill %d", props.getProxyUser(), processId);
-//        } else {
-//          cmd = String.format("kill %d", processId);
-//        }
         // 注意通过 sudo -u user command 运行的命令, 是不能直接通过 user 来 kill 的
         String cmd = String.format("sudo kill %d", processId);
 
-        logger.info("softkill job:{}, process id:{}, cmd:{}", props.getJobAppId(), processId, cmd);
+        logger.info("softkill job:{}, process id:{}, cmd:{}", jobAppId, processId, cmd);
 
         Runtime.getRuntime().exec(cmd);
       } catch (IOException e) {
@@ -257,15 +285,16 @@ public abstract class AbstractProcessJob extends AbstractJob {
 
   /**
    * 直接 kill
+   *
+   * @param processId 进程 id
    */
-  public void hardKill(int processId) {
-    checkStarted();
-
+  private void hardKill(int processId) {
+    // 不是 0 号进程, 且进程存在
     if (processId != 0 && process.isAlive()) {
       try {
         String cmd = String.format("sudo kill -9 %d", processId);
 
-        logger.info("hardKill job:{}, process id:{}, cmd:{}", props.getJobAppId(), processId, cmd);
+        logger.info("hardKill job:{}, process id:{}, cmd:{}", jobAppId, processId, cmd);
 
         Runtime.getRuntime().exec(cmd);
       } catch (IOException e) {
@@ -276,6 +305,8 @@ public abstract class AbstractProcessJob extends AbstractJob {
 
   /**
    * 打印命令
+   *
+   * @param processBuilder 进程构建器
    */
   private void printCommand(ProcessBuilder processBuilder) {
     String cmdStr;
@@ -290,6 +321,9 @@ public abstract class AbstractProcessJob extends AbstractJob {
 
   /**
    * 得到进程 id
+   *
+   * @param process 进程信息
+   * @return 得到进程的 id
    */
   private int getProcessId(Process process) {
     int processId = 0;
@@ -310,7 +344,7 @@ public abstract class AbstractProcessJob extends AbstractJob {
    * 获取进程的标准输出, 并进行处理
    */
   private void readProcessOutput() {
-    String threadLoggerInfoName = String.format("LoggerInfo-%s", props.getJobAppId());
+    String threadLoggerInfoName = String.format("LoggerInfo-%s", jobAppId);
 
     Thread loggerInfoThread = new Thread(() -> {
       BufferedReader reader = null;
@@ -332,7 +366,10 @@ public abstract class AbstractProcessJob extends AbstractJob {
           if (logs.size() >= Constants.defaultLogBufferSize
               || now - preFlushTime > Constants.defaultLogFlushInterval) {
             preFlushTime = now;
-            logProcess(logs);
+
+            // 日志处理器
+            logHandler.accept(logs);
+
             logs.clear();
           }
         }
@@ -341,7 +378,10 @@ public abstract class AbstractProcessJob extends AbstractJob {
       } finally {
         // 还有日志, 继续输出
         if (!logs.isEmpty()) {
-          logProcess(logs);
+
+          // 日志处理器
+          logHandler.accept(logs);
+
           logs.clear();
         }
 

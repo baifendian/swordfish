@@ -18,18 +18,18 @@ package com.baifendian.swordfish.execserver.job.spark;
 import com.baifendian.swordfish.common.job.struct.node.BaseParam;
 import com.baifendian.swordfish.common.job.struct.node.spark.SparkParam;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
+import com.baifendian.swordfish.execserver.job.AbstractYarnProcessJob;
 import com.baifendian.swordfish.execserver.job.JobProps;
-import com.baifendian.swordfish.execserver.job.yarn.AbstractYarnJob;
 import com.baifendian.swordfish.execserver.parameter.ParamHelper;
-import org.slf4j.Logger;
-
 import java.util.ArrayList;
 import java.util.List;
+import org.slf4j.Logger;
 
 /**
  * Spark 作业 <p>
  */
-public class SparkJob extends AbstractYarnJob {
+public class SparkJob extends AbstractYarnProcessJob {
+
   /**
    * spark 命令
    */
@@ -56,25 +56,15 @@ public class SparkJob extends AbstractYarnJob {
   }
 
   /**
-   * spark 示例:
-   * <p>
-   * spark-submit --class org.apache.spark.examples.FilesAndArchivesTest \
-   * --master yarn \
-   * --deploy-mode cluster \
-   * --driver-cores 1 \
-   * --driver-memory 512M \
-   * --num-executors 4 \
-   * --executor-cores 2 \
-   * --executor-memory 1024M \
-   * --files story.txt#st \
-   * --archives dicts.tar.gz#z \
-   * spark-examples-1.0-SNAPSHOT-hadoop2.6.0.jar st z blackheads,Adrien
+   * spark 示例: <p> spark-submit --class org.apache.spark.examples.FilesAndArchivesTest \ --master
+   * yarn \ --deploy-mode cluster \ --driver-cores 1 \ --driver-memory 512M \ --num-executors 4 \
+   * --executor-cores 2 \ --executor-memory 1024M \ --files story.txt#st \ --archives dicts.tar.gz#z
+   * \ spark-examples-1.0-SNAPSHOT-hadoop2.6.0.jar st z blackheads,Adrien
    *
-   * @return
-   * @throws Exception
+   * @return 构建的 shell 语句
    */
   @Override
-  public String createCommand() throws Exception {
+  protected String createCommand() {
     List<String> args = new ArrayList<>();
 
     args.add(SPARK_COMMAND);
@@ -82,7 +72,8 @@ public class SparkJob extends AbstractYarnJob {
     // 添加其它参数
     args.addAll(SparkSubmitArgsUtil.buildArgs(sparkParam));
 
-    String command = ParamHelper.resolvePlaceholders(String.join(" ", args), props.getDefinedParams());
+    String command = ParamHelper
+        .resolvePlaceholders(String.join(" ", args), props.getDefinedParams());
 
     logger.info("spark job command:\n{}", command);
 

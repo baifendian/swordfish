@@ -16,75 +16,122 @@
 package com.baifendian.swordfish.execserver.job;
 
 import com.baifendian.swordfish.common.job.struct.node.BaseParam;
-import com.baifendian.swordfish.execserver.common.ExecResult;
 import java.util.List;
+import org.slf4j.Logger;
 
 /**
  * 执行的 Job (用于执行某个具体任务，如 MR/Spark 等) <p>
  */
-public interface Job {
+public abstract class Job {
 
   /**
-   * 初始化
+   * 配置参数
+   **/
+  protected JobProps props;
+
+  /**
+   * 是否长任务
    */
-  void init() throws Exception;
+  protected boolean isLongJob;
 
   /**
-   * 作业前处理
+   * 日志记录
    */
-  void before() throws Exception;
+  protected Logger logger;
 
   /**
-   * 作业处理
+   * 是否已经启动
    */
-  void process() throws Exception;
+  protected volatile boolean started = false;
 
   /**
-   * 作业后处理
+   * 是否完成
    */
-  void after() throws Exception;
+  protected volatile boolean complete = false;
 
   /**
-   * 取消执行
+   * 退出状态
    */
-  void cancel(boolean cancelApplication) throws Exception;
+  protected volatile int exitCode = -1;
 
   /**
-   * 作业是否已经启动
+   * @param props 作业配置信息, 各类作业根据此配置信息生成具体的作业
+   * @param logger 日志
    */
-  boolean isStarted();
+  protected Job(JobProps props, boolean isLongJob, Logger logger) {
+    this.props = props;
+    this.isLongJob = isLongJob;
+    this.logger = logger;
+  }
 
   /**
-   * 作业是否执行完成
+   * 初始化 job
+   */
+  public void init() throws Exception {
+  }
+
+  /**
+   * 前置处理
+   */
+  public void before() throws Exception {
+  }
+
+  /**
+   * job 的处理
+   */
+  public abstract void process() throws Exception;
+
+  /**
+   * 后置处理
+   */
+  public void after() throws Exception {
+  }
+
+  /**
+   * 取消运行
    *
-   * @return 是否已完成
+   * @param cancelApplication 是否取消应用, 比如 yarn 应用(大部分的任务没有 yarn 应用)
    */
-  boolean isCompleted();
+  public void cancel(boolean cancelApplication) throws Exception {
+  }
 
   /**
-   * 是否长任务类型
+   * 处理日志
    */
-  boolean isLongJob();
+  public void logProcess(List<String> logs) {
+    logger.info("(stdout, stderr) -> \n{}", String.join("\n", logs));
+  }
 
   /**
-   * 获取返回码
-   *
-   * @return 0 表示成功，其他值表示失败
+   * 是否启动了
    */
-  int getExitCode();
+  public boolean isStarted() {
+    return started;
+  }
 
   /**
-   * job 执行是否有返回结果
+   * 是否完成
    */
-  boolean hasResults();
+  public boolean isCompleted() {
+    return complete;
+  }
 
   /**
-   * 获取 job 执行返回的结果
+   * 退出状态
    */
-  List<ExecResult> getResults();
+  public int getExitCode() {
+    return exitCode;
+  }
+
+  /**
+   * 是否长任务
+   */
+  public boolean isLongJob() {
+    return isLongJob;
+  }
 
   /**
    * 获取 job 参数
    */
-  BaseParam getParam();
+  public abstract BaseParam getParam();
 }

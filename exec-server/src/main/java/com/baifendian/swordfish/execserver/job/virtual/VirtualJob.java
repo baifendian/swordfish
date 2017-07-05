@@ -16,17 +16,17 @@
 package com.baifendian.swordfish.execserver.job.virtual;
 
 import com.baifendian.swordfish.common.job.struct.node.BaseParam;
-import com.baifendian.swordfish.execserver.job.AbstractProcessJob;
+import com.baifendian.swordfish.execserver.job.Job;
 import com.baifendian.swordfish.execserver.job.JobProps;
 import org.slf4j.Logger;
 
 /**
  * 空操作的作业 <p>
  */
-public class VirtualJob extends AbstractProcessJob {
+public class VirtualJob extends Job {
 
   /**
-   * @param props  作业配置信息,各类作业根据此配置信息生成具体的作业
+   * @param props 作业配置信息,各类作业根据此配置信息生成具体的作业
    * @param logger 日志
    */
   public VirtualJob(JobProps props, boolean isLongJob, Logger logger) {
@@ -34,8 +34,11 @@ public class VirtualJob extends AbstractProcessJob {
   }
 
   @Override
-  public String createCommand() throws Exception {
-    return null;
+  public void process() throws Exception {
+    // 设置相关状态
+    started = true;
+    complete = true;
+    exitCode = 0;
   }
 
   @Override

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.baifendian.swordfish.execserver.job.yarn;
+package com.baifendian.swordfish.execserver.job;
 
 import com.baifendian.swordfish.common.hadoop.YarnRestClient;
 import com.baifendian.swordfish.dao.DaoFactory;
@@ -22,13 +22,6 @@ import com.baifendian.swordfish.dao.StreamingDao;
 import com.baifendian.swordfish.dao.enums.FlowStatus;
 import com.baifendian.swordfish.dao.model.ExecutionNode;
 import com.baifendian.swordfish.dao.model.StreamingResult;
-import com.baifendian.swordfish.execserver.job.AbstractProcessJob;
-import com.baifendian.swordfish.execserver.job.JobProps;
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -36,10 +29,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
 
-public abstract class AbstractYarnJob extends AbstractProcessJob {
+public abstract class AbstractYarnJob extends Job {
 
+  // 抽取应用 id 的规则
   private static final Pattern APPLICATION_REGEX = Pattern.compile("application_\\d+_\\d+");
+
+  // 抽取 job id 的规则
   private static final Pattern JOB_REGEX = Pattern.compile("job_\\d+_\\d+");
 
   /**
@@ -72,8 +72,13 @@ public abstract class AbstractYarnJob extends AbstractProcessJob {
     jobLinks = new ArrayList<>();
   }
 
+  /**
+   * 处理 log 日志, 是批量日志
+   *
+   * @param logs 待打印日志
+   */
   @Override
-  protected void logProcess(List<String> logs) {
+  public void logProcess(List<String> logs) {
     super.logProcess(logs);
 
     boolean captureAppLinks = false;
@@ -102,7 +107,8 @@ public abstract class AbstractYarnJob extends AbstractProcessJob {
     if (captureAppLinks || captureJobLinks) {
       // 短任务
       if (!isLongJob()) {
-        ExecutionNode executionNode = flowDao.queryExecutionNode(props.getExecId(), props.getNodeName());
+        ExecutionNode executionNode = flowDao
+            .queryExecutionNode(props.getExecId(), props.getNodeName());
 
         if (executionNode != null) {
           if (captureAppLinks) {
@@ -133,6 +139,9 @@ public abstract class AbstractYarnJob extends AbstractProcessJob {
     }
   }
 
+  /**
+   * 是否完成, 对于 yarn 应用来说, 这个运行没有运行完成, 根据
+   */
   @Override
   public boolean isCompleted() {
     if (CollectionUtils.isNotEmpty(appLinks)) {
@@ -142,6 +151,7 @@ public abstract class AbstractYarnJob extends AbstractProcessJob {
         FlowStatus status = YarnRestClient.getInstance().getApplicationStatus(appId);
 
         if (status == null) {
+          complete = false;
           return complete;
         }
 
@@ -161,43 +171,12 @@ public abstract class AbstractYarnJob extends AbstractProcessJob {
   }
 
   /**
-   * 获取 appid <p>
+   * 取消 yarn 上的应用
    *
-   * @param line
-   * @return appid
+   * @param cancelApplication 是否取消相应的 yarn 应用
    */
-
-  protected String findAppId(String line) {
-    Matcher matcher = APPLICATION_REGEX.matcher(line);
-
-    if (matcher.find()) {
-      return matcher.group();
-    }
-
-    return null;
-  }
-
-  /**
-   * 查找 job id
-   *
-   * @param line
-   * @return
-   */
-  protected String findJobId(String line) {
-    Matcher matcher = JOB_REGEX.matcher(line);
-
-    if (matcher.find()) {
-      return matcher.group();
-    }
-
-    return null;
-  }
-
   @Override
   public void cancel(boolean cancelApplication) throws Exception {
-    // 先停止任务
-    super.cancel(cancelApplication);
-
     if (cancelApplication) {
       cancelApplication(appLinks, props, logger);
     }
@@ -207,14 +186,15 @@ public abstract class AbstractYarnJob extends AbstractProcessJob {
    * 关闭应用
    *
    * @param appLinks 应用列表
-   * @param props    每个任务, 应该有一个唯一的 job application id, 这里用于生成脚本
+   * @param props 每个任务, 应该有一个唯一的 job application id, 这里用于生成脚本
    */
-  public static void cancelApplication(List<String> appLinks, JobProps props, Logger logger) throws IOException {
-
+  public static void cancelApplication(List<String> appLinks, JobProps props, Logger logger)
+      throws IOException {
     // 然后 kill application, 一般来说, 就是最后一个(前面的都运行完了)
     if (CollectionUtils.isNotEmpty(appLinks)) {
       String appid = appLinks.get(appLinks.size() - 1);
-      String commandFile = String.format("%s/%s_%s.kill", props.getWorkDir(), props.getJobAppId(), appid);
+      String commandFile = String
+          .format("%s/%s_%s.kill", props.getWorkDir(), props.getJobAppId(), appid);
       String cmd = "yarn application -kill " + appid;
 
       StringBuilder sb = new StringBuilder();
@@ -252,10 +232,41 @@ public abstract class AbstractYarnJob extends AbstractProcessJob {
     }
   }
 
+  /**
+   * 获取 appid <p>
+   *
+   * @return appid
+   */
+  private String findAppId(String line) {
+    Matcher matcher = APPLICATION_REGEX.matcher(line);
+
+    if (matcher.find()) {
+      return matcher.group();
+    }
+
+    return null;
+  }
+
+  /**
+   * 查找 job id
+   */
+  private String findJobId(String line) {
+    Matcher matcher = JOB_REGEX.matcher(line);
+
+    if (matcher.find()) {
+      return matcher.group();
+    }
+
+    return null;
+  }
+
   public static void main(String[] args) {
-    String msg = "[INFO] 2017-05-23 18:25:22.268 com.baifendian.swordfish.execserver.runner.node.NodeRunner:[147] -  hive execute log : INFO  : Starting Job = job_1493947416024_0139, Tracking URL = http://hlg-5p149-wangwenting:8088/proxy/application_1493947416024_0139/\n" +
-        "job_1493947416024_0140 [INFO] 2017-05-23 18:25:22.268 com.baifendian.swordfish.execserver.runner.node.NodeRunner:[147] -  hive execute log : INFO  : Kill Command = /opt/hadoop/bin/hadoop job  -kill job_1493947416024_0139\n" +
-        "[INFO] 2017-05-23 18:25:27.269 com.baifendian.swordfish.execserver.runner.node.NodeRunner:[147] -  hive execute log : INFO  : Hadoop job information for Stage-1: number of mappers: 1; number of reducers: 0";
+    String msg =
+        "[INFO] 2017-05-23 18:25:22.268 com.baifendian.swordfish.execserver.runner.node.NodeRunner:[147] -  hive execute log : INFO  : Starting Job = job_1493947416024_0139, Tracking URL = http://hlg-5p149-wangwenting:8088/proxy/application_1493947416024_0139/\n"
+            +
+            "job_1493947416024_0140 [INFO] 2017-05-23 18:25:22.268 com.baifendian.swordfish.execserver.runner.node.NodeRunner:[147] -  hive execute log : INFO  : Kill Command = /opt/hadoop/bin/hadoop job  -kill job_1493947416024_0139\n"
+            +
+            "[INFO] 2017-05-23 18:25:27.269 com.baifendian.swordfish.execserver.runner.node.NodeRunner:[147] -  hive execute log : INFO  : Hadoop job information for Stage-1: number of mappers: 1; number of reducers: 0";
 
     // 查找 application id
     Matcher matcher = APPLICATION_REGEX.matcher(msg);
