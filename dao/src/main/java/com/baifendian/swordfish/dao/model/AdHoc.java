@@ -15,6 +15,7 @@
  */
 package com.baifendian.swordfish.dao.model;
 
+import com.baifendian.swordfish.dao.enums.AdHocType;
 import com.baifendian.swordfish.dao.enums.FlowStatus;
 
 import java.util.Date;
@@ -31,6 +32,11 @@ public class AdHoc {
   private int projectId;
 
   /**
+   * 即席查询名称
+   */
+  private String name;
+
+  /**
    * owner
    */
   private int owner;
@@ -44,6 +50,11 @@ public class AdHoc {
    * 代理用户
    */
   private String proxyUser;
+
+  /**
+   * 即系查询类型
+   */
+  private AdHocType type;
 
   /**
    * 队列
@@ -174,5 +185,21 @@ public class AdHoc {
 
   public void setEndTime(Date endTime) {
     this.endTime = endTime;
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public void setName(String name) {
+    this.name = name;
+  }
+
+  public AdHocType getType() {
+    return type;
+  }
+
+  public void setType(AdHocType type) {
+    this.type = type;
   }
 }

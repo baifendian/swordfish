@@ -17,6 +17,7 @@ package com.baifendian.swordfish.webserver.service;
 
 import com.baifendian.swordfish.common.job.struct.node.adhoc.AdHocParam;
 import com.baifendian.swordfish.common.job.struct.node.common.UdfsInfo;
+import com.baifendian.swordfish.dao.enums.AdHocType;
 import com.baifendian.swordfish.dao.enums.FlowStatus;
 import com.baifendian.swordfish.dao.mapper.AdHocMapper;
 import com.baifendian.swordfish.dao.mapper.MasterServerMapper;
@@ -25,10 +26,7 @@ import com.baifendian.swordfish.dao.model.*;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
 import com.baifendian.swordfish.rpc.RetInfo;
 import com.baifendian.swordfish.rpc.client.MasterClient;
-import com.baifendian.swordfish.webserver.dto.AdHocLogDto;
-import com.baifendian.swordfish.webserver.dto.AdHocResultDto;
-import com.baifendian.swordfish.webserver.dto.ExecutorIdDto;
-import com.baifendian.swordfish.webserver.dto.LogResult;
+import com.baifendian.swordfish.webserver.dto.*;
 import com.baifendian.swordfish.webserver.exception.NotFoundException;
 import com.baifendian.swordfish.webserver.exception.PermissionException;
 import com.baifendian.swordfish.webserver.exception.ServerErrorException;
@@ -39,6 +37,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -77,7 +76,7 @@ public class AdhocService {
    * @param timeout
    * @return
    */
-  public ExecutorIdDto execAdhoc(User operator, String projectName, String stms, int limit, String proxyUser, String queue, List<UdfsInfo> udfs, int timeout) {
+  public ExecutorIdDto execAdhoc(User operator, String projectName, String name, String stms, int limit, String proxyUser, AdHocType type, String queue, List<UdfsInfo> udfs, int timeout) {
 
     // 查看用户对项目是否具备相应权限
     Project project = projectMapper.queryByName(projectName);
@@ -105,6 +104,7 @@ public class AdhocService {
     AdHoc adhoc = new AdHoc();
     Date now = new Date();
 
+    adhoc.setName(name);
     // 这里不涉及到项目名称
     adhoc.setProjectId(project.getId());
 
@@ -120,6 +120,7 @@ public class AdhocService {
 
     adhoc.setParameter(JsonUtil.toJsonString(adHocParam));
 
+    adhoc.setType(type);
     adhoc.setProxyUser(proxyUser);
     adhoc.setQueue(queue);
     adhoc.setStatus(FlowStatus.INIT);
@@ -307,5 +308,35 @@ public class AdhocService {
 
       adHocMapper.updateStatus(adhoc);
     }
+  }
+
+  /**
+   * 根据即系查询的名称查看一个即系查询的记录
+   *
+   * @param operator
+   * @param projectName
+   * @param adHocName
+   */
+  public List<AdHocDto> getAdHoc(User operator, String projectName, String adHocName) {
+    // 查看用户对项目是否具备相应权限
+    Project project = projectMapper.queryByName(projectName);
+    if (project == null) {
+      logger.error("Project does not exist: {}", projectName);
+      throw new NotFoundException("Not found project \"{0}\"", projectName);
+    }
+    // 必须要有project执行权限
+    if (!projectService.hasReadPerm(operator.getId(), project)) {
+      logger.error("User {} has no right permission for the project {}", operator.getName(), project.getName());
+      throw new PermissionException("User \"{0}\" is not has project \"{1}\" write permission", operator.getName(), project.getName());
+    }
+
+    List<AdHoc> adHocList = adHocMapper.selectAdhocByName(project.getId(), adHocName);
+
+    List<AdHocDto> adHocDtoList = new ArrayList<>();
+
+    for (AdHoc adHoc : adHocList) {
+      adHocDtoList.add(new AdHocDto(adHoc));
+    }
+    return adHocDtoList;
   }
 }

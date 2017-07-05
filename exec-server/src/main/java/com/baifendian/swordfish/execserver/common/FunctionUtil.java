@@ -163,9 +163,11 @@ public class FunctionUtil {
    * 添加临时函数
    */
   private static void addTempFuncSql(List<String> sqls, List<UdfsInfo> udfsInfos) {
-    for (UdfsInfo udfsInfo : udfsInfos) {
-      sqls.add(MessageFormat
-          .format(CREATE_FUNCTION_FORMAT, udfsInfo.getFunc(), udfsInfo.getClassName()));
+    if (CollectionUtils.isNotEmpty(udfsInfos)){
+      for (UdfsInfo udfsInfo : udfsInfos) {
+        sqls.add(MessageFormat
+                .format(CREATE_FUNCTION_FORMAT, udfsInfo.getFunc(), udfsInfo.getClassName()));
+      }
     }
   }
 }
