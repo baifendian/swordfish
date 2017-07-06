@@ -18,11 +18,9 @@ package com.baifendian.swordfish.execserver.job.impexp.Args;
 import com.baifendian.swordfish.common.enums.MongoWriteMode;
 import com.baifendian.swordfish.common.job.struct.node.impexp.column.MongoColumn;
 import com.baifendian.swordfish.common.job.struct.node.impexp.writer.MongoWriter;
-import com.baifendian.swordfish.execserver.parameter.ParamHelper;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * mongo wirter DataX 配置

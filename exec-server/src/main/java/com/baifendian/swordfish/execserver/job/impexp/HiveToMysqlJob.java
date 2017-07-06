@@ -17,16 +17,13 @@ package com.baifendian.swordfish.execserver.job.impexp;
 
 import com.baifendian.swordfish.common.job.struct.datasource.DatasourceFactory;
 import com.baifendian.swordfish.common.job.struct.datasource.MysqlDatasource;
-import com.baifendian.swordfish.common.job.struct.node.impexp.ImpExpParam;
 import com.baifendian.swordfish.common.job.struct.node.impexp.reader.HiveReader;
 import com.baifendian.swordfish.common.job.struct.node.impexp.writer.MysqlWriter;
 import com.baifendian.swordfish.dao.enums.DbType;
 import com.baifendian.swordfish.dao.model.DataSource;
-import com.baifendian.swordfish.execserver.job.Job;
 import com.baifendian.swordfish.execserver.job.JobProps;
 import com.baifendian.swordfish.execserver.job.impexp.Args.*;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.apache.commons.configuration.ConfigurationException;
 import org.slf4j.Logger;
 
 import java.text.MessageFormat;

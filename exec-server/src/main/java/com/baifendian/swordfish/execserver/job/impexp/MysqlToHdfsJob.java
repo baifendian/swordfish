@@ -17,25 +17,18 @@ package com.baifendian.swordfish.execserver.job.impexp;
 
 import com.baifendian.swordfish.common.job.struct.datasource.DatasourceFactory;
 import com.baifendian.swordfish.common.job.struct.datasource.MysqlDatasource;
-import com.baifendian.swordfish.common.job.struct.node.impexp.ImpExpParam;
 import com.baifendian.swordfish.common.job.struct.node.impexp.reader.MysqlReader;
 import com.baifendian.swordfish.common.job.struct.node.impexp.writer.HdfsWriter;
-import com.baifendian.swordfish.common.job.struct.node.impexp.writer.HiveWriter;
 import com.baifendian.swordfish.dao.enums.DbType;
 import com.baifendian.swordfish.dao.model.DataSource;
-import com.baifendian.swordfish.dao.utils.json.JsonUtil;
 import com.baifendian.swordfish.execserver.job.JobProps;
-import com.baifendian.swordfish.execserver.job.impexp.Args.*;
+import com.baifendian.swordfish.execserver.job.impexp.Args.HdfsWriterArg;
+import com.baifendian.swordfish.execserver.job.impexp.Args.ImpExpProps;
+import com.baifendian.swordfish.execserver.job.impexp.Args.MysqlReaderArg;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.apache.commons.configuration.ConfigurationException;
-import org.json.JSONArray;
 import org.slf4j.Logger;
 
 import java.text.MessageFormat;
-import java.util.Arrays;
-
-import static com.baifendian.swordfish.execserver.job.impexp.ImpExpJobConst.DEFAULT_DELIMITER;
-import static com.baifendian.swordfish.execserver.job.impexp.ImpExpJobConst.DEFAULT_FILE_TYPE;
 
 /**
  * mysql 到 Hdfs

@@ -1,18 +1,14 @@
 package com.baifendian.swordfish.execserver.job.impexp.Args;
 
-import com.baifendian.swordfish.common.job.struct.node.impexp.column.HiveColumn;
 import com.baifendian.swordfish.common.job.struct.node.impexp.reader.HiveReader;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
-import com.baifendian.swordfish.execserver.parameter.ParamHelper;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 /**
  * dataX hive 读配置
