@@ -17,8 +17,6 @@ package com.baifendian.swordfish.execserver.job.impexp;
 
 import com.baifendian.swordfish.common.job.struct.datasource.DatasourceFactory;
 import com.baifendian.swordfish.common.job.struct.datasource.MongoDatasource;
-import com.baifendian.swordfish.common.job.struct.datasource.MysqlDatasource;
-import com.baifendian.swordfish.common.job.struct.node.impexp.ImpExpParam;
 import com.baifendian.swordfish.common.job.struct.node.impexp.reader.HiveReader;
 import com.baifendian.swordfish.common.job.struct.node.impexp.writer.MongoWriter;
 import com.baifendian.swordfish.dao.enums.DbType;

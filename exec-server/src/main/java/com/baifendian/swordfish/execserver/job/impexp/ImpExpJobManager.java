@@ -19,14 +19,11 @@ import com.baifendian.swordfish.common.job.struct.node.BaseParamFactory;
 import com.baifendian.swordfish.common.job.struct.node.impexp.ImpExpParam;
 import com.baifendian.swordfish.execserver.job.Job;
 import com.baifendian.swordfish.execserver.job.JobProps;
-import com.baifendian.swordfish.execserver.job.hql.EtlSqlJob;
 import com.baifendian.swordfish.execserver.job.impexp.Args.ImpExpProps;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 
-import java.util.concurrent.RecursiveTask;
-
-import static com.baifendian.swordfish.common.job.struct.node.JobType.*;
+import static com.baifendian.swordfish.common.job.struct.node.JobType.IMPEXP;
 
 /**
  * 导入导处理job 生成器

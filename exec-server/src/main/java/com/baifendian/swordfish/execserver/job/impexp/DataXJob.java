@@ -1,9 +1,5 @@
 package com.baifendian.swordfish.execserver.job.impexp;
 
-import static com.baifendian.swordfish.execserver.job.impexp.ImpExpJobConst.COMMAND;
-import static com.baifendian.swordfish.execserver.job.impexp.ImpExpJobConst.DATAX_FILE_NAME;
-import static com.baifendian.swordfish.execserver.job.impexp.ImpExpJobConst.DATAX_JSON;
-
 import com.baifendian.swordfish.common.job.struct.node.BaseParam;
 import com.baifendian.swordfish.common.job.struct.node.impexp.setting.Setting;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
@@ -13,13 +9,16 @@ import com.baifendian.swordfish.execserver.job.impexp.Args.ImpExpProps;
 import com.baifendian.swordfish.execserver.job.impexp.Args.ReaderArg;
 import com.baifendian.swordfish.execserver.job.impexp.Args.WriterArg;
 import com.baifendian.swordfish.execserver.parameter.ParamHelper;
+import org.apache.commons.io.FileUtils;
+import org.slf4j.Logger;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.text.MessageFormat;
 import java.util.UUID;
-import org.apache.commons.io.FileUtils;
-import org.slf4j.Logger;
+
+import static com.baifendian.swordfish.execserver.job.impexp.ImpExpJobConst.*;
 
 /**
  * DataX 类型任务

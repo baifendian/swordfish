@@ -15,10 +15,6 @@
  */
 package com.baifendian.swordfish.execserver.job.impexp;
 
-import static com.baifendian.swordfish.execserver.job.impexp.ImpExpJobConst.DEFAULT_DB;
-import static com.baifendian.swordfish.execserver.job.impexp.ImpExpJobConst.DEFAULT_DELIMITER;
-import static com.baifendian.swordfish.execserver.job.impexp.ImpExpJobConst.DEFAULT_FILE_TYPE;
-
 import com.baifendian.swordfish.common.config.BaseConfig;
 import com.baifendian.swordfish.common.enums.WriteMode;
 import com.baifendian.swordfish.common.hadoop.HdfsClient;
@@ -38,16 +34,19 @@ import com.baifendian.swordfish.execserver.job.impexp.Args.HqlColumn;
 import com.baifendian.swordfish.execserver.job.impexp.Args.ImpExpProps;
 import com.baifendian.swordfish.execserver.job.impexp.Args.MysqlReaderArg;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.permission.FsPermission;
 import org.apache.hadoop.hive.metastore.api.FieldSchema;
 import org.slf4j.Logger;
+
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import static com.baifendian.swordfish.execserver.job.impexp.ImpExpJobConst.*;
 
 
 /**

@@ -15,8 +15,6 @@
  */
 package com.baifendian.swordfish.execserver.job.impexp.Args;
 
-import java.util.Map;
-
 /**
  * 写参数接口
  */
