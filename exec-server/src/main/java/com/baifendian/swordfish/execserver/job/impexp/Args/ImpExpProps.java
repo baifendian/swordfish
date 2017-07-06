@@ -49,7 +49,8 @@ public class ImpExpProps {
       workConf = new PropertiesConfiguration("worker.properties");
       hiveConf = new PropertiesConfiguration("common/hive/hive.properties");
     } catch (ConfigurationException e) {
-      logger.error("Init work conf error", e);
+      logger.error("Init impExpProps error", e);
+      throw new IllegalArgumentException("Init impExpProps error!");
     }
   }
 
