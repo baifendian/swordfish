@@ -69,15 +69,11 @@ public class ShellJob extends Job {
   @Override
   public void process() throws Exception {
     try {
-      started = true;
-
       // 构造进程
       exitCode = processJob.runCommand(createCommand());
     } catch (Exception e) {
       logger.error("Shell process exception", e);
       exitCode = -1;
-    } finally {
-      complete = true;
     }
   }
 

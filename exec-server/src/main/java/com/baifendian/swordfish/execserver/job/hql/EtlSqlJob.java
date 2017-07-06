@@ -22,7 +22,6 @@ import com.baifendian.swordfish.dao.utils.json.JsonUtil;
 import com.baifendian.swordfish.execserver.common.FunctionUtil;
 import com.baifendian.swordfish.execserver.engine.hive.HiveSqlExec;
 import com.baifendian.swordfish.execserver.job.AbstractYarnJob;
-import com.baifendian.swordfish.execserver.job.Job;
 import com.baifendian.swordfish.execserver.job.JobProps;
 import com.baifendian.swordfish.execserver.parameter.ParamHelper;
 import java.util.List;
@@ -44,8 +43,6 @@ public class EtlSqlJob extends AbstractYarnJob {
   @Override
   public void process() throws Exception {
     try {
-      started = true;
-
       String sqls = param.getSql();
 
       // 解析其中的变量
@@ -58,14 +55,10 @@ public class EtlSqlJob extends AbstractYarnJob {
       List<String> execSqls = CommonUtil.sqlSplit(sqls);
       HiveSqlExec hiveSqlExec = new HiveSqlExec(this::logProcess, props.getProxyUser(), logger);
 
-      started = true;
-
       exitCode = (hiveSqlExec.execute(funcs, execSqls, false, null, null)) ? 0 : -1;
     } catch (Exception e) {
       logger.error(String.format("hql process exception, sql: %s", param.getSql()), e);
       exitCode = -1;
-    } finally {
-      complete = true;
     }
   }
 

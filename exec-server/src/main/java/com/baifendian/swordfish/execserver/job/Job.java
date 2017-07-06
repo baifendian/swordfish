@@ -74,6 +74,7 @@ public abstract class Job {
    * 前置处理
    */
   public void before() throws Exception {
+    started = true;
   }
 
   /**
@@ -85,6 +86,7 @@ public abstract class Job {
    * 后置处理
    */
   public void after() throws Exception {
+    complete = true;
   }
 
   /**
