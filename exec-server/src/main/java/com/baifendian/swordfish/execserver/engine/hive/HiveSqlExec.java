@@ -319,15 +319,17 @@ public class HiveSqlExec {
 
           Thread.sleep(DEFAULT_QUERY_PROGRESS_INTERVAL);
         } catch (InterruptedException e) {
-          showRemainingLogsIfAny();
+          logger.error(e.getMessage(), e);
           return;
         } catch (Exception e) {
           logger.error(e.getMessage(), e);
           return;
         } finally {
+          // 处理剩余日志
+          showRemainingLogsIfAny();
+
           // 还有日志, 继续输出
           if (!logs.isEmpty()) {
-
             // 日志处理器
             logHandler.accept(logs);
 

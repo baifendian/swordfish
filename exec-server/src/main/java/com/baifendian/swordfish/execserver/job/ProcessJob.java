@@ -28,6 +28,7 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -102,6 +103,11 @@ public class ProcessJob {
    */
   private Logger logger;
 
+  /**
+   * 日志记录
+   */
+  private final List<String> logs;
+
   public ProcessJob(Consumer<List<String>> logHandler, BooleanSupplier isCompleted,
       boolean isLongJob, String workDir, String jobAppId, String proxyUser, String envFile,
       Date startTime, int timeout, Logger logger) {
@@ -115,6 +121,7 @@ public class ProcessJob {
     this.startTime = startTime;
     this.timeout = timeout;
     this.logger = logger;
+    this.logs = Collections.synchronizedList(new ArrayList<>());
   }
 
   /**
@@ -244,6 +251,9 @@ public class ProcessJob {
       return;
     }
 
+    // 清理一下日志
+    clear();
+
     int processId = getProcessId(process);
 
     // kill, 等待完成
@@ -341,6 +351,18 @@ public class ProcessJob {
   }
 
   /**
+   * 执行清理
+   */
+  private void clear() {
+    if (!logs.isEmpty()) {
+      // 日志处理器
+      logHandler.accept(logs);
+
+      logs.clear();
+    }
+  }
+
+  /**
    * 获取进程的标准输出, 并进行处理
    */
   private void readProcessOutput() {
@@ -348,8 +370,6 @@ public class ProcessJob {
 
     Thread loggerInfoThread = new Thread(() -> {
       BufferedReader reader = null;
-
-      List<String> logs = new ArrayList<>();
 
       try {
         reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
@@ -378,7 +398,6 @@ public class ProcessJob {
       } finally {
         // 还有日志, 继续输出
         if (!logs.isEmpty()) {
-
           // 日志处理器
           logHandler.accept(logs);
 

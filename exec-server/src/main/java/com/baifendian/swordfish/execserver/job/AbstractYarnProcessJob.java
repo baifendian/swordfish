@@ -53,10 +53,10 @@ public abstract class AbstractYarnProcessJob extends AbstractYarnJob {
 
   @Override
   public void cancel(boolean cancelApplication) throws Exception {
-    super.cancel(cancelApplication);
-
     // 关闭进程
     processJob.cancel();
+
+    super.cancel(cancelApplication);
   }
 
   /**
