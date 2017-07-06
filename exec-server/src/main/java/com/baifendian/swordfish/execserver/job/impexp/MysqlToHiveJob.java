@@ -77,6 +77,7 @@ public class MysqlToHiveJob extends DataXJob {
 
   @Override
   public void before() throws Exception {
+    super.before();
     logger.info("Start MysqlToHiveJob before function...");
 
     // 构造一个hive服务类，预备使用
