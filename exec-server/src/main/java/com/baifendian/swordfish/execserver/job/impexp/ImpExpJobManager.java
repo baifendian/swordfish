@@ -20,6 +20,7 @@ import com.baifendian.swordfish.common.job.struct.node.impexp.ImpExpParam;
 import com.baifendian.swordfish.execserver.job.Job;
 import com.baifendian.swordfish.execserver.job.JobProps;
 import com.baifendian.swordfish.execserver.job.hql.EtlSqlJob;
+import com.baifendian.swordfish.execserver.job.impexp.Args.ImpExpProps;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 
@@ -38,17 +39,18 @@ public class ImpExpJobManager {
     }
 
     ImpExpParam impExpParam = (ImpExpParam) BaseParamFactory.getBaseParam(jobTypeStr, props.getJobParams());
+    ImpExpProps impExpProps = new ImpExpProps(impExpParam, logger);
     switch (impExpParam.getType()) {
       case MYSQL_TO_HIVE:
-        return new MysqlToHiveJob(props, false, logger, impExpParam);
+        return new MysqlToHiveJob(props, false, logger, impExpProps);
       case MYSQL_TO_HDFS:
-        return new MysqlToHdfsJob(props, false, logger, impExpParam);
+        return new MysqlToHdfsJob(props, false, logger, impExpProps);
       case HIVE_TO_MYSQL:
-        return new HiveToMysqlJob(props, false, logger, impExpParam);
+        return new HiveToMysqlJob(props, false, logger, impExpProps);
       case HIVE_TO_MONGODB:
-        return new HiveToMongoJob(props, false, logger, impExpParam);
+        return new HiveToMongoJob(props, false, logger, impExpProps);
       case FILE_TO_HIVE:
-        return new FileToHiveJob(props, false, logger, impExpParam);
+        return new FileToHiveJob(props, false, logger, impExpProps);
       default:
         logger.error("unsupport ImpExp job type: {}", jobTypeStr);
         throw new IllegalArgumentException("Not support job type");

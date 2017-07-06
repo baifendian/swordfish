@@ -25,10 +25,7 @@ import com.baifendian.swordfish.dao.enums.DbType;
 import com.baifendian.swordfish.dao.model.DataSource;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
 import com.baifendian.swordfish.execserver.job.JobProps;
-import com.baifendian.swordfish.execserver.job.impexp.Args.HdfsWriterArg;
-import com.baifendian.swordfish.execserver.job.impexp.Args.MysqlReaderArg;
-import com.baifendian.swordfish.execserver.job.impexp.Args.ReaderArg;
-import com.baifendian.swordfish.execserver.job.impexp.Args.WriterArg;
+import com.baifendian.swordfish.execserver.job.impexp.Args.*;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.configuration.ConfigurationException;
 import org.json.JSONArray;
@@ -43,31 +40,22 @@ import static com.baifendian.swordfish.execserver.job.impexp.ImpExpJobConst.DEFA
 /**
  * mysql 到 Hdfs
  */
-public class MysqlToHdfsJob extends ImpExpJob {
+public class MysqlToHdfsJob extends DataXJob {
 
-  /**
-   * swordfish reader配置
-   */
-  private MysqlReader mysqlReader;
-
-  /**
-   * swordfish wirter配置
-   */
-  private HdfsWriter hdfsWriter;
-
-  public MysqlToHdfsJob(JobProps props, boolean isLongJob, Logger logger, ImpExpParam impExpParam) {
-    super(props, isLongJob, logger, impExpParam);
-    mysqlReader = (MysqlReader) impExpParam.getReader();
-    hdfsWriter = (HdfsWriter) impExpParam.getWriter();
+  public MysqlToHdfsJob(JobProps props, boolean isLongJob, Logger logger, ImpExpProps impExpProps) {
+    super(props, isLongJob, logger, impExpProps);
   }
-
 
   @Override
   public MysqlReaderArg getDataXReaderArg() throws Exception {
     logger.info("Start MysqlToHdfsJob get dataX reader arg...");
+
+    MysqlReader mysqlReader = (MysqlReader) impExpProps.getImpExpParam().getReader();
+
+
     MysqlReaderArg mysqlReaderArg = new MysqlReaderArg(mysqlReader);
     //TODO 增加一个判断根据类型
-    DataSource datasource = datasourceDao.queryResource(props.getProjectId(), mysqlReader.getDatasource());
+    DataSource datasource = impExpProps.getDatasourceDao().queryResource(props.getProjectId(), mysqlReader.getDatasource());
     if (datasource == null) {
       throw new NoSuchFieldException(MessageFormat.format("Datasource {0} in project {1} not found!", mysqlReader.getDatasource(), props.getProjectId()));
     }
@@ -84,11 +72,15 @@ public class MysqlToHdfsJob extends ImpExpJob {
   @Override
   public HdfsWriterArg getDateXWriterArg() throws Exception {
     logger.info("Start MysqlToHdfsJob get dataX writer arg...");
+
+    HdfsWriter hdfsWriter = (HdfsWriter) impExpProps.getImpExpParam().getWriter();
+    String defaultFS = impExpProps.getHadoopConf().getString("fs.defaultFS");
+
     HdfsWriterArg hdfsWriterArg = new HdfsWriterArg();
     hdfsWriterArg.setPath(hdfsWriter.getPath());
     hdfsWriterArg.setFileName(hdfsWriter.getFileName());
     hdfsWriterArg.setFieldDelimiter(hdfsWriter.getFieldDelimiter());
-    hdfsWriterArg.setDefaultFS(hadoopConf.getString("fs.defaultFS"));
+    hdfsWriterArg.setDefaultFS(defaultFS);
     hdfsWriterArg.setColumn(hdfsWriter.getColumn());
     hdfsWriterArg.setWriteMode(hdfsWriter.getWriteMode().getHdfsType());
     hdfsWriterArg.setFileType(hdfsWriter.getFileType());

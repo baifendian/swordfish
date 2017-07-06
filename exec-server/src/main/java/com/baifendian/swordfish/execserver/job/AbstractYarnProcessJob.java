@@ -62,5 +62,5 @@ public abstract class AbstractYarnProcessJob extends AbstractYarnJob {
   /**
    * 具体运行的命令
    */
-  protected abstract String createCommand();
+  protected abstract String createCommand() throws Exception;
 }

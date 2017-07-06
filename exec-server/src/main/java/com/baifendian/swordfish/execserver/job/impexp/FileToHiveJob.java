@@ -17,9 +17,10 @@ import com.baifendian.swordfish.dao.DatasourceDao;
 import com.baifendian.swordfish.execserver.engine.hive.HiveMetaExec;
 import com.baifendian.swordfish.execserver.engine.hive.HiveSqlExec;
 import com.baifendian.swordfish.execserver.engine.hive.HiveUtil;
-import com.baifendian.swordfish.execserver.job.AbstractJob;
+import com.baifendian.swordfish.execserver.job.AbstractYarnJob;
 import com.baifendian.swordfish.execserver.job.JobProps;
 import com.baifendian.swordfish.execserver.job.impexp.Args.HqlColumn;
+import com.baifendian.swordfish.execserver.job.impexp.Args.ImpExpProps;
 import com.baifendian.swordfish.execserver.parameter.ParamHelper;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.configuration.Configuration;
@@ -42,7 +43,7 @@ import static com.baifendian.swordfish.execserver.job.impexp.ImpExpJobConst.DEFA
 /**
  * 文件导入hive任务
  */
-public class FileToHiveJob extends AbstractJob {
+public class FileToHiveJob extends AbstractYarnJob {
 
   /**
    * 读取的配置文件
@@ -51,7 +52,7 @@ public class FileToHiveJob extends AbstractJob {
   protected Configuration workConf;
   protected Configuration hiveConf;
 
-  private ImpExpParam impExpParam;
+  private ImpExpProps impExpProps;
 
   private HiveMetaExec hiveMetaExec;
 
@@ -79,16 +80,15 @@ public class FileToHiveJob extends AbstractJob {
    * @param isLongJob
    * @param logger    日志
    */
-  protected FileToHiveJob(JobProps props, boolean isLongJob, Logger logger, ImpExpParam impExpParam) {
+  protected FileToHiveJob(JobProps props, boolean isLongJob, Logger logger, ImpExpProps impExpProps) {
     super(props, isLongJob, logger);
-    this.impExpParam = impExpParam;
-    this.fileReader = (FileReader) impExpParam.getReader();
-    this.hiveWriter = (HiveWriter) impExpParam.getWriter();
+    this.impExpProps = impExpProps;
+    this.fileReader = (FileReader) impExpProps.getImpExpParam().getReader();
+    this.hiveWriter = (HiveWriter) impExpProps.getImpExpParam().getWriter();
   }
 
   @Override
   public void init() {
-    super.init();
     logger.info("Start init base job...");
     try {
       hadoopConf = new PropertiesConfiguration("common/hadoop/hadoop.properties");
@@ -125,7 +125,6 @@ public class FileToHiveJob extends AbstractJob {
 
   @Override
   public void process() throws Exception {
-    super.process();
     List<String> execSqls = new ArrayList<>();
     try {
       String hdfsPath = fileReader.getHdfsPath();
@@ -177,7 +176,7 @@ public class FileToHiveJob extends AbstractJob {
 
       logger.info("Start exec sql to hive...");
       execSqls = Arrays.asList(ddl, "SET hive.exec.dynamic.partition.mode=nonstrict", sql);
-      HiveSqlExec hiveSqlExec = new HiveSqlExec(props.getProxyUser(), logger);
+      HiveSqlExec hiveSqlExec = new HiveSqlExec(this::logProcess,props.getProxyUser(), logger);
 
       exitCode = (hiveSqlExec.execute(null, execSqls, false, null, null)) ? 0 : -1;
 
@@ -197,7 +196,6 @@ public class FileToHiveJob extends AbstractJob {
 
   @Override
   public void cancel(boolean cancelApplication) throws Exception {
-
   }
 
   /**
@@ -293,6 +291,6 @@ public class FileToHiveJob extends AbstractJob {
 
   @Override
   public BaseParam getParam() {
-    return impExpParam;
+    return impExpProps.getImpExpParam();
   }
 }

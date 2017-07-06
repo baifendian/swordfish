@@ -24,10 +24,7 @@ import com.baifendian.swordfish.common.job.struct.node.impexp.writer.MongoWriter
 import com.baifendian.swordfish.dao.enums.DbType;
 import com.baifendian.swordfish.dao.model.DataSource;
 import com.baifendian.swordfish.execserver.job.JobProps;
-import com.baifendian.swordfish.execserver.job.impexp.Args.HiveReaderArg;
-import com.baifendian.swordfish.execserver.job.impexp.Args.MongoWriterArg;
-import com.baifendian.swordfish.execserver.job.impexp.Args.ReaderArg;
-import com.baifendian.swordfish.execserver.job.impexp.Args.WriterArg;
+import com.baifendian.swordfish.execserver.job.impexp.Args.*;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.slf4j.Logger;
 
@@ -37,24 +34,23 @@ import java.util.Arrays;
 /**
  * Hive 导入 Mysql 插件
  */
-public class HiveToMongoJob extends ImpExpJob {
+public class HiveToMongoJob extends DataXJob {
 
-  private HiveReader hiveReader;
-  private MongoWriter mongoWriter;
-
-  public HiveToMongoJob(JobProps props, boolean isLongJob, Logger logger, ImpExpParam impExpParam) {
-    super(props, isLongJob, logger, impExpParam);
-    hiveReader = (HiveReader) impExpParam.getReader();
-    mongoWriter = (MongoWriter) impExpParam.getWriter();
+  public HiveToMongoJob(JobProps props, boolean isLongJob, Logger logger, ImpExpProps impExpProps) {
+    super(props, isLongJob, logger, impExpProps);
   }
 
   @Override
   public ReaderArg getDataXReaderArg() throws Exception {
     logger.info("Start HiveToMongoJob get dataX reader arg...");
+
+    String hiveUrl = impExpProps.getHiveConf().getString("hive.thrift.uris");
+    HiveReader hiveReader = (HiveReader) impExpProps.getImpExpParam().getReader();
+
     HiveReaderArg hiveReaderArg = new HiveReaderArg(hiveReader);
     hiveReaderArg.setUsername(props.getProxyUser());
     ObjectNode connection = (ObjectNode) hiveReaderArg.getConnection().get(0);
-    String jdbcUrl = MessageFormat.format("{0}/{1}", hiveConf.getString("hive.thrift.uris"), hiveReader.getDatabase());
+    String jdbcUrl = MessageFormat.format("{0}/{1}", hiveUrl, hiveReader.getDatabase());
     connection.putArray("jdbcUrl").add(jdbcUrl);
     logger.info("Finish HiveToMongoJob get dataX reader arg!");
     return hiveReaderArg;
@@ -63,8 +59,11 @@ public class HiveToMongoJob extends ImpExpJob {
   @Override
   public WriterArg getDateXWriterArg() throws Exception {
     logger.info("Start HiveToMongoJob get dataX writer arg...");
+
+    MongoWriter mongoWriter = (MongoWriter) impExpProps.getImpExpParam().getWriter();
+
     MongoWriterArg mongoWriterArg = new MongoWriterArg(mongoWriter);
-    DataSource datasource = datasourceDao.queryResource(props.getProjectId(), mongoWriter.getDatasource());
+    DataSource datasource = impExpProps.getDatasourceDao().queryResource(props.getProjectId(), mongoWriter.getDatasource());
     if (datasource == null) {
       throw new NoSuchFieldException(MessageFormat.format("Datasource {0} in project {1} not found!", mongoWriter.getDatasource(), String.valueOf(props.getProjectId())));
     }

@@ -20,14 +20,18 @@ import com.baifendian.swordfish.common.enums.WriteMode;
 import com.baifendian.swordfish.common.hadoop.HdfsClient;
 import com.baifendian.swordfish.common.job.struct.datasource.DatasourceFactory;
 import com.baifendian.swordfish.common.job.struct.datasource.MysqlDatasource;
+import com.baifendian.swordfish.common.job.struct.node.BaseParam;
 import com.baifendian.swordfish.common.job.struct.node.impexp.ImpExpParam;
+import com.baifendian.swordfish.common.job.struct.node.impexp.writer.HdfsWriter;
 import com.baifendian.swordfish.common.job.struct.node.impexp.writer.HiveWriter;
 import com.baifendian.swordfish.common.job.struct.node.impexp.reader.MysqlReader;
+import com.baifendian.swordfish.common.job.struct.node.impexp.writer.MysqlWriter;
 import com.baifendian.swordfish.dao.enums.DbType;
 import com.baifendian.swordfish.dao.model.DataSource;
 import com.baifendian.swordfish.execserver.engine.hive.HiveMetaExec;
 import com.baifendian.swordfish.execserver.engine.hive.HiveSqlExec;
 import com.baifendian.swordfish.execserver.engine.hive.HiveUtil;
+import com.baifendian.swordfish.execserver.job.AbstractYarnProcessJob;
 import com.baifendian.swordfish.execserver.job.JobProps;
 import com.baifendian.swordfish.execserver.job.impexp.Args.*;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -49,35 +53,28 @@ import static com.baifendian.swordfish.execserver.job.impexp.ImpExpJobConst.*;
 /**
  * mysql 导入 hive 任务
  */
-public class MysqlToHiveJob extends ImpExpJob {
+public class MysqlToHiveJob extends DataXJob {
+
+  private HiveWriter hiveWriter;
+
+  private MysqlReader mysqlReader;
+
+  private MysqlReaderArg mysqlReaderArg;
+
+  private HdfsWriterArg hdfsWriterArg;
 
   private HiveMetaExec hiveMetaExec;
 
-  /**
-   * swordfish reader配置
-   */
-  private MysqlReader mysqlReader;
-
-  /**
-   * swordfish wirter配置
-   */
-  private HiveWriter hiveWriter;
-
-
-  /**
-   * 源 Hql 字段
-   */
-  private List<HqlColumn> srcColumns;
-
-  /**
-   * 目标 Hql 字段
-   */
   private List<HqlColumn> destColumns;
 
-  public MysqlToHiveJob(JobProps props, boolean isLongJob, Logger logger, ImpExpParam impExpParam) {
-    super(props, isLongJob, logger, impExpParam);
-    mysqlReader = (MysqlReader) impExpParam.getReader();
-    hiveWriter = (HiveWriter) impExpParam.getWriter();
+  private List<HqlColumn> srcColumns;
+
+
+  public MysqlToHiveJob(JobProps props, boolean isLongJob, Logger logger, ImpExpProps impExpProps) {
+    super(props, isLongJob, logger, impExpProps);
+    //先获取swordfish读写配置方便后面使用
+    mysqlReader = (MysqlReader) impExpProps.getImpExpParam().getReader();
+    hiveWriter = (HiveWriter) impExpProps.getImpExpParam().getWriter();
   }
 
   @Override
@@ -95,9 +92,11 @@ public class MysqlToHiveJob extends ImpExpJob {
   @Override
   public MysqlReaderArg getDataXReaderArg() throws Exception {
     logger.info("Start MysqlToHiveJob get dataX reader arg...");
+
+    MysqlReader mysqlReader = (MysqlReader) impExpProps.getImpExpParam().getReader();
     MysqlReaderArg mysqlReaderArg = new MysqlReaderArg(mysqlReader);
     //TODO 增加一个判断根据类型
-    DataSource datasource = datasourceDao.queryResource(props.getProjectId(), mysqlReader.getDatasource());
+    DataSource datasource = impExpProps.getDatasourceDao().queryResource(props.getProjectId(), mysqlReader.getDatasource());
     if (datasource == null) {
       throw new NoSuchFieldException(MessageFormat.format("Datasource {0} in project {1} not found!", mysqlReader.getDatasource(), String.valueOf(props.getProjectId())));
     }
@@ -107,6 +106,7 @@ public class MysqlToHiveJob extends ImpExpJob {
     mysqlReaderArg.setUsername(mysqlDatasource.getUser());
     mysqlReaderArg.setPassword(mysqlDatasource.getPassword());
     logger.info("Finish MysqlToHiveJob get dataX reader arg!");
+    this.mysqlReaderArg = mysqlReaderArg;
     return mysqlReaderArg;
   }
 
@@ -139,11 +139,12 @@ public class MysqlToHiveJob extends ImpExpJob {
     hdfsWriterArg.setPath(path);
     hdfsWriterArg.setFileName(props.getNodeName());
     hdfsWriterArg.setFieldDelimiter(DEFAULT_DELIMITER);
-    hdfsWriterArg.setDefaultFS(hadoopConf.getString("fs.defaultFS"));
-    hdfsWriterArg.setColumn(hiveWriter.getColumn());
+    hdfsWriterArg.setDefaultFS(impExpProps.getHadoopConf().getString("fs.defaultFS"));
+    hdfsWriterArg.setColumn(((HiveWriter) impExpProps.getImpExpParam().getWriter()).getColumn());
     hdfsWriterArg.setFileType(DEFAULT_FILE_TYPE);
     hdfsWriterArg.setWriteMode(WriteMode.OVERWRITE.getHdfsType());
     logger.info("Finish MysqlToHiveJob get dataX writer arg!");
+    this.hdfsWriterArg = hdfsWriterArg;
     return hdfsWriterArg;
   }
 
@@ -163,7 +164,7 @@ public class MysqlToHiveJob extends ImpExpJob {
       //注册临时外部表
       String srcTableName = HiveUtil.getTmpTableName(props.getProjectId(), props.getExecId());
       //构造生成临时表sql
-      String ddl = HiveUtil.getTmpTableDDL(DEFAULT_DB, srcTableName, srcColumns, ((HdfsWriterArg) writerArg).getPath(), DEFAULT_DELIMITER, "UTF-8");
+      String ddl = HiveUtil.getTmpTableDDL(DEFAULT_DB, srcTableName, srcColumns, hdfsWriterArg.getPath(), DEFAULT_DELIMITER, "UTF-8");
       logger.info("Create temp hive table ddl: {}", ddl);
 
 
@@ -175,7 +176,7 @@ public class MysqlToHiveJob extends ImpExpJob {
       execSqls = Arrays.asList(ddl, "SET hive.exec.dynamic.partition.mode=nonstrict", insertSql);
 
       //执行sql
-      HiveSqlExec hiveSqlExec = new HiveSqlExec(props.getProxyUser(), logger);
+      HiveSqlExec hiveSqlExec = new HiveSqlExec(this::logProcess, props.getProxyUser(), logger);
 
       exitCode = (hiveSqlExec.execute(null, execSqls, false, null, null)) ? 0 : -1;
 
@@ -186,6 +187,11 @@ public class MysqlToHiveJob extends ImpExpJob {
     } finally {
       complete = true;
     }
+  }
+
+  @Override
+  public BaseParam getParam() {
+    return impExpProps.getImpExpParam();
   }
 
   /**
@@ -230,5 +236,4 @@ public class MysqlToHiveJob extends ImpExpJob {
     logger.info("Insert table sql: {}", insertSql);
     return insertSql;
   }
-
 }
