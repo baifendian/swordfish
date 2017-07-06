@@ -36,8 +36,6 @@ public class VirtualJob extends Job {
   @Override
   public void process() throws Exception {
     // 设置相关状态
-    started = true;
-    complete = true;
     exitCode = 0;
   }
 
