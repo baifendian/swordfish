@@ -221,7 +221,7 @@ public class HiveSqlExec {
           logThread.join(HiveUtil.DEFAULT_QUERY_PROGRESS_THREAD_TIMEOUT);
         }
       } catch (Exception e) {
-        logger.error("Catch an exception", e);
+//        logger.error("Catch an exception", e);
       }
 
       try {
