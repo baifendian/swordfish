@@ -177,8 +177,6 @@ public class FileToHiveJob extends AbstractYarnJob {
     } catch (Exception e) {
       logger.error(String.format("hql process exception, sql: %s", String.join(";", execSqls)), e);
       exitCode = -1;
-    } finally {
-      complete = true;
     }
   }
 
