@@ -19,6 +19,6 @@ package com.baifendian.swordfish.execserver.job.impexp.Args;
  * 写参数接口
  */
 public interface WriterArg {
-  String dataxName();
 
+  String dataxName();
 }

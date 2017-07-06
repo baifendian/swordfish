@@ -22,14 +22,12 @@ import org.apache.commons.lang.StringUtils;
  * 导入导出工具类诶
  */
 public class ImpExpUtil {
+
   /**
    * 去除一个字符串头尾的反引号
-   *
-   * @param str
-   * @return
    */
   public static String exceptBackQuota(String str) {
-    //不处理空字符串和长度小于2的字符串
+    // 不处理空字符串和长度小于2的字符串
     if (StringUtils.isEmpty(str) || str.length() < 2) {
       return str;
     }
@@ -47,9 +45,6 @@ public class ImpExpUtil {
 
   /**
    * 给字符串增加反引号
-   *
-   * @param str
-   * @return
    */
   public static String addBackQuota(String str) {
     //不处理空字符串
@@ -71,10 +66,6 @@ public class ImpExpUtil {
 
   /**
    * 判断两个字符串是否相同，排除反引号区别
-   *
-   * @param str1
-   * @param str2
-   * @return
    */
   public static boolean equalWithoutBackQuota(String str1, String str2) {
     return StringUtils.equals(exceptBackQuota(str1), exceptBackQuota(str2));

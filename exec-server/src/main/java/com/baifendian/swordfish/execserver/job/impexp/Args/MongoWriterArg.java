@@ -19,7 +19,6 @@ import com.baifendian.swordfish.common.enums.MongoWriteMode;
 import com.baifendian.swordfish.common.job.struct.node.impexp.column.MongoColumn;
 import com.baifendian.swordfish.common.job.struct.node.impexp.writer.MongoWriter;
 import com.fasterxml.jackson.annotation.JsonInclude;
-
 import java.util.List;
 
 /**
@@ -27,6 +26,7 @@ import java.util.List;
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class MongoWriterArg implements WriterArg {
+
   private List<String> address;
   private String userName;
   private String userPassword;

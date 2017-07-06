@@ -27,6 +27,7 @@ import org.slf4j.Logger;
  * ImpExp 参数
  */
 public class ImpExpProps {
+
   private DatasourceDao datasourceDao;
 
   /**
@@ -37,13 +38,14 @@ public class ImpExpProps {
   private Configuration hiveConf;
 
   /**
-   * swordfish的导入导出配置
+   * swordfish 的导入导出配置
    */
   private ImpExpParam impExpParam;
 
-  public ImpExpProps(ImpExpParam impExpParam,Logger logger) {
+  public ImpExpProps(ImpExpParam impExpParam, Logger logger) {
     this.impExpParam = impExpParam;
-    datasourceDao = DaoFactory.getDaoInstance(DatasourceDao.class);
+    this.datasourceDao = DaoFactory.getDaoInstance(DatasourceDao.class);
+
     try {
       hadoopConf = new PropertiesConfiguration("common/hadoop/hadoop.properties");
       workConf = new PropertiesConfiguration("worker.properties");
@@ -93,6 +95,4 @@ public class ImpExpProps {
   public void setImpExpParam(ImpExpParam impExpParam) {
     this.impExpParam = impExpParam;
   }
-
-
 }

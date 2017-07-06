@@ -22,11 +22,14 @@ import com.baifendian.swordfish.common.job.struct.node.impexp.writer.MysqlWriter
 import com.baifendian.swordfish.dao.enums.DbType;
 import com.baifendian.swordfish.dao.model.DataSource;
 import com.baifendian.swordfish.execserver.job.JobProps;
-import com.baifendian.swordfish.execserver.job.impexp.Args.*;
+import com.baifendian.swordfish.execserver.job.impexp.Args.HiveReaderArg;
+import com.baifendian.swordfish.execserver.job.impexp.Args.ImpExpProps;
+import com.baifendian.swordfish.execserver.job.impexp.Args.MysqlWriterArg;
+import com.baifendian.swordfish.execserver.job.impexp.Args.ReaderArg;
+import com.baifendian.swordfish.execserver.job.impexp.Args.WriterArg;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.slf4j.Logger;
-
 import java.text.MessageFormat;
+import org.slf4j.Logger;
 
 /**
  * hive 导出到 mysql
@@ -43,7 +46,6 @@ public class HiveToMysqlJob extends DataXJob {
 
     String hiveUrl = impExpProps.getHiveConf().getString("hive.thrift.uris");
     HiveReader hiveReader = (HiveReader) impExpProps.getImpExpParam().getReader();
-
 
     HiveReaderArg hiveReaderArg = new HiveReaderArg(hiveReader);
     hiveReaderArg.setUsername(props.getProxyUser());
@@ -62,19 +64,26 @@ public class HiveToMysqlJob extends DataXJob {
 
     MysqlWriterArg mysqlWriterArg = new MysqlWriterArg(mysqlWriter);
 
-    DataSource datasource = impExpProps.getDatasourceDao().queryResource(props.getProjectId(), mysqlWriter.getDatasource());
+    DataSource datasource = impExpProps.getDatasourceDao()
+        .queryResource(props.getProjectId(), mysqlWriter.getDatasource());
+
     if (datasource == null) {
-      throw new NoSuchFieldException(MessageFormat.format("Datasource {0} in project {1} not found!", mysqlWriter.getDatasource(), props.getProjectId()));
+      throw new NoSuchFieldException(MessageFormat
+          .format("Datasource {0} in project {1} not found!", mysqlWriter.getDatasource(),
+              props.getProjectId()));
     }
-    MysqlDatasource mysqlDatasource = (MysqlDatasource) DatasourceFactory.getDatasource(DbType.MYSQL, datasource.getParameter());
+
+    MysqlDatasource mysqlDatasource = (MysqlDatasource) DatasourceFactory
+        .getDatasource(DbType.MYSQL, datasource.getParameter());
 
     ObjectNode connection = (ObjectNode) mysqlWriterArg.getConnection().get(0);
     connection.put("jdbcUrl", mysqlDatasource.getJdbcUrl());
 
     mysqlWriterArg.setUsername(mysqlDatasource.getUser());
     mysqlWriterArg.setPassword(mysqlDatasource.getPassword());
+
     logger.info("Finish HiveToMysqlJob get dataX writer arg...");
+
     return mysqlWriterArg;
   }
-
 }

@@ -19,6 +19,6 @@ package com.baifendian.swordfish.execserver.job.impexp.Args;
  * 读参数接口
  */
 public interface ReaderArg {
-  String dataxName();
 
+  String dataxName();
 }

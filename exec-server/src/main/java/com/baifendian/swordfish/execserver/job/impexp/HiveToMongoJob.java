@@ -22,12 +22,15 @@ import com.baifendian.swordfish.common.job.struct.node.impexp.writer.MongoWriter
 import com.baifendian.swordfish.dao.enums.DbType;
 import com.baifendian.swordfish.dao.model.DataSource;
 import com.baifendian.swordfish.execserver.job.JobProps;
-import com.baifendian.swordfish.execserver.job.impexp.Args.*;
+import com.baifendian.swordfish.execserver.job.impexp.Args.HiveReaderArg;
+import com.baifendian.swordfish.execserver.job.impexp.Args.ImpExpProps;
+import com.baifendian.swordfish.execserver.job.impexp.Args.MongoWriterArg;
+import com.baifendian.swordfish.execserver.job.impexp.Args.ReaderArg;
+import com.baifendian.swordfish.execserver.job.impexp.Args.WriterArg;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.slf4j.Logger;
-
 import java.text.MessageFormat;
 import java.util.Arrays;
+import org.slf4j.Logger;
 
 /**
  * Hive 导入 Mysql 插件
@@ -61,12 +64,19 @@ public class HiveToMongoJob extends DataXJob {
     MongoWriter mongoWriter = (MongoWriter) impExpProps.getImpExpParam().getWriter();
 
     MongoWriterArg mongoWriterArg = new MongoWriterArg(mongoWriter);
-    DataSource datasource = impExpProps.getDatasourceDao().queryResource(props.getProjectId(), mongoWriter.getDatasource());
+    DataSource datasource = impExpProps.getDatasourceDao()
+        .queryResource(props.getProjectId(), mongoWriter.getDatasource());
+
     if (datasource == null) {
-      throw new NoSuchFieldException(MessageFormat.format("Datasource {0} in project {1} not found!", mongoWriter.getDatasource(), String.valueOf(props.getProjectId())));
+      throw new NoSuchFieldException(MessageFormat
+          .format("Datasource {0} in project {1} not found!", mongoWriter.getDatasource(),
+              String.valueOf(props.getProjectId())));
     }
-    MongoDatasource mongoDatasource = (MongoDatasource) DatasourceFactory.getDatasource(DbType.MONGODB, datasource.getParameter());
-    //这里的ip格式不能直接用要去掉mongodb://前缀
+
+    MongoDatasource mongoDatasource = (MongoDatasource) DatasourceFactory
+        .getDatasource(DbType.MONGODB, datasource.getParameter());
+
+    // 这里的 ip 格式不能直接用要去掉 mongodb:// 前缀
     String address = mongoDatasource.getAddress();
     mongoWriterArg.setAddress(Arrays.asList(address.replace("mongodb://", "")));
     mongoWriterArg.setDbName(mongoDatasource.getDatabase());

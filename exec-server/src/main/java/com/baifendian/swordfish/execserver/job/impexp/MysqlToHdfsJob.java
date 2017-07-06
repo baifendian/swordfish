@@ -26,9 +26,8 @@ import com.baifendian.swordfish.execserver.job.impexp.Args.HdfsWriterArg;
 import com.baifendian.swordfish.execserver.job.impexp.Args.ImpExpProps;
 import com.baifendian.swordfish.execserver.job.impexp.Args.MysqlReaderArg;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.slf4j.Logger;
-
 import java.text.MessageFormat;
+import org.slf4j.Logger;
 
 /**
  * mysql 到 Hdfs
@@ -46,12 +45,17 @@ public class MysqlToHdfsJob extends DataXJob {
     MysqlReader mysqlReader = (MysqlReader) impExpProps.getImpExpParam().getReader();
 
     MysqlReaderArg mysqlReaderArg = new MysqlReaderArg(mysqlReader);
-    //TODO 增加一个判断根据类型
-    DataSource datasource = impExpProps.getDatasourceDao().queryResource(props.getProjectId(), mysqlReader.getDatasource());
+
+    // TODO 增加一个判断根据类型
+    DataSource datasource = impExpProps.getDatasourceDao()
+        .queryResource(props.getProjectId(), mysqlReader.getDatasource());
     if (datasource == null) {
-      throw new NoSuchFieldException(MessageFormat.format("Datasource {0} in project {1} not found!", mysqlReader.getDatasource(), props.getProjectId()));
+      throw new NoSuchFieldException(MessageFormat
+          .format("Datasource {0} in project {1} not found!", mysqlReader.getDatasource(),
+              props.getProjectId()));
     }
-    MysqlDatasource mysqlDatasource = (MysqlDatasource) DatasourceFactory.getDatasource(DbType.MYSQL, datasource.getParameter());
+    MysqlDatasource mysqlDatasource = (MysqlDatasource) DatasourceFactory
+        .getDatasource(DbType.MYSQL, datasource.getParameter());
 
     ObjectNode connection = (ObjectNode) mysqlReaderArg.getConnection().get(0);
     connection.putArray("jdbcUrl").add(mysqlDatasource.getJdbcUrl());
@@ -80,5 +84,4 @@ public class MysqlToHdfsJob extends DataXJob {
     logger.info("Finish MysqlToHdfsJob get dataX writer arg...");
     return hdfsWriterArg;
   }
-
 }
