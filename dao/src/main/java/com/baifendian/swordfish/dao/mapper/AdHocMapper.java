@@ -156,4 +156,12 @@ public interface AdHocMapper {
   })
   @SelectProvider(type = AdHocMapperProvider.class, method = "selectAdhocByName")
   List<AdHoc> selectAdhocByName(@Param("projectId") int projectId, @Param("name") String name);
+
+  /**
+   * 根据name删除一个即席查询的记录
+   * @param projectId
+   * @param name
+   */
+  @DeleteProvider(type = AdHocMapperProvider.class, method = "deleteAdHocByName")
+  void deleteAdHocByName(@Param("projectId") int projectId, @Param("name") String name);
 }

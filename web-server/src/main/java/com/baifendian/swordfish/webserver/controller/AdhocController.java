@@ -25,15 +25,13 @@ import com.baifendian.swordfish.webserver.dto.AdHocResultDto;
 import com.baifendian.swordfish.webserver.dto.ExecutorIdDto;
 import com.baifendian.swordfish.webserver.exception.BadRequestException;
 import com.baifendian.swordfish.webserver.service.AdhocService;
-import org.springframework.http.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-
-import static org.apache.commons.httpclient.HttpStatus.SC_CREATED;
 
 /**
  * 即席查询的服务入口
@@ -175,11 +173,29 @@ public class AdhocController {
    */
   @GetMapping(value = "/projects/{projectName}/adHoc/{adHocName}")
   public List<AdHocDto> getAdhocQuery(@RequestAttribute(value = "session.user") User operator,
-                                @PathVariable String projectName,
-                                @PathVariable String adHocName) {
+                                      @PathVariable String projectName,
+                                      @PathVariable String adHocName) {
     logger.info("Operator user {}, project name {}, ad hoc name {}",
             operator.getName(), projectName, adHocName);
 
     return adhocService.getAdHoc(operator, projectName, adHocName);
+  }
+
+  /**
+   * 根据name删除一个即系查询记录
+   *
+   * @param operator
+   * @param projectName
+   * @param adHocName
+   */
+  @DeleteMapping(value = "/projects/{projectName}/adHoc/{adHocName}")
+  public void deleteAdhocQuery(@RequestAttribute(value = "session.user") User operator,
+                               @PathVariable String projectName,
+                               @PathVariable String adHocName) {
+    logger.info("Operator user {}, project name {}, ad hoc name {}",
+            operator.getName(), projectName, adHocName);
+
+    adhocService.deleteAdHoc(operator, projectName, adHocName);
+
   }
 }

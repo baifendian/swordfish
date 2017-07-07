@@ -339,4 +339,27 @@ public class AdhocService {
     }
     return adHocDtoList;
   }
+
+  /**
+   * 根据name删除一个即席查询
+   *
+   * @param operator
+   * @param projectName
+   * @param adHocName
+   */
+  public void deleteAdHoc(User operator, String projectName, String adHocName) {
+    // 查看用户对项目是否具备相应权限
+    Project project = projectMapper.queryByName(projectName);
+    if (project == null) {
+      logger.error("Project does not exist: {}", projectName);
+      throw new NotFoundException("Not found project \"{0}\"", projectName);
+    }
+    // 必须要有project执行权限
+    if (!projectService.hasWritePerm(operator.getId(), project)) {
+      logger.error("User {} has no right permission for the project {}", operator.getName(), project.getName());
+      throw new PermissionException("User \"{0}\" is not has project \"{1}\" write permission", operator.getName(), project.getName());
+    }
+
+    adHocMapper.deleteAdHocByName(project.getId(), adHocName);
+  }
 }
