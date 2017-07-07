@@ -339,6 +339,8 @@ public class HiveSqlExec {
 
               logs.clear();
             }
+
+            logger.info("end doing remain logs");
           }
         }
       }
