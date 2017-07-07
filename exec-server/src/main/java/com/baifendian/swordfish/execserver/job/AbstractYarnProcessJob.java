@@ -49,6 +49,9 @@ public abstract class AbstractYarnProcessJob extends AbstractYarnJob {
 
   @Override
   public void cancel(boolean cancelApplication) throws Exception {
+    // 取消了
+    canceled = true;
+
     // 关闭进程
     processJob.cancel();
 

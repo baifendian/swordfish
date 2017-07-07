@@ -256,6 +256,8 @@ public class ProcessJob {
 
     int processId = getProcessId(process);
 
+    logger.info("cancel process: {}", processId);
+
     // kill, 等待完成
     boolean killed = softKill(processId);
 
