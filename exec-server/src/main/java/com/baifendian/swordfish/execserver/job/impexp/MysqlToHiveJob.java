@@ -25,6 +25,7 @@ import com.baifendian.swordfish.common.job.struct.node.impexp.reader.MysqlReader
 import com.baifendian.swordfish.common.job.struct.node.impexp.writer.HiveWriter;
 import com.baifendian.swordfish.dao.enums.DbType;
 import com.baifendian.swordfish.dao.model.DataSource;
+import com.baifendian.swordfish.dao.utils.json.JsonUtil;
 import com.baifendian.swordfish.execserver.engine.hive.HiveMetaExec;
 import com.baifendian.swordfish.execserver.engine.hive.HiveSqlExec;
 import com.baifendian.swordfish.execserver.engine.hive.HiveUtil;
@@ -84,6 +85,8 @@ public class MysqlToHiveJob extends DataXJob {
     hiveMetaExec = new HiveMetaExec(logger);
     // 获取源HQL字段
     destColumns = hiveMetaExec.getHiveDesc(hiveWriter.getDatabase(), hiveWriter.getTable());
+    logger.info("dest col: {}", JsonUtil.toJsonString(destColumns));
+
     // 获取源字段
     srcColumns = hiveMetaExec.checkHiveColumn(hiveWriter.getColumn(), destColumns);
 
