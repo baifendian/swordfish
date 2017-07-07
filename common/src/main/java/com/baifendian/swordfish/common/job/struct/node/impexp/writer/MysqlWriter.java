@@ -13,8 +13,8 @@ public class MysqlWriter implements Writer {
   private String datasource;
   private String table;
   private List<String> session;
-  private List<String> preSql;
-  private List<String> postSql;
+  private String preSql;
+  private String postSql;
   private MysqlWriteMode writeMode;
   private Long batchSize;
   private List<String> column;
@@ -43,19 +43,19 @@ public class MysqlWriter implements Writer {
     this.session = session;
   }
 
-  public List<String> getPreSql() {
+  public String getPreSql() {
     return preSql;
   }
 
-  public void setPreSql(List<String> preSql) {
+  public void setPreSql(String preSql) {
     this.preSql = preSql;
   }
 
-  public List<String> getPostSql() {
+  public String getPostSql() {
     return postSql;
   }
 
-  public void setPostSql(List<String> postSql) {
+  public void setPostSql(String postSql) {
     this.postSql = postSql;
   }
 
