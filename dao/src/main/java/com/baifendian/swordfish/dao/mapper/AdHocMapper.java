@@ -123,6 +123,7 @@ public interface AdHocMapper {
   @Results(value = {
           @Result(property = "execId", column = "exec_id", id = true, javaType = int.class, jdbcType = JdbcType.INTEGER),
           @Result(property = "index", column = "index", id = true, javaType = int.class, jdbcType = JdbcType.INTEGER),
+          @Result(property = "name", column = "name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
           @Result(property = "stm", column = "stm", javaType = String.class, jdbcType = JdbcType.VARCHAR),
           @Result(property = "result", column = "result", javaType = String.class, jdbcType = JdbcType.VARCHAR),
           @Result(property = "status", column = "status", typeHandler = EnumOrdinalTypeHandler.class, jdbcType = JdbcType.TINYINT),

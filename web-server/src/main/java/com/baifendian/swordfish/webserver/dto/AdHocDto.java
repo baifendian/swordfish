@@ -17,10 +17,12 @@ package com.baifendian.swordfish.webserver.dto;
 
 import com.baifendian.swordfish.common.job.struct.node.BaseParamFactory;
 import com.baifendian.swordfish.common.job.struct.node.adhoc.AdHocParam;
+import com.baifendian.swordfish.common.json.JsonOrdinalSerializer;
 import com.baifendian.swordfish.dao.enums.AdHocType;
 import com.baifendian.swordfish.dao.enums.FlowStatus;
 import com.baifendian.swordfish.dao.model.AdHoc;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import java.util.Date;
 
@@ -32,6 +34,7 @@ public class AdHocDto {
   private Date startTime;
   private Date endTime;
   private String stms;
+  @JsonSerialize(using = JsonOrdinalSerializer.class)
   private FlowStatus status;
   private String proxyUser;
   private String queue;
