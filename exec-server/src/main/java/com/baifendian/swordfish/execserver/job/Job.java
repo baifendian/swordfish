@@ -30,14 +30,14 @@ public abstract class Job {
   protected JobProps props;
 
   /**
-   * 是否长任务
-   */
-  protected boolean isLongJob;
-
-  /**
    * 日志记录
    */
   protected Logger logger;
+
+  /**
+   * 是否长任务
+   */
+  protected volatile boolean isLongJob;
 
   /**
    * 是否已经启动
