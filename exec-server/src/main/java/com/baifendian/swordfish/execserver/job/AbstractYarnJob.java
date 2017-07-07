@@ -128,6 +128,9 @@ public abstract class AbstractYarnJob extends Job {
             executionNode.setJobLinkList(appLinks);
           }
 
+          logger.info("update execution node, execution id:{} and node name:{}", props.getExecId(),
+              props.getNodeName());
+
           flowDao.updateExecutionNode(executionNode);
         }
       } else { // 长任务
