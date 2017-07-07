@@ -328,6 +328,8 @@ public class HiveSqlExec {
             return;
           } finally {
             // 处理剩余日志
+            logger.info("do with remain logs");
+
             showRemainingLogsIfAny();
 
             // 还有日志, 继续输出

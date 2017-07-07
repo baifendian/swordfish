@@ -91,6 +91,7 @@ public abstract class AbstractYarnJob extends Job {
       String appId = findAppId(log);
 
       if (StringUtils.isNotEmpty(appId) && !appLinks.contains(appId)) {
+        logger.info("find app id: {}", appId);
         appLinks.add(appId);
         captureAppLinks = true;
       }
@@ -99,6 +100,7 @@ public abstract class AbstractYarnJob extends Job {
       String jobId = findJobId(log);
 
       if (StringUtils.isNotEmpty(jobId) && !jobLinks.contains(jobId)) {
+        logger.info("find job id: {}", jobId);
         jobLinks.add(jobId);
         captureJobLinks = true;
       }
@@ -276,11 +278,7 @@ public abstract class AbstractYarnJob extends Job {
 
   public static void main(String[] args) {
     String msg =
-        "[INFO] 2017-05-23 18:25:22.268 com.baifendian.swordfish.execserver.runner.node.NodeRunner:[147] -  hive execute log : INFO  : Starting Job = job_1493947416024_0139, Tracking URL = http://hlg-5p149-wangwenting:8088/proxy/application_1493947416024_0139/\n"
-            +
-            "job_1493947416024_0140 [INFO] 2017-05-23 18:25:22.268 com.baifendian.swordfish.execserver.runner.node.NodeRunner:[147] -  hive execute log : INFO  : Kill Command = /opt/hadoop/bin/hadoop job  -kill job_1493947416024_0139\n"
-            +
-            "[INFO] 2017-05-23 18:25:27.269 com.baifendian.swordfish.execserver.runner.node.NodeRunner:[147] -  hive execute log : INFO  : Hadoop job information for Stage-1: number of mappers: 1; number of reducers: 0";
+        "INFO  : Starting Job = job_1499151077551_0548, Tracking URL = http://bgsbtsp0006-dqf:8088/proxy/application_1499151077551_0548/\n";
 
     // 查找 application id
     Matcher matcher = APPLICATION_REGEX.matcher(msg);
