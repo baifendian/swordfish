@@ -50,6 +50,11 @@ public abstract class Job {
   protected volatile boolean complete = false;
 
   /**
+   * 是否完成
+   */
+  protected volatile boolean canceled = false;
+
+  /**
    * 退出状态
    */
   protected volatile int exitCode = -1;
@@ -95,6 +100,7 @@ public abstract class Job {
    * @param cancelApplication 是否取消应用, 比如 yarn 应用(大部分的任务没有 yarn 应用)
    */
   public void cancel(boolean cancelApplication) throws Exception {
+    canceled = true;
   }
 
   /**
@@ -109,6 +115,13 @@ public abstract class Job {
    */
   public boolean isStarted() {
     return started;
+  }
+
+  /**
+   * 是否停止了
+   */
+  public boolean isCanceled() {
+    return canceled;
   }
 
   /**

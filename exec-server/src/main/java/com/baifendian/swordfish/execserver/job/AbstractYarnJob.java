@@ -177,6 +177,11 @@ public abstract class AbstractYarnJob extends Job {
    */
   @Override
   public void cancel(boolean cancelApplication) throws Exception {
+    // 取消了
+    canceled = true;
+
+    logger.info("cancel yarn application");
+
     if (cancelApplication) {
       cancelApplication(appLinks, props, logger);
     }
