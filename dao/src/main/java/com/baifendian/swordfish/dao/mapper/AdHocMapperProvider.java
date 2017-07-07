@@ -188,4 +188,20 @@ public class AdHocMapperProvider {
       }
     }.toString();
   }
+
+  /**
+   * 根据name删除即席查询记录
+   *
+   * @param parameter
+   * @return
+   */
+  public String deleteAdHocByName(Map<String, Object> parameter) {
+    return new SQL() {
+      {
+        DELETE_FROM(TABLE_NAME);
+        WHERE("`project_id` = #{projectId}");
+        WHERE("`name` = #{name}");
+      }
+    }.toString();
+  }
 }
