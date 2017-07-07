@@ -15,6 +15,10 @@
  */
 package com.baifendian.swordfish.execserver.job.impexp;
 
+import static com.baifendian.swordfish.execserver.job.impexp.ImpExpJobConst.DEFAULT_DB;
+import static com.baifendian.swordfish.execserver.job.impexp.ImpExpJobConst.DEFAULT_DELIMITER;
+import static com.baifendian.swordfish.execserver.job.impexp.ImpExpJobConst.DEFAULT_FILE_TYPE;
+
 import com.baifendian.swordfish.common.config.BaseConfig;
 import com.baifendian.swordfish.common.enums.WriteMode;
 import com.baifendian.swordfish.common.hadoop.HdfsClient;
@@ -35,19 +39,16 @@ import com.baifendian.swordfish.execserver.job.impexp.Args.HqlColumn;
 import com.baifendian.swordfish.execserver.job.impexp.Args.ImpExpProps;
 import com.baifendian.swordfish.execserver.job.impexp.Args.MysqlReaderArg;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.permission.FsPermission;
 import org.apache.hadoop.hive.metastore.api.FieldSchema;
 import org.slf4j.Logger;
-
-import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import static com.baifendian.swordfish.execserver.job.impexp.ImpExpJobConst.*;
 
 
 /**
@@ -102,15 +103,15 @@ public class MysqlToHiveJob extends DataXJob {
 
     // TODO 增加一个判断根据类型
     DataSource datasource = impExpProps.getDatasourceDao()
-            .queryResource(props.getProjectId(), mysqlReader.getDatasource());
+        .queryResource(props.getProjectId(), mysqlReader.getDatasource());
     if (datasource == null) {
       throw new NoSuchFieldException(MessageFormat
-              .format("Datasource {0} in project {1} not found!", mysqlReader.getDatasource(),
-                      String.valueOf(props.getProjectId())));
+          .format("Datasource {0} in project {1} not found!", mysqlReader.getDatasource(),
+              String.valueOf(props.getProjectId())));
     }
 
     MysqlDatasource mysqlDatasource = (MysqlDatasource) DatasourceFactory
-            .getDatasource(DbType.MYSQL, datasource.getParameter());
+        .getDatasource(DbType.MYSQL, datasource.getParameter());
     ObjectNode connection = (ObjectNode) mysqlReaderArg.getConnection().get(0);
     connection.putArray("jdbcUrl").add(mysqlDatasource.getJdbcUrl());
     mysqlReaderArg.setUsername(mysqlDatasource.getUser());
@@ -128,7 +129,7 @@ public class MysqlToHiveJob extends DataXJob {
     logger.info("Start MysqlToHiveJob get dataX writer arg...");
     //由于DataX不能直接写入到hive中，我们这里先生成写入到HDFS的任务。
     String path = BaseConfig
-            .getHdfsImpExpDir(props.getProjectId(), props.getExecId(), props.getNodeName());
+        .getHdfsImpExpDir(props.getProjectId(), props.getExecId(), props.getNodeName());
     HdfsClient hdfsClient = HdfsClient.getInstance();
 
     //如果目录不存在就新建
@@ -173,6 +174,8 @@ public class MysqlToHiveJob extends DataXJob {
       return;
     }
 
+    exitCode = -1;
+
     List<String> execSqls = new ArrayList<>();
 
     try {
@@ -183,13 +186,13 @@ public class MysqlToHiveJob extends DataXJob {
 
       // 构造生成临时表 sql
       String ddl = HiveUtil
-              .getTmpTableDDL(DEFAULT_DB, srcTableName, srcColumns, hdfsWriterArg.getPath(),
-                      DEFAULT_DELIMITER, "UTF-8");
+          .getTmpTableDDL(DEFAULT_DB, srcTableName, srcColumns, hdfsWriterArg.getPath(),
+              DEFAULT_DELIMITER, "UTF-8");
       logger.info("Create temp hive table ddl: {}", ddl);
 
       // 构造插入数据 sql
       String insertSql = insertTable(DEFAULT_DB, srcTableName, hiveWriter.getDatabase(),
-              hiveWriter.getTable(), srcColumns, destColumns, hiveWriter.getWriteMode());
+          hiveWriter.getTable(), srcColumns, destColumns, hiveWriter.getWriteMode());
       logger.info("Insert to hive table sql: {}", insertSql);
 
       logger.info("Start exec sql to hive...");
@@ -216,8 +219,8 @@ public class MysqlToHiveJob extends DataXJob {
    * 生成insert sql
    */
   public String insertTable(String srcDbNmae, String srcTableName, String destDbName,
-                            String destTableName, List<HqlColumn> srcHqlColumnList, List<HqlColumn> destHqlColumnList,
-                            WriteMode writeMode) throws Exception {
+      String destTableName, List<HqlColumn> srcHqlColumnList, List<HqlColumn> destHqlColumnList,
+      WriteMode writeMode) throws Exception {
     String insertSql = "INSERT {0} TABLE {1}.{2} {3} SELECT {4} FROM {5}.{6}";
     String partFieldSql = "";
 
@@ -251,8 +254,8 @@ public class MysqlToHiveJob extends DataXJob {
     }
 
     insertSql = MessageFormat
-            .format(insertSql, writeMode.gethiveSql(), destDbName, destTableName, partFieldSql,
-                    String.join(",", fieldList), srcDbNmae, srcTableName);
+        .format(insertSql, writeMode.gethiveSql(), destDbName, destTableName, partFieldSql,
+            String.join(",", fieldList), srcDbNmae, srcTableName);
     logger.info("Insert table sql: {}", insertSql);
     return insertSql;
   }

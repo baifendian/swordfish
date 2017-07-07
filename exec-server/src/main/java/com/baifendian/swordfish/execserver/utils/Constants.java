@@ -16,6 +16,7 @@
 package com.baifendian.swordfish.execserver.utils;
 
 public class Constants {
+
   public static final String DATETIME_FORMAT = "yyyyMMddHHmmss";
 
   public static final String EXECUTOR_PORT = "executor.port";
@@ -81,9 +82,9 @@ public class Constants {
   public static final int defaultLogBufferSize = 4 * 16;
 
   /**
-   * 日志刷新周期
+   * 日志刷新周期, 越快越精确
    */
-  public static final int defaultLogFlushInterval = 3000;
+  public static final int defaultLogFlushInterval = 1000;
 
   /**
    * 默认的清理 flow 数

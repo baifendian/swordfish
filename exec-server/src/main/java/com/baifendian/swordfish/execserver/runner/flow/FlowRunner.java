@@ -631,11 +631,11 @@ public class FlowRunner implements Runnable {
           logger
               .info("kill exec, id: {}, node: {}", executionFlow.getId(), nodeRunner.getNodename());
 
-          // 强制进行关闭, 关闭线程
-          future.cancel(true);
-
           // 结点运行
           nodeRunner.kill();
+
+          // 强制进行关闭, 关闭线程
+          future.cancel(true);
         }
       }
     }

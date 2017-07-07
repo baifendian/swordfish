@@ -26,6 +26,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -68,8 +69,8 @@ public abstract class AbstractYarnJob extends Job {
     flowDao = DaoFactory.getDaoInstance(FlowDao.class);
     streamingDao = DaoFactory.getDaoInstance(StreamingDao.class);
 
-    appLinks = new ArrayList<>();
-    jobLinks = new ArrayList<>();
+    appLinks = Collections.synchronizedList(new ArrayList<>());
+    jobLinks = Collections.synchronizedList(new ArrayList<>());
   }
 
   /**
@@ -79,7 +80,7 @@ public abstract class AbstractYarnJob extends Job {
    */
   @Override
   public void logProcess(List<String> logs) {
-    super.logProcess(logs);
+    logger.info("(stdout, stderr) -> \n{}", String.join("\n", logs));
 
     boolean captureAppLinks = false;
     boolean captureJobLinks = false;
@@ -90,6 +91,7 @@ public abstract class AbstractYarnJob extends Job {
       String appId = findAppId(log);
 
       if (StringUtils.isNotEmpty(appId) && !appLinks.contains(appId)) {
+        logger.info("find app id: {}", appId);
         appLinks.add(appId);
         captureAppLinks = true;
       }
@@ -98,6 +100,7 @@ public abstract class AbstractYarnJob extends Job {
       String jobId = findJobId(log);
 
       if (StringUtils.isNotEmpty(jobId) && !jobLinks.contains(jobId)) {
+        logger.info("find job id: {}", jobId);
         jobLinks.add(jobId);
         captureJobLinks = true;
       }
@@ -135,6 +138,15 @@ public abstract class AbstractYarnJob extends Job {
 
           streamingDao.updateResult(streamingResult);
         }
+      }
+    }
+
+    // 如果已经被取消, 感觉取消应用, 不然会比较危险
+    if (isCancel() && !appLinks.isEmpty()) {
+      try {
+        cancelApplication(appLinks, props, logger);
+      } catch (Exception e) {
+        logger.error("catch an exception", e);
       }
     }
   }
@@ -177,10 +189,9 @@ public abstract class AbstractYarnJob extends Job {
    */
   @Override
   public void cancel(boolean cancelApplication) throws Exception {
-    // 取消了
-    canceled = true;
-
     logger.info("cancel yarn application");
+
+    cancel = true;
 
     if (cancelApplication) {
       cancelApplication(appLinks, props, logger);
@@ -267,11 +278,7 @@ public abstract class AbstractYarnJob extends Job {
 
   public static void main(String[] args) {
     String msg =
-        "[INFO] 2017-05-23 18:25:22.268 com.baifendian.swordfish.execserver.runner.node.NodeRunner:[147] -  hive execute log : INFO  : Starting Job = job_1493947416024_0139, Tracking URL = http://hlg-5p149-wangwenting:8088/proxy/application_1493947416024_0139/\n"
-            +
-            "job_1493947416024_0140 [INFO] 2017-05-23 18:25:22.268 com.baifendian.swordfish.execserver.runner.node.NodeRunner:[147] -  hive execute log : INFO  : Kill Command = /opt/hadoop/bin/hadoop job  -kill job_1493947416024_0139\n"
-            +
-            "[INFO] 2017-05-23 18:25:27.269 com.baifendian.swordfish.execserver.runner.node.NodeRunner:[147] -  hive execute log : INFO  : Hadoop job information for Stage-1: number of mappers: 1; number of reducers: 0";
+        "INFO  : Starting Job = job_1499151077551_0548, Tracking URL = http://bgsbtsp0006-dqf:8088/proxy/application_1499151077551_0548/\n";
 
     // 查找 application id
     Matcher matcher = APPLICATION_REGEX.matcher(msg);
