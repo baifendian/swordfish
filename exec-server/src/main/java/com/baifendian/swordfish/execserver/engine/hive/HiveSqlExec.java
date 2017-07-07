@@ -215,15 +215,7 @@ public class HiveSqlExec {
         }
       }
     } finally {
-      try {
-        if (logThread != null) {
-          logThread.interrupt();
-          logThread.join(HiveUtil.DEFAULT_QUERY_PROGRESS_THREAD_TIMEOUT);
-        }
-      } catch (Exception e) {
-//        logger.error("Catch an exception", e);
-      }
-
+      // 关闭连接
       try {
         if (sta != null) {
           sta.close();
@@ -235,6 +227,16 @@ public class HiveSqlExec {
       // 返回连接
       if (hiveConnection != null) {
         hiveService2Client.returnClient(hiveService2ConnectionInfo, hiveConnection);
+      }
+
+      // 关闭日志
+      try {
+        if (logThread != null) {
+          logThread.interrupt();
+          logThread.join(HiveUtil.DEFAULT_QUERY_PROGRESS_THREAD_TIMEOUT);
+        }
+      } catch (Exception e) {
+//        logger.error("Catch an exception", e);
       }
     }
 
@@ -355,6 +357,7 @@ public class HiveSqlExec {
           /*logger.error(e.getMessage(), e);*/
           return;
         }
+
         for (String log : logsTemp) {
           logs.add(log);
         }
