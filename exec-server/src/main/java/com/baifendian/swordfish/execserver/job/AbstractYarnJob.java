@@ -26,6 +26,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -68,8 +69,8 @@ public abstract class AbstractYarnJob extends Job {
     flowDao = DaoFactory.getDaoInstance(FlowDao.class);
     streamingDao = DaoFactory.getDaoInstance(StreamingDao.class);
 
-    appLinks = new ArrayList<>();
-    jobLinks = new ArrayList<>();
+    appLinks = Collections.synchronizedList(new ArrayList<>());
+    jobLinks = Collections.synchronizedList(new ArrayList<>());
   }
 
   /**
@@ -137,6 +138,14 @@ public abstract class AbstractYarnJob extends Job {
         }
       }
     }
+
+    // 如果已经被取消, 感觉取消应用, 不然会比较危险
+    if (isCancel()) {
+      try {
+        cancel(true);
+      } catch (Exception e) {
+      }
+    }
   }
 
   /**
@@ -177,10 +186,9 @@ public abstract class AbstractYarnJob extends Job {
    */
   @Override
   public void cancel(boolean cancelApplication) throws Exception {
-    // 取消了
-    canceled = true;
-
     logger.info("cancel yarn application");
+
+    cancel = true;
 
     if (cancelApplication) {
       cancelApplication(appLinks, props, logger);
