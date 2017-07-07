@@ -286,7 +286,8 @@ public class HiveSqlExec {
       if (statement instanceof HiveStatement) {
         this.hiveStatement = (HiveStatement) statement;
       }
-      logs = new LinkedList<>();
+
+      logs = new ArrayList<>();
     }
 
     @Override

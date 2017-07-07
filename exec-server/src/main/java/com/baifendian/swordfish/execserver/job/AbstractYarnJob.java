@@ -80,7 +80,7 @@ public abstract class AbstractYarnJob extends Job {
    */
   @Override
   public void logProcess(List<String> logs) {
-    super.logProcess(logs);
+    logger.info("(stdout, stderr) -> \n{}", String.join("\n", logs));
 
     boolean captureAppLinks = false;
     boolean captureJobLinks = false;
