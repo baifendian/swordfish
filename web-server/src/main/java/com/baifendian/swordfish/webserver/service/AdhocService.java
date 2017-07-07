@@ -264,6 +264,7 @@ public class AdhocService {
 
     AdHocResultDto adHocResultDto = new AdHocResultDto();
 
+    adHocResultDto.setName(adHocResult.getName());
     adHocResultDto.setStartTime(adHocResult.getStartTime());
     adHocResultDto.setEndTime(adHocResult.getEndTime());
     adHocResultDto.setStm(adHocResult.getStm());

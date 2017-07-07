@@ -22,6 +22,11 @@ import java.util.Date;
 public class AdHocResultDto {
 
   /**
+   * name of ad hoc query
+   */
+  private String name;
+
+  /**
    * start time of exec
    */
   private Date startTime;
@@ -71,5 +76,13 @@ public class AdHocResultDto {
 
   public void setResults(AdHocJsonObject results) {
     this.results = results;
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public void setName(String name) {
+    this.name = name;
   }
 }

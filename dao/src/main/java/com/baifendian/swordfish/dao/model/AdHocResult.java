@@ -26,6 +26,11 @@ public class AdHocResult {
   private int execId;
 
   /**
+   * 即席查询的名称
+   */
+  private String name;
+
+  /**
    * 执行语句在查询语句数组中的索引
    */
   private int index;
@@ -122,5 +127,13 @@ public class AdHocResult {
 
   public void setEndTime(Date endTime) {
     this.endTime = endTime;
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public void setName(String name) {
+    this.name = name;
   }
 }

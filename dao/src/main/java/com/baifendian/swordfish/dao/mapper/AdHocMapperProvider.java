@@ -161,12 +161,14 @@ public class AdHocMapperProvider {
   public String selectResultByIdAndIndex(Map<String, Object> parameter) {
     return new SQL() {
       {
-        SELECT("*");
+        SELECT("ahr.*");
+        SELECT("ah.name as name");
 
-        FROM(RESULT_TABLE_NAME);
+        FROM(RESULT_TABLE_NAME + " as ahr");
+        JOIN(TABLE_NAME + " as ah on ahr.exec_id = ah.id");
 
-        WHERE("`exec_id` = #{execId}");
-        WHERE("`index` = #{index}");
+        WHERE("ahr.exec_id = #{execId}");
+        WHERE("ahr.index = #{index}");
       }
     }.toString();
   }
