@@ -15,7 +15,14 @@
  */
 package com.baifendian.swordfish.execserver.job.impexp;
 
+import com.baifendian.swordfish.common.job.struct.node.impexp.column.HiveColumn;
+import com.baifendian.swordfish.execserver.job.impexp.Args.HqlColumn;
 import org.apache.commons.lang.StringUtils;
+import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
+
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -67,7 +74,7 @@ public class ImpExpUtil {
   /**
    * 判断两个字符串是否相同，排除反引号区别
    */
-  public static boolean equalWithoutBackQuota(String str1, String str2) {
-    return StringUtils.equals(exceptBackQuota(str1), exceptBackQuota(str2));
+  public static boolean equalIgnoreCaseWithoutBackQuota(String str1, String str2) {
+    return StringUtils.equalsIgnoreCase(exceptBackQuota(str1), exceptBackQuota(str2));
   }
 }
