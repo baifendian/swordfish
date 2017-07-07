@@ -27,8 +27,8 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Consumer;
 import org.apache.hive.jdbc.HiveConnection;
@@ -287,7 +287,7 @@ public class HiveSqlExec {
         this.hiveStatement = (HiveStatement) statement;
       }
 
-      logs = new ArrayList<>();
+      this.logs = Collections.synchronizedList(new ArrayList<>());
     }
 
     @Override
@@ -299,42 +299,44 @@ public class HiveSqlExec {
       // 当前 flush 的时间
       long preFlushTime = System.currentTimeMillis();
 
-      while (true) {
-        try {
-          for (String log : hiveStatement.getQueryLog()) {
-            logs.add(log);
+      synchronized (this) { // 不能异步处理
+        while (true) {
+          try {
+            for (String log : hiveStatement.getQueryLog()) {
+              logs.add(log);
 
-            long now = System.currentTimeMillis();
+              long now = System.currentTimeMillis();
 
-            // 到一定日志量就输出处理
-            if (logs.size() >= Constants.defaultLogBufferSize
-                || now - preFlushTime > Constants.defaultLogFlushInterval) {
-              preFlushTime = now;
+              // 到一定日志量就输出处理
+              if (logs.size() >= Constants.defaultLogBufferSize
+                  || now - preFlushTime > Constants.defaultLogFlushInterval) {
+                preFlushTime = now;
 
+                // 日志处理器
+                logHandler.accept(logs);
+
+                logs.clear();
+              }
+            }
+
+            Thread.sleep(DEFAULT_QUERY_PROGRESS_INTERVAL);
+          } catch (InterruptedException e) {
+            logger.error(e.getMessage(), e);
+            return;
+          } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+            return;
+          } finally {
+            // 处理剩余日志
+            showRemainingLogsIfAny();
+
+            // 还有日志, 继续输出
+            if (!logs.isEmpty()) {
               // 日志处理器
               logHandler.accept(logs);
 
               logs.clear();
             }
-          }
-
-          Thread.sleep(DEFAULT_QUERY_PROGRESS_INTERVAL);
-        } catch (InterruptedException e) {
-          logger.error(e.getMessage(), e);
-          return;
-        } catch (Exception e) {
-          logger.error(e.getMessage(), e);
-          return;
-        } finally {
-          // 处理剩余日志
-          showRemainingLogsIfAny();
-
-          // 还有日志, 继续输出
-          if (!logs.isEmpty()) {
-            // 日志处理器
-            logHandler.accept(logs);
-
-            logs.clear();
           }
         }
       }
