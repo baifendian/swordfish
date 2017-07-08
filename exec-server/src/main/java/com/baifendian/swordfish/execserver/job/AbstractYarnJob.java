@@ -106,16 +106,10 @@ public abstract class AbstractYarnJob extends Job {
       }
     }
 
-    logger.info("job is long:{}, captureAppLinks:{}, captureJobLinks:{}", isLongJob(),
-        captureAppLinks, captureJobLinks);
-
     // 有一个改变才能进行里面的操作
     if (captureAppLinks || captureJobLinks) {
       // 短任务
       if (!isLongJob()) {
-        logger.info("find execution node, execution id:{} and node name:{}", props.getExecId(),
-            props.getNodeName());
-
         ExecutionNode executionNode = flowDao
             .queryExecutionNode(props.getExecId(), props.getNodeName());
 
@@ -144,6 +138,8 @@ public abstract class AbstractYarnJob extends Job {
           if (captureJobLinks) {
             streamingResult.setJobLinkList(appLinks);
           }
+
+          logger.info("update streaming, execution id:{}", props.getExecId());
 
           streamingDao.updateResult(streamingResult);
         }
