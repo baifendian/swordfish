@@ -17,10 +17,10 @@ package com.baifendian.swordfish.dao.model;
 
 import com.baifendian.swordfish.dao.enums.FlowStatus;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
-
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import org.apache.commons.collections4.CollectionUtils;
 
 public class ExecutionNode {
 
@@ -149,7 +149,7 @@ public class ExecutionNode {
 
   public void setAppLinkList(List<String> appLinkList) {
     this.appLinkList = appLinkList;
-    if (appLinkList != null) {
+    if (CollectionUtils.isNotEmpty(appLinkList)) {
       this.appLinks = JsonUtil.toJsonString(appLinkList);
     }
   }
@@ -178,7 +178,7 @@ public class ExecutionNode {
 
   public void setJobLinkList(List<String> jobLinkList) {
     this.jobLinkList = jobLinkList;
-    if (jobLinkList != null) {
+    if (CollectionUtils.isNotEmpty(jobLinkList)) {
       this.jobLinks = JsonUtil.toJsonString(jobLinkList);
     }
   }

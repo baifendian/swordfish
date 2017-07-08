@@ -330,19 +330,7 @@ public class HiveSqlExec {
             return;
           } finally {
             // 处理剩余日志
-            logger.info("do with remain logs");
-
             showRemainingLogsIfAny();
-
-            // 还有日志, 继续输出
-            if (!logs.isEmpty()) {
-              // 日志处理器
-              logHandler.accept(logs);
-
-              logs.clear();
-            }
-
-            logger.info("end doing remain logs");
           }
         }
       }
@@ -360,6 +348,11 @@ public class HiveSqlExec {
 
         for (String log : logsTemp) {
           logs.add(log);
+
+          // 日志处理器
+          logHandler.accept(logs);
+
+          logs.clear();
         }
       } while (logsTemp.size() > 0);
     }
