@@ -101,7 +101,7 @@ function process_check()
 {
     sleep 3s
 
-    pid=`cat *$1.pid`
+    pid=`cat /tmp/*$1.pid`
     ps -fe|grep ${pid}|grep -v grep
 
     if [ $? -ne 0 ]
