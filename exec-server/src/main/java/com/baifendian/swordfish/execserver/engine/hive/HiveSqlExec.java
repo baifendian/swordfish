@@ -25,6 +25,7 @@ import com.baifendian.swordfish.execserver.common.ResultCallback;
 import com.baifendian.swordfish.execserver.utils.Constants;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -322,6 +323,8 @@ public class HiveSqlExec {
             }
 
             Thread.sleep(DEFAULT_QUERY_PROGRESS_INTERVAL);
+          } catch (SQLException e) {
+            return;
           } catch (InterruptedException e) {
             logger.error(e.getMessage(), e);
             return;
