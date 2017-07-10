@@ -12,6 +12,9 @@ zkAddress="172.24.5.149:2181,172.24.5.150:2181,172.24.5.151:2181"
 # ES address
 esAddress="172.24.5.149:9300,172.24.5.150:9300,172.24.5.151:9300"
 
+# es cluster name
+esClusterName="logging-dev"
+
 # mysql address
 mysqlAddress="172.24.5.149:3306"
 
@@ -38,6 +41,8 @@ envFile="/home/baseline/.sf_env.sh"
 
 # datax home path
 dataxHome="/home/baseline/DataX/target/datax/datax"
+
+
 
 # 使用示例
 function usage() {
@@ -73,6 +78,7 @@ function file_replace()
 
     # 3. common 组件下的文件替换
     sed -i "s#es.address.*#es.address = ${esAddress}#g" conf/common/search.properties
+    sed -i "s#es.cluster.name.*#es.cluster.name = ${esClusterName}#g" conf/common/search.properties
 
     sed -i "s#sf.env.file.*#sf.env.file = ${envFile}#g" conf/common/base_config.properties
 

@@ -286,7 +286,7 @@ public class FileToHiveJob extends AbstractYarnJob {
       String srcColVal = "null";
 
       if (srcCol != null) {
-        if (srcCol.getType() == FileColumnType.DATE) {
+        if (srcCol.getType() == FileColumnType.DATE || srcCol.getType() == FileColumnType.TIMESTAMP) {
           //srcColVal = MessageFormat.format("CAST(TO_DATE(from_unixtime(UNIX_TIMESTAMP({0},\"{1}\"))) AS DATE)", srcCol.getName(), srcCol.getDateFormat());
 
           //date timestamp分别处理
