@@ -262,6 +262,11 @@ public class AdhocService {
     // 返回结果
     AdHocResult adHocResult = adHocMapper.selectResultByIdAndIndex(execId, index);
 
+    if (adHocResult == null) {
+      logger.error("execId: {} index: {} result not found!", String.valueOf(execId), String.valueOf(index));
+      throw new NotFoundException("execId: {0} index: {1} result not found!", String.valueOf(execId), String.valueOf(index));
+    }
+
     AdHocResultDto adHocResultDto = new AdHocResultDto();
 
     adHocResultDto.setName(adHocResult.getName());
