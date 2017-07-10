@@ -25,6 +25,7 @@ import com.baifendian.swordfish.execserver.common.ResultCallback;
 import com.baifendian.swordfish.execserver.utils.Constants;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -215,15 +216,7 @@ public class HiveSqlExec {
         }
       }
     } finally {
-      try {
-        if (logThread != null) {
-          logThread.interrupt();
-          logThread.join(HiveUtil.DEFAULT_QUERY_PROGRESS_THREAD_TIMEOUT);
-        }
-      } catch (Exception e) {
-//        logger.error("Catch an exception", e);
-      }
-
+      // 关闭连接
       try {
         if (sta != null) {
           sta.close();
@@ -235,6 +228,16 @@ public class HiveSqlExec {
       // 返回连接
       if (hiveConnection != null) {
         hiveService2Client.returnClient(hiveService2ConnectionInfo, hiveConnection);
+      }
+
+      // 关闭日志
+      try {
+        if (logThread != null) {
+          logThread.interrupt();
+          logThread.join(HiveUtil.DEFAULT_QUERY_PROGRESS_THREAD_TIMEOUT);
+        }
+      } catch (Exception e) {
+//        logger.error("Catch an exception", e);
       }
     }
 
@@ -320,6 +323,8 @@ public class HiveSqlExec {
             }
 
             Thread.sleep(DEFAULT_QUERY_PROGRESS_INTERVAL);
+          } catch (SQLException e) {
+            return;
           } catch (InterruptedException e) {
             logger.error(e.getMessage(), e);
             return;
@@ -328,17 +333,7 @@ public class HiveSqlExec {
             return;
           } finally {
             // 处理剩余日志
-            logger.info("do with remain logs");
-
             showRemainingLogsIfAny();
-
-            // 还有日志, 继续输出
-            if (!logs.isEmpty()) {
-              // 日志处理器
-              logHandler.accept(logs);
-
-              logs.clear();
-            }
           }
         }
       }
@@ -353,8 +348,14 @@ public class HiveSqlExec {
           /*logger.error(e.getMessage(), e);*/
           return;
         }
+
         for (String log : logsTemp) {
           logs.add(log);
+
+          // 日志处理器
+          logHandler.accept(logs);
+
+          logs.clear();
         }
       } while (logsTemp.size() > 0);
     }

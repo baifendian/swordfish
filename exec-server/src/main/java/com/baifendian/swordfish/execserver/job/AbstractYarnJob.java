@@ -119,8 +119,11 @@ public abstract class AbstractYarnJob extends Job {
           }
 
           if (captureJobLinks) {
-            executionNode.setJobLinkList(appLinks);
+            executionNode.setJobLinkList(jobLinks);
           }
+
+          logger.info("update execution node, execution id:{} and node name:{}", props.getExecId(),
+              props.getNodeName());
 
           flowDao.updateExecutionNode(executionNode);
         }
@@ -135,6 +138,8 @@ public abstract class AbstractYarnJob extends Job {
           if (captureJobLinks) {
             streamingResult.setJobLinkList(appLinks);
           }
+
+          logger.info("update streaming, execution id:{}", props.getExecId());
 
           streamingDao.updateResult(streamingResult);
         }

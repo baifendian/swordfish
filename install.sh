@@ -101,7 +101,7 @@ function process_check()
 {
     sleep 3s
 
-    pid=`cat *$1.pid`
+    pid=`cat /tmp/*$1.pid`
     ps -fe|grep ${pid}|grep -v grep
 
     if [ $? -ne 0 ]
@@ -120,10 +120,6 @@ SWORDFISH_HOME=`cd "$CUR_DIR"; pwd`
 # stop all service
 cd $SWORDFISH_HOME/target/swordfish-all-${version}/
 
-sh bin/swordfish-daemon.sh stop web-server
-sh bin/swordfish-daemon.sh stop master-server
-sh bin/swordfish-daemon.sh stop exec-server
-
 # compile project
 cd $SWORDFISH_HOME
 mvn -U clean package assembly:assembly -Dmaven.test.skip=true || { echo "maven failed."; exit 1; }
@@ -141,14 +137,17 @@ fi
 # start all service
 cd $SWORDFISH_HOME/target/swordfish-all-${version}/
 
+sh bin/swordfish-daemon.sh stop web-server
 sh bin/swordfish-daemon.sh start web-server
 
 process_check web-server
 
+sh bin/swordfish-daemon.sh stop master-server
 sh bin/swordfish-daemon.sh start master-server
 
 process_check master-server
 
+sh bin/swordfish-daemon.sh stop exec-server
 sh bin/swordfish-daemon.sh start exec-server
 
 process_check exec-server
