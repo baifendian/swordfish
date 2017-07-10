@@ -2,14 +2,16 @@ package com.baifendian.swordfish.execserver.job.impexp.Args;
 
 import com.baifendian.swordfish.common.enums.MysqlWriteMode;
 import com.baifendian.swordfish.common.job.struct.node.impexp.writer.MysqlWriter;
+import com.baifendian.swordfish.common.utils.CommonUtil;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.Arrays;
 import java.util.List;
+
+import org.apache.commons.collections4.CollectionUtils;
 
 /**
  * mysql writer
@@ -118,8 +120,8 @@ public class MysqlWriterArg implements WriterArg {
       }
     }
 
-    preSql = mysqlWriter.getPreSql();
-    postSql = mysqlWriter.getPostSql();
+    preSql = CommonUtil.sqlSplit(mysqlWriter.getPreSql());
+    postSql = CommonUtil.sqlSplit(mysqlWriter.getPostSql());
     column = mysqlWriter.getColumn();
     session = mysqlWriter.getSession();
     batchSize = mysqlWriter.getBatchSize();

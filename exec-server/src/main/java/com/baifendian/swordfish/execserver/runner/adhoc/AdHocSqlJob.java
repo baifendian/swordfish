@@ -67,6 +67,13 @@ public class AdHocSqlJob {
   }
 
   /**
+   * 处理日志
+   */
+  public void logProcess(List<String> logs) {
+    logger.info("(stdout, stderr) -> \n{}", String.join("\n", logs));
+  }
+
+  /**
    * 具体执行的过程
    */
   public FlowStatus process() throws Exception {
@@ -114,7 +121,7 @@ public class AdHocSqlJob {
     // 切分 sql
     List<String> execSqls = CommonUtil.sqlSplit(sqls);
 
-    HiveSqlExec hiveSqlExec = new HiveSqlExec(props.getProxyUser(), logger);
+    HiveSqlExec hiveSqlExec = new HiveSqlExec(this::logProcess, props.getProxyUser(), logger);
 
     return hiveSqlExec.execute(funcs, execSqls, true, resultCallback, param.getLimit())
         ? FlowStatus.SUCCESS : FlowStatus.FAILED;

@@ -15,8 +15,6 @@
  */
 package com.baifendian.swordfish.execserver.common;
 
-import com.baifendian.swordfish.execserver.common.ExecResult;
-
 import java.util.Date;
 
 /**

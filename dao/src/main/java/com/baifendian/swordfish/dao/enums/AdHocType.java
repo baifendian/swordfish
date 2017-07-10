@@ -13,12 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.baifendian.swordfish.execserver.job.impexp.Args;
+package com.baifendian.swordfish.dao.enums;
 
 /**
- * 读参数接口
+ * 即系查询类型
  */
-public interface ReaderArg {
-
-  String dataxName();
+public enum AdHocType {
+  HIVE,SPARK;
 }

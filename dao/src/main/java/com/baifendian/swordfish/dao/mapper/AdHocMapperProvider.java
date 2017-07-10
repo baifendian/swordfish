@@ -15,6 +15,7 @@
  */
 package com.baifendian.swordfish.dao.mapper;
 
+import com.baifendian.swordfish.dao.enums.AdHocType;
 import com.baifendian.swordfish.dao.enums.FlowStatus;
 import com.baifendian.swordfish.dao.mapper.utils.EnumFieldUtil;
 import org.apache.ibatis.jdbc.SQL;
@@ -39,11 +40,12 @@ public class AdHocMapperProvider {
     return new SQL() {
       {
         INSERT_INTO(TABLE_NAME);
-
+        VALUES("`name`", "#{adHoc.name}");
         VALUES("`project_id`", "#{adHoc.projectId}");
         VALUES("`owner`", "#{adHoc.owner}");
         VALUES("`parameter`", "#{adHoc.parameter}");
         VALUES("`proxy_user`", "#{adHoc.proxyUser}");
+        VALUES("`type`", EnumFieldUtil.genFieldStr("adHoc.type", AdHocType.class));
         VALUES("`queue`", "#{adHoc.queue}");
         VALUES("`status`", EnumFieldUtil.genFieldStr("adHoc.status", FlowStatus.class));
         VALUES("`job_id`", "#{adHoc.jobId}");
@@ -51,6 +53,7 @@ public class AdHocMapperProvider {
         VALUES("`create_time`", "#{adHoc.createTime}");
         VALUES("`start_time`", "#{adHoc.startTime}");
         VALUES("`end_time`", "#{adHoc.endTime}");
+
       }
     }.toString();
   }
@@ -158,12 +161,48 @@ public class AdHocMapperProvider {
   public String selectResultByIdAndIndex(Map<String, Object> parameter) {
     return new SQL() {
       {
+        SELECT("ahr.*");
+        SELECT("ah.name as name");
+
+        FROM(RESULT_TABLE_NAME + " as ahr");
+        JOIN(TABLE_NAME + " as ah on ahr.exec_id = ah.id");
+
+        WHERE("ahr.exec_id = #{execId}");
+        WHERE("ahr.index = #{index}");
+      }
+    }.toString();
+  }
+
+  /**
+   * 查询adhoc, 根据 name 查询
+   *
+   * @param parameter
+   * @return
+   */
+  public String selectAdhocByName(Map<String, Object> parameter) {
+    return new SQL() {
+      {
         SELECT("*");
 
-        FROM(RESULT_TABLE_NAME);
+        FROM(TABLE_NAME);
+        WHERE("`project_id` = #{projectId}");
+        WHERE("`name` = #{name}");
+      }
+    }.toString();
+  }
 
-        WHERE("`exec_id` = #{execId}");
-        WHERE("`index` = #{index}");
+  /**
+   * 根据name删除即席查询记录
+   *
+   * @param parameter
+   * @return
+   */
+  public String deleteAdHocByName(Map<String, Object> parameter) {
+    return new SQL() {
+      {
+        DELETE_FROM(TABLE_NAME);
+        WHERE("`project_id` = #{projectId}");
+        WHERE("`name` = #{name}");
       }
     }.toString();
   }

@@ -22,12 +22,16 @@ import com.baifendian.swordfish.dao.enums.FlowStatus;
 import com.baifendian.swordfish.dao.exception.DaoSemanticException;
 import com.baifendian.swordfish.execserver.common.ExecResult;
 import com.baifendian.swordfish.execserver.common.ResultCallback;
+import com.baifendian.swordfish.execserver.utils.Constants;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.function.Consumer;
 import org.apache.hive.jdbc.HiveConnection;
 import org.apache.hive.jdbc.HiveStatement;
 import org.apache.hive.service.cli.HiveSQLException;
@@ -44,21 +48,27 @@ public class HiveSqlExec {
   private static int defualtQueryLimit = 1000;
 
   /**
-   * 执行用户
-   */
-  private String userName;
-
-  /**
    * {@link HiveUtil}
    */
   private final HiveUtil hiveUtil;
+
+  /**
+   * 日志处理器
+   */
+  private Consumer<List<String>> logHandler;
+
+  /**
+   * 执行用户
+   */
+  private String userName;
 
   /**
    * 记录日志的实例
    */
   private Logger logger;
 
-  public HiveSqlExec(String userName, Logger logger) {
+  public HiveSqlExec(Consumer<List<String>> logHandler, String userName, Logger logger) {
+    this.logHandler = logHandler;
     this.userName = userName;
     this.logger = logger;
 
@@ -206,15 +216,7 @@ public class HiveSqlExec {
         }
       }
     } finally {
-      try {
-        if (logThread != null) {
-          logThread.interrupt();
-          logThread.join(HiveUtil.DEFAULT_QUERY_PROGRESS_THREAD_TIMEOUT);
-        }
-      } catch (Exception e) {
-        logger.error("Catch an exception", e);
-      }
-
+      // 关闭连接
       try {
         if (sta != null) {
           sta.close();
@@ -226,6 +228,16 @@ public class HiveSqlExec {
       // 返回连接
       if (hiveConnection != null) {
         hiveService2Client.returnClient(hiveService2ConnectionInfo, hiveConnection);
+      }
+
+      // 关闭日志
+      try {
+        if (logThread != null) {
+          logThread.interrupt();
+          logThread.join(HiveUtil.DEFAULT_QUERY_PROGRESS_THREAD_TIMEOUT);
+        }
+      } catch (Exception e) {
+//        logger.error("Catch an exception", e);
       }
     }
 
@@ -271,11 +283,14 @@ public class HiveSqlExec {
     private static final int DEFAULT_QUERY_PROGRESS_INTERVAL = 1000;
 
     private HiveStatement hiveStatement;
+    private List<String> logs;
 
     public JdbcLogRunnable(Statement statement) {
       if (statement instanceof HiveStatement) {
         this.hiveStatement = (HiveStatement) statement;
       }
+
+      this.logs = Collections.synchronizedList(new ArrayList<>());
     }
 
     @Override
@@ -284,19 +299,42 @@ public class HiveSqlExec {
         return;
       }
 
-      while (true) {
-        try {
-          for (String log : hiveStatement.getQueryLog()) {
-            logger.info("hive execute log : {}", log);
-          }
+      // 当前 flush 的时间
+      long preFlushTime = System.currentTimeMillis();
 
-          Thread.sleep(DEFAULT_QUERY_PROGRESS_INTERVAL);
-        } catch (InterruptedException e) {
-          showRemainingLogsIfAny();
-          return;
-        } catch (Exception e) {
-          logger.error(e.getMessage(), e);
-          return;
+      synchronized (this) { // 不能异步处理
+        while (true) {
+          try {
+            for (String log : hiveStatement.getQueryLog()) {
+              logs.add(log);
+
+              long now = System.currentTimeMillis();
+
+              // 到一定日志量就输出处理
+              if (logs.size() >= Constants.defaultLogBufferSize
+                  || now - preFlushTime > Constants.defaultLogFlushInterval) {
+                preFlushTime = now;
+
+                // 日志处理器
+                logHandler.accept(logs);
+
+                logs.clear();
+              }
+            }
+
+            Thread.sleep(DEFAULT_QUERY_PROGRESS_INTERVAL);
+          } catch (SQLException e) {
+            return;
+          } catch (InterruptedException e) {
+            logger.error(e.getMessage(), e);
+            return;
+          } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+            return;
+          } finally {
+            // 处理剩余日志
+            showRemainingLogsIfAny();
+          }
         }
       }
     }
@@ -310,8 +348,14 @@ public class HiveSqlExec {
           /*logger.error(e.getMessage(), e);*/
           return;
         }
+
         for (String log : logsTemp) {
-          logger.info("hive execute log : {}", log);
+          logs.add(log);
+
+          // 日志处理器
+          logHandler.accept(logs);
+
+          logs.clear();
         }
       } while (logsTemp.size() > 0);
     }

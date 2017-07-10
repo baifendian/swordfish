@@ -22,6 +22,8 @@ import com.baifendian.swordfish.execserver.job.impexp.Args.HqlColumn;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
+
+import com.baifendian.swordfish.execserver.job.impexp.ImpExpUtil;
 import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
 import org.apache.hadoop.hive.metastore.api.FieldSchema;
@@ -96,7 +98,7 @@ public class HiveMetaExec {
         boolean found = false;
 
         for (HqlColumn destCol : destColumn) {
-          if (StringUtils.equalsIgnoreCase(srcCol.getName(), destCol.getName())) {
+          if (ImpExpUtil.equalIgnoreCaseWithoutBackQuota(srcCol.getName(), destCol.getName())) {
             hqlColumnList.add(destCol);
             found = true;
             break;

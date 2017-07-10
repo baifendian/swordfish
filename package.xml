@@ -30,5 +30,12 @@
             </includes>
             <outputDirectory>.</outputDirectory>
         </fileSet>
+        <fileSet>
+            <directory>sql</directory>
+            <includes>
+                <include>**/*.*</include>
+            </includes>
+            <outputDirectory>./sql</outputDirectory>
+        </fileSet>
     </fileSets>
 </assembly>

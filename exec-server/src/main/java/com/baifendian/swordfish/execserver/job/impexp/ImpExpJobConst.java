@@ -23,17 +23,17 @@ import com.baifendian.swordfish.common.enums.WriteHdfsType;
 public class ImpExpJobConst {
 
   /**
-   * 写入hdfs临时文件的默认分隔符
+   * 写入 hdfs 临时文件的默认分隔符
    */
   public static final String DEFAULT_DELIMITER = ",";
 
   /**
-   * 写入hdfs临时文件的默认文件类型
+   * 写入 hdfs 临时文件的默认文件类型
    */
   public static final WriteHdfsType DEFAULT_FILE_TYPE = WriteHdfsType.TEXT;
 
   /**
-   * hive的默认数据库
+   * hive 的默认数据库
    */
   public static final String DEFAULT_DB = "default";
 
@@ -56,5 +56,4 @@ public class ImpExpJobConst {
    * HIVE 驱动
    */
   public static final String HIVE_DRIVER = "org.apache.hive.jdbc.HiveDriver";
-
 }

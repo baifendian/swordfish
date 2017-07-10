@@ -18,9 +18,9 @@ package com.baifendian.swordfish.dao.mapper;
 import com.baifendian.swordfish.dao.enums.FlowStatus;
 import com.baifendian.swordfish.dao.mapper.utils.EnumFieldUtil;
 import com.baifendian.swordfish.dao.model.ExecutionNode;
-import org.apache.ibatis.jdbc.SQL;
-
 import java.util.Map;
+import org.apache.commons.lang.StringUtils;
+import org.apache.ibatis.jdbc.SQL;
 
 public class ExecutionNodeMapperProvider {
 
@@ -54,6 +54,7 @@ public class ExecutionNodeMapperProvider {
    */
   public String update(Map<String, Object> parameter) {
     ExecutionNode executionNode = (ExecutionNode) parameter.get("executionNode");
+
     return new SQL() {
       {
         UPDATE(TABLE_NAME);
@@ -61,18 +62,21 @@ public class ExecutionNodeMapperProvider {
         if (executionNode.getAttempt() != null) {
           SET("attempt = #{executionNode.attempt}");
         }
+
         if (executionNode.getEndTime() != null) {
           SET("end_time = #{executionNode.endTime}");
         }
+
         if (executionNode.getStatus() != null) {
           SET("status = " + EnumFieldUtil.genFieldStr("executionNode.status", FlowStatus.class));
         }
-        if (executionNode.getAppLinks() != null) {
+
+        if (StringUtils.isNotEmpty(executionNode.getAppLinks())) {
           SET("app_links = #{executionNode.appLinks}");
         }
 
-        if (executionNode.getJobLinkList() != null) {
-          SET("app_links = #{executionNode.appLinks}");
+        if (StringUtils.isNotEmpty(executionNode.getJobLinks())) {
+          SET("job_links = #{executionNode.jobLinks}");
         }
 
         WHERE("exec_id = #{executionNode.execId}");
@@ -133,9 +137,6 @@ public class ExecutionNodeMapperProvider {
 
   /**
    * 删除结点
-   *
-   * @param parameter
-   * @return
    */
   public String deleteExecutionNodes(Map<String, Object> parameter) {
     return new SQL() {

@@ -15,6 +15,14 @@
  */
 package com.baifendian.swordfish.execserver.job;
 
+import static com.baifendian.swordfish.common.job.struct.node.JobType.HQL;
+import static com.baifendian.swordfish.common.job.struct.node.JobType.IMPEXP;
+import static com.baifendian.swordfish.common.job.struct.node.JobType.MR;
+import static com.baifendian.swordfish.common.job.struct.node.JobType.SHELL;
+import static com.baifendian.swordfish.common.job.struct.node.JobType.SPARK;
+import static com.baifendian.swordfish.common.job.struct.node.JobType.SPARK_STREAMING;
+import static com.baifendian.swordfish.common.job.struct.node.JobType.VIRTUAL;
+
 import com.baifendian.swordfish.execserver.job.hql.EtlSqlJob;
 import com.baifendian.swordfish.execserver.job.impexp.ImpExpJobManager;
 import com.baifendian.swordfish.execserver.job.mr.MrJob;
@@ -23,10 +31,10 @@ import com.baifendian.swordfish.execserver.job.spark.SparkJob;
 import com.baifendian.swordfish.execserver.job.virtual.VirtualJob;
 import org.slf4j.Logger;
 
-import static com.baifendian.swordfish.common.job.struct.node.JobType.*;
-
 public class JobManager {
-  public static Job newJob(String jobTypeStr, JobProps props, Logger logger) throws IllegalArgumentException {
+
+  public static Job newJob(String jobTypeStr, JobProps props, Logger logger)
+      throws IllegalArgumentException {
     switch (jobTypeStr) {
       case HQL:
         return new EtlSqlJob(props, false, logger);

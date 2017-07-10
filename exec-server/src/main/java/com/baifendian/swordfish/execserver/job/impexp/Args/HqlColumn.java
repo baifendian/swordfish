@@ -19,9 +19,10 @@ import com.baifendian.swordfish.common.job.struct.node.impexp.column.HiveColumn;
 import org.apache.commons.lang.StringUtils;
 
 /**
- * Hive sql中字段参数
+ * Hive sql 中字段参数
  */
 public class HqlColumn {
+
   private String name;
   private String type;
 
@@ -50,12 +51,10 @@ public class HqlColumn {
   }
 
   /**
-   * 判断一个HqlColumn 和一个 hiveColumn 是否相同
-   * @param hiveColumn
-   * @return
+   * 判断一个 HqlColumn 和一个 hiveColumn 是否相同
    */
   public boolean equals(HiveColumn hiveColumn) {
     return StringUtils.equalsIgnoreCase(name, hiveColumn.getName()) &&
-            StringUtils.containsIgnoreCase(type, hiveColumn.getType().name());
+        StringUtils.containsIgnoreCase(type, hiveColumn.getType().name());
   }
 }
