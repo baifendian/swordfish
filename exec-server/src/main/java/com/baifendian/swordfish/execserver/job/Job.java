@@ -103,7 +103,7 @@ public abstract class Job {
    */
   public void logProcess(List<String> logs) {
     // 注意, 这里换行还要加 " " 是为了便于日志解析
-    logger.info("(stdout, stderr) -> {}", String.join("\n ", logs));
+    logger.info("(stdout, stderr) -> {}", String.join("\n\t", logs));
   }
 
   /**
