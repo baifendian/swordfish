@@ -104,27 +104,32 @@ public class FileToHiveJob extends AbstractYarnJob {
   public void before() throws Exception {
     super.before();
 
-    logger.info("Start FileToHiveJob before function...");
+    try {
+      logger.info("Start FileToHiveJob before function...");
+      // 变量替换
+      for (FileColumn fileColumn : fileReader.getTargetColumn()) {
+        fileColumn
+                .setName(ParamHelper.resolvePlaceholders(fileColumn.getName(), props.getDefinedParams()));
+      }
 
-    // 变量替换
-    for (FileColumn fileColumn : fileReader.getTargetColumn()) {
-      fileColumn
-              .setName(ParamHelper.resolvePlaceholders(fileColumn.getName(), props.getDefinedParams()));
+      // 进行参数合理性检测
+      checkParam();
+
+      // 构造一个 hive 元数据服务类
+      hiveMetaExec = new HiveMetaExec(logger);
+
+      // 获取源 HQL 字段
+      destHiveColumns = hiveMetaExec.getHiveDesc(hiveWriter.getDatabase(), hiveWriter.getTable());
+
+      // 获取源字段
+      srcHiveColumns = hiveMetaExec.checkHiveColumn(hiveWriter.getColumn(), destHiveColumns);
+      logger.info("Finish FileToHiveJob before function!");
+    } catch (Exception e) {
+      logger.error("FileToHiveJob before function error", e);
+      throw e;
     }
 
-    // 进行参数合理性检测
-    checkParam();
 
-    // 构造一个 hive 元数据服务类
-    hiveMetaExec = new HiveMetaExec(logger);
-
-    // 获取源 HQL 字段
-    destHiveColumns = hiveMetaExec.getHiveDesc(hiveWriter.getDatabase(), hiveWriter.getTable());
-
-    // 获取源字段
-    srcHiveColumns = hiveMetaExec.checkHiveColumn(hiveWriter.getColumn(), destHiveColumns);
-
-    logger.info("Finish FileToHiveJob before function!");
   }
 
   @Override
@@ -203,11 +208,6 @@ public class FileToHiveJob extends AbstractYarnJob {
       logger.error(String.format("hql process exception, sql: %s", String.join(";", execSqls)), e);
       exitCode = -1;
     }
-  }
-
-  @Override
-  public void after() throws Exception {
-    super.after();
   }
 
   @Override
