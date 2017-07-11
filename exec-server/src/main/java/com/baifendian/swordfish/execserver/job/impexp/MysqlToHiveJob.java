@@ -148,7 +148,8 @@ public class MysqlToHiveJob extends DataXJob {
 
     //设置权限
     Path dir = new Path(path);
-    while (!dir.getName().equalsIgnoreCase("swordfish")) {
+    Path dirBase = new Path(BaseConfig.getHdfsImpExpDir(props.getProjectId()));
+    while (!dir.getName().equalsIgnoreCase(dirBase.getParent().getName())) {
       hdfsClient.setPermissionThis(dir, FsPermission.createImmutable((short) 0777));
       dir = dir.getParent();
     }

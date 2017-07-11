@@ -167,12 +167,12 @@ public class FileToHiveJob extends AbstractYarnJob {
 
         String fileHdfsPath = MessageFormat.format("{0}/{1}", hdfsPath, fileName);
 
-        // 设置权限
-        Path dir = new Path(fileHdfsPath);
-        while (!dir.getName().equalsIgnoreCase("swordfish")) {
-          HdfsClient.getInstance()
-                  .setPermissionThis(dir, FsPermission.createImmutable((short) 0777));
-          dir = dir.getParent();
+        //设置权限
+        Path fileHdfsPathObject = new Path(fileHdfsPath);
+        Path dirBase = new Path(BaseConfig.getHdfsImpExpDir(props.getProjectId()));
+        while (!fileHdfsPathObject.getName().equalsIgnoreCase(dirBase.getParent().getName())) {
+          HdfsClient.getInstance().setPermissionThis(fileHdfsPathObject, FsPermission.createImmutable((short) 0777));
+          fileHdfsPathObject = fileHdfsPathObject.getParent();
         }
 
         logger.info("Finish upload file to temp hdfs dir!");

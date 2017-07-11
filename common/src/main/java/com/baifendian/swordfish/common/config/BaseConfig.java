@@ -16,6 +16,7 @@
 package com.baifendian.swordfish.common.config;
 
 import com.baifendian.swordfish.common.utils.http.HttpUtil;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -25,6 +26,7 @@ import java.util.HashSet;
 import java.util.Properties;
 import java.util.Set;
 import java.util.UUID;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -103,7 +105,7 @@ public class BaseConfig {
    */
   public static String getLocalDownloadFilename(String filename) {
     return MessageFormat
-        .format("{0}/{1}/{2}", localDownloadBasePath, UUID.randomUUID().toString(), filename);
+            .format("{0}/{1}/{2}", localDownloadBasePath, UUID.randomUUID().toString(), filename);
   }
 
   /**
@@ -188,8 +190,8 @@ public class BaseConfig {
    */
   public static String getFlowExecDir(int projectId, int workflowId, long execId) {
     return MessageFormat
-        .format("{0}/flow/{1}/{2}/{3}", localExecBasePath, Integer.toString(projectId),
-            Integer.toString(workflowId), Long.toString(execId));
+            .format("{0}/flow/{1}/{2}/{3}", localExecBasePath, Integer.toString(projectId),
+                    Integer.toString(workflowId), Long.toString(execId));
   }
 
   /**
@@ -197,9 +199,20 @@ public class BaseConfig {
    */
   public static String getStreamingExecDir(int projectId, int jobId, long execId) {
     return MessageFormat
-        .format("{0}/streaming/{1}/{2}/{3}", localExecBasePath, Integer.toString(projectId),
-            Integer.toString(jobId),
-            Long.toString(execId));
+            .format("{0}/streaming/{1}/{2}/{3}", localExecBasePath, Integer.toString(projectId),
+                    Integer.toString(jobId),
+                    Long.toString(execId));
+  }
+
+  /**
+   * 获取 ImpExp 执行的项目根目录
+   *
+   * @param projectId
+   * @return
+   */
+  public static String getHdfsImpExpDir(int projectId) {
+    return MessageFormat
+            .format("{0}/{1}", hdfsImpexpBasePath, Integer.toString(projectId));
   }
 
   /**
@@ -207,8 +220,8 @@ public class BaseConfig {
    */
   public static String getHdfsImpExpDir(int projectId, long execId) {
     return MessageFormat
-        .format("{0}/{1}/{2}", hdfsImpexpBasePath, Integer.toString(projectId),
-            Long.toString(execId));
+            .format("{0}/{1}", getHdfsImpExpDir(projectId),
+                    Long.toString(execId));
   }
 
   /**
@@ -216,8 +229,8 @@ public class BaseConfig {
    */
   public static String getHdfsImpExpDir(int projectId, long execId, String nodeName) {
     return MessageFormat
-        .format("{0}/{1}", getHdfsImpExpDir(projectId, execId),
-            HttpUtil.getMd5(nodeName).substring(0, 8));
+            .format("{0}/{1}", getHdfsImpExpDir(projectId, execId),
+                    HttpUtil.getMd5(nodeName).substring(0, 8));
   }
 
   /**
@@ -225,7 +238,7 @@ public class BaseConfig {
    */
   public static String getJobHiveUdfJarPath(long execId) {
     return MessageFormat
-        .format("{0}/{1}", hdfsUdfJarBasePath, Long.toString(execId));
+            .format("{0}/{1}", hdfsUdfJarBasePath, Long.toString(execId));
   }
 
   /**
