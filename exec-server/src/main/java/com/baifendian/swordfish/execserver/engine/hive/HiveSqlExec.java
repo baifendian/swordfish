@@ -326,7 +326,7 @@ public class HiveSqlExec {
           } catch (SQLException e) {
             return;
           } catch (InterruptedException e) {
-            logger.error(e.getMessage(), e);
+//            logger.error(e.getMessage(), e);
             return;
           } catch (Exception e) {
             logger.error(e.getMessage(), e);
