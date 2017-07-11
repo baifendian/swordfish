@@ -4,43 +4,43 @@
 version="1.0-SNAPSHOT"
 
 # host address
-hostname="172.24.5.149"
+hostname="172.24.8.98"
 
 # zk address
-zkAddress="172.24.5.149:2181,172.24.5.150:2181,172.24.5.151:2181"
+zkAddress="172.24.8.95:2181,172.24.8.97:2181,172.24.8.98:2181"
 
 # ES address
-esAddress="172.24.5.149:9300,172.24.5.150:9300,172.24.5.151:9300"
+esAddress="172.24.8.96:9300,172.24.8.97:9300,172.24.8.98:9300"
 
 # es cluster name
-esClusterName="logging-dev"
+esClusterName="udpdev"
 
 # mysql address
-mysqlAddress="172.24.5.149:3306"
+mysqlAddress="172.24.8.94:3306"
 
 # mysql db name
 mysqlDb="swordfish"
 
 # mysql user name
-mysqlUser="swordfish"
+mysqlUser="udp"
 
 # mysql password
-mysqlPassword="swordfish"
+mysqlPassword="Udp-2017"
 
 # hive server address
-hiveAddress="172.24.5.149"
+hiveAddress="172.24.8.95"
 
 # hadoop address
-hadoopNamenodeAddress="172.24.5.149"
+hadoopNamenodeAddress="172.24.8.94"
 
 # hadoop yarn address
-hadoopYarnAddress="172.24.5.149"
+hadoopYarnAddress="172.24.8.95"
 
 # env config file
-envFile="/home/baseline/.sf_env.sh"
+envFile="/opt/udp/.sf_env.sh"
 
 # datax home path
-dataxHome="/home/baseline/DataX/target/datax/datax"
+dataxHome="/opt/udp/DataX/target/datax/datax"
 
 
 
