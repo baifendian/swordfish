@@ -161,6 +161,7 @@ public class HiveUtil extends BaseDao {
     HiveService2ConnectionInfo hiveService2ConnectionInfo = new HiveService2ConnectionInfo();
 
     hiveService2ConnectionInfo.setUser(userName);
+    hiveService2ConnectionInfo.setPassword("");
     hiveService2ConnectionInfo.setUri(hiveConfig.getThriftUris());
 
     return hiveService2ConnectionInfo;
