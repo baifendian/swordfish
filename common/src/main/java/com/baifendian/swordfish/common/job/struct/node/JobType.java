@@ -21,6 +21,7 @@ public class JobType {
   public static final String MR = "MR";
   public static final String SHELL = "SHELL";
   public static final String SPARK = "SPARK";
+  public static final String STORM = "STORM";
   public static final String VIRTUAL = "VIRTUAL";
   public static final String SPARK_STREAMING = "SPARK_STREAMING"; // 长任务类型
   public static final String IMPEXP = "IMPEXP";
