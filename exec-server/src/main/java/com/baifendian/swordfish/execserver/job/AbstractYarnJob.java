@@ -194,8 +194,6 @@ public abstract class AbstractYarnJob extends Job {
    */
   @Override
   public void cancel(boolean cancelApplication) throws Exception {
-    logger.info("cancel yarn application");
-
     cancel = true;
 
     if (cancelApplication) {
@@ -211,6 +209,8 @@ public abstract class AbstractYarnJob extends Job {
    */
   public static void cancelApplication(List<String> appLinks, JobProps props, Logger logger)
       throws IOException {
+    logger.info("begin cancel yarn application...");
+
     // 然后 kill application, 一般来说, 就是最后一个(前面的都运行完了)
     if (CollectionUtils.isNotEmpty(appLinks)) {
       String appid = appLinks.get(appLinks.size() - 1);
@@ -251,6 +251,8 @@ public abstract class AbstractYarnJob extends Job {
         logger.error(String.format("kill application %s exception", appid), e);
       }
     }
+
+    logger.info("end cancel yarn application.");
   }
 
   /**
