@@ -645,9 +645,9 @@ public class FlowRunner implements Runnable {
    * flow 执行完的后置处理 <p>
    */
   private void postProcess() {
-    logger.info("Develop mode is: {}", BaseConfig.isDevlopMode());
+    logger.info("Develop mode is: {}", BaseConfig.isDevelopMode());
 
-    if (!BaseConfig.isDevlopMode()) {
+    if (!BaseConfig.isDevelopMode()) {
       // 执行完后, 清理目录, 避免文件过大
       String execLocalPath = BaseConfig
           .getFlowExecDir(executionFlow.getProjectId(), executionFlow.getFlowId(),

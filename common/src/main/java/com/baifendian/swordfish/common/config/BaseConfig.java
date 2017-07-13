@@ -95,9 +95,10 @@ public class BaseConfig {
         prohibitUserSet.add(user);
       }
 
-      devlopMode = Boolean.getBoolean(properties.getProperty("develop.mode"));
+      devlopMode = Boolean.parseBoolean(properties.getProperty("develop.mode"));
     } catch (IOException e) {
       LOGGER.error(e.getMessage(), e);
+      System.exit(1);
     } finally {
       IOUtils.closeQuietly(is);
     }
@@ -258,7 +259,7 @@ public class BaseConfig {
   /**
    * 是否处于开发模式
    */
-  public static boolean isDevlopMode() {
+  public static boolean isDevelopMode() {
     return devlopMode;
   }
 
