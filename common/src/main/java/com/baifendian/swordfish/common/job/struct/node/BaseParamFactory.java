@@ -21,6 +21,7 @@ import com.baifendian.swordfish.common.job.struct.node.impexp.ImpExpBuilder;
 import com.baifendian.swordfish.common.job.struct.node.mr.MrParam;
 import com.baifendian.swordfish.common.job.struct.node.shell.ShellParam;
 import com.baifendian.swordfish.common.job.struct.node.spark.SparkParam;
+import com.baifendian.swordfish.common.job.struct.node.storm.StormBuilder;
 import com.baifendian.swordfish.common.job.struct.node.virtual.VirtualParam;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
 import org.apache.avro.data.Json;
@@ -53,6 +54,8 @@ public class BaseParamFactory {
           return JsonUtil.parseObject(parameter, SparkParam.class);
         case IMPEXP:
           return JsonUtil.parseObject(parameter,ImpExpBuilder.class).buildImpExp();
+        case STORM:
+          return JsonUtil.parseObject(parameter, StormBuilder.class).buildStormParam();
         default:
           return null;
       }

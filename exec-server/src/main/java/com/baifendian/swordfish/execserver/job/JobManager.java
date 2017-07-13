@@ -21,6 +21,7 @@ import static com.baifendian.swordfish.common.job.struct.node.JobType.MR;
 import static com.baifendian.swordfish.common.job.struct.node.JobType.SHELL;
 import static com.baifendian.swordfish.common.job.struct.node.JobType.SPARK;
 import static com.baifendian.swordfish.common.job.struct.node.JobType.SPARK_STREAMING;
+import static com.baifendian.swordfish.common.job.struct.node.JobType.STORM;
 import static com.baifendian.swordfish.common.job.struct.node.JobType.VIRTUAL;
 
 import com.baifendian.swordfish.execserver.job.hql.EtlSqlJob;
@@ -28,6 +29,7 @@ import com.baifendian.swordfish.execserver.job.impexp.ImpExpJobManager;
 import com.baifendian.swordfish.execserver.job.mr.MrJob;
 import com.baifendian.swordfish.execserver.job.shell.ShellJob;
 import com.baifendian.swordfish.execserver.job.spark.SparkJob;
+import com.baifendian.swordfish.execserver.job.storm.StormJob;
 import com.baifendian.swordfish.execserver.job.virtual.VirtualJob;
 import org.slf4j.Logger;
 
@@ -48,6 +50,8 @@ public class JobManager {
         return new VirtualJob(props, false, logger);
       case SPARK_STREAMING:
         return new SparkJob(props, true, logger);
+      case STORM:
+        return new StormJob(props, true, logger);
       case IMPEXP:
         return ImpExpJobManager.newJob(jobTypeStr, props, logger);
       default:

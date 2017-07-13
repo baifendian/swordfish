@@ -56,6 +56,9 @@ public class BaseConfig {
   // 禁用用户列表
   private static Set<String> prohibitUserSet;
 
+  // 开发模式
+  private static boolean devlopMode;
+
   /**
    * 环境变量信息
    */
@@ -91,6 +94,8 @@ public class BaseConfig {
         LOGGER.info("prohibit user: {}", user);
         prohibitUserSet.add(user);
       }
+
+      devlopMode = Boolean.getBoolean(properties.getProperty("develop.mode"));
     } catch (IOException e) {
       LOGGER.error(e.getMessage(), e);
     } finally {
@@ -203,11 +208,19 @@ public class BaseConfig {
   }
 
   /**
+   * 获取 ImpExp 执行的项目根目录
+   */
+  public static String getHdfsImpExpDir(int projectId) {
+    return MessageFormat
+        .format("{0}/{1}", hdfsImpexpBasePath, Integer.toString(projectId));
+  }
+
+  /**
    * 获取 ImpExp 执行的根目录
    */
   public static String getHdfsImpExpDir(int projectId, long execId) {
     return MessageFormat
-        .format("{0}/{1}/{2}", hdfsImpexpBasePath, Integer.toString(projectId),
+        .format("{0}/{1}", getHdfsImpExpDir(projectId),
             Long.toString(execId));
   }
 
@@ -240,6 +253,13 @@ public class BaseConfig {
    */
   public static boolean isProhibitUser(String user) {
     return prohibitUserSet.contains(user);
+  }
+
+  /**
+   * 是否处于开发模式
+   */
+  public static boolean isDevlopMode() {
+    return devlopMode;
   }
 
   public static void main(String[] args) {

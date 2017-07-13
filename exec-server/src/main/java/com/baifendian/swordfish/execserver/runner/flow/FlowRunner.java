@@ -645,22 +645,24 @@ public class FlowRunner implements Runnable {
    * flow 执行完的后置处理 <p>
    */
   private void postProcess() {
-    // 执行完后, 清理目录, 避免文件过大
-    String execLocalPath = BaseConfig
-        .getFlowExecDir(executionFlow.getProjectId(), executionFlow.getFlowId(),
-            executionFlow.getId());
+    if (!BaseConfig.isDevlopMode()) {
+      // 执行完后, 清理目录, 避免文件过大
+      String execLocalPath = BaseConfig
+          .getFlowExecDir(executionFlow.getProjectId(), executionFlow.getFlowId(),
+              executionFlow.getId());
 
-    try {
-      FileUtils.deleteDirectory(new File(execLocalPath));
-    } catch (IOException e) {
-      logger.error(String.format("delete exec dir exception: %s", execLocalPath), e);
+      try {
+        FileUtils.deleteDirectory(new File(execLocalPath));
+      } catch (IOException e) {
+        logger.error(String.format("delete exec dir exception: %s", execLocalPath), e);
+      }
+
+      // 执行完后, 清理 udf 目录
+      hdfsCleanUp(BaseConfig.getJobHiveUdfJarPath(executionFlow.getId()));
+
+      // 执行完后, 清理 import/export 目录
+      hdfsCleanUp(BaseConfig.getHdfsImpExpDir(executionFlow.getProjectId(), executionFlow.getId()));
     }
-
-    // 执行完后, 清理 udf 目录
-    hdfsCleanUp(BaseConfig.getJobHiveUdfJarPath(executionFlow.getId()));
-
-    // 执行完后, 清理 import/export 目录
-    hdfsCleanUp(BaseConfig.getHdfsImpExpDir(executionFlow.getProjectId(), executionFlow.getId()));
 
     EmailManager.sendMessageOfExecutionFlow(executionFlow);
   }
