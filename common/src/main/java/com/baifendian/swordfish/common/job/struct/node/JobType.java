@@ -33,6 +33,8 @@ public class JobType {
     switch (job) {
       case SPARK_STREAMING:
         return true;
+      case STORM:
+        return true;
       case HQL:
       case MR:
       case SHELL:
