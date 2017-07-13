@@ -147,7 +147,7 @@ public abstract class AbstractYarnJob extends Job {
     }
 
     // 如果已经被取消, 感觉取消应用, 不然会比较危险
-    if (isCancel() && !appLinks.isEmpty()) {
+    if (!isLongJob && isCancel() && !appLinks.isEmpty()) {
       try {
         cancelApplication(appLinks, props, logger);
       } catch (Exception e) {
