@@ -26,7 +26,6 @@ import com.baifendian.swordfish.execserver.job.JobManager;
 import com.baifendian.swordfish.execserver.job.JobProps;
 import com.baifendian.swordfish.execserver.parameter.SystemParamManager;
 import com.baifendian.swordfish.execserver.utils.EnvHelper;
-import com.baifendian.swordfish.execserver.utils.JobLogger;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -143,10 +142,12 @@ public class StreamingRunner implements Callable<Boolean> {
       kill();
 
       // 执行完后, 清理目录, 避免文件过大
-      try {
-        FileUtils.deleteDirectory(new File(jobScriptPath));
-      } catch (IOException e) {
-        logger.error(String.format("delete dir exception: %s", jobScriptPath), e);
+      if (!BaseConfig.isDevlopMode()) {
+        try {
+          FileUtils.deleteDirectory(new File(jobScriptPath));
+        } catch (IOException e) {
+          logger.error(String.format("delete dir exception: %s", jobScriptPath), e);
+        }
       }
 
       logger.info("job process done, streaming job id: {}, exec id: {}, success: {}",

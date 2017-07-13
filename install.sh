@@ -42,7 +42,8 @@ envFile="/opt/udp/.sf_env.sh"
 # datax home path
 dataxHome="/opt/udp/DataX/target/datax/datax"
 
-
+# develop mode
+developMode=true
 
 # 使用示例
 function usage() {
@@ -81,6 +82,7 @@ function file_replace()
     sed -i "s#es.cluster.name.*#es.cluster.name = ${esClusterName}#g" conf/common/search.properties
 
     sed -i "s#sf.env.file.*#sf.env.file = ${envFile}#g" conf/common/base_config.properties
+    sed -i "s#develop.mode.*#develop.mode = ${developMode}#g" conf/common/base_config.properties
 
     sed -i "s#fs.defaultFS.*#fs.defaultFS = hdfs://${hadoopNamenodeAddress}:8020#g" conf/common/hadoop/hadoop.properties
     sed -i "s#yarn.resourcemanager.address.*#yarn.resourcemanager.address = ${hadoopYarnAddress}:8032#g" conf/common/hadoop/hadoop.properties
