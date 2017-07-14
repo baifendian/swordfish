@@ -243,6 +243,14 @@ public class BaseConfig {
   }
 
   /**
+   * 得到路径
+   */
+  public static String getJobHiveUdfJarPath(long execId, String nodeName) {
+    return MessageFormat
+        .format("{0}/{1}", getJobHiveUdfJarPath(execId), HttpUtil.getMd5(nodeName).substring(0, 8));
+  }
+
+  /**
    * 得到系统环境变量路径
    */
   public static String getSystemEnvPath() {
