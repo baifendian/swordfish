@@ -47,15 +47,19 @@ developMode=true
 
 # 使用示例
 function usage() {
-    echo "Usage: $0 -r <true|false>" 1>&2;
+    echo "Usage: $0 -r <true|false> [-m <all|web-server|master-server|exec-server>" 1>&2;
     exit 1;
 }
 
-while getopts ":r:" o; do
+while getopts ":r:m:" o; do
     case "${o}" in
         r)
             r=${OPTARG}
             [[ "$r" = "true" || "$r" = "false" ]] || usage
+            ;;
+        m)
+            m=${OPTARG}
+            [[ "$m" = "all" || "$m" = "web-server" || "$m" = "master-server" || "$m" = "exec-server" ]] || usage
             ;;
         *)
             usage
@@ -66,6 +70,12 @@ done
 if [ -z "${r}" ]; then
     usage
 fi
+
+if [ -z "${m}" ]; then
+    m="all"
+fi
+
+echo "replace: $r, module: $m"
 
 # 文件替换
 function file_replace()
@@ -145,20 +155,26 @@ fi
 # start all service
 cd $SWORDFISH_HOME/target/swordfish-all-${version}/
 
-sh bin/swordfish-daemon.sh stop web-server
-sh bin/swordfish-daemon.sh start web-server
+if [ "$m" = "all" ] || [ "$m" = "web-server" ]; then
+  sh bin/swordfish-daemon.sh stop web-server
+  sh bin/swordfish-daemon.sh start web-server
 
-process_check web-server
+  process_check web-server
+fi
 
-sh bin/swordfish-daemon.sh stop master-server
-sh bin/swordfish-daemon.sh start master-server
+if [ "$m" = "all" ] || [ "$m" = "master-server" ]; then
+  sh bin/swordfish-daemon.sh stop master-server
+  sh bin/swordfish-daemon.sh start master-server
 
-process_check master-server
+  process_check master-server
+fi
 
-sh bin/swordfish-daemon.sh stop exec-server
-sh bin/swordfish-daemon.sh start exec-server
+if [ "$m" = "all" ] || [ "$m" = "exec-server" ]; then
+  sh bin/swordfish-daemon.sh stop exec-server
+  sh bin/swordfish-daemon.sh start exec-server
 
-process_check exec-server
+  process_check exec-server
+fi
 
 # 查看进程是否存在
 sleep 1s
