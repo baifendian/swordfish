@@ -96,7 +96,12 @@
             <dependency>
                 <groupId>org.apache.httpcomponents</groupId>
                 <artifactId>httpclient</artifactId>
-                <version>4.5.2</version>
+                <version>4.5.3</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.httpcomponents</groupId>
+                <artifactId>fluent-hc</artifactId>
+                <version>4.5.3</version>
             </dependency>
             <dependency>
                 <groupId>commons-httpclient</groupId>
@@ -412,6 +417,7 @@
                 <artifactId>zip4j</artifactId>
                 <version>1.3.2</version>
             </dependency>
+
         </dependencies>
 
     </dependencyManagement>

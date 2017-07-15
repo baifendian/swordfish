@@ -14,7 +14,7 @@ public class StormParamFactory {
       case SQL:
         return JsonUtil.parseObject(param, StormSqlParam.class);
       case SHELL:
-        return JsonUtil.parseObject(param, StormSqlParam.class);
+        return JsonUtil.parseObject(param, StormShellParam.class);
       default:
         return null;
     }

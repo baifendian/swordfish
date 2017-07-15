@@ -15,12 +15,52 @@
  */
 package com.baifendian.swordfish.execserver.job;
 
+import org.apache.commons.configuration.PropertiesConfiguration;
 import org.slf4j.Logger;
 
+import java.util.List;
+
+
+/**
+ * storm 框架任务
+ */
 public abstract class AbstractStormJob extends Job {
+
+  protected PropertiesConfiguration stormConf;
+
+  /**
+   * storm 任务名称
+   */
+  protected String TopologyName;
+
+  /**
+   * storm 任务Id
+   */
+  protected String TopologyId;
 
   public AbstractStormJob(JobProps props, boolean isLongJob, Logger logger) {
     super(props, isLongJob, logger);
   }
+
+  @Override
+  public void init() throws Exception {
+    super.init();
+    stormConf = new PropertiesConfiguration("common/storm.properties");
+  }
+
+  @Override
+  public void logProcess(List<String> logs) {
+    super.logProcess(logs);
+
+  }
+
+
+
+
+  @Override
+  public void cancel(boolean cancelApplication) throws Exception {
+    super.cancel(cancelApplication);
+  }
+
 
 }
