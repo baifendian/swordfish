@@ -20,6 +20,7 @@ import com.baifendian.swordfish.common.job.struct.node.adhoc.AdHocParam;
 import com.baifendian.swordfish.common.utils.CommonUtil;
 import com.baifendian.swordfish.dao.AdHocDao;
 import com.baifendian.swordfish.dao.DaoFactory;
+import com.baifendian.swordfish.dao.enums.AdHocType;
 import com.baifendian.swordfish.dao.enums.ExecType;
 import com.baifendian.swordfish.dao.enums.FlowStatus;
 import com.baifendian.swordfish.dao.model.AdHocJsonObject;
@@ -55,14 +56,20 @@ public class AdHocSqlJob {
   private AdHocParam param;
 
   /**
+   * 即席的类型
+   */
+  private AdHocType type;
+
+  /**
    * 记录日志
    */
   private Logger logger;
 
-  public AdHocSqlJob(JobProps props, Logger logger) {
+  public AdHocSqlJob(JobProps props, AdHocType type, Logger logger) {
     this.props = props;
     this.adHocDao = DaoFactory.getDaoInstance(AdHocDao.class);
     this.param = JsonUtil.parseObject(props.getJobParams(), AdHocParam.class);
+    this.type = type;
     this.logger = logger;
   }
 
@@ -121,9 +128,19 @@ public class AdHocSqlJob {
     // 切分 sql
     List<String> execSqls = CommonUtil.sqlSplit(sqls);
 
-    HiveSqlExec hiveSqlExec = new HiveSqlExec(this::logProcess, props.getProxyUser(), logger);
+    switch (type) {
+      case SPARK: {
+        // TODO:: Support Spark Sql Engine
 
-    return hiveSqlExec.execute(funcs, execSqls, true, resultCallback, param.getLimit())
-        ? FlowStatus.SUCCESS : FlowStatus.FAILED;
+      }
+      case PHOENIX:
+      case HIVE:
+      default: {
+        HiveSqlExec hiveSqlExec = new HiveSqlExec(this::logProcess, props.getProxyUser(), logger);
+
+        return hiveSqlExec.execute(funcs, execSqls, true, resultCallback, param.getLimit())
+            ? FlowStatus.SUCCESS : FlowStatus.FAILED;
+      }
+    }
   }
 }

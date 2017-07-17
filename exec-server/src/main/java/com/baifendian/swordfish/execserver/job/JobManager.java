@@ -24,7 +24,7 @@ import static com.baifendian.swordfish.common.job.struct.node.JobType.SPARK_STRE
 import static com.baifendian.swordfish.common.job.struct.node.JobType.STORM;
 import static com.baifendian.swordfish.common.job.struct.node.JobType.VIRTUAL;
 
-import com.baifendian.swordfish.execserver.job.hql.EtlSqlJob;
+import com.baifendian.swordfish.execserver.job.sql.EtlSqlJob;
 import com.baifendian.swordfish.execserver.job.impexp.ImpExpJobManager;
 import com.baifendian.swordfish.execserver.job.mr.MrJob;
 import com.baifendian.swordfish.execserver.job.shell.ShellJob;
