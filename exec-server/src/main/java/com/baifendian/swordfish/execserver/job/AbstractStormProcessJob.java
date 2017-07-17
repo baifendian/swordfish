@@ -80,6 +80,7 @@ public abstract class AbstractStormProcessJob extends Job {
 
   @Override
   public boolean isCompleted() {
+    /*
     if (StringUtils.isNotEmpty(topologyId)) {
       try {
         TopologyInfoDto topologyInfo = StormRestUtil.getTopologyInfo(topologyId);
@@ -92,6 +93,12 @@ public abstract class AbstractStormProcessJob extends Job {
       } catch (IOException e) {
         e.printStackTrace();
       }
+    }
+    */
+
+    //如果能获取到topologName 我们就认为提交完成了
+    if (StringUtils.isNotEmpty(topologyName)) {
+      complete = true;
     }
 
     return complete;
@@ -131,54 +138,50 @@ public abstract class AbstractStormProcessJob extends Job {
   public void process() throws Exception {
     try {
       // 构造进程
-      exitCode = processJob.runCommand(createCommand());
+      processJob.runCommand(createCommand());
+      logger.info("Start get topologyId...");
+      //尝试3次获取id，如果不能获取到id就算任务失败
+      int index = 0;
 
-      if (exitCode != -1) {
-        logger.info("Start get topologyId...");
-        //尝试3次获取id，如果不能获取到id就算任务失败
-        int index = 0;
-
-        while (true) {
-          index++;
-          try {
-            topologyId = StormRestUtil.getTopologyId(topologyName).trim();
-            logger.info("Get topologyId: {}", topologyId);
-          } catch (IOException e) {
-
-            logger.error("Get topologyId error", e);
-          }
-
-          if (index > 3) {
-            throw new Exception("Not found topologyId!");
-          }
-
-          if (StringUtils.isEmpty(topologyId)) {
-            Thread.sleep(checkInterval);
-          } else {
-            break;
-          }
-        }
-        logger.info("Finish get topologyId!");
-        //获取日志
+      while (true) {
+        index++;
         try {
-          topologyLogs = StormRestUtil.getTopologyLogs(topologyId);
-          logger.info("Get topology logs");
-        } catch (Exception e) {
-          logger.error("Get topology logs error", e);
+          topologyId = StormRestUtil.getTopologyId(topologyName).trim();
+          logger.info("Get topologyId: {}", topologyId);
+        } catch (IOException e) {
+
+          logger.error("Get topologyId error", e);
         }
-        logger.info("Start update streaming_result dao...");
-        StreamingResult streamingResult = streamingDao.queryStreamingExec(props.getExecId());
-        if (streamingResult != null) {
-          streamingResult.setAppLinks(topologyId);
-          streamingResult.setJobLinkList(topologyLogs);
-          streamingDao.updateResult(streamingResult);
+
+        if (index > 3) {
+          throw new Exception("Not found topologyId!");
+        }
+
+        if (StringUtils.isEmpty(topologyId)) {
+          Thread.sleep(checkInterval);
         } else {
-          logger.warn("Not found execId: {}", props.getExecId());
+          break;
         }
-        logger.info("Finish update streaming_result dao!");
       }
-
-
+      logger.info("Finish get topologyId!");
+      //获取日志
+      try {
+        topologyLogs = StormRestUtil.getTopologyLogs(topologyId);
+        logger.info("Get topology logs");
+      } catch (Exception e) {
+        logger.error("Get topology logs error", e);
+      }
+      logger.info("Start update streaming_result dao...");
+      StreamingResult streamingResult = streamingDao.queryStreamingExec(props.getExecId());
+      if (streamingResult != null) {
+        streamingResult.setAppLinks(topologyId);
+        streamingResult.setJobLinkList(topologyLogs);
+        streamingDao.updateResult(streamingResult);
+      } else {
+        logger.warn("Not found execId: {}", props.getExecId());
+      }
+      logger.info("Finish update streaming_result dao!");
+      exitCode = 0;
     } catch (Exception e) {
       logger.error("Storm process exception", e);
       exitCode = -1;
