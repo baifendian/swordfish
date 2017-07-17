@@ -60,7 +60,7 @@ public class AdHocRunner implements Runnable {
     FlowStatus status;
 
     try {
-      AdHocSqlJob job = new AdHocSqlJob(props, logger);
+      AdHocSqlJob job = new AdHocSqlJob(props, adHoc.getType(), logger);
       status = job.process();
     } catch (Exception e) {
       logger.error("run adHoc job error", e);

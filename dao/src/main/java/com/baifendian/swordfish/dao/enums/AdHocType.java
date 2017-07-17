@@ -19,5 +19,5 @@ package com.baifendian.swordfish.dao.enums;
  * 即系查询类型
  */
 public enum AdHocType {
-  HIVE,SPARK;
+  HIVE, SPARK, PHOENIX
 }
