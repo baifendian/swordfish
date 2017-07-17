@@ -11,6 +11,7 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -173,7 +174,7 @@ public abstract class AbstractStormProcessJob extends Job {
       logger.info("Start update streaming_result dao...");
       StreamingResult streamingResult = streamingDao.queryStreamingExec(props.getExecId());
       if (streamingResult != null) {
-        streamingResult.setAppLinks(topologyId);
+        streamingResult.setAppLinkList(Arrays.asList(topologyId));
         streamingResult.setJobLinkList(topologyLogs);
         streamingDao.updateResult(streamingResult);
       } else {
