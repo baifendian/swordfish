@@ -21,6 +21,7 @@ import com.baifendian.swordfish.common.job.struct.node.storm.StormBuilder;
 import com.baifendian.swordfish.common.job.struct.node.storm.StormParam;
 import com.baifendian.swordfish.common.job.struct.node.storm.param.StormShellParam;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
+import com.baifendian.swordfish.execserver.job.AbstractStormProcessJob;
 import com.baifendian.swordfish.execserver.job.AbstractYarnProcessJob;
 import com.baifendian.swordfish.execserver.job.JobProps;
 import com.baifendian.swordfish.execserver.parameter.ParamHelper;
@@ -36,7 +37,7 @@ import static com.baifendian.swordfish.execserver.job.storm.StormSubmitArgsConst
 /**
  * Storm 任务
  */
-public class StormJob extends AbstractYarnProcessJob {
+public class StormJob extends AbstractStormProcessJob {
 
   private StormParam stormParam;
 
