@@ -45,7 +45,7 @@ public class StormRestUtil {
 
   private final static String topologyDeactivate = "/api/v1/topology/{0}/deactivate";
 
-  private final static String topologyRebalance = "/api/v1/topology/{0}/rebalance/{1}";
+  private final static String topologyActivate = "/api/v1/topology/{0}/activate";
 
   /**
    * 获取 topologySummary url
@@ -91,11 +91,10 @@ public class StormRestUtil {
    * 恢复一个任务
    *
    * @param topologyId
-   * @param waitTime
    * @return
    */
-  private static String getTopologyRebalanceUrl(String topologyId, long waitTime) {
-    return stormRestUrl + MessageFormat.format(topologyRebalance, topologyId, waitTime);
+  private static String getTopologyActivateUrl(String topologyId) {
+    return stormRestUrl + MessageFormat.format(topologyActivate, topologyId);
   }
 
   /**
@@ -200,12 +199,11 @@ public class StormRestUtil {
    * 恢复一个任务
    *
    * @param topologyId
-   * @param waitTime
    * @return
    * @throws IOException
    */
-  public static void topologyRebalance(String topologyId, long waitTime) throws Exception {
-    String res = Request.Post(getTopologyRebalanceUrl(topologyId, waitTime)).execute().returnContent().toString();
+  public static void topologyActivate(String topologyId) throws Exception {
+    String res = Request.Post(getTopologyActivateUrl(topologyId)).execute().returnContent().toString();
 
     TopologyOperationDto topologyOperation = JsonUtil.parseObject(res, TopologyOperationDto.class);
 

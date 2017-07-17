@@ -152,4 +152,22 @@ public abstract class AbstractStormJob extends Job {
     StormRestUtil.topologyKill(appLinks, waitTime);
   }
 
+  /**
+   * 恢复一个任务
+   * @param appLinks
+   * @throws Exception
+   */
+  public static void activateApplication(String appLinks) throws Exception {
+    StormRestUtil.topologyActivate(appLinks);
+  }
+
+  /**
+   * 暂停一个任务
+   * @param appLinks
+   * @throws Exception
+   */
+  public static void dedeactivate(String appLinks) throws Exception {
+    StormRestUtil.topologyActivate(appLinks);
+  }
+
 }

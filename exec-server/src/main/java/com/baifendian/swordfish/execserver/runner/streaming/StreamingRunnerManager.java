@@ -17,25 +17,32 @@ package com.baifendian.swordfish.execserver.runner.streaming;
 
 import com.baifendian.swordfish.common.config.BaseConfig;
 import com.baifendian.swordfish.common.hadoop.YarnRestClient;
+import com.baifendian.swordfish.common.job.utils.node.storm.StormRestUtil;
 import com.baifendian.swordfish.common.utils.DateUtils;
 import com.baifendian.swordfish.dao.DaoFactory;
 import com.baifendian.swordfish.dao.StreamingDao;
 import com.baifendian.swordfish.dao.enums.FlowStatus;
 import com.baifendian.swordfish.dao.model.StreamingResult;
+import com.baifendian.swordfish.execserver.job.AbstractStormJob;
 import com.baifendian.swordfish.execserver.job.JobProps;
 import com.baifendian.swordfish.execserver.job.AbstractYarnJob;
 import com.baifendian.swordfish.execserver.utils.Constants;
 import com.baifendian.swordfish.execserver.utils.JobLogger;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+
+import java.text.MessageFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
+
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.configuration.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static com.baifendian.swordfish.common.job.struct.node.JobType.*;
 
 public class StreamingRunnerManager {
 
@@ -49,10 +56,10 @@ public class StreamingRunnerManager {
     streamingDao = DaoFactory.getDaoInstance(StreamingDao.class);
 
     int threads = conf
-        .getInt(Constants.EXECUTOR_STREAMING_THREADS, Constants.defaultStreamingThreadNum);
+            .getInt(Constants.EXECUTOR_STREAMING_THREADS, Constants.defaultStreamingThreadNum);
 
     ThreadFactory flowThreadFactory = new ThreadFactoryBuilder()
-        .setNameFormat("Exec-Server-StreamingRunner").build();
+            .setNameFormat("Exec-Server-StreamingRunner").build();
     streamingExecutorService = Executors.newFixedThreadPool(threads, flowThreadFactory);
   }
 
@@ -69,7 +76,7 @@ public class StreamingRunnerManager {
     }
 
     String jobId = String.format("STREAMING_JOB_%s_%s", streamingResult.getExecId(),
-        DateUtils.now(Constants.DATETIME_FORMAT));
+            DateUtils.now(Constants.DATETIME_FORMAT));
 
     Date now = new Date();
 
@@ -92,41 +99,104 @@ public class StreamingRunnerManager {
    *
    * @param streamingResult 流任务的结果
    */
-  public void cancelJob(StreamingResult streamingResult) {
+  public void cancelJob(StreamingResult streamingResult) throws Exception {
     JobProps props = new JobProps();
 
     props.setWorkDir(BaseConfig
-        .getStreamingExecDir(streamingResult.getProjectId(), streamingResult.getStreamingId(),
-            streamingResult.getExecId()));
+            .getStreamingExecDir(streamingResult.getProjectId(), streamingResult.getStreamingId(),
+                    streamingResult.getExecId()));
     props.setProxyUser(streamingResult.getProxyUser());
     props.setEnvFile(BaseConfig.getSystemEnvPath());
     props.setJobAppId(streamingResult.getJobId());
 
+    FlowStatus status = null;
+
     try {
-      AbstractYarnJob.cancelApplication(streamingResult.getAppLinkList(), props,
-          new JobLogger(streamingResult.getJobId()));
+      switch (streamingResult.getType()) {
+        case SPARK_STREAMING: {
+          AbstractYarnJob.cancelApplication(streamingResult.getAppLinkList(), props,
+                  new JobLogger(streamingResult.getJobId()));
 
-      // 删除后, 需要更新状态
-      List<String> appLinkList = streamingResult.getAppLinkList();
-      String appId =
-          (CollectionUtils.isEmpty(appLinkList)) ? null : appLinkList.get(appLinkList.size() - 1);
+          // 删除后, 需要更新状态
+          List<String> appLinkList = streamingResult.getAppLinkList();
+          String appId =
+                  (CollectionUtils.isEmpty(appLinkList)) ? null : appLinkList.get(appLinkList.size() - 1);
 
-      FlowStatus status = YarnRestClient.getInstance().getApplicationStatus(appId);
+          status = YarnRestClient.getInstance().getApplicationStatus(appId);
+          break;
 
-      if (status == null || (status != null && status.typeIsFinished())) {
-        if (status == null) {
-          streamingResult.setStatus(FlowStatus.KILL);
-        } else {
-          streamingResult.setStatus(status);
         }
+        case STORM: {
+          AbstractStormJob.cancelApplication(streamingResult.getAppLinks());
+          status = FlowStatus.KILL;
+          break;
+        }
+        default: {
+          String msg = MessageFormat.format("Not support job type: {0}", streamingResult.getType());
+          throw new Exception(msg);
+        }
+      }
+
+      if (status == null) {
+        status = FlowStatus.KILL;
+      }
+
+      if (status.typeIsFinished()) {
+        streamingResult.setStatus(status);
 
         streamingResult.setEndTime(new Date());
 
         streamingDao.updateResult(streamingResult);
       }
+
     } catch (Exception e) {
-      logger.error(String.format("cancel streaming job exception: %d", streamingResult.getExecId()),
-          e);
+      logger.error(String.format("Cancel streaming job exception: %d", streamingResult.getExecId()),
+              e);
+      throw e;
+    }
+  }
+
+  /**
+   * 激活一个暂停的Job
+   *
+   * @param streamingResult
+   */
+  public void activateJob(StreamingResult streamingResult) throws Exception {
+    try {
+      switch (streamingResult.getType()) {
+        case STORM:
+          AbstractStormJob.activateApplication(streamingResult.getAppLinks());
+        default:
+          String msg = MessageFormat.format("Not support job type: {0}", streamingResult.getType());
+          throw new Exception(msg);
+      }
+    } catch (Exception e) {
+      logger.error(String.format("Activate streaming job exception: %d", streamingResult.getExecId()),
+              e);
+      throw e;
+    }
+
+  }
+
+  /**
+   * 恢复一个暂停的Job
+   *
+   * @param streamingResult
+   * @throws Exception
+   */
+  public void deactivate(StreamingResult streamingResult) throws Exception {
+    try {
+      switch (streamingResult.getType()) {
+        case STORM:
+          AbstractStormJob.dedeactivate(streamingResult.getAppLinks());
+        default:
+          String msg = MessageFormat.format("Not support job type: {0}", streamingResult.getType());
+          throw new Exception(msg);
+      }
+    } catch (Exception e) {
+      logger.error(String.format("Deactivate streaming job exception: %d", streamingResult.getExecId()),
+              e);
+      throw e;
     }
   }
 
