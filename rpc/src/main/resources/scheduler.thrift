@@ -161,6 +161,20 @@ service MasterService {
   RetInfo cancelStreamingJob(1:i32 execId),
 
   /**
+   * 恢复已经暂停的流任务
+   *
+   * execId : 执行 id
+   */
+  RetInfo activateStreamingJob(1:i32 execId),
+
+  /**
+   * 暂停指定的流任务
+   *
+   * execId : 执行 id
+   */
+  RetInfo deactivateStreamingJob(1:i32 execId),
+
+  /**
    * 给一个 workflow 补数据
    *
    * projectId : 项目 ID
@@ -225,6 +239,20 @@ service WorkerService {
    * execId : 执行 id
    */
   RetInfo cancelStreamingJob(1:i32 execId),
+
+  /**
+   * 恢复暂停的流任务
+   *
+   * execId : 执行 id
+   */
+  RetInfo activateStreamingJob(1:i32 execId),
+
+  /**
+   * 暂停流任务
+   *
+   * execId : 执行 id
+   */
+  RetInfo deactivateStreamingJob(1:i32 execId),
 
   /**
    * 执行某个 adHoc SQL

@@ -63,6 +63,10 @@ public class StormSubmitArgsUtil {
       args.add(StringUtils.join(jars.stream().map(p -> p.getRes()).toArray(), ","));
     }
 
+    if (StringUtils.isNotEmpty(stormJarParam.getArgs())){
+      args.add(stormJarParam.getArgs());
+    }
+
     if (StringUtils.isNotEmpty(stormJarParam.getArtifacts())){
       args.add(ARTIFACTS);
       args.add(stormJarParam.getArtifacts());
