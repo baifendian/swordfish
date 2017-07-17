@@ -68,7 +68,7 @@ public abstract class AbstractStormProcessJob extends Job {
         //获取name
         String[] logList = log.split(":");
         if (logList.length == 2) {
-          topologyName = logList[1];
+          topologyName = logList[1].trim();
           logger.info("Get topologyName: {}", topologyName);
         } else {
           logger.error("Get topologyName error");
@@ -146,10 +146,9 @@ public abstract class AbstractStormProcessJob extends Job {
       while (true) {
         index++;
         try {
-          topologyId = StormRestUtil.getTopologyId(topologyName).trim();
+          topologyId = StormRestUtil.getTopologyId(topologyName);
           logger.info("Get topologyId: {}", topologyId);
-        } catch (IOException e) {
-
+        } catch (Exception e) {
           logger.error("Get topologyId error", e);
         }
 
