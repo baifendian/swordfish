@@ -16,6 +16,7 @@
 package com.baifendian.swordfish.dao.mapper;
 
 import com.baifendian.swordfish.dao.enums.ExecType;
+import com.baifendian.swordfish.dao.enums.FailurePolicyType;
 import com.baifendian.swordfish.dao.enums.FlowStatus;
 import com.baifendian.swordfish.dao.enums.NotifyType;
 import com.baifendian.swordfish.dao.mapper.utils.EnumFieldUtil;
@@ -60,6 +61,7 @@ public class ExecutionFlowMapperProvider {
         VALUES("workflow_data", "#{executionFlow.workflowData}");
         VALUES("user_defined_params", "#{executionFlow.userDefinedParams}");
         VALUES("type", EnumFieldUtil.genFieldStr("executionFlow.type", ExecType.class));
+        VALUES("failure_policy", EnumFieldUtil.genFieldStr("executionFlow.failure_policy", FailurePolicyType.class));
         VALUES("max_try_times", "#{executionFlow.maxTryTimes}");
         VALUES("notify_type", EnumFieldUtil.genFieldStr("executionFlow.notifyType", NotifyType.class));
         VALUES("notify_mails", "#{executionFlow.notifyMails}");

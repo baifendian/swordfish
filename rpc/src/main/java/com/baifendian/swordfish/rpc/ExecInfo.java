@@ -41,6 +41,7 @@ public class ExecInfo implements org.apache.thrift.TBase<ExecInfo, ExecInfo._Fie
   private static final org.apache.thrift.protocol.TField NOTIFY_TYPE_FIELD_DESC = new org.apache.thrift.protocol.TField("notifyType", org.apache.thrift.protocol.TType.I32, (short)3);
   private static final org.apache.thrift.protocol.TField NOTIFY_MAILS_FIELD_DESC = new org.apache.thrift.protocol.TField("notifyMails", org.apache.thrift.protocol.TType.LIST, (short)4);
   private static final org.apache.thrift.protocol.TField TIMEOUT_FIELD_DESC = new org.apache.thrift.protocol.TField("timeout", org.apache.thrift.protocol.TType.I32, (short)5);
+  private static final org.apache.thrift.protocol.TField FAILURE_POLICY_FIELD_DESC = new org.apache.thrift.protocol.TField("failurePolicy", org.apache.thrift.protocol.TType.I32, (short)6);
 
   private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
   static {
@@ -68,6 +69,10 @@ public class ExecInfo implements org.apache.thrift.TBase<ExecInfo, ExecInfo._Fie
    * 超时时间, 单位: 秒
    */
   public int timeout; // required
+  /**
+   * 失败策略
+   */
+  public int failurePolicy; // required
 
   /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
   public enum _Fields implements org.apache.thrift.TFieldIdEnum {
@@ -90,7 +95,11 @@ public class ExecInfo implements org.apache.thrift.TBase<ExecInfo, ExecInfo._Fie
     /**
      * 超时时间, 单位: 秒
      */
-    TIMEOUT((short)5, "timeout");
+    TIMEOUT((short)5, "timeout"),
+    /**
+     * 失败策略
+     */
+    FAILURE_POLICY((short)6, "failurePolicy");
 
     private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
@@ -115,6 +124,8 @@ public class ExecInfo implements org.apache.thrift.TBase<ExecInfo, ExecInfo._Fie
           return NOTIFY_MAILS;
         case 5: // TIMEOUT
           return TIMEOUT;
+        case 6: // FAILURE_POLICY
+          return FAILURE_POLICY;
         default:
           return null;
       }
@@ -158,6 +169,7 @@ public class ExecInfo implements org.apache.thrift.TBase<ExecInfo, ExecInfo._Fie
   private static final int __NODEDEP_ISSET_ID = 0;
   private static final int __NOTIFYTYPE_ISSET_ID = 1;
   private static final int __TIMEOUT_ISSET_ID = 2;
+  private static final int __FAILUREPOLICY_ISSET_ID = 3;
   private byte __isset_bitfield = 0;
   public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
   static {
@@ -173,6 +185,8 @@ public class ExecInfo implements org.apache.thrift.TBase<ExecInfo, ExecInfo._Fie
             new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING))));
     tmpMap.put(_Fields.TIMEOUT, new org.apache.thrift.meta_data.FieldMetaData("timeout", org.apache.thrift.TFieldRequirementType.DEFAULT, 
         new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.I32)));
+    tmpMap.put(_Fields.FAILURE_POLICY, new org.apache.thrift.meta_data.FieldMetaData("failurePolicy", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+        new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.I32)));
     metaDataMap = Collections.unmodifiableMap(tmpMap);
     org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(ExecInfo.class, metaDataMap);
   }
@@ -184,6 +198,8 @@ public class ExecInfo implements org.apache.thrift.TBase<ExecInfo, ExecInfo._Fie
 
     this.timeout = 1800;
 
+    this.failurePolicy = 0;
+
   }
 
   public ExecInfo(
@@ -191,7 +207,8 @@ public class ExecInfo implements org.apache.thrift.TBase<ExecInfo, ExecInfo._Fie
     int nodeDep,
     int notifyType,
     List<String> notifyMails,
-    int timeout)
+    int timeout,
+    int failurePolicy)
   {
     this();
     this.nodeName = nodeName;
@@ -202,6 +219,8 @@ public class ExecInfo implements org.apache.thrift.TBase<ExecInfo, ExecInfo._Fie
     this.notifyMails = notifyMails;
     this.timeout = timeout;
     setTimeoutIsSet(true);
+    this.failurePolicy = failurePolicy;
+    setFailurePolicyIsSet(true);
   }
 
   /**
@@ -222,6 +241,7 @@ public class ExecInfo implements org.apache.thrift.TBase<ExecInfo, ExecInfo._Fie
       this.notifyMails = __this__notifyMails;
     }
     this.timeout = other.timeout;
+    this.failurePolicy = other.failurePolicy;
   }
 
   public ExecInfo deepCopy() {
@@ -237,6 +257,8 @@ public class ExecInfo implements org.apache.thrift.TBase<ExecInfo, ExecInfo._Fie
 
     this.notifyMails = null;
     this.timeout = 1800;
+
+    this.failurePolicy = 0;
 
   }
 
@@ -402,6 +424,35 @@ public class ExecInfo implements org.apache.thrift.TBase<ExecInfo, ExecInfo._Fie
     __isset_bitfield = EncodingUtils.setBit(__isset_bitfield, __TIMEOUT_ISSET_ID, value);
   }
 
+  /**
+   * 失败策略
+   */
+  public int getFailurePolicy() {
+    return this.failurePolicy;
+  }
+
+  /**
+   * 失败策略
+   */
+  public ExecInfo setFailurePolicy(int failurePolicy) {
+    this.failurePolicy = failurePolicy;
+    setFailurePolicyIsSet(true);
+    return this;
+  }
+
+  public void unsetFailurePolicy() {
+    __isset_bitfield = EncodingUtils.clearBit(__isset_bitfield, __FAILUREPOLICY_ISSET_ID);
+  }
+
+  /** Returns true if field failurePolicy is set (has been assigned a value) and false otherwise */
+  public boolean isSetFailurePolicy() {
+    return EncodingUtils.testBit(__isset_bitfield, __FAILUREPOLICY_ISSET_ID);
+  }
+
+  public void setFailurePolicyIsSet(boolean value) {
+    __isset_bitfield = EncodingUtils.setBit(__isset_bitfield, __FAILUREPOLICY_ISSET_ID, value);
+  }
+
   public void setFieldValue(_Fields field, Object value) {
     switch (field) {
     case NODE_NAME:
@@ -444,6 +495,14 @@ public class ExecInfo implements org.apache.thrift.TBase<ExecInfo, ExecInfo._Fie
       }
       break;
 
+    case FAILURE_POLICY:
+      if (value == null) {
+        unsetFailurePolicy();
+      } else {
+        setFailurePolicy((Integer)value);
+      }
+      break;
+
     }
   }
 
@@ -463,6 +522,9 @@ public class ExecInfo implements org.apache.thrift.TBase<ExecInfo, ExecInfo._Fie
 
     case TIMEOUT:
       return Integer.valueOf(getTimeout());
+
+    case FAILURE_POLICY:
+      return Integer.valueOf(getFailurePolicy());
 
     }
     throw new IllegalStateException();
@@ -485,6 +547,8 @@ public class ExecInfo implements org.apache.thrift.TBase<ExecInfo, ExecInfo._Fie
       return isSetNotifyMails();
     case TIMEOUT:
       return isSetTimeout();
+    case FAILURE_POLICY:
+      return isSetFailurePolicy();
     }
     throw new IllegalStateException();
   }
@@ -544,6 +608,15 @@ public class ExecInfo implements org.apache.thrift.TBase<ExecInfo, ExecInfo._Fie
       if (!(this_present_timeout && that_present_timeout))
         return false;
       if (this.timeout != that.timeout)
+        return false;
+    }
+
+    boolean this_present_failurePolicy = true;
+    boolean that_present_failurePolicy = true;
+    if (this_present_failurePolicy || that_present_failurePolicy) {
+      if (!(this_present_failurePolicy && that_present_failurePolicy))
+        return false;
+      if (this.failurePolicy != that.failurePolicy)
         return false;
     }
 
@@ -613,6 +686,16 @@ public class ExecInfo implements org.apache.thrift.TBase<ExecInfo, ExecInfo._Fie
         return lastComparison;
       }
     }
+    lastComparison = Boolean.valueOf(isSetFailurePolicy()).compareTo(typedOther.isSetFailurePolicy());
+    if (lastComparison != 0) {
+      return lastComparison;
+    }
+    if (isSetFailurePolicy()) {
+      lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.failurePolicy, typedOther.failurePolicy);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
     return 0;
   }
 
@@ -659,6 +742,10 @@ public class ExecInfo implements org.apache.thrift.TBase<ExecInfo, ExecInfo._Fie
     if (!first) sb.append(", ");
     sb.append("timeout:");
     sb.append(this.timeout);
+    first = false;
+    if (!first) sb.append(", ");
+    sb.append("failurePolicy:");
+    sb.append(this.failurePolicy);
     first = false;
     sb.append(")");
     return sb.toString();
@@ -755,6 +842,14 @@ public class ExecInfo implements org.apache.thrift.TBase<ExecInfo, ExecInfo._Fie
               org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
             }
             break;
+          case 6: // FAILURE_POLICY
+            if (schemeField.type == org.apache.thrift.protocol.TType.I32) {
+              struct.failurePolicy = iprot.readI32();
+              struct.setFailurePolicyIsSet(true);
+            } else { 
+              org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+            }
+            break;
           default:
             org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
         }
@@ -796,6 +891,9 @@ public class ExecInfo implements org.apache.thrift.TBase<ExecInfo, ExecInfo._Fie
       oprot.writeFieldBegin(TIMEOUT_FIELD_DESC);
       oprot.writeI32(struct.timeout);
       oprot.writeFieldEnd();
+      oprot.writeFieldBegin(FAILURE_POLICY_FIELD_DESC);
+      oprot.writeI32(struct.failurePolicy);
+      oprot.writeFieldEnd();
       oprot.writeFieldStop();
       oprot.writeStructEnd();
     }
@@ -829,7 +927,10 @@ public class ExecInfo implements org.apache.thrift.TBase<ExecInfo, ExecInfo._Fie
       if (struct.isSetTimeout()) {
         optionals.set(4);
       }
-      oprot.writeBitSet(optionals, 5);
+      if (struct.isSetFailurePolicy()) {
+        optionals.set(5);
+      }
+      oprot.writeBitSet(optionals, 6);
       if (struct.isSetNodeName()) {
         oprot.writeString(struct.nodeName);
       }
@@ -851,12 +952,15 @@ public class ExecInfo implements org.apache.thrift.TBase<ExecInfo, ExecInfo._Fie
       if (struct.isSetTimeout()) {
         oprot.writeI32(struct.timeout);
       }
+      if (struct.isSetFailurePolicy()) {
+        oprot.writeI32(struct.failurePolicy);
+      }
     }
 
     @Override
     public void read(org.apache.thrift.protocol.TProtocol prot, ExecInfo struct) throws org.apache.thrift.TException {
       TTupleProtocol iprot = (TTupleProtocol) prot;
-      BitSet incoming = iprot.readBitSet(5);
+      BitSet incoming = iprot.readBitSet(6);
       if (incoming.get(0)) {
         struct.nodeName = iprot.readString();
         struct.setNodeNameIsSet(true);
@@ -885,6 +989,10 @@ public class ExecInfo implements org.apache.thrift.TBase<ExecInfo, ExecInfo._Fie
       if (incoming.get(4)) {
         struct.timeout = iprot.readI32();
         struct.setTimeoutIsSet(true);
+      }
+      if (incoming.get(5)) {
+        struct.failurePolicy = iprot.readI32();
+        struct.setFailurePolicyIsSet(true);
       }
     }
   }

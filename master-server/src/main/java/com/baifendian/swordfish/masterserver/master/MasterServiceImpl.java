@@ -20,25 +20,33 @@ import com.baifendian.swordfish.dao.DaoFactory;
 import com.baifendian.swordfish.dao.FlowDao;
 import com.baifendian.swordfish.dao.StreamingDao;
 import com.baifendian.swordfish.dao.enums.ExecType;
+import com.baifendian.swordfish.dao.enums.FailurePolicyType;
 import com.baifendian.swordfish.dao.enums.FlowStatus;
 import com.baifendian.swordfish.dao.enums.NodeDepType;
 import com.baifendian.swordfish.dao.enums.NotifyType;
-import com.baifendian.swordfish.dao.model.*;
+import com.baifendian.swordfish.dao.model.AdHoc;
+import com.baifendian.swordfish.dao.model.ExecutionFlow;
+import com.baifendian.swordfish.dao.model.ProjectFlow;
+import com.baifendian.swordfish.dao.model.Schedule;
+import com.baifendian.swordfish.dao.model.StreamingResult;
 import com.baifendian.swordfish.masterserver.quartz.FlowScheduleJob;
 import com.baifendian.swordfish.masterserver.quartz.QuartzManager;
 import com.baifendian.swordfish.masterserver.utils.ResultDetailHelper;
 import com.baifendian.swordfish.masterserver.utils.ResultHelper;
-import com.baifendian.swordfish.rpc.*;
+import com.baifendian.swordfish.rpc.ExecInfo;
+import com.baifendian.swordfish.rpc.HeartBeatData;
 import com.baifendian.swordfish.rpc.MasterService.Iface;
-import org.apache.thrift.TException;
-import org.quartz.CronExpression;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import com.baifendian.swordfish.rpc.RetInfo;
+import com.baifendian.swordfish.rpc.RetResultInfo;
+import com.baifendian.swordfish.rpc.ScheduleInfo;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Map;
+import org.apache.thrift.TException;
+import org.quartz.CronExpression;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * MasterService 实现 <p>
@@ -81,10 +89,6 @@ public class MasterServiceImpl implements Iface {
   /**
    * 设置调度信息, 最终设置的是 Crontab 表达式(其实是按照 Quartz 的语法)
    *
-   * @param projectId
-   * @param flowId
-   * @return
-   * @throws TException
    * @see CronExpression
    */
   @Override
@@ -104,7 +108,9 @@ public class MasterServiceImpl implements Iface {
       String jobName = FlowScheduleJob.genJobName(flowId);
       String jobGroupName = FlowScheduleJob.genJobGroupName(projectId);
       Map<String, Object> dataMap = FlowScheduleJob.genDataMap(projectId, flowId, schedule);
-      QuartzManager.addJobAndTrigger(jobName, jobGroupName, FlowScheduleJob.class, startDate, endDate, schedule.getCrontab(), dataMap);
+      QuartzManager
+          .addJobAndTrigger(jobName, jobGroupName, FlowScheduleJob.class, startDate, endDate,
+              schedule.getCrontab(), dataMap);
     } catch (Exception e) {
       logger.error(e.getMessage(), e);
       return ResultHelper.createErrorResult(e.getMessage());
@@ -115,11 +121,6 @@ public class MasterServiceImpl implements Iface {
 
   /**
    * 删除调度信息
-   *
-   * @param projectId
-   * @param flowId
-   * @return
-   * @throws TException
    */
   @Override
   public RetInfo deleteSchedule(int projectId, int flowId) throws TException {
@@ -139,10 +140,6 @@ public class MasterServiceImpl implements Iface {
 
   /**
    * 删除一个项目的所有调度信息
-   *
-   * @param projectId
-   * @return
-   * @throws TException
    */
   @Override
   public RetInfo deleteSchedules(int projectId) throws TException {
@@ -162,16 +159,13 @@ public class MasterServiceImpl implements Iface {
   /**
    * 运行一个工作流, 是指直接运行的方式
    *
-   * @param projectId
-   * @param flowId
-   * @param runTime   执行该工作流的时刻
-   * @param execInfo
-   * @return
-   * @throws TException
+   * @param runTime 执行该工作流的时刻
    */
   @Override
-  public RetResultInfo execFlow(int projectId, int flowId, long runTime, ExecInfo execInfo) throws TException {
-    logger.info("exec flow project id:{}, flow id:{}, run time:{}, exec info:{}", projectId, flowId, runTime, execInfo);
+  public RetResultInfo execFlow(int projectId, int flowId, long runTime, ExecInfo execInfo)
+      throws TException {
+    logger.info("exec flow project id:{}, flow id:{}, run time:{}, exec info:{}", projectId, flowId,
+        runTime, execInfo);
 
     ExecutionFlow executionFlow;
 
@@ -189,6 +183,7 @@ public class MasterServiceImpl implements Iface {
           flow.getOwnerId(),
           new Date(runTime),
           ExecType.DIRECT,
+          FailurePolicyType.valueOfType(execInfo.failurePolicy),
           0, // 默认不重复执行
           execInfo.getNodeName(),
           NodeDepType.valueOfType(execInfo.getNodeDep()),
@@ -199,7 +194,8 @@ public class MasterServiceImpl implements Iface {
       ExecFlowInfo execFlowInfo = new ExecFlowInfo();
       execFlowInfo.setExecId(executionFlow.getId());
 
-      logger.info("insert a flow to execution, exec id:{}, flow id:{}", executionFlow.getId(), flowId);
+      logger.info("insert a flow to execution, exec id:{}, flow id:{}", executionFlow.getId(),
+          flowId);
 
       jobExecManager.addExecFlow(execFlowInfo);
     } catch (Exception e) {
@@ -228,11 +224,7 @@ public class MasterServiceImpl implements Iface {
   }
 
   /**
-   * 执行某个流任务
-   * <p>
-   * execId : 执行 id
-   *
-   * @param execId
+   * 执行某个流任务 <p> execId : 执行 id
    */
   public RetInfo execStreamingJob(int execId) throws TException {
     logger.info("receive exec streaming job request, id: {}", execId);
@@ -257,11 +249,7 @@ public class MasterServiceImpl implements Iface {
   }
 
   /**
-   * 取消在执行的指定流任务
-   * <p>
-   * execId : 执行 id
-   *
-   * @param execId
+   * 取消在执行的指定流任务 <p> execId : 执行 id
    */
   public RetInfo cancelStreamingJob(int execId) throws TException {
     logger.info("receive cancel streaming job request, id: {}", execId);
@@ -276,16 +264,12 @@ public class MasterServiceImpl implements Iface {
 
   /**
    * 补数据
-   *
-   * @param projectId
-   * @param flowId
-   * @param scheduleInfo
-   * @return
-   * @throws TException
    */
   @Override
-  public RetResultInfo appendWorkFlow(int projectId, int flowId, ScheduleInfo scheduleInfo) throws TException {
-    logger.info("append workflow projectId:{}, flowId:{}, scheduleMeta:{}", projectId, flowId, scheduleInfo);
+  public RetResultInfo appendWorkFlow(int projectId, int flowId, ScheduleInfo scheduleInfo,
+      ExecInfo execInfo) throws TException {
+    logger.info("append workflow projectId:{}, flowId:{}, scheduleMeta:{}", projectId, flowId,
+        scheduleInfo);
 
     try {
       ProjectFlow flow = flowDao.projectFlowFindById(flowId);
@@ -314,9 +298,6 @@ public class MasterServiceImpl implements Iface {
 
   /**
    * 根据即席查询的执行 id 执行即席查询
-   *
-   * @param adHocId
-   * @return
    */
   @Override
   public RetInfo execAdHoc(int adHocId) {
@@ -362,11 +343,8 @@ public class MasterServiceImpl implements Iface {
   /**
    * 接受 executor 注册的接口
    *
-   * @param host         executor 注册的 host 地址
-   * @param port         executor 注册的 port
-   * @param registerTime
-   * @return
-   * @throws TException
+   * @param host executor 注册的 host 地址
+   * @param port executor 注册的 port
    */
   @Override
   public RetInfo registerExecutor(String host, int port, long registerTime) throws TException {
@@ -383,14 +361,12 @@ public class MasterServiceImpl implements Iface {
   /**
    * 接受 executor 汇报心跳的接口
    *
-   * @param host          executor 的 host 地址
-   * @param port          executor 的 port
-   * @param heartBeatData
-   * @return
-   * @throws TException
+   * @param host executor 的 host 地址
+   * @param port executor 的 port
    */
   @Override
-  public RetInfo executorReport(String host, int port, HeartBeatData heartBeatData) throws TException {
+  public RetInfo executorReport(String host, int port, HeartBeatData heartBeatData)
+      throws TException {
     try {
       jobExecManager.executorReport(host, port, heartBeatData);
     } catch (Exception e) {
