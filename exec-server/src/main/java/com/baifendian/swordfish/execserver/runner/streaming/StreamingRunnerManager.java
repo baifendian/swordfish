@@ -164,7 +164,7 @@ public class StreamingRunnerManager {
     try {
       switch (streamingResult.getType()) {
         case STORM:
-          AbstractStormProcessJob.activateApplication(streamingResult.getAppLinks());
+          AbstractStormProcessJob.activateApplication(streamingResult.getAppLinkList().get(0));
           break;
         default:
           String msg = MessageFormat.format("Not support job type: {0}", streamingResult.getType());
@@ -190,7 +190,7 @@ public class StreamingRunnerManager {
     try {
       switch (streamingResult.getType()) {
         case STORM:
-          AbstractStormProcessJob.deactivateApplication(streamingResult.getAppLinks());
+          AbstractStormProcessJob.deactivateApplication(streamingResult.getAppLinkList().get(0));
           break;
         default:
           String msg = MessageFormat.format("Not support job type: {0}", streamingResult.getType());
