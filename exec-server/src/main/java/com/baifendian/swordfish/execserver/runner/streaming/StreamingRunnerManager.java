@@ -23,7 +23,7 @@ import com.baifendian.swordfish.dao.DaoFactory;
 import com.baifendian.swordfish.dao.StreamingDao;
 import com.baifendian.swordfish.dao.enums.FlowStatus;
 import com.baifendian.swordfish.dao.model.StreamingResult;
-import com.baifendian.swordfish.execserver.job.AbstractStormJob;
+import com.baifendian.swordfish.execserver.job.AbstractStormProcessJob;
 import com.baifendian.swordfish.execserver.job.JobProps;
 import com.baifendian.swordfish.execserver.job.AbstractYarnJob;
 import com.baifendian.swordfish.execserver.utils.Constants;
@@ -127,7 +127,7 @@ public class StreamingRunnerManager {
 
         }
         case STORM: {
-          AbstractStormJob.cancelApplication(streamingResult.getAppLinks());
+          AbstractStormProcessJob.cancelApplication(streamingResult.getAppLinks());
           status = FlowStatus.KILL;
           break;
         }
@@ -165,7 +165,7 @@ public class StreamingRunnerManager {
     try {
       switch (streamingResult.getType()) {
         case STORM:
-          AbstractStormJob.activateApplication(streamingResult.getAppLinks());
+          AbstractStormProcessJob.activateApplication(streamingResult.getAppLinks());
         default:
           String msg = MessageFormat.format("Not support job type: {0}", streamingResult.getType());
           throw new Exception(msg);
@@ -188,7 +188,7 @@ public class StreamingRunnerManager {
     try {
       switch (streamingResult.getType()) {
         case STORM:
-          AbstractStormJob.dedeactivate(streamingResult.getAppLinks());
+          AbstractStormProcessJob.dedeactivate(streamingResult.getAppLinks());
         default:
           String msg = MessageFormat.format("Not support job type: {0}", streamingResult.getType());
           throw new Exception(msg);
