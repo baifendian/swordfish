@@ -127,7 +127,7 @@ public class StreamingRunnerManager {
 
         }
         case STORM: {
-          AbstractStormProcessJob.cancelApplication(streamingResult.getAppLinks());
+          AbstractStormProcessJob.cancelApplication(streamingResult.getAppLinkList().get(0));
           status = FlowStatus.KILL;
           break;
         }
