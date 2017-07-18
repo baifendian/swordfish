@@ -1,10 +1,12 @@
 package com.baifendian.swordfish.common.job.utils.node.storm;
 
 import com.baifendian.swordfish.common.config.BaseConfig;
-import com.baifendian.swordfish.common.job.struct.node.storm.dto.*;
+import com.baifendian.swordfish.common.job.struct.node.storm.dto.TopologyInfoDto;
+import com.baifendian.swordfish.common.job.struct.node.storm.dto.TopologyOperationDto;
+import com.baifendian.swordfish.common.job.struct.node.storm.dto.TopologySummaryDto;
+import com.baifendian.swordfish.common.job.struct.node.storm.dto.TopologyWorkerDto;
 import com.baifendian.swordfish.dao.enums.FlowStatus;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
-import org.apache.avro.data.Json;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.lang.StringUtils;
@@ -72,7 +74,9 @@ public class StormRestUtil {
    * @return
    */
   private static String getTopologyInfoUrl(String topologyId) {
-    return stormRestUrl + MessageFormat.format(topologyInfo, topologyId);
+    String url = stormRestUrl + MessageFormat.format(topologyInfo, topologyId);
+    LOGGER.info("Get topology info url: {}", url);
+    return url;
   }
 
   /**
@@ -83,7 +87,9 @@ public class StormRestUtil {
    * @return
    */
   private static String getTopologyKillUrl(String topologyId, long waitTime) {
-    return stormRestUrl + MessageFormat.format(topologyKill, topologyId, waitTime);
+    String url = stormRestUrl + MessageFormat.format(topologyKill, topologyId, String.valueOf(waitTime));
+    LOGGER.info("Get Topology kill url: {}", url);
+    return url;
   }
 
   /**
@@ -93,7 +99,9 @@ public class StormRestUtil {
    * @return
    */
   private static String getTopologyDeactivateUrl(String topologyId) {
-    return stormRestUrl + MessageFormat.format(topologyDeactivate, topologyId);
+    String url = stormRestUrl + MessageFormat.format(topologyDeactivate, topologyId);
+    LOGGER.info("Get topology deactivate url: {}", url);
+    return url;
   }
 
   /**
@@ -103,7 +111,9 @@ public class StormRestUtil {
    * @return
    */
   private static String getTopologyActivateUrl(String topologyId) {
-    return stormRestUrl + MessageFormat.format(topologyActivate, topologyId);
+    String url = stormRestUrl + MessageFormat.format(topologyActivate, topologyId);
+    LOGGER.info("Get topology activate url: {}", url);
+    return url;
   }
 
   /**
