@@ -16,8 +16,7 @@
 package com.baifendian.swordfish.masterserver.master;
 
 import com.baifendian.swordfish.common.hadoop.YarnRestClient;
-import com.baifendian.swordfish.common.job.struct.node.storm.dto.TopologyInfoDto;
-import com.baifendian.swordfish.common.job.utils.node.storm.StormRestUtil;
+import com.baifendian.swordfish.common.storm.StormRestUtil;
 import com.baifendian.swordfish.common.mail.EmailManager;
 import com.baifendian.swordfish.dao.StreamingDao;
 import com.baifendian.swordfish.dao.enums.FlowStatus;

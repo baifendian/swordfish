@@ -17,7 +17,6 @@ package com.baifendian.swordfish.execserver.runner.streaming;
 
 import com.baifendian.swordfish.common.config.BaseConfig;
 import com.baifendian.swordfish.common.hadoop.YarnRestClient;
-import com.baifendian.swordfish.common.job.utils.node.storm.StormRestUtil;
 import com.baifendian.swordfish.common.utils.DateUtils;
 import com.baifendian.swordfish.dao.DaoFactory;
 import com.baifendian.swordfish.dao.StreamingDao;
