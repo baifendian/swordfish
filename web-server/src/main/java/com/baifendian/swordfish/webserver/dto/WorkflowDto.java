@@ -21,17 +21,17 @@ import com.baifendian.swordfish.dao.utils.json.JsonObjectDeserializer;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonRawValue;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import org.apache.commons.collections.CollectionUtils;
-
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import org.apache.commons.collections.CollectionUtils;
 
 /**
  * 工作流返回DTO
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class WorkflowDto {
+
   private String name;
   private String desc;
   private WorkflowData data;
@@ -49,15 +49,16 @@ public class WorkflowDto {
   }
 
   public WorkflowDto(ProjectFlow projectFlow) {
-    if (projectFlow != null){
+    if (projectFlow != null) {
       this.name = projectFlow.getName();
       this.desc = projectFlow.getDesc();
-      if (CollectionUtils.isNotEmpty(projectFlow.getFlowsNodes())){
+      if (CollectionUtils.isNotEmpty(projectFlow.getFlowsNodes())) {
         List<WorkflowNodeDto> workflowNodeResponseList = new ArrayList<>();
-        for (FlowNode flowNode:projectFlow.getFlowsNodes()){
+        for (FlowNode flowNode : projectFlow.getFlowsNodes()) {
           workflowNodeResponseList.add(new WorkflowNodeDto(flowNode));
         }
-        this.data = new WorkflowData(workflowNodeResponseList,projectFlow.getUserDefinedParamList());
+        this.data = new WorkflowData(workflowNodeResponseList,
+            projectFlow.getUserDefinedParamList());
       }
       this.proxyUser = projectFlow.getProxyUser();
       this.queue = projectFlow.getQueue();
