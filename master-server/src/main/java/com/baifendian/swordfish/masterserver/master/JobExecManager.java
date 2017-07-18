@@ -30,15 +30,23 @@ import com.baifendian.swordfish.masterserver.exec.ExecutorServerInfo;
 import com.baifendian.swordfish.masterserver.exec.ExecutorServerManager;
 import com.baifendian.swordfish.masterserver.quartz.FlowScheduleJob;
 import com.baifendian.swordfish.masterserver.utils.ResultHelper;
+import com.baifendian.swordfish.rpc.ExecInfo;
 import com.baifendian.swordfish.rpc.HeartBeatData;
 import com.baifendian.swordfish.rpc.RetInfo;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import org.apache.thrift.TException;
 import org.quartz.CronExpression;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.*;
-import java.util.concurrent.*;
 
 /**
  * 任务执行管理器
@@ -111,22 +119,26 @@ public class JobExecManager {
     FlowScheduleJob.init(executionFlowQueue, flowDao);
 
     // 启动请求 executor server 的处理线程
-    flowSubmit2ExecutorThread = new Submit2ExecutorServerThread(executorServerManager, flowDao, executionFlowQueue);
+    flowSubmit2ExecutorThread = new Submit2ExecutorServerThread(executorServerManager, flowDao,
+        executionFlowQueue);
     flowSubmit2ExecutorThread.setDaemon(true);
     flowSubmit2ExecutorThread.start();
 
     // 检测 executor 的线程
-    executorCheckThread = new ExecutorCheckThread(executorServerManager, MasterConfig.heartBeatTimeoutInterval,
+    executorCheckThread = new ExecutorCheckThread(executorServerManager,
+        MasterConfig.heartBeatTimeoutInterval,
         executionFlowQueue, flowDao);
 
     // 固定执行 executor 的检测
-    checkService.scheduleAtFixedRate(executorCheckThread, 10, MasterConfig.heartBeatCheckInterval, TimeUnit.SECONDS);
+    checkService.scheduleAtFixedRate(executorCheckThread, 10, MasterConfig.heartBeatCheckInterval,
+        TimeUnit.SECONDS);
 
     // 查看流任务的状态
     streamingCheckThread = new StreamingCheckThread(streamingDao);
 
     // 固定执行 executor 的检测
-    checkService.scheduleAtFixedRate(streamingCheckThread, 10, MasterConfig.streamingCheckInterval, TimeUnit.SECONDS);
+    checkService.scheduleAtFixedRate(streamingCheckThread, 10, MasterConfig.streamingCheckInterval,
+        TimeUnit.SECONDS);
 
     recoveryExecFlow();
   }
@@ -162,11 +174,13 @@ public class JobExecManager {
       for (ExecutionFlow executionFlow : executionFlowList) {
         String worker = executionFlow.getWorker();
         if (worker != null && worker.contains(":")) {
-          logger.info("recovery execId:{}, executor server:{}", executionFlow.getId(), executionFlow.getWorker());
+          logger.info("recovery execId:{}, executor server:{}", executionFlow.getId(),
+              executionFlow.getWorker());
 
           String[] workerInfo = worker.split(":");
           if (executorServerInfoMap.containsKey(worker)) {
-            executorServerInfoMap.get(worker).getHeartBeatData().getExecIds().add(executionFlow.getId());
+            executorServerInfoMap.get(worker).getHeartBeatData().getExecIds()
+                .add(executionFlow.getId());
           } else {
             ExecutorServerInfo executorServerInfo = new ExecutorServerInfo();
             executorServerInfo.setHost(workerInfo[0]);
@@ -182,7 +196,8 @@ public class JobExecManager {
           }
         } else {
           // 没有 worker 信息，提交到 executionFlowQueue 队列
-          logger.info("no worker info, add execution flow[execId:{}] to queue", executionFlow.getId());
+          logger.info("no worker info, add execution flow[execId:{}] to queue",
+              executionFlow.getId());
 
           ExecFlowInfo execFlowInfo = new ExecFlowInfo();
           execFlowInfo.setExecId(executionFlow.getId());
@@ -197,8 +212,6 @@ public class JobExecManager {
 
   /**
    * 添加执行的工作流
-   *
-   * @param execFlowInfo
    */
   public void addExecFlow(ExecFlowInfo execFlowInfo) {
     executionFlowQueue.add(execFlowInfo);
@@ -206,21 +219,14 @@ public class JobExecManager {
 
   /**
    * 提交补数据任务
-   *
-   * @param flow
-   * @param cron
-   * @param startDateTime
-   * @param endDateTime
    */
-  public void submitAddData(ProjectFlow flow, CronExpression cron, Date startDateTime, Date endDateTime) {
-    flowExecManager.submitAddData(flow, cron, startDateTime, endDateTime);
+  public void submitAddData(ProjectFlow flow, CronExpression cron, Date startDateTime,
+      Date endDateTime, ExecInfo execInfo) {
+    flowExecManager.submitAddData(flow, cron, startDateTime, endDateTime, execInfo);
   }
 
   /**
    * 执行即席查询
-   *
-   * @param id
-   * @throws TException
    */
   public void execAdHoc(int id) throws TException {
     ExecutorServerInfo executorServerInfo = executorServerManager.getExecutorServer();
@@ -229,7 +235,8 @@ public class JobExecManager {
       throw new ExecException("can't found active executor server");
     }
 
-    logger.info("exec ad hoc {} on server {}:{}", id, executorServerInfo.getHost(), executorServerInfo.getPort());
+    logger.info("exec ad hoc {} on server {}:{}", id, executorServerInfo.getHost(),
+        executorServerInfo.getPort());
 
     ExecutorClient executorClient = new ExecutorClient(executorServerInfo);
     executorClient.execAdHoc(id);
@@ -237,9 +244,6 @@ public class JobExecManager {
 
   /**
    * 执行流任务
-   *
-   * @param execId
-   * @throws TException
    */
   public RetInfo execStreamingJob(int execId) throws TException {
 
@@ -263,23 +267,22 @@ public class JobExecManager {
     }
 
     streamingResult.setStatus(FlowStatus.WAITING_RES);
-    streamingResult.setWorker(String.format("%s:%s", executorServerInfo.getHost(), executorServerInfo.getPort()));
+    streamingResult.setWorker(
+        String.format("%s:%s", executorServerInfo.getHost(), executorServerInfo.getPort()));
 
     streamingDao.updateResult(streamingResult);
 
-    logger.info("exec streaming job {} on server {}:{}", execId, executorServerInfo.getHost(), executorServerInfo.getPort());
+    logger.info("exec streaming job {} on server {}:{}", execId, executorServerInfo.getHost(),
+        executorServerInfo.getPort());
 
-    ExecutorClient executionClient = new ExecutorClient(executorServerInfo.getHost(), executorServerInfo.getPort());
+    ExecutorClient executionClient = new ExecutorClient(executorServerInfo.getHost(),
+        executorServerInfo.getPort());
 
     return executionClient.execStreamingJob(execId);
   }
 
   /**
    * 取消流任务的执行
-   *
-   * @param execId
-   * @return
-   * @throws TException
    */
   public RetInfo cancelStreamingJob(int execId) throws TException {
     StreamingResult streamingResult = streamingDao.queryStreamingExec(execId);
@@ -300,16 +303,13 @@ public class JobExecManager {
 
     logger.info("cancel exec streaming {} on worker {}", execId, worker);
 
-    ExecutorClient executionClient = new ExecutorClient(workerInfo[0], Integer.valueOf(workerInfo[1]));
+    ExecutorClient executionClient = new ExecutorClient(workerInfo[0],
+        Integer.valueOf(workerInfo[1]));
     return executionClient.cancelStreamingJob(execId);
   }
 
   /**
    * 恢复已经暂停的任务
-   *
-   * @param execId
-   * @return
-   * @throws TException
    */
   public RetInfo activateStreamingJob(int execId) throws TException {
     StreamingResult streamingResult = streamingDao.queryStreamingExec(execId);
@@ -330,16 +330,13 @@ public class JobExecManager {
 
     logger.info("Activate exec streaming {} on worker {}", execId, worker);
 
-    ExecutorClient executionClient = new ExecutorClient(workerInfo[0], Integer.valueOf(workerInfo[1]));
+    ExecutorClient executionClient = new ExecutorClient(workerInfo[0],
+        Integer.valueOf(workerInfo[1]));
     return executionClient.activateStreamingJob(execId);
   }
 
   /**
    * 暂停正在运行的任务
-   *
-   * @param execId
-   * @return
-   * @throws TException
    */
   public RetInfo deactivateStreamingJob(int execId) throws TException {
     StreamingResult streamingResult = streamingDao.queryStreamingExec(execId);
@@ -360,16 +357,13 @@ public class JobExecManager {
 
     logger.info("Deactivate exec streaming {} on worker {}", execId, worker);
 
-    ExecutorClient executionClient = new ExecutorClient(workerInfo[0], Integer.valueOf(workerInfo[1]));
+    ExecutorClient executionClient = new ExecutorClient(workerInfo[0],
+        Integer.valueOf(workerInfo[1]));
     return executionClient.deactivateStreamingJob(execId);
   }
 
   /**
    * 注册 executor
-   *
-   * @param host
-   * @param port
-   * @param registerTime
    */
   public void registerExecutor(String host, int port, long registerTime) {
     logger.info("register executor server[{}:{}]", host, port);
@@ -393,10 +387,6 @@ public class JobExecManager {
 
   /**
    * 报告 executor server 信息
-   *
-   * @param host
-   * @param port
-   * @param heartBeatData
    */
   public void executorReport(String host, int port, HeartBeatData heartBeatData) {
     logger.debug("executor server[{}:{}] report info {}", host, port, heartBeatData);
@@ -411,10 +401,6 @@ public class JobExecManager {
 
   /**
    * 取消工作流执行
-   *
-   * @param execId
-   * @return
-   * @throws TException
    */
   public RetInfo cancelExecFlow(int execId) throws TException {
     ExecutionFlow executionFlow = flowDao.queryExecutionFlow(execId);
@@ -434,7 +420,8 @@ public class JobExecManager {
 
     logger.info("cancel exec flow {} on worker {}", execId, worker);
 
-    ExecutorClient executionClient = new ExecutorClient(workerInfo[0], Integer.valueOf(workerInfo[1]));
+    ExecutorClient executionClient = new ExecutorClient(workerInfo[0],
+        Integer.valueOf(workerInfo[1]));
     return executionClient.cancelExecFlow(execId);
   }
 }

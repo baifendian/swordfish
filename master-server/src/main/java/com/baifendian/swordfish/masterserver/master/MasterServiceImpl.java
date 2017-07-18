@@ -292,8 +292,8 @@ public class MasterServiceImpl implements Iface {
   @Override
   public RetResultInfo appendWorkFlow(int projectId, int flowId, ScheduleInfo scheduleInfo,
       ExecInfo execInfo) throws TException {
-    logger.info("append workflow projectId:{}, flowId:{}, scheduleMeta:{}", projectId, flowId,
-        scheduleInfo);
+    logger.info("append workflow projectId:{}, flowId:{}, scheduleMeta:{}, execInfo:{}", projectId, flowId,
+        scheduleInfo, execInfo);
 
     try {
       ProjectFlow flow = flowDao.projectFlowFindById(flowId);
@@ -311,7 +311,7 @@ public class MasterServiceImpl implements Iface {
       Date endDateTime = new Date(scheduleInfo.getEndDate());
 
       // 提交补数据任务
-      jobExecManager.submitAddData(flow, cron, startDateTime, endDateTime);
+      jobExecManager.submitAddData(flow, cron, startDateTime, endDateTime, execInfo);
     } catch (Exception e) {
       logger.error(e.getMessage(), e);
       return ResultDetailHelper.createErrorResult(e.getMessage());
