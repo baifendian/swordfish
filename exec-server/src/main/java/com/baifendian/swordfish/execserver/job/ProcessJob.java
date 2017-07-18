@@ -103,6 +103,7 @@ public class ProcessJob {
    */
   private Logger logger;
 
+
   /**
    * 日志记录
    */

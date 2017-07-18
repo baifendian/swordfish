@@ -5,6 +5,7 @@ import com.baifendian.swordfish.common.job.struct.node.storm.dto.TopologyInfoDto
 import com.baifendian.swordfish.common.job.utils.node.storm.StormRestUtil;
 import com.baifendian.swordfish.dao.DaoFactory;
 import com.baifendian.swordfish.dao.StreamingDao;
+import com.baifendian.swordfish.dao.enums.FlowStatus;
 import com.baifendian.swordfish.dao.model.StreamingResult;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.lang.StringUtils;
@@ -12,6 +13,7 @@ import org.slf4j.Logger;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -38,9 +40,21 @@ public abstract class AbstractStormProcessJob extends Job {
 
   protected List<String> topologyLogs;
 
+  /**
+   * storm kill wait time
+   */
   protected static long waitTime = 60000;
 
   protected long checkInterval = 5000;
+
+  protected static long submitWait = 60 * 10 * 1000;
+
+
+  /**
+   * 启动时间
+   */
+  private Long startTime;
+
 
   private ProcessJob processJob;
 
@@ -50,6 +64,7 @@ public abstract class AbstractStormProcessJob extends Job {
             props.getWorkDir(), props.getJobAppId(),
             props.getProxyUser(), props.getEnvFile(), props.getExecJobStartTime(),
             props.getExecJobTimeout(), logger);
+    startTime = System.currentTimeMillis();
   }
 
   @Override
@@ -97,8 +112,14 @@ public abstract class AbstractStormProcessJob extends Job {
     }
     */
 
+    long now = System.currentTimeMillis();
+
     //如果能获取到topologName 我们就认为提交完成了
     if (StringUtils.isNotEmpty(topologyName)) {
+      complete = true;
+    }
+
+    if (now - startTime > submitWait) {
       complete = true;
     }
 
@@ -131,8 +152,8 @@ public abstract class AbstractStormProcessJob extends Job {
    * @param appLinks
    * @throws Exception
    */
-  public static void dedeactivate(String appLinks) throws Exception {
-    StormRestUtil.topologyActivate(appLinks);
+  public static void deactivateApplication(String appLinks) throws Exception {
+    StormRestUtil.topologyDeactivate(appLinks);
   }
 
   @Override
@@ -141,7 +162,7 @@ public abstract class AbstractStormProcessJob extends Job {
       // 构造进程
       processJob.runCommand(createCommand());
       logger.info("Start get topologyId...");
-      //尝试3次获取id，如果不能获取到id就算任务失败
+      // 尝试3次获取id，如果不能获取到id就算任务失败
       int index = 0;
 
       while (true) {
@@ -164,14 +185,14 @@ public abstract class AbstractStormProcessJob extends Job {
         }
       }
       logger.info("Finish get topologyId!");
-      //获取日志
+      // 获取日志
       try {
         topologyLogs = StormRestUtil.getTopologyLogs(topologyId);
         logger.info("Get topology logs");
       } catch (Exception e) {
         logger.error("Get topology logs error", e);
       }
-      logger.info("Start update streaming_result dao...");
+      logger.info("Start update streaming result dao...");
       StreamingResult streamingResult = streamingDao.queryStreamingExec(props.getExecId());
       if (streamingResult != null) {
         streamingResult.setAppLinkList(Arrays.asList(topologyId));
@@ -186,8 +207,22 @@ public abstract class AbstractStormProcessJob extends Job {
       logger.error("Storm process exception", e);
       exitCode = -1;
     }
+  }
 
-
+  @Override
+  public void after() throws Exception {
+    super.after();
+    if (exitCode != 0){
+      logger.info("Job failed update streaming result dao...");
+      StreamingResult streamingResult = streamingDao.queryStreamingExec(props.getExecId());
+      if (streamingResult != null) {
+        streamingResult.setStatus(FlowStatus.FAILED);
+        streamingDao.updateResult(streamingResult);
+      } else {
+        logger.warn("Not found execId: {}", props.getExecId());
+      }
+      logger.info("Finish job failed update streaming result dao!");
+    }
   }
 
   @Override

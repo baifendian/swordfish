@@ -128,7 +128,6 @@ public class StreamingRunnerManager {
         }
         case STORM: {
           AbstractStormProcessJob.cancelApplication(streamingResult.getAppLinkList().get(0));
-          status = FlowStatus.KILL;
           break;
         }
         default: {
@@ -191,7 +190,7 @@ public class StreamingRunnerManager {
     try {
       switch (streamingResult.getType()) {
         case STORM:
-          AbstractStormProcessJob.dedeactivate(streamingResult.getAppLinks());
+          AbstractStormProcessJob.deactivateApplication(streamingResult.getAppLinks());
           break;
         default:
           String msg = MessageFormat.format("Not support job type: {0}", streamingResult.getType());

@@ -63,13 +63,13 @@ public class StreamingCheckThread implements Runnable {
         for (StreamingResult streamingResult : streamingResults) {
           List<String> appIds = streamingResult.getAppLinkList();
 
-          FlowStatus status = FlowStatus.SUCCESS;
+          FlowStatus status = streamingResult.getStatus();
 
-          //如果有appid根据不同调度平台处理
+          // 如果有 appid 根据不同调度平台处理
           switch (streamingResult.getType()) {
             case SPARK_STREAMING: {
 
-              //如果更本没有appid
+              // 如果更本没有 appid
               if (CollectionUtils.isEmpty(appIds)) {
                 continue;
               } else if (System.currentTimeMillis() - streamingResult.getScheduleTime().getTime() >=
@@ -105,15 +105,13 @@ public class StreamingCheckThread implements Runnable {
             case STORM: {
 
               if (CollectionUtils.isEmpty(appIds)) {
-                status = FlowStatus.FAILED;
                 break;
               }
 
-              //storm 只有一个appId
+              // storm 只有一个appId
               String topologyId = appIds.get(0);
               try {
                 FlowStatus tmpStatus = StormRestUtil.getTopologyStatus(topologyId);
-
                 if (tmpStatus == null) {
                   status = FlowStatus.FAILED;
                   String msg = MessageFormat.format("Not found topology: {0}", topologyId);
@@ -131,7 +129,6 @@ public class StreamingCheckThread implements Runnable {
             default:
               String msg = MessageFormat.format("No support type: {}", streamingResult.getType());
               logger.error(msg);
-              continue;
           }
 
           // 更新状态
