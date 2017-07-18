@@ -274,6 +274,30 @@ public class MasterServiceImpl implements Iface {
     }
   }
 
+  @Override
+  public RetInfo activateStreamingJob(int execId) throws TException {
+    logger.info("receive activate streaming job request, id: {}", execId);
+
+    try {
+      return jobExecManager.activateStreamingJob(execId);
+    } catch (Exception e) {
+      logger.warn("executor report error", e);
+      return ResultHelper.createErrorResult(e.getMessage());
+    }
+  }
+
+  @Override
+  public RetInfo deactivateStreamingJob(int execId) throws TException {
+    logger.info("receive deactivate streaming job request, id: {}", execId);
+
+    try {
+      return jobExecManager.deactivateStreamingJob(execId);
+    } catch (Exception e) {
+      logger.warn("executor report error", e);
+      return ResultHelper.createErrorResult(e.getMessage());
+    }
+  }
+
   /**
    * 补数据
    *

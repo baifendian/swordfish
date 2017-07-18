@@ -305,6 +305,66 @@ public class JobExecManager {
   }
 
   /**
+   * 恢复已经暂停的任务
+   *
+   * @param execId
+   * @return
+   * @throws TException
+   */
+  public RetInfo activateStreamingJob(int execId) throws TException {
+    StreamingResult streamingResult = streamingDao.queryStreamingExec(execId);
+
+    if (streamingResult == null) {
+      throw new MasterException("streaming exec id is not exists");
+    }
+
+    String worker = streamingResult.getWorker();
+    if (worker == null) {
+      throw new MasterException("worker is not exists");
+    }
+
+    String[] workerInfo = worker.split(":");
+    if (workerInfo.length < 2) {
+      throw new MasterException("worker is not validate format " + worker);
+    }
+
+    logger.info("Activate exec streaming {} on worker {}", execId, worker);
+
+    ExecutorClient executionClient = new ExecutorClient(workerInfo[0], Integer.valueOf(workerInfo[1]));
+    return executionClient.activateStreamingJob(execId);
+  }
+
+  /**
+   * 暂停正在运行的任务
+   *
+   * @param execId
+   * @return
+   * @throws TException
+   */
+  public RetInfo deactivateStreamingJob(int execId) throws TException {
+    StreamingResult streamingResult = streamingDao.queryStreamingExec(execId);
+
+    if (streamingResult == null) {
+      throw new MasterException("streaming exec id is not exists");
+    }
+
+    String worker = streamingResult.getWorker();
+    if (worker == null) {
+      throw new MasterException("worker is not exists");
+    }
+
+    String[] workerInfo = worker.split(":");
+    if (workerInfo.length < 2) {
+      throw new MasterException("worker is not validate format " + worker);
+    }
+
+    logger.info("Deactivate exec streaming {} on worker {}", execId, worker);
+
+    ExecutorClient executionClient = new ExecutorClient(workerInfo[0], Integer.valueOf(workerInfo[1]));
+    return executionClient.deactivateStreamingJob(execId);
+  }
+
+  /**
    * 注册 executor
    *
    * @param host

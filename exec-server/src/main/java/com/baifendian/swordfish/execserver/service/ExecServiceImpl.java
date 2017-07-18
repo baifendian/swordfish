@@ -31,6 +31,7 @@ import com.baifendian.swordfish.rpc.RetInfo;
 import com.baifendian.swordfish.rpc.WorkerService.Iface;
 import org.apache.commons.configuration.Configuration;
 import org.apache.thrift.TException;
+import org.omg.PortableInterceptor.INACTIVE;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -238,6 +239,72 @@ public class ExecServiceImpl implements Iface {
       }
 
       streamingRunnerManager.cancelJob(streamingResult);
+    } catch (Exception e) {
+      logger.error(e.getMessage(), e);
+      return ResultHelper.createErrorResult(e.getMessage());
+    }
+
+    return ResultHelper.SUCCESS;
+  }
+
+  /**
+   * 恢复一个被暂停的流任务
+   * @param execId
+   * @return
+   * @throws TException
+   */
+  @Override
+  public RetInfo activateStreamingJob(int execId) throws TException {
+    logger.info("Activate streaming job: {}", execId);
+
+    try {
+      // 查询
+      StreamingResult streamingResult = streamingDao.queryStreamingExec(execId);
+
+      if (streamingResult == null) {
+        return ResultHelper.createErrorResult("streaming exec id not exists");
+      }
+
+      //只有暂停状态的任务可以被恢复
+      if (streamingResult.getStatus() != FlowStatus.INACTIVE) {
+        logger.error("streaming exec not inactive, exec id:{}", execId);
+        return ResultHelper.createErrorResult("streaming exec id not inactive!");
+      }
+
+      streamingRunnerManager.activateJob(streamingResult);
+    } catch (Exception e) {
+      logger.error(e.getMessage(), e);
+      return ResultHelper.createErrorResult(e.getMessage());
+    }
+
+    return ResultHelper.SUCCESS;
+  }
+
+  /**
+   * 暂停一个正在运行的任务
+   * @param execId
+   * @return
+   * @throws TException
+   */
+  @Override
+  public RetInfo deactivateStreamingJob(int execId) throws TException {
+    logger.info("Deactivate streaming job: {}", execId);
+
+    try {
+      // 查询
+      StreamingResult streamingResult = streamingDao.queryStreamingExec(execId);
+
+      if (streamingResult == null) {
+        return ResultHelper.createErrorResult("streaming exec id not exists");
+      }
+
+      //任务必须在运行中才能暂停
+      if (streamingResult.getStatus() != FlowStatus.RUNNING) {
+        logger.error("streaming exec not running!, exec id:{}", execId);
+        return ResultHelper.createErrorResult("streaming exec id not running!");
+      }
+
+      streamingRunnerManager.deactivateJob(streamingResult);
     } catch (Exception e) {
       logger.error(e.getMessage(), e);
       return ResultHelper.createErrorResult(e.getMessage());

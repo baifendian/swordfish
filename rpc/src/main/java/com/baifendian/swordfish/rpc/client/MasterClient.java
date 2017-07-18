@@ -391,6 +391,64 @@ public class MasterClient {
   }
 
   /**
+   * 取消流任务执行, 用于 web-server
+   *
+   * @param execId
+   * @return
+   */
+  public boolean activateStreamingJob(int execId) {
+    if (!connect()) {
+      close();
+      return false;
+    }
+
+    try {
+      RetInfo ret = client.activateStreamingJob(execId);
+
+      if (ret.getStatus() != 0) {
+        logger.error("Activate streaming job error:{}", ret.getMsg());
+        return false;
+      }
+    } catch (TException e) {
+      logger.error("Activate streaming job error", e);
+      return false;
+    } finally {
+      close();
+    }
+
+    return true;
+  }
+
+  /**
+   * 取消流任务执行, 用于 web-server
+   *
+   * @param execId
+   * @return
+   */
+  public boolean deactivateStreamingJob(int execId) {
+    if (!connect()) {
+      close();
+      return false;
+    }
+
+    try {
+      RetInfo ret = client.deactivateStreamingJob(execId);
+
+      if (ret.getStatus() != 0) {
+        logger.error("Deactivate streaming job error:{}", ret.getMsg());
+        return false;
+      }
+    } catch (TException e) {
+      logger.error("Deactivate streaming job error", e);
+      return false;
+    } finally {
+      close();
+    }
+
+    return true;
+  }
+
+  /**
    * 补数据接口, 用于 web-server
    *
    * @param projectId
