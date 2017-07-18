@@ -95,7 +95,7 @@ public class StreamingResultMapperProvider {
    */
   public String findNoFinishedJob(Map<String, Object> parameter) {
     return constructCommonSimpleSQL().
-            WHERE("status <= " + FlowStatus.RUNNING.ordinal()).OR().WHERE("status == " + FlowStatus.INACTIVE.ordinal()).toString();
+            WHERE("status <= " + FlowStatus.RUNNING.ordinal()).OR().WHERE("status = " + FlowStatus.INACTIVE.ordinal()).toString();
   }
 
   /**
