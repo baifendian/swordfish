@@ -217,6 +217,7 @@ public class ProcessJob {
 
         logger.info("streaming job has exit, work dir:{}, pid:{}", workDir, pid);
 
+        // 对有的框架来说, 比如 storm, 不能根据这个状态来判断正确性
         exitCode = (isCompleted.getAsBoolean()) ? 0 : -1;
       } else {// 等待运行完毕
         boolean status = process.waitFor(remainTime, TimeUnit.SECONDS);

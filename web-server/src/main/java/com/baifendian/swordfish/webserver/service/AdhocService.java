@@ -15,6 +15,8 @@
  */
 package com.baifendian.swordfish.webserver.service;
 
+import static com.baifendian.swordfish.webserver.utils.ParamVerify.verifyProxyUser;
+
 import com.baifendian.swordfish.common.job.struct.node.adhoc.AdHocParam;
 import com.baifendian.swordfish.common.job.struct.node.common.UdfsInfo;
 import com.baifendian.swordfish.dao.enums.AdHocType;
@@ -22,26 +24,32 @@ import com.baifendian.swordfish.dao.enums.FlowStatus;
 import com.baifendian.swordfish.dao.mapper.AdHocMapper;
 import com.baifendian.swordfish.dao.mapper.MasterServerMapper;
 import com.baifendian.swordfish.dao.mapper.ProjectMapper;
-import com.baifendian.swordfish.dao.model.*;
+import com.baifendian.swordfish.dao.model.AdHoc;
+import com.baifendian.swordfish.dao.model.AdHocJsonObject;
+import com.baifendian.swordfish.dao.model.AdHocResult;
+import com.baifendian.swordfish.dao.model.MasterServer;
+import com.baifendian.swordfish.dao.model.Project;
+import com.baifendian.swordfish.dao.model.User;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
 import com.baifendian.swordfish.rpc.RetInfo;
 import com.baifendian.swordfish.rpc.client.MasterClient;
-import com.baifendian.swordfish.webserver.dto.*;
+import com.baifendian.swordfish.webserver.dto.AdHocDto;
+import com.baifendian.swordfish.webserver.dto.AdHocLogDto;
+import com.baifendian.swordfish.webserver.dto.AdHocResultDto;
+import com.baifendian.swordfish.webserver.dto.ExecutorIdDto;
+import com.baifendian.swordfish.webserver.dto.LogResult;
 import com.baifendian.swordfish.webserver.exception.NotFoundException;
 import com.baifendian.swordfish.webserver.exception.PermissionException;
 import com.baifendian.swordfish.webserver.exception.ServerErrorException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
-import static com.baifendian.swordfish.webserver.utils.ParamVerify.verifyProxyUser;
 
 @Service
 public class AdhocService {
@@ -65,18 +73,9 @@ public class AdhocService {
 
   /**
    * 执行即席查询
-   *
-   * @param operator
-   * @param projectName
-   * @param stms
-   * @param limit
-   * @param proxyUser
-   * @param queue
-   * @param udfs
-   * @param timeout
-   * @return
    */
-  public ExecutorIdDto execAdhoc(User operator, String projectName, String name, String stms, int limit, String proxyUser, AdHocType type, String queue, List<UdfsInfo> udfs, int timeout) {
+  public ExecutorIdDto execAdhoc(User operator, String projectName, String name, String stms,
+      int limit, String proxyUser, AdHocType type, String queue, List<UdfsInfo> udfs, int timeout) {
 
     // 查看用户对项目是否具备相应权限
     Project project = projectMapper.queryByName(projectName);
@@ -84,10 +83,13 @@ public class AdhocService {
       logger.error("Project does not exist: {}", projectName);
       throw new NotFoundException("Not found project \"{0}\"", projectName);
     }
-    // 必须要有project执行权限
+
+    // 必须要有 project 执行权限
     if (!projectService.hasWritePerm(operator.getId(), project)) {
-      logger.error("User {} has no right permission for the project {}", operator.getName(), project.getName());
-      throw new PermissionException("User \"{0}\" is not has project \"{1}\" write permission", operator.getName(), project.getName());
+      logger.error("User {} has no right permission for the project {}", operator.getName(),
+          project.getName());
+      throw new PermissionException("User \"{0}\" is not has project \"{1}\" write permission",
+          operator.getName(), project.getName());
     }
 
     // 判断 proxyUser 是否合理的
@@ -105,6 +107,7 @@ public class AdhocService {
     Date now = new Date();
 
     adhoc.setName(name);
+
     // 这里不涉及到项目名称
     adhoc.setProjectId(project.getId());
 
@@ -138,7 +141,8 @@ public class AdhocService {
     // 连接
     MasterClient masterClient = new MasterClient(masterServer.getHost(), masterServer.getPort());
 
-    logger.info("Call master client, exec id: {}, host: {}, port: {}", adhoc.getId(), masterServer.getHost(), masterServer.getPort());
+    logger.info("Call master client, exec id: {}, host: {}, port: {}", adhoc.getId(),
+        masterServer.getHost(), masterServer.getPort());
 
     RetInfo retInfo = masterClient.execAdHoc(adhoc.getId());
 
@@ -162,13 +166,6 @@ public class AdhocService {
 
   /**
    * 查询日志
-   *
-   * @param operator
-   * @param execId
-   * @param index
-   * @param from
-   * @param size
-   * @return
    */
   public AdHocLogDto queryLogs(User operator, int execId, int index, int from, int size) {
 
@@ -182,8 +179,10 @@ public class AdhocService {
 
     // 必须要有 project 执行权限
     if (!projectService.hasExecPerm(operator.getId(), project)) {
-      logger.error("User {} has no right permission for the project {}", operator.getName(), project.getName());
-      throw new PermissionException("User \"{0}\" is not has project \"{1}\" exec permission", operator.getName(), project.getName());
+      logger.error("User {} has no right permission for the project {}", operator.getName(),
+          project.getName());
+      throw new PermissionException("User \"{0}\" is not has project \"{1}\" exec permission",
+          operator.getName(), project.getName());
     }
 
     // 返回日志信息
@@ -237,11 +236,6 @@ public class AdhocService {
 
   /**
    * 查询结果
-   *
-   * @param operator
-   * @param execId
-   * @param index
-   * @return
    */
   public AdHocResultDto queryResult(User operator, int execId, int index) {
 
@@ -255,16 +249,20 @@ public class AdhocService {
 
     // 如果有项目的执行去哪先才可以 kill
     if (!projectService.hasWritePerm(operator.getId(), project)) {
-      logger.error("User {} has no right permission for the project {}", operator.getName(), project.getName());
-      throw new PermissionException("User \"{0}\" is not has project \"{1}\" write permission", operator.getName(), project.getName());
+      logger.error("User {} has no right permission for the project {}", operator.getName(),
+          project.getName());
+      throw new PermissionException("User \"{0}\" is not has project \"{1}\" write permission",
+          operator.getName(), project.getName());
     }
 
     // 返回结果
     AdHocResult adHocResult = adHocMapper.selectResultByIdAndIndex(execId, index);
 
     if (adHocResult == null) {
-      logger.error("execId: {} index: {} result not found!", String.valueOf(execId), String.valueOf(index));
-      throw new NotFoundException("execId: {0} index: {1} result not found!", String.valueOf(execId), String.valueOf(index));
+      logger.error("execId: {} index: {} result not found!", String.valueOf(execId),
+          String.valueOf(index));
+      throw new NotFoundException("execId: {0} index: {1} result not found!",
+          String.valueOf(execId), String.valueOf(index));
     }
 
     AdHocResultDto adHocResultDto = new AdHocResultDto();
@@ -280,9 +278,6 @@ public class AdhocService {
 
   /**
    * kill 即席查询任务, 只有在没有运行完的任务才可以 kill
-   *
-   * @param operator
-   * @param execId
    */
   public void killAdhoc(User operator, int execId) {
 
@@ -296,8 +291,10 @@ public class AdhocService {
 
     // 如果有项目的执行去哪先才可以 kill
     if (!projectService.hasWritePerm(operator.getId(), project)) {
-      logger.error("User {} has no right permission for the project {}", operator.getName(), project.getName());
-      throw new PermissionException("User \"{0}\" is not has project \"{1}\" write permission", operator.getName(), project.getName());
+      logger.error("User {} has no right permission for the project {}", operator.getName(),
+          project.getName());
+      throw new PermissionException("User \"{0}\" is not has project \"{1}\" write permission",
+          operator.getName(), project.getName());
     }
 
     // kill 即席, 通过数据库来做到
@@ -318,54 +315,53 @@ public class AdhocService {
 
   /**
    * 根据即系查询的名称查看一个即系查询的记录
-   *
-   * @param operator
-   * @param projectName
-   * @param adHocName
    */
-  public List<AdHocDto> getAdHoc(User operator, String projectName, String adHocName) {
+  public List<AdHocDto> getAdHoc(User operator, String projectName, String name) {
     // 查看用户对项目是否具备相应权限
     Project project = projectMapper.queryByName(projectName);
     if (project == null) {
       logger.error("Project does not exist: {}", projectName);
       throw new NotFoundException("Not found project \"{0}\"", projectName);
     }
-    // 必须要有project执行权限
+    // 必须要有 project 执行权限
     if (!projectService.hasReadPerm(operator.getId(), project)) {
-      logger.error("User {} has no right permission for the project {}", operator.getName(), project.getName());
-      throw new PermissionException("User \"{0}\" is not has project \"{1}\" write permission", operator.getName(), project.getName());
+      logger.error("User {} has no right permission for the project {}", operator.getName(),
+          project.getName());
+      throw new PermissionException("User \"{0}\" is not has project \"{1}\" write permission",
+          operator.getName(), project.getName());
     }
 
-    List<AdHoc> adHocList = adHocMapper.selectAdhocByName(project.getId(), adHocName);
+    List<AdHoc> adHocList = adHocMapper.selectAdhocByName(project.getId(), name);
 
     List<AdHocDto> adHocDtoList = new ArrayList<>();
 
     for (AdHoc adHoc : adHocList) {
       adHocDtoList.add(new AdHocDto(adHoc));
     }
+
     return adHocDtoList;
   }
 
   /**
-   * 根据name删除一个即席查询
-   *
-   * @param operator
-   * @param projectName
-   * @param adHocName
+   * 根据 name 删除一个即席查询
    */
-  public void deleteAdHoc(User operator, String projectName, String adHocName) {
+  public void deleteAdHoc(User operator, String projectName, String name) {
     // 查看用户对项目是否具备相应权限
     Project project = projectMapper.queryByName(projectName);
+
     if (project == null) {
       logger.error("Project does not exist: {}", projectName);
       throw new NotFoundException("Not found project \"{0}\"", projectName);
     }
-    // 必须要有project执行权限
+
+    // 必须要有 project 执行权限
     if (!projectService.hasWritePerm(operator.getId(), project)) {
-      logger.error("User {} has no right permission for the project {}", operator.getName(), project.getName());
-      throw new PermissionException("User \"{0}\" is not has project \"{1}\" write permission", operator.getName(), project.getName());
+      logger.error("User {} has no right permission for the project {}", operator.getName(),
+          project.getName());
+      throw new PermissionException("User \"{0}\" is not has project \"{1}\" write permission",
+          operator.getName(), project.getName());
     }
 
-    adHocMapper.deleteAdHocByName(project.getId(), adHocName);
+    adHocMapper.deleteAdHocByName(project.getId(), name);
   }
 }

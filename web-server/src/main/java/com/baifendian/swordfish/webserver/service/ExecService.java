@@ -17,6 +17,7 @@ package com.baifendian.swordfish.webserver.service;
 
 import com.baifendian.swordfish.dao.FlowDao;
 import com.baifendian.swordfish.dao.enums.ExecType;
+import com.baifendian.swordfish.dao.enums.FailurePolicyType;
 import com.baifendian.swordfish.dao.enums.FlowStatus;
 import com.baifendian.swordfish.dao.enums.NodeDepType;
 import com.baifendian.swordfish.dao.enums.NotifyType;
@@ -24,14 +25,31 @@ import com.baifendian.swordfish.dao.mapper.ExecutionFlowMapper;
 import com.baifendian.swordfish.dao.mapper.ExecutionNodeMapper;
 import com.baifendian.swordfish.dao.mapper.MasterServerMapper;
 import com.baifendian.swordfish.dao.mapper.ProjectMapper;
-import com.baifendian.swordfish.dao.model.*;
+import com.baifendian.swordfish.dao.model.ExecutionFlow;
+import com.baifendian.swordfish.dao.model.ExecutionNode;
+import com.baifendian.swordfish.dao.model.MasterServer;
+import com.baifendian.swordfish.dao.model.Project;
+import com.baifendian.swordfish.dao.model.ProjectFlow;
+import com.baifendian.swordfish.dao.model.User;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
 import com.baifendian.swordfish.rpc.ExecInfo;
 import com.baifendian.swordfish.rpc.RetResultInfo;
 import com.baifendian.swordfish.rpc.ScheduleInfo;
 import com.baifendian.swordfish.rpc.client.MasterClient;
-import com.baifendian.swordfish.webserver.dto.*;
-import com.baifendian.swordfish.webserver.exception.*;
+import com.baifendian.swordfish.webserver.dto.ExecWorkflowsDto;
+import com.baifendian.swordfish.webserver.dto.ExecutionFlowDto;
+import com.baifendian.swordfish.webserver.dto.ExecutionNodeDto;
+import com.baifendian.swordfish.webserver.dto.ExecutorIdDto;
+import com.baifendian.swordfish.webserver.dto.ExecutorIdsDto;
+import com.baifendian.swordfish.webserver.dto.LogResult;
+import com.baifendian.swordfish.webserver.exception.NotFoundException;
+import com.baifendian.swordfish.webserver.exception.ParameterException;
+import com.baifendian.swordfish.webserver.exception.PermissionException;
+import com.baifendian.swordfish.webserver.exception.PreFailedException;
+import com.baifendian.swordfish.webserver.exception.ServerErrorException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,10 +57,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
 
 @Service
 public class ExecService {
@@ -75,20 +89,10 @@ public class ExecService {
 
   /**
    * 执行已经发布过的工作流
-   *
-   * @param operator
-   * @param projectName
-   * @param workflowName
-   * @param schedule
-   * @param execType
-   * @param nodeName
-   * @param nodeDep
-   * @param notifyType
-   * @param notifyMails
-   * @param timeout
-   * @return
    */
-  public ExecutorIdsDto postExecWorkflow(User operator, String projectName, String workflowName, String schedule, ExecType execType, String nodeName, NodeDepType nodeDep, NotifyType notifyType, String notifyMails, int timeout) {
+  public ExecutorIdsDto postExecWorkflow(User operator, String projectName, String workflowName,
+      String schedule, ExecType execType, FailurePolicyType failurePolicy, String nodeName,
+      NodeDepType nodeDep, NotifyType notifyType, String notifyMails, int timeout) {
 
     Project project = projectMapper.queryByName(projectName);
 
@@ -99,22 +103,28 @@ public class ExecService {
 
     // 必须有 project 写权限
     if (!projectService.hasWritePerm(operator.getId(), project)) {
-      logger.error("User {} has no right permission for the project {}", operator.getName(), project.getName());
-      throw new PermissionException("User \"{0}\" is not has project \"{1}\" write permission", operator.getName(), project.getName());
+      logger.error("User {} has no right permission for the project {}", operator.getName(),
+          project.getName());
+      throw new PermissionException("User \"{0}\" is not has project \"{1}\" write permission",
+          operator.getName(), project.getName());
     }
 
     ProjectFlow projectFlow = flowDao.projectFlowfindByName(project.getId(), workflowName);
 
     if (projectFlow == null) {
       logger.error("Not found project flow {} in project {}", workflowName, project.getName());
-      throw new NotFoundException("Not found project flow \"{0}\" in project \"{1}\"", workflowName, project.getName());
+      throw new NotFoundException("Not found project flow \"{0}\" in project \"{1}\"", workflowName,
+          project.getName());
     }
 
     // 已经在运行的任务禁止重复提交
-    ExecutionFlow executionFlow = executionFlowMapper.selectPreDate(projectFlow.getId(), new Date());
-    if (executionFlow != null && executionFlow.getStatus() != null && !executionFlow.getStatus().typeIsFinished()) {
+    ExecutionFlow executionFlow = executionFlowMapper
+        .selectPreDate(projectFlow.getId(), new Date());
+    if (executionFlow != null && executionFlow.getStatus() != null && !executionFlow.getStatus()
+        .typeIsFinished()) {
       logger.error("The workflow is already running");
-      throw new PreFailedException("The workflow \"{0}\" is already running", projectFlow.getName());
+      throw new PreFailedException("The workflow \"{0}\" is already running",
+          projectFlow.getName());
     }
 
     // 查看 master 是否存在
@@ -131,25 +141,34 @@ public class ExecService {
     long now = new Date().getTime();
 
     try {
-      logger.info("Call master client exec workflow, project id: {}, flow id: {}, host: {}, port: {}", project.getId(), projectFlow.getId(), masterServer.getHost(), masterServer.getPort());
+      logger
+          .info("Call master client exec workflow, project id: {}, flow id: {}, host: {}, port: {}",
+              project.getId(), projectFlow.getId(), masterServer.getHost(), masterServer.getPort());
+
+      // 反序列化邮箱列表
+      List<String> notifyMailList;
+
+      try {
+        notifyMailList = JsonUtil.parseObjectList(notifyMails, String.class);
+      } catch (Exception e) {
+        logger.error("notify mail list des11n error", e);
+        throw new ParameterException("Notify mail \"{0}\" not valid", notifyMails);
+      }
 
       switch (execType) {
         case DIRECT: {
-          // 反序列化邮箱列表
-          List<String> notifyMailList;
+          ExecInfo execInfo = new ExecInfo(nodeName, nodeDep != null ? nodeDep.ordinal() : 0,
+              notifyType != null ? notifyType.ordinal() : 0, notifyMailList, timeout,
+              failurePolicy != null? failurePolicy.ordinal(): 0);
 
-          try {
-            notifyMailList = JsonUtil.parseObjectList(notifyMails, String.class);
-          } catch (Exception e) {
-            logger.error("notify mail list des11n error", e);
-            throw new ParameterException("Notify mail \"{0}\" not valid", notifyMails);
-          }
-
-          ExecInfo execInfo = new ExecInfo(nodeName, nodeDep != null ? nodeDep.ordinal() : 0, notifyType != null ? notifyType.ordinal() : 0, notifyMailList, timeout);
-          RetResultInfo retInfo = masterClient.execFlow(project.getId(), projectFlow.getId(), now, execInfo);
+          RetResultInfo retInfo = masterClient
+              .execFlow(project.getId(), projectFlow.getId(), now, execInfo);
 
           if (retInfo == null || retInfo.getRetInfo().getStatus() != 0) {
-            logger.error("Call master client exec workflow false , project id: {}, flow id: {},host: {}, port: {}", project.getId(), projectFlow.getId(), masterServer.getHost(), masterServer.getPort());
+            logger.error(
+                "Call master client exec workflow false , project id: {}, flow id: {},host: {}, port: {}",
+                project.getId(), projectFlow.getId(), masterServer.getHost(),
+                masterServer.getPort());
             throw new ServerErrorException("master server return error");
           }
 
@@ -166,10 +185,23 @@ public class ExecService {
             throw new ParameterException("Schedule info \"{0}\" not valid", notifyMails);
           }
 
-          RetResultInfo retInfo = masterClient.appendWorkFlow(project.getId(), projectFlow.getId(), scheduleInfo);
+          ExecInfo execInfo = new ExecInfo(null, 0,
+              notifyType != null ? notifyType.ordinal() : 0, notifyMailList, timeout,
+              failurePolicy != null? failurePolicy.ordinal(): 0);
+
+          RetResultInfo retInfo = masterClient
+              .appendWorkFlow(project.getId(), projectFlow.getId(), scheduleInfo, execInfo);
+
           if (retInfo == null || retInfo.getRetInfo().getStatus() != 0) {
-            logger.error("Call master client append workflow data false , project id: {}, flow id: {},host: {}, port: {}", project.getId(), projectFlow.getId(), masterServer.getHost(), masterServer.getPort());
-            throw new ServerErrorException("Call master client append workflow data false , project id: {0}, flow id: {1},host: {2}, port: {3}", project.getId(), projectFlow.getId(), masterServer.getHost(), masterServer.getPort());
+            logger.error(
+                "Call master client append workflow data false , project id: {}, flow id: {},host: {}, port: {}",
+                project.getId(), projectFlow.getId(), masterServer.getHost(),
+                masterServer.getPort());
+
+            throw new ServerErrorException(
+                "Call master client append workflow data false , project id: {0}, flow id: {1},host: {2}, port: {3}",
+                project.getId(), projectFlow.getId(), masterServer.getHost(),
+                masterServer.getPort());
           }
 
           return new ExecutorIdsDto(retInfo.getExecIds());
@@ -187,31 +219,25 @@ public class ExecService {
 
   /**
    * 直接执行一个工作流
-   *
-   * @param operator
-   * @param projectName
-   * @param workflowName
-   * @param proxyUser
-   * @param queue
-   * @param data
-   * @param file
-   * @param notifyType
-   * @param notifyMails
-   * @param timeout
-   * @param extras
-   * @return
    */
-  public ExecutorIdDto postExecWorkflowDirect(User operator, String projectName, String workflowName, String desc, String proxyUser, String queue, String data, MultipartFile file, NotifyType notifyType, String notifyMails, int timeout, String extras) {
+  public ExecutorIdDto postExecWorkflowDirect(User operator, String projectName,
+      String workflowName, String desc, String proxyUser, String queue, String data,
+      MultipartFile file, FailurePolicyType failurePolicy, NotifyType notifyType,
+      String notifyMails, int timeout, String extras) {
     logger.info("step1. create temp workflow");
 
-    ProjectFlow projectFlow = workflowService.createWorkflow(operator, projectName, workflowName, desc, proxyUser, queue, data, file, extras, 1);
+    ProjectFlow projectFlow = workflowService
+        .createWorkflow(operator, projectName, workflowName, desc, proxyUser, queue, data, file,
+            extras, 1);
+
     if (projectFlow == null) {
       throw new ServerErrorException("project workflow create return is null");
     }
 
     logger.info("step2. exec temp workflow");
 
-    ExecutorIdsDto executorIdsDto = postExecWorkflow(operator, projectName, workflowName, null, ExecType.DIRECT, null, null, notifyType, notifyMails, timeout);
+    ExecutorIdsDto executorIdsDto = postExecWorkflow(operator, projectName, workflowName, null,
+        ExecType.DIRECT, failurePolicy, null, null, notifyType, notifyMails, timeout);
     if (CollectionUtils.isEmpty(executorIdsDto.getExecIds())) {
       throw new ServerErrorException("project workflow exec return is null");
     }
@@ -221,18 +247,9 @@ public class ExecService {
 
   /**
    * 查询任务运行情况
-   *
-   * @param operator
-   * @param projectName
-   * @param workflowName
-   * @param startDate
-   * @param endDate
-   * @param status
-   * @param from
-   * @param size
-   * @return
    */
-  public ExecWorkflowsDto getExecWorkflow(User operator, String projectName, String workflowName, Date startDate, Date endDate, String status, int from, int size) {
+  public ExecWorkflowsDto getExecWorkflow(User operator, String projectName, String workflowName,
+      Date startDate, Date endDate, String status, int from, int size) {
 
     List<String> workflowList = new ArrayList<>();
 
@@ -253,8 +270,10 @@ public class ExecService {
 
     // project 必须有执行权限
     if (!projectService.hasExecPerm(operator.getId(), project)) {
-      logger.error("User {} has no right permission for the project {}", operator.getName(), project.getName());
-      throw new PermissionException("User \"{0}\" is not has project \"{1}\" exec permission", operator.getName(), project.getName());
+      logger.error("User {} has no right permission for the project {}", operator.getName(),
+          project.getName());
+      throw new PermissionException("User \"{0}\" is not has project \"{1}\" exec permission",
+          operator.getName(), project.getName());
     }
 
     List<FlowStatus> flowStatusList;
@@ -265,22 +284,22 @@ public class ExecService {
       throw new ParameterException("Flow status list \"{0}\" not valid", status);
     }
 
-    List<ExecutionFlow> executionFlowList = executionFlowMapper.selectByFlowIdAndTimesAndStatusLimit(projectName, workflowList, startDate, endDate, from, size, flowStatusList);
+    List<ExecutionFlow> executionFlowList = executionFlowMapper
+        .selectByFlowIdAndTimesAndStatusLimit(projectName, workflowList, startDate, endDate, from,
+            size, flowStatusList);
     List<ExecutionFlowDto> executionFlowResponseList = new ArrayList<>();
     for (ExecutionFlow executionFlow : executionFlowList) {
       executionFlowResponseList.add(new ExecutionFlowDto(executionFlow));
     }
 
-    int total = executionFlowMapper.sumByFlowIdAndTimesAndStatus(projectName, workflowList, startDate, endDate, flowStatusList);
+    int total = executionFlowMapper
+        .sumByFlowIdAndTimesAndStatus(projectName, workflowList, startDate, endDate,
+            flowStatusList);
     return new ExecWorkflowsDto(total, from, executionFlowResponseList);
   }
 
   /**
    * 查询具体某个任务的运行情况
-   *
-   * @param operator
-   * @param execId
-   * @return
    */
   public ExecutionFlowDto getExecWorkflow(User operator, int execId) {
 
@@ -299,8 +318,10 @@ public class ExecService {
 
     // 必须有 project 执行权限
     if (!projectService.hasExecPerm(operator.getId(), project)) {
-      logger.error("User {} has no right permission for the project {}", operator.getName(), project.getName());
-      throw new PermissionException("User \"{0}\" is not has project \"{1}\" exec permission", operator.getName(), project.getName());
+      logger.error("User {} has no right permission for the project {}", operator.getName(),
+          project.getName());
+      throw new PermissionException("User \"{0}\" is not has project \"{1}\" exec permission",
+          operator.getName(), project.getName());
     }
 
     ExecutionFlowDto executionFlowDto = new ExecutionFlowDto(executionFlow);
@@ -319,12 +340,6 @@ public class ExecService {
 
   /**
    * 查询日志信息
-   *
-   * @param operator
-   * @param jobId
-   * @param from
-   * @param size
-   * @return
    */
   public LogResult getEexcWorkflowLog(User operator, String jobId, int from, int size) {
     ExecutionNode executionNode = executionNodeMapper.selectExecNodeByJobId(jobId);
@@ -350,8 +365,10 @@ public class ExecService {
 
     // 必须有 project 执行权限
     if (!projectService.hasExecPerm(operator.getId(), project)) {
-      logger.error("User {} has no right permission for the project {}", operator.getName(), project.getName());
-      throw new PermissionException("User \"{0}\" is not has project \"{1}\" exec permission", operator.getName(), project.getName());
+      logger.error("User {} has no right permission for the project {}", operator.getName(),
+          project.getName());
+      throw new PermissionException("User \"{0}\" is not has project \"{1}\" exec permission",
+          operator.getName(), project.getName());
     }
 
     return logHelper.getLog(from, size, jobId);
@@ -359,9 +376,6 @@ public class ExecService {
 
   /**
    * 停止运行
-   *
-   * @param operator
-   * @param execId
    */
   public void postKillWorkflow(User operator, int execId) {
 
@@ -380,8 +394,10 @@ public class ExecService {
 
     // 必须有 project 执行权限
     if (!projectService.hasExecPerm(operator.getId(), project)) {
-      logger.error("User {} has no right permission for the project {}", operator.getName(), project.getName());
-      throw new PermissionException("User \"{0}\" is not has project \"{1}\" exec permission", operator.getName(), project.getName());
+      logger.error("User {} has no right permission for the project {}", operator.getName(),
+          project.getName());
+      throw new PermissionException("User \"{0}\" is not has project \"{1}\" exec permission",
+          operator.getName(), project.getName());
     }
 
     MasterServer masterServer = masterServerMapper.query();
@@ -392,10 +408,17 @@ public class ExecService {
 
     MasterClient masterClient = new MasterClient(masterServer.getHost(), masterServer.getPort());
     try {
-      logger.info("Call master client kill workflow , project id: {}, flow id: {},host: {}, port: {}", project.getId(), executionFlow.getWorkflowName(), masterServer.getHost(), masterServer.getPort());
+      logger
+          .info("Call master client kill workflow , project id: {}, flow id: {},host: {}, port: {}",
+              project.getId(), executionFlow.getWorkflowName(), masterServer.getHost(),
+              masterServer.getPort());
       if (!masterClient.cancelExecFlow(execId)) {
-        logger.error("Call master client kill workflow false , project id: {}, exec flow id: {}, host: {}, port: {}", project.getId(), execId, masterServer.getHost(), masterServer.getPort());
-        throw new ServerErrorException("Call master client kill workflow false , project id: \"{0}\", exec flow id: \"{1}\", host: \"{2}\", port: \"{3}\"", project.getId(), execId, masterServer.getHost(), masterServer.getPort());
+        logger.error(
+            "Call master client kill workflow false , project id: {}, exec flow id: {}, host: {}, port: {}",
+            project.getId(), execId, masterServer.getHost(), masterServer.getPort());
+        throw new ServerErrorException(
+            "Call master client kill workflow false , project id: \"{0}\", exec flow id: \"{1}\", host: \"{2}\", port: \"{3}\"",
+            project.getId(), execId, masterServer.getHost(), masterServer.getPort());
       }
     } catch (Exception e) {
       logger.error("Call master client set schedule error", e);

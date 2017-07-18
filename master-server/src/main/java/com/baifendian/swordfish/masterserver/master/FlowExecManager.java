@@ -106,7 +106,7 @@ public class FlowExecManager {
             }
 
             ExecutionFlow executionFlow = flowDao.scheduleFlowToExecution(flow.getProjectId(), flow.getId(),
-                flow.getOwnerId(), scheduleDate, ExecType.COMPLEMENT_DATA, maxTryTimes, null, null, schedule.getNotifyType(), schedule.getNotifyMails(), timeout);
+                flow.getOwnerId(), scheduleDate, ExecType.COMPLEMENT_DATA, schedule.getFailurePolicy() ,maxTryTimes, null, null, schedule.getNotifyType(), schedule.getNotifyMails(), timeout);
             executionFlow.setProjectId(flow.getProjectId());
 
             ExecFlowInfo execFlowInfo = new ExecFlowInfo();

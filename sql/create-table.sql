@@ -172,6 +172,7 @@ CREATE TABLE `execution_flows` (
   `workflow_data` LONGTEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT 'short desc of the workflow, contain keys: edges, nodes, extras; [{edges: [{"startNode": "xxx", "endNode": "xxx"}, ...], nodes: [{"name": "shelljob1", "desc":"shell", "type":"VIRTUAL", "param": {"script": "echo shelljob1"}, dep: [], "extras": {...}}, ...]',
   `user_defined_params` LONGTEXT DEFAULT NULL COMMENT 'user defined parameter of the flows.',
   `type` tinyint(4) NOT NULL COMMENT 'exec ways, schedule, add data or run ad-hoc.',
+  `failure_policy` tinyint(4) NOT NULL COMMENT 'failure policy',
   `max_try_times` tinyint(4) DEFAULT NULL COMMENT 'max try times of the exec',
   `notify_type` tinyint(4) DEFAULT NULL COMMENT 'notify type',
   `notify_mails` text DEFAULT NULL COMMENT 'notify emails',
