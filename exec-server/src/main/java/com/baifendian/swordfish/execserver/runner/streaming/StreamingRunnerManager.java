@@ -128,7 +128,6 @@ public class StreamingRunnerManager {
         }
         case STORM: {
           AbstractStormProcessJob.cancelApplication(streamingResult.getAppLinkList().get(0));
-          status = FlowStatus.KILL;
           break;
         }
         default: {
@@ -165,14 +164,14 @@ public class StreamingRunnerManager {
     try {
       switch (streamingResult.getType()) {
         case STORM:
-          AbstractStormProcessJob.activateApplication(streamingResult.getAppLinks());
+          AbstractStormProcessJob.activateApplication(streamingResult.getAppLinkList().get(0));
           break;
         default:
           String msg = MessageFormat.format("Not support job type: {0}", streamingResult.getType());
           throw new Exception(msg);
       }
-      //streamingResult.setStatus(FlowStatus.RUNNING);
-      //streamingDao.updateResult(streamingResult);
+      streamingResult.setStatus(FlowStatus.RUNNING);
+      streamingDao.updateResult(streamingResult);
     } catch (Exception e) {
       logger.error(String.format("Activate streaming job exception: %d", streamingResult.getExecId()),
               e);
@@ -191,14 +190,14 @@ public class StreamingRunnerManager {
     try {
       switch (streamingResult.getType()) {
         case STORM:
-          AbstractStormProcessJob.dedeactivate(streamingResult.getAppLinks());
+          AbstractStormProcessJob.deactivateApplication(streamingResult.getAppLinkList().get(0));
           break;
         default:
           String msg = MessageFormat.format("Not support job type: {0}", streamingResult.getType());
           throw new Exception(msg);
       }
-      //streamingResult.setStatus(FlowStatus.INACTIVE);
-      //streamingDao.updateResult(streamingResult);
+      streamingResult.setStatus(FlowStatus.INACTIVE);
+      streamingDao.updateResult(streamingResult);
     } catch (Exception e) {
       logger.error(String.format("Deactivate streaming job exception: %d", streamingResult.getExecId()),
               e);
