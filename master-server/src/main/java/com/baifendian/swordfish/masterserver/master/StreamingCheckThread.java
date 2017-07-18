@@ -63,26 +63,26 @@ public class StreamingCheckThread implements Runnable {
         for (StreamingResult streamingResult : streamingResults) {
           List<String> appIds = streamingResult.getAppLinkList();
 
-          //如果更本没有appid
-          if (CollectionUtils.isEmpty(appIds)) {
-            continue;
-          } else if (System.currentTimeMillis() - streamingResult.getScheduleTime().getTime() >=
-                  MasterConfig.streamingTimeoutThreshold * 1000) { // 提交很久了, 没有任何执行和接受
-            // 设置状态和结束时间
-            streamingResult.setStatus(FlowStatus.FAILED);
-            streamingResult.setEndTime(now);
-
-            streamingDao.updateResult(streamingResult);
-
-            // 发送报警
-            EmailManager.sendMessageOfStreamingJob(streamingResult);
-          }
-
           FlowStatus status = FlowStatus.SUCCESS;
 
           //如果有appid根据不同调度平台处理
           switch (streamingResult.getType()) {
             case SPARK_STREAMING: {
+
+              //如果更本没有appid
+              if (CollectionUtils.isEmpty(appIds)) {
+                continue;
+              } else if (System.currentTimeMillis() - streamingResult.getScheduleTime().getTime() >=
+                      MasterConfig.streamingTimeoutThreshold * 1000) { // 提交很久了, 没有任何执行和接受
+                // 设置状态和结束时间
+                streamingResult.setStatus(FlowStatus.FAILED);
+                streamingResult.setEndTime(now);
+
+                streamingDao.updateResult(streamingResult);
+
+                // 发送报警
+                EmailManager.sendMessageOfStreamingJob(streamingResult);
+              }
 
               // 可能有好多个子任务, 都完成算真的完成, 有一个失败, 算失败
               String appId = appIds.get(appIds.size() - 1);
@@ -103,6 +103,12 @@ public class StreamingCheckThread implements Runnable {
               break;
             }
             case STORM: {
+
+              if (CollectionUtils.isEmpty(appIds)) {
+                status = FlowStatus.FAILED;
+                break;
+              }
+
               //storm 只有一个appId
               String topologyId = appIds.get(0);
               try {
