@@ -700,8 +700,8 @@ public class FlowRunner implements Runnable {
       }
 
       // 如果失败了, 且应该是停止的
-      if (!preFinishedNode.getStatus().typeIsSuccess()
-          && failurePolicyType == FailurePolicyType.END) {
+      if (!preFinishedNode.getStatus().typeIsSuccess()/*
+          && failurePolicyType == FailurePolicyType.END*/) {
         return false;
       }
     }
