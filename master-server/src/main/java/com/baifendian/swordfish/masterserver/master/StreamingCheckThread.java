@@ -16,6 +16,8 @@
 package com.baifendian.swordfish.masterserver.master;
 
 import com.baifendian.swordfish.common.hadoop.YarnRestClient;
+import com.baifendian.swordfish.common.job.struct.node.storm.dto.TopologyInfoDto;
+import com.baifendian.swordfish.common.job.utils.node.storm.StormRestUtil;
 import com.baifendian.swordfish.common.mail.EmailManager;
 import com.baifendian.swordfish.dao.StreamingDao;
 import com.baifendian.swordfish.dao.enums.FlowStatus;
@@ -25,8 +27,11 @@ import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.text.MessageFormat;
 import java.util.Date;
 import java.util.List;
+
+import static com.baifendian.swordfish.common.job.struct.node.JobType.*;
 
 /**
  * 检测流任务, 对于完成的流任务, 更新其状态
@@ -56,47 +61,13 @@ public class StreamingCheckThread implements Runnable {
 
         // 遍历流任务列表
         for (StreamingResult streamingResult : streamingResults) {
-          // 得到 app id 列表
           List<String> appIds = streamingResult.getAppLinkList();
-          // 列表为空, 就不管了
-          if (CollectionUtils.isNotEmpty(appIds)) {
-            FlowStatus status = FlowStatus.SUCCESS;
 
-            // 可能有好多个子任务, 都完成算真的完成, 有一个失败, 算失败
-            String appId = appIds.get(appIds.size() - 1);
-
-            try {
-              FlowStatus tmpStatus = YarnRestClient.getInstance().getApplicationStatus(appId);
-
-              // 任务不存在
-              if (tmpStatus == null) {
-                logger.error("application not exist: {}", appId);
-                status = FlowStatus.FAILED;
-              } else if (!tmpStatus.typeIsSuccess()) {// 如果没有完成
-                status = tmpStatus;
-              }
-            } catch (Exception e) {
-              logger.error(String.format("get application exception: {}", appId), e);
-            }
-
-            // 更新状态
-            if (status != streamingResult.getStatus()) {
-              // 设置状态和结束时间
-              streamingResult.setStatus(status);
-
-              if (status.typeIsFinished()) {
-                streamingResult.setEndTime(now);
-              }
-
-              streamingDao.updateResult(streamingResult);
-
-              // 发送报警
-              if (status.typeIsFinished()) {
-                EmailManager.sendMessageOfStreamingJob(streamingResult);
-              }
-            }
+          //如果更本没有appid
+          if (CollectionUtils.isEmpty(appIds)) {
+            continue;
           } else if (System.currentTimeMillis() - streamingResult.getScheduleTime().getTime() >=
-              MasterConfig.streamingTimeoutThreshold * 1000) { // 提交很久了, 没有任何执行和接受
+                  MasterConfig.streamingTimeoutThreshold * 1000) { // 提交很久了, 没有任何执行和接受
             // 设置状态和结束时间
             streamingResult.setStatus(FlowStatus.FAILED);
             streamingResult.setEndTime(now);
@@ -105,6 +76,73 @@ public class StreamingCheckThread implements Runnable {
 
             // 发送报警
             EmailManager.sendMessageOfStreamingJob(streamingResult);
+          }
+
+          FlowStatus status = FlowStatus.SUCCESS;
+
+          //如果有appid根据不同调度平台处理
+          switch (streamingResult.getType()) {
+            case SPARK_STREAMING: {
+
+              // 可能有好多个子任务, 都完成算真的完成, 有一个失败, 算失败
+              String appId = appIds.get(appIds.size() - 1);
+
+              try {
+                FlowStatus tmpStatus = YarnRestClient.getInstance().getApplicationStatus(appId);
+
+                // 任务不存在
+                if (tmpStatus == null) {
+                  logger.error("application not exist: {}", appId);
+                  status = FlowStatus.FAILED;
+                } else if (!tmpStatus.typeIsSuccess()) {// 如果没有完成
+                  status = tmpStatus;
+                }
+              } catch (Exception e) {
+                logger.error(String.format("get application exception: {}", appId), e);
+              }
+              break;
+            }
+            case STORM: {
+              //storm 只有一个appId
+              String topologyId = appIds.get(0);
+              try {
+                FlowStatus tmpStatus = StormRestUtil.getTopologyStatus(topologyId);
+
+                if (tmpStatus == null) {
+                  status = FlowStatus.FAILED;
+                  String msg = MessageFormat.format("Not found topology: {0}", topologyId);
+                  logger.error(msg);
+                  throw new Exception(msg);
+                }
+
+                status = tmpStatus;
+
+              } catch (Exception e) {
+                logger.error(String.format("get application exception: {}", topologyId), e);
+              }
+              break;
+            }
+            default:
+              String msg = MessageFormat.format("No support type: {}", streamingResult.getType());
+              logger.error(msg);
+              continue;
+          }
+
+          // 更新状态
+          if (status != streamingResult.getStatus()) {
+            // 设置状态和结束时间
+            streamingResult.setStatus(status);
+
+            if (status.typeIsFinished()) {
+              streamingResult.setEndTime(now);
+            }
+
+            streamingDao.updateResult(streamingResult);
+
+            // 发送报警
+            if (status.typeIsFinished()) {
+              EmailManager.sendMessageOfStreamingJob(streamingResult);
+            }
           }
         }
       }

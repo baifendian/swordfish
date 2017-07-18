@@ -2,6 +2,7 @@ package com.baifendian.swordfish.common.job.utils.node.storm;
 
 import com.baifendian.swordfish.common.config.BaseConfig;
 import com.baifendian.swordfish.common.job.struct.node.storm.dto.*;
+import com.baifendian.swordfish.dao.enums.FlowStatus;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
 import org.apache.avro.data.Json;
 import org.apache.commons.configuration.ConfigurationException;
@@ -36,6 +37,14 @@ public class StormRestUtil {
       System.exit(1);
     }
   }
+
+  private final static String ACTIVE = "ACTIVE";
+
+  private final static String INACTIVE = "INACTIVE";
+
+  private final static String KILLED = "KILLED";
+
+  private final static String REBALANCING = "REBALANCING";
 
   private final static String topologySummary = "/api/v1/topology/summary";
 
@@ -110,6 +119,7 @@ public class StormRestUtil {
     return JsonUtil.parseObject(res, TopologySummaryDto.class);
   }
 
+
   /**
    * 通过名称获取ID,只能的当前正在运行的任务的ID
    *
@@ -132,6 +142,33 @@ public class StormRestUtil {
             .execute().returnContent().toString();
 
     return JsonUtil.parseObject(res, TopologyInfoDto.class);
+  }
+
+
+  /**
+   * 根据任务ID获取一个任务的状态
+   *
+   * @param topologyId
+   * @return
+   */
+  public static FlowStatus getTopologyStatus(String topologyId) throws IOException {
+    TopologyInfoDto topologyInfo = getTopologyInfo(topologyId);
+    if (topologyInfo == null || topologyInfo.getStatus() == null) {
+      return null;
+    }
+
+    switch (topologyInfo.getStatus()) {
+      case ACTIVE:
+        return FlowStatus.RUNNING;
+      case INACTIVE:
+        return FlowStatus.INACTIVE;
+      case KILLED:
+        return FlowStatus.KILL;
+      case REBALANCING:
+        return FlowStatus.INIT;
+      default:
+        return FlowStatus.FAILED;
+    }
   }
 
   /**
