@@ -1,9 +1,12 @@
 package com.baifendian.swordfish.common.job.utils.node.storm;
 
 import com.baifendian.swordfish.common.config.BaseConfig;
-import com.baifendian.swordfish.common.job.struct.node.storm.dto.*;
+import com.baifendian.swordfish.common.job.struct.node.storm.dto.TopologyInfoDto;
+import com.baifendian.swordfish.common.job.struct.node.storm.dto.TopologyOperationDto;
+import com.baifendian.swordfish.common.job.struct.node.storm.dto.TopologySummaryDto;
+import com.baifendian.swordfish.common.job.struct.node.storm.dto.TopologyWorkerDto;
+import com.baifendian.swordfish.dao.enums.FlowStatus;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
-import org.apache.avro.data.Json;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.lang.StringUtils;
@@ -37,6 +40,14 @@ public class StormRestUtil {
     }
   }
 
+  private final static String ACTIVE = "ACTIVE";
+
+  private final static String INACTIVE = "INACTIVE";
+
+  private final static String KILLED = "KILLED";
+
+  private final static String REBALANCING = "REBALANCING";
+
   private final static String topologySummary = "/api/v1/topology/summary";
 
   private final static String topologyInfo = "/api/v1/topology/{0}";
@@ -63,7 +74,9 @@ public class StormRestUtil {
    * @return
    */
   private static String getTopologyInfoUrl(String topologyId) {
-    return stormRestUrl + MessageFormat.format(topologyInfo, topologyId);
+    String url = stormRestUrl + MessageFormat.format(topologyInfo, topologyId);
+    LOGGER.info("Get topology info url: {}", url);
+    return url;
   }
 
   /**
@@ -74,7 +87,9 @@ public class StormRestUtil {
    * @return
    */
   private static String getTopologyKillUrl(String topologyId, long waitTime) {
-    return stormRestUrl + MessageFormat.format(topologyKill, topologyId, waitTime);
+    String url = stormRestUrl + MessageFormat.format(topologyKill, topologyId, String.valueOf(waitTime));
+    LOGGER.info("Get Topology kill url: {}", url);
+    return url;
   }
 
   /**
@@ -84,7 +99,9 @@ public class StormRestUtil {
    * @return
    */
   private static String getTopologyDeactivateUrl(String topologyId) {
-    return stormRestUrl + MessageFormat.format(topologyDeactivate, topologyId);
+    String url = stormRestUrl + MessageFormat.format(topologyDeactivate, topologyId);
+    LOGGER.info("Get topology deactivate url: {}", url);
+    return url;
   }
 
   /**
@@ -94,7 +111,9 @@ public class StormRestUtil {
    * @return
    */
   private static String getTopologyActivateUrl(String topologyId) {
-    return stormRestUrl + MessageFormat.format(topologyActivate, topologyId);
+    String url = stormRestUrl + MessageFormat.format(topologyActivate, topologyId);
+    LOGGER.info("Get topology activate url: {}", url);
+    return url;
   }
 
   /**
@@ -109,6 +128,7 @@ public class StormRestUtil {
 
     return JsonUtil.parseObject(res, TopologySummaryDto.class);
   }
+
 
   /**
    * 通过名称获取ID,只能的当前正在运行的任务的ID
@@ -132,6 +152,33 @@ public class StormRestUtil {
             .execute().returnContent().toString();
 
     return JsonUtil.parseObject(res, TopologyInfoDto.class);
+  }
+
+
+  /**
+   * 根据任务ID获取一个任务的状态
+   *
+   * @param topologyId
+   * @return
+   */
+  public static FlowStatus getTopologyStatus(String topologyId) throws IOException {
+    TopologyInfoDto topologyInfo = getTopologyInfo(topologyId);
+    if (topologyInfo == null || topologyInfo.getStatus() == null) {
+      return null;
+    }
+
+    switch (topologyInfo.getStatus()) {
+      case ACTIVE:
+        return FlowStatus.RUNNING;
+      case INACTIVE:
+        return FlowStatus.INACTIVE;
+      case KILLED:
+        return FlowStatus.KILL;
+      case REBALANCING:
+        return FlowStatus.INIT;
+      default:
+        return FlowStatus.FAILED;
+    }
   }
 
   /**

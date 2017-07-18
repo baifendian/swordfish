@@ -10,11 +10,10 @@ import java.io.IOException;
 public class StormRestUtilTest {
 
   @Test
-  public void testGetTopologySummary(){
+  public void testGetTopologySummary() {
     try {
-      String res = StormRestUtil.getTopologySummary();
-      System.out.println(res);
-    } catch (IOException e) {
+      StormRestUtil.topologyKill("production-topology-7-1500348415", 60000L);
+    } catch (Exception e) {
       e.printStackTrace();
     }
   }
