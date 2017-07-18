@@ -170,8 +170,8 @@ public class StreamingRunnerManager {
           String msg = MessageFormat.format("Not support job type: {0}", streamingResult.getType());
           throw new Exception(msg);
       }
-      //streamingResult.setStatus(FlowStatus.RUNNING);
-      //streamingDao.updateResult(streamingResult);
+      streamingResult.setStatus(FlowStatus.RUNNING);
+      streamingDao.updateResult(streamingResult);
     } catch (Exception e) {
       logger.error(String.format("Activate streaming job exception: %d", streamingResult.getExecId()),
               e);
@@ -196,8 +196,8 @@ public class StreamingRunnerManager {
           String msg = MessageFormat.format("Not support job type: {0}", streamingResult.getType());
           throw new Exception(msg);
       }
-      //streamingResult.setStatus(FlowStatus.INACTIVE);
-      //streamingDao.updateResult(streamingResult);
+      streamingResult.setStatus(FlowStatus.INACTIVE);
+      streamingDao.updateResult(streamingResult);
     } catch (Exception e) {
       logger.error(String.format("Deactivate streaming job exception: %d", streamingResult.getExecId()),
               e);
