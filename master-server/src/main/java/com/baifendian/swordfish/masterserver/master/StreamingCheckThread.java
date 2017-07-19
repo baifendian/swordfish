@@ -15,22 +15,22 @@
  */
 package com.baifendian.swordfish.masterserver.master;
 
+import static com.baifendian.swordfish.common.job.struct.node.JobType.SPARK_STREAMING;
+import static com.baifendian.swordfish.common.job.struct.node.JobType.STORM;
+
 import com.baifendian.swordfish.common.hadoop.YarnRestClient;
-import com.baifendian.swordfish.common.storm.StormRestUtil;
 import com.baifendian.swordfish.common.mail.EmailManager;
+import com.baifendian.swordfish.common.storm.StormRestUtil;
 import com.baifendian.swordfish.dao.StreamingDao;
 import com.baifendian.swordfish.dao.enums.FlowStatus;
 import com.baifendian.swordfish.dao.model.StreamingResult;
 import com.baifendian.swordfish.masterserver.config.MasterConfig;
-import org.apache.commons.collections.CollectionUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.text.MessageFormat;
 import java.util.Date;
 import java.util.List;
-
-import static com.baifendian.swordfish.common.job.struct.node.JobType.*;
+import org.apache.commons.collections.CollectionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * 检测流任务, 对于完成的流任务, 更新其状态
@@ -67,12 +67,11 @@ public class StreamingCheckThread implements Runnable {
           // 如果有 appid 根据不同调度平台处理
           switch (streamingResult.getType()) {
             case SPARK_STREAMING: {
-
               // 如果更本没有 appid
               if (CollectionUtils.isEmpty(appIds)) {
                 continue;
               } else if (System.currentTimeMillis() - streamingResult.getScheduleTime().getTime() >=
-                      MasterConfig.streamingTimeoutThreshold * 1000) { // 提交很久了, 没有任何执行和接受
+                  MasterConfig.streamingTimeoutThreshold * 1000) { // 提交很久了, 没有任何执行和接受
                 // 设置状态和结束时间
                 streamingResult.setStatus(FlowStatus.FAILED);
                 streamingResult.setEndTime(now);
@@ -99,16 +98,17 @@ public class StreamingCheckThread implements Runnable {
               } catch (Exception e) {
                 logger.error(String.format("get application exception: {}", appId), e);
               }
-              break;
             }
-            case STORM: {
+            break;
 
+            case STORM: {
               if (CollectionUtils.isEmpty(appIds)) {
                 break;
               }
 
-              // storm 只有一个appId
+              // storm 只有一个 appId
               String topologyId = appIds.get(0);
+
               try {
                 FlowStatus tmpStatus = StormRestUtil.getTopologyStatus(topologyId);
                 if (tmpStatus == null) {
@@ -123,8 +123,9 @@ public class StreamingCheckThread implements Runnable {
               } catch (Exception e) {
                 logger.error(String.format("get application exception: {}", topologyId), e);
               }
-              break;
             }
+            break;
+
             default:
               String msg = MessageFormat.format("No support type: {}", streamingResult.getType());
               logger.error(msg);
