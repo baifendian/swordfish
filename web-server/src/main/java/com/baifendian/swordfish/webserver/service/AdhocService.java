@@ -40,6 +40,7 @@ import com.baifendian.swordfish.webserver.dto.ExecutorIdDto;
 import com.baifendian.swordfish.webserver.dto.LogResult;
 import com.baifendian.swordfish.webserver.exception.NotFoundException;
 import com.baifendian.swordfish.webserver.exception.PermissionException;
+import com.baifendian.swordfish.webserver.exception.PreFailedException;
 import com.baifendian.swordfish.webserver.exception.ServerErrorException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -207,7 +208,7 @@ public class AdhocService {
     // 3. 得到需要的 index
     if (results == null || index >= results.size()) {
       logger.error("Result is empty or index equal or more than results size");
-      throw new ServerErrorException("Result is empty or index equal or more than results size");
+      throw new NotFoundException("Result is empty or index equal or more than results size");
     }
 
     // 3. 查看结果

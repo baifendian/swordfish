@@ -79,6 +79,8 @@ public class ConfigurationUtil {
     return String.format(configuration.get("yarn.resourcemanager.webapp.address"), appId);
   }
 
+
+
   /**
    * 根据 appid 生成一个 url
    *
