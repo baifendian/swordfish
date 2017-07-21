@@ -30,6 +30,9 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import static com.baifendian.swordfish.common.job.struct.node.JobType.SPARK_STREAMING;
+import static com.baifendian.swordfish.common.job.struct.node.JobType.STORM;
+
 public class StreamingResultDto {
 
   private int execId;
@@ -105,13 +108,27 @@ public class StreamingResultDto {
       // link 需要添加前缀
       List<String> appIds = streamingResult.getAppLinkList();
 
-      if (CollectionUtils.isNotEmpty(appIds)) {
-        this.appLinks = new ArrayList<>();
+      switch (type) {
+        case STORM: {
+          if (CollectionUtils.isNotEmpty(appIds)) {
+            this.appLinks = new ArrayList<>();
 
-        for (String appId : appIds) {
-          this.appLinks.add(ConfigurationUtil.getWebappAddress(appId));
+            for (String appId : appIds) {
+              this.appLinks.add(ConfigurationUtil.getStormAppAddress(appId));
+            }
+          }
+        }
+        case SPARK_STREAMING: {
+          if (CollectionUtils.isNotEmpty(appIds)) {
+            this.appLinks = new ArrayList<>();
+
+            for (String appId : appIds) {
+              this.appLinks.add(ConfigurationUtil.getWebappAddress(appId));
+            }
+          }
         }
       }
+
 
       this.notifyType = streamingResult.getNotifyType();
       this.notifyMails = streamingResult.getNotifyMails();

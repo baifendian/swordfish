@@ -15,6 +15,8 @@
  */
 package com.baifendian.swordfish.common.hadoop;
 
+import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.slf4j.Logger;
@@ -25,6 +27,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.MessageFormat;
 import java.util.Properties;
 
 /**
@@ -46,14 +49,20 @@ public class ConfigurationUtil {
    */
   private static final Properties PROPERTIES = new Properties();
 
+  private static PropertiesConfiguration STORM_PROPERTIES;
+
   static {
     InputStream is = null;
     try {
       File dataSourceFile = ResourceUtils.getFile("classpath:common/hadoop/hadoop.properties");
+      STORM_PROPERTIES = new PropertiesConfiguration("common/storm.properties");
       is = new FileInputStream(dataSourceFile);
       PROPERTIES.load(is);
     } catch (IOException e) {
       logger.error(e.getMessage(), e);
+    } catch (ConfigurationException e) {
+      logger.error(e.getMessage(), e);
+      System.exit(-1);
     } finally {
       IOUtils.closeQuietly(is);
     }
@@ -79,6 +88,15 @@ public class ConfigurationUtil {
     return String.format(configuration.get("yarn.resourcemanager.webapp.address"), appId);
   }
 
+  /**
+   * 获取 Storm web app 地址
+   * @param appId
+   * @return
+   */
+  public static String getStormAppAddress(String appId) {
+    init();
+    return MessageFormat.format("{0}/{1}{2}", configuration.get("storm.rest.url"), configuration.get("Storm.rest.topolog"), appId);
+  }
 
 
   /**
@@ -118,5 +136,7 @@ public class ConfigurationUtil {
     configuration.set("mapreduce.jobhistory.address", PROPERTIES.getProperty("mapreduce.jobhistory.address"));
     configuration.set("yarn.resourcemanager.webapp.address", PROPERTIES.getProperty("yarn.resourcemanager.webapp.address"));
     configuration.set("yarn.application.status.address", PROPERTIES.getProperty("yarn.application.status.address"));
+    configuration.set("storm.rest.url", STORM_PROPERTIES.getString("storm.rest.url"));
+    configuration.set("Storm.rest.topology", STORM_PROPERTIES.getString("Storm.rest.topology"));
   }
 }
