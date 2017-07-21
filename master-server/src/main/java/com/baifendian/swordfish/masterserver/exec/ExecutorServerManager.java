@@ -16,32 +16,29 @@
 package com.baifendian.swordfish.masterserver.exec;
 
 import com.baifendian.swordfish.masterserver.exception.MasterException;
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * 管理 executor server, 包括添加, 更新, 删除等功能
  */
 public class ExecutorServerManager {
+
   private final Logger logger = LoggerFactory.getLogger(getClass());
 
   private Map<String, ExecutorServerInfo> executorServers = new ConcurrentHashMap<>();
 
   /**
    * 添加一个 executor server
-   *
-   * @param executorServerInfo
-   * @return
-   * @throws MasterException
    */
-  public synchronized ExecutorServerInfo addServer(ExecutorServerInfo executorServerInfo) throws MasterException {
+  public synchronized ExecutorServerInfo addServer(ExecutorServerInfo executorServerInfo)
+      throws MasterException {
     String key = getKey(executorServerInfo);
 
     if (executorServers.containsKey(key)) {
@@ -53,12 +50,9 @@ public class ExecutorServerManager {
 
   /**
    * 删除具体的 executor server
-   *
-   * @param executorServerInfo
-   * @return
-   * @throws MasterException
    */
-  public synchronized ExecutorServerInfo updateServer(ExecutorServerInfo executorServerInfo) throws MasterException {
+  public synchronized ExecutorServerInfo updateServer(ExecutorServerInfo executorServerInfo)
+      throws MasterException {
     String key = getKey(executorServerInfo);
 
     if (!executorServers.containsKey(key)) {
@@ -70,8 +64,6 @@ public class ExecutorServerManager {
 
   /**
    * 获取一个可用的 executor server, 选取执行的 workflow 最少的那个 executor server
-   *
-   * @return
    */
   public synchronized ExecutorServerInfo getExecutorServer() {
     logger.debug("executor servers: {}", executorServers.toString());
@@ -85,7 +77,8 @@ public class ExecutorServerManager {
 
       if (result == null) {
         result = executorServerInfo;
-      } else if (result.getHeartBeatData().getExecIdsSize() > executorServerInfo.getHeartBeatData().getExecIdsSize()) {
+      } else if (result.getHeartBeatData().getExecIdsSize() > executorServerInfo.getHeartBeatData()
+          .getExecIdsSize()) {
         result = executorServerInfo;
       }
     }
@@ -95,14 +88,12 @@ public class ExecutorServerManager {
 
   /**
    * 检测超时的 executor 并返回
-   *
-   * @param timeoutInterval
-   * @return
    */
   public synchronized List<ExecutorServerInfo> checkTimeoutServer(long timeoutInterval) {
     List<ExecutorServerInfo> faultServers = new ArrayList<>();
 
     logger.debug("{} ", executorServers);
+
     for (Map.Entry<String, ExecutorServerInfo> entry : executorServers.entrySet()) {
       logger.debug("{} {}", entry.getKey(), entry.getValue().getHeartBeatData());
 
@@ -132,8 +123,6 @@ public class ExecutorServerManager {
 
   /**
    * 初始化 executor server 信息
-   *
-   * @param executorServerInfos
    */
   public synchronized void initServers(Collection<ExecutorServerInfo> executorServerInfos) {
     for (ExecutorServerInfo executorServerInfo : executorServerInfos) {
@@ -143,9 +132,6 @@ public class ExecutorServerManager {
 
   /**
    * 获取 key 信息
-   *
-   * @param executorServerInfo
-   * @return
    */
   private String getKey(ExecutorServerInfo executorServerInfo) {
     if (executorServerInfo == null) {
@@ -153,5 +139,18 @@ public class ExecutorServerManager {
     }
 
     return executorServerInfo.getHost() + ":" + executorServerInfo.getPort();
+  }
+
+  /**
+   * 打印 server 信息
+   */
+  public synchronized void printServerInfo() {
+    for (Map.Entry<String, ExecutorServerInfo> entry : executorServers.entrySet()) {
+      ExecutorServerInfo executorServerInfo = entry.getValue();
+
+      logger.info("executor information, host: {}, port: {}, heart beat: {}",
+          executorServerInfo.getHost(), executorServerInfo.getPort(),
+          executorServerInfo.getHeartBeatData());
+    }
   }
 }
