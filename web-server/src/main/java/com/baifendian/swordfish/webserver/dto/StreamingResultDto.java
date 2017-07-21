@@ -117,6 +117,7 @@ public class StreamingResultDto {
               this.appLinks.add(ConfigurationUtil.getStormAppAddress(appId));
             }
           }
+          break;
         }
         case SPARK_STREAMING: {
           if (CollectionUtils.isNotEmpty(appIds)) {
@@ -126,6 +127,7 @@ public class StreamingResultDto {
               this.appLinks.add(ConfigurationUtil.getWebappAddress(appId));
             }
           }
+          break;
         }
       }
 
