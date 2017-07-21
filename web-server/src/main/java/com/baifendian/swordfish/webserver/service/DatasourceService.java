@@ -228,11 +228,16 @@ public class DatasourceService {
       throw new NotFoundException("Not found project \"{0}\"", projectName);
     }
 
-
     // 必须有 project 写权限
     if (!projectService.hasWritePerm(operator.getId(), project)) {
       logger.error("User {} has no right permission for the project {}", operator.getName(), project.getName());
       throw new PermissionException("User \"{0}\" is not has project \"{1}\" write permission", operator.getName(), project.getName());
+    }
+
+    // 查找指定数据源
+    DataSource dataSource = dataSourceMapper.getByName(project.getId(), name);
+    if (dataSource == null) {
+      throw new NotFoundException("Not found datasource \"{0}\" in project \"{1}\"", name, project.getName());
     }
 
     int count = dataSourceMapper.deleteByProjectAndName(project.getId(), name);
