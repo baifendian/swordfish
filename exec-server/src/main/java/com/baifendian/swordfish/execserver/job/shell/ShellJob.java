@@ -114,6 +114,9 @@ public class ShellJob extends Job {
 
     // 替换 ^M, windows 的字符串
     String cmd = String.format("sed -i -e 's/\r$//g' %s", fileName);
+
+    logger.info("do with ^M: {}", cmd);
+
     Runtime.getRuntime().exec(cmd);
 
     return fileName;
