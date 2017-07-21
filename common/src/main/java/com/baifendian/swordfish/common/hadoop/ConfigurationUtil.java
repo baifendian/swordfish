@@ -55,7 +55,7 @@ public class ConfigurationUtil {
     InputStream is = null;
     try {
       File dataSourceFile = ResourceUtils.getFile("classpath:common/hadoop/hadoop.properties");
-      STORM_PROPERTIES = new PropertiesConfiguration("classpath:common/storm.properties");
+      STORM_PROPERTIES = new PropertiesConfiguration("common/storm.properties");
       is = new FileInputStream(dataSourceFile);
       PROPERTIES.load(is);
     } catch (IOException e) {
@@ -137,6 +137,6 @@ public class ConfigurationUtil {
     configuration.set("yarn.resourcemanager.webapp.address", PROPERTIES.getProperty("yarn.resourcemanager.webapp.address"));
     configuration.set("yarn.application.status.address", PROPERTIES.getProperty("yarn.application.status.address"));
     configuration.set("storm.rest.url", STORM_PROPERTIES.getString("storm.rest.url"));
-    configuration.set("Storm.rest.topolog", STORM_PROPERTIES.getString("Storm.rest.topolog"));
+    configuration.set("Storm.rest.topology", STORM_PROPERTIES.getString("Storm.rest.topology"));
   }
 }
