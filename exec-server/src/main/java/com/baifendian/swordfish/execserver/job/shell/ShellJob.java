@@ -113,7 +113,7 @@ public class ShellJob extends Job {
     Files.write(path, shellParam.getScript().getBytes(), StandardOpenOption.APPEND);
 
     // 替换 ^M, windows 的字符串
-    String cmd = String.format("sed -i -e 's/\\r//' %s", fileName);
+    String cmd = String.format("sed -i -e 's/\r$//g' %s", fileName);
     Runtime.getRuntime().exec(cmd);
 
     return fileName;
