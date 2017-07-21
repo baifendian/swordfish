@@ -97,7 +97,7 @@ public class ShellJob extends Job {
       return fileName;
     }
 
-    String script = shellParam.getScript();
+    String script = shellParam.getScript().replaceAll("\\r\\n", "\n");
     script = ParamHelper.resolvePlaceholders(script, props.getDefinedParams());
 
     shellParam.setScript(script);
@@ -111,13 +111,6 @@ public class ShellJob extends Job {
     Files.createFile(path, attr);
 
     Files.write(path, shellParam.getScript().getBytes(), StandardOpenOption.APPEND);
-
-    // 替换 ^M, windows 的字符串
-    String cmd = String.format("sed -i -e 's/\\r$//g' %s", fileName);
-
-    logger.info("do with ^M: {}", cmd);
-
-    Runtime.getRuntime().exec(cmd);
 
     return fileName;
   }
