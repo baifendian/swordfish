@@ -162,8 +162,6 @@ public class ProcessJob {
         return exitCode;
       }
 
-      command = command.replace("\r", "");
-
       // 命令语句
       String commandFile = String.format("%s/%s.command", workDir, jobAppId);
 
@@ -188,9 +186,14 @@ public class ProcessJob {
         // 写数据到文件
         FileUtils.writeStringToFile(new File(commandFile), stringBuilder.toString(),
             Charset.forName("UTF-8"));
+
+        // 替换 ^M, windows 的字符串
+        String cmd = String.format("sed -i -e 's/\r$//' %s", commandFile);
+        Runtime.getRuntime().exec(cmd);
       }
 
       // 设置运行命令
+
       processBuilder.command("sudo", "-u", proxyUser, "sh", commandFile);
 
       // 设置工作目录
