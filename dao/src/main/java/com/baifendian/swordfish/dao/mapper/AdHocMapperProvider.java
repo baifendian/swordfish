@@ -187,6 +187,7 @@ public class AdHocMapperProvider {
         FROM(TABLE_NAME);
         WHERE("`project_id` = #{projectId}");
         WHERE("`name` = #{name}");
+        ORDER_BY("`create_time` desc");
       }
     }.toString();
   }
