@@ -55,7 +55,7 @@ public class ConfigurationUtil {
     InputStream is = null;
     try {
       File dataSourceFile = ResourceUtils.getFile("classpath:common/hadoop/hadoop.properties");
-      STORM_PROPERTIES = new PropertiesConfiguration("common/hive/hive.properties");
+      STORM_PROPERTIES = new PropertiesConfiguration("classpath:common/storm.properties");
       is = new FileInputStream(dataSourceFile);
       PROPERTIES.load(is);
     } catch (IOException e) {
