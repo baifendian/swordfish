@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -70,17 +71,33 @@ public class ExecutorServerManager {
 
     ExecutorServerInfo result = null;
 
+    int size = executorServers.size();
+
+    if (size <= 0) {
+      return result;
+    }
+
+    int choose = new Random().nextInt(size);
+    int index = 0;
+
     for (ExecutorServerInfo executorServerInfo : executorServers.values()) {
-      if (executorServerInfo.getHeartBeatData() == null) {
-        continue;
+      if (index == choose) {
+        result = executorServerInfo;
+        break;
       }
 
-      if (result == null) {
-        result = executorServerInfo;
-      } else if (result.getHeartBeatData().getExecIdsSize() > executorServerInfo.getHeartBeatData()
-          .getExecIdsSize()) {
-        result = executorServerInfo;
-      }
+      ++index;
+
+//      if (executorServerInfo.getHeartBeatData() == null) {
+//        continue;
+//      }
+//
+//      if (result == null) {
+//        result = executorServerInfo;
+//      } else if (result.getHeartBeatData().getExecIdsSize() > executorServerInfo.getHeartBeatData()
+//          .getExecIdsSize()) {
+//        result = executorServerInfo;
+//      }
     }
 
     return result;
