@@ -186,10 +186,6 @@ public class ProcessJob {
         // 写数据到文件
         FileUtils.writeStringToFile(new File(commandFile), stringBuilder.toString(),
             Charset.forName("UTF-8"));
-
-        // 替换 ^M, windows 的字符串
-        String cmd = String.format("sed -i -e 's/\r$//' %s", commandFile);
-        Runtime.getRuntime().exec(cmd);
       }
 
       // 设置运行命令
