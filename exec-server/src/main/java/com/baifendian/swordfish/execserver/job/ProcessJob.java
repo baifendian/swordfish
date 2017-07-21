@@ -162,6 +162,8 @@ public class ProcessJob {
         return exitCode;
       }
 
+      command = command.replace("\r", "");
+
       // 命令语句
       String commandFile = String.format("%s/%s.command", workDir, jobAppId);
 
