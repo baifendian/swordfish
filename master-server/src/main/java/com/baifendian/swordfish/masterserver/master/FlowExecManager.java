@@ -61,9 +61,9 @@ public class FlowExecManager {
   private final FlowDao flowDao;
 
   /**
-   * 检测依赖的等待时间，默认 30 s
+   * 检测依赖的等待时间
    */
-  private static long checkInterval = 30 * 1000;
+  private static long checkInterval = 5 * 1000;
 
 
   /**
@@ -86,26 +86,11 @@ public class FlowExecManager {
                             Date endDateTime, ExecInfo execInfo) {
     // 提交任务去执行
     appendFlowExecutorService.submit(() -> {
-      /**
-       * 获取第一次补数据触发的时间
-       *
-       * 1.先计算出 startTime 前一秒的时间:
-       * DateUtils.addSeconds(startDateTime, -1)
-       *
-       * 2.再获取startTime前一秒为基准，一下轮调度触发的时间:
-       * cron.getTimeAfter(...)
-       *
-       * 说明：为什么要以 startTime 前一秒作为基准时间？
-       *
-       * 因为可能 startTime 本身可能就是第一次补数据触发的时间。
-       * 这里减去调度系统支持的最小间隔1秒后，再以此为基准计算下个次调度触发的时间，就不会错过 startTime 本身可能是触发时间的情况。
-       *
-       */
+      // 先计算出 startTime 前一秒的时间, 再获取 startTime 前一秒为基准，下轮调度触发的时间
       Date scheduleDate = cron.getTimeAfter(new Date(startDateTime.getTime() - 1000));
 
       try {
         while (scheduleDate.before(endDateTime) || scheduleDate.equals(endDateTime)) {
-
           ExecutionFlow executionFlow = flowDao
                   .scheduleFlowToExecution(flow.getProjectId(), flow.getId(),
                           flow.getOwnerId(), scheduleDate, ExecType.COMPLEMENT_DATA,
@@ -129,8 +114,6 @@ public class FlowExecManager {
             break;
           }
 
-          //resultList.add(
-          //        new AbstractMap.SimpleImmutableEntry<>(new Date(scheduleDate.getTime()), execStatus));
           scheduleDate = cron.getTimeAfter(scheduleDate);
         }
       } catch (Exception e) {

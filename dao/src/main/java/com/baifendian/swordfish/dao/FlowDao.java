@@ -39,12 +39,16 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 @Component
 public class FlowDao extends BaseDao {
+
+  private final Logger logger = LoggerFactory.getLogger(getClass());
 
   @Autowired
   private ExecutionFlowMapper executionFlowMapper;
@@ -173,6 +177,9 @@ public class FlowDao extends BaseDao {
       NotifyType notifyType,
       List<String> mails,
       int timeout) throws Exception {
+    logger.info("project id:{}, workflow id:{}, schedule time:{}", projectId, workflowId,
+        scheduleTime);
+
     // 查询工作流的节点信息
     List<FlowNode> flowNodes = flowNodeMapper.selectByFlowId(workflowId);
 
