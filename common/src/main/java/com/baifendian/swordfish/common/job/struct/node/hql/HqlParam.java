@@ -17,11 +17,11 @@ package com.baifendian.swordfish.common.job.struct.node.hql;
 
 import com.baifendian.swordfish.common.job.struct.node.BaseParam;
 import com.baifendian.swordfish.common.job.struct.node.common.UdfsInfo;
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
-
+import com.baifendian.swordfish.dao.enums.SqlEngineType;
 import java.util.ArrayList;
 import java.util.List;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 
 /**
  * sql 节点参数 <p>
@@ -34,6 +34,11 @@ public class HqlParam extends BaseParam {
   private String sql;
 
   /**
+   * 执行类型
+   */
+  private SqlEngineType type;
+
+  /**
    * udfs 函数列表
    */
   private List<UdfsInfo> udfs;
@@ -44,6 +49,14 @@ public class HqlParam extends BaseParam {
 
   public void setSql(String sql) {
     this.sql = sql;
+  }
+
+  public SqlEngineType getType() {
+    return type;
+  }
+
+  public void setType(SqlEngineType type) {
+    this.type = type;
   }
 
   public List<UdfsInfo> getUdfs() {

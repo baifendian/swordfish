@@ -15,10 +15,9 @@
  */
 package com.baifendian.swordfish.webserver.dto;
 
-import com.baifendian.swordfish.common.job.struct.node.BaseParamFactory;
 import com.baifendian.swordfish.common.job.struct.node.adhoc.AdHocParam;
 import com.baifendian.swordfish.common.json.JsonOrdinalSerializer;
-import com.baifendian.swordfish.dao.enums.AdHocType;
+import com.baifendian.swordfish.dao.enums.SqlEngineType;
 import com.baifendian.swordfish.dao.enums.FlowStatus;
 import com.baifendian.swordfish.dao.model.AdHoc;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
@@ -38,7 +37,7 @@ public class AdHocDto {
   private FlowStatus status;
   private String proxyUser;
   private String queue;
-  private AdHocType type;
+  private SqlEngineType type;
 
   public AdHocDto() {
   }
@@ -111,11 +110,11 @@ public class AdHocDto {
     this.queue = queue;
   }
 
-  public AdHocType getType() {
+  public SqlEngineType getType() {
     return type;
   }
 
-  public void setType(AdHocType type) {
+  public void setType(SqlEngineType type) {
     this.type = type;
   }
 }
