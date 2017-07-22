@@ -101,7 +101,7 @@ public class FlowExecManager {
        * 这里减去调度系统支持的最小间隔1秒后，再以此为基准计算下个次调度触发的时间，就不会错过 startTime 本身可能是触发时间的情况。
        *
        */
-      Date scheduleDate = cron.getTimeAfter(DateUtils.addSeconds(startDateTime, -1));
+      Date scheduleDate = cron.getTimeAfter(new Date(startDateTime.getTime() - 1000));
 
       try {
         while (scheduleDate.before(endDateTime) || scheduleDate.equals(endDateTime)) {
