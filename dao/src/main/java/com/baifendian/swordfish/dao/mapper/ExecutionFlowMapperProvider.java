@@ -256,8 +256,8 @@ public class ExecutionFlowMapperProvider {
         }
 
         if (startDate != null && endDate != null) {
-          WHERE("schedule_time >= #{startDate}");
-          WHERE("schedule_time <= #{endDate}");
+          WHERE("start_time >= #{startDate}");
+          WHERE("start_time <= #{endDate}");
         }
 
         if (CollectionUtils.isNotEmpty(flowStatuses)) {
@@ -275,7 +275,7 @@ public class ExecutionFlowMapperProvider {
 
         JOIN("user u on e_f.submit_user = u.id");
       }
-    }.toString() + " order by schedule_time DESC limit #{start},#{limit}";
+    }.toString() + " order by start_time DESC limit #{start},#{limit}";
 
     return sql2;
   }
@@ -321,8 +321,8 @@ public class ExecutionFlowMapperProvider {
           WHERE("p_f.name in (" + String.join(",", workflowList2) + ")");
         }
 
-        WHERE("submit_time >= #{startDate}");
-        WHERE("submit_time <= #{endDate}");
+        WHERE("start_time >= #{startDate}");
+        WHERE("start_time <= #{endDate}");
 
         if (CollectionUtils.isNotEmpty(flowStatuses)) {
           WHERE("`status` in (" + where + ") ");
