@@ -15,7 +15,7 @@
  */
 package com.baifendian.swordfish.dao.model;
 
-import com.baifendian.swordfish.dao.enums.AdHocType;
+import com.baifendian.swordfish.dao.enums.SqlEngineType;
 import com.baifendian.swordfish.dao.enums.FlowStatus;
 
 import java.util.Date;
@@ -54,7 +54,7 @@ public class AdHoc {
   /**
    * 即系查询类型
    */
-  private AdHocType type;
+  private SqlEngineType type;
 
   /**
    * 队列
@@ -195,11 +195,11 @@ public class AdHoc {
     this.name = name;
   }
 
-  public AdHocType getType() {
+  public SqlEngineType getType() {
     return type;
   }
 
-  public void setType(AdHocType type) {
+  public void setType(SqlEngineType type) {
     this.type = type;
   }
 }

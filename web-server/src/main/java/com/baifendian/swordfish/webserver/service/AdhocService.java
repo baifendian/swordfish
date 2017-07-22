@@ -19,7 +19,7 @@ import static com.baifendian.swordfish.webserver.utils.ParamVerify.verifyProxyUs
 
 import com.baifendian.swordfish.common.job.struct.node.adhoc.AdHocParam;
 import com.baifendian.swordfish.common.job.struct.node.common.UdfsInfo;
-import com.baifendian.swordfish.dao.enums.AdHocType;
+import com.baifendian.swordfish.dao.enums.SqlEngineType;
 import com.baifendian.swordfish.dao.enums.FlowStatus;
 import com.baifendian.swordfish.dao.mapper.AdHocMapper;
 import com.baifendian.swordfish.dao.mapper.MasterServerMapper;
@@ -40,7 +40,6 @@ import com.baifendian.swordfish.webserver.dto.ExecutorIdDto;
 import com.baifendian.swordfish.webserver.dto.LogResult;
 import com.baifendian.swordfish.webserver.exception.NotFoundException;
 import com.baifendian.swordfish.webserver.exception.PermissionException;
-import com.baifendian.swordfish.webserver.exception.PreFailedException;
 import com.baifendian.swordfish.webserver.exception.ServerErrorException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -76,7 +75,7 @@ public class AdhocService {
    * 执行即席查询
    */
   public ExecutorIdDto execAdhoc(User operator, String projectName, String name, String stms,
-      int limit, String proxyUser, AdHocType type, String queue, List<UdfsInfo> udfs, int timeout) {
+      int limit, String proxyUser, SqlEngineType type, String queue, List<UdfsInfo> udfs, int timeout) {
 
     // 查看用户对项目是否具备相应权限
     Project project = projectMapper.queryByName(projectName);

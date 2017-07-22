@@ -16,7 +16,7 @@
 package com.baifendian.swordfish.webserver.controller;
 
 import com.baifendian.swordfish.common.job.struct.node.common.UdfsInfo;
-import com.baifendian.swordfish.dao.enums.AdHocType;
+import com.baifendian.swordfish.dao.enums.SqlEngineType;
 import com.baifendian.swordfish.dao.model.User;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
 import com.baifendian.swordfish.webserver.dto.AdHocDto;
@@ -64,7 +64,7 @@ public class AdhocController {
       @RequestParam(value = "limit", required = false, defaultValue = "1000") int limit,
       @RequestParam(value = "proxyUser") String proxyUser,
       @RequestParam(value = "queue") String queue,
-      @RequestParam(value = "type") AdHocType type,
+      @RequestParam(value = "type", required = false) SqlEngineType type,
       @RequestParam(value = "udfs", required = false) String udfs,
       @RequestParam(value = "timeout", required = false, defaultValue = "43200") int timeout
   ) {
@@ -91,6 +91,11 @@ public class AdhocController {
     } catch (Exception e) {
       logger.error("Parse json exception.", e);
       throw new BadRequestException("Argument is not valid, udfs format is invalid.");
+    }
+
+    // 默认是 hive
+    if (type == null) {
+      type = SqlEngineType.HIVE;
     }
 
     return adhocService
