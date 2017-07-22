@@ -111,9 +111,9 @@ public class FlowRunner implements Runnable {
   private final int timeout;
 
   /**
-   * 真实的调度时间 (ms)
+   * 运行的起始时间 (ms)
    */
-  private final long scheduleTime;
+  private final long startTime;
 
   /**
    * @param context
@@ -125,7 +125,7 @@ public class FlowRunner implements Runnable {
     this.maxTryTimes = context.getMaxTryTimes();
     this.timeout = context.getTimeout();
     this.failurePolicyType = context.getFailurePolicyType();
-    this.scheduleTime = executionFlow.getScheduleTime().getTime();
+    this.startTime = executionFlow.getStartTime().getTime();
   }
 
   /**
@@ -500,7 +500,7 @@ public class FlowRunner implements Runnable {
    * @return 超时时间
    */
   private int calcNodeTimeout() {
-    int usedTime = (int) ((System.currentTimeMillis() - scheduleTime) / 1000);
+    int usedTime = (int) ((System.currentTimeMillis() - startTime) / 1000);
 
     int remainTime = timeout - usedTime;
 
