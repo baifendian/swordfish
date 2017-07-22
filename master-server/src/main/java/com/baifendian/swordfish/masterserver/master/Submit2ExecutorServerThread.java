@@ -24,14 +24,13 @@ import com.baifendian.swordfish.masterserver.exec.ExecutorClient;
 import com.baifendian.swordfish.masterserver.exec.ExecutorServerInfo;
 import com.baifendian.swordfish.masterserver.exec.ExecutorServerManager;
 import com.baifendian.swordfish.rpc.RetInfo;
+import java.util.Date;
+import java.util.List;
+import java.util.concurrent.BlockingQueue;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.thrift.TException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.Date;
-import java.util.List;
-import java.util.concurrent.BlockingQueue;
 
 /**
  * 提交exec flow到exec-server 的线程 <p>
@@ -65,7 +64,8 @@ public class Submit2ExecutorServerThread extends Thread {
    * @param flowDao
    * @param executionFlowQueue
    */
-  public Submit2ExecutorServerThread(ExecutorServerManager executorServerManager, FlowDao flowDao, BlockingQueue<ExecFlowInfo> executionFlowQueue) {
+  public Submit2ExecutorServerThread(ExecutorServerManager executorServerManager, FlowDao flowDao,
+      BlockingQueue<ExecFlowInfo> executionFlowQueue) {
     this.executorServerManager = executorServerManager;
     this.flowDao = flowDao;
     this.executionFlowQueue = executionFlowQueue;
@@ -115,7 +115,7 @@ public class Submit2ExecutorServerThread extends Thread {
       ExecutionFlow executionFlow = flowDao.queryExecutionFlow(execId);
 
       // 判断 exec flow 是否超时
-      if (isScheduleTimeout(executionFlow.getTimeout(), executionFlow.getScheduleTime().getTime())) {
+      if (isScheduleTimeout(executionFlow.getTimeout(), executionFlow.getStartTime().getTime() /* executionFlow.getScheduleTime().getTime()*/)) {
         Date now = new Date();
 
         executionFlow.setEndTime(now);
@@ -129,7 +129,8 @@ public class Submit2ExecutorServerThread extends Thread {
         continue;
       }
 
-      executionFlow.setWorker(String.format("%s:%d", executorServerInfo.getHost(), executorServerInfo.getPort()));
+      executionFlow.setWorker(
+          String.format("%s:%d", executorServerInfo.getHost(), executorServerInfo.getPort()));
 
       flowDao.updateExecutionFlow(executionFlow);
 
@@ -143,7 +144,8 @@ public class Submit2ExecutorServerThread extends Thread {
         try {
           ExecutorClient executorClient = new ExecutorClient(executorServerInfo);
 
-          logger.info("exec id:{}, project id:{}, executor client:{}:{}, try count:{}", execId, executionFlow.getProjectId(),
+          logger.info("exec id:{}, project id:{}, executor client:{}:{}, try count:{}", execId,
+              executionFlow.getProjectId(),
               executorServerInfo.getHost(), executorServerInfo.getPort(), i);
 
           // 可能抛出 TException 异常
@@ -169,11 +171,14 @@ public class Submit2ExecutorServerThread extends Thread {
           // executor server error，将执行数据放回队列，将该 executor server 从 executor server 列表删除
           executionFlowQueue.add(execFlowInfo);
 
-          logger.info("connect to executor server error, remove {}:{}", executorServerInfo.getHost(), executorServerInfo.getPort());
+          logger
+              .info("connect to executor server error, remove {}:{}", executorServerInfo.getHost(),
+                  executorServerInfo.getPort());
 
           // 如果是 executor server 有问题, 对有问题的 executor server 进行重新提交
           // 如果是 executor server 异常了, 可以重新对其上面的任务进行提交
-          ExecutorServerInfo removedExecutionServerInfo = executorServerManager.removeServer(executorServerInfo);
+          ExecutorServerInfo removedExecutionServerInfo = executorServerManager
+              .removeServer(executorServerInfo);
           resubmitExecFlow(removedExecutionServerInfo);
         } else {
           // 如果是其它的异常情况, 直接更新状态即可
@@ -191,12 +196,11 @@ public class Submit2ExecutorServerThread extends Thread {
   /**
    * 判断是否超时
    *
-   * @param timeout      单位是秒
-   * @param scheduleTime 单位是毫秒
-   * @return
+   * @param timeout 单位是秒
+   * @param startTime 单位是毫秒
    */
-  private boolean isScheduleTimeout(int timeout, long scheduleTime) {
-    int remainTime = timeout - (int) ((System.currentTimeMillis() - scheduleTime) / 1000);
+  private boolean isScheduleTimeout(int timeout, long startTime) {
+    int remainTime = timeout - (int) ((System.currentTimeMillis() - startTime) / 1000);
 
     if (remainTime <= 0) {
       return true;
@@ -207,15 +211,15 @@ public class Submit2ExecutorServerThread extends Thread {
 
   /**
    * 重新提交工作流执行
-   *
-   * @param executorServerInfo
    */
   private void resubmitExecFlow(ExecutorServerInfo executorServerInfo) {
     // 这里使用数据库查询到的数据保证准确性，避免内存数据出现不一致的情况
-    List<ExecutionFlow> executionFlows = flowDao.queryNoFinishFlow(executorServerInfo.getHost() + ":" + executorServerInfo.getPort());
+    List<ExecutionFlow> executionFlows = flowDao
+        .queryNoFinishFlow(executorServerInfo.getHost() + ":" + executorServerInfo.getPort());
 
     if (!CollectionUtils.isEmpty(executionFlows)) {
-      logger.info("executor server {} fault, execIds size:{} ", executorServerInfo, executionFlows.size());
+      logger.info("executor server {} fault, execIds size:{} ", executorServerInfo,
+          executionFlows.size());
 
       for (ExecutionFlow execFlow : executionFlows) {
         Integer execId = execFlow.getId();

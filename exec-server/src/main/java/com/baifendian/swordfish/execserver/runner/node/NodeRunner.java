@@ -127,7 +127,7 @@ public class NodeRunner implements Callable<Boolean> {
     props.setExecId(executionFlow.getId());
     props.setEnvFile(BaseConfig.getSystemEnvPath());
     props.setQueue(executionFlow.getQueue());
-    props.setExecJobStartTime(executionFlow.getScheduleTime());
+    props.setExecJobStartTime(executionFlow.getStartTime()); // 设置为起始运行的时间
     props.setExecJobTimeout(executionFlow.getTimeout());
 
     props.setJobAppId(String.format("%s_%s", executionNode.getJobId(),

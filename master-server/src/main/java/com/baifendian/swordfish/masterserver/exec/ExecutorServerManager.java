@@ -77,7 +77,7 @@ public class ExecutorServerManager {
       return result;
     }
 
-    int choose = new Random().nextInt(size);
+    int choose = new Random().nextInt() % size;
     int index = 0;
 
     for (ExecutorServerInfo executorServerInfo : executorServers.values()) {
