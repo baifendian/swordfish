@@ -23,6 +23,7 @@ import com.baifendian.swordfish.dao.model.ExecutionFlow;
 import com.baifendian.swordfish.dao.model.ProjectFlow;
 import com.baifendian.swordfish.rpc.ExecInfo;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Date;
@@ -31,6 +32,7 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
+
 import org.apache.commons.lang.time.DateUtils;
 import org.quartz.CronExpression;
 import org.slf4j.Logger;
@@ -73,7 +75,7 @@ public class FlowExecManager {
     this.flowDao = flowDao;
 
     ThreadFactory flowThreadFactory = new ThreadFactoryBuilder()
-        .setNameFormat("Scheduler-JobExecManager-AddData").build();
+            .setNameFormat("Scheduler-JobExecManager-AddData").build();
     appendFlowExecutorService = Executors.newCachedThreadPool(flowThreadFactory);
   }
 
@@ -81,46 +83,54 @@ public class FlowExecManager {
    * 提交补数据任务
    */
   public void submitAddData(ProjectFlow flow, CronExpression cron, Date startDateTime,
-      Date endDateTime, ExecInfo execInfo) {
+                            Date endDateTime, ExecInfo execInfo) {
     // 提交任务去执行
     appendFlowExecutorService.submit(() -> {
+      /**
+       * 获取第一次补数据触发的时间
+       *
+       * 1.先计算出 startTime 前一秒的时间:
+       * DateUtils.addSeconds(startDateTime, -1)
+       *
+       * 2.再获取startTime前一秒为基准，一下轮调度触发的时间:
+       * cron.getTimeAfter(...)
+       *
+       * 说明：为什么要以 startTime 前一秒作为基准时间？
+       *
+       * 因为可能 startTime 本身可能就是第一次补数据触发的时间。
+       * 这里减去调度系统支持的最小间隔1秒后，再以此为基准计算下个次调度触发的时间，就不会错过 startTime 本身可能是触发时间的情况。
+       *
+       */
       Date scheduleDate = cron.getTimeAfter(DateUtils.addSeconds(startDateTime, -1));
 
       try {
-        // 是否已经失败
-        boolean isFailed = false;
-        List<Map.Entry<Date, Boolean>> resultList = new ArrayList<>();
-
         while (scheduleDate.before(endDateTime) || scheduleDate.equals(endDateTime)) {
-          Boolean execStatus = null;
 
-          if (!isFailed) {
-            ExecutionFlow executionFlow = flowDao
-                .scheduleFlowToExecution(flow.getProjectId(), flow.getId(),
-                    flow.getOwnerId(), scheduleDate, ExecType.COMPLEMENT_DATA,
-                    FailurePolicyType.valueOfType(execInfo.getFailurePolicy()), 0, null, null,
-                    NotifyType.valueOfType(execInfo.getNotifyType()), execInfo.getNotifyMails(),
-                    execInfo.getTimeout());
+          ExecutionFlow executionFlow = flowDao
+                  .scheduleFlowToExecution(flow.getProjectId(), flow.getId(),
+                          flow.getOwnerId(), scheduleDate, ExecType.COMPLEMENT_DATA,
+                          FailurePolicyType.valueOfType(execInfo.getFailurePolicy()), 0, null, null,
+                          NotifyType.valueOfType(execInfo.getNotifyType()), execInfo.getNotifyMails(),
+                          execInfo.getTimeout());
 
-            executionFlow.setProjectId(flow.getProjectId());
+          executionFlow.setProjectId(flow.getProjectId());
 
-            ExecFlowInfo execFlowInfo = new ExecFlowInfo();
+          ExecFlowInfo execFlowInfo = new ExecFlowInfo();
 
-            execFlowInfo.setExecId(executionFlow.getId());
+          execFlowInfo.setExecId(executionFlow.getId());
 
-            // 发送请求到 executor server 中执行
-            jobExecManager.addExecFlow(execFlowInfo);
+          // 发送请求到 executor server 中执行
+          jobExecManager.addExecFlow(execFlowInfo);
 
-            // 如果当前任务补数据任务失败，后续任务不再执行
-            execStatus = checkExecStatus(executionFlow.getId());
+          // 如果当前任务补数据任务失败，后续任务不再执行
+          boolean execStatus = checkExecStatus(executionFlow.getId());
 
-            if (!execStatus) {
-              isFailed = true;
-            }
+          if (!execStatus) {
+            break;
           }
 
-          resultList.add(
-              new AbstractMap.SimpleImmutableEntry<>(new Date(scheduleDate.getTime()), execStatus));
+          //resultList.add(
+          //        new AbstractMap.SimpleImmutableEntry<>(new Date(scheduleDate.getTime()), execStatus));
           scheduleDate = cron.getTimeAfter(scheduleDate);
         }
       } catch (Exception e) {
