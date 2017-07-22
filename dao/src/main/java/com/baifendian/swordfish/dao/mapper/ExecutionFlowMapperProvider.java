@@ -321,8 +321,8 @@ public class ExecutionFlowMapperProvider {
           WHERE("p_f.name in (" + String.join(",", workflowList2) + ")");
         }
 
-        WHERE("schedule_time >= #{startDate}");
-        WHERE("schedule_time <= #{endDate}");
+        WHERE("submit_time >= #{startDate}");
+        WHERE("submit_time <= #{endDate}");
 
         if (CollectionUtils.isNotEmpty(flowStatuses)) {
           WHERE("`status` in (" + where + ") ");
