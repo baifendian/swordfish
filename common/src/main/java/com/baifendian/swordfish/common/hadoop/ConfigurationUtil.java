@@ -95,7 +95,7 @@ public class ConfigurationUtil {
    */
   public static String getStormAppAddress(String appId) {
     init();
-    return MessageFormat.format("{0}/{1}{2}", configuration.get("storm.rest.url"), configuration.get("Storm.rest.topolog"), appId);
+    return MessageFormat.format("{0}/{1}{2}", configuration.get("storm.rest.url"), configuration.get("Storm.rest.topology"), appId);
   }
 
 
