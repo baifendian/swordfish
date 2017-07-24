@@ -53,6 +53,8 @@ public class ExecutionFlowDto {
 
   private String queue;
 
+  private Date scheduleTime;
+
   @JsonSerialize(using = JsonOrdinalSerializer.class)
   private FlowStatus status;
 
@@ -69,6 +71,7 @@ public class ExecutionFlowDto {
 
   public ExecutionFlowDto(ExecutionFlow executionFlow) {
     if (executionFlow != null) {
+      this.scheduleTime = executionFlow.getScheduleTime();
       this.execId = executionFlow.getId();
       this.projectName = executionFlow.getProjectName();
       this.workflowName = executionFlow.getWorkflowName();
@@ -211,5 +214,13 @@ public class ExecutionFlowDto {
 
   public void setData(ExecutionFlowData data) {
     this.data = data;
+  }
+
+  public Date getScheduleTime() {
+    return scheduleTime;
+  }
+
+  public void setScheduleTime(Date scheduleTime) {
+    this.scheduleTime = scheduleTime;
   }
 }

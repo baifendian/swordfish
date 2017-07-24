@@ -218,13 +218,19 @@ public class WorkflowController {
    * @return
    */
   @GetMapping(value = "/workflows/{name}")
-  public WorkflowDto queryWorkflowDetail(@RequestAttribute(value = "session.user") User operator,
-                                         @PathVariable String projectName,
-                                         @PathVariable String name) {
+  public List<WorkflowDto> queryWorkflowDetail(@RequestAttribute(value = "session.user") User operator,
+                                               @PathVariable String projectName,
+                                               @PathVariable String name) {
     logger.info("Operator user {}, query workflow detail, project name: {}, workflow name: {}",
             operator.getName(), projectName, name);
 
-    return new WorkflowDto(workflowService.queryProjectFlow(operator, projectName, name));
+    List<WorkflowDto> workflowDtoList = new ArrayList<>();
+    List<ProjectFlow> projectFlowList = workflowService.queryProjectFlow(operator, projectName, name);
+    for (ProjectFlow projectFlow : projectFlowList) {
+      workflowDtoList.add(new WorkflowDto(projectFlow));
+    }
+
+    return workflowDtoList;
   }
 
   /**

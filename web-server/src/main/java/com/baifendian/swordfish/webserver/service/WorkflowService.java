@@ -58,10 +58,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 import static com.baifendian.swordfish.common.job.struct.node.JobType.IMPEXP;
 import static com.baifendian.swordfish.webserver.utils.ParamVerify.*;
@@ -499,7 +496,7 @@ public class WorkflowService {
    * @param name
    * @return
    */
-  public ProjectFlow queryProjectFlow(User operator, String projectName, String name) {
+  public List<ProjectFlow> queryProjectFlow(User operator, String projectName, String name) {
 
     Project project = projectMapper.queryByName(projectName);
 
@@ -520,7 +517,7 @@ public class WorkflowService {
       throw new NotFoundException("Not found Workflow \"{0}\"", name);
     }
 
-    return projectFlow;
+    return Arrays.asList(projectFlow);
   }
 
   /**
