@@ -18,8 +18,10 @@ package com.baifendian.swordfish.common.job.struct.node.hql;
 import com.baifendian.swordfish.common.job.struct.node.BaseParam;
 import com.baifendian.swordfish.common.job.struct.node.common.UdfsInfo;
 import com.baifendian.swordfish.dao.enums.SqlEngineType;
+
 import java.util.ArrayList;
 import java.util.List;
+
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 
@@ -36,7 +38,7 @@ public class HqlParam extends BaseParam {
   /**
    * 执行类型
    */
-  private SqlEngineType type;
+  private SqlEngineType type = SqlEngineType.HIVE;
 
   /**
    * udfs 函数列表
@@ -69,11 +71,7 @@ public class HqlParam extends BaseParam {
 
   @Override
   public boolean checkValid() {
-    if (StringUtils.isEmpty(sql)) {
-      return false;
-    }
-
-    return true;
+    return StringUtils.isNotEmpty(sql) && type != null;
   }
 
   @Override
