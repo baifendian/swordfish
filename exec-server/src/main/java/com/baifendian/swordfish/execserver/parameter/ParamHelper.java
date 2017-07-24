@@ -38,8 +38,8 @@ public class ParamHelper {
   /**
    * 替换参数的占位符
    *
-   * @param text
-   * @param paramMap
+   * @param text 待替换的文本, 如 ${sf.sytem.cyctime}
+   * @param paramMap 参数列表, 比如 sf.system.cyctime -> 20170308201820, v1 -> hello,world 等等
    * @return
    */
   public static String resolvePlaceholders(String text, Map<String, String> paramMap) {
@@ -51,10 +51,10 @@ public class ParamHelper {
     String cycTimeStr = paramMap.get(SystemParamManager.CYC_TIME);
     Date cycTime = getCycTime(cycTimeStr);
 
-    // 替换 ${...} 形式
+    // 替换 ${...} 形式, 这种形式指的是替换系统变量, 以及自定义变量
     text = PlaceholderUtil.resolvePlaceholders(text, paramMap, true);
 
-    // 替换时间的形式: $[...]
+    // 替换时间的形式: $[...], 比如 $[yyyyMMddHHmmss], $[add_months(yyyyMMdd,12*N)]
     if (cycTime != null) {
       text = TimePlaceholderUtil.resolvePlaceholders(text, cycTime, true);
     }
