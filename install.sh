@@ -42,6 +42,9 @@ envFile="/opt/udp/.sf_env.sh"
 # datax home path
 dataxHome="/opt/udp/DataX/target/datax/datax"
 
+# storm path
+stormRestAddr="bgs-8p95-zhanglifeng.bfdabc.com:8744"
+
 # develop mode
 developMode=true
 
@@ -100,6 +103,8 @@ function file_replace()
     sed -i "s#mapreduce.jobhistory.address.*#mapreduce.jobhistory.address = ${hadoopYarnAddress}:10020#g" conf/common/hadoop/hadoop.properties
     sed -i "s#yarn.resourcemanager.webapp.address.*#yarn.resourcemanager.webapp.address = http://${hadoopYarnAddress}:8088/cluster/app/%s#g" conf/common/hadoop/hadoop.properties
     sed -i "s#yarn.application.status.address.*#yarn.application.status.address = http://${hadoopYarnAddress}:8088/ws/v1/cluster/apps/%s#g" conf/common/hadoop/hadoop.properties
+
+    sed -i "s#storm.rest.url.*#storm.rest.url = http://${stormRestAddr}#g" conf/common/storm.properties
 
     # 4. quartz
     sed -i "s#org.quartz.dataSource.myDS.URL.*#org.quartz.dataSource.myDS.URL= jdbc:mysql://${mysqlAddress}/${mysqlDb}?autoReconnect=true#g" conf/quartz.properties
