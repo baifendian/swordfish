@@ -497,6 +497,7 @@ public class ExecutionFlowMapperProvider {
       FROM(TABLE_NAME);
       WHERE("flow_id = #{flowId}");
       WHERE("schedule_time = #{scheduleTime}");
-    }}.toString();
+      ORDER_BY("id desc");
+    }}.toString()+" limit 0,1";
   }
 }
