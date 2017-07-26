@@ -56,11 +56,6 @@ public class FlowRunnerManager {
   private final ExecutorService nodeExecutorService;
 
   /**
-   * 默认的节点失败后的执行策略
-   */
-  private final FailurePolicyType defaultFailurePolicyType = FailurePolicyType.END;
-
-  /**
    * 正在运行的 flows, key => flow id, value => flow runner 线程
    */
   private final Map<Integer, FlowRunner> runningFlows = new ConcurrentHashMap<>();
@@ -122,7 +117,7 @@ public class FlowRunnerManager {
     context.setNodeExecutorService(nodeExecutorService);
     context.setMaxTryTimes(maxTryTimes);
     context.setTimeout(timeout);
-    context.setFailurePolicyType(defaultFailurePolicyType);
+    context.setFailurePolicyType(executionFlow.getFailurePolicy());
 
     FlowRunner flowRunner = new FlowRunner(context);
 

@@ -17,7 +17,7 @@ package com.baifendian.swordfish.common.job.struct.node;
 
 public class JobType {
 
-  public static final String HQL = "HQL";
+  public static final String HQL = "HQL"; // in fact, "HQL" is not accurate, "SQL" is more accuracy
   public static final String MR = "MR";
   public static final String SHELL = "SHELL";
   public static final String SPARK = "SPARK";

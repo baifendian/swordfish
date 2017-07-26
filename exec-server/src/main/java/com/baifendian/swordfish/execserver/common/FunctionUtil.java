@@ -42,10 +42,10 @@ public class FunctionUtil {
    * @param srcDir 资源目录
    * @param isHdfsFile 源是否是 hdfs 文件系统
    */
-  public static List<String> createFuncs(List<UdfsInfo> udfsInfos, int execId, Logger logger,
+  public static List<String> createFuncs(List<UdfsInfo> udfsInfos, int execId, String nodeName, Logger logger,
       String srcDir, boolean isHdfsFile) throws IOException, InterruptedException {
     // 得到 hive udf jar 包路径
-    String hiveUdfJarPath = BaseConfig.getJobHiveUdfJarPath(execId);
+    String hiveUdfJarPath = BaseConfig.getJobHiveUdfJarPath(execId, nodeName);
 
     // 是否定义了 udf 的基本目录
     if (StringUtils.isEmpty(hiveUdfJarPath)) {

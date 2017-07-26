@@ -16,6 +16,7 @@
 package com.baifendian.swordfish.dao.mapper;
 
 import com.baifendian.swordfish.dao.enums.ExecType;
+import com.baifendian.swordfish.dao.enums.FailurePolicyType;
 import com.baifendian.swordfish.dao.enums.FlowStatus;
 import com.baifendian.swordfish.dao.enums.NotifyType;
 import com.baifendian.swordfish.dao.mapper.utils.EnumFieldUtil;
@@ -60,6 +61,7 @@ public class ExecutionFlowMapperProvider {
         VALUES("workflow_data", "#{executionFlow.workflowData}");
         VALUES("user_defined_params", "#{executionFlow.userDefinedParams}");
         VALUES("type", EnumFieldUtil.genFieldStr("executionFlow.type", ExecType.class));
+        VALUES("failure_policy", EnumFieldUtil.genFieldStr("executionFlow.failurePolicy", FailurePolicyType.class));
         VALUES("max_try_times", "#{executionFlow.maxTryTimes}");
         VALUES("notify_type", EnumFieldUtil.genFieldStr("executionFlow.notifyType", NotifyType.class));
         VALUES("notify_mails", "#{executionFlow.notifyMails}");
@@ -254,8 +256,8 @@ public class ExecutionFlowMapperProvider {
         }
 
         if (startDate != null && endDate != null) {
-          WHERE("schedule_time >= #{startDate}");
-          WHERE("schedule_time <= #{endDate}");
+          WHERE("start_time >= #{startDate}");
+          WHERE("start_time <= #{endDate}");
         }
 
         if (CollectionUtils.isNotEmpty(flowStatuses)) {
@@ -273,7 +275,7 @@ public class ExecutionFlowMapperProvider {
 
         JOIN("user u on e_f.submit_user = u.id");
       }
-    }.toString() + " order by schedule_time DESC limit #{start},#{limit}";
+    }.toString() + " order by start_time DESC limit #{start},#{limit}";
 
     return sql2;
   }
@@ -319,8 +321,8 @@ public class ExecutionFlowMapperProvider {
           WHERE("p_f.name in (" + String.join(",", workflowList2) + ")");
         }
 
-        WHERE("schedule_time >= #{startDate}");
-        WHERE("schedule_time <= #{endDate}");
+        WHERE("start_time >= #{startDate}");
+        WHERE("start_time <= #{endDate}");
 
         if (CollectionUtils.isNotEmpty(flowStatuses)) {
           WHERE("`status` in (" + where + ") ");
@@ -495,6 +497,7 @@ public class ExecutionFlowMapperProvider {
       FROM(TABLE_NAME);
       WHERE("flow_id = #{flowId}");
       WHERE("schedule_time = #{scheduleTime}");
-    }}.toString();
+      ORDER_BY("id desc");
+    }}.toString()+" limit 0,1";
   }
 }

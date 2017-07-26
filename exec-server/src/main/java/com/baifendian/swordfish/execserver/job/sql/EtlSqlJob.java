@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.baifendian.swordfish.execserver.job.hql;
+package com.baifendian.swordfish.execserver.job.sql;
 
 import com.baifendian.swordfish.common.job.struct.node.BaseParam;
 import com.baifendian.swordfish.common.job.struct.node.hql.HqlParam;
@@ -48,14 +48,29 @@ public class EtlSqlJob extends AbstractYarnJob {
       // 解析其中的变量
       sqls = ParamHelper.resolvePlaceholders(sqls, props.getDefinedParams());
       List<String> funcs = FunctionUtil
-          .createFuncs(param.getUdfs(), props.getExecId(), logger, props.getWorkDir(), false);
+          .createFuncs(param.getUdfs(), props.getExecId(), props.getNodeName(), logger,
+              props.getWorkDir(), false);
 
       logger.info("\nhql:\n{}\nfuncs:\n{}", sqls, funcs);
 
       List<String> execSqls = CommonUtil.sqlSplit(sqls);
-      HiveSqlExec hiveSqlExec = new HiveSqlExec(this::logProcess, props.getProxyUser(), logger);
 
-      exitCode = (hiveSqlExec.execute(funcs, execSqls, false, null, null)) ? 0 : -1;
+      switch (param.getType()) {
+        case SPARK: {
+          // TODO:: Support Spark SQL Engine
+
+        }
+        case PHOENIX: {
+          // TODO:: Support Spark SQL Engine
+
+        }
+        case HIVE:
+        default: {
+          HiveSqlExec hiveSqlExec = new HiveSqlExec(this::logProcess, props.getProxyUser(), logger);
+
+          exitCode = (hiveSqlExec.execute(funcs, execSqls, false, null, null)) ? 0 : -1;
+        }
+      }
     } catch (Exception e) {
       logger.error(String.format("hql process exception, sql: %s", param.getSql()), e);
       exitCode = -1;

@@ -79,6 +79,38 @@ public class StreamingExecController {
   }
 
   /**
+   * 恢复一个暂停的流任务
+   *
+   * @param operator
+   * @param execId
+   * @return
+   */
+  @PostMapping(value = "/streaming/{execId}/activate")
+  public void activateStreamingJob(@RequestAttribute(value = "session.user") User operator,
+                               @PathVariable int execId) {
+    logger.info("Operator user {}, activate streaming job, exec id: {}",
+            operator.getName(), execId);
+
+    streamingExecService.activateStreamingJob(operator, execId);
+  }
+
+  /**
+   * 暂停一个正在运行的流任务
+   *
+   * @param operator
+   * @param execId
+   * @return
+   */
+  @PostMapping(value = "/streaming/{execId}/deactivate")
+  public void deactivateStreamingJob(@RequestAttribute(value = "session.user") User operator,
+                                   @PathVariable int execId) {
+    logger.info("Operator user {}, deactivate streaming job, exec id: {}",
+            operator.getName(), execId);
+
+    streamingExecService.deactivateStreamingJob(operator, execId);
+  }
+
+  /**
    * 查询项目下流任务及其结果
    *
    * @param operator

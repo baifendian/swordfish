@@ -61,7 +61,7 @@ public class StreamingResultMapperProvider {
    */
   public String selectById(Map<String, Object> parameter) {
     return constructCommonSimpleSQL().
-        WHERE("r.id=#{execId}").toString();
+            WHERE("r.id=#{execId}").toString();
   }
 
   /**
@@ -83,8 +83,8 @@ public class StreamingResultMapperProvider {
     }.toString() + " limit 1";
 
     return constructCommonDetailSQL().
-        WHERE("r.id = " + "(" + subSql + ")").
-        toString();
+            WHERE("r.id = " + "(" + subSql + ")").
+            toString();
   }
 
   /**
@@ -95,7 +95,7 @@ public class StreamingResultMapperProvider {
    */
   public String findNoFinishedJob(Map<String, Object> parameter) {
     return constructCommonSimpleSQL().
-        WHERE("status <= " + FlowStatus.RUNNING.ordinal()).toString();
+            WHERE("status <= " + FlowStatus.RUNNING.ordinal()).OR().WHERE("status = " + FlowStatus.INACTIVE.ordinal()).toString();
   }
 
   /**
@@ -158,8 +158,8 @@ public class StreamingResultMapperProvider {
    */
   public String findDetailByExecId(Map<String, Object> parameter) {
     return constructCommonDetailSQL().
-        WHERE("r.id=#{execId}")
-        .toString();
+            WHERE("r.id=#{execId}")
+            .toString();
   }
 
   /**
@@ -189,8 +189,8 @@ public class StreamingResultMapperProvider {
     }.toString();
 
     return constructCommonDetailSQL().
-        WHERE("r.id in " + "(" + subSql + ")").
-        toString();
+            WHERE("r.id in " + "(" + subSql + ")").
+            toString();
   }
 
   /**
@@ -207,7 +207,7 @@ public class StreamingResultMapperProvider {
     Date endDate = (Date) parameter.get("endDate");
 
     SQL sql = constructCommonDetailSQL().
-        WHERE("s.project_id = #{projectId}");
+            WHERE("s.project_id = #{projectId}");
 
     if (startDate != null) {
       sql = sql.WHERE("schedule_time >= #{startDate}");

@@ -22,6 +22,9 @@ import com.baifendian.swordfish.webserver.exception.ParameterException;
 import com.baifendian.swordfish.webserver.exception.UnAuthorizedException;
 import com.baifendian.swordfish.webserver.service.SessionService;
 import com.baifendian.swordfish.webserver.service.UserService;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -31,10 +34,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 /**
  * 用户登录入口
@@ -52,19 +51,18 @@ public class LoginController {
   private UserService userService;
 
   /**
-   * @param name     用户名
-   * @param email    用户 email
+   * @param name 用户名
+   * @param email 用户 email
    * @param password 登陆密码
-   * @param request  请求信息
+   * @param request 请求信息
    * @param response 返回信息
-   * @return
    */
   @RequestMapping(value = "", method = {RequestMethod.POST, RequestMethod.GET})
   public UserSessionDto login(@RequestParam(value = "name", required = false) String name,
-                              @RequestParam(value = "email", required = false) String email,
-                              @RequestParam(value = "password") String password,
-                              HttpServletRequest request,
-                              HttpServletResponse response) {
+      @RequestParam(value = "email", required = false) String email,
+      @RequestParam(value = "password") String password,
+      HttpServletRequest request,
+      HttpServletResponse response) {
     logger.info("Login, user name: {}, email: {}, password: {}", name, email, "******");
 
     // 必须存在一个

@@ -142,7 +142,7 @@ public class StreamingRunner implements Callable<Boolean> {
       kill();
 
       // 执行完后, 清理目录, 避免文件过大
-      if (!BaseConfig.isDevlopMode()) {
+      if (!BaseConfig.isDevelopMode()) {
         try {
           FileUtils.deleteDirectory(new File(jobScriptPath));
         } catch (IOException e) {

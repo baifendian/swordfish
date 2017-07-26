@@ -59,9 +59,12 @@ public class StormSubmitArgsUtil {
     //add Jars
     List<ResourceInfo> jars = stormJarParam.getJars();
     if (CollectionUtils.isNotEmpty(jars)){
-      //TODO
       args.add(JARS);
       args.add(StringUtils.join(jars.stream().map(p -> p.getRes()).toArray(), ","));
+    }
+
+    if (StringUtils.isNotEmpty(stormJarParam.getArgs())){
+      args.add(stormJarParam.getArgs());
     }
 
     if (StringUtils.isNotEmpty(stormJarParam.getArtifacts())){
@@ -87,7 +90,6 @@ public class StormSubmitArgsUtil {
     //add Jars
     List<ResourceInfo> jars = stormSqlParam.getJars();
     if (CollectionUtils.isNotEmpty(jars)){
-      //TODO
       args.add(JARS);
       args.add(StringUtils.join(jars.stream().map(p -> p.getRes()).toArray(), ","));
     }

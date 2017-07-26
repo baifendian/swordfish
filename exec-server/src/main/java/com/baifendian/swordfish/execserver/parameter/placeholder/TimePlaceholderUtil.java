@@ -16,15 +16,15 @@
 package com.baifendian.swordfish.execserver.parameter.placeholder;
 
 import com.baifendian.swordfish.common.utils.DateUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.util.PropertyPlaceholderHelper;
-
+import com.baifendian.swordfish.execserver.parameter.SystemParamManager;
 import java.text.MessageFormat;
 import java.util.AbstractMap;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.util.PropertyPlaceholderHelper;
 
 
 /**
@@ -33,6 +33,7 @@ import java.util.Map;
  * @see <a href="https://github.com/baifendian/swordfish/wiki/parameter-desc">系统参数定义</a>
  */
 public class TimePlaceholderUtil {
+
   /**
    * LOGGER
    */
@@ -56,12 +57,14 @@ public class TimePlaceholderUtil {
   /**
    * 严格的替换工具实现，待替换的位置没有获取到对应值时，则抛出异常
    */
-  private static final PropertyPlaceholderHelper strictHelper = new PropertyPlaceholderHelper(PLACEHOLDER_PREFIX, PLACEHOLDER_SUFFIX, VALUE_SEPARATOR, false);
+  private static final PropertyPlaceholderHelper strictHelper = new PropertyPlaceholderHelper(
+      PLACEHOLDER_PREFIX, PLACEHOLDER_SUFFIX, VALUE_SEPARATOR, false);
 
   /**
    * 非严格的替换工具实现，待替换的位置没有获取到对应值时，则忽略当前位置，继续替换下一个位置
    */
-  private static final PropertyPlaceholderHelper nonStrictHelper = new PropertyPlaceholderHelper(PLACEHOLDER_PREFIX, PLACEHOLDER_SUFFIX, VALUE_SEPARATOR, true);
+  private static final PropertyPlaceholderHelper nonStrictHelper = new PropertyPlaceholderHelper(
+      PLACEHOLDER_PREFIX, PLACEHOLDER_SUFFIX, VALUE_SEPARATOR, true);
 
   /**
    * add_months
@@ -96,21 +99,21 @@ public class TimePlaceholderUtil {
   /**
    * 替换文本的占位符 <p>
    *
-   * @param text                           待替换文本
-   * @param date                           需要自定义的日期
+   * @param text 待替换文本
+   * @param date 需要自定义的日期
    * @param ignoreUnresolvablePlaceholders 是否忽略没有匹配到值的占位符
    * @return 替换后的字符串
    */
-  public static String resolvePlaceholders(String text, Date date, boolean ignoreUnresolvablePlaceholders) {
-    PropertyPlaceholderHelper helper = (ignoreUnresolvablePlaceholders ? nonStrictHelper : strictHelper);
+  public static String resolvePlaceholders(String text, Date date,
+      boolean ignoreUnresolvablePlaceholders) {
+    PropertyPlaceholderHelper helper = (ignoreUnresolvablePlaceholders ? nonStrictHelper
+        : strictHelper);
     return helper.replacePlaceholders(text, new TimePlaceholderResolver(text, date));
   }
 
   /**
    * 替换文本的占位符（空替换） <p>
    *
-   * @param text
-   * @param constValue
    * @return 替换后的字符串
    */
   public static String resolvePlaceholdersConst(String text, String constValue) {
@@ -120,7 +123,8 @@ public class TimePlaceholderUtil {
   /**
    * 占位符替换的处理 <p>
    */
-  private static class TimePlaceholderResolver implements PropertyPlaceholderHelper.PlaceholderResolver {
+  private static class TimePlaceholderResolver implements
+      PropertyPlaceholderHelper.PlaceholderResolver {
 
     private final String text;
 
@@ -138,7 +142,8 @@ public class TimePlaceholderUtil {
 
         return propVal;
       } catch (Throwable ex) {
-        LOGGER.error("Could not resolve placeholder '" + placeholderName + "' in [" + text + "]", ex);
+        LOGGER
+            .error("Could not resolve placeholder '" + placeholderName + "' in [" + text + "]", ex);
         return null;
       }
     }
@@ -147,7 +152,8 @@ public class TimePlaceholderUtil {
   /**
    * 占位符替换的处理（空字符串替换占位符） <p>
    */
-  private static class ConstPlaceholderResolver implements PropertyPlaceholderHelper.PlaceholderResolver {
+  private static class ConstPlaceholderResolver implements
+      PropertyPlaceholderHelper.PlaceholderResolver {
 
     private final String constValue;
 
@@ -164,8 +170,8 @@ public class TimePlaceholderUtil {
   /**
    * 计算自定义时间 <p>
    *
-   * @param expr
-   * @param date
+   * @param expr 要替换的表达式, 详解 {@link https://github.com/baifendian/swordfish/wiki/parameter-desc#toc0|swordfish}
+   * @param date 日期
    * @return 自定义的时间
    */
   private static String customTime(String expr, Date date) {
@@ -173,13 +179,22 @@ public class TimePlaceholderUtil {
     String value;
 
     try {
+      // timestamp 比较特别, 格式化不一定好找
       if (expr.startsWith(TIMESTAMP)) {
         String timeExpr = expr.substring(TIMESTAMP.length() + 1, expr.length() - 1);
+
+        // 日期, 表达式对应出来
         Map.Entry<Date, String> entry = calcTimeExpr(timeExpr, date);
+
+        // 采用日期对表达式进行 format
         String dateStr = DateUtils.format(entry.getKey(), entry.getValue());
-        Date timestamp = DateUtils.parse(dateStr, entry.getValue());
+
+        // 得到 timestamp, 这里采用固定的格式来进行解析
+        Date timestamp = DateUtils.parse(dateStr, SystemParamManager.TIME_FORMAT);
+
         value = String.valueOf(timestamp.getTime() / 1000); // 获取时间戳（精确到s）
       } else {
+        // 找出里面的日期, 以及相关的格式化
         Map.Entry<Date, String> entry = calcTimeExpr(expr, date);
         value = DateUtils.format(entry.getKey(), entry.getValue());
       }
@@ -194,9 +209,7 @@ public class TimePlaceholderUtil {
   /**
    * 计算时间表达式 <p>
    *
-   * @param expr
-   * @param date
-   * @return <日期,时间格式>
+   * @return <日期, 时间格式>
    */
   private static Map.Entry<Date, String> calcTimeExpr(String expr, Date date) {
     Map.Entry<Date, String> resultEntry;
@@ -221,8 +234,6 @@ public class TimePlaceholderUtil {
   /**
    * 获取月初 <p>
    *
-   * @param expr
-   * @param cycTime
    * @return 月初
    */
   private static Map.Entry<Date, String> monthBeginCalc(String expr, Date cycTime) {
@@ -245,8 +256,6 @@ public class TimePlaceholderUtil {
   /**
    * 获取月末 <p>
    *
-   * @param expr
-   * @param cycTime
    * @return 月末
    */
   private static Map.Entry<Date, String> monthEndCalc(String expr, Date cycTime) {
@@ -269,8 +278,6 @@ public class TimePlaceholderUtil {
   /**
    * 获取周一 <p>
    *
-   * @param expr
-   * @param cycTime
    * @return 周一
    */
   private static Map.Entry<Date, String> weekStartCalc(String expr, Date cycTime) {
@@ -292,8 +299,6 @@ public class TimePlaceholderUtil {
   /**
    * 获取月末 <p>
    *
-   * @param expr
-   * @param cycTime
    * @return 周末
    */
   private static Map.Entry<Date, String> weekEndCalc(String expr, Date cycTime) {
@@ -316,9 +321,7 @@ public class TimePlaceholderUtil {
   /**
    * 计算时间表达式（增加月） <p>
    *
-   * @param expr
-   * @param cycTime
-   * @return <日期,时间格式>
+   * @return <日期, 时间格式>
    */
   private static Map.Entry<Date, String> addMonthCalc(String expr, Date cycTime) {
     String addMonthExpr = expr.substring(ADD_MONTHS.length() + 1, expr.length() - 1);
@@ -339,18 +342,17 @@ public class TimePlaceholderUtil {
   /**
    * 计算时间表达式（增加分钟） <p>
    *
-   * @param expr
-   * @param cycTime
    * @return <日期, 时间格式>
    */
   private static Map.Entry<Date, String> addMinuteCalc(String expr, Date cycTime) {
     if (expr.contains("+")) {
       int index = expr.lastIndexOf('+');
 
-      // $[HHmmss+N/24/60]
+      // HHmmss+N/24/60
       if (Character.isDigit(expr.charAt(index + 1))) {
         String addMinuteExpr = expr.substring(index + 1);
-        Date targetDate = org.apache.commons.lang.time.DateUtils.addMinutes(cycTime, calcAddMinute(addMinuteExpr));
+        Date targetDate = org.apache.commons.lang.time.DateUtils
+            .addMinutes(cycTime, calcAddMinute(addMinuteExpr));
         String dateFormat = expr.substring(0, index);
 
         return new AbstractMap.SimpleImmutableEntry<>(targetDate, dateFormat);
@@ -358,16 +360,17 @@ public class TimePlaceholderUtil {
     } else if (expr.contains("-")) {
       int index = expr.lastIndexOf('-');
 
-      // $[HHmmss-N/24/60]
+      // HHmmss-N/24/60
       if (Character.isDigit(expr.charAt(index + 1))) {
         String addMinuteExpr = expr.substring(index + 1);
-        Date targetDate = org.apache.commons.lang.time.DateUtils.addMinutes(cycTime, 0 - calcAddMinute(addMinuteExpr));
+        Date targetDate = org.apache.commons.lang.time.DateUtils
+            .addMinutes(cycTime, 0 - calcAddMinute(addMinuteExpr));
         String dateFormat = expr.substring(0, index);
 
         return new AbstractMap.SimpleImmutableEntry<>(targetDate, dateFormat);
       }
 
-      // $[yyyy-MM-dd/HH:mm:ss]
+      // yyyy-MM-dd/HH:mm:ss
       return new AbstractMap.SimpleImmutableEntry<>(cycTime, expr);
     }
 
@@ -377,9 +380,6 @@ public class TimePlaceholderUtil {
 
   /**
    * 计算需要 add 的分钟数 <p>
-   *
-   * @param addMinuteExpr
-   * @return
    */
   private static Integer calcAddMinute(String addMinuteExpr) {
     int index = addMinuteExpr.indexOf("/");
@@ -389,7 +389,8 @@ public class TimePlaceholderUtil {
     if (index == -1) {
       calcExpr = MessageFormat.format("60*24*({0})", addMinuteExpr);
     } else {
-      calcExpr = MessageFormat.format("60*24*({0}){1}", addMinuteExpr.substring(0, index), addMinuteExpr.substring(index));
+      calcExpr = MessageFormat.format("60*24*({0}){1}", addMinuteExpr.substring(0, index),
+          addMinuteExpr.substring(index));
     }
 
     return CalculateUtil.calc(calcExpr);
@@ -397,9 +398,6 @@ public class TimePlaceholderUtil {
 
   /**
    * 获取周一 <p>
-   *
-   * @param date
-   * @return
    */
   public static Date getMonday(Date date) {
     Calendar cal = Calendar.getInstance();
@@ -415,9 +413,6 @@ public class TimePlaceholderUtil {
 
   /**
    * 获取周日 <p>
-   *
-   * @param date
-   * @return
    */
   public static Date getSunday(Date date) {
     Calendar cal = Calendar.getInstance();
@@ -432,9 +427,6 @@ public class TimePlaceholderUtil {
 
   /**
    * 获取每月的第一天 <p>
-   *
-   * @param date
-   * @return
    */
   public static Date getFirstDayOfMonth(Date date) {
     Calendar cal = Calendar.getInstance();
@@ -447,9 +439,6 @@ public class TimePlaceholderUtil {
 
   /**
    * 获取每月的最后一天 <p>
-   *
-   * @param date
-   * @return
    */
   public static Date getLastDayOfMonth(Date date) {
     Calendar cal = Calendar.getInstance();
@@ -487,8 +476,14 @@ public class TimePlaceholderUtil {
     String test2 = TimePlaceholderUtil.resolvePlaceholdersConst("$[test1]test1$[parm1:***]$[test1]", "NULL");
     System.out.println(test2);
 
-    String test3 = TimePlaceholderUtil.resolvePlaceholders("$[timestamp(month_begin(yyyyMMdd, 1))],$[timestamp(month_end(yyyyMMdd, -1))],$[timestamp(week_begin(yyyyMMdd, 1))],$[timestamp(week_end(yyyyMMdd, -1))]",
+    String test3 = TimePlaceholderUtil.resolvePlaceholders("$[timestamp(yyyyMMdd00mmss)],"
+            + "$[timestamp(month_begin(yyyyMMddHHmmss, 1))],"
+            + "$[timestamp(month_end(yyyyMMddHHmmss, -1))],"
+            + "$[timestamp(week_begin(yyyyMMddHHmmss, 1))],"
+            + "$[timestamp(week_end(yyyyMMdd000000, -1))],"
+            + "$[timestamp(yyyyMMddHHmmss)]",
         new Date(), true);
+
     System.out.println(test3);
   }
 }

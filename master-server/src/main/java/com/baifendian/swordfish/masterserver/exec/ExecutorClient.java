@@ -155,4 +155,38 @@ public class ExecutorClient {
       close();
     }
   }
+
+  /**
+   * 恢复一个任务
+   *
+   * @param execId
+   * @return
+   * @throws TException
+   */
+  public RetInfo activateStreamingJob(int execId) throws TException {
+    connect();
+
+    try {
+      return client.activateStreamingJob(execId);
+    } finally {
+      close();
+    }
+  }
+
+  /**
+   * 暂停一个任务
+   *
+   * @param execId
+   * @return
+   * @throws TException
+   */
+  public RetInfo deactivateStreamingJob(int execId) throws TException {
+    connect();
+
+    try {
+      return client.deactivateStreamingJob(execId);
+    } finally {
+      close();
+    }
+  }
 }

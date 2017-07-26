@@ -97,7 +97,7 @@ public class ShellJob extends Job {
       return fileName;
     }
 
-    String script = shellParam.getScript();
+    String script = shellParam.getScript().replaceAll("\\r\\n", "\n");
     script = ParamHelper.resolvePlaceholders(script, props.getDefinedParams());
 
     shellParam.setScript(script);

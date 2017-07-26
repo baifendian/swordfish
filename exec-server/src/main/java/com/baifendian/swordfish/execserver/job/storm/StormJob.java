@@ -15,45 +15,40 @@
  */
 package com.baifendian.swordfish.execserver.job.storm;
 
+import static com.baifendian.swordfish.execserver.job.storm.StormSubmitArgsConst.STORM_COMMAND;
+
 import com.baifendian.swordfish.common.enums.StormType;
 import com.baifendian.swordfish.common.job.struct.node.BaseParam;
 import com.baifendian.swordfish.common.job.struct.node.storm.StormBuilder;
 import com.baifendian.swordfish.common.job.struct.node.storm.StormParam;
 import com.baifendian.swordfish.common.job.struct.node.storm.param.StormShellParam;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
-import com.baifendian.swordfish.execserver.job.AbstractYarnProcessJob;
+import com.baifendian.swordfish.execserver.job.AbstractStormProcessJob;
 import com.baifendian.swordfish.execserver.job.JobProps;
 import com.baifendian.swordfish.execserver.parameter.ParamHelper;
-import org.slf4j.Logger;
-
 import java.util.ArrayList;
 import java.util.List;
-
 import net.lingala.zip4j.core.ZipFile;
-
-import static com.baifendian.swordfish.execserver.job.storm.StormSubmitArgsConst.STORM_COMMAND;
+import org.slf4j.Logger;
 
 /**
  * Storm 任务
  */
-public class StormJob extends AbstractYarnProcessJob {
+public class StormJob extends AbstractStormProcessJob {
 
   private StormParam stormParam;
 
-  /**
-   * @param props
-   * @param isLongJob
-   * @param logger    @throws IOException
-   */
   public StormJob(JobProps props, boolean isLongJob, Logger logger) {
     super(props, isLongJob, logger);
-    stormParam = JsonUtil.parseObject(props.getJobParams(), StormBuilder.class).buildStormParam();
+
+    this.stormParam = JsonUtil.parseObject(props.getJobParams(), StormBuilder.class)
+        .buildStormParam();
   }
 
   @Override
   public void before() throws Exception {
     try {
-      //提前解压需要解压的文件
+      // 提前解压需要解压的文件
       if (stormParam.getType() == StormType.SHELL) {
         logger.info("Start extract resources...");
         StormShellParam stormShellParam = (StormShellParam) stormParam.getStormParam();
@@ -64,8 +59,8 @@ public class StormJob extends AbstractYarnProcessJob {
         zipFile.extractAll(props.getWorkDir());
         logger.info("Finish extract resources to {}", props.getWorkDir());
       }
-    }catch (Exception e){
-      logger.error("before function error",e);
+    } catch (Exception e) {
+      logger.error("before function error", e);
       throw e;
     }
   }
@@ -81,7 +76,7 @@ public class StormJob extends AbstractYarnProcessJob {
       args.addAll(StormSubmitArgsUtil.buildArgs(stormParam));
 
       String command = ParamHelper
-              .resolvePlaceholders(String.join(" ", args), props.getDefinedParams());
+          .resolvePlaceholders(String.join(" ", args), props.getDefinedParams());
 
       logger.info("Finish create command: {}", command);
 
@@ -90,7 +85,6 @@ public class StormJob extends AbstractYarnProcessJob {
       logger.error("create command error", e);
       throw e;
     }
-
   }
 
   @Override

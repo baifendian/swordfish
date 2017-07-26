@@ -13,14 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.baifendian.swordfish.execserver.job;
+package com.baifendian.swordfish.common.storm;
 
-import org.slf4j.Logger;
+import org.junit.Test;
 
-public abstract class AbstractStormJob extends Job {
+import java.io.IOException;
 
-  public AbstractStormJob(JobProps props, boolean isLongJob, Logger logger) {
-    super(props, isLongJob, logger);
-  }
+/**
+ * Created by caojingwei on 2017/7/15.
+ */
+public class StormRestUtilTest {
 
+/*  @Test
+  public void testGetTopologySummary() {
+    try {
+      StormRestUtil.topologyKill("production-topology-7-1500348415", 60000L);
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+  }*/
 }

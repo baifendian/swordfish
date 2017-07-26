@@ -73,7 +73,12 @@ struct ExecInfo {
   /**
    * 超时时间, 单位: 秒
    */
-  5: i32 timeout = 1800
+  5: i32 timeout = 1800,
+
+  /**
+   * 失败策略
+   */
+  6: i32 failurePolicy = 0
 }
 
 /**
@@ -102,7 +107,7 @@ struct HeartBeatData {
 }
 
 /**
- * Master 服务接口
+ * Master 服务接口, 供 web-server 调用使用
  */
 service MasterService {
 
@@ -161,13 +166,27 @@ service MasterService {
   RetInfo cancelStreamingJob(1:i32 execId),
 
   /**
+   * 恢复已经暂停的流任务
+   *
+   * execId : 执行 id
+   */
+  RetInfo activateStreamingJob(1:i32 execId),
+
+  /**
+   * 暂停指定的流任务
+   *
+   * execId : 执行 id
+   */
+  RetInfo deactivateStreamingJob(1:i32 execId),
+
+  /**
    * 给一个 workflow 补数据
    *
    * projectId : 项目 ID
    * flowId : 工作流 ID
    * scheduleInfo: 补数据相关信息(此处不通过调度去执行)
    */
-  RetResultInfo appendWorkFlow(1:i32 projectId, 2:i32 flowId, 3:ScheduleInfo scheduleInfo),
+  RetResultInfo appendWorkFlow(1:i32 projectId, 2:i32 flowId, 3:ScheduleInfo scheduleInfo, 4:ExecInfo execInfo),
 
   /**
    * 注册 execServer
@@ -195,7 +214,7 @@ service MasterService {
 }
 
 /**
- * Worker 服务接口
+ * Worker 服务接口, 供 master-server 调用使用
  */
 service WorkerService {
   /**
@@ -225,6 +244,20 @@ service WorkerService {
    * execId : 执行 id
    */
   RetInfo cancelStreamingJob(1:i32 execId),
+
+  /**
+   * 恢复暂停的流任务
+   *
+   * execId : 执行 id
+   */
+  RetInfo activateStreamingJob(1:i32 execId),
+
+  /**
+   * 暂停流任务
+   *
+   * execId : 执行 id
+   */
+  RetInfo deactivateStreamingJob(1:i32 execId),
 
   /**
    * 执行某个 adHoc SQL

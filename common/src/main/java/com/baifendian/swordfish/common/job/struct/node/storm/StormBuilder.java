@@ -18,6 +18,9 @@ package com.baifendian.swordfish.common.job.struct.node.storm;
 import com.baifendian.swordfish.common.enums.StormType;
 import com.baifendian.swordfish.common.job.struct.node.storm.param.IStormParam;
 import com.baifendian.swordfish.common.job.struct.node.storm.param.StormParamFactory;
+import com.baifendian.swordfish.dao.utils.json.JsonObjectDeserializer;
+import com.fasterxml.jackson.annotation.JsonRawValue;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 /**
  * storm 参数构造器
@@ -25,6 +28,8 @@ import com.baifendian.swordfish.common.job.struct.node.storm.param.StormParamFac
 public class StormBuilder {
   private StormType type;
   private String topologyName;
+  @JsonRawValue
+  @JsonDeserialize(using = JsonObjectDeserializer.class)
   private String stormParam;
   private IStormParam iStormParam;
 

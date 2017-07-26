@@ -39,9 +39,11 @@ import com.baifendian.swordfish.webserver.exception.ParameterException;
 import com.baifendian.swordfish.webserver.exception.PermissionException;
 import com.baifendian.swordfish.webserver.exception.PreFailedException;
 import com.baifendian.swordfish.webserver.exception.ServerErrorException;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -76,7 +78,7 @@ public class StreamingExecService {
    * 执行一个流任务
    */
   public ExecutorIdDto executeStreamingJob(User operator, String projectName, String name,
-      String proxyUser, String queue) {
+                                           String proxyUser, String queue) {
 
     // 查询项目, 如果不存在, 返回错误
     Project project = projectMapper.queryByName(projectName);
@@ -89,9 +91,9 @@ public class StreamingExecService {
     // 应该有项目执行权限
     if (!projectService.hasExecPerm(operator.getId(), project)) {
       logger.error("User {} has no right permission for the project {}", operator.getName(),
-          project.getName());
+              project.getName());
       throw new PermissionException("User \"{0}\" is not has project \"{1}\" exec permission",
-          operator.getName(), project.getName());
+              operator.getName(), project.getName());
     }
 
     // 判断 proxyUser 是否合理的
@@ -103,19 +105,19 @@ public class StreamingExecService {
     if (streamingJob == null) {
       logger.error("Not found streaming job {} in project {}", name, project.getName());
       throw new NotFoundException("Not found streaming job \"{0}\" in project \"{1}\"", name,
-          project.getName());
+              project.getName());
     }
 
     // 如果最新一条信息是显示没有执行, 插入或者更新一条记录
     StreamingResult streamingResult = streamingResultMapper
-        .findLatestDetailByStreamingId(streamingJob.getId());
+            .findLatestDetailByStreamingId(streamingJob.getId());
     Date now = new Date();
 
     if (streamingResult != null && streamingResult.getStatus().typeIsNotFinished()) {
       logger.error("Streaming job is not finished yet: {}", streamingJob.getId());
       throw new PreFailedException(
-          "Project \"{0}\", streaming job \"{1}\" not stop, must stop first", operator.getName(),
-          project.getName());
+              "Project \"{0}\", streaming job \"{1}\" not stop, must stop first", operator.getName(),
+              project.getName());
     }
 
     // 查看 master 是否存在
@@ -150,8 +152,8 @@ public class StreamingExecService {
     MasterClient masterClient = new MasterClient(masterServer.getHost(), masterServer.getPort());
 
     logger
-        .info("Call master client, exec id: {}, host: {}, port: {}", execId, masterServer.getHost(),
-            masterServer.getPort());
+            .info("Call master client, exec id: {}, host: {}, port: {}", execId, masterServer.getHost(),
+                    masterServer.getPort());
 
     RetInfo retInfo = masterClient.execStreamingJob(execId);
 
@@ -186,9 +188,9 @@ public class StreamingExecService {
     // 应该有项目执行权限
     if (!projectService.hasExecPerm(operator.getId(), project)) {
       logger.error("User {} has no right permission for the project {}", operator.getName(),
-          project.getName());
+              project.getName());
       throw new PermissionException("User \"{0}\" is not has project \"{1}\" exec permission",
-          operator.getName(), project.getName());
+              operator.getName(), project.getName());
     }
 
     // 查询流任务是否运行中
@@ -215,15 +217,15 @@ public class StreamingExecService {
 
     try {
       logger.info(
-          "Call master client kill streaming job , project id: {}, exec id: {}, host: {}, port: {}",
-          project.getId(), execId, masterServer.getHost(), masterServer.getPort());
+              "Call master client kill streaming job , project id: {}, exec id: {}, host: {}, port: {}",
+              project.getId(), execId, masterServer.getHost(), masterServer.getPort());
       if (!masterClient.cancelStreamingJob(execId)) {
         logger.error(
-            "Call master client kill streaming job false , project id: {}, exec id: {}, host: {}, port: {}",
-            project.getId(), execId, masterServer.getHost(), masterServer.getPort());
+                "Call master client kill streaming job false , project id: {}, exec id: {}, host: {}, port: {}",
+                project.getId(), execId, masterServer.getHost(), masterServer.getPort());
         throw new ServerErrorException(
-            "Call master client kill streaming job false , project id: \"{0}\", exec flow id: \"{1}\", host: \"{2}\", port: \"{3}\"",
-            project.getId(), execId, masterServer.getHost(), masterServer.getPort());
+                "Call master client kill streaming job false , project id: \"{0}\", exec flow id: \"{1}\", host: \"{2}\", port: \"{3}\"",
+                project.getId(), execId, masterServer.getHost(), masterServer.getPort());
       }
     } catch (Exception e) {
       logger.error("Call master client kill streaming job error", e);
@@ -232,16 +234,141 @@ public class StreamingExecService {
   }
 
   /**
+   * 恢复一个已经已经暂停的任务
+   *
+   * @param operator
+   * @param execId
+   */
+  public void activateStreamingJob(User operator, int execId) {
+    Project project = streamingResultMapper.queryProject(execId);
+
+    if (project == null) {
+      logger.error("Exec does not exist: {}", execId);
+      throw new NotFoundException("Exec does not exist \"{0}\"", execId);
+    }
+
+    // 应该有项目执行权限
+    if (!projectService.hasExecPerm(operator.getId(), project)) {
+      logger.error("User {} has no right permission for the project {}", operator.getName(),
+              project.getName());
+      throw new PermissionException("User \"{0}\" is not has project \"{1}\" exec permission",
+              operator.getName(), project.getName());
+    }
+
+    // 查询流任务是否暂停中
+    StreamingResult streamingResult = streamingResultMapper.selectById(execId);
+
+    if (streamingResult == null) {
+      throw new NotFoundException("streaming not found");
+    }
+
+    // 如果不在暂停中
+    if (streamingResult.getStatus() != FlowStatus.INACTIVE) {
+      throw new PreFailedException("streaming Job not inactive!");
+    }
+
+    // activate 流任务
+    MasterServer masterServer = masterServerMapper.query();
+
+    if (masterServer == null) {
+      logger.error("Master server does not exist.");
+      throw new ServerErrorException("Master server does not exist.");
+    }
+
+    MasterClient masterClient = new MasterClient(masterServer.getHost(), masterServer.getPort());
+
+    try {
+      logger.info(
+              "Call master client activate streaming job , project id: {}, exec id: {}, host: {}, port: {}",
+              project.getId(), execId, masterServer.getHost(), masterServer.getPort());
+      if (!masterClient.activateStreamingJob(execId)) {
+        logger.error(
+                "Call master client activate streaming job false , project id: {}, exec id: {}, host: {}, port: {}",
+                project.getId(), execId, masterServer.getHost(), masterServer.getPort());
+        throw new ServerErrorException(
+                "Call master client activate streaming job false , project id: \"{0}\", exec flow id: \"{1}\", host: \"{2}\", port: \"{3}\"",
+                project.getId(), execId, masterServer.getHost(), masterServer.getPort());
+      }
+    } catch (Exception e) {
+      logger.error("Call master client activate streaming job error", e);
+      throw e;
+    }
+
+  }
+
+  /**
+   * 暂停一个正在运行的job
+   * @param operator
+   * @param execId
+   */
+  public void deactivateStreamingJob(User operator, int execId) {
+    Project project = streamingResultMapper.queryProject(execId);
+
+    if (project == null) {
+      logger.error("Exec does not exist: {}", execId);
+      throw new NotFoundException("Exec does not exist \"{0}\"", execId);
+    }
+
+    // 应该有项目执行权限
+    if (!projectService.hasExecPerm(operator.getId(), project)) {
+      logger.error("User {} has no right permission for the project {}", operator.getName(),
+              project.getName());
+      throw new PermissionException("User \"{0}\" is not has project \"{1}\" exec permission",
+              operator.getName(), project.getName());
+    }
+
+    // 查询流任务是否在运行中
+    StreamingResult streamingResult = streamingResultMapper.selectById(execId);
+
+    if (streamingResult == null) {
+      throw new NotFoundException("streaming not found");
+    }
+
+    // 如果不在运行中
+    if (streamingResult.getStatus() != FlowStatus.RUNNING) {
+      throw new PreFailedException("streaming Job not running!");
+    }
+
+    // activate 流任务
+    MasterServer masterServer = masterServerMapper.query();
+
+    if (masterServer == null) {
+      logger.error("Master server does not exist.");
+      throw new ServerErrorException("Master server does not exist.");
+    }
+
+    MasterClient masterClient = new MasterClient(masterServer.getHost(), masterServer.getPort());
+
+    try {
+      logger.info(
+              "Call master client deactivate streaming job , project id: {}, exec id: {}, host: {}, port: {}",
+              project.getId(), execId, masterServer.getHost(), masterServer.getPort());
+      if (!masterClient.deactivateStreamingJob(execId)) {
+        logger.error(
+                "Call master client deactivate streaming job false , project id: {}, exec id: {}, host: {}, port: {}",
+                project.getId(), execId, masterServer.getHost(), masterServer.getPort());
+        throw new ServerErrorException(
+                "Call master client deactivate streaming job false , project id: \"{0}\", exec flow id: \"{1}\", host: \"{2}\", port: \"{3}\"",
+                project.getId(), execId, masterServer.getHost(), masterServer.getPort());
+      }
+    } catch (Exception e) {
+      logger.error("Call master client deactivate streaming job error", e);
+      throw e;
+    }
+
+  }
+
+  /**
    * 查询项目下所有流任务
    */
   public StreamingResultsDto queryStreamingExecs(User operator,
-      String projectName,
-      String name,
-      Date startDate,
-      Date endDate,
-      Integer status,
-      int from,
-      int size) {
+                                                 String projectName,
+                                                 String name,
+                                                 Date startDate,
+                                                 Date endDate,
+                                                 Integer status,
+                                                 int from,
+                                                 int size) {
 
     // 查询项目, 如果不存在, 返回错误
     Project project = projectMapper.queryByName(projectName);
@@ -254,9 +381,9 @@ public class StreamingExecService {
     // 应该有项目执行权限
     if (!projectService.hasReadPerm(operator.getId(), project)) {
       logger.error("User {} has no right permission for the project {}", operator.getName(),
-          project.getName());
+              project.getName());
       throw new PermissionException("User \"{0}\" is not has project \"{1}\" read permission",
-          operator.getName(), project.getName());
+              operator.getName(), project.getName());
     }
 
     // 查询数目
@@ -267,14 +394,14 @@ public class StreamingExecService {
     }
 
     List<StreamingResult> streamingResults = streamingResultMapper
-        .findByMultiCondition(project.getId(), name, startDate, endDate, status, from, size);
+            .findByMultiCondition(project.getId(), name, startDate, endDate, status, from, size);
 
     for (StreamingResult streamingResult : streamingResults) {
       streamingResultDtos.add(new StreamingResultDto(streamingResult));
     }
 
     int total = streamingResultMapper
-        .findCountByMultiCondition(project.getId(), name, startDate, endDate, status);
+            .findCountByMultiCondition(project.getId(), name, startDate, endDate, status);
 
     return new StreamingResultsDto(total, from, streamingResultDtos);
   }
@@ -295,9 +422,9 @@ public class StreamingExecService {
     // 应该有项目执行权限
     if (!projectService.hasReadPerm(operator.getId(), project)) {
       logger.error("User {} has no right permission for the project {}", operator.getName(),
-          project.getName());
+              project.getName());
       throw new PermissionException("User \"{0}\" is not has project \"{1}\" read permission",
-          operator.getName(), project.getName());
+              operator.getName(), project.getName());
     }
 
     List<String> nameList;
@@ -310,9 +437,9 @@ public class StreamingExecService {
     }
 
     List<StreamingResult> streamingResults = streamingResultMapper
-        .findLatestDetailByProjectAndNames(
-            project.getId(),
-            nameList);
+            .findLatestDetailByProjectAndNames(
+                    project.getId(),
+                    nameList);
 
     List<StreamingResultDto> streamingResultDtos = new ArrayList<>();
 
@@ -338,9 +465,9 @@ public class StreamingExecService {
     // 应该有项目执行权限
     if (!projectService.hasReadPerm(operator.getId(), project)) {
       logger.error("User {} has no right permission for the project {}", operator.getName(),
-          project.getName());
+              project.getName());
       throw new PermissionException("User \"{0}\" is not has project \"{1}\" read permission",
-          operator.getName(), project.getName());
+              operator.getName(), project.getName());
     }
 
     StreamingResult streamingResult = streamingResultMapper.findDetailByExecId(execId);
@@ -370,9 +497,9 @@ public class StreamingExecService {
     // 应该有项目执行权限
     if (!projectService.hasReadPerm(operator.getId(), project)) {
       logger.error("User {} has no right permission for the project {}", operator.getName(),
-          project.getName());
+              project.getName());
       throw new PermissionException("User \"{0}\" is not has project \"{1}\" read permission",
-          operator.getName(), project.getName());
+              operator.getName(), project.getName());
     }
 
     StreamingResult streamingResult = streamingResultMapper.selectById(execId);

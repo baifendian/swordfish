@@ -17,19 +17,26 @@ package com.baifendian.swordfish.masterserver.master;
 
 import com.baifendian.swordfish.dao.FlowDao;
 import com.baifendian.swordfish.dao.enums.ExecType;
+import com.baifendian.swordfish.dao.enums.FailurePolicyType;
+import com.baifendian.swordfish.dao.enums.NotifyType;
 import com.baifendian.swordfish.dao.model.ExecutionFlow;
 import com.baifendian.swordfish.dao.model.ProjectFlow;
-import com.baifendian.swordfish.dao.model.Schedule;
+import com.baifendian.swordfish.rpc.ExecInfo;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+
+import java.util.AbstractMap;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
+
 import org.apache.commons.lang.time.DateUtils;
 import org.quartz.CronExpression;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.*;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadFactory;
 
 /**
  * 工作流的执行管理
@@ -54,9 +61,9 @@ public class FlowExecManager {
   private final FlowDao flowDao;
 
   /**
-   * 检测依赖的等待时间，默认 30 s
+   * 检测依赖的等待时间
    */
-  private static long checkInterval = 30 * 1000;
+  private static long checkInterval = 5 * 1000;
 
 
   /**
@@ -67,62 +74,46 @@ public class FlowExecManager {
     this.jobExecManager = jobExecManager;
     this.flowDao = flowDao;
 
-    ThreadFactory flowThreadFactory = new ThreadFactoryBuilder().setNameFormat("Scheduler-JobExecManager-AddData").build();
+    ThreadFactory flowThreadFactory = new ThreadFactoryBuilder()
+            .setNameFormat("Scheduler-JobExecManager-AddData").build();
     appendFlowExecutorService = Executors.newCachedThreadPool(flowThreadFactory);
   }
 
   /**
    * 提交补数据任务
-   *
-   * @param flow
-   * @param cron
-   * @param startDateTime
-   * @param endDateTime
    */
-  public void submitAddData(ProjectFlow flow, CronExpression cron, Date startDateTime, Date endDateTime) {
+  public void submitAddData(ProjectFlow flow, CronExpression cron, Date startDateTime,
+                            Date endDateTime, ExecInfo execInfo) {
     // 提交任务去执行
     appendFlowExecutorService.submit(() -> {
-      Date scheduleDate = cron.getTimeAfter(DateUtils.addSeconds(startDateTime, -1));
+      // 先计算出 startTime 前一秒的时间, 再获取 startTime 前一秒为基准，下轮调度触发的时间
+      Date scheduleDate = cron.getTimeAfter(new Date(startDateTime.getTime() - 1000));
 
       try {
-        // 是否已经失败
-        boolean isFailed = false;
-        List<Map.Entry<Date, Boolean>> resultList = new ArrayList<>();
-
         while (scheduleDate.before(endDateTime) || scheduleDate.equals(endDateTime)) {
-          Boolean execStatus = null;
+          ExecutionFlow executionFlow = flowDao
+                  .scheduleFlowToExecution(flow.getProjectId(), flow.getId(),
+                          flow.getOwnerId(), scheduleDate, ExecType.COMPLEMENT_DATA,
+                          FailurePolicyType.valueOfType(execInfo.getFailurePolicy()), 0, null, null,
+                          NotifyType.valueOfType(execInfo.getNotifyType()), execInfo.getNotifyMails(),
+                          execInfo.getTimeout());
 
-          if (!isFailed) {
-            // 插入 ExecutionFlow
-            Schedule schedule = flowDao.querySchedule(flow.getId());
+          executionFlow.setProjectId(flow.getProjectId());
 
-            // 默认最大重试 2 次, 即最多运行 3 次
-            Integer maxTryTimes = 2;
-            Integer timeout = 10 * 3600;
+          ExecFlowInfo execFlowInfo = new ExecFlowInfo();
 
-            if (schedule != null) {
-              maxTryTimes = schedule.getMaxTryTimes();
-              timeout = schedule.getTimeout();
-            }
+          execFlowInfo.setExecId(executionFlow.getId());
 
-            ExecutionFlow executionFlow = flowDao.scheduleFlowToExecution(flow.getProjectId(), flow.getId(),
-                flow.getOwnerId(), scheduleDate, ExecType.COMPLEMENT_DATA, maxTryTimes, null, null, schedule.getNotifyType(), schedule.getNotifyMails(), timeout);
-            executionFlow.setProjectId(flow.getProjectId());
+          // 发送请求到 executor server 中执行
+          jobExecManager.addExecFlow(execFlowInfo);
 
-            ExecFlowInfo execFlowInfo = new ExecFlowInfo();
-            execFlowInfo.setExecId(executionFlow.getId());
+          // 如果当前任务补数据任务失败，后续任务不再执行
+          boolean execStatus = checkExecStatus(executionFlow.getId());
 
-            // 发送请求到 executor server 中执行
-            jobExecManager.addExecFlow(execFlowInfo);
-
-            // 如果当前任务补数据任务失败，后续任务不再执行
-            execStatus = checkExecStatus(executionFlow.getId());
-            if (!execStatus) {
-              isFailed = true;
-            }
+          if (!execStatus) {
+            break;
           }
 
-          resultList.add(new AbstractMap.SimpleImmutableEntry<>(new Date(scheduleDate.getTime()), execStatus));
           scheduleDate = cron.getTimeAfter(scheduleDate);
         }
       } catch (Exception e) {
@@ -134,7 +125,6 @@ public class FlowExecManager {
   /**
    * 检测 workflow 的执行状态 <p>
    *
-   * @param execId
    * @return 是否成功
    */
   private boolean checkExecStatus(int execId) {

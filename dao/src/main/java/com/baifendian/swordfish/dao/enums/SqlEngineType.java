@@ -16,8 +16,8 @@
 package com.baifendian.swordfish.dao.enums;
 
 /**
- * 即系查询类型
+ * SQL 执行引擎类型
  */
-public enum AdHocType {
-  HIVE,SPARK;
+public enum SqlEngineType {
+  HIVE, SPARK, PHOENIX
 }

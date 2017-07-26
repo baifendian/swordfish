@@ -19,12 +19,11 @@ import com.baifendian.swordfish.dao.FlowDao;
 import com.baifendian.swordfish.dao.model.ExecutionFlow;
 import com.baifendian.swordfish.masterserver.exec.ExecutorServerInfo;
 import com.baifendian.swordfish.masterserver.exec.ExecutorServerManager;
+import java.util.List;
+import java.util.concurrent.BlockingQueue;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.List;
-import java.util.concurrent.BlockingQueue;
 
 /**
  * executor server 容错处理服务线程
@@ -46,7 +45,7 @@ public class ExecutorCheckThread implements Runnable {
   private FlowDao flowDao;
 
   public ExecutorCheckThread(ExecutorServerManager executorServerManager, int timeoutInterval,
-                             BlockingQueue<ExecFlowInfo> executionFlowQueue, FlowDao flowDao) {
+      BlockingQueue<ExecFlowInfo> executionFlowQueue, FlowDao flowDao) {
     this.executorServerManager = executorServerManager;
     this.executionFlowQueue = executionFlowQueue;
     this.timeoutInterval = timeoutInterval;
@@ -59,7 +58,11 @@ public class ExecutorCheckThread implements Runnable {
 
     try {
       // 得到超时的工作流列表
-      List<ExecutorServerInfo> faultServers = executorServerManager.checkTimeoutServer(timeoutInterval);
+      List<ExecutorServerInfo> faultServers = executorServerManager
+          .checkTimeoutServer(timeoutInterval);
+
+      // 展示当前的 worker 列表信息
+      executorServerManager.printServerInfo();
 
       if (CollectionUtils.isEmpty(faultServers)) {
         return;
@@ -69,11 +72,13 @@ public class ExecutorCheckThread implements Runnable {
 
       for (ExecutorServerInfo executorServerInfo : faultServers) {
         // 查询超时工作流上的任务(这里使用数据库查询到的数据保证准确性，避免内存数据出现不一致的情况)
-        List<ExecutionFlow> executionFlows = flowDao.queryNoFinishFlow(executorServerInfo.getHost() + ":" + executorServerInfo.getPort());
+        List<ExecutionFlow> executionFlows = flowDao
+            .queryNoFinishFlow(executorServerInfo.getHost() + ":" + executorServerInfo.getPort());
 
         // 如果查到了相应的任务
         if (!CollectionUtils.isEmpty(executionFlows)) {
-          logger.info("executor server {} fault, execIds size:{} ", executorServerInfo, executionFlows.size());
+          logger.info("executor server {} fault, execIds size:{} ", executorServerInfo,
+              executionFlows.size());
 
           for (ExecutionFlow execFlow : executionFlows) {
             Integer execId = execFlow.getId();
@@ -93,7 +98,9 @@ public class ExecutorCheckThread implements Runnable {
                   executionFlowQueue.add(execFlowInfo);
                 }
               } else {
-                logger.error("executor server fault reschedule workflow execId:{}, but execId:{} not exists", execId, execId);
+                logger.error(
+                    "executor server fault reschedule workflow execId:{}, but execId:{} not exists",
+                    execId, execId);
               }
             } catch (Exception e) {
               logger.error("reschedule get error", e);

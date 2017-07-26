@@ -111,9 +111,9 @@ public class FlowRunner implements Runnable {
   private final int timeout;
 
   /**
-   * 真实的调度时间 (ms)
+   * 运行的起始时间 (ms)
    */
-  private final long scheduleTime;
+  private final long startTime;
 
   /**
    * @param context
@@ -125,7 +125,7 @@ public class FlowRunner implements Runnable {
     this.maxTryTimes = context.getMaxTryTimes();
     this.timeout = context.getTimeout();
     this.failurePolicyType = context.getFailurePolicyType();
-    this.scheduleTime = executionFlow.getScheduleTime().getTime();
+    this.startTime = executionFlow.getStartTime().getTime();
   }
 
   /**
@@ -500,7 +500,7 @@ public class FlowRunner implements Runnable {
    * @return 超时时间
    */
   private int calcNodeTimeout() {
-    int usedTime = (int) ((System.currentTimeMillis() - scheduleTime) / 1000);
+    int usedTime = (int) ((System.currentTimeMillis() - startTime) / 1000);
 
     int remainTime = timeout - usedTime;
 
@@ -645,7 +645,9 @@ public class FlowRunner implements Runnable {
    * flow 执行完的后置处理 <p>
    */
   private void postProcess() {
-    if (!BaseConfig.isDevlopMode()) {
+    logger.info("Develop mode is: {}", BaseConfig.isDevelopMode());
+
+    if (!BaseConfig.isDevelopMode()) {
       // 执行完后, 清理目录, 避免文件过大
       String execLocalPath = BaseConfig
           .getFlowExecDir(executionFlow.getProjectId(), executionFlow.getFlowId(),
@@ -698,8 +700,8 @@ public class FlowRunner implements Runnable {
       }
 
       // 如果失败了, 且应该是停止的
-      if (!preFinishedNode.getStatus().typeIsSuccess()
-          && failurePolicyType == FailurePolicyType.END) {
+      if (!preFinishedNode.getStatus().typeIsSuccess()/*
+          && failurePolicyType == FailurePolicyType.END*/) {
         return false;
       }
     }

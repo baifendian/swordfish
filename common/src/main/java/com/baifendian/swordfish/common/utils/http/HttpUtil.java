@@ -15,22 +15,19 @@
  */
 package com.baifendian.swordfish.common.utils.http;
 
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-
 public class HttpUtil {
+
   private static final Logger logger = LoggerFactory.getLogger(HttpUtil.class);
 
   /**
    * 得到 http 请求中的 ip 地址
-   *
-   * @param request
-   * @return
    */
   public static String getClientIpAddress(HttpServletRequest request) {
     String ip = request.getHeader("X-Forwarded-For");
@@ -55,10 +52,6 @@ public class HttpUtil {
 
   /**
    * 获取 cookie 信息
-   *
-   * @param request
-   * @param name
-   * @return
    */
   public static Cookie getCookieByName(HttpServletRequest request, String name) {
     Cookie[] cookies = request.getCookies();
@@ -75,11 +68,14 @@ public class HttpUtil {
 
   /**
    * 得到 md5
-   *
-   * @param raw
-   * @return
    */
   public static String getMd5(String raw) {
+    if (raw == null) {
+      raw = StringUtils.EMPTY;
+    }
+
     return DigestUtils.md5Hex(raw);
   }
+
+
 }

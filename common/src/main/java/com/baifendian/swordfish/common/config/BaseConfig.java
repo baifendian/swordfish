@@ -95,9 +95,10 @@ public class BaseConfig {
         prohibitUserSet.add(user);
       }
 
-      devlopMode = Boolean.getBoolean(properties.getProperty("develop.mode"));
+      devlopMode = Boolean.parseBoolean(properties.getProperty("develop.mode"));
     } catch (IOException e) {
       LOGGER.error(e.getMessage(), e);
+      System.exit(1);
     } finally {
       IOUtils.closeQuietly(is);
     }
@@ -242,6 +243,14 @@ public class BaseConfig {
   }
 
   /**
+   * 得到路径
+   */
+  public static String getJobHiveUdfJarPath(long execId, String nodeName) {
+    return MessageFormat
+        .format("{0}/{1}", getJobHiveUdfJarPath(execId), HttpUtil.getMd5(nodeName).substring(0, 8));
+  }
+
+  /**
    * 得到系统环境变量路径
    */
   public static String getSystemEnvPath() {
@@ -258,7 +267,7 @@ public class BaseConfig {
   /**
    * 是否处于开发模式
    */
-  public static boolean isDevlopMode() {
+  public static boolean isDevelopMode() {
     return devlopMode;
   }
 

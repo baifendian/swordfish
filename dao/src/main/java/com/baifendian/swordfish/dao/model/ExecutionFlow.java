@@ -16,27 +16,26 @@
 package com.baifendian.swordfish.dao.model;
 
 import com.baifendian.swordfish.dao.enums.ExecType;
+import com.baifendian.swordfish.dao.enums.FailurePolicyType;
 import com.baifendian.swordfish.dao.enums.FlowStatus;
 import com.baifendian.swordfish.dao.enums.NotifyType;
 import com.baifendian.swordfish.dao.model.flow.Property;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
-import org.apache.commons.lang.StringUtils;
-
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import org.apache.commons.lang.StringUtils;
 
 public class ExecutionFlow {
+
   /**
-   * 具体执行的 id
-   * 数据库映射字段
+   * 具体执行的 id 数据库映射字段
    **/
   private Integer id;
 
   /**
-   * workflow 的 id
-   * 数据库映射字段 flow_id
+   * workflow 的 id 数据库映射字段 flow_id
    **/
   private int flowId;
 
@@ -51,8 +50,7 @@ public class ExecutionFlow {
   private FlowStatus status;
 
   /**
-   * 提交用户id
-   * 数据库映射字段 submit_user
+   * 提交用户id 数据库映射字段 submit_user
    **/
   private int submitUserId;
 
@@ -92,6 +90,11 @@ public class ExecutionFlow {
   private ExecType type;
 
   /**
+   * 失败的策略
+   */
+  private FailurePolicyType failurePolicy;
+
+  /**
    * workflow 所在项目的 id
    */
   private Integer projectId;
@@ -102,8 +105,7 @@ public class ExecutionFlow {
   private String projectName;
 
   /**
-   * 工作流名称
-   * DTO需要字段
+   * 工作流名称 DTO需要字段
    */
   private String workflowName;
 
@@ -138,8 +140,7 @@ public class ExecutionFlow {
   private Map<String, String> userDefinedParamMap;
 
   /**
-   * 报警类型
-   * 数据库映射字段 notify_type
+   * 报警类型 数据库映射字段 notify_type
    */
   private NotifyType notifyType;
 
@@ -263,6 +264,14 @@ public class ExecutionFlow {
     this.type = type;
   }
 
+  public FailurePolicyType getFailurePolicy() {
+    return failurePolicy;
+  }
+
+  public void setFailurePolicy(FailurePolicyType failurePolicy) {
+    this.failurePolicy = failurePolicy;
+  }
+
   public Integer getProjectId() {
     return projectId;
   }
@@ -374,7 +383,8 @@ public class ExecutionFlow {
 
     if (userDefinedParamMap == null && StringUtils.isNotEmpty(userDefinedParams)) {
       propList = JsonUtil.parseObjectList(userDefinedParams, Property.class);
-      userDefinedParamMap = propList.stream().collect(Collectors.toMap(Property::getProp, Property::getValue));
+      userDefinedParamMap = propList.stream()
+          .collect(Collectors.toMap(Property::getProp, Property::getValue));
     }
 
     return userDefinedParamMap;

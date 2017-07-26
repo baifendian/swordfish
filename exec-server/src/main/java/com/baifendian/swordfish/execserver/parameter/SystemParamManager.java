@@ -99,7 +99,7 @@ public class SystemParamManager {
 
     valueMap.put(BIZ_DATE, formatDate(bizDate));
     valueMap.put(BIZ_CUR_DATE, formatDate(bizCurDate));
-    valueMap.put(CYC_TIME, formatTime(bizCurDate));
+    valueMap.put(CYC_TIME, formatTime(time));
 
     if (execId != null) {
       valueMap.put(EXEC_ID, Long.toString(execId));

@@ -15,7 +15,12 @@
  */
 package com.baifendian.swordfish.rpc.client;
 
-import com.baifendian.swordfish.rpc.*;
+import com.baifendian.swordfish.rpc.ExecInfo;
+import com.baifendian.swordfish.rpc.HeartBeatData;
+import com.baifendian.swordfish.rpc.MasterService;
+import com.baifendian.swordfish.rpc.RetInfo;
+import com.baifendian.swordfish.rpc.RetResultInfo;
+import com.baifendian.swordfish.rpc.ScheduleInfo;
 import org.apache.thrift.TException;
 import org.apache.thrift.protocol.TBinaryProtocol;
 import org.apache.thrift.protocol.TProtocol;
@@ -115,11 +120,6 @@ public class MasterClient {
 
   /**
    * 报告状态, 用于 exec-server
-   *
-   * @param clientHost
-   * @param clientPort
-   * @param heartBeatData
-   * @return
    */
   public boolean executorReport(String clientHost, int clientPort, HeartBeatData heartBeatData) {
     boolean result = false;
@@ -143,11 +143,6 @@ public class MasterClient {
 
   /**
    * 报告状态, 用于 exec-server
-   *
-   * @param clientHost
-   * @param clientPort
-   * @param heartBeatData
-   * @return
    */
   public boolean executorReportOne(String clientHost, int clientPort, HeartBeatData heartBeatData) {
     if (!connect()) {
@@ -173,11 +168,6 @@ public class MasterClient {
 
   /**
    * 注册一个 executor, 用于 exec-server
-   *
-   * @param clientHost
-   * @param clientPort
-   * @param registerTime
-   * @return
    */
   public boolean registerExecutor(String clientHost, int clientPort, long registerTime) {
     if (!connect()) {
@@ -203,10 +193,6 @@ public class MasterClient {
 
   /**
    * 上线一个工作流的调度, 用于 web-server
-   *
-   * @param projectId
-   * @param flowId
-   * @return
    */
   public boolean setSchedule(int projectId, int flowId) throws TTransportException {
     if (!connect()) {
@@ -232,10 +218,6 @@ public class MasterClient {
 
   /**
    * 取消一个调度的设置, 用于 web-server
-   *
-   * @param projectId
-   * @param flowId
-   * @return
    */
   public boolean deleteSchedule(int projectId, int flowId) {
     if (!connect()) {
@@ -260,9 +242,6 @@ public class MasterClient {
 
   /**
    * 执行即席查询, 用于 web-server
-   *
-   * @param id
-   * @return
    */
   public RetInfo execAdHoc(int id) {
     if (!connect()) {
@@ -284,11 +263,8 @@ public class MasterClient {
   /**
    * 执行一个工作流, 用于 web-server
    *
-   * @param projectId
-   * @param flowId
-   * @param runTime   工作流的运行时间
-   * @param execInfo  执行的一些 context 信息
-   * @return
+   * @param runTime 工作流的运行时间
+   * @param execInfo 执行的一些 context 信息
    */
   public RetResultInfo execFlow(int projectId, int flowId, long runTime, ExecInfo execInfo) {
     if (!connect()) {
@@ -310,9 +286,6 @@ public class MasterClient {
 
   /**
    * 取消工作流执行, 用于 web-server
-   *
-   * @param id
-   * @return
    */
   public boolean cancelExecFlow(int id) {
     if (!connect()) {
@@ -339,9 +312,6 @@ public class MasterClient {
 
   /**
    * 执行一个流任务, 用于 web-server
-   *
-   * @param execId
-   * @return
    */
   public RetInfo execStreamingJob(int execId) {
     if (!connect()) {
@@ -363,9 +333,6 @@ public class MasterClient {
 
   /**
    * 取消流任务执行, 用于 web-server
-   *
-   * @param execId
-   * @return
    */
   public boolean cancelStreamingJob(int execId) {
     if (!connect()) {
@@ -391,21 +358,75 @@ public class MasterClient {
   }
 
   /**
-   * 补数据接口, 用于 web-server
+   * 取消流任务执行, 用于 web-server
    *
-   * @param projectId
-   * @param workflowId
-   * @param scheduleInfo
+   * @param execId
    * @return
    */
-  public RetResultInfo appendWorkFlow(int projectId, int workflowId, ScheduleInfo scheduleInfo) {
+  public boolean activateStreamingJob(int execId) {
+    if (!connect()) {
+      close();
+      return false;
+    }
+
+    try {
+      RetInfo ret = client.activateStreamingJob(execId);
+
+      if (ret.getStatus() != 0) {
+        logger.error("Activate streaming job error:{}", ret.getMsg());
+        return false;
+      }
+    } catch (TException e) {
+      logger.error("Activate streaming job error", e);
+      return false;
+    } finally {
+      close();
+    }
+
+    return true;
+  }
+
+  /**
+   * 取消流任务执行, 用于 web-server
+   *
+   * @param execId
+   * @return
+   */
+  public boolean deactivateStreamingJob(int execId) {
+    if (!connect()) {
+      close();
+      return false;
+    }
+
+    try {
+      RetInfo ret = client.deactivateStreamingJob(execId);
+
+      if (ret.getStatus() != 0) {
+        logger.error("Deactivate streaming job error:{}", ret.getMsg());
+        return false;
+      }
+    } catch (TException e) {
+      logger.error("Deactivate streaming job error", e);
+      return false;
+    } finally {
+      close();
+    }
+
+    return true;
+  }
+
+  /**
+   * 补数据接口, 用于 web-server
+   */
+  public RetResultInfo appendWorkFlow(int projectId, int workflowId, ScheduleInfo scheduleInfo,
+      ExecInfo execInfo) {
     if (!connect()) {
       close();
       return null;
     }
 
     try {
-      RetResultInfo ret = client.appendWorkFlow(projectId, workflowId, scheduleInfo);
+      RetResultInfo ret = client.appendWorkFlow(projectId, workflowId, scheduleInfo, execInfo);
 
       return ret;
     } catch (TException e) {

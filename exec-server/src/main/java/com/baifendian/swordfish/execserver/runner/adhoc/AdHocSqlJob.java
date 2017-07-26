@@ -22,12 +22,14 @@ import com.baifendian.swordfish.dao.AdHocDao;
 import com.baifendian.swordfish.dao.DaoFactory;
 import com.baifendian.swordfish.dao.enums.ExecType;
 import com.baifendian.swordfish.dao.enums.FlowStatus;
+import com.baifendian.swordfish.dao.enums.SqlEngineType;
 import com.baifendian.swordfish.dao.model.AdHocJsonObject;
 import com.baifendian.swordfish.dao.model.AdHocResult;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
 import com.baifendian.swordfish.execserver.common.FunctionUtil;
 import com.baifendian.swordfish.execserver.common.ResultCallback;
 import com.baifendian.swordfish.execserver.engine.hive.HiveSqlExec;
+import com.baifendian.swordfish.execserver.engine.hive.HiveUtil;
 import com.baifendian.swordfish.execserver.job.JobProps;
 import com.baifendian.swordfish.execserver.parameter.ParamHelper;
 import com.baifendian.swordfish.execserver.parameter.SystemParamManager;
@@ -55,14 +57,20 @@ public class AdHocSqlJob {
   private AdHocParam param;
 
   /**
+   * 即席的类型
+   */
+  private SqlEngineType type;
+
+  /**
    * 记录日志
    */
   private Logger logger;
 
-  public AdHocSqlJob(JobProps props, Logger logger) {
+  public AdHocSqlJob(JobProps props, SqlEngineType type, Logger logger) {
     this.props = props;
     this.adHocDao = DaoFactory.getDaoInstance(AdHocDao.class);
     this.param = JsonUtil.parseObject(props.getJobParams(), AdHocParam.class);
+    this.type = type;
     this.logger = logger;
   }
 
@@ -87,8 +95,18 @@ public class AdHocSqlJob {
         SystemParamManager.buildSystemParam(ExecType.DIRECT, props.getCycTime()));
 
     // 创建自定义函数
-    List<String> funcs = FunctionUtil.createFuncs(param.getUdfs(), props.getExecId(), logger,
+    List<String> funcs = FunctionUtil.createFuncs(param.getUdfs(), props.getExecId(), null, logger,
         BaseConfig.getHdfsResourcesDir(props.getProjectId()), true);
+
+    // 切分 sql
+    List<String> execSqls = CommonUtil.sqlSplit(sqls);
+
+    for (String sql : execSqls) {
+      if (HiveUtil.isTokDDL(sql)) {
+        logger.error("exec sqls has ddl or invalid clause, can't execution, clause is: \"{}\"", sql);
+        return FlowStatus.FAILED;
+      }
+    }
 
     logger.info("exec sql: {}, funcs: {}", sqls, funcs);
 
@@ -118,12 +136,22 @@ public class AdHocSqlJob {
       adHocDao.updateAdHocResult(adHocResult);
     };
 
-    // 切分 sql
-    List<String> execSqls = CommonUtil.sqlSplit(sqls);
+    switch (type) {
+      case SPARK: {
+        // TODO:: Support Spark SQL Engine
 
-    HiveSqlExec hiveSqlExec = new HiveSqlExec(this::logProcess, props.getProxyUser(), logger);
+      }
+      case PHOENIX: {
+        // TODO:: Support Spark SQL Engine
 
-    return hiveSqlExec.execute(funcs, execSqls, true, resultCallback, param.getLimit())
-        ? FlowStatus.SUCCESS : FlowStatus.FAILED;
+      }
+      case HIVE:
+      default: {
+        HiveSqlExec hiveSqlExec = new HiveSqlExec(this::logProcess, props.getProxyUser(), logger);
+
+        return hiveSqlExec.execute(funcs, execSqls, true, resultCallback, param.getLimit())
+            ? FlowStatus.SUCCESS : FlowStatus.FAILED;
+      }
+    }
   }
 }

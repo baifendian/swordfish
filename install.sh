@@ -42,20 +42,27 @@ envFile="/opt/udp/.sf_env.sh"
 # datax home path
 dataxHome="/opt/udp/DataX/target/datax/datax"
 
+# storm path
+stormRestAddr="bgs-8p95-zhanglifeng.bfdabc.com:8744"
+
 # develop mode
 developMode=true
 
 # 使用示例
 function usage() {
-    echo "Usage: $0 -r <true|false>" 1>&2;
+    echo "Usage: $0 -r <true|false> [-m <all|web-server|master-server|exec-server>" 1>&2;
     exit 1;
 }
 
-while getopts ":r:" o; do
+while getopts ":r:m:" o; do
     case "${o}" in
         r)
             r=${OPTARG}
             [[ "$r" = "true" || "$r" = "false" ]] || usage
+            ;;
+        m)
+            m=${OPTARG}
+            [[ "$m" = "all" || "$m" = "web-server" || "$m" = "master-server" || "$m" = "exec-server" ]] || usage
             ;;
         *)
             usage
@@ -66,6 +73,12 @@ done
 if [ -z "${r}" ]; then
     usage
 fi
+
+if [ -z "${m}" ]; then
+    m="all"
+fi
+
+echo "replace: $r, module: $m"
 
 # 文件替换
 function file_replace()
@@ -90,6 +103,8 @@ function file_replace()
     sed -i "s#mapreduce.jobhistory.address.*#mapreduce.jobhistory.address = ${hadoopYarnAddress}:10020#g" conf/common/hadoop/hadoop.properties
     sed -i "s#yarn.resourcemanager.webapp.address.*#yarn.resourcemanager.webapp.address = http://${hadoopYarnAddress}:8088/cluster/app/%s#g" conf/common/hadoop/hadoop.properties
     sed -i "s#yarn.application.status.address.*#yarn.application.status.address = http://${hadoopYarnAddress}:8088/ws/v1/cluster/apps/%s#g" conf/common/hadoop/hadoop.properties
+
+    sed -i "s#storm.rest.url.*#storm.rest.url = http://${stormRestAddr}#g" conf/common/storm.properties
 
     # 4. quartz
     sed -i "s#org.quartz.dataSource.myDS.URL.*#org.quartz.dataSource.myDS.URL= jdbc:mysql://${mysqlAddress}/${mysqlDb}?autoReconnect=true#g" conf/quartz.properties
@@ -145,20 +160,26 @@ fi
 # start all service
 cd $SWORDFISH_HOME/target/swordfish-all-${version}/
 
-sh bin/swordfish-daemon.sh stop web-server
-sh bin/swordfish-daemon.sh start web-server
+if [ "$m" = "all" ] || [ "$m" = "web-server" ]; then
+  sh bin/swordfish-daemon.sh stop web-server
+  sh bin/swordfish-daemon.sh start web-server
 
-process_check web-server
+  process_check web-server
+fi
 
-sh bin/swordfish-daemon.sh stop master-server
-sh bin/swordfish-daemon.sh start master-server
+if [ "$m" = "all" ] || [ "$m" = "master-server" ]; then
+  sh bin/swordfish-daemon.sh stop master-server
+  sh bin/swordfish-daemon.sh start master-server
 
-process_check master-server
+  process_check master-server
+fi
 
-sh bin/swordfish-daemon.sh stop exec-server
-sh bin/swordfish-daemon.sh start exec-server
+if [ "$m" = "all" ] || [ "$m" = "exec-server" ]; then
+  sh bin/swordfish-daemon.sh stop exec-server
+  sh bin/swordfish-daemon.sh start exec-server
 
-process_check exec-server
+  process_check exec-server
+fi
 
 # 查看进程是否存在
 sleep 1s

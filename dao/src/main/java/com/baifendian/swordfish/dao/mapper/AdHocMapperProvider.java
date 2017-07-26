@@ -15,7 +15,7 @@
  */
 package com.baifendian.swordfish.dao.mapper;
 
-import com.baifendian.swordfish.dao.enums.AdHocType;
+import com.baifendian.swordfish.dao.enums.SqlEngineType;
 import com.baifendian.swordfish.dao.enums.FlowStatus;
 import com.baifendian.swordfish.dao.mapper.utils.EnumFieldUtil;
 import org.apache.ibatis.jdbc.SQL;
@@ -45,7 +45,7 @@ public class AdHocMapperProvider {
         VALUES("`owner`", "#{adHoc.owner}");
         VALUES("`parameter`", "#{adHoc.parameter}");
         VALUES("`proxy_user`", "#{adHoc.proxyUser}");
-        VALUES("`type`", EnumFieldUtil.genFieldStr("adHoc.type", AdHocType.class));
+        VALUES("`type`", EnumFieldUtil.genFieldStr("adHoc.type", SqlEngineType.class));
         VALUES("`queue`", "#{adHoc.queue}");
         VALUES("`status`", EnumFieldUtil.genFieldStr("adHoc.status", FlowStatus.class));
         VALUES("`job_id`", "#{adHoc.jobId}");
@@ -187,6 +187,7 @@ public class AdHocMapperProvider {
         FROM(TABLE_NAME);
         WHERE("`project_id` = #{projectId}");
         WHERE("`name` = #{name}");
+        ORDER_BY("`create_time` desc");
       }
     }.toString();
   }
