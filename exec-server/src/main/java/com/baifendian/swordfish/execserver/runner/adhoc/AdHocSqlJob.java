@@ -98,6 +98,16 @@ public class AdHocSqlJob {
     List<String> funcs = FunctionUtil.createFuncs(param.getUdfs(), props.getExecId(), null, logger,
         BaseConfig.getHdfsResourcesDir(props.getProjectId()), true);
 
+    // 切分 sql
+    List<String> execSqls = CommonUtil.sqlSplit(sqls);
+
+    for (String sql : execSqls) {
+      if (HiveUtil.isTokDDL(sql)) {
+        logger.error("exec sqls has ddl or invalid clause, can't execution, clause is: \"{}\"", sql);
+        return FlowStatus.FAILED;
+      }
+    }
+
     logger.info("exec sql: {}, funcs: {}", sqls, funcs);
 
     // 查询结果写入数据库
@@ -125,16 +135,6 @@ public class AdHocSqlJob {
       // 更新结果到数据库中
       adHocDao.updateAdHocResult(adHocResult);
     };
-
-    // 切分 sql
-    List<String> execSqls = CommonUtil.sqlSplit(sqls);
-
-    for (String sql : execSqls) {
-      if (HiveUtil.isTokDDL(sql)) {
-        logger.error("exec sqls has ddl or invalid clause, can't execution, clause is: {}", sql);
-        return FlowStatus.FAILED;
-      }
-    }
 
     switch (type) {
       case SPARK: {
