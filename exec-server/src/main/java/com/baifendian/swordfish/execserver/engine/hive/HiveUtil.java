@@ -196,12 +196,4 @@ public class HiveUtil extends BaseDao {
 
     return hiveService2ConnectionInfo;
   }
-
-  public static void main(String[] args) {
-    System.out.println(isTokDDL(""));
-    System.out.println(isTokDDL("create table abc"));
-    System.out.println(isTokDDL("alter table abc"));
-    System.out.println(isTokDDL("select * from abc"));
-    System.out.println(isTokDDL(null));
-  }
 }

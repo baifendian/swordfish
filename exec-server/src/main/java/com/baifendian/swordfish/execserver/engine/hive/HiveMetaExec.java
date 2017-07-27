@@ -223,36 +223,4 @@ public class HiveMetaExec {
       }
     }
   }
-
-  public static void main(String[] args) throws Exception {
-    Logger logger = LoggerFactory.getLogger(HiveMetaExec.class);
-
-    HiveMetaExec hiveMetaExec = new HiveMetaExec(logger);
-
-    int times = 100;
-
-    long start = System.currentTimeMillis();
-
-    for (int i = 0; i < times; ++i) {
-      List<String> tables = hiveMetaExec.getTables("dw");
-
-      System.out.println(tables.size());
-    }
-
-    long end = System.currentTimeMillis();
-
-    System.out.println((end - start) / times);
-
-    start = System.currentTimeMillis();
-
-    for (int i = 0; i < times; ++i) {
-      List<Table> tables = hiveMetaExec.getTableObjectsByName("dw");
-
-      System.out.println(tables.size());
-    }
-
-    end = System.currentTimeMillis();
-
-    System.out.println((end - start) / times);
-  }
 }
