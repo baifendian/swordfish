@@ -236,7 +236,7 @@ public class HiveMetaExec {
     for (int i = 0; i < times; ++i) {
       List<String> tables = hiveMetaExec.getTables("dw");
 
-//      System.out.println(tables.size());
+      System.out.println(tables.size());
     }
 
     long end = System.currentTimeMillis();
@@ -248,7 +248,7 @@ public class HiveMetaExec {
     for (int i = 0; i < times; ++i) {
       List<Table> tables = hiveMetaExec.getTableObjectsByName("dw");
 
-//      System.out.println(tables.size());
+      System.out.println(tables.size());
     }
 
     end = System.currentTimeMillis();
