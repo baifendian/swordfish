@@ -43,6 +43,11 @@ public class MasterClient {
   private static final int DEFAULT_RETRY_TIMES = 3;
 
   /**
+   * 再次发送心跳间隔
+   */
+  private static final int HEARTBEAT_INTERVAL = 3;
+
+  /**
    * master 地址
    */
   private String host;
@@ -61,11 +66,6 @@ public class MasterClient {
    * exec 向 master 发送心跳的重试次数
    */
   private int retries;
-
-  /**
-   * 再次发送心态间隔
-   */
-  private int executorHeartbeatTryInterval;
 
   /**
    * 传输层对象
@@ -131,7 +131,7 @@ public class MasterClient {
       }
 
       try {
-        Thread.sleep(3);
+        Thread.sleep(HEARTBEAT_INTERVAL);
       } catch (InterruptedException e) {
         logger.error("report info error", e);
         return false;
