@@ -141,6 +141,12 @@ public class HiveUtil extends BaseDao {
           .equals(ast.getChild(0).getText())) {
         return true;
       }
+
+      String tmp = sql.toUpperCase();
+
+      if (tmp.startsWith("CREATE") || tmp.startsWith("DROP") || tmp.startsWith("ALTER")) {
+        return true;
+      }
     } catch (Exception e) {
       logger.error(String.format("parse ddl %s exception", sql), e);
       return true;
@@ -189,13 +195,5 @@ public class HiveUtil extends BaseDao {
     hiveService2ConnectionInfo.setUri(hiveConfig.getThriftUris());
 
     return hiveService2ConnectionInfo;
-  }
-
-  public static void main(String[] args) {
-    System.out.println(isTokDDL(""));
-    System.out.println(isTokDDL("create table abc"));
-    System.out.println(isTokDDL("alter table abc"));
-    System.out.println(isTokDDL("select * from abc"));
-    System.out.println(isTokDDL(null));
   }
 }
