@@ -170,6 +170,8 @@ public class JobExecManager {
     List<ExecutionFlow> executionFlowList = flowDao.queryAllNoFinishFlow();
     Map<String, ExecutorServerInfo> executorServerInfoMap = new HashMap<>();
 
+    logger.info("recovery exec flows: {}", executionFlowList.size());
+
     if (executionFlowList != null) {
       for (ExecutionFlow executionFlow : executionFlowList) {
         String worker = executionFlow.getWorker();

@@ -81,6 +81,8 @@ public class Submit2ExecutorServerThread extends Thread {
 
       // 得到要执行的 executor flow 信息
       try {
+        logger.info("execution flow size: {}", executionFlowQueue.size());
+
         execFlowInfo = executionFlowQueue.take();
         logger.info("get execution flow from queue, exec info:{}", execFlowInfo);
       } catch (InterruptedException e) {
