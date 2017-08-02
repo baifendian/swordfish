@@ -15,31 +15,30 @@
  */
 package com.baifendian.swordfish.execserver.engine.hive;
 
+import static com.baifendian.swordfish.execserver.job.impexp.ImpExpJobConst.DEFAULT_FILE_TYPE;
+
 import com.baifendian.swordfish.common.hive.metastore.HiveMetaPoolClient;
 import com.baifendian.swordfish.common.hive.service2.HiveService2Client;
 import com.baifendian.swordfish.common.hive.service2.HiveService2ConnectionInfo;
 import com.baifendian.swordfish.dao.BaseDao;
-
+import com.baifendian.swordfish.execserver.job.impexp.Args.HqlColumn;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-
-import com.baifendian.swordfish.execserver.job.impexp.Args.HqlColumn;
 import org.apache.commons.lang.StringUtils;
+import org.apache.hadoop.hive.ql.parse.ASTNode;
+import org.apache.hadoop.hive.ql.parse.ParseDriver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import static com.baifendian.swordfish.execserver.job.impexp.ImpExpJobConst.DEFAULT_FILE_TYPE;
-
 @Component
 public class HiveUtil extends BaseDao {
 
-  private final Logger logger = LoggerFactory.getLogger(getClass());
+  private static Logger logger = LoggerFactory.getLogger(HiveUtil.class);
 
   public static final int DEFAULT_QUERY_PROGRESS_THREAD_TIMEOUT = 10 * 1000;
 
@@ -85,11 +84,10 @@ public class HiveUtil extends BaseDao {
 
   /**
    * 组装一个临时外部表
-   *
-   * @param
-   * @return
    */
-  public static String getTmpTableDDL(String dbName, String tableName, List<HqlColumn> hqlColumnList, String localtion, String fieldDelimiter, String fileCode) throws SQLException {
+  public static String getTmpTableDDL(String dbName, String tableName,
+      List<HqlColumn> hqlColumnList, String localtion, String fieldDelimiter, String fileCode)
+      throws SQLException {
 
     List<String> fieldList = new ArrayList<>();
 
@@ -99,11 +97,12 @@ public class HiveUtil extends BaseDao {
 
     String sql = "CREATE TEMPORARY EXTERNAL TABLE {0}.{1}({2}) ROW FORMAT SERDE \"org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe\" WITH SERDEPROPERTIES(\"field.delim\"=\"{3}\",\"serialization.encoding\"=\"{4}\") STORED AS {5} LOCATION \"{6}\"";
 
-    sql = MessageFormat.format(sql, dbName, tableName, String.join(",", fieldList), fieldDelimiter, fileCode, DEFAULT_FILE_TYPE.getType(), localtion);
+    sql = MessageFormat
+        .format(sql, dbName, tableName, String.join(",", fieldList), fieldDelimiter, fileCode,
+            DEFAULT_FILE_TYPE.getType(), localtion);
 
     return sql;
   }
-
 
 
   /**
@@ -119,6 +118,37 @@ public class HiveUtil extends BaseDao {
     if (sql.startsWith("select")
         || sql.startsWith("describe")
         || sql.startsWith("explain")) {
+      return true;
+    }
+
+    return false;
+  }
+
+  /**
+   * 是否是 DDL 语句, 如 create table 等
+   */
+  public static boolean isTokDDL(String sql) {
+    if (org.apache.commons.lang3.StringUtils.isEmpty(sql)) {
+      return false;
+    }
+
+    try {
+      ParseDriver pd = new ParseDriver();
+
+      ASTNode ast = pd.parse(sql);
+
+      if ("TOK_ALTERTABLE".equals(ast.getChild(0).getText()) || "TOK_CREATETABLE"
+          .equals(ast.getChild(0).getText())) {
+        return true;
+      }
+
+      String tmp = sql.toUpperCase();
+
+      if (tmp.startsWith("CREATE") || tmp.startsWith("DROP") || tmp.startsWith("ALTER")) {
+        return true;
+      }
+    } catch (Exception e) {
+      logger.error(String.format("parse ddl %s exception", sql), e);
       return true;
     }
 

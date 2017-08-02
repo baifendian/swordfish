@@ -19,16 +19,15 @@ import com.baifendian.swordfish.common.hive.metastore.HiveMetaPoolClient;
 import com.baifendian.swordfish.common.job.struct.node.impexp.column.HiveColumn;
 import com.baifendian.swordfish.dao.DaoFactory;
 import com.baifendian.swordfish.execserver.job.impexp.Args.HqlColumn;
+import com.baifendian.swordfish.execserver.job.impexp.ImpExpUtil;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
-
-import com.baifendian.swordfish.execserver.job.impexp.ImpExpUtil;
-import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
 import org.apache.hadoop.hive.metastore.api.FieldSchema;
 import org.apache.hadoop.hive.metastore.api.Table;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class HiveMetaExec {
 
@@ -85,7 +84,7 @@ public class HiveMetaExec {
   }
 
   /**
-   * 检测一个 HiveColumn 是否合法，如果合法就返回hql
+   * 检测一个 HiveColumn 是否合法，如果合法就返回 hql
    */
   public List<HqlColumn> checkHiveColumn(List<HiveColumn> srcColumn, List<HqlColumn> destColumn)
       throws Exception {
@@ -186,6 +185,42 @@ public class HiveMetaExec {
     if (e.toString().contains("SocketException")) {
       logger.error("SocketException clear pool", e);
       hiveMetaPoolClient.clear();
+    }
+  }
+
+  /**
+   * 根据 db 名称获取表名称
+   */
+  public List<String> getTables(String dbname) throws Exception {
+    HiveMetaStoreClient hiveMetaStoreClient = hiveMetaPoolClient.borrowClient();
+
+    try {
+      return hiveMetaStoreClient.getAllTables(dbname);
+    } catch (Exception e) {
+      doWithException(hiveMetaStoreClient, e);
+      throw e;
+    } finally {
+      if (hiveMetaStoreClient != null) {
+        hiveMetaPoolClient.returnClient(hiveMetaStoreClient);
+      }
+    }
+  }
+
+  /**
+   * 获取表详情
+   */
+  public List<Table> getTableObjectsByName(String dbname) throws Exception {
+    HiveMetaStoreClient hiveMetaStoreClient = hiveMetaPoolClient.borrowClient();
+
+    try {
+      return hiveMetaStoreClient.getTableObjectsByName(dbname, getTables(dbname));
+    } catch (Exception e) {
+      doWithException(hiveMetaStoreClient, e);
+      throw e;
+    } finally {
+      if (hiveMetaStoreClient != null) {
+        hiveMetaPoolClient.returnClient(hiveMetaStoreClient);
+      }
     }
   }
 }

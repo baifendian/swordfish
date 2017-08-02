@@ -383,8 +383,11 @@ public class ExecutionFlow {
 
     if (userDefinedParamMap == null && StringUtils.isNotEmpty(userDefinedParams)) {
       propList = JsonUtil.parseObjectList(userDefinedParams, Property.class);
-      userDefinedParamMap = propList.stream()
-          .collect(Collectors.toMap(Property::getProp, Property::getValue));
+
+      if (propList != null) {
+        userDefinedParamMap = propList.stream()
+            .collect(Collectors.toMap(Property::getProp, Property::getValue));
+      }
     }
 
     return userDefinedParamMap;

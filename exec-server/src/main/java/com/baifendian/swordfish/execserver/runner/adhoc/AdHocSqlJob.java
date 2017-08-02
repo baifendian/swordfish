@@ -20,15 +20,16 @@ import com.baifendian.swordfish.common.job.struct.node.adhoc.AdHocParam;
 import com.baifendian.swordfish.common.utils.CommonUtil;
 import com.baifendian.swordfish.dao.AdHocDao;
 import com.baifendian.swordfish.dao.DaoFactory;
-import com.baifendian.swordfish.dao.enums.SqlEngineType;
 import com.baifendian.swordfish.dao.enums.ExecType;
 import com.baifendian.swordfish.dao.enums.FlowStatus;
+import com.baifendian.swordfish.dao.enums.SqlEngineType;
 import com.baifendian.swordfish.dao.model.AdHocJsonObject;
 import com.baifendian.swordfish.dao.model.AdHocResult;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
 import com.baifendian.swordfish.execserver.common.FunctionUtil;
 import com.baifendian.swordfish.execserver.common.ResultCallback;
 import com.baifendian.swordfish.execserver.engine.hive.HiveSqlExec;
+import com.baifendian.swordfish.execserver.engine.hive.HiveUtil;
 import com.baifendian.swordfish.execserver.job.JobProps;
 import com.baifendian.swordfish.execserver.parameter.ParamHelper;
 import com.baifendian.swordfish.execserver.parameter.SystemParamManager;
@@ -97,6 +98,16 @@ public class AdHocSqlJob {
     List<String> funcs = FunctionUtil.createFuncs(param.getUdfs(), props.getExecId(), null, logger,
         BaseConfig.getHdfsResourcesDir(props.getProjectId()), true);
 
+    // 切分 sql
+    List<String> execSqls = CommonUtil.sqlSplit(sqls);
+
+    for (String sql : execSqls) {
+      if (HiveUtil.isTokDDL(sql)) {
+        logger.error("exec sqls has ddl or invalid clause, can't execution, clause is: \"{}\"", sql);
+        return FlowStatus.FAILED;
+      }
+    }
+
     logger.info("exec sql: {}, funcs: {}", sqls, funcs);
 
     // 查询结果写入数据库
@@ -124,9 +135,6 @@ public class AdHocSqlJob {
       // 更新结果到数据库中
       adHocDao.updateAdHocResult(adHocResult);
     };
-
-    // 切分 sql
-    List<String> execSqls = CommonUtil.sqlSplit(sqls);
 
     switch (type) {
       case SPARK: {
