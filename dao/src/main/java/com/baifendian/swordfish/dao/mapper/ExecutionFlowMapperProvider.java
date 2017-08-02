@@ -486,6 +486,25 @@ public class ExecutionFlowMapperProvider {
   }
 
   /**
+   * @param parameter
+   * @return
+   */
+  public String selectPreStartDate(Map<String, Object> parameter) {
+    return new SQL() {
+      {
+        SELECT("*");
+
+        FROM(TABLE_NAME);
+
+        WHERE("start_time <= #{date}");
+        WHERE("flow_id = #{flowId}");
+
+        ORDER_BY("schedule_time DESC");
+      }
+    }.toString() + " limit 1";
+  }
+
+  /**
    * 根据flowId和ScheduleTime查询一个ExecutionFlow
    *
    * @param parameter

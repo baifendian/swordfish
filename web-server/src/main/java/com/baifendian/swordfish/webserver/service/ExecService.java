@@ -119,7 +119,7 @@ public class ExecService {
 
     // 已经在运行的任务禁止重复提交
     ExecutionFlow executionFlow = executionFlowMapper
-        .selectPreDate(projectFlow.getId(), new Date());
+        .selectPreStartDate(projectFlow.getId(), new Date());
     if (executionFlow != null && executionFlow.getStatus() != null && !executionFlow.getStatus()
         .typeIsFinished()) {
       logger.error("The workflow is already running");
