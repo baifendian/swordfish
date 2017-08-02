@@ -77,8 +77,10 @@ public class ExecutorServerManager {
       return result;
     }
 
-    int choose = new Random().nextInt() % size;
+    int choose = Math.abs(new Random().nextInt()) % size;
     int index = 0;
+
+    logger.info("executor servers size: {}, choose: {}", size, choose);
 
     for (ExecutorServerInfo executorServerInfo : executorServers.values()) {
       if (index == choose) {
@@ -168,6 +170,13 @@ public class ExecutorServerManager {
       logger.info("executor information, host: {}, port: {}, heart beat: {}",
           executorServerInfo.getHost(), executorServerInfo.getPort(),
           executorServerInfo.getHeartBeatData());
+    }
+  }
+
+  public static void main(String[] args) {
+    for (int i = 0; i < 100; ++i) {
+      int choose = new Random().nextInt() % 1;
+      System.out.println(choose);
     }
   }
 }

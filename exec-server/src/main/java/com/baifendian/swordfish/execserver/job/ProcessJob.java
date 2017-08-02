@@ -234,7 +234,7 @@ public class ProcessJob {
         }
       }
     } catch (InterruptedException e) {
-      logger.error("interrupt exception, maybe task has been cancel or killed.");
+      logger.error("interrupt exception, maybe task has been cancel or killed.", e);
       exitCode = -1;
       throw new ExecException("Process has been interrupted. Exit code is " + exitCode);
     } catch (Exception e) {

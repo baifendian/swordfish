@@ -104,6 +104,8 @@ public class FlowExecManager {
 
           execFlowInfo.setExecId(executionFlow.getId());
 
+          logger.info("add data: {}", execFlowInfo);
+
           // 发送请求到 executor server 中执行
           jobExecManager.addExecFlow(execFlowInfo);
 

@@ -305,6 +305,29 @@ public interface ExecutionFlowMapper {
   ExecutionFlow selectPreDate(@Param("flowId") int flowId, @Param("date") Date date);
 
   /**
+   * 获取参照时间最近的前一次调度结果
+   *
+   * @param flowId
+   * @param date
+   * @return
+   */
+  @Results(value = {@Result(property = "id", column = "id", id = true, javaType = int.class, jdbcType = JdbcType.INTEGER),
+      @Result(property = "flowId", column = "flow_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
+      @Result(property = "status", column = "status", typeHandler = EnumOrdinalTypeHandler.class, jdbcType = JdbcType.TINYINT),
+      @Result(property = "worker", column = "worker", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+      @Result(property = "status", column = "status", typeHandler = EnumOrdinalTypeHandler.class, jdbcType = JdbcType.TINYINT),
+      @Result(property = "scheduleTime", column = "schedule_time", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP),
+      @Result(property = "submitTime", column = "submit_time", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP),
+      @Result(property = "startTime", column = "start_time", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP),
+      @Result(property = "endTime", column = "end_time", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP),
+      @Result(property = "submitUserId", column = "schedule_user", javaType = int.class, jdbcType = JdbcType.INTEGER),
+      @Result(property = "type", column = "type", typeHandler = EnumOrdinalTypeHandler.class, jdbcType = JdbcType.TINYINT),
+      @Result(property = "proxyUser", column = "proxy_user", javaType = String.class, jdbcType = JdbcType.VARCHAR)
+  })
+  @SelectProvider(type = ExecutionFlowMapperProvider.class, method = "selectPreStartDate")
+  ExecutionFlow selectPreStartDate(@Param("flowId") int flowId, @Param("date") Date date);
+
+  /**
    * 根据scheduleTime 和 flowId 查询一个ExecutionFlow信息
    *
    * @param flowId

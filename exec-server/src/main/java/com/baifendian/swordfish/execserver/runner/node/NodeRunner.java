@@ -87,57 +87,58 @@ public class NodeRunner implements Callable<Boolean> {
 
     flowDao.updateExecutionNode(executionNode);
 
-    // "项目id/flowId/执行id"
-    String jobScriptPath = BaseConfig
-        .getFlowExecDir(executionFlow.getProjectId(), executionFlow.getFlowId(),
-            executionFlow.getId());
-
-    logger
-        .info("exec id:{}, node:{}, script path:{}", executionFlow.getId(), executionNode.getName(),
-            jobScriptPath);
-
-    // 作业参数配置
-    Map<String, String> systemParamMap = SystemParamManager
-        .buildSystemParam(executionFlow.getType(), executionFlow.getScheduleTime(),
-            executionNode.getExecId(),
-            executionNode.getJobId());
-
-    // 构建自定义参数, 比如定义了 ${abc} = ${sf.system.bizdate}, $[yyyyMMdd] 等情况
-    Map<String, String> customParamMap = executionFlow.getUserDefinedParamMap();
-
-    Map<String, String> allParamMap = new HashMap<>();
-
-    if (systemParamMap != null) {
-      allParamMap.putAll(systemParamMap);
-    }
-
-    if (customParamMap != null) {
-      allParamMap.putAll(customParamMap);
-    }
-
-    JobProps props = new JobProps();
-
-    props.setJobParams(flowNode.getParameter());
-    props.setWorkDir(jobScriptPath);
-    props.setProxyUser(executionFlow.getProxyUser());
-    props.setDefinedParams(allParamMap);
-    props.setProjectId(executionFlow.getProjectId());
-    props.setExecJobId(executionFlow.getFlowId());
-    props.setNodeName(flowNode.getName());
-    props.setExecId(executionFlow.getId());
-    props.setEnvFile(BaseConfig.getSystemEnvPath());
-    props.setQueue(executionFlow.getQueue());
-    props.setExecJobStartTime(executionFlow.getStartTime()); // 设置为起始运行的时间
-    props.setExecJobTimeout(executionFlow.getTimeout());
-
-    props.setJobAppId(String.format("%s_%s", executionNode.getJobId(),
-        HttpUtil.getMd5(executionNode.getName()).substring(0, 8)));
-
-    JobLogger jobLogger = new JobLogger(executionNode.getJobId());
-
     boolean success = false;
 
     try {
+      // "项目id/flowId/执行id"
+      String jobScriptPath = BaseConfig
+          .getFlowExecDir(executionFlow.getProjectId(), executionFlow.getFlowId(),
+              executionFlow.getId());
+
+      logger
+          .info("exec id:{}, node:{}, script path:{}", executionFlow.getId(),
+              executionNode.getName(),
+              jobScriptPath);
+
+      // 作业参数配置
+      Map<String, String> systemParamMap = SystemParamManager
+          .buildSystemParam(executionFlow.getType(), executionFlow.getScheduleTime(),
+              executionNode.getExecId(),
+              executionNode.getJobId());
+
+      // 构建自定义参数, 比如定义了 ${abc} = ${sf.system.bizdate}, $[yyyyMMdd] 等情况
+      Map<String, String> customParamMap = executionFlow.getUserDefinedParamMap();
+
+      Map<String, String> allParamMap = new HashMap<>();
+
+      if (systemParamMap != null) {
+        allParamMap.putAll(systemParamMap);
+      }
+
+      if (customParamMap != null) {
+        allParamMap.putAll(customParamMap);
+      }
+
+      JobProps props = new JobProps();
+
+      props.setJobParams(flowNode.getParameter());
+      props.setWorkDir(jobScriptPath);
+      props.setProxyUser(executionFlow.getProxyUser());
+      props.setDefinedParams(allParamMap);
+      props.setProjectId(executionFlow.getProjectId());
+      props.setExecJobId(executionFlow.getFlowId());
+      props.setNodeName(flowNode.getName());
+      props.setExecId(executionFlow.getId());
+      props.setEnvFile(BaseConfig.getSystemEnvPath());
+      props.setQueue(executionFlow.getQueue());
+      props.setExecJobStartTime(executionFlow.getStartTime()); // 设置为起始运行的时间
+      props.setExecJobTimeout(executionFlow.getTimeout());
+
+      props.setJobAppId(String.format("%s_%s", executionNode.getJobId(),
+          HttpUtil.getMd5(executionNode.getName()).substring(0, 8)));
+
+      JobLogger jobLogger = new JobLogger(executionNode.getJobId());
+
       job = JobManager.newJob(flowNode.getType(), props, jobLogger);
 
       // job 的初始化
