@@ -68,18 +68,21 @@ public class StreamingCheckThread implements Runnable {
           switch (streamingResult.getType()) {
             case SPARK_STREAMING: {
               // 如果更本没有 appid
-              if (CollectionUtils.isEmpty(appIds)) {
-                continue;
-              } else if (System.currentTimeMillis() - streamingResult.getScheduleTime().getTime() >=
-                  MasterConfig.streamingTimeoutThreshold * 1000) { // 提交很久了, 没有任何执行和接受
-                // 设置状态和结束时间
-                streamingResult.setStatus(FlowStatus.FAILED);
-                streamingResult.setEndTime(now);
+              if (CollectionUtils.isEmpty(appIds)){
+                //如果已经很久没有appid了就失败。
+                if (System.currentTimeMillis() - streamingResult.getScheduleTime().getTime() >=
+                    MasterConfig.streamingTimeoutThreshold * 1000) { // 提交很久了, 没有任何执行和接受
+                  // 设置状态和结束时间
+                  streamingResult.setStatus(FlowStatus.FAILED);
+                  streamingResult.setEndTime(now);
 
-                streamingDao.updateResult(streamingResult);
+                  streamingDao.updateResult(streamingResult);
 
-                // 发送报警
-                EmailManager.sendMessageOfStreamingJob(streamingResult);
+                  // 发送报警
+                  EmailManager.sendMessageOfStreamingJob(streamingResult);
+                }else{
+                  continue;
+                }
               }
 
               // 可能有好多个子任务, 都完成算真的完成, 有一个失败, 算失败
