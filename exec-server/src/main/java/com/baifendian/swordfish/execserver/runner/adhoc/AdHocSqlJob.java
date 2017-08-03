@@ -33,6 +33,7 @@ import com.baifendian.swordfish.execserver.engine.hive.HiveUtil;
 import com.baifendian.swordfish.execserver.job.JobProps;
 import com.baifendian.swordfish.execserver.parameter.ParamHelper;
 import com.baifendian.swordfish.execserver.parameter.SystemParamManager;
+import com.baifendian.swordfish.execserver.utils.Constants;
 import java.util.List;
 import org.slf4j.Logger;
 
@@ -149,7 +150,7 @@ public class AdHocSqlJob {
       default: {
         HiveSqlExec hiveSqlExec = new HiveSqlExec(this::logProcess, props.getProxyUser(), logger);
 
-        return hiveSqlExec.execute(funcs, execSqls, true, resultCallback, param.getLimit())
+        return hiveSqlExec.execute(funcs, execSqls, true, resultCallback, param.getLimit(), Constants.ADHOC_TIMEOUT)
             ? FlowStatus.SUCCESS : FlowStatus.FAILED;
       }
     }

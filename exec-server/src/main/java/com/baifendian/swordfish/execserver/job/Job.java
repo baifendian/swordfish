@@ -142,6 +142,16 @@ public abstract class Job {
   }
 
   /**
+   * 得到剩余时间
+   */
+  public int getRemainTime() {
+    long usedTime = (System.currentTimeMillis() - props.getExecJobStartTime().getTime()) / 1000;
+    long remainTime = props.getExecJobTimeout() - usedTime;
+
+    return (int)remainTime;
+  }
+
+  /**
    * 获取 job 参数
    */
   public abstract BaseParam getParam();
