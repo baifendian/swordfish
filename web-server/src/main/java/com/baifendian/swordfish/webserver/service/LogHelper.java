@@ -38,7 +38,7 @@ public class LogHelper {
 
   private EsSearch search = EsSearch.getInstance();
 
-  public LogResult getLog(Integer from, Integer size, String jobId) {
+  public LogResult getLog(Integer from, Integer size, String query, String jobId) {
     // 日志 id 为空, 返回空的日志信息
     if (StringUtils.isEmpty(jobId)) {
       return LogResult.EMPTY_LOG_RESULT;
@@ -57,7 +57,7 @@ public class LogHelper {
     LogResult result = new LogResult();
 
     try {
-      SearchResponse response = search.search(from, size, jobId/*, (sort == null) ? true : sort*/);
+      SearchResponse response = search.search(from, size, query, jobId/*, (sort == null) ? true : sort*/);
 
       if (response != null) {
         if (response.status() == RestStatus.OK) {

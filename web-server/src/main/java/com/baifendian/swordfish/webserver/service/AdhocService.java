@@ -167,7 +167,7 @@ public class AdhocService {
   /**
    * 查询日志
    */
-  public AdHocLogDto queryLogs(User operator, int execId, int index, int from, int size) {
+  public AdHocLogDto queryLogs(User operator, int execId, int index, int from, int size, String query) {
 
     // 查看用户对项目是否具备相应权限
     Project project = adHocMapper.queryProjectByExecId(execId);
@@ -214,7 +214,7 @@ public class AdhocService {
     AdHocResult adHocResult = results.get(index);
 
     // 4. 获取日志信息
-    LogResult logResult = logHelper.getLog(from, size, jobId);
+    LogResult logResult = logHelper.getLog(from, size, query, jobId);
 
     // 构造结果返回
     AdHocLogDto adHocLogDto = new AdHocLogDto();

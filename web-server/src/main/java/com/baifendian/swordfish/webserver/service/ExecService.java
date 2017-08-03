@@ -341,7 +341,7 @@ public class ExecService {
   /**
    * 查询日志信息
    */
-  public LogResult getEexcWorkflowLog(User operator, String jobId, int from, int size) {
+  public LogResult getEexcWorkflowLog(User operator, String jobId, int from, int size, String query) {
     ExecutionNode executionNode = executionNodeMapper.selectExecNodeByJobId(jobId);
 
     if (executionNode == null) {
@@ -371,7 +371,7 @@ public class ExecService {
           operator.getName(), project.getName());
     }
 
-    return logHelper.getLog(from, size, jobId);
+    return logHelper.getLog(from, size, query, jobId);
   }
 
   /**

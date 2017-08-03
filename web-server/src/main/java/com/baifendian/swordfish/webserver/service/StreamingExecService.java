@@ -485,7 +485,7 @@ public class StreamingExecService {
    * 查询日志信息
    */
 
-  public LogResult queryLogs(User operator, int execId, int from, int size) {
+  public LogResult queryLogs(User operator, int execId, int from, int size, String query) {
     Project project = streamingResultMapper.queryProject(execId);
 
     // 注意, 这里实际上执行信息没有
@@ -509,6 +509,6 @@ public class StreamingExecService {
       throw new NotFoundException("Exec does not exist \"{0}\"", execId);
     }
 
-    return logHelper.getLog(from, size, streamingResult.getJobId());
+    return logHelper.getLog(from, size, query, streamingResult.getJobId());
   }
 }

@@ -15,6 +15,7 @@
  */
 package com.baifendian.swordfish.common.search;
 
+import org.apache.commons.lang.StringUtils;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.transport.TransportClient;
@@ -130,17 +131,24 @@ public class EsSearch {
    *
    * @param from
    * @param size
+   * @param query
    * @param jobId
    * @throws IOException
    */
-  public SearchResponse search(int from, int size, String jobId) throws IOException {
+  public SearchResponse search(int from, int size, String query, String jobId) throws IOException {
     if (from <= 0) {
       from = 0;
     }
 
-    QueryBuilder queryBuilder = QueryBuilders.termQuery("jobId", jobId.toLowerCase());
+    QueryBuilder termQuery = QueryBuilders.termQuery("jobId", jobId.toLowerCase());
 
-    SearchRequestBuilder builder = client.prepareSearch(endpoint).setQuery(queryBuilder);
+    SearchRequestBuilder builder = client.prepareSearch(endpoint).setQuery(termQuery);
+
+    if(StringUtils.isNotEmpty(query)) {
+      QueryBuilder keywordQuery = QueryBuilders.matchQuery("nest_msg", query);
+
+      builder = builder.setQuery(keywordQuery);
+    }
 
     SearchResponse response = builder
         .setTimeout(TimeValue.timeValueMillis(esMaxRetryTimeoutMillis))

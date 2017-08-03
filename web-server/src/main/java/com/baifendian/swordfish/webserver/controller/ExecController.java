@@ -180,9 +180,10 @@ public class ExecController {
   public LogResult queryLogs(@RequestAttribute(value = "session.user") User operator,
       @PathVariable(value = "jobId") String jobId,
       @RequestParam(value = "from", required = false, defaultValue = "0") int from,
-      @RequestParam(value = "size", required = false, defaultValue = "100") int size) {
-    logger.info("Operator user {}, query log, job id: {}, from: {}, size: {}",
-        operator.getName(), jobId, from, size);
+      @RequestParam(value = "size", required = false, defaultValue = "100") int size,
+      @RequestParam(value = "query", required = false) String query) {
+    logger.info("Operator user {}, query log, job id: {}, from: {}, size: {}, query: {}",
+        operator.getName(), jobId, from, size, query);
 
     // from 的限制
     if (from < 0) {
@@ -194,7 +195,7 @@ public class ExecController {
       throw new BadRequestException("Argument is not valid, size must be between (0, 1000]");
     }
 
-    return execService.getEexcWorkflowLog(operator, jobId, from, size);
+    return execService.getEexcWorkflowLog(operator, jobId, from, size, query);
   }
 
   /**
