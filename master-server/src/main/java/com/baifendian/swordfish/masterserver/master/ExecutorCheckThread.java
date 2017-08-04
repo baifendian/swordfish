@@ -57,20 +57,25 @@ public class ExecutorCheckThread implements Runnable {
     logger.debug("execution flow queue size:{}", executionFlowQueue.size());
 
     try {
+      // 展示当前的 worker 列表信息
+      executorServerManager.printServerInfo();
+
       // 得到超时的工作流列表
       List<ExecutorServerInfo> faultServers = executorServerManager
           .checkTimeoutServer(timeoutInterval);
-
-      // 展示当前的 worker 列表信息
-      executorServerManager.printServerInfo();
 
       if (CollectionUtils.isEmpty(faultServers)) {
         return;
       }
 
-      logger.error("get fault servers:{}", faultServers);
+      for (ExecutorServerInfo executorServerInfo : faultServers) {
+        logger.error("get fault servers:{}", executorServerInfo);
+      }
 
       for (ExecutorServerInfo executorServerInfo : faultServers) {
+        // 删除该结点
+        executorServerManager.removeServer(executorServerInfo);
+
         // 查询超时工作流上的任务(这里使用数据库查询到的数据保证准确性，避免内存数据出现不一致的情况)
         List<ExecutionFlow> executionFlows = flowDao
             .queryNoFinishFlow(executorServerInfo.getHost() + ":" + executorServerInfo.getPort());

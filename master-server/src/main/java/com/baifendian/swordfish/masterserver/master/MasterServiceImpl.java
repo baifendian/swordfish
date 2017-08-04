@@ -292,7 +292,8 @@ public class MasterServiceImpl implements Iface {
   @Override
   public RetResultInfo appendWorkFlow(int projectId, int flowId, ScheduleInfo scheduleInfo,
       ExecInfo execInfo) throws TException {
-    logger.info("append workflow projectId:{}, flowId:{}, scheduleMeta:{}, execInfo:{}", projectId, flowId,
+    logger.info("append workflow projectId:{}, flowId:{}, scheduleMeta:{}, execInfo:{}", projectId,
+        flowId,
         scheduleInfo, execInfo);
 
     try {
@@ -394,7 +395,7 @@ public class MasterServiceImpl implements Iface {
     try {
       jobExecManager.executorReport(host, port, heartBeatData);
     } catch (Exception e) {
-      logger.warn("executor report error", e);
+      logger.warn(String.format("executor report error, [%s:%d]", host, port), e);
       return ResultHelper.createErrorResult(e.getMessage());
     }
 

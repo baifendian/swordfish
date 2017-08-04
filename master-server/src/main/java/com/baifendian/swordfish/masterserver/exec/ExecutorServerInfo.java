@@ -51,4 +51,13 @@ public class ExecutorServerInfo {
   public void setHeartBeatData(HeartBeatData heartBeatData) {
     this.heartBeatData = heartBeatData;
   }
+
+  @Override
+  public String toString() {
+    return "ExecutorServerInfo{" +
+        "host='" + host + '\'' +
+        ", port=" + port +
+        ", heartBeatData=" + heartBeatData +
+        '}';
+  }
 }
