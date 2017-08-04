@@ -116,13 +116,7 @@ public class ExecutorServerManager {
                 entry.getKey(),
                 entry.getValue().getHeartBeatData().getReportDate(), nowTime, diff);
 
-        // 这里做了一个容错, 如果只有 1 个了, 保留看看
-        if (executorServers.size() > 1) {
-          faultServers.add(entry.getValue());
-        } else {
-          logger
-              .warn("executor server list only has one size, we can't remove the last one.");
-        }
+        faultServers.add(entry.getValue());
       }
     }
 
