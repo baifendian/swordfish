@@ -222,16 +222,17 @@ public class ExecThriftServer {
     Runnable heartBeatThread = () -> {
       if (running.get()) {
         HeartBeatData heartBeatData = new HeartBeatData();
+
         heartBeatData.setReportDate(System.currentTimeMillis());
         heartBeatData.setCpuUsed(OsUtil.cpuUsage());
         heartBeatData.setMemUsed(OsUtil.memoryUsage());
 
-        logger.debug("executor report heartbeat:{}", heartBeatData);
+        logger.info("executor report heartbeat:{}", heartBeatData);
 
         boolean result = masterClient.executorReport(host, port, heartBeatData);
 
         if (!result) {
-          logger.warn("heart beat time out");
+          logger.warn("heart beat time out!");
           running.compareAndSet(true, false);
 
           synchronized (this) {
