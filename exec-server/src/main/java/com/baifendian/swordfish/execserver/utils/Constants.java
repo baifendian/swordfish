@@ -31,6 +31,8 @@ public class Constants {
 
   public static final String EXECUTOR_STREAMING_THREADS = "executor.streaming.threads";
 
+  public static final int ADHOC_TIMEOUT = 3600 * 6;
+
   /**
    * 默认的最大重试次数为 0 次
    */

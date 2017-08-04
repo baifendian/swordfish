@@ -26,6 +26,7 @@ import com.baifendian.swordfish.execserver.utils.Constants;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.sql.SQLTimeoutException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -83,9 +84,16 @@ public class HiveSqlExec {
    * @param isContinue 遇到错误, 是否继续执行下一条语句
    * @param resultCallback 回调, 执行的结果处理
    * @param queryLimit 结果限制
+   * @param remainTime 剩余运行时间
    */
   public boolean execute(List<String> createFuncs, List<String> sqls,
-      boolean isContinue, ResultCallback resultCallback, Integer queryLimit) {
+      boolean isContinue, ResultCallback resultCallback, Integer queryLimit, int remainTime) {
+
+    // 没有剩余运行的时间
+    if(remainTime <= 0) {
+      return false;
+    }
+
     // 查询结果限制
     queryLimit = (queryLimit != null) ? queryLimit : defualtQueryLimit;
 
@@ -104,7 +112,9 @@ public class HiveSqlExec {
     try {
       try {
         hiveConnection = hiveService2Client.borrowClient(hiveService2ConnectionInfo);
+
         sta = hiveConnection.createStatement();
+        sta.setQueryTimeout(remainTime);
 
         // 日志线程
         logThread = new Thread(new JdbcLogRunnable(sta));
@@ -178,6 +188,12 @@ public class HiveSqlExec {
             Date endTime = new Date();
             resultCallback.handleResult(execResult, startTime, endTime);
           }
+        } catch (SQLTimeoutException e) {
+          // sql 超时异常
+          logger.error("executeQuery timeout exception", e);
+
+          handlerResults(index, sqls, FlowStatus.FAILED, resultCallback);
+          return false;
         } catch (DaoSemanticException | HiveSQLException e) {
           // 语义异常
           logger.error("executeQuery exception", e);

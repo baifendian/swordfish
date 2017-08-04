@@ -111,9 +111,10 @@ public class AdhocController {
       @PathVariable int execId,
       @RequestParam(value = "index") int index,
       @RequestParam(value = "from", required = false, defaultValue = "0") int from,
-      @RequestParam(value = "size", required = false, defaultValue = "100") int size) {
-    logger.info("Operator user {}, get adhoc logs, exec id: {}, index: {}, from: {}, size: {}",
-        operator.getName(), execId, index, from, size);
+      @RequestParam(value = "size", required = false, defaultValue = "100") int size,
+      @RequestParam(value = "query", required = false) String query) {
+    logger.info("Operator user {}, get adhoc logs, exec id: {}, index: {}, from: {}, size: {}, query: {}",
+        operator.getName(), execId, index, from, size, query);
 
     // index & from 的限制
     if (index < 0 || from < 0) {
@@ -126,7 +127,7 @@ public class AdhocController {
       throw new BadRequestException("Argument is not valid, size must be between (0, 1000]");
     }
 
-    return adhocService.queryLogs(operator, execId, index, from, size);
+    return adhocService.queryLogs(operator, execId, index, from, size, query);
   }
 
   /**

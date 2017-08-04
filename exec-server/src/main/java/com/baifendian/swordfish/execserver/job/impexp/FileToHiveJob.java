@@ -19,7 +19,6 @@ import com.baifendian.swordfish.execserver.job.JobProps;
 import com.baifendian.swordfish.execserver.job.impexp.Args.HqlColumn;
 import com.baifendian.swordfish.execserver.job.impexp.Args.ImpExpProps;
 import com.baifendian.swordfish.execserver.parameter.ParamHelper;
-
 import java.io.File;
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -27,7 +26,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
@@ -75,11 +73,11 @@ public class FileToHiveJob extends AbstractYarnJob {
   private List<HqlColumn> destHiveColumns;
 
   /**
-   * @param props  作业配置信息, 各类作业根据此配置信息生成具体的作业
+   * @param props 作业配置信息, 各类作业根据此配置信息生成具体的作业
    * @param logger 日志
    */
   protected FileToHiveJob(JobProps props, boolean isLongJob, Logger logger,
-                          ImpExpProps impExpProps) {
+      ImpExpProps impExpProps) {
     super(props, isLongJob, logger);
     this.impExpProps = impExpProps;
     this.fileReader = (FileReader) impExpProps.getImpExpParam().getReader();
@@ -109,7 +107,8 @@ public class FileToHiveJob extends AbstractYarnJob {
       // 变量替换
       for (FileColumn fileColumn : fileReader.getTargetColumn()) {
         fileColumn
-                .setName(ParamHelper.resolvePlaceholders(fileColumn.getName(), props.getDefinedParams()));
+            .setName(
+                ParamHelper.resolvePlaceholders(fileColumn.getName(), props.getDefinedParams()));
       }
 
       // 进行参数合理性检测
@@ -153,7 +152,7 @@ public class FileToHiveJob extends AbstractYarnJob {
         }
 
         hdfsPath = BaseConfig
-                .getHdfsImpExpDir(props.getProjectId(), props.getExecId(), props.getNodeName());
+            .getHdfsImpExpDir(props.getProjectId(), props.getExecId(), props.getNodeName());
 
         logger.info("Start upload file to temp hdfs dir: {} ...", hdfsPath);
 
@@ -171,7 +170,8 @@ public class FileToHiveJob extends AbstractYarnJob {
         Path fileHdfsPathObject = new Path(fileHdfsPath);
         Path dirBase = new Path(BaseConfig.getHdfsImpExpDir(props.getProjectId()));
         while (!fileHdfsPathObject.getName().equalsIgnoreCase(dirBase.getParent().getName())) {
-          HdfsClient.getInstance().setPermissionThis(fileHdfsPathObject, FsPermission.createImmutable((short) 0777));
+          HdfsClient.getInstance()
+              .setPermissionThis(fileHdfsPathObject, FsPermission.createImmutable((short) 0777));
           fileHdfsPathObject = fileHdfsPathObject.getParent();
         }
 
@@ -187,21 +187,21 @@ public class FileToHiveJob extends AbstractYarnJob {
 
       // 生成临时表 ddl
       String ddl = HiveUtil.getTmpTableDDL(DEFAULT_DB, srcTable, getFileHqlColumn(), hdfsPath,
-              fileReader.getFieldDelimiter(), fileReader.getFileCode());
+          fileReader.getFieldDelimiter(), fileReader.getFileCode());
       logger.info("Create temp hive table ddl: {}", ddl);
 
       // 2.插入数据
       logger.info("Second, insert into target table...");
       String sql = getInsertSql(DEFAULT_DB, srcTable, hiveWriter.getDatabase(),
-              hiveWriter.getTable(), destHiveColumns,
-              getFileHiveColumnRel(fileReader.getTargetColumn(), hiveWriter.getColumn()),
-              hiveWriter.getWriteMode());
+          hiveWriter.getTable(), destHiveColumns,
+          getFileHiveColumnRel(fileReader.getTargetColumn(), hiveWriter.getColumn()),
+          hiveWriter.getWriteMode());
 
       logger.info("Start exec sql to hive...");
       execSqls = Arrays.asList(ddl, "SET hive.exec.dynamic.partition.mode=nonstrict", sql);
       HiveSqlExec hiveSqlExec = new HiveSqlExec(this::logProcess, props.getProxyUser(), logger);
 
-      exitCode = (hiveSqlExec.execute(null, execSqls, false, null, null)) ? 0 : -1;
+      exitCode = (hiveSqlExec.execute(null, execSqls, false, null, null, getRemainTime())) ? 0 : -1;
 
       logger.info("Finish exec sql!");
     } catch (Exception e) {
@@ -225,7 +225,7 @@ public class FileToHiveJob extends AbstractYarnJob {
    * 获取导入导出字段关系
    */
   public Map<String, FileColumn> getFileHiveColumnRel(List<FileColumn> fileColumnList,
-                                                      List<HiveColumn> hiveColumnList) {
+      List<HiveColumn> hiveColumnList) {
     Map<String, FileColumn> res = new HashMap<>();
     for (int i = 0, len = fileColumnList.size(); i < len; i++) {
       res.put(hiveColumnList.get(i).getName(), fileColumnList.get(i));
@@ -257,8 +257,8 @@ public class FileToHiveJob extends AbstractYarnJob {
    * 生成插入sql
    */
   public String getInsertSql(String srcDbName, String srcTable, String destDbName, String destTable,
-                             List<HqlColumn> destHiveColumns, Map<String, FileColumn> columnRet, WriteMode writeMode)
-          throws Exception {
+      List<HqlColumn> destHiveColumns, Map<String, FileColumn> columnRet, WriteMode writeMode)
+      throws Exception {
     logger.info("Start create insert sql...");
     String insertSql = "INSERT {0} TABLE {1}.{2} {3} SELECT {4} FROM {5}.{6}";
     String partFieldSql = "";
@@ -286,18 +286,21 @@ public class FileToHiveJob extends AbstractYarnJob {
       String srcColVal = "null";
 
       if (srcCol != null) {
-        if (srcCol.getType() == FileColumnType.DATE || srcCol.getType() == FileColumnType.TIMESTAMP) {
+        if (srcCol.getType() == FileColumnType.DATE
+            || srcCol.getType() == FileColumnType.TIMESTAMP) {
           //srcColVal = MessageFormat.format("CAST(TO_DATE(from_unixtime(UNIX_TIMESTAMP({0},\"{1}\"))) AS DATE)", srcCol.getName(), srcCol.getDateFormat());
 
           //date timestamp分别处理
           if (destHqlColumn.getType().equalsIgnoreCase("DATE")) {
             srcColVal = MessageFormat
-                    .format("CAST(to_date(from_unixtime(unix_timestamp({0},\"{1}\"))) AS DATE)", srcCol.getName(),
-                            srcCol.getDateFormat());
+                .format("CAST(to_date(from_unixtime(unix_timestamp({0},\"{1}\"))) AS DATE)",
+                    srcCol.getName(),
+                    srcCol.getDateFormat());
           } else {
             srcColVal = MessageFormat
-                    .format("CAST(from_unixtime(unix_timestamp({0},\"{1}\")) AS TIMESTAMP)", srcCol.getName(),
-                            srcCol.getDateFormat());
+                .format("CAST(from_unixtime(unix_timestamp({0},\"{1}\")) AS TIMESTAMP)",
+                    srcCol.getName(),
+                    srcCol.getDateFormat());
           }
 
 
@@ -307,12 +310,12 @@ public class FileToHiveJob extends AbstractYarnJob {
       }
 
       fieldList
-              .add(MessageFormat.format("{0} as {1}", srcColVal, ImpExpUtil.addBackQuota(destCol)));
+          .add(MessageFormat.format("{0} as {1}", srcColVal, ImpExpUtil.addBackQuota(destCol)));
     }
 
     insertSql = MessageFormat
-            .format(insertSql, writeMode.gethiveSql(), destDbName, destTable, partFieldSql,
-                    String.join(",", fieldList), srcDbName, srcTable);
+        .format(insertSql, writeMode.gethiveSql(), destDbName, destTable, partFieldSql,
+            String.join(",", fieldList), srcDbName, srcTable);
     logger.info("Finish create insert sql: {}", insertSql);
     return insertSql;
   }

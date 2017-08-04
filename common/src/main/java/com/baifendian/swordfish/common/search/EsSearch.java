@@ -15,6 +15,14 @@
  */
 package com.baifendian.swordfish.common.search;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.Properties;
+import org.apache.commons.lang.StringUtils;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.transport.TransportClient;
@@ -30,15 +38,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.ResourceUtils;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.util.Properties;
-
 public class EsSearch {
+
   private static Logger LOGGER = LoggerFactory.getLogger(EsSearch.class.getName());
 
   private static String esAddress;
@@ -63,7 +64,8 @@ public class EsSearch {
       properties.load(is);
 
       esAddress = properties.getProperty("es.address");
-      esMaxRetryTimeoutMillis = Integer.parseInt(properties.getProperty("es.max.retry.timeout.millis"));
+      esMaxRetryTimeoutMillis = Integer
+          .parseInt(properties.getProperty("es.max.retry.timeout.millis"));
 
       esClusterName = properties.getProperty("es.cluster.name").trim();
       endpoint = properties.getProperty("swordfish.endpoint");
@@ -89,7 +91,8 @@ public class EsSearch {
       Integer port = Integer.parseInt(hostPort[1]);
 
       try {
-        client.addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName(host), port));
+        client
+            .addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName(host), port));
 
         LOGGER.info("Add (host,port) => ({},{})", host, port);
       } catch (UnknownHostException e) {
@@ -127,18 +130,21 @@ public class EsSearch {
 
   /**
    * 搜索 job 的信息
-   *
-   * @param from
-   * @param size
-   * @param jobId
-   * @throws IOException
    */
-  public SearchResponse search(int from, int size, String jobId) throws IOException {
+  public SearchResponse search(int from, int size, String query, String jobId) throws IOException {
     if (from <= 0) {
       from = 0;
     }
 
-    QueryBuilder queryBuilder = QueryBuilders.termQuery("jobId", jobId.toLowerCase());
+    QueryBuilder queryBuilder;
+
+    if (StringUtils.isNotEmpty(query)) {
+      queryBuilder = QueryBuilders.boolQuery()
+          .filter(QueryBuilders.termQuery("jobId", jobId.toLowerCase()))
+          .must(QueryBuilders.matchQuery("nest_msg", query));
+    } else {
+      queryBuilder = QueryBuilders.termQuery("jobId", jobId.toLowerCase());
+    }
 
     SearchRequestBuilder builder = client.prepareSearch(endpoint).setQuery(queryBuilder);
 
