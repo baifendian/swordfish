@@ -7,6 +7,7 @@ import com.baifendian.swordfish.dao.StreamingDao;
 import com.baifendian.swordfish.dao.enums.FlowStatus;
 import com.baifendian.swordfish.dao.model.StreamingResult;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.lang.StringUtils;
@@ -142,6 +143,7 @@ public abstract class AbstractStormProcessJob extends Job {
     try {
       // 构造进程
       processJob.runCommand(createCommand());
+
       logger.info("Start get topologyId...");
 
       // 尝试 3 次获取 id，如果不能获取到 id 就算任务失败
@@ -190,7 +192,7 @@ public abstract class AbstractStormProcessJob extends Job {
         logger.warn("Not found execId: {}", props.getExecId());
       }
 
-      logger.info("Finish update streaming_result dao!");
+      logger.info("Finish update streaming result dao!");
       exitCode = 0;
     } catch (Exception e) {
       logger.error("Storm process exception", e);
@@ -208,7 +210,11 @@ public abstract class AbstractStormProcessJob extends Job {
       StreamingResult streamingResult = streamingDao.queryStreamingExec(props.getExecId());
 
       if (streamingResult != null) {
+        Date now = new Date();
+
         streamingResult.setStatus(FlowStatus.FAILED);
+        streamingResult.setEndTime(now);
+
         streamingDao.updateResult(streamingResult);
       } else {
         logger.warn("Not found execId: {}", props.getExecId());

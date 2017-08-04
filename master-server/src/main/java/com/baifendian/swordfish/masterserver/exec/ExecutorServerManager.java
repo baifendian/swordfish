@@ -60,6 +60,7 @@ public class ExecutorServerManager {
       throw new MasterException("executor is not register");
     }
 
+    // 这里会进行重新注册
     return executorServers.put(key, executorServerInfo);
   }
 
@@ -89,17 +90,6 @@ public class ExecutorServerManager {
       }
 
       ++index;
-
-//      if (executorServerInfo.getHeartBeatData() == null) {
-//        continue;
-//      }
-//
-//      if (result == null) {
-//        result = executorServerInfo;
-//      } else if (result.getHeartBeatData().getExecIdsSize() > executorServerInfo.getHeartBeatData()
-//          .getExecIdsSize()) {
-//        result = executorServerInfo;
-//      }
     }
 
     return result;
@@ -120,8 +110,11 @@ public class ExecutorServerManager {
       long diff = nowTime - entry.getValue().getHeartBeatData().getReportDate();
 
       if (diff > timeoutInterval) {
-        logger.warn("executor server time out {}", entry.getKey());
-        executorServers.remove(entry.getKey());
+        logger
+            .warn(
+                "executor server time out {}, last report time: {}, now time: {}, more than diff time: {}",
+                entry.getKey(),
+                entry.getValue().getHeartBeatData().getReportDate(), nowTime, diff);
 
         faultServers.add(entry.getValue());
       }
