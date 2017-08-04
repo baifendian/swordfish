@@ -84,7 +84,7 @@ public class HiveSqlExec {
    * @param isContinue 遇到错误, 是否继续执行下一条语句
    * @param resultCallback 回调, 执行的结果处理
    * @param queryLimit 结果限制
-   * @param remainTime 剩余运行时间
+   * @param remainTime 剩余运行时间, 暂没实现
    */
   public boolean execute(List<String> createFuncs, List<String> sqls,
       boolean isContinue, ResultCallback resultCallback, Integer queryLimit, int remainTime) {
@@ -114,7 +114,7 @@ public class HiveSqlExec {
         hiveConnection = hiveService2Client.borrowClient(hiveService2ConnectionInfo);
 
         sta = hiveConnection.createStatement();
-        sta.setQueryTimeout(remainTime);
+//        sta.setQueryTimeout(remainTime);
 
         // 日志线程
         logThread = new Thread(new JdbcLogRunnable(sta));
