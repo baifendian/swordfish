@@ -370,10 +370,10 @@ public class JobExecManager {
   public void registerExecutor(String host, int port, long registerTime) {
     logger.info("register executor server[{}:{}]", host, port);
 
-    // 时钟差异检查
+    // 时钟差异检查, 不能超过 5 秒
     long nowTime = System.currentTimeMillis();
-    if (registerTime > nowTime + 10000) {
-      throw new MasterException("executor master clock time diff then 10 seconds");
+    if (Math.abs(registerTime - nowTime) >= 5000) {
+      throw new MasterException("executor master clock time diff then 5 seconds");
     }
 
     HeartBeatData heartBeatData = new HeartBeatData();

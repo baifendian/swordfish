@@ -291,6 +291,9 @@ public class ExecutionFlowMapperProvider {
     List<String> workflowList = (List<String>) parameter.get("workflowList");
     List<String> workflowList2 = new ArrayList<>();
 
+    Date startDate = (Date) parameter.get("startDate");
+    Date endDate = (Date) parameter.get("endDate");
+
     if (CollectionUtils.isNotEmpty(workflowList)) {
       for (String workflow : workflowList) {
         workflowList2.add("\"" + workflow + "\"");
@@ -321,8 +324,10 @@ public class ExecutionFlowMapperProvider {
           WHERE("p_f.name in (" + String.join(",", workflowList2) + ")");
         }
 
-        WHERE("start_time >= #{startDate}");
-        WHERE("start_time <= #{endDate}");
+        if (startDate != null && endDate != null) {
+          WHERE("start_time >= #{startDate}");
+          WHERE("start_time <= #{endDate}");
+        }
 
         if (CollectionUtils.isNotEmpty(flowStatuses)) {
           WHERE("`status` in (" + where + ") ");
