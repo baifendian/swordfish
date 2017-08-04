@@ -28,8 +28,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import org.apache.commons.lang.StringUtils;
-import org.apache.hadoop.hive.ql.parse.ASTNode;
-import org.apache.hadoop.hive.ql.parse.ParseDriver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -131,26 +129,26 @@ public class HiveUtil extends BaseDao {
     if (org.apache.commons.lang3.StringUtils.isEmpty(sql)) {
       return false;
     }
+//
+//    try {
+//      ParseDriver pd = new ParseDriver();
+//
+//      ASTNode ast = pd.parse(sql);
+//
+//      if ("TOK_ALTERTABLE".equals(ast.getChild(0).getText()) || "TOK_CREATETABLE"
+//          .equals(ast.getChild(0).getText())) {
+//        return true;
+//      }
 
-    try {
-      ParseDriver pd = new ParseDriver();
+    String tmp = sql.toUpperCase();
 
-      ASTNode ast = pd.parse(sql);
-
-      if ("TOK_ALTERTABLE".equals(ast.getChild(0).getText()) || "TOK_CREATETABLE"
-          .equals(ast.getChild(0).getText())) {
-        return true;
-      }
-
-      String tmp = sql.toUpperCase();
-
-      if (tmp.startsWith("CREATE") || tmp.startsWith("DROP") || tmp.startsWith("ALTER")) {
-        return true;
-      }
-    } catch (Exception e) {
-      logger.error(String.format("parse ddl %s exception", sql), e);
+    if (tmp.startsWith("CREATE") || tmp.startsWith("DROP") || tmp.startsWith("ALTER")) {
       return true;
     }
+//    } catch (Exception e) {
+//      logger.error(String.format("parse ddl %s exception", sql), e);
+//      return true;
+//    }
 
     return false;
   }
