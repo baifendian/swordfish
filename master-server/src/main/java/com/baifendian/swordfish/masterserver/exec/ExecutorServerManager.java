@@ -56,9 +56,9 @@ public class ExecutorServerManager {
       throws MasterException {
     String key = getKey(executorServerInfo);
 
-//    if (!executorServers.containsKey(key)) {
-//      throw new MasterException("executor is not register");
-//    }
+    if (!executorServers.containsKey(key)) {
+      throw new MasterException("executor is not register");
+    }
 
     // 这里会进行重新注册
     return executorServers.put(key, executorServerInfo);
