@@ -38,14 +38,14 @@ public class MasterClient {
   private static Logger logger = LoggerFactory.getLogger(MasterClient.class.getName());
 
   /**
-   * 默认的 client 与 server 重连次数
-   */
-  private static final int DEFAULT_RETRY_TIMES = 3;
-
-  /**
    * 再次发送心跳间隔
    */
-  private static final int HEARTBEAT_INTERVAL = 3;
+  private static final int HEARTBEAT_INTERVAL = 2;
+
+  /**
+   * 超时时间, 客户端连接到 master 的超时时间
+   */
+  private static final int CONNECTION_TIMEOUT = 4000;
 
   /**
    * master 地址
@@ -56,11 +56,6 @@ public class MasterClient {
    * master 端口
    */
   private int port;
-
-  /**
-   * 超时时间, 客户端连接到 master 的超时时间
-   */
-  private int timeout = 10000;
 
   /**
    * exec 向 master 发送心跳的重试次数
@@ -83,18 +78,13 @@ public class MasterClient {
     this.retries = retries;
   }
 
-  public MasterClient(String host, int port) {
-    this(host, port, DEFAULT_RETRY_TIMES);
-  }
-
-
   /**
    * 连接 master
    *
    * @return 成功返回 true, 否则返回 false
    */
   private boolean connect() {
-    tTransport = new TSocket(host, port, timeout);
+    tTransport = new TSocket(host, port, CONNECTION_TIMEOUT);
 
     try {
       TProtocol protocol = new TBinaryProtocol(tTransport);
@@ -359,9 +349,6 @@ public class MasterClient {
 
   /**
    * 取消流任务执行, 用于 web-server
-   *
-   * @param execId
-   * @return
    */
   public boolean activateStreamingJob(int execId) {
     if (!connect()) {
@@ -388,9 +375,6 @@ public class MasterClient {
 
   /**
    * 取消流任务执行, 用于 web-server
-   *
-   * @param execId
-   * @return
    */
   public boolean deactivateStreamingJob(int execId) {
     if (!connect()) {

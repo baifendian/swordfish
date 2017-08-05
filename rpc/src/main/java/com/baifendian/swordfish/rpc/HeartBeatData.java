@@ -37,9 +37,10 @@ public class HeartBeatData implements org.apache.thrift.TBase<HeartBeatData, Hea
   private static final org.apache.thrift.protocol.TStruct STRUCT_DESC = new org.apache.thrift.protocol.TStruct("HeartBeatData");
 
   private static final org.apache.thrift.protocol.TField REPORT_DATE_FIELD_DESC = new org.apache.thrift.protocol.TField("reportDate", org.apache.thrift.protocol.TType.I64, (short)1);
-  private static final org.apache.thrift.protocol.TField CPU_USED_FIELD_DESC = new org.apache.thrift.protocol.TField("cpuUsed", org.apache.thrift.protocol.TType.DOUBLE, (short)2);
-  private static final org.apache.thrift.protocol.TField MEM_USED_FIELD_DESC = new org.apache.thrift.protocol.TField("memUsed", org.apache.thrift.protocol.TType.DOUBLE, (short)3);
-  private static final org.apache.thrift.protocol.TField EXEC_IDS_FIELD_DESC = new org.apache.thrift.protocol.TField("execIds", org.apache.thrift.protocol.TType.LIST, (short)4);
+  private static final org.apache.thrift.protocol.TField RECEIVE_DATE_FIELD_DESC = new org.apache.thrift.protocol.TField("receiveDate", org.apache.thrift.protocol.TType.I64, (short)2);
+  private static final org.apache.thrift.protocol.TField CPU_USED_FIELD_DESC = new org.apache.thrift.protocol.TField("cpuUsed", org.apache.thrift.protocol.TType.DOUBLE, (short)3);
+  private static final org.apache.thrift.protocol.TField MEM_USED_FIELD_DESC = new org.apache.thrift.protocol.TField("memUsed", org.apache.thrift.protocol.TType.DOUBLE, (short)4);
+  private static final org.apache.thrift.protocol.TField EXEC_IDS_FIELD_DESC = new org.apache.thrift.protocol.TField("execIds", org.apache.thrift.protocol.TType.LIST, (short)5);
 
   private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
   static {
@@ -51,6 +52,10 @@ public class HeartBeatData implements org.apache.thrift.TBase<HeartBeatData, Hea
    * 汇报时间
    */
   public long reportDate; // required
+  /**
+   * 汇报时间
+   */
+  public long receiveDate; // required
   /**
    * cpu 使用率
    */
@@ -71,17 +76,21 @@ public class HeartBeatData implements org.apache.thrift.TBase<HeartBeatData, Hea
      */
     REPORT_DATE((short)1, "reportDate"),
     /**
+     * 汇报时间
+     */
+    RECEIVE_DATE((short)2, "receiveDate"),
+    /**
      * cpu 使用率
      */
-    CPU_USED((short)2, "cpuUsed"),
+    CPU_USED((short)3, "cpuUsed"),
     /**
      * 内存使用率
      */
-    MEM_USED((short)3, "memUsed"),
+    MEM_USED((short)4, "memUsed"),
     /**
      * workflow execId list
      */
-    EXEC_IDS((short)4, "execIds");
+    EXEC_IDS((short)5, "execIds");
 
     private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
@@ -98,11 +107,13 @@ public class HeartBeatData implements org.apache.thrift.TBase<HeartBeatData, Hea
       switch(fieldId) {
         case 1: // REPORT_DATE
           return REPORT_DATE;
-        case 2: // CPU_USED
+        case 2: // RECEIVE_DATE
+          return RECEIVE_DATE;
+        case 3: // CPU_USED
           return CPU_USED;
-        case 3: // MEM_USED
+        case 4: // MEM_USED
           return MEM_USED;
-        case 4: // EXEC_IDS
+        case 5: // EXEC_IDS
           return EXEC_IDS;
         default:
           return null;
@@ -145,13 +156,16 @@ public class HeartBeatData implements org.apache.thrift.TBase<HeartBeatData, Hea
 
   // isset id assignments
   private static final int __REPORTDATE_ISSET_ID = 0;
-  private static final int __CPUUSED_ISSET_ID = 1;
-  private static final int __MEMUSED_ISSET_ID = 2;
+  private static final int __RECEIVEDATE_ISSET_ID = 1;
+  private static final int __CPUUSED_ISSET_ID = 2;
+  private static final int __MEMUSED_ISSET_ID = 3;
   private byte __isset_bitfield = 0;
   public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
   static {
     Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
     tmpMap.put(_Fields.REPORT_DATE, new org.apache.thrift.meta_data.FieldMetaData("reportDate", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+        new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.I64)));
+    tmpMap.put(_Fields.RECEIVE_DATE, new org.apache.thrift.meta_data.FieldMetaData("receiveDate", org.apache.thrift.TFieldRequirementType.DEFAULT, 
         new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.I64)));
     tmpMap.put(_Fields.CPU_USED, new org.apache.thrift.meta_data.FieldMetaData("cpuUsed", org.apache.thrift.TFieldRequirementType.DEFAULT, 
         new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.DOUBLE)));
@@ -169,6 +183,7 @@ public class HeartBeatData implements org.apache.thrift.TBase<HeartBeatData, Hea
 
   public HeartBeatData(
     long reportDate,
+    long receiveDate,
     double cpuUsed,
     double memUsed,
     List<Integer> execIds)
@@ -176,6 +191,8 @@ public class HeartBeatData implements org.apache.thrift.TBase<HeartBeatData, Hea
     this();
     this.reportDate = reportDate;
     setReportDateIsSet(true);
+    this.receiveDate = receiveDate;
+    setReceiveDateIsSet(true);
     this.cpuUsed = cpuUsed;
     setCpuUsedIsSet(true);
     this.memUsed = memUsed;
@@ -189,6 +206,7 @@ public class HeartBeatData implements org.apache.thrift.TBase<HeartBeatData, Hea
   public HeartBeatData(HeartBeatData other) {
     __isset_bitfield = other.__isset_bitfield;
     this.reportDate = other.reportDate;
+    this.receiveDate = other.receiveDate;
     this.cpuUsed = other.cpuUsed;
     this.memUsed = other.memUsed;
     if (other.isSetExecIds()) {
@@ -208,6 +226,8 @@ public class HeartBeatData implements org.apache.thrift.TBase<HeartBeatData, Hea
   public void clear() {
     setReportDateIsSet(false);
     this.reportDate = 0;
+    setReceiveDateIsSet(false);
+    this.receiveDate = 0;
     setCpuUsedIsSet(false);
     this.cpuUsed = 0.0;
     setMemUsedIsSet(false);
@@ -242,6 +262,35 @@ public class HeartBeatData implements org.apache.thrift.TBase<HeartBeatData, Hea
 
   public void setReportDateIsSet(boolean value) {
     __isset_bitfield = EncodingUtils.setBit(__isset_bitfield, __REPORTDATE_ISSET_ID, value);
+  }
+
+  /**
+   * 汇报时间
+   */
+  public long getReceiveDate() {
+    return this.receiveDate;
+  }
+
+  /**
+   * 汇报时间
+   */
+  public HeartBeatData setReceiveDate(long receiveDate) {
+    this.receiveDate = receiveDate;
+    setReceiveDateIsSet(true);
+    return this;
+  }
+
+  public void unsetReceiveDate() {
+    __isset_bitfield = EncodingUtils.clearBit(__isset_bitfield, __RECEIVEDATE_ISSET_ID);
+  }
+
+  /** Returns true if field receiveDate is set (has been assigned a value) and false otherwise */
+  public boolean isSetReceiveDate() {
+    return EncodingUtils.testBit(__isset_bitfield, __RECEIVEDATE_ISSET_ID);
+  }
+
+  public void setReceiveDateIsSet(boolean value) {
+    __isset_bitfield = EncodingUtils.setBit(__isset_bitfield, __RECEIVEDATE_ISSET_ID, value);
   }
 
   /**
@@ -357,6 +406,14 @@ public class HeartBeatData implements org.apache.thrift.TBase<HeartBeatData, Hea
       }
       break;
 
+    case RECEIVE_DATE:
+      if (value == null) {
+        unsetReceiveDate();
+      } else {
+        setReceiveDate((Long)value);
+      }
+      break;
+
     case CPU_USED:
       if (value == null) {
         unsetCpuUsed();
@@ -389,6 +446,9 @@ public class HeartBeatData implements org.apache.thrift.TBase<HeartBeatData, Hea
     case REPORT_DATE:
       return Long.valueOf(getReportDate());
 
+    case RECEIVE_DATE:
+      return Long.valueOf(getReceiveDate());
+
     case CPU_USED:
       return Double.valueOf(getCpuUsed());
 
@@ -411,6 +471,8 @@ public class HeartBeatData implements org.apache.thrift.TBase<HeartBeatData, Hea
     switch (field) {
     case REPORT_DATE:
       return isSetReportDate();
+    case RECEIVE_DATE:
+      return isSetReceiveDate();
     case CPU_USED:
       return isSetCpuUsed();
     case MEM_USED:
@@ -440,6 +502,15 @@ public class HeartBeatData implements org.apache.thrift.TBase<HeartBeatData, Hea
       if (!(this_present_reportDate && that_present_reportDate))
         return false;
       if (this.reportDate != that.reportDate)
+        return false;
+    }
+
+    boolean this_present_receiveDate = true;
+    boolean that_present_receiveDate = true;
+    if (this_present_receiveDate || that_present_receiveDate) {
+      if (!(this_present_receiveDate && that_present_receiveDate))
+        return false;
+      if (this.receiveDate != that.receiveDate)
         return false;
     }
 
@@ -496,6 +567,16 @@ public class HeartBeatData implements org.apache.thrift.TBase<HeartBeatData, Hea
         return lastComparison;
       }
     }
+    lastComparison = Boolean.valueOf(isSetReceiveDate()).compareTo(typedOther.isSetReceiveDate());
+    if (lastComparison != 0) {
+      return lastComparison;
+    }
+    if (isSetReceiveDate()) {
+      lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.receiveDate, typedOther.receiveDate);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
     lastComparison = Boolean.valueOf(isSetCpuUsed()).compareTo(typedOther.isSetCpuUsed());
     if (lastComparison != 0) {
       return lastComparison;
@@ -548,6 +629,10 @@ public class HeartBeatData implements org.apache.thrift.TBase<HeartBeatData, Hea
 
     sb.append("reportDate:");
     sb.append(this.reportDate);
+    first = false;
+    if (!first) sb.append(", ");
+    sb.append("receiveDate:");
+    sb.append(this.receiveDate);
     first = false;
     if (!first) sb.append(", ");
     sb.append("cpuUsed:");
@@ -618,7 +703,15 @@ public class HeartBeatData implements org.apache.thrift.TBase<HeartBeatData, Hea
               org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
             }
             break;
-          case 2: // CPU_USED
+          case 2: // RECEIVE_DATE
+            if (schemeField.type == org.apache.thrift.protocol.TType.I64) {
+              struct.receiveDate = iprot.readI64();
+              struct.setReceiveDateIsSet(true);
+            } else { 
+              org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+            }
+            break;
+          case 3: // CPU_USED
             if (schemeField.type == org.apache.thrift.protocol.TType.DOUBLE) {
               struct.cpuUsed = iprot.readDouble();
               struct.setCpuUsedIsSet(true);
@@ -626,7 +719,7 @@ public class HeartBeatData implements org.apache.thrift.TBase<HeartBeatData, Hea
               org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
             }
             break;
-          case 3: // MEM_USED
+          case 4: // MEM_USED
             if (schemeField.type == org.apache.thrift.protocol.TType.DOUBLE) {
               struct.memUsed = iprot.readDouble();
               struct.setMemUsedIsSet(true);
@@ -634,7 +727,7 @@ public class HeartBeatData implements org.apache.thrift.TBase<HeartBeatData, Hea
               org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
             }
             break;
-          case 4: // EXEC_IDS
+          case 5: // EXEC_IDS
             if (schemeField.type == org.apache.thrift.protocol.TType.LIST) {
               {
                 org.apache.thrift.protocol.TList _list16 = iprot.readListBegin();
@@ -669,6 +762,9 @@ public class HeartBeatData implements org.apache.thrift.TBase<HeartBeatData, Hea
       oprot.writeStructBegin(STRUCT_DESC);
       oprot.writeFieldBegin(REPORT_DATE_FIELD_DESC);
       oprot.writeI64(struct.reportDate);
+      oprot.writeFieldEnd();
+      oprot.writeFieldBegin(RECEIVE_DATE_FIELD_DESC);
+      oprot.writeI64(struct.receiveDate);
       oprot.writeFieldEnd();
       oprot.writeFieldBegin(CPU_USED_FIELD_DESC);
       oprot.writeDouble(struct.cpuUsed);
@@ -709,18 +805,24 @@ public class HeartBeatData implements org.apache.thrift.TBase<HeartBeatData, Hea
       if (struct.isSetReportDate()) {
         optionals.set(0);
       }
-      if (struct.isSetCpuUsed()) {
+      if (struct.isSetReceiveDate()) {
         optionals.set(1);
       }
-      if (struct.isSetMemUsed()) {
+      if (struct.isSetCpuUsed()) {
         optionals.set(2);
       }
-      if (struct.isSetExecIds()) {
+      if (struct.isSetMemUsed()) {
         optionals.set(3);
       }
-      oprot.writeBitSet(optionals, 4);
+      if (struct.isSetExecIds()) {
+        optionals.set(4);
+      }
+      oprot.writeBitSet(optionals, 5);
       if (struct.isSetReportDate()) {
         oprot.writeI64(struct.reportDate);
+      }
+      if (struct.isSetReceiveDate()) {
+        oprot.writeI64(struct.receiveDate);
       }
       if (struct.isSetCpuUsed()) {
         oprot.writeDouble(struct.cpuUsed);
@@ -742,20 +844,24 @@ public class HeartBeatData implements org.apache.thrift.TBase<HeartBeatData, Hea
     @Override
     public void read(org.apache.thrift.protocol.TProtocol prot, HeartBeatData struct) throws org.apache.thrift.TException {
       TTupleProtocol iprot = (TTupleProtocol) prot;
-      BitSet incoming = iprot.readBitSet(4);
+      BitSet incoming = iprot.readBitSet(5);
       if (incoming.get(0)) {
         struct.reportDate = iprot.readI64();
         struct.setReportDateIsSet(true);
       }
       if (incoming.get(1)) {
+        struct.receiveDate = iprot.readI64();
+        struct.setReceiveDateIsSet(true);
+      }
+      if (incoming.get(2)) {
         struct.cpuUsed = iprot.readDouble();
         struct.setCpuUsedIsSet(true);
       }
-      if (incoming.get(2)) {
+      if (incoming.get(3)) {
         struct.memUsed = iprot.readDouble();
         struct.setMemUsedIsSet(true);
       }
-      if (incoming.get(3)) {
+      if (incoming.get(4)) {
         {
           org.apache.thrift.protocol.TList _list21 = new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.I32, iprot.readI32());
           struct.execIds = new ArrayList<Integer>(_list21.size);

@@ -91,19 +91,24 @@ struct HeartBeatData {
   1: i64 reportDate,
 
   /**
+   * 汇报时间
+   */
+  2: i64 receiveDate,
+
+  /**
    * cpu 使用率
    */
-  2: double cpuUsed,
+  3: double cpuUsed,
 
   /**
    * 内存使用率
    */
-  3: double memUsed,
+  4: double memUsed,
 
   /**
    * workflow execId list
    */
-  4: list<i32> execIds
+  5: list<i32> execIds
 }
 
 /**
