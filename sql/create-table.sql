@@ -235,7 +235,7 @@ CREATE TABLE `ad_hoc_results` (
   `start_time` datetime DEFAULT NULL COMMENT 'start time of this exec',
   `end_time` datetime DEFAULT NULL COMMENT 'end time of this exec',
   PRIMARY KEY (`exec_id`,`index`),
-  FOREIGN KEY (`exec_id`) REFERENCES `ad_hocs`(`id`) ON DELETE CASCADE,
+  FOREIGN KEY (`exec_id`) REFERENCES `ad_hocs`(`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- `master_server` table

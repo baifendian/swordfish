@@ -40,7 +40,7 @@ public abstract class AbstractStormProcessJob extends Job {
   /**
    * storm kill wait time
    */
-  protected static long waitTime = 60000;
+  protected static long waitTime = 30;
 
   protected long checkInterval = 5000;
 
