@@ -56,8 +56,10 @@ public class ExecutorServerManager {
       throws MasterException {
     String key = getKey(executorServerInfo);
 
+    // 如果以前没有, 记录一条信息
     if (!executorServers.containsKey(key)) {
-      throw new MasterException("executor is not register");
+      //      throw new MasterException("executor is not register");
+      logger.warn("executor is not register: {}", executorServerInfo);
     }
 
     // 这里会进行重新注册
@@ -99,22 +101,23 @@ public class ExecutorServerManager {
    * 检测超时的 executor 并返回
    */
   public synchronized List<ExecutorServerInfo> checkTimeoutServer(long timeoutInterval) {
-    List<ExecutorServerInfo> faultServers = new ArrayList<>();
-
-    logger.debug("{} ", executorServers);
+    List<ExecutorServerInfo> faultServers = null;
 
     for (Map.Entry<String, ExecutorServerInfo> entry : executorServers.entrySet()) {
       logger.debug("{} {}", entry.getKey(), entry.getValue().getHeartBeatData());
 
       long nowTime = System.currentTimeMillis();
-      long diff = nowTime - entry.getValue().getHeartBeatData().getReportDate();
+      long diff = nowTime - entry.getValue().getHeartBeatData().getReceiveDate();
 
       if (diff > timeoutInterval) {
         logger
             .warn(
-                "executor server time out {}, last report time: {}, now time: {}, more than diff time: {}",
-                entry.getKey(),
-                entry.getValue().getHeartBeatData().getReportDate(), nowTime, diff);
+                "executor server time out: {}, now time: {}, diff time: {}, timeout interval: {}",
+                entry.getValue(), nowTime, diff, timeoutInterval);
+
+        if (faultServers == null) {
+          faultServers = new ArrayList<>();
+        }
 
         faultServers.add(entry.getValue());
       }
@@ -160,7 +163,7 @@ public class ExecutorServerManager {
     for (Map.Entry<String, ExecutorServerInfo> entry : executorServers.entrySet()) {
       ExecutorServerInfo executorServerInfo = entry.getValue();
 
-      logger.info("executor information, host: {}, port: {}, heart beat: {}",
+      logger.debug("executor information, host: {}, port: {}, heart beat: {}",
           executorServerInfo.getHost(), executorServerInfo.getPort(),
           executorServerInfo.getHeartBeatData());
     }

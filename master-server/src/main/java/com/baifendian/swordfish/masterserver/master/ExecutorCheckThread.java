@@ -70,9 +70,7 @@ public class ExecutorCheckThread implements Runnable {
 
       for (ExecutorServerInfo executorServerInfo : faultServers) {
         logger.error("get fault servers:{}", executorServerInfo);
-      }
 
-      for (ExecutorServerInfo executorServerInfo : faultServers) {
         // 删除该结点
         executorServerManager.removeServer(executorServerInfo);
 
@@ -88,7 +86,7 @@ public class ExecutorCheckThread implements Runnable {
           for (ExecutionFlow execFlow : executionFlows) {
             Integer execId = execFlow.getId();
 
-            logger.info("reschedule workflow execId:{} ", execId);
+            logger.info("reschedule workflow exec id:{} ", execId);
 
             try {
               ExecutionFlow executionFlow = flowDao.queryExecutionFlow(execId);
@@ -104,7 +102,7 @@ public class ExecutorCheckThread implements Runnable {
                 }
               } else {
                 logger.error(
-                    "executor server fault reschedule workflow execId:{}, but execId:{} not exists",
+                    "executor server fault reschedule workflow execId:{}, but exec id:{} not exists",
                     execId, execId);
               }
             } catch (Exception e) {

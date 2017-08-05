@@ -370,14 +370,10 @@ public class JobExecManager {
   public void registerExecutor(String host, int port, long registerTime) {
     logger.info("register executor server[{}:{}]", host, port);
 
-    // 时钟差异检查, 不能超过 5 秒
-    long nowTime = System.currentTimeMillis();
-    if (Math.abs(registerTime - nowTime) >= 5000) {
-      throw new MasterException("executor master clock time diff then 5 seconds");
-    }
-
+    // 设置接收到的时间, 以及心跳发送过来的时间
     HeartBeatData heartBeatData = new HeartBeatData();
     heartBeatData.setReportDate(registerTime);
+    heartBeatData.setReceiveDate(System.currentTimeMillis());
 
     ExecutorServerInfo executorServerInfo = new ExecutorServerInfo();
 
@@ -392,6 +388,9 @@ public class JobExecManager {
    * 报告 executor server 信息
    */
   public void executorReport(String host, int port, HeartBeatData heartBeatData) {
+    // 设置接收到的时间
+    heartBeatData.setReceiveDate(System.currentTimeMillis());
+
     logger.info("executor server[{}:{}] report info {}", host, port, heartBeatData);
 
     ExecutorServerInfo executorServerInfo = new ExecutorServerInfo();
