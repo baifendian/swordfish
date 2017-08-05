@@ -48,6 +48,11 @@ public class MasterClient {
   private static final int CONNECTION_TIMEOUT = 4000;
 
   /**
+   * 默认连接次数
+   */
+  private static final int RETRY_TIMES = 3;
+
+  /**
    * master 地址
    */
   private String host;
@@ -71,6 +76,12 @@ public class MasterClient {
    * master client
    */
   private MasterService.Client client;
+
+  public MasterClient(String host, int port) {
+    this.host = host;
+    this.port = port;
+    this.retries = RETRY_TIMES;
+  }
 
   public MasterClient(String host, int port, int retries) {
     this.host = host;
