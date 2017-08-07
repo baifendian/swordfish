@@ -16,6 +16,7 @@
 package com.baifendian.swordfish.webserver.controller;
 
 import com.baifendian.swordfish.dao.model.User;
+import com.baifendian.swordfish.dao.utils.json.JsonUtil;
 import com.baifendian.swordfish.webserver.dto.ExecutorIdDto;
 import com.baifendian.swordfish.webserver.dto.LogResult;
 import com.baifendian.swordfish.webserver.dto.StreamingResultDto;
@@ -109,7 +110,7 @@ public class StreamingExecController {
       @RequestParam(value = "endDate", required = false) Long endDate,
       @RequestParam(value = "projectName") String projectName,
       @RequestParam(value = "name", required = false) String name,
-      @RequestParam(value = "status", required = false) Integer status,
+      @RequestParam(value = "status", required = false) String status,
       @RequestParam(value = "from", required = false, defaultValue = "0") int from,
       @RequestParam(value = "size", required = false, defaultValue = "100") int size) {
     logger.info(
@@ -121,6 +122,11 @@ public class StreamingExecController {
       throw new BadRequestException("Argument is not valid, from must be equal or more than zero");
     }
 
+    List<Integer> statusList = null;
+    if (status != null){
+      statusList = JsonUtil.parseObjectList(status,Integer.class);
+    }
+
     // size 的限制
     if (size <= 0 || size > 1000) {
       throw new BadRequestException("Argument is not valid, size must be between (0, 1000]");
@@ -128,7 +134,7 @@ public class StreamingExecController {
 
     return streamingExecService.queryStreamingExecs(operator, projectName, name,
         (startDate == null) ? null : new Date(startDate),
-        (endDate == null) ? null : new Date(endDate), status, from, size);
+        (endDate == null) ? null : new Date(endDate), statusList, from, size);
   }
 
   /**

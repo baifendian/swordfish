@@ -258,7 +258,7 @@ public interface StreamingResultMapper {
    * @return
    */
   @SelectProvider(type = StreamingResultMapperProvider.class, method = "findCountByMultiCondition")
-  int findCountByMultiCondition(@Param("projectId") int projectId, @Param("name") String name, @Param("startDate") Date startDate, @Param("endDate") Date endDate, @Param("status") Integer status);
+  int findCountByMultiCondition(@Param("projectId") int projectId, @Param("name") String name, @Param("startDate") Date startDate, @Param("endDate") Date endDate, @Param("status") List<Integer> status);
 
   /**
    * 根据条件查询结果
@@ -301,5 +301,5 @@ public interface StreamingResultMapper {
       @Result(property = "jobId", column = "job_id", javaType = String.class, jdbcType = JdbcType.VARCHAR)
   })
   @SelectProvider(type = StreamingResultMapperProvider.class, method = "findByMultiCondition")
-  List<StreamingResult> findByMultiCondition(@Param("projectId") int projectId, @Param("name") String name, @Param("startDate") Date startDate, @Param("endDate") Date endDate, @Param("status") Integer status, @Param("start") int start, @Param("limit") int limit);
+  List<StreamingResult> findByMultiCondition(@Param("projectId") int projectId, @Param("name") String name, @Param("startDate") Date startDate, @Param("endDate") Date endDate, @Param("status") List<Integer> status, @Param("start") int start, @Param("limit") int limit);
 }

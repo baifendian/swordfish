@@ -366,7 +366,7 @@ public class StreamingExecService {
                                                  String name,
                                                  Date startDate,
                                                  Date endDate,
-                                                 Integer status,
+                                                 List<Integer> status,
                                                  int from,
                                                  int size) {
 
