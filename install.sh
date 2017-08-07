@@ -40,13 +40,16 @@ hadoopYarnAddress="172.24.8.95"
 envFile="/opt/udp/.sf_env.sh"
 
 # datax home path
-dataxHome="/opt/udp/DataX/target/datax/datax"
+dataxHome="/opt/udp/datax"
 
 # storm path
 stormRestAddr="bgs-8p95-zhanglifeng.bfdabc.com:8744"
 
 # develop mode
 developMode=true
+
+# home of swordfish
+SWORDFISH_HOME="/opt/udp/swordfish-all-${version}/"
 
 # 使用示例
 function usage() {
@@ -138,19 +141,11 @@ function process_check()
 
 # get script path
 CUR_DIR=`dirname $0`
-SWORDFISH_HOME=`cd "$CUR_DIR"; pwd`
-
-# stop all service
-cd $SWORDFISH_HOME/target/swordfish-all-${version}/
-
-# compile project
-cd $SWORDFISH_HOME
-mvn -U clean package assembly:assembly -Dmaven.test.skip=true || { echo "maven failed."; exit 1; }
 
 if [ "$r" = "true" ]; then
     echo "exec file replace"
 
-    cd $SWORDFISH_HOME/target/swordfish-all-${version}/
+    cd $SWORDFISH_HOME
 
     file_replace || { echo "conf file replace failed."; exit 1; }
 else
@@ -158,7 +153,7 @@ else
 fi
 
 # start all service
-cd $SWORDFISH_HOME/target/swordfish-all-${version}/
+cd $SWORDFISH_HOME
 
 if [ "$m" = "all" ] || [ "$m" = "web-server" ]; then
   sh bin/swordfish-daemon.sh stop web-server

@@ -92,7 +92,7 @@ public class StreamingCheckThread implements Runnable {
                   status = tmpStatus;
                 }
               } catch (Exception e) {
-                logger.error(String.format("get application exception: {}", appId), e);
+                logger.error(String.format("get application exception: %s", appId), e);
               }
             }
           } else if (streamingResult.getType() == STORM) {
@@ -110,17 +110,15 @@ public class StreamingCheckThread implements Runnable {
 
               if (tmpStatus == null) {
                 status = FlowStatus.FAILED;
-                String msg = MessageFormat.format("Not found topology: {0}", topologyId);
-                logger.error(msg);
+                logger.error("Not found topology: {}", topologyId);
               } else {
                 status = tmpStatus;
               }
             } catch (Exception e) {
-              logger.error(String.format("get topology d exception: {}", topologyId), e);
+              logger.error(String.format("get topology id exception: %s", topologyId), e);
             }
           } else {
-            String msg = MessageFormat.format("No support type: {}", streamingResult.getType());
-            logger.error(msg);
+            logger.error("No support type: {}", streamingResult.getType());
           }
 
           // 更新状态
