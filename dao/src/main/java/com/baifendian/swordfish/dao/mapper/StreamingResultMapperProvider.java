@@ -200,7 +200,7 @@ public class StreamingResultMapperProvider {
    * @return
    */
   public String findByMultiCondition(Map<String, Object> parameter) {
-    Integer status = (Integer) parameter.get("status");
+    List<Integer> status = (List<Integer>) parameter.get("status");
     String name = (String) parameter.get("name");
 
     Date startDate = (Date) parameter.get("startDate");
@@ -222,8 +222,8 @@ public class StreamingResultMapperProvider {
       sql = sql.WHERE("s.name like '" + name + "%'");
     }
 
-    if (status != null) {
-      sql = sql.WHERE("`status` = #{status}");
+    if (CollectionUtils.isNotEmpty(status)) {
+      sql = sql.WHERE("`status` in ("+StringUtils.join(status,",")+")");
     }
 
     String subClause = sql.toString();
@@ -246,7 +246,7 @@ public class StreamingResultMapperProvider {
    * @return
    */
   public String findCountByMultiCondition(Map<String, Object> parameter) {
-    Integer status = (Integer) parameter.get("status");
+    List<Integer> status = (List<Integer>) parameter.get("status");
     String name = (String) parameter.get("name");
 
     Date startDate = (Date) parameter.get("startDate");
@@ -275,9 +275,10 @@ public class StreamingResultMapperProvider {
           WHERE("s.name like '" + name + "%'");
         }
 
-        if (status != null) {
-          WHERE("`status`=#{status}");
+        if (CollectionUtils.isNotEmpty(status)) {
+          WHERE("`status` in ("+StringUtils.join(status,",")+")");
         }
+
       }
     }.toString();
   }
