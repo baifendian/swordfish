@@ -357,7 +357,7 @@ public class ExecutionFlowMapperProvider {
   public String selectStateByProject(Map<String, Object> parameter) {
     String sql = new SQL() {
       {
-        SELECT("str_to_date(DATE_FORMAT(e_f.schedule_time,'%Y%m%d'),'%Y%m%d') as day,\n" +
+        SELECT("str_to_date(DATE_FORMAT(e_f.start_time,'%Y%m%d'),'%Y%m%d') as day,\n" +
                 "SUM(case e_f.status when 0 then 1 else 0 end) as INIT,\n" +
                 "SUM(case e_f.status when 1 then 1 else 0 end) as WAITING_DEP,\n" +
                 "SUM(case e_f.status when 2 then 1 else 0 end) as WAITING_RES,\n" +
@@ -387,7 +387,7 @@ public class ExecutionFlowMapperProvider {
   public String selectStateHourByProject(Map<String, Object> parameter) {
     return new SQL() {
       {
-        SELECT("CONVERT(DATE_FORMAT(e_f.schedule_time,'%H'),SIGNED) as hour,\n" +
+        SELECT("CONVERT(DATE_FORMAT(e_f.start_time,'%H'),SIGNED) as hour,\n" +
                 "SUM(case e_f.status when 0 then 1 else 0 end) as INIT,\n" +
                 "SUM(case e_f.status when 1 then 1 else 0 end) as WAITING_DEP,\n" +
                 "SUM(case e_f.status when 2 then 1 else 0 end) as WAITING_RES,\n" +
