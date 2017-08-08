@@ -205,6 +205,10 @@ public class StreamingExecService {
       return;
     }
 
+    if (StringUtils.isEmpty(streamingResult.getAppLinks())){
+      throw new PreFailedException("streaming Job app links is null!");
+    }
+
     // kill 流任务
     MasterServer masterServer = masterServerMapper.query();
 
@@ -267,6 +271,10 @@ public class StreamingExecService {
       throw new PreFailedException("streaming Job not inactive!");
     }
 
+    if (StringUtils.isEmpty(streamingResult.getAppLinks())){
+      throw new PreFailedException("streaming Job app links is null!");
+    }
+
     // activate 流任务
     MasterServer masterServer = masterServerMapper.query();
 
@@ -327,6 +335,10 @@ public class StreamingExecService {
     // 如果不在运行中
     if (streamingResult.getStatus() != FlowStatus.RUNNING) {
       throw new PreFailedException("streaming Job not running!");
+    }
+
+    if (StringUtils.isEmpty(streamingResult.getAppLinks())){
+      throw new PreFailedException("streaming Job app links is null!");
     }
 
     // activate 流任务
