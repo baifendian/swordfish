@@ -199,7 +199,7 @@ public class ExecutionFlowMapperProvider {
 
     sb.append("SELECT id, flow_id, worker, type, status, schedule_time FROM execution_flows WHERE flow_id = #{flowId} AND type IN " + inExpr + " AND ");
     sb.append("schedule_time = (SELECT MIN(schedule_time) FROM execution_flows WHERE flow_id = #{flowId} AND type IN" + inExpr
-            + " AND schedule_time >= #{startDate} AND schedule_time < #{endDate})");
+            + " AND start_time >= #{startDate} AND start_time < #{endDate})");
 
     return sb.toString();
   }
@@ -365,12 +365,13 @@ public class ExecutionFlowMapperProvider {
                 "SUM(case e_f.status when 4 then 1 else 0 end) as SUCCESS,\n" +
                 "SUM(case e_f.status when 5 then 1 else 0 end) as `KILL`,\n" +
                 "SUM(case e_f.status when 6 then 1 else 0 end) as `FAILED`,\n" +
-                "SUM(case e_f.status when 7 then 1 else 0 end) as `DEP_FAILED`");
+                "SUM(case e_f.status when 7 then 1 else 0 end) as `DEP_FAILED`"+
+                "SUM(case e_f.status when 8 then 1 else 0 end) as `INACTIVE`");
 
         FROM(TABLE_NAME + " e_f");
 
         JOIN("project_flows p_f on e_f.flow_id = p_f.id");
-        WHERE("e_f.schedule_time >= #{startDate} AND e_f.schedule_time <= #{endDate}");
+        WHERE("e_f.start_time >= #{startDate} AND e_f.start_time <= #{endDate}");
         WHERE("p_f.project_id = #{projectId}");
 
         GROUP_BY("day");
@@ -394,13 +395,14 @@ public class ExecutionFlowMapperProvider {
                 "SUM(case e_f.status when 4 then 1 else 0 end) as SUCCESS,\n" +
                 "SUM(case e_f.status when 5 then 1 else 0 end) as `KILL`,\n" +
                 "SUM(case e_f.status when 6 then 1 else 0 end) as `FAILED`,\n" +
-                "SUM(case e_f.status when 7 then 1 else 0 end) as `DEP_FAILED`");
+                "SUM(case e_f.status when 7 then 1 else 0 end) as `DEP_FAILED`"+
+                "SUM(case e_f.status when 8 then 1 else 0 end) as `INACTIVE`");
 
         FROM(TABLE_NAME + " e_f");
 
         JOIN("project_flows p_f on e_f.flow_id = p_f.id");
 
-        WHERE("str_to_date(DATE_FORMAT(e_f.schedule_time,'%Y%m%d'),'%Y%m%d') = #{day}");
+        WHERE("str_to_date(DATE_FORMAT(e_f.start_time,'%Y%m%d'),'%Y%m%d') = #{day}");
         WHERE("p_f.project_id = #{projectId}");
 
         GROUP_BY("hour");
@@ -425,7 +427,7 @@ public class ExecutionFlowMapperProvider {
         JOIN("project_flows p_f on e_f.flow_id = p_f.id");
         JOIN("user u on p_f.owner = u.id");
 
-        WHERE("str_to_date(DATE_FORMAT(e_f.schedule_time,'%Y%m%d'),'%Y%m%d') = #{date}");
+        WHERE("str_to_date(DATE_FORMAT(e_f.start_time,'%Y%m%d'),'%Y%m%d') = #{date}");
         WHERE("p_f.project_id = #{projectId}");
 
         ORDER_BY("duration DESC");
@@ -461,7 +463,7 @@ public class ExecutionFlowMapperProvider {
         JOIN("user u on p_f.owner = u.id");
         JOIN("project p on p_f.project_id = p.id");
 
-        WHERE("str_to_date(DATE_FORMAT(e_f.schedule_time,'%Y%m%d'),'%Y%m%d') = #{date}");
+        WHERE("str_to_date(DATE_FORMAT(e_f.start_time,'%Y%m%d'),'%Y%m%d') = #{date}");
         WHERE("e_f.status in (" + FlowStatus.FAILED.ordinal() + "," + FlowStatus.DEP_FAILED.ordinal() + ")");
         WHERE("p.id = #{projectId}");
 
