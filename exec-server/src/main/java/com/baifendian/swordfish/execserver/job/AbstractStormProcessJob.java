@@ -31,10 +31,13 @@ public abstract class AbstractStormProcessJob extends Job {
   private StreamingDao streamingDao;
 
   /**
-   * storm 任务Id
+   * storm 任务 Id
    */
   protected String topologyId;
 
+  /**
+   * storm 任务的日志 id
+   */
   protected List<String> topologyLogs;
 
   /**
@@ -42,8 +45,14 @@ public abstract class AbstractStormProcessJob extends Job {
    */
   protected static long waitTime = 30;
 
-  protected long checkInterval = 5000;
+  /**
+   * 循环获取 topology id 的频率
+   */
+  protected long checkInterval = 2000;
 
+  /**
+   * 提交等等事件
+   */
   protected static long submitWait = 60 * 10 * 1000;
 
 
@@ -91,22 +100,6 @@ public abstract class AbstractStormProcessJob extends Job {
 
   @Override
   public boolean isCompleted() {
-    /*
-    if (StringUtils.isNotEmpty(topologyId)) {
-      try {
-        TopologyInfoDto topologyInfo = StormRestUtil.getTopologyInfo(topologyId);
-        if (topologyInfo == null || topologyInfo.getStatus() == null) {
-          complete = false;
-        } else {
-          logger.info("current status is: {}", topologyInfo.getStatus());
-          complete = true;
-        }
-      } catch (IOException e) {
-        e.printStackTrace();
-      }
-    }
-    */
-
     long now = System.currentTimeMillis();
 
     // 如果能获取到 topologName 我们就认为提交完成了
@@ -142,35 +135,32 @@ public abstract class AbstractStormProcessJob extends Job {
   public void process() throws Exception {
     try {
       // 构造进程
-      processJob.runCommand(createCommand());
+      int processExitCode = processJob.runCommand(createCommand());
 
       logger.info("Start get topologyId...");
 
-      // 尝试 3 次获取 id，如果不能获取到 id 就算任务失败
+      // 尝试多次获取 id，如果不能获取到 id 就算任务失败
       int index = 0;
 
       while (true) {
         ++index;
 
-        try {
-          topologyId = StormRestUtil.getTopologyId(topologyName);
-          logger.info("Get topologyId: {}", topologyId);
-        } catch (Exception e) {
-          logger.error("Get topologyId error", e);
-        }
-
-        if (index > 3) {
-          throw new Exception("Not found topologyId!");
-        }
+        topologyId = StormRestUtil.getTopologyId(topologyName);
 
         if (StringUtils.isEmpty(topologyId)) {
           Thread.sleep(checkInterval);
+          logger.error("Get topology id empty");
         } else {
           break;
         }
+
+        // 如果退出码不对, 检测 3 次, 否则检测 6 次
+        if ((processExitCode != 0 && index > 3) || (index > 6)) {
+          throw new Exception("Not found topologyId, task maybe submit failed!");
+        }
       }
 
-      logger.info("Finish get topologyId!");
+      logger.info("Get topologyId: {}", topologyId);
 
       // 获取日志
       try {
@@ -205,7 +195,7 @@ public abstract class AbstractStormProcessJob extends Job {
     super.after();
 
     if (exitCode != 0) {
-      logger.info("Job failed update streaming result dao...");
+      logger.info("Job exec failed, update status...");
 
       StreamingResult streamingResult = streamingDao.queryStreamingExec(props.getExecId());
 
