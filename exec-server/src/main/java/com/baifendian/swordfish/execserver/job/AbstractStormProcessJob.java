@@ -144,15 +144,19 @@ public abstract class AbstractStormProcessJob extends Job {
 
       while (true) {
         ++index;
-
-        topologyId = StormRestUtil.getTopologyId(topologyName);
+        try {
+          topologyId = StormRestUtil.getTopologyId(topologyName);
+        } catch (Exception e) {
+          logger.error("Get topology id error", e);
+        }
 
         if (StringUtils.isEmpty(topologyId)) {
-          Thread.sleep(checkInterval);
           logger.error("Get topology id empty");
         } else {
           break;
         }
+
+        Thread.sleep(checkInterval);
 
         // 如果退出码不对, 检测 3 次, 否则检测 6 次
         if ((processExitCode != 0 && index > 3) || (index > 6)) {
