@@ -365,7 +365,7 @@ public class ExecutionFlowMapperProvider {
                 "SUM(case e_f.status when 4 then 1 else 0 end) as SUCCESS,\n" +
                 "SUM(case e_f.status when 5 then 1 else 0 end) as `KILL`,\n" +
                 "SUM(case e_f.status when 6 then 1 else 0 end) as `FAILED`,\n" +
-                "SUM(case e_f.status when 7 then 1 else 0 end) as `DEP_FAILED`"+
+                "SUM(case e_f.status when 7 then 1 else 0 end) as `DEP_FAILED`,\n"+
                 "SUM(case e_f.status when 8 then 1 else 0 end) as `INACTIVE`");
 
         FROM(TABLE_NAME + " e_f");
@@ -395,7 +395,7 @@ public class ExecutionFlowMapperProvider {
                 "SUM(case e_f.status when 4 then 1 else 0 end) as SUCCESS,\n" +
                 "SUM(case e_f.status when 5 then 1 else 0 end) as `KILL`,\n" +
                 "SUM(case e_f.status when 6 then 1 else 0 end) as `FAILED`,\n" +
-                "SUM(case e_f.status when 7 then 1 else 0 end) as `DEP_FAILED`"+
+                "SUM(case e_f.status when 7 then 1 else 0 end) as `DEP_FAILED`,\n"+
                 "SUM(case e_f.status when 8 then 1 else 0 end) as `INACTIVE`");
 
         FROM(TABLE_NAME + " e_f");
