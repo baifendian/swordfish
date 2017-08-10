@@ -100,6 +100,8 @@ public class HiveService2Client {
     poolConfig.maxWait = maxWait;
     poolConfig.timeBetweenEvictionRunsMillis = timeBetweenEvictionRunsMillis;
     poolConfig.testWhileIdle = testWhileIdle;
+    poolConfig.testOnBorrow = true;
+    poolConfig.testOnReturn = true;
 
     HiveService2PoolFactory clientFactory = new HiveService2PoolFactory();
 

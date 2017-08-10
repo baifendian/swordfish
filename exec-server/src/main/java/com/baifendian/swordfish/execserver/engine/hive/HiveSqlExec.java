@@ -245,11 +245,11 @@ public class HiveSqlExec {
       try {
         // 返回连接
         if (hiveConnection != null) {
+          // 关闭
+          hiveConnection.close();
+
           // 返回连接
           hiveService2Client.returnClient(hiveService2ConnectionInfo, hiveConnection);
-          // 让它无效, 让其无效
-          hiveService2Client.invalidateObject(hiveService2ConnectionInfo, hiveConnection);
-//          hiveConnection.close();
         }
       } catch (Exception e) {
         logger.error("Catch an exception", e);
