@@ -15,6 +15,8 @@
  */
 package com.baifendian.swordfish.common.utils.http;
 
+import java.io.IOException;
+import java.net.InetAddress;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -25,6 +27,20 @@ import org.slf4j.LoggerFactory;
 public class HttpUtil {
 
   private static final Logger logger = LoggerFactory.getLogger(HttpUtil.class);
+
+  private static String HOST_ADDRESS = "UNKNOWN HOST";
+
+  static {
+    try {
+      InetAddress IP = InetAddress.getLocalHost();
+      HOST_ADDRESS = IP.getHostAddress();
+    } catch (IOException e) {
+    }
+  }
+
+  public static String getHostAddress() {
+    return HOST_ADDRESS;
+  }
 
   /**
    * 得到 http 请求中的 ip 地址
