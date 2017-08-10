@@ -69,6 +69,16 @@ public class ExecutionState {
    */
   private int depFailed;
 
+  private int inActive;
+
+  public int getInActive() {
+    return inActive;
+  }
+
+  public void setInActive(int inActive) {
+    this.inActive = inActive;
+  }
+
   public Date getDay() {
     return day;
   }

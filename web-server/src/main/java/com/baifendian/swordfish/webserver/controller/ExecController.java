@@ -15,6 +15,7 @@
  */
 package com.baifendian.swordfish.webserver.controller;
 
+import com.baifendian.swordfish.common.consts.Constants;
 import com.baifendian.swordfish.dao.enums.ExecType;
 import com.baifendian.swordfish.dao.enums.FailurePolicyType;
 import com.baifendian.swordfish.dao.enums.NodeDepType;
@@ -69,7 +70,7 @@ public class ExecController {
       @RequestParam(value = "nodeDep", required = false) NodeDepType nodeDep,
       @RequestParam(value = "notifyType", required = false) NotifyType notifyType,
       @RequestParam(value = "notifyMails", required = false) String notifyMails,
-      @RequestParam(value = "timeout", required = false, defaultValue = "43200") int timeout) {
+      @RequestParam(value = "timeout", required = false) Integer timeout) {
     logger.info(
         "Operator user {}, exec workflow, project name: {}, workflow name: {}, schedule: {}, "
             + "exec type: {}, failure policy: {}, node name: {}, node dep: {}, notify type: {}, "
@@ -77,9 +78,15 @@ public class ExecController {
         operator.getName(), projectName, workflowName, schedule, execType, failurePolicy, nodeName,
         nodeDep, notifyType, notifyMails, timeout);
 
+    if (timeout == null) {
+      timeout = Constants.TASK_MAX_TIMEOUT;
+    }
+
     // timeout 的限制
-    if (timeout <= 0 || timeout > 43200) {
-      throw new BadRequestException("Argument is not valid, timeout must be between (0, 43200]");
+    if (timeout <= 0 || timeout > Constants.TASK_MAX_TIMEOUT) {
+      throw new BadRequestException(String
+          .format("Argument is not valid, timeout must be between (0, %d]",
+              Constants.TASK_MAX_TIMEOUT));
     }
 
     return execService
@@ -102,7 +109,7 @@ public class ExecController {
       @RequestParam(value = "failurePolicy", required = false) FailurePolicyType failurePolicy,
       @RequestParam(value = "notifyType", required = false) NotifyType notifyType,
       @RequestParam(value = "notifyMails", required = false) String notifyMails,
-      @RequestParam(value = "timeout", required = false, defaultValue = "43200") int timeout,
+      @RequestParam(value = "timeout", required = false) Integer timeout,
       @RequestParam(value = "extras", required = false) String extras) {
     logger.info(
         "Operator user {}, exec workflow, project name: {}, workflow name: {}, proxy user: {}, queue: {},"
@@ -110,9 +117,15 @@ public class ExecController {
         operator.getName(), projectName, workflowName, proxyUser, queue, data, file.getName(),
         failurePolicy, notifyType, notifyMails, timeout, extras);
 
+    if (timeout == null) {
+      timeout = Constants.TASK_MAX_TIMEOUT;
+    }
+
     // timeout 的限制
-    if (timeout <= 0 || timeout > 43200) {
-      throw new BadRequestException("Argument is not valid, timeout must be between (0, 43200]");
+    if (timeout <= 0 || timeout > Constants.TASK_MAX_TIMEOUT) {
+      throw new BadRequestException(String
+          .format("Argument is not valid, timeout must be between (0, %d]",
+              Constants.TASK_MAX_TIMEOUT));
     }
 
     return execService

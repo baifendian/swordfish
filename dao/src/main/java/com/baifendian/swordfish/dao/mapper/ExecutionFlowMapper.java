@@ -209,7 +209,8 @@ public interface ExecutionFlowMapper {
       @Result(property = "success", column = "SUCCESS", javaType = int.class, jdbcType = JdbcType.INTEGER),
       @Result(property = "kill", column = "KILL", javaType = int.class, jdbcType = JdbcType.INTEGER),
       @Result(property = "failed", column = "FAILED", javaType = int.class, jdbcType = JdbcType.INTEGER),
-      @Result(property = "depFailed", column = "DEP_FAILED", javaType = int.class, jdbcType = JdbcType.INTEGER)
+      @Result(property = "depFailed", column = "DEP_FAILED", javaType = int.class, jdbcType = JdbcType.INTEGER),
+      @Result(property = "inActive", column = "INACTIVE", javaType = int.class, jdbcType = JdbcType.INTEGER)
   })
   @SelectProvider(type = ExecutionFlowMapperProvider.class, method = "selectStateByProject")
   List<ExecutionState> selectStateByProject(@Param("projectId") int projectId, @Param("startDate") Date startDate, @Param("endDate") Date endDate);
@@ -230,7 +231,8 @@ public interface ExecutionFlowMapper {
       @Result(property = "success", column = "SUCCESS", javaType = int.class, jdbcType = JdbcType.INTEGER),
       @Result(property = "kill", column = "KILL", javaType = int.class, jdbcType = JdbcType.INTEGER),
       @Result(property = "failed", column = "FAILED", javaType = int.class, jdbcType = JdbcType.INTEGER),
-      @Result(property = "depFailed", column = "DEP_FAILED", javaType = int.class, jdbcType = JdbcType.INTEGER)
+      @Result(property = "depFailed", column = "DEP_FAILED", javaType = int.class, jdbcType = JdbcType.INTEGER),
+      @Result(property = "inActive", column = "INACTIVE", javaType = int.class, jdbcType = JdbcType.INTEGER)
   })
   @SelectProvider(type = ExecutionFlowMapperProvider.class, method = "selectStateHourByProject")
   List<ExecutionState> selectStateHourByProject(@Param("projectId") int projectId, @Param("day") Date day);

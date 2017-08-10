@@ -24,6 +24,7 @@ import java.util.Date;
  * 统计数据返回实体
  */
 public class StatDto {
+
   @JsonInclude(JsonInclude.Include.NON_NULL)
   private Date date;
 
@@ -68,6 +69,7 @@ public class StatDto {
   }
 
   public static class Info {
+
     private int init;
     private int waitingDep;
     private int waitingRes;
@@ -76,6 +78,7 @@ public class StatDto {
     private int kill;
     private int failed;
     private int depFailed;
+    private int inActive;
     private int total;
 
     public Info() {
@@ -91,6 +94,7 @@ public class StatDto {
         this.kill = executionState.getKill();
         this.failed = executionState.getFailed();
         this.depFailed = executionState.getDepFailed();
+        this.inActive = executionState.getInActive();
       }
     }
 
@@ -163,7 +167,8 @@ public class StatDto {
     }
 
     public int getTotal() {
-      return this.init + this.waitingDep + this.waitingRes + this.running + this.success + this.kill + this.failed + this.depFailed;
+      return this.init + this.waitingDep + this.waitingRes + this.running + this.success + this.kill
+          + this.failed + this.depFailed + this.inActive;
     }
 
   }

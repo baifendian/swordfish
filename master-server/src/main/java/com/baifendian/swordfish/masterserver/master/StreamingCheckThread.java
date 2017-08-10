@@ -29,6 +29,7 @@ import java.text.MessageFormat;
 import java.util.Date;
 import java.util.List;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -65,7 +66,7 @@ public class StreamingCheckThread implements Runnable {
           FlowStatus status = streamingResult.getStatus();
 
           // 如果有 appid 根据不同调度平台处理
-          if (streamingResult.getType() == SPARK_STREAMING) {
+          if (StringUtils.equalsIgnoreCase(streamingResult.getType(), SPARK_STREAMING)) {
 
             // 如果更本没有 appid
             if (CollectionUtils.isEmpty(appIds)) {
@@ -95,7 +96,7 @@ public class StreamingCheckThread implements Runnable {
                 logger.error(String.format("get application exception: %s", appId), e);
               }
             }
-          } else if (streamingResult.getType() == STORM) {
+          } else if (StringUtils.equalsIgnoreCase(streamingResult.getType(), STORM)) {
 
             // 为空, 继续
             if (CollectionUtils.isEmpty(appIds)) {
