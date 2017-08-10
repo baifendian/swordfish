@@ -241,12 +241,12 @@ public class StormRestUtil {
     TopologyOperationDto topologyOperation = JsonUtil.parseObject(res, TopologyOperationDto.class);
 
     if (topologyOperation == null) {
-      throw new Exception("Rebalance not result return!");
+      throw new Exception("Activate not result return!");
     }
 
     if (!StringUtils.equalsIgnoreCase(topologyOperation.getStatus(), "success")) {
       String msg = MessageFormat
-          .format("Rebalance status not equal success: {0}", topologyOperation.getStatus());
+          .format("Activate status not equal success: {0}", topologyOperation.getStatus());
       throw new Exception(msg);
     }
   }
