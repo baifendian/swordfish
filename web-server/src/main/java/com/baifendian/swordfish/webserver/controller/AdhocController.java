@@ -15,6 +15,7 @@
  */
 package com.baifendian.swordfish.webserver.controller;
 
+import com.baifendian.swordfish.common.consts.Constants;
 import com.baifendian.swordfish.common.job.struct.node.common.UdfsInfo;
 import com.baifendian.swordfish.dao.enums.SqlEngineType;
 import com.baifendian.swordfish.dao.model.User;
@@ -66,7 +67,7 @@ public class AdhocController {
       @RequestParam(value = "queue") String queue,
       @RequestParam(value = "type", required = false) SqlEngineType type,
       @RequestParam(value = "udfs", required = false) String udfs,
-      @RequestParam(value = "timeout", required = false, defaultValue = "43200") int timeout
+      @RequestParam(value = "timeout", required = false) Integer timeout
   ) {
     logger.info(
         "Operator user {}, exec adhoc, project name: {}, adhoc name: {}, stms: {}, limit: {}, "
@@ -78,9 +79,15 @@ public class AdhocController {
       throw new BadRequestException("Argument is not valid, limit must be between (0, 5000]");
     }
 
+    if (timeout == null) {
+      timeout = Constants.TASK_MAX_TIMEOUT;
+    }
+
     // timeout 的限制
-    if (timeout <= 0 || timeout > 43200) {
-      throw new BadRequestException("Argument is not valid, timeout must be between (0, 43200]");
+    if (timeout <= 0 || timeout > Constants.TASK_MAX_TIMEOUT) {
+      throw new BadRequestException(String
+          .format("Argument is not valid, timeout must be between (0, %d]",
+              Constants.TASK_MAX_TIMEOUT));
     }
 
     // 检验 udfs, 生成对象
@@ -113,7 +120,8 @@ public class AdhocController {
       @RequestParam(value = "from", required = false, defaultValue = "0") int from,
       @RequestParam(value = "size", required = false, defaultValue = "100") int size,
       @RequestParam(value = "query", required = false) String query) {
-    logger.info("Operator user {}, get adhoc logs, exec id: {}, index: {}, from: {}, size: {}, query: {}",
+    logger.info(
+        "Operator user {}, get adhoc logs, exec id: {}, index: {}, from: {}, size: {}, query: {}",
         operator.getName(), execId, index, from, size, query);
 
     // index & from 的限制

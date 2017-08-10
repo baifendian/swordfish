@@ -15,6 +15,7 @@
  */
 package com.baifendian.swordfish.webserver.controller;
 
+import com.baifendian.swordfish.common.consts.Constants;
 import com.baifendian.swordfish.dao.enums.DepPolicyType;
 import com.baifendian.swordfish.dao.enums.FailurePolicyType;
 import com.baifendian.swordfish.dao.enums.NotifyType;
@@ -73,14 +74,20 @@ public class ScheduleController {
                                     @RequestParam(value = "failurePolicy", required = false, defaultValue = "END") FailurePolicyType failurePolicy,
                                     @RequestParam(value = "depWorkflows", required = false) String depWorkflows,
                                     @RequestParam(value = "depPolicy", required = false, defaultValue = "NO_DEP_PRE") DepPolicyType depPolicyType,
-                                    @RequestParam(value = "timeout", required = false, defaultValue = "43200") int timeout) {
+                                    @RequestParam(value = "timeout", required = false) Integer timeout) {
     logger.info("Operator user {}, exec workflow, project name: {}, workflow name: {}, schedule: {}, notify type: {}, notify mails: {}, max try times: {}," +
                     "failure policy: {}, dep workflows: {}, dep policy: {}, timeout: {}",
             operator.getName(), projectName, workflowName, schedule, notifyType, notifyMails, maxTryTimes, failurePolicy, depWorkflows, depPolicyType, timeout);
 
-    if (timeout < 0 || timeout > 43200) {
-      logger.error("Timeout {} not in [0,43200]");
-      throw new ParameterException("Timeout \"{0}\" not in [0,43200]", timeout);
+    if (timeout == null) {
+      timeout = Constants.TASK_MAX_TIMEOUT;
+    }
+
+    // timeout 的限制
+    if (timeout <= 0 || timeout > Constants.TASK_MAX_TIMEOUT) {
+      throw new BadRequestException(String
+          .format("Argument is not valid, timeout must be between (0, %d]",
+              Constants.TASK_MAX_TIMEOUT));
     }
 
     return new ScheduleDto(scheduleService.createSchedule(operator, projectName, workflowName, schedule, notifyType, notifyMails, maxTryTimes, failurePolicy, depWorkflows, depPolicyType, timeout));
@@ -112,14 +119,20 @@ public class ScheduleController {
                                              @RequestParam(value = "failurePolicy", required = false, defaultValue = "END") FailurePolicyType failurePolicy,
                                              @RequestParam(value = "depWorkflows", required = false) String depWorkflows,
                                              @RequestParam(value = "depPolicy", required = false, defaultValue = "NO_DEP_PRE") DepPolicyType depPolicyType,
-                                             @RequestParam(value = "timeout", required = false, defaultValue = "43200") int timeout) {
+                                             @RequestParam(value = "timeout", required = false) Integer timeout) {
     logger.info("Operator user {}, exec workflow, project name: {}, workflow name: {}, schedule: {}, notify type: {}, notify mails: {}, max try times: {}," +
                     "failure policy: {}, dep workflows: {}, dep policy: {}, timeout: {}",
             operator.getName(), projectName, workflowName, schedule, notifyType, notifyMails, maxTryTimes, failurePolicy, depWorkflows, depPolicyType, timeout);
 
+    if (timeout == null) {
+      timeout = Constants.TASK_MAX_TIMEOUT;
+    }
+
     // timeout 的限制
-    if (timeout <= 0 || timeout > 43200) {
-      throw new BadRequestException("Argument is not valid, timeout must be between (0, 43200]");
+    if (timeout <= 0 || timeout > Constants.TASK_MAX_TIMEOUT) {
+      throw new BadRequestException(String
+          .format("Argument is not valid, timeout must be between (0, %d]",
+              Constants.TASK_MAX_TIMEOUT));
     }
 
     return new ScheduleDto(scheduleService.putSchedule(operator, projectName, workflowName, schedule, notifyType, notifyMails, maxTryTimes, failurePolicy, depWorkflows, depPolicyType, timeout));
@@ -151,14 +164,20 @@ public class ScheduleController {
                                    @RequestParam(value = "failurePolicy", required = false, defaultValue = "END") FailurePolicyType failurePolicy,
                                    @RequestParam(value = "depWorkflows", required = false) String depWorkflows,
                                    @RequestParam(value = "depPolicy", required = false, defaultValue = "NO_DEP_PRE") DepPolicyType depPolicyType,
-                                   @RequestParam(value = "timeout", required = false, defaultValue = "43200") int timeout) {
+                                   @RequestParam(value = "timeout", required = false) Integer timeout) {
     logger.info("Operator user {}, exec workflow, project name: {}, workflow name: {}, schedule: {}, notify type: {}, notify mails: {}, max try times: {}," +
                     "failure policy: {}, dep workflows: {}, dep policy: {}, timeout: {}",
             operator.getName(), projectName, workflowName, schedule, notifyType, notifyMails, maxTryTimes, failurePolicy, depWorkflows, depPolicyType, timeout);
 
+    if (timeout == null) {
+      timeout = Constants.TASK_MAX_TIMEOUT;
+    }
+
     // timeout 的限制
-    if (timeout <= 0 || timeout > 43200) {
-      throw new BadRequestException("Argument is not valid, timeout must be between (0, 43200]");
+    if (timeout <= 0 || timeout > Constants.TASK_MAX_TIMEOUT) {
+      throw new BadRequestException(String
+          .format("Argument is not valid, timeout must be between (0, %d]",
+              Constants.TASK_MAX_TIMEOUT));
     }
 
     return new ScheduleDto(scheduleService.patchSchedule(operator, projectName, workflowName, schedule, notifyType, notifyMails, maxTryTimes, failurePolicy, depWorkflows, depPolicyType, timeout, null));

@@ -21,6 +21,7 @@ import java.util.regex.Pattern;
  * 常用的常量 <p>
  */
 public class Constants {
+
   /**
    * "yyyy-MM-dd HH:mm:ss"
    */
@@ -74,6 +75,11 @@ public class Constants {
   /**
    * 所有权限
    */
-  public static final int PROJECT_USER_PERM_ALL = PROJECT_USER_PERM_WRITE | PROJECT_USER_PERM_READ | PROJECT_USER_PERM_EXEC;
+  public static final int PROJECT_USER_PERM_ALL =
+      PROJECT_USER_PERM_WRITE | PROJECT_USER_PERM_READ | PROJECT_USER_PERM_EXEC;
 
+  /**
+   * 超时的上限设置
+   */
+  public static final int TASK_MAX_TIMEOUT = 86400;
 }
