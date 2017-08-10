@@ -40,6 +40,8 @@ public class DatasourceFactory {
           return JsonUtil.parseObject(parameter, OracleDatasource.class);
         case FTP:
           return JsonUtil.parseObject(parameter, FtpDatasource.class);
+        case POSTGRE:
+          return JsonUtil.parseObject(parameter, PostgreDatasource.class);
         default:
           return null;
       }
