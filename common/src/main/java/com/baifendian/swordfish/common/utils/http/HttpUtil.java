@@ -28,7 +28,7 @@ public class HttpUtil {
 
   private static final Logger logger = LoggerFactory.getLogger(HttpUtil.class);
 
-  private static String HOST_ADDRESS = "UNKNOWN HOST";
+  private static String HOST_ADDRESS = "localhost";
 
   static {
     try {
