@@ -30,7 +30,7 @@ public class ImpExpJobConst {
   /**
    * 写入 hdfs 临时文件的默认文件类型
    */
-  public static final WriteHdfsType DEFAULT_FILE_TYPE = WriteHdfsType.TEXT;
+  public static final WriteHdfsType DEFAULT_FILE_TYPE = WriteHdfsType.ORC;
 
   /**
    * hive 的默认数据库
