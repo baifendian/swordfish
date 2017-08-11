@@ -27,8 +27,8 @@ public enum ImpExpType {
   HIVE_TO_MYSQL(ReaderType.HIVE, WriterType.MYSQL),
   HIVE_TO_MONGODB(ReaderType.HIVE, WriterType.MONGO),
   FILE_TO_HIVE(ReaderType.FILE, WriterType.HIVE),
-  POSTGRE_TO_HIVE(ReaderType.POSTGRE, WriterType.HIVE),
-  HIVE_TO_POSTGRE(ReaderType.HIVE, WriterType.POSTGRE);
+  POSTGRES_TO_HIVE(ReaderType.POSTGRES, WriterType.HIVE),
+  HIVE_TO_POSTGRES(ReaderType.HIVE, WriterType.POSTGRES);
 
   private ReaderType reader;
   private WriterType writer;
