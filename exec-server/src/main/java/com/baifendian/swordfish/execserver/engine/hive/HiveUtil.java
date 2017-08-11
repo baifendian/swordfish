@@ -81,6 +81,30 @@ public class HiveUtil extends BaseDao {
 
 
   /**
+   * 组装一个ORC存储的临时表
+   * @param dbName
+   * @param tableName
+   * @param hqlColumnList
+   * @param localtion
+   * @return
+   */
+  public static String getORCTmpTableDDL(String dbName, String tableName,
+      List<HqlColumn> hqlColumnList, String localtion) {
+    List<String> fieldList = new ArrayList<>();
+
+    for (HqlColumn hqlColumn : hqlColumnList) {
+      fieldList.add(MessageFormat.format("{0} {1}", hqlColumn.getName(), hqlColumn.getType()));
+    }
+
+    String sql = "CREATE TEMPORARY EXTERNAL TABLE {0}.{1}({2}) STORED AS orc LOCATION \"{3}\"";
+
+    sql = MessageFormat
+        .format(sql, dbName, tableName, String.join(",", fieldList), localtion);
+
+    return sql;
+  }
+
+  /**
    * 组装一个临时外部表
    */
   public static String getTmpTableDDL(String dbName, String tableName,

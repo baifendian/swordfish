@@ -32,6 +32,7 @@ import org.slf4j.Logger;
  * 把XXX 写入到 hive的任务
  */
 public abstract class WriteHiveJob extends DataXJob {
+
   private HiveWriter hiveWriter;
 
   private HdfsWriterArg hdfsWriterArg;
@@ -134,8 +135,7 @@ public abstract class WriteHiveJob extends DataXJob {
 
       // 构造生成临时表 sql
       String ddl = HiveUtil
-          .getTmpTableDDL(DEFAULT_DB, srcTableName, srcColumns, hdfsWriterArg.getPath(),
-              DEFAULT_DELIMITER, "UTF-8");
+          .getORCTmpTableDDL(DEFAULT_DB, srcTableName, srcColumns, hdfsWriterArg.getPath());
       logger.info("Create temp hive table ddl: {}", ddl);
 
       // 构造插入数据 sql
