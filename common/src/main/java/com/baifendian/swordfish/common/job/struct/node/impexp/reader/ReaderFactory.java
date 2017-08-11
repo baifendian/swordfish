@@ -33,7 +33,7 @@ public class ReaderFactory {
         return JsonUtil.parseObject(reader, HiveReader.class);
       case FILE:
         return JsonUtil.parseObject(reader, FileReader.class);
-      case POSTGRE:
+      case POSTGRES:
         return JsonUtil.parseObject(reader, PostgreReader.class);
       default:
         return null;
