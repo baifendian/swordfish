@@ -16,6 +16,7 @@
 package com.baifendian.swordfish.common.job.struct.node.impexp.writer;
 
 import com.baifendian.swordfish.common.enums.ImpExpType;
+import com.baifendian.swordfish.common.enums.WriterType;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
 import org.apache.avro.data.Json;
 
@@ -24,20 +25,22 @@ import org.apache.avro.data.Json;
  */
 public class WriterFactory {
 
-  public static Writer getWriter(ImpExpType type, String writer) {
+  public static Writer getWriter(WriterType type, String writer) {
     switch (type) {
-      case MYSQL_TO_HDFS:
+      case HDFS:
         return JsonUtil.parseObject(writer, HdfsWriter.class);
-      case MYSQL_TO_HIVE:
+      case HIVE:
         return JsonUtil.parseObject(writer, HiveWriter.class);
-      case HIVE_TO_MYSQL:
+      case MYSQL:
         return JsonUtil.parseObject(writer, MysqlWriter.class);
-      case HIVE_TO_MONGODB:
+      case MONGO:
         return JsonUtil.parseObject(writer, MongoWriter.class);
-      case FILE_TO_HIVE:
-        return JsonUtil.parseObject(writer, HiveWriter.class);
       default:
         return null;
     }
+  }
+
+  public static Writer getWriter(ImpExpType type, String writer) {
+    return getWriter(type.getWriter(), writer);
   }
 }

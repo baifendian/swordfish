@@ -22,5 +22,35 @@ public enum ImpExpType {
   /**
    * 0 mysql 到 hive ,1 mysql 到 hdfs
    */
-  MYSQL_TO_HIVE, MYSQL_TO_HDFS, HIVE_TO_MYSQL, HIVE_TO_MONGODB, FILE_TO_HIVE;
+  MYSQL_TO_HIVE(ReaderType.MYSQL, WriterType.HIVE),
+  MYSQL_TO_HDFS(ReaderType.MYSQL, WriterType.HDFS),
+  HIVE_TO_MYSQL(ReaderType.HIVE, WriterType.MYSQL),
+  HIVE_TO_MONGODB(ReaderType.HIVE, WriterType.MONGO),
+  FILE_TO_HIVE(ReaderType.FILE, WriterType.HIVE),
+  POSTGRE_TO_HIVE(ReaderType.POSTGRE, WriterType.HIVE),
+  HIVE_TO_POSTGRE(ReaderType.HIVE, WriterType.POSTGRE);
+
+  private ReaderType reader;
+  private WriterType writer;
+
+  public ReaderType getReader() {
+    return reader;
+  }
+
+  public void setReader(ReaderType reader) {
+    this.reader = reader;
+  }
+
+  public WriterType getWriter() {
+    return writer;
+  }
+
+  public void setWriter(WriterType writer) {
+    this.writer = writer;
+  }
+
+  ImpExpType(ReaderType reader, WriterType writer) {
+    this.reader = reader;
+    this.writer = writer;
+  }
 }
