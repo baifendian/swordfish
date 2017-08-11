@@ -27,7 +27,7 @@ import java.sql.SQLException;
  */
 public class MysqlDatasource extends Datasource {
 
-  private static Logger logger = LoggerFactory.getLogger(MongoDatasource.class.getName());
+  private static Logger logger = LoggerFactory.getLogger(MysqlDatasource.class.getName());
 
   private String address;
 
