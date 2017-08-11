@@ -38,7 +38,7 @@ public class PostgreToHiveJob extends WriteHiveJob {
     }
 
     PostgreDatasource postgreDatasource = (PostgreDatasource) DatasourceFactory
-        .getDatasource(DbType.POSTGRE, datasource.getParameter());
+        .getDatasource(DbType.POSTGRES, datasource.getParameter());
     ObjectNode connection = (ObjectNode) postgreReaderArg.getConnection().get(0);
     connection.putArray("jdbcUrl").add(postgreDatasource.getJdbcUrl());
     postgreReaderArg.setUsername(postgreDatasource.getUser());
