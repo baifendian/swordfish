@@ -111,16 +111,15 @@ public class HiveUtil extends BaseDao {
       return false;
     }
 
-    sql = sql.toLowerCase();
+    sql = sql.toUpperCase();
 
-    if (sql.startsWith("select")
-        || sql.startsWith("describe")
-        || sql.startsWith("explain")) {
+    if (sql.startsWith("SELECT")) {
       return true;
     }
 
     return false;
   }
+
 
   /**
    * 是否是 DDL 语句, 如 create table 等
@@ -129,26 +128,12 @@ public class HiveUtil extends BaseDao {
     if (org.apache.commons.lang3.StringUtils.isEmpty(sql)) {
       return false;
     }
-//
-//    try {
-//      ParseDriver pd = new ParseDriver();
-//
-//      ASTNode ast = pd.parse(sql);
-//
-//      if ("TOK_ALTERTABLE".equals(ast.getChild(0).getText()) || "TOK_CREATETABLE"
-//          .equals(ast.getChild(0).getText())) {
-//        return true;
-//      }
 
     String tmp = sql.toUpperCase();
 
     if (tmp.startsWith("CREATE") || tmp.startsWith("DROP") || tmp.startsWith("ALTER")) {
       return true;
     }
-//    } catch (Exception e) {
-//      logger.error(String.format("parse ddl %s exception", sql), e);
-//      return true;
-//    }
 
     return false;
   }
@@ -156,16 +141,20 @@ public class HiveUtil extends BaseDao {
   /**
    * 是否类似于 show 语句的查询（show/desc/describe） <p>
    *
-   * @return 如果是 'show/desc/describe' 语句返回 true, 否则返回 false
+   * @return 如果是 'show/desc/describe' 等语句返回 true, 否则返回 false
    */
   public static boolean isLikeShowStm(String sql) {
     if (StringUtils.isEmpty(sql)) {
       return false;
     }
 
-    sql = sql.toLowerCase();
+    sql = sql.toUpperCase();
 
-    if (sql.startsWith("show") || sql.startsWith("desc")) {
+    if (sql.startsWith("SHOW") ||
+        sql.startsWith("ANALYZE") ||
+        sql.startsWith("EXPLAIN") ||
+        sql.startsWith("DESC") ||
+        sql.startsWith("DESCRIBE")) {
       return true;
     }
 

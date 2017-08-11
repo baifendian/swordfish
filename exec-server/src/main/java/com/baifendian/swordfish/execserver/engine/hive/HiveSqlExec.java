@@ -166,11 +166,27 @@ public class HiveSqlExec {
             execResult.setTitles(colums);
 
             List<List<String>> datas = new ArrayList<>();
-            while (res.next()) {
-              List<String> values = new ArrayList<>();
-              for (int i = 1; i <= count; ++i) {
-                values.add(res.getString(i));
+
+            // 如果字段数大于 1, 或是 query 语句
+            if (count > 1 || HiveUtil.isTokQuery(sql)) {
+              while (res.next()) {
+                List<String> values = new ArrayList<>();
+                for (int i = 1; i <= count; ++i) {
+                  values.add(res.getString(i));
+                }
+
+                datas.add(values);
               }
+            } else {
+              StringBuffer buffer = new StringBuffer();
+
+              while (res.next()) {
+                buffer.append(res.getString(1));
+                buffer.append("\n");
+              }
+
+              List<String> values = new ArrayList<>();
+              values.add(buffer.toString().trim());
 
               datas.add(values);
             }
