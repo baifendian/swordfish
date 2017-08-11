@@ -16,28 +16,20 @@
 package com.baifendian.swordfish.common.job.struct.node.impexp.reader;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import java.util.List;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.List;
-
-/**
- * mysql 读取对象
- */
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class MysqlReader implements Reader {
+public class PostgreReader implements Reader {
 
   private String datasource;
-
   private List<String> table;
-
-  private String splitPk;
-
-  private String where;
-
-  private String querySql;
-
   private List<String> column;
+  private String splitPk;
+  private String where;
+  private String querySql;
+  private Long fetchSize;
 
   public String getDatasource() {
     return datasource;
@@ -53,6 +45,14 @@ public class MysqlReader implements Reader {
 
   public void setTable(List<String> table) {
     this.table = table;
+  }
+
+  public List<String> getColumn() {
+    return column;
+  }
+
+  public void setColumn(List<String> column) {
+    this.column = column;
   }
 
   public String getSplitPk() {
@@ -79,16 +79,18 @@ public class MysqlReader implements Reader {
     this.querySql = querySql;
   }
 
-  public List<String> getColumn() {
-    return column;
+  public Long getFetchSize() {
+    return fetchSize;
   }
 
-  public void setColumn(List<String> column) {
-    this.column = column;
+  public void setFetchSize(Long fetchSize) {
+    this.fetchSize = fetchSize;
   }
 
   @Override
   public boolean checkValid() {
-    return StringUtils.isNotEmpty(datasource) && (StringUtils.isNotEmpty(querySql) || CollectionUtils.isNotEmpty(table));
+    return StringUtils.isNotEmpty(datasource) && (StringUtils.isNotEmpty(querySql)
+        || CollectionUtils
+        .isNotEmpty(table));
   }
 }

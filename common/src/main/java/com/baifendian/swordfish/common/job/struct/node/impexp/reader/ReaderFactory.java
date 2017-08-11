@@ -16,6 +16,7 @@
 package com.baifendian.swordfish.common.job.struct.node.impexp.reader;
 
 import com.baifendian.swordfish.common.enums.ImpExpType;
+import com.baifendian.swordfish.common.enums.ReaderType;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
 import org.apache.avro.data.Json;
 
@@ -23,20 +24,23 @@ import org.apache.avro.data.Json;
  * 读配置工厂
  */
 public class ReaderFactory {
-  public static Reader getReader(ImpExpType type, String reader) {
+
+  public static Reader getReader(ReaderType type, String reader) {
     switch (type) {
-      case MYSQL_TO_HIVE:
+      case MYSQL:
         return JsonUtil.parseObject(reader, MysqlReader.class);
-      case MYSQL_TO_HDFS:
-        return JsonUtil.parseObject(reader, MysqlReader.class);
-      case HIVE_TO_MYSQL:
+      case HIVE:
         return JsonUtil.parseObject(reader, HiveReader.class);
-      case HIVE_TO_MONGODB:
-        return JsonUtil.parseObject(reader, HiveReader.class);
-      case FILE_TO_HIVE:
+      case FILE:
         return JsonUtil.parseObject(reader, FileReader.class);
+      case POSTGRES:
+        return JsonUtil.parseObject(reader, PostgreReader.class);
       default:
         return null;
     }
+  }
+
+  public static Reader getReader(ImpExpType type, String reader) {
+    return getReader(type.getReader(), reader);
   }
 }

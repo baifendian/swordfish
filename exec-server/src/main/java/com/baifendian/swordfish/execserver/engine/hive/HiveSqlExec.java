@@ -46,7 +46,7 @@ public class HiveSqlExec {
   /**
    * 查询限制，默认为 1000
    */
-  private static int defualtQueryLimit = 1000;
+  private static int defaultQueryLimit = 1000;
 
   /**
    * {@link HiveUtil}
@@ -90,12 +90,12 @@ public class HiveSqlExec {
       boolean isContinue, ResultCallback resultCallback, Integer queryLimit, int remainTime) {
 
     // 没有剩余运行的时间
-    if(remainTime <= 0) {
+    if (remainTime <= 0) {
       return false;
     }
 
     // 查询结果限制
-    queryLimit = (queryLimit != null) ? queryLimit : defualtQueryLimit;
+    queryLimit = (queryLimit != null) ? queryLimit : defaultQueryLimit;
 
     HiveConnection hiveConnection = null;
     Statement sta = null;
@@ -166,11 +166,27 @@ public class HiveSqlExec {
             execResult.setTitles(colums);
 
             List<List<String>> datas = new ArrayList<>();
-            while (res.next()) {
-              List<String> values = new ArrayList<>();
-              for (int i = 1; i <= count; ++i) {
-                values.add(res.getString(i));
+
+            // 如果字段数大于 1, 或是 query 语句
+            if (count > 1 || HiveUtil.isTokQuery(sql)) {
+              while (res.next()) {
+                List<String> values = new ArrayList<>();
+                for (int i = 1; i <= count; ++i) {
+                  values.add(res.getString(i));
+                }
+
+                datas.add(values);
               }
+            } else {
+              StringBuffer buffer = new StringBuffer();
+
+              while (res.next()) {
+                buffer.append(res.getString(1));
+                buffer.append("\n");
+              }
+
+              List<String> values = new ArrayList<>();
+              values.add(buffer.toString().trim());
 
               datas.add(values);
             }
@@ -208,7 +224,8 @@ public class HiveSqlExec {
           // TTransport 异常
           if (e.toString().contains("TTransportException")) {
             logger.error("Get TTransportException return a client", e);
-            hiveService2Client.invalidateObject(hiveService2ConnectionInfo, hiveConnection);
+            // 这个不需要处理
+//            hiveService2Client.invalidateObject(hiveService2ConnectionInfo, hiveConnection);
             handlerResults(index, sqls, FlowStatus.FAILED, resultCallback);
             return false;
           }
@@ -241,9 +258,17 @@ public class HiveSqlExec {
         logger.error("Catch an exception", e);
       }
 
-      // 返回连接
-      if (hiveConnection != null) {
-        hiveService2Client.returnClient(hiveService2ConnectionInfo, hiveConnection);
+      try {
+        // 返回连接
+        if (hiveConnection != null) {
+          // 关闭
+          hiveConnection.close();
+
+          // 返回连接
+          hiveService2Client.returnClient(hiveService2ConnectionInfo, hiveConnection);
+        }
+      } catch (Exception e) {
+        logger.error("Catch an exception", e);
       }
 
       // 关闭日志

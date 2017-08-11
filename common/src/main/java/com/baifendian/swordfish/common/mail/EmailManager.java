@@ -16,6 +16,7 @@
 package com.baifendian.swordfish.common.mail;
 
 import com.baifendian.swordfish.common.utils.DateUtils;
+import com.baifendian.swordfish.common.utils.http.HttpUtil;
 import com.baifendian.swordfish.dao.enums.ExecType;
 import com.baifendian.swordfish.dao.enums.FlowStatus;
 import com.baifendian.swordfish.dao.enums.NotifyType;
@@ -46,7 +47,8 @@ public class EmailManager {
       "Schedule time: {5}<br/>" +
       "Start execution time：{6}<br/>" +
       "End execution time：{7}<br/>" +
-      "Final status：{8}<br/>";
+      "Final status：{8}<br/>" +
+      "Send from host: " + HttpUtil.getHostAddress() + "<br/>";
 
   /**
    * 发送 EMAIL(调度)

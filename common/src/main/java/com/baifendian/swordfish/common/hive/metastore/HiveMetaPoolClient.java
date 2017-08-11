@@ -98,6 +98,8 @@ public class HiveMetaPoolClient {
     poolConfig.maxWait = maxWait;
     poolConfig.timeBetweenEvictionRunsMillis = timeBetweenEvictionRunsMillis;
     poolConfig.testWhileIdle = testWhileIdle;
+    poolConfig.testOnBorrow = true;
+    poolConfig.testOnReturn = true;
 
     HiveMetaStorePoolFactory clientFactory = new HiveMetaStorePoolFactory(metastoreUris);
     return new GenericObjectPool(clientFactory, poolConfig);

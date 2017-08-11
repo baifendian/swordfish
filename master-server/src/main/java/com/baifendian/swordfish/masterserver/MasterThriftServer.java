@@ -16,6 +16,7 @@
 package com.baifendian.swordfish.masterserver;
 
 import com.baifendian.swordfish.common.utils.ThriftUtil;
+import com.baifendian.swordfish.common.utils.http.HttpUtil;
 import com.baifendian.swordfish.dao.DaoFactory;
 import com.baifendian.swordfish.dao.MasterDao;
 import com.baifendian.swordfish.dao.model.MasterServer;
@@ -62,7 +63,7 @@ public class MasterThriftServer {
   private JobExecManager jobExecManager;
 
   public MasterThriftServer() throws UnknownHostException {
-    host = InetAddress.getLocalHost().getHostAddress();
+    host = HttpUtil.getHostAddress();
     port = MasterConfig.masterPort;
 
     masterDao = DaoFactory.getDaoInstance(MasterDao.class);
