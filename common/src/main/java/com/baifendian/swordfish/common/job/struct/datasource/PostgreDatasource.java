@@ -3,6 +3,7 @@ package com.baifendian.swordfish.common.job.struct.datasource;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,6 +18,8 @@ public class PostgreDatasource extends Datasource {
   private String user;
 
   private String password;
+
+  private String other;
 
   public String getAddress() {
     return address;
@@ -52,14 +55,20 @@ public class PostgreDatasource extends Datasource {
 
   /**
    * 获取 url
-   * @return
    */
   public String getJdbcUrl() {
-    String address = this.address;
-    if (address.lastIndexOf("/") != (address.length() - 1)) {
-      address += "/";
+    String jdbcUrl = address;
+    if (jdbcUrl.lastIndexOf("/") != (jdbcUrl.length() - 1)) {
+      jdbcUrl += "/";
     }
-    return address + this.database;
+
+    jdbcUrl += database;
+
+    if (StringUtils.isNotEmpty(other)) {
+      jdbcUrl += "?" + other;
+    }
+
+    return jdbcUrl;
   }
 
   @Override
