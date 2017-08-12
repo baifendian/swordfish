@@ -90,7 +90,8 @@ public class ExecController {
     }
 
     return execService
-        .postExecWorkflow(operator, projectName, workflowName, schedule, execType, failurePolicy, nodeName,
+        .postExecWorkflow(operator, projectName, workflowName, schedule, execType, failurePolicy,
+            nodeName,
             nodeDep, notifyType, notifyMails, timeout);
   }
 
@@ -114,7 +115,8 @@ public class ExecController {
     logger.info(
         "Operator user {}, exec workflow, project name: {}, workflow name: {}, proxy user: {}, queue: {},"
             + " data: {}, file: {}, failure policy: {}, notify type: {}, notify mails: {}, timeout: {}, extras: {}",
-        operator.getName(), projectName, workflowName, proxyUser, queue, data, file.getName(),
+        operator.getName(), projectName, workflowName, proxyUser, queue, data,
+        file != null ? file.getName() : null,
         failurePolicy, notifyType, notifyMails, timeout, extras);
 
     if (timeout == null) {
