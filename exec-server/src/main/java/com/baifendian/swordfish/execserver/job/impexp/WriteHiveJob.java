@@ -107,6 +107,7 @@ public abstract class WriteHiveJob extends DataXJob {
     hdfsWriterArg.setDefaultFS(impExpProps.getHadoopConf().getString("fs.defaultFS"));
     hdfsWriterArg.setColumn(((HiveWriter) impExpProps.getImpExpParam().getWriter()).getColumn());
     hdfsWriterArg.setFileType(DEFAULT_FILE_TYPE);
+    hdfsWriterArg.setFieldDelimiter(DEFAULT_DELIMITER);
     hdfsWriterArg.setWriteMode(WriteMode.OVERWRITE.getHdfsType());
     logger.info("Finish MysqlToHiveJob get dataX writer arg!");
     this.hdfsWriterArg = hdfsWriterArg;
