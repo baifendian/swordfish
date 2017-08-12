@@ -28,7 +28,8 @@ public enum ImpExpType {
   HIVE_TO_MONGODB(ReaderType.HIVE, WriterType.MONGO),
   FILE_TO_HIVE(ReaderType.FILE, WriterType.HIVE),
   POSTGRES_TO_HIVE(ReaderType.POSTGRES, WriterType.HIVE),
-  HIVE_TO_POSTGRES(ReaderType.HIVE, WriterType.POSTGRES);
+  HIVE_TO_POSTGRES(ReaderType.HIVE, WriterType.POSTGRES),
+  POSTGRES_TO_HDFS(ReaderType.POSTGRES, WriterType.HDFS);
 
   private ReaderType reader;
   private WriterType writer;

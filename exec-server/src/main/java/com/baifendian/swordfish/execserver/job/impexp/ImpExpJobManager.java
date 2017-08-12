@@ -56,6 +56,8 @@ public class ImpExpJobManager {
         return new PostgreToHiveJob(props, false, logger, impExpProps);
       case HIVE_TO_POSTGRES:
         return new HiveToPostgreJob(props, false, logger, impExpProps);
+      case POSTGRES_TO_HDFS:
+        return new PostgreToHdfsJob(props, false, logger, impExpProps);
       default:
         logger.error("unsupport ImpExp job type: {}", jobTypeStr);
         throw new IllegalArgumentException("Not support job type");
