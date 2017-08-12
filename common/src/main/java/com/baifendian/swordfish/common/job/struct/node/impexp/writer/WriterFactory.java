@@ -35,6 +35,8 @@ public class WriterFactory {
         return JsonUtil.parseObject(writer, MysqlWriter.class);
       case MONGO:
         return JsonUtil.parseObject(writer, MongoWriter.class);
+      case POSTGRES:
+        return JsonUtil.parseObject(writer, PostgreWriter.class);
       default:
         return null;
     }
