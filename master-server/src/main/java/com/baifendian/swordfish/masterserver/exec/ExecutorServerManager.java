@@ -115,7 +115,10 @@ public class ExecutorServerManager {
   }
 
   /**
-   * 得到指定的 executor
+   * 得到指定的 executor, 会有建议的 (host, port), 但是真的运行不一定是在这个地址
+   *
+   * @param host : 这里是建议的 (host, port)
+   * @param port : 这里是建议的 (host, port)
    */
   public synchronized ExecutorServerInfo getExecutorServer(String host, int port) {
     logger.debug("executor servers: {}", executorServers.toString());

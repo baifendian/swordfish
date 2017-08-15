@@ -604,7 +604,6 @@ public class FlowRunner implements Runnable {
         if (updateKilled || (nodeRunner.getExecType() != ExecType.SCHEDULER
             && nodeRunner.getExecType() != ExecType.COMPLEMENT_DATA)) {
           ExecutionNode executionNode = nodeRunner.getExecutionNode();
-
           updateNodeToKilled(executionNode);
         }
       } else {
@@ -635,7 +634,6 @@ public class FlowRunner implements Runnable {
             if (updateKilled || (nodeRunner.getExecType() != ExecType.SCHEDULER
                 && nodeRunner.getExecType() != ExecType.COMPLEMENT_DATA)) {
               ExecutionNode executionNode = nodeRunner.getExecutionNode();
-
               updateNodeToKilled(executionNode);
             }
           }

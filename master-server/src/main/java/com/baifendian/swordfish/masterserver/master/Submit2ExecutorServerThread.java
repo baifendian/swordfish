@@ -16,7 +16,6 @@
 package com.baifendian.swordfish.masterserver.master;
 
 import com.baifendian.swordfish.common.mail.EmailManager;
-import com.baifendian.swordfish.common.utils.CommonUtil;
 import com.baifendian.swordfish.dao.FlowDao;
 import com.baifendian.swordfish.dao.enums.FlowStatus;
 import com.baifendian.swordfish.dao.model.ExecutionFlow;
@@ -29,7 +28,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang3.tuple.Pair;
 import org.apache.thrift.TException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -181,9 +179,6 @@ public class Submit2ExecutorServerThread extends Thread {
         if (!isSuccess) {
           // 并且是 executor server 失败
           if (isExecutorServerError) {
-            // executor server error，将执行数据放回队列，将该 executor server 从 executor server 列表删除
-            executionFlowQueue.add(execFlowInfo);
-
             logger
                 .info("connect to executor server error, remove {}:{}",
                     executorServerInfo.getHost(),
@@ -194,7 +189,7 @@ public class Submit2ExecutorServerThread extends Thread {
             ExecutorServerInfo removedExecutionServerInfo = executorServerManager
                 .removeServer(executorServerInfo);
 
-            // 这里是 exec-server 出现了问题
+            // 这里是 exec-server 出现了问题, 重新调用
             resubmitExecFlow(removedExecutionServerInfo);
           } else {
             // 如果是其它的异常情况, 直接更新状态即可
@@ -231,10 +226,7 @@ public class Submit2ExecutorServerThread extends Thread {
   /**
    * 重新提交工作流执行:
    *
-   * 1. 超时
-   * 2. 被报告下线
-   * 3. 调用频繁超时
-   * ......
+   * 1. 超时 2. 被报告下线 3. 调用频繁超时 ......
    */
   public void resubmitExecFlow(ExecutorServerInfo executorServerInfo) {
     logger.warn("reschedule workflow of server: {} ", executorServerInfo);
@@ -253,10 +245,8 @@ public class Submit2ExecutorServerThread extends Thread {
           if (!executionFlow.getStatus().typeIsFinished()) {
             logger.warn("reschedule exec id: {}", execId);
 
-            Pair<String, Integer> pair = CommonUtil.parseWorker(executionFlow.getWorker());
-
-            ExecFlowInfo execFlowInfo = (pair == null) ? new ExecFlowInfo(executionFlow.getId())
-                : new ExecFlowInfo(pair.getLeft(), pair.getRight(), executionFlow.getId());
+            ExecFlowInfo execFlowInfo = new ExecFlowInfo(executorServerInfo.getHost(),
+                executorServerInfo.getPort(), executionFlow.getId());
 
             executionFlowQueue.add(execFlowInfo);
           }

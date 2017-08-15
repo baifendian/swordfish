@@ -690,10 +690,12 @@ public class MasterServiceImpl implements Iface {
       executorServerInfo.setHost(host);
       executorServerInfo.setPort(port);
 
-      executorServerManager.removeServer(executorServerInfo);
+      if (executorServerManager.containServer(executorServerInfo)) {
+        executorServerManager.removeServer(executorServerInfo);
 
-      // 重新提交上面的任务
-      flowSubmit2ExecutorThread.resubmitExecFlow(executorServerInfo);
+        // 重新提交上面的任务
+        flowSubmit2ExecutorThread.resubmitExecFlow(executorServerInfo);
+      }
     } catch (Exception e) {
       logger.warn("executor down error", e);
       return ResultHelper.createErrorResult(e.getMessage());
