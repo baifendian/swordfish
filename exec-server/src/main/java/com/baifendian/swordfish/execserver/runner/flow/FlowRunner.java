@@ -117,6 +117,11 @@ public class FlowRunner implements Runnable {
   private final long startTime;
 
   /**
+   * 是否停止
+   */
+  private volatile boolean shutdown;
+
+  /**
    * @param context
    */
   public FlowRunner(FlowRunnerContext context) {
@@ -127,6 +132,7 @@ public class FlowRunner implements Runnable {
     this.timeout = context.getTimeout();
     this.failurePolicyType = context.getFailurePolicyType();
     this.startTime = executionFlow.getStartTime().getTime();
+    this.shutdown = false;
   }
 
   /**
@@ -525,6 +531,13 @@ public class FlowRunner implements Runnable {
    * 更新 ExecutionFlow <p>
    */
   private void updateExecutionFlow(FlowStatus status) {
+    // 如果是关闭情况下, 且 shutdown 了, 且是调度或补数据
+    if (shutdown && status == FlowStatus.KILL && (
+        executionFlow.getType() == ExecType.COMPLEMENT_DATA
+            || executionFlow.getType() == ExecType.SCHEDULER)) {
+      return;
+    }
+
     Date now = new Date();
 
     // 没有完成才更新
@@ -585,6 +598,13 @@ public class FlowRunner implements Runnable {
 
     // 更新未完成的任务结点
     updateUnfinishNodeStatus(updateKilled);
+  }
+
+  /**
+   * 关闭
+   */
+  public void shutdown() {
+    this.shutdown = true;
   }
 
   /**

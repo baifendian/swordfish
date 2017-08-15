@@ -165,6 +165,8 @@ public class FlowRunnerManager {
     shutdownExecutorService(nodeExecutorService, false);
 
     for (FlowRunner flowRunner : runningFlows.values()) {
+      flowRunner.shutdown();
+
       // 更新状态
       flowRunner.clean(false);
 
