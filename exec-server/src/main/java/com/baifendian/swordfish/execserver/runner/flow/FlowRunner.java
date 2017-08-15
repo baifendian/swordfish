@@ -150,7 +150,8 @@ public class FlowRunner implements Runnable {
         return;
       }
 
-      flowDao.deleteExecutionNodes(executionFlow.getId());
+      // 不用从头执行
+      // flowDao.deleteExecutionNodes(executionFlow.getId());
     } else { // 压根查不到
       logger.info("flow is not exist: {}", executionFlow.getId());
       return;
