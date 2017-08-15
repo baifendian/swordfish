@@ -396,15 +396,21 @@ public class FlowScheduleJob implements Job {
 
         // 检测周期特征是否符合
         Date nextDate = cronExpression.getTimeAfter(executionFlow.getSubmitTime());
-        if (nextDate != null && nextDate.getTime() <= relativeTime.getTime()) {
-          return false;
+
+        //没有下一次了直接算通过
+        if (nextDate == null) {
+          return true;
         }
 
-        FlowStatus flowStatus = executionFlow.getStatus();
-        if (flowStatus != null && flowStatus.typeIsSuccess()) {
-          return true;
-        } else if (flowStatus == null || flowStatus.typeIsNotFinished()) {
-          isNotFinshed = true;
+        if (nextDate.getTime() >= relativeTime.getTime()) {
+          FlowStatus flowStatus = executionFlow.getStatus();
+          if (flowStatus != null && flowStatus.typeIsSuccess()) {
+            return true;
+          } else if (flowStatus == null || flowStatus.typeIsNotFinished()) {
+            isNotFinshed = true;
+          }
+        } else {
+          return false;
         }
 
       }
@@ -428,6 +434,7 @@ public class FlowScheduleJob implements Job {
       }
     }
   }
+
 
   /**
    * 检测一段时间内调度最后一个工作流，或第一个工作流是否完成
