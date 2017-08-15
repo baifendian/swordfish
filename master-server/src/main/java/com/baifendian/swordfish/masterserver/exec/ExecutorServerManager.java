@@ -42,8 +42,11 @@ public class ExecutorServerManager {
       throws MasterException {
     String key = getKey(executorServerInfo);
 
+    // 如果以前没有, 记录一条信息
     if (executorServers.containsKey(key)) {
-      throw new MasterException("executor is register");
+      logger.error("executor is register already: {}", executorServerInfo);
+
+      throw new MasterException("executor is register already: " + executorServerInfo);
     }
 
     return executorServers.put(key, executorServerInfo);
@@ -58,12 +61,26 @@ public class ExecutorServerManager {
 
     // 如果以前没有, 记录一条信息
     if (!executorServers.containsKey(key)) {
-      //      throw new MasterException("executor is not register");
-      logger.warn("executor is not register: {}", executorServerInfo);
+      logger.warn("executor is not register, maybe master restart but executor not timeout: {}",
+          executorServerInfo);
     }
 
     // 这里会进行重新注册
     return executorServers.put(key, executorServerInfo);
+  }
+
+  /**
+   * executor server 是否已经存在
+   */
+  public synchronized boolean containServer(ExecutorServerInfo executorServerInfo)
+      throws MasterException {
+    String key = getKey(executorServerInfo);
+
+    if (executorServers.containsKey(key)) {
+      return true;
+    }
+
+    return false;
   }
 
   /**
@@ -95,6 +112,25 @@ public class ExecutorServerManager {
     }
 
     return result;
+  }
+
+  /**
+   * 得到指定的 executor
+   */
+  public synchronized ExecutorServerInfo getExecutorServer(String host, int port) {
+    logger.debug("executor servers: {}", executorServers.toString());
+
+    if (StringUtils.isEmpty(host)) {
+      return getExecutorServer();
+    }
+
+    String key = host + ":" + port;
+
+    if (executorServers.containsKey(key)) {
+      return executorServers.get(key);
+    }
+
+    return getExecutorServer();
   }
 
   /**
@@ -148,7 +184,7 @@ public class ExecutorServerManager {
   /**
    * 获取 key 信息
    */
-  private String getKey(ExecutorServerInfo executorServerInfo) {
+  public String getKey(ExecutorServerInfo executorServerInfo) {
     if (executorServerInfo == null) {
       return StringUtils.EMPTY;
     }
@@ -166,13 +202,6 @@ public class ExecutorServerManager {
       logger.debug("executor information, host: {}, port: {}, heart beat: {}",
           executorServerInfo.getHost(), executorServerInfo.getPort(),
           executorServerInfo.getHeartBeatData());
-    }
-  }
-
-  public static void main(String[] args) {
-    for (int i = 0; i < 100; ++i) {
-      int choose = new Random().nextInt() % 1;
-      System.out.println(choose);
     }
   }
 }

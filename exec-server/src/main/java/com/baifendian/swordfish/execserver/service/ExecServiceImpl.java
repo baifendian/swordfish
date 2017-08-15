@@ -133,32 +133,6 @@ public class ExecServiceImpl implements Iface {
   }
 
   /**
-   * 执行即席查询
-   *
-   * @param adHocId
-   * @return
-   */
-  @Override
-  public RetInfo execAdHoc(int adHocId) {
-    logger.info("exec ad hoc: {}", adHocId);
-
-    AdHoc adHoc = adHocDao.getAdHoc(adHocId);
-
-    if (adHoc == null) {
-      logger.error("ad hoc id {} not exists", adHocId);
-      return ResultHelper.createErrorResult("ad hoc id not exists");
-    }
-
-    if (adHoc.getStatus().typeIsFinished()) {
-      logger.error("ad hoc id {} finished unexpected", adHocId);
-      return ResultHelper.createErrorResult("task finished unexpected");
-    }
-
-    adHocRunnerManager.submitAdHoc(adHoc);
-    return ResultHelper.SUCCESS;
-  }
-
-  /**
    * 取消工作流的执行
    *
    * @param execId
@@ -186,6 +160,32 @@ public class ExecServiceImpl implements Iface {
       return ResultHelper.createErrorResult(e.getMessage());
     }
 
+    return ResultHelper.SUCCESS;
+  }
+
+  /**
+   * 执行即席查询
+   *
+   * @param adHocId
+   * @return
+   */
+  @Override
+  public RetInfo execAdHoc(int adHocId) {
+    logger.info("exec ad hoc: {}", adHocId);
+
+    AdHoc adHoc = adHocDao.getAdHoc(adHocId);
+
+    if (adHoc == null) {
+      logger.error("ad hoc id {} not exists", adHocId);
+      return ResultHelper.createErrorResult("ad hoc id not exists");
+    }
+
+    if (adHoc.getStatus().typeIsFinished()) {
+      logger.error("ad hoc id {} finished unexpected", adHocId);
+      return ResultHelper.createErrorResult("task finished unexpected");
+    }
+
+    adHocRunnerManager.submitAdHoc(adHoc);
     return ResultHelper.SUCCESS;
   }
 

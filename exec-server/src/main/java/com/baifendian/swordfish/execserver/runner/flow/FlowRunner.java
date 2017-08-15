@@ -24,6 +24,7 @@ import com.baifendian.swordfish.common.utils.graph.DAGGraph;
 import com.baifendian.swordfish.common.utils.graph.Graph;
 import com.baifendian.swordfish.dao.DaoFactory;
 import com.baifendian.swordfish.dao.FlowDao;
+import com.baifendian.swordfish.dao.enums.ExecType;
 import com.baifendian.swordfish.dao.enums.FailurePolicyType;
 import com.baifendian.swordfish.dao.enums.FlowStatus;
 import com.baifendian.swordfish.dao.model.ExecutionFlow;
@@ -213,10 +214,10 @@ public class FlowRunner implements Runnable {
       status = runFlow(dagGraph);
     } catch (ExecTimeoutException e) {
       logger.error("Exec flow timeout", e);
-      clean();
+      clean(true);
     } catch (Exception e) {
       logger.error(String.format("run exec id: %s", executionFlow.getId()), e);
-      clean();
+      clean(true);
     } finally {
       // 执行失败
       if (status == null) {
@@ -288,20 +289,23 @@ public class FlowRunner implements Runnable {
     // 信号量控制, 是否有线程结束了
     Semaphore semaphore = new Semaphore(0);
 
-    // 如果图有环, 直接返回
-    if (dagGraph.hasCycle()) {
-      logger.error("flow has cycle");
+    // 将 dagGraph 做一下处理, 去掉已经完成的结点
+    try {
+      for (String nodeName : dagGraph.topologicalSort()) {
+        ExecutionNode executionNode = flowDao.queryExecutionNode(executionFlow.getId(), nodeName);
+
+        // 删除完成的结点
+        if (executionNode != null && executionNode.getStatus().typeIsFinished()) {
+          dagGraph.removeVertex(nodeName);
+        }
+      }
+    } catch (Exception e) {
+      logger.error("Get topological of graph failed.", e);
       return FlowStatus.FAILED;
     }
 
     // 得到起始结点
     Collection<String> startVertex = dagGraph.getStartVertex();
-
-    // 如果没有结点
-    if (CollectionUtils.isEmpty(startVertex)) {
-      logger.error("flow has no start nodes");
-      return FlowStatus.FAILED;
-    }
 
     // 提交起始的一些节点
     for (String nodeName : startVertex) {
@@ -335,7 +339,7 @@ public class FlowRunner implements Runnable {
 
       // 如果没有获取到, 则执行清理
       if (!acquire) {
-        clean();
+        clean(true);
         return FlowStatus.FAILED;
       }
 
@@ -360,7 +364,7 @@ public class FlowRunner implements Runnable {
             // 完成了
             done = true;
 
-            // 删除, 认为只需完毕
+            // 删除, 认为执行完毕
             activeNodeRunners.remove(nodeRunner);
 
             Boolean value = false;
@@ -373,7 +377,7 @@ public class FlowRunner implements Runnable {
               logger.error("task has been cancel");
 
               // 清理任务
-              clean();
+              clean(true);
               return FlowStatus.KILL;
             } catch (InterruptedException e) {
               logger.error(e.getMessage(), e);
@@ -407,7 +411,7 @@ public class FlowRunner implements Runnable {
                 flowDao.updateExecutionNode(executionNode);
 
                 if (failurePolicyType == FailurePolicyType.END) {
-                  clean();
+                  clean(true);
                   return status;
                 }
               }
@@ -446,11 +450,17 @@ public class FlowRunner implements Runnable {
   }
 
   /**
-   * 插入一个结点
+   * 插入一个结点, 如果存在, 则直接返回
    */
   private ExecutionNode insertExecutionNode(ExecutionFlow executionFlow, String nodeName) {
+    ExecutionNode executionNode = flowDao.queryExecutionNode(executionFlow.getId(), nodeName);
+
+    if (executionNode != null) {
+      return executionNode;
+    }
+
     // 创建新结点并插入
-    ExecutionNode executionNode = new ExecutionNode();
+    executionNode = new ExecutionNode();
 
     Date now = new Date();
 
@@ -527,12 +537,24 @@ public class FlowRunner implements Runnable {
   }
 
   /**
-   * 更新 ExecutionFlow <p>
+   * 更新 ExecutionFlow <p> 注意的是, 调度和补数据没有状态更新, 这是为了能够容错处理.
    */
-  public void updateExecutionFlowToKillStatus() {
+  public void updateExecutionFlowToKillStatus(boolean updateKilled) {
     ExecutionFlow queryExecutionFlow = flowDao.queryExecutionFlow(executionFlow.getId());
 
-    if (queryExecutionFlow.getStatus().typeIsNotFinished()) {
+    if (updateKilled || (queryExecutionFlow.getType() != ExecType.SCHEDULER
+        && queryExecutionFlow.getType() != ExecType.COMPLEMENT_DATA)) {
+      updateToKilled(queryExecutionFlow);
+    }
+  }
+
+  /**
+   * 更新为 kill 状态
+   *
+   * @param executionFlow : 待更新的 flow
+   */
+  private void updateToKilled(ExecutionFlow executionFlow) {
+    if (executionFlow.getStatus().typeIsNotFinished()) {
       Date now = new Date();
 
       executionFlow.setEndTime(now);
@@ -543,20 +565,32 @@ public class FlowRunner implements Runnable {
   }
 
   /**
+   * 更新的是结点
+   */
+  private void updateNodeToKilled(ExecutionNode executionNode) {
+    Date now = new Date();
+
+    executionNode.setStatus(FlowStatus.KILL);
+    executionNode.setEndTime(now);
+
+    flowDao.updateExecutionNode(executionNode);
+  }
+
+  /**
    * 关闭正在执行的任务, 以及更新节点状态
    */
-  public void clean() {
+  public void clean(boolean updateKilled) {
     // kill 正在运行的任务
     kill();
 
     // 更新未完成的任务结点
-    updateUnfinishNodeStatus();
+    updateUnfinishNodeStatus(updateKilled);
   }
 
   /**
    * 对没有完成的节点, 更新其状态
    */
-  private void updateUnfinishNodeStatus() {
+  private void updateUnfinishNodeStatus(boolean updateKilled) {
     Date now = new Date();
 
     // 遍历没有完成的节点
@@ -566,12 +600,13 @@ public class FlowRunner implements Runnable {
 
       // 进程还在的情况下
       if (!future.isDone()) {
-        ExecutionNode executionNode = nodeRunner.getExecutionNode();
+        // 如果是需要更新, 或者是不需要更新, 但是不是补数据和调度方式
+        if (updateKilled || (nodeRunner.getExecType() != ExecType.SCHEDULER
+            && nodeRunner.getExecType() != ExecType.COMPLEMENT_DATA)) {
+          ExecutionNode executionNode = nodeRunner.getExecutionNode();
 
-        executionNode.setStatus(FlowStatus.KILL);
-        executionNode.setEndTime(now);
-
-        flowDao.updateExecutionNode(executionNode);
+          updateNodeToKilled(executionNode);
+        }
       } else {
         // 已经结束的情况
         Boolean value = false;
@@ -597,12 +632,12 @@ public class FlowRunner implements Runnable {
           logger.error(e.getMessage(), e);
         } finally {
           if (!value) {
-            ExecutionNode executionNode = nodeRunner.getExecutionNode();
+            if (updateKilled || (nodeRunner.getExecType() != ExecType.SCHEDULER
+                && nodeRunner.getExecType() != ExecType.COMPLEMENT_DATA)) {
+              ExecutionNode executionNode = nodeRunner.getExecutionNode();
 
-            executionNode.setStatus(FlowStatus.KILL);
-            executionNode.setEndTime(now);
-
-            flowDao.updateExecutionNode(executionNode);
+              updateNodeToKilled(executionNode);
+            }
           }
         }
       }

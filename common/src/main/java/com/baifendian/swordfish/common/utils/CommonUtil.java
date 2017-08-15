@@ -15,11 +15,15 @@
  */
 package com.baifendian.swordfish.common.utils;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 import org.apache.commons.lang.StringUtils;
-
-import java.util.*;
+import org.apache.commons.lang3.tuple.Pair;
 
 public class CommonUtil {
+
   /**
    * 状态机描述
    */
@@ -29,9 +33,6 @@ public class CommonUtil {
 
   /**
    * 识别文件后缀名称
-   *
-   * @param filename
-   * @return
    */
   public static String fileSuffix(String filename) {
     if (StringUtils.isEmpty(filename)) {
@@ -48,9 +49,6 @@ public class CommonUtil {
 
   /**
    * sql 字符串解析, 将一个语句进行正常切割为多个, 语句的切割符号为 ";"
-   *
-   * @param sql
-   * @return
    */
   public static List<String> sqlSplit(String sql) {
     if (StringUtils.isEmpty(sql)) {
@@ -184,11 +182,29 @@ public class CommonUtil {
     return r;
   }
 
+  /**
+   * 解析服务器信息, 得到 host,port
+   */
+  public static Pair<String, Integer> parseWorker(String worker) {
+    if (StringUtils.isEmpty(worker)) {
+      return null;
+    }
+
+    int index = worker.indexOf(":");
+
+    if (index >= 0) {
+      return Pair.of(worker.substring(0, index), Integer.parseInt(worker.substring(index + 1)));
+    }
+
+    return null;
+  }
+
   public static void main(String[] args) {
     System.out.println("abc'\\t'def");
 
     System.out.println("split complex clause...");
-    Collection<String> r = sqlSplit("by '\\t' by '\\n' e;LOAD DATA INPATH 'hdfs:///tmp/dw//testtxt_1479882703178_4322' INTO TABLE testtxt_1479882703178_4322;INSERT INTO TABLE baifendian_e_commerce.fact_daily_order PARTITION(l_date='aa') SELECT col_0,null,null,null,null from testtxt_1479882703178_4322;DROP TABLE IF EXISTS testtxt_1479882703178_4322;");
+    Collection<String> r = sqlSplit(
+        "by '\\t' by '\\n' e;LOAD DATA INPATH 'hdfs:///tmp/dw//testtxt_1479882703178_4322' INTO TABLE testtxt_1479882703178_4322;INSERT INTO TABLE baifendian_e_commerce.fact_daily_order PARTITION(l_date='aa') SELECT col_0,null,null,null,null from testtxt_1479882703178_4322;DROP TABLE IF EXISTS testtxt_1479882703178_4322;");
     for (String sr : r) {
       System.out.println(sr);
     }

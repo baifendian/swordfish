@@ -164,6 +164,8 @@ public class FlowDao extends BaseDao {
 
   /**
    * 调度 workflow 时，插入执行信息（调度或者补数据） <p>
+   *
+   * @param scheduleTime : 这个时间在不同的场景, 有不同的解释, 直接运行指接受到的时间, 调度和补数据 则是 fire time(定时器给的时间)
    */
   public ExecutionFlow scheduleFlowToExecution(Integer projectId,
       Integer workflowId,
@@ -212,11 +214,11 @@ public class FlowDao extends BaseDao {
 
     executionFlow.setFlowId(workflowId);
     executionFlow.setSubmitUserId(submitUser);
-    executionFlow.setSubmitTime(now);
+    executionFlow.setSubmitTime(now); // 即插入任务的时间
     executionFlow.setQueue(projectFlow.getQueue());
     executionFlow.setProxyUser(projectFlow.getProxyUser());
     executionFlow.setScheduleTime(scheduleTime);
-    executionFlow.setStartTime(now);
+    executionFlow.setStartTime(now); // 即插入任务的时间
 
     // 如果 node 名称为空, 表示是执行整个节点
     if (nodeName != null) {

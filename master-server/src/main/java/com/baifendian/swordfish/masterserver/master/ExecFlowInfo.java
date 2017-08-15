@@ -16,26 +16,54 @@
 package com.baifendian.swordfish.masterserver.master;
 
 public class ExecFlowInfo {
+
+  private String host;
+  private int port;
   private int execId;
 
-  public ExecFlowInfo(){
+  public ExecFlowInfo() {
   }
 
-  public ExecFlowInfo(int execId){
+  public ExecFlowInfo(int execId) {
     this.execId = execId;
+  }
+
+  public ExecFlowInfo(String host, int port, int execId) {
+    this.host = host;
+    this.port = port;
+    this.execId = execId;
+  }
+
+  public String getHost() {
+    return host;
+  }
+
+  public void setHost(String host) {
+    this.host = host;
+  }
+
+  public int getPort() {
+    return port;
+  }
+
+  public void setPort(int port) {
+    this.port = port;
   }
 
   public int getExecId() {
     return execId;
   }
 
-  public ExecFlowInfo setExecId(int execId) {
+  public void setExecId(int execId) {
     this.execId = execId;
-    return this;
   }
 
   @Override
-  public String toString(){
-    return String.format("execId:%d", execId);
+  public String toString() {
+    return "ExecFlowInfo{" +
+        "host='" + host + '\'' +
+        ", port=" + port +
+        ", execId=" + execId +
+        '}';
   }
 }

@@ -153,16 +153,15 @@ public class ExecThriftServer {
       }
     }
 
+    // 心跳
     heartBeatInterval = conf.getInt(Constants.EXECUTOR_HEARTBEAT_INTERVAL, Constants.defaultExecutorHeartbeatInterval);
 
-    // 执行启动
     heartbeatExecutorService = Executors.newScheduledThreadPool(Constants.defaultExecutorHeartbeatThreadNum);
 
-    // 心跳任务启动
     Runnable heartBeatThread = getHeartBeatThread();
     heartbeatExecutorService.scheduleAtFixedRate(heartBeatThread, 10, heartBeatInterval, TimeUnit.SECONDS);
 
-    // 启动实际的 worker service
+    // 启动 worker service
     TProtocolFactory protocolFactory = new TBinaryProtocol.Factory();
     TTransportFactory tTransportFactory = new TTransportFactory();
 
@@ -179,7 +178,7 @@ public class ExecThriftServer {
     serverThread.setDaemon(true);
     serverThread.start();
 
-    // 注册钩子
+    // 注册钩子, 销毁一些信息
     Runtime.getRuntime().addShutdownHook(new Thread(() -> {
       if (heartbeatExecutorService != null) {
         heartbeatExecutorService.shutdownNow();
@@ -192,6 +191,11 @@ public class ExecThriftServer {
       if (server != null) {
         server.stop();
       }
+
+      // 告知 master 已经关闭
+      masterClient.downExecutor(host, port);
+
+      logger.info("exec server stop");
     }));
 
     synchronized (this) {
@@ -208,6 +212,9 @@ public class ExecThriftServer {
       heartbeatExecutorService.shutdownNow();
       workerService.destory();
       server.stop();
+
+      // 告知 master 已经关闭
+      masterClient.downExecutor(host, port);
 
       logger.info("exec server stop");
     }

@@ -70,9 +70,11 @@ public class MasterConfig {
    */
   public static int masterPort;
 
-  private static final String MASTER_MIN_THREADS = "master.min.threads";
-  private static final String MASTER_MAX_THREADS = "master.max.threads";
-  private static final String MASTER_PORT = "master.port";
+  /**
+   * 最大允许的 ticket interval
+   */
+  public static int masterExecutorMaxAllowTicketInterval;
+
 
   static {
     Configuration conf = null;
@@ -84,13 +86,19 @@ public class MasterConfig {
     }
 
     failRetryCount = conf.getInt("masterToWorker.failRetry.count", 2);
+
     executionFlowQueueSize = conf.getInt("masterToWorker.executionFlow.queueSize", 10000);
+
     heartBeatTimeoutInterval = conf.getInt("master.heartbeat.timeout.interval", 60) * 1000;
     heartBeatCheckInterval = conf.getInt("master.heartbeat.check.interval", 30);
+
     streamingCheckInterval = conf.getInt("streaming.check.interval", 30);
     streamingTimeoutThreshold = conf.getInt("streaming.timeout.threshold", 1800);
-    masterMinThreads = conf.getInt(MASTER_MIN_THREADS, 50);
-    masterMaxThreads = conf.getInt(MASTER_MAX_THREADS, 200);
-    masterPort = conf.getInt(MASTER_PORT, 9999);
+
+    masterMinThreads = conf.getInt("master.min.threads", 50);
+    masterMaxThreads = conf.getInt("master.max.threads", 200);
+    masterPort = conf.getInt("master.port", 9999);
+
+    masterExecutorMaxAllowTicketInterval = conf.getInt("master.executor.maxallow.ticket.interval", 2000);
   }
 }
