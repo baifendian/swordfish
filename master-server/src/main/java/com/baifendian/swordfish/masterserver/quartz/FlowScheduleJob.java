@@ -398,7 +398,7 @@ public class FlowScheduleJob implements Job {
 
       // 检测周期特征是否符合
       Date nextDate = cronExpression.getTimeAfter(executionFlow.getSubmitTime());
-      if (nextDate.getTime() <= relativeTime.getTime()) {
+      if (nextDate != null && nextDate.getTime() <= relativeTime.getTime()) {
         return false;
       }
 
