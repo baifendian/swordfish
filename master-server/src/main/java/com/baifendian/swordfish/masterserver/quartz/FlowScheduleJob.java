@@ -391,22 +391,22 @@ public class FlowScheduleJob implements Job {
       boolean isNotFinshed = false;
       ExecutionFlow executionFlow = flowDao.executionFlowPreDate(flowId, relativeTime);
 
-      // 系统没有触发调度直接认为依赖失败
-      if (executionFlow == null) {
-        return false;
-      }
+      //如果存在记录就处理，否则等待到超时。
+      if (executionFlow != null) {
 
-      // 检测周期特征是否符合
-      Date nextDate = cronExpression.getTimeAfter(executionFlow.getSubmitTime());
-      if (nextDate != null && nextDate.getTime() <= relativeTime.getTime()) {
-        return false;
-      }
+        // 检测周期特征是否符合
+        Date nextDate = cronExpression.getTimeAfter(executionFlow.getSubmitTime());
+        if (nextDate != null && nextDate.getTime() <= relativeTime.getTime()) {
+          return false;
+        }
 
-      FlowStatus flowStatus = executionFlow.getStatus();
-      if (flowStatus != null && flowStatus.typeIsSuccess()) {
-        return true;
-      } else if (flowStatus == null || flowStatus.typeIsNotFinished()) {
-        isNotFinshed = true;
+        FlowStatus flowStatus = executionFlow.getStatus();
+        if (flowStatus != null && flowStatus.typeIsSuccess()) {
+          return true;
+        } else if (flowStatus == null || flowStatus.typeIsNotFinished()) {
+          isNotFinshed = true;
+        }
+
       }
 
       if (isNotFinshed) {
