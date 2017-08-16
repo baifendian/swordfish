@@ -397,7 +397,7 @@ public class FlowScheduleJob implements Job {
       if (executionFlow != null) {
 
         // 检测周期特征是否符合
-        Date nextDate = cronExpression.getTimeAfter(executionFlow.getSubmitTime());
+        Date nextDate = cronExpression.getTimeAfter(executionFlow.getScheduleTime());
 
         // 没有下一次了直接算通过
         if (nextDate == null) {
