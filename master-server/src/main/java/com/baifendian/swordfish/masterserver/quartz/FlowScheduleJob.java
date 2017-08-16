@@ -386,10 +386,12 @@ public class FlowScheduleJob implements Job {
    */
   private boolean checkExecutionFlowStatus(Date relativeTime, int flowId,
       CronExpression cronExpression, long systemTime, int timeout) {
+    ExecutionFlow executionFlow = flowDao.executionFlowPreDate(flowId, relativeTime);
     while (true) {
       // 是否没有完成
       boolean isNotFinshed = false;
-      ExecutionFlow executionFlow = flowDao.executionFlowPreDate(flowId, relativeTime);
+      // 是否需要刷新纪录
+      boolean flushExecFlow = false;
 
       //如果存在记录就处理，否则等待到超时。
       if (executionFlow != null) {
@@ -397,22 +399,29 @@ public class FlowScheduleJob implements Job {
         // 检测周期特征是否符合
         Date nextDate = cronExpression.getTimeAfter(executionFlow.getSubmitTime());
 
-        //没有下一次了直接算通过
+        // 没有下一次了直接算通过
         if (nextDate == null) {
           return true;
         }
 
-        if (nextDate.getTime() >= relativeTime.getTime()) {
+        // 如果依赖的下一个词调度比当前迟，那我们就看这次依赖的结果
+        if (nextDate.getTime() > relativeTime.getTime()) {
           FlowStatus flowStatus = executionFlow.getStatus();
           if (flowStatus != null && flowStatus.typeIsSuccess()) {
             return true;
           } else if (flowStatus == null || flowStatus.typeIsNotFinished()) {
             isNotFinshed = true;
           }
+        // 否则的话重新尝试获取依赖纪录。
         } else {
-          return false;
+          //需要刷新重新查
+          flushExecFlow = true;
+          isNotFinshed = true;
         }
 
+      }else{
+        // 如果没有依赖纪录也尝试重新获取
+        flushExecFlow = true;
       }
 
       if (isNotFinshed) {
@@ -424,6 +433,9 @@ public class FlowScheduleJob implements Job {
 
         try {
           Thread.sleep(checkInterval);
+          if (flushExecFlow){
+            executionFlow = flowDao.executionFlowPreDate(flowId, relativeTime);
+          }
         } catch (InterruptedException e) {
           logger.error(e.getMessage(), e);
           return false;
