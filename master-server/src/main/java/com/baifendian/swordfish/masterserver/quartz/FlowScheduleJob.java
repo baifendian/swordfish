@@ -215,39 +215,19 @@ public class FlowScheduleJob implements Job {
       return false;
     }
 
-
-
     while (true) {
-      ExecutionFlow executionFlow = flowDao
-          .executionFlowPreDate(flowId, scheduleFireTime);
+      ExecutionFlow executionFlow = getLastSelfExecFlow(flowId, cronExpression, scheduleFireTime);
       // 是否没有完成
       boolean isNotFinshed = false;
 
       //如果存在记录就处理，否则等待到超时。
       if (executionFlow != null) {
-
-        // 检测周期特征是否符合
-        Date nextDate = cronExpression.getTimeAfter(executionFlow.getScheduleTime());
-
-        // 没有下一次了,这种情况理论不存在，返回失败
-        if (nextDate == null) {
-          return false;
-        }
-
-        // 如果下次执行结果就是当前调度时间，那么就看这次，否则说明依赖的工作流没有调用。
-        if (nextDate.getTime() == scheduleFireTime.getTime()) {
           FlowStatus flowStatus = executionFlow.getStatus();
           if (flowStatus != null && flowStatus.typeIsSuccess()) {
             return true;
           } else if (flowStatus == null || flowStatus.typeIsNotFinished()) {
             isNotFinshed = true;
           }
-          // 否则的话重新尝试获取依赖纪录。
-        } else {
-          //需要刷新重新查
-          isNotFinshed = true;
-        }
-
       } else {
         // 如果没有依赖纪录也尝试重新获取
         isNotFinshed = true;
@@ -315,34 +295,18 @@ public class FlowScheduleJob implements Job {
   private boolean checkWorkflowDep(int flowId,
       CronExpression cronExpression, Date fireTime, Date scheduleFireTime, int timeout) {
     while (true) {
-      ExecutionFlow executionFlow = flowDao.executionFlowPreDate(flowId, scheduleFireTime);
+      ExecutionFlow executionFlow = getLastExecFlow(flowId, cronExpression, scheduleFireTime);
       // 是否没有完成
       boolean isNotFinshed = false;
 
-      //如果存在记录就处理，否则等待到超时。
       if (executionFlow != null) {
-
-        // 检测周期特征是否符合
-        Date nextDate = cronExpression.getTimeAfter(executionFlow.getScheduleTime());
-
-        // 没有下一次了直接算通过
-        if (nextDate == null) {
-          return true;
-        }
-
         // 如果依赖的下一个词调度比当前迟，那我们就看这次依赖的结果
-        if (nextDate.getTime() > scheduleFireTime.getTime()) {
-          FlowStatus flowStatus = executionFlow.getStatus();
-          if (flowStatus != null && flowStatus.typeIsSuccess()) {
-            return true;
-          } else if (flowStatus == null || flowStatus.typeIsNotFinished()) {
-            isNotFinshed = true;
-          }
-        } else {
-          // 需要刷新重查记录
+        FlowStatus flowStatus = executionFlow.getStatus();
+        if (flowStatus != null && flowStatus.typeIsSuccess()) {
+          return true;
+        } else if (flowStatus == null || flowStatus.typeIsNotFinished()) {
           isNotFinshed = true;
         }
-
       } else {
         // 如果没有依赖纪录也尝试重新获取
         isNotFinshed = true;
@@ -366,6 +330,70 @@ public class FlowScheduleJob implements Job {
         return false;
       }
     }
+  }
+
+  /**
+   * 获取最后一次工作流执行的记录
+   */
+  private ExecutionFlow getLastExecFlow(int flowId, CronExpression cronExpression,
+      Date scheduleFireTime) {
+    ExecutionFlow scheduleFlow = flowDao.executionFlowPreDate(flowId, scheduleFireTime);
+
+    if (scheduleFlow != null) {
+      Date nextDate = cronExpression.getTimeAfter(scheduleFlow.getScheduleTime());
+
+      if (nextDate == null || nextDate.getTime() <= scheduleFireTime.getTime()) {
+        return null;
+      }
+    } else {
+      return null;
+    }
+
+    ExecutionFlow startTimeFlow = flowDao
+        .executionFlowByStartTimeAndScheduleTime(flowId, scheduleFlow.getScheduleTime(),
+            scheduleFlow.getStartTime());
+
+    if (startTimeFlow != null) {
+      Date nextDate = cronExpression.getTimeAfter(startTimeFlow.getScheduleTime());
+
+      if (nextDate != null && nextDate.getTime() > scheduleFireTime.getTime()) {
+        return startTimeFlow;
+      }
+    }
+
+    return scheduleFlow;
+  }
+
+  /**
+   * 获取最后一次工作流执行的记录
+   */
+  private ExecutionFlow getLastSelfExecFlow(int flowId, CronExpression cronExpression,
+      Date scheduleFireTime) {
+    ExecutionFlow scheduleFlow = flowDao.executionFlowPreDate(flowId, scheduleFireTime);
+
+    if (scheduleFlow != null) {
+      Date nextDate = cronExpression.getTimeAfter(scheduleFlow.getScheduleTime());
+
+      if (nextDate == null || nextDate.getTime() < scheduleFireTime.getTime()) {
+        return null;
+      }
+    } else {
+      return null;
+    }
+
+    ExecutionFlow startTimeFlow = flowDao
+        .executionFlowByStartTimeAndScheduleTime(flowId, scheduleFlow.getScheduleTime(),
+            scheduleFlow.getStartTime());
+
+    if (startTimeFlow != null) {
+      Date nextDate = cronExpression.getTimeAfter(startTimeFlow.getScheduleTime());
+
+      if (nextDate != null && nextDate.getTime() >= scheduleFireTime.getTime()) {
+        return startTimeFlow;
+      }
+    }
+
+    return scheduleFlow;
   }
 
 

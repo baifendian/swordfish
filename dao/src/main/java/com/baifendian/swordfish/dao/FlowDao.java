@@ -410,4 +410,9 @@ public class FlowDao extends BaseDao {
   public ExecutionFlow executionFlowPreDate(int flowId, Date date) {
     return executionFlowMapper.selectPreDate(flowId, date);
   }
+
+  public ExecutionFlow executionFlowByStartTimeAndScheduleTime(int flowId, Date startTIme,
+      Date scheduleTime) {
+    return executionFlowMapper.selectByStartTimeAndScheduleTime(flowId, startTIme, scheduleTime);
+  }
 }

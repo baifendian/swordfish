@@ -511,6 +511,22 @@ public class ExecutionFlowMapperProvider {
     }.toString() + " limit 1";
   }
 
+  public String selectByStartTimeAndScheduleTime(Map<String, Object> parameter) {
+    return new SQL() {
+      {
+        SELECT("*");
+
+        FROM(TABLE_NAME);
+
+        WHERE("schedule_time < #{scheduleTime}");
+        WHERE("start_time > #{startTime}");
+        WHERE("flow_id = #{flowId}");
+
+        ORDER_BY("schedule_time,start_time DESC");
+      }
+    }.toString() + " limit 1";
+  }
+
   /**
    * 根据flowId和ScheduleTime查询一个ExecutionFlow
    *
