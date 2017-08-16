@@ -207,8 +207,8 @@ public class ScheduleController {
    */
   @PostMapping("/{workflowName}/schedules/online")
   public void scheduleOnline(@RequestAttribute(value = "session.user") User operator,
-                             @PathVariable String projectName,
-                             @PathVariable String workflowName) {
+                             @PathVariable("projectName") String projectName,
+                             @PathVariable("workflowName") String workflowName) {
     logger.info("Operator user {}, schedule online, project name: {}, workflow name: {}",
             operator.getName(), projectName, workflowName);
 
@@ -228,8 +228,8 @@ public class ScheduleController {
    */
   @PostMapping("/{workflowName}/schedules/offline")
   public void scheduleOffline(@RequestAttribute(value = "session.user") User operator,
-                              @PathVariable String projectName,
-                              @PathVariable String workflowName) {
+                              @PathVariable("projectName") String projectName,
+                              @PathVariable("workflowName") String workflowName) {
     logger.info("Operator user {}, schedule offline, project name: {}, workflow name: {}",
             operator.getName(), projectName, workflowName);
 
