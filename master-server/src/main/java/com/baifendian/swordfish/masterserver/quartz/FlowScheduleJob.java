@@ -193,7 +193,7 @@ public class FlowScheduleJob implements Job {
 
     if (preCheck) {
       sendToExecution(executionFlow);
-    } else if (executionFlow.getNotifyType().typeIsSendFailureMail()) {
+    } else {
       EmailManager.sendMessageOfExecutionFlow(executionFlow);
     }
   }
