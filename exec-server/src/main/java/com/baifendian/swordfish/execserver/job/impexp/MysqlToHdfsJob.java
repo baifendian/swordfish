@@ -46,7 +46,7 @@ public class MysqlToHdfsJob extends DataXJob {
 
     MysqlReaderArg mysqlReaderArg = new MysqlReaderArg(mysqlReader);
 
-    // TODO 增加一个判断根据类型
+    // TODO:: 增加一个判断根据类型
     DataSource datasource = impExpProps.getDatasourceDao()
         .queryResource(props.getProjectId(), mysqlReader.getDatasource());
     if (datasource == null) {

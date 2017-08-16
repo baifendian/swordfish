@@ -32,8 +32,6 @@ public class StartupRunner implements CommandLineRunner {
     logger.info("init hdfs instance");
     HdfsClient.init(ConfigurationUtil.getConfiguration());
 
-    // TODO::
-
     logger.info("end startup");
   }
 }

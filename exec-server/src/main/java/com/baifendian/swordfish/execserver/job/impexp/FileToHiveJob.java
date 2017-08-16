@@ -127,13 +127,12 @@ public class FileToHiveJob extends AbstractYarnJob {
       logger.error("FileToHiveJob before function error", e);
       throw e;
     }
-
-
   }
 
   @Override
   public void process() throws Exception {
     List<String> execSqls = new ArrayList<>();
+
     try {
       String hdfsPath = fileReader.getHdfsPath();
       String fileName = fileReader.getFileName();
