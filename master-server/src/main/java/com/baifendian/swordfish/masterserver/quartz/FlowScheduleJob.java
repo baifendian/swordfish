@@ -215,14 +215,13 @@ public class FlowScheduleJob implements Job {
       return false;
     }
 
-    ExecutionFlow executionFlow = flowDao
-        .executionFlowPreDate(flowId, scheduleFireTime);
+
 
     while (true) {
+      ExecutionFlow executionFlow = flowDao
+          .executionFlowPreDate(flowId, scheduleFireTime);
       // 是否没有完成
       boolean isNotFinshed = false;
-      // 是否需要刷新执行记录
-      boolean flushExecFlow = false;
 
       //如果存在记录就处理，否则等待到超时。
       if (executionFlow != null) {
@@ -246,14 +245,12 @@ public class FlowScheduleJob implements Job {
           // 否则的话重新尝试获取依赖纪录。
         } else {
           //需要刷新重新查
-          flushExecFlow = true;
           isNotFinshed = true;
         }
 
       } else {
         // 如果没有依赖纪录也尝试重新获取
         isNotFinshed = true;
-        flushExecFlow = true;
       }
 
       if (isNotFinshed) {
@@ -265,9 +262,6 @@ public class FlowScheduleJob implements Job {
 
         try {
           Thread.sleep(checkInterval);
-          if (flushExecFlow) {
-            executionFlow = flowDao.executionFlowPreDate(flowId, scheduleFireTime);
-          }
         } catch (InterruptedException e) {
           logger.error(e.getMessage(), e);
           return false;
@@ -320,12 +314,10 @@ public class FlowScheduleJob implements Job {
    */
   private boolean checkWorkflowDep(int flowId,
       CronExpression cronExpression, Date fireTime, Date scheduleFireTime, int timeout) {
-    ExecutionFlow executionFlow = flowDao.executionFlowPreDate(flowId, scheduleFireTime);
     while (true) {
+      ExecutionFlow executionFlow = flowDao.executionFlowPreDate(flowId, scheduleFireTime);
       // 是否没有完成
       boolean isNotFinshed = false;
-      // 是否需要刷新纪录
-      boolean flushExecFlow = false;
 
       //如果存在记录就处理，否则等待到超时。
       if (executionFlow != null) {
@@ -348,14 +340,12 @@ public class FlowScheduleJob implements Job {
           }
         } else {
           // 需要刷新重查记录
-          flushExecFlow = true;
           isNotFinshed = true;
         }
 
       } else {
         // 如果没有依赖纪录也尝试重新获取
         isNotFinshed = true;
-        flushExecFlow = true;
       }
 
       if (isNotFinshed) {
@@ -367,9 +357,6 @@ public class FlowScheduleJob implements Job {
 
         try {
           Thread.sleep(checkInterval);
-          if (flushExecFlow) {
-            executionFlow = flowDao.executionFlowPreDate(flowId, scheduleFireTime);
-          }
         } catch (InterruptedException e) {
           logger.error(e.getMessage(), e);
           return false;
