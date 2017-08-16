@@ -487,7 +487,7 @@ public class ExecutionFlowMapperProvider {
         WHERE("schedule_time <= #{date}");
         WHERE("flow_id = #{flowId}");
 
-        ORDER_BY("schedule_time DESC");
+        ORDER_BY("start_time DESC");
       }
     }.toString() + " limit 1";
   }
@@ -506,7 +506,7 @@ public class ExecutionFlowMapperProvider {
         WHERE("start_time <= #{date}");
         WHERE("flow_id = #{flowId}");
 
-        ORDER_BY("schedule_time DESC");
+        ORDER_BY("start_time DESC");
       }
     }.toString() + " limit 1";
   }
