@@ -82,11 +82,6 @@ public class HiveUtil extends BaseDao {
 
   /**
    * 组装一个ORC存储的临时表
-   * @param dbName
-   * @param tableName
-   * @param hqlColumnList
-   * @param localtion
-   * @return
    */
   public static String getORCTmpTableDDL(String dbName, String tableName,
       List<HqlColumn> hqlColumnList, String localtion) {
@@ -120,7 +115,7 @@ public class HiveUtil extends BaseDao {
     String sql = "CREATE TEMPORARY EXTERNAL TABLE {0}.{1}({2}) ROW FORMAT SERDE \"org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe\" WITH SERDEPROPERTIES(\"field.delim\"=\"{3}\",\"serialization.encoding\"=\"{4}\") STORED AS textfile LOCATION \"{5}\"";
 
     sql = MessageFormat
-        .format(sql, dbName, tableName, String.join(",", fieldList), fieldDelimiter, fileCode,
+        .format(sql, dbName, tableName, String.join(",", fieldList), fieldDelimiter, fileCode
             , localtion);
 
     return sql;
