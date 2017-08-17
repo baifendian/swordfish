@@ -93,9 +93,9 @@ public class FlowScheduleJob implements Job {
   private static FlowDao flowDao;
 
   /**
-   * 检测依赖的等待时间，默认 30 s
+   * 检测依赖的等待时间
    */
-  private static long checkInterval = 30 * 1000;
+  private static long checkInterval = 15 * 1000;
 
   /**
    * 初始化 Job （使用该调度 Job 前，必须先调用该函数初始化） <p>
