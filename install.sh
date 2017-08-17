@@ -51,6 +51,9 @@ developMode=true
 # home of swordfish
 SWORDFISH_HOME="/opt/udp/swordfish-all-${version}/"
 
+# prohibit user list
+prohibitUserList=admin,ambari-qa,hbase,hcat,hdfs,hive,root,spark,a207,udp
+
 # 使用示例
 function usage() {
     echo "Usage: $0 -r <true|false> [-m <all|web-server|master-server|exec-server>" 1>&2;
@@ -99,6 +102,7 @@ function file_replace()
 
     sed -i "s#sf.env.file.*#sf.env.file = ${envFile}#g" conf/common/base_config.properties
     sed -i "s#develop.mode.*#develop.mode = ${developMode}#g" conf/common/base_config.properties
+    sed -i "s#prohibit.user.list.*#prohibit.user.list = ${prohibitUserList}#g" conf/common/base_config.properties
 
     sed -i "s#fs.defaultFS.*#fs.defaultFS = hdfs://${hadoopNamenodeAddress}:8020#g" conf/common/hadoop/hadoop.properties
     sed -i "s#yarn.resourcemanager.address.*#yarn.resourcemanager.address = ${hadoopYarnAddress}:8032#g" conf/common/hadoop/hadoop.properties
