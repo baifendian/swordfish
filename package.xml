@@ -37,5 +37,12 @@
             </includes>
             <outputDirectory>./sql</outputDirectory>
         </fileSet>
+        <fileSet>
+            <directory>./</directory>
+            <includes>
+                <include>*.sh</include>
+            </includes>
+            <outputDirectory>./script</outputDirectory>
+        </fileSet>
     </fileSets>
 </assembly>
