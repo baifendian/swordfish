@@ -329,6 +329,22 @@ public interface ExecutionFlowMapper {
   @SelectProvider(type = ExecutionFlowMapperProvider.class, method = "selectPreStartDate")
   ExecutionFlow selectPreStartDate(@Param("flowId") int flowId, @Param("date") Date date);
 
+  @Results(value = {@Result(property = "id", column = "id", id = true, javaType = int.class, jdbcType = JdbcType.INTEGER),
+      @Result(property = "flowId", column = "flow_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
+      @Result(property = "status", column = "status", typeHandler = EnumOrdinalTypeHandler.class, jdbcType = JdbcType.TINYINT),
+      @Result(property = "worker", column = "worker", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+      @Result(property = "status", column = "status", typeHandler = EnumOrdinalTypeHandler.class, jdbcType = JdbcType.TINYINT),
+      @Result(property = "scheduleTime", column = "schedule_time", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP),
+      @Result(property = "submitTime", column = "submit_time", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP),
+      @Result(property = "startTime", column = "start_time", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP),
+      @Result(property = "endTime", column = "end_time", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP),
+      @Result(property = "submitUserId", column = "schedule_user", javaType = int.class, jdbcType = JdbcType.INTEGER),
+      @Result(property = "type", column = "type", typeHandler = EnumOrdinalTypeHandler.class, jdbcType = JdbcType.TINYINT),
+      @Result(property = "proxyUser", column = "proxy_user", javaType = String.class, jdbcType = JdbcType.VARCHAR)
+  })
+  @SelectProvider(type = ExecutionFlowMapperProvider.class, method = "selectByStartTimeAndScheduleTime")
+  ExecutionFlow selectByStartTimeAndScheduleTime(@Param("flowId") int flowId, @Param("startTime") Date startTime, @Param("scheduleTime") Date scheduleTime);
+
   /**
    * 根据scheduleTime 和 flowId 查询一个ExecutionFlow信息
    *

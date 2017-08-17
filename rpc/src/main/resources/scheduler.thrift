@@ -202,6 +202,14 @@ service MasterService {
   RetInfo registerExecutor(1:string ip, 2:i32 port, 3:i64 registerTime),
 
   /**
+   * execServer 删除下线
+   *
+   * ip :  ip 地址
+   * port : 端口号
+   */
+  RetInfo downExecutor(1:string ip, 2:i32 port),
+
+  /**
    * execServer 汇报心跳
    *
    * ip :  ip 地址

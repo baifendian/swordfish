@@ -19,6 +19,7 @@ import com.baifendian.swordfish.common.config.BaseConfig;
 import com.baifendian.swordfish.common.utils.http.HttpUtil;
 import com.baifendian.swordfish.dao.DaoFactory;
 import com.baifendian.swordfish.dao.FlowDao;
+import com.baifendian.swordfish.dao.enums.ExecType;
 import com.baifendian.swordfish.dao.enums.FlowStatus;
 import com.baifendian.swordfish.dao.model.ExecutionFlow;
 import com.baifendian.swordfish.dao.model.ExecutionNode;
@@ -64,6 +65,10 @@ public class NodeRunner implements Callable<Boolean> {
     this.executionNode = jobContext.getExecutionNode();
     this.flowNode = jobContext.getFlowNode();
     this.semaphore = jobContext.getSemaphore();
+  }
+
+  public ExecType getExecType() {
+    return executionFlow.getType();
   }
 
   /**

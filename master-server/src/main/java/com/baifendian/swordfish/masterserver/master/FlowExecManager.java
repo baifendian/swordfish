@@ -53,7 +53,7 @@ public class FlowExecManager {
   /**
    * execution flow queue
    **/
-  private final JobExecManager jobExecManager;
+  private final MasterServiceImpl masterService;
 
   /**
    * {@link FlowDao}
@@ -67,11 +67,11 @@ public class FlowExecManager {
 
 
   /**
-   * @param jobExecManager
+   * @param masterService
    * @param flowDao
    */
-  public FlowExecManager(JobExecManager jobExecManager, FlowDao flowDao) {
-    this.jobExecManager = jobExecManager;
+  public FlowExecManager(MasterServiceImpl masterService, FlowDao flowDao) {
+    this.masterService = masterService;
     this.flowDao = flowDao;
 
     ThreadFactory flowThreadFactory = new ThreadFactoryBuilder()
@@ -107,7 +107,7 @@ public class FlowExecManager {
           logger.info("add data: {}", execFlowInfo);
 
           // 发送请求到 executor server 中执行
-          jobExecManager.addExecFlow(execFlowInfo);
+          masterService.addExecFlow(execFlowInfo);
 
           // 如果当前任务补数据任务失败，后续任务不再执行
           boolean execStatus = checkExecStatus(executionFlow.getId());

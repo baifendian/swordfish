@@ -147,6 +147,25 @@ public class ExecutionNode {
     return appLinkList;
   }
 
+  /**
+   * 已有的里面增加
+   *
+   * @param appLinkList : 增加的 app links
+   */
+  public void addAppLinkList(List<String> appLinkList) {
+    if (appLinkList == null) {
+      return;
+    }
+
+    if (CollectionUtils.isEmpty(this.appLinkList)) {
+      setAppLinkList(appLinkList);
+      return;
+    }
+
+    this.appLinkList.addAll(appLinkList);
+    this.appLinks = JsonUtil.toJsonString(this.appLinkList);
+  }
+
   public void setAppLinkList(List<String> appLinkList) {
     this.appLinkList = appLinkList;
     if (CollectionUtils.isNotEmpty(appLinkList)) {
@@ -174,6 +193,23 @@ public class ExecutionNode {
 
   public List<String> getJobLinkList() {
     return jobLinkList;
+  }
+
+  /**
+   * 增加 job link 列表
+   */
+  public void addJobLinkList(List<String> jobLinkList) {
+    if (jobLinkList == null) {
+      return;
+    }
+
+    if (CollectionUtils.isEmpty(this.jobLinkList)) {
+      setAppLinkList(jobLinkList);
+      return;
+    }
+
+    this.jobLinkList.addAll(jobLinkList);
+    this.jobLinks = JsonUtil.toJsonString(this.jobLinkList);
   }
 
   public void setJobLinkList(List<String> jobLinkList) {

@@ -25,7 +25,6 @@ import com.baifendian.swordfish.dao.StreamingDao;
 import com.baifendian.swordfish.dao.enums.FlowStatus;
 import com.baifendian.swordfish.dao.model.StreamingResult;
 import com.baifendian.swordfish.masterserver.config.MasterConfig;
-import java.text.MessageFormat;
 import java.util.Date;
 import java.util.List;
 import org.apache.commons.collections.CollectionUtils;
@@ -67,7 +66,6 @@ public class StreamingCheckThread implements Runnable {
 
           // 如果有 appid 根据不同调度平台处理
           if (StringUtils.equalsIgnoreCase(streamingResult.getType(), SPARK_STREAMING)) {
-
             // 如果更本没有 appid
             if (CollectionUtils.isEmpty(appIds)) {
               // 如果已经很久没有 appid 了就失败
@@ -97,7 +95,6 @@ public class StreamingCheckThread implements Runnable {
               }
             }
           } else if (StringUtils.equalsIgnoreCase(streamingResult.getType(), STORM)) {
-
             // 为空, 继续
             if (CollectionUtils.isEmpty(appIds)) {
               continue;

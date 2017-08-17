@@ -115,11 +115,13 @@ public abstract class AbstractYarnJob extends Job {
 
         if (executionNode != null) {
           if (captureAppLinks) {
-            executionNode.setAppLinkList(appLinks);
+            // 注意, 这里为什么要用 add, 是因为可能放到其它机器执行, 这个时候需要 append
+            executionNode.addAppLinkList(appLinks);
           }
 
           if (captureJobLinks) {
-            executionNode.setJobLinkList(jobLinks);
+            // 注意, 这里为什么要用 add, 是因为可能放到其它机器执行, 这个时候需要 append
+            executionNode.addJobLinkList(jobLinks);
           }
 
           logger.info("update execution node, execution id:{} and node name:{}", props.getExecId(),

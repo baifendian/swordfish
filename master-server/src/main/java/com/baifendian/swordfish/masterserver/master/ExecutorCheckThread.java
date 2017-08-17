@@ -16,11 +16,9 @@
 package com.baifendian.swordfish.masterserver.master;
 
 import com.baifendian.swordfish.dao.FlowDao;
-import com.baifendian.swordfish.dao.model.ExecutionFlow;
 import com.baifendian.swordfish.masterserver.exec.ExecutorServerInfo;
 import com.baifendian.swordfish.masterserver.exec.ExecutorServerManager;
 import java.util.List;
-import java.util.concurrent.BlockingQueue;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,8 +33,8 @@ public class ExecutorCheckThread implements Runnable {
   // 管理 executor 的 server
   private ExecutorServerManager executorServerManager;
 
-  // 执行的 flow 队列
-  private final BlockingQueue<ExecFlowInfo> executionFlowQueue;
+  // 执行线程
+  private final Submit2ExecutorServerThread submit2ExecutorServerThread;
 
   // 心跳超时时间
   private int timeoutInterval;
@@ -45,17 +43,15 @@ public class ExecutorCheckThread implements Runnable {
   private FlowDao flowDao;
 
   public ExecutorCheckThread(ExecutorServerManager executorServerManager, int timeoutInterval,
-      BlockingQueue<ExecFlowInfo> executionFlowQueue, FlowDao flowDao) {
+      Submit2ExecutorServerThread submit2ExecutorServerThread, FlowDao flowDao) {
     this.executorServerManager = executorServerManager;
-    this.executionFlowQueue = executionFlowQueue;
+    this.submit2ExecutorServerThread = submit2ExecutorServerThread;
     this.timeoutInterval = timeoutInterval;
     this.flowDao = flowDao;
   }
 
   @Override
   public void run() {
-    logger.debug("execution flow queue size:{}", executionFlowQueue.size());
-
     try {
       // 展示当前的 worker 列表信息
       executorServerManager.printServerInfo();
@@ -68,48 +64,14 @@ public class ExecutorCheckThread implements Runnable {
         return;
       }
 
+      // 超时重新提交
       for (ExecutorServerInfo executorServerInfo : faultServers) {
         logger.error("get fault servers:{}", executorServerInfo);
 
-        // 删除该结点
         executorServerManager.removeServer(executorServerInfo);
 
-        // 查询超时工作流上的任务(这里使用数据库查询到的数据保证准确性，避免内存数据出现不一致的情况)
-        List<ExecutionFlow> executionFlows = flowDao
-            .queryNoFinishFlow(executorServerInfo.getHost() + ":" + executorServerInfo.getPort());
-
-        // 如果查到了相应的任务
-        if (!CollectionUtils.isEmpty(executionFlows)) {
-          logger.info("executor server {} fault, execIds size:{} ", executorServerInfo,
-              executionFlows.size());
-
-          for (ExecutionFlow execFlow : executionFlows) {
-            Integer execId = execFlow.getId();
-
-            logger.info("reschedule workflow exec id:{} ", execId);
-
-            try {
-              ExecutionFlow executionFlow = flowDao.queryExecutionFlow(execId);
-
-              // 重新开始调度
-              if (executionFlow != null) {
-                if (!executionFlow.getStatus().typeIsFinished()) {
-
-                  logger.info("executor server fault reschedule workflow execId:{}", execId);
-
-                  ExecFlowInfo execFlowInfo = new ExecFlowInfo(executionFlow.getId());
-                  executionFlowQueue.add(execFlowInfo);
-                }
-              } else {
-                logger.error(
-                    "executor server fault reschedule workflow execId:{}, but exec id:{} not exists",
-                    execId, execId);
-              }
-            } catch (Exception e) {
-              logger.error("reschedule get error", e);
-            }
-          }
-        }
+        // 重新提交上面的任务
+        submit2ExecutorServerThread.resubmitExecFlow(executorServerInfo);
       }
     } catch (Exception e) {
       logger.error("check thread get error", e);

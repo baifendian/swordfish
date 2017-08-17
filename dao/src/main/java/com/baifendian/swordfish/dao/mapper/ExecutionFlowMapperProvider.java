@@ -506,7 +506,23 @@ public class ExecutionFlowMapperProvider {
         WHERE("start_time <= #{date}");
         WHERE("flow_id = #{flowId}");
 
-        ORDER_BY("schedule_time DESC");
+        ORDER_BY("start_time DESC");
+      }
+    }.toString() + " limit 1";
+  }
+
+  public String selectByStartTimeAndScheduleTime(Map<String, Object> parameter) {
+    return new SQL() {
+      {
+        SELECT("*");
+
+        FROM(TABLE_NAME);
+
+        WHERE("schedule_time < #{scheduleTime}");
+        WHERE("start_time > #{startTime}");
+        WHERE("flow_id = #{flowId}");
+
+        ORDER_BY("schedule_time,start_time DESC");
       }
     }.toString() + " limit 1";
   }

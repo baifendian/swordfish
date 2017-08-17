@@ -167,6 +167,32 @@ public class MasterClient {
     return true;
   }
 
+
+  /**
+   * 下线一个 executor, 用于 exec-server
+   */
+  public boolean downExecutor(String clientHost, int clientPort) {
+    if (!connect()) {
+      close();
+      return false;
+    }
+
+    try {
+      RetInfo ret = client.downExecutor(clientHost, clientPort);
+      if (ret.getStatus() != 0) {
+        logger.error("down executor error:{}", ret.getMsg());
+        return false;
+      }
+    } catch (TException e) {
+      logger.error("down executor error", e);
+      return false;
+    } finally {
+      close();
+    }
+
+    return true;
+  }
+
   /**
    * 注册一个 executor, 用于 exec-server
    */

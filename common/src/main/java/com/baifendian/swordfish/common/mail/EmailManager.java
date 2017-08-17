@@ -138,14 +138,17 @@ public class EmailManager {
         if (executionFlow.getStatus().typeIsSuccess()) {
           sendMail = true;
         }
+        break;
       case FAILURE:
         if (executionFlow.getStatus().typeIsFailure()) {
           sendMail = true;
         }
+        break;
       case ALL:
         if (executionFlow.getStatus().typeIsFinished()) {
           sendMail = true;
         }
+        break;
       default:
     }
 

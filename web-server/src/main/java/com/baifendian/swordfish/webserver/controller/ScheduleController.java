@@ -70,7 +70,7 @@ public class ScheduleController {
                                     @RequestParam(value = "schedule") String schedule,
                                     @RequestParam(value = "notifyType", required = false) NotifyType notifyType,
                                     @RequestParam(value = "notifyMails", required = false) String notifyMails,
-                                    @RequestParam(value = "maxTryTimes", required = false, defaultValue = "1") int maxTryTimes,
+                                    @RequestParam(value = "maxTryTimes", required = false, defaultValue = "0") int maxTryTimes,
                                     @RequestParam(value = "failurePolicy", required = false, defaultValue = "END") FailurePolicyType failurePolicy,
                                     @RequestParam(value = "depWorkflows", required = false) String depWorkflows,
                                     @RequestParam(value = "depPolicy", required = false, defaultValue = "NO_DEP_PRE") DepPolicyType depPolicyType,
@@ -88,6 +88,11 @@ public class ScheduleController {
       throw new BadRequestException(String
           .format("Argument is not valid, timeout must be between (0, %d]",
               Constants.TASK_MAX_TIMEOUT));
+    }
+
+    // maxTryTimes 的限制
+    if(maxTryTimes < 0 || maxTryTimes > 2) {
+      throw new BadRequestException("Argument is not valid, max try times must be between [0, 2]");
     }
 
     return new ScheduleDto(scheduleService.createSchedule(operator, projectName, workflowName, schedule, notifyType, notifyMails, maxTryTimes, failurePolicy, depWorkflows, depPolicyType, timeout));
@@ -115,7 +120,7 @@ public class ScheduleController {
                                              @RequestParam(value = "schedule") String schedule,
                                              @RequestParam(value = "notifyType", required = false, defaultValue = "None") NotifyType notifyType,
                                              @RequestParam(value = "notifyMails", required = false) String notifyMails,
-                                             @RequestParam(value = "maxTryTimes", required = false, defaultValue = "1") int maxTryTimes,
+                                             @RequestParam(value = "maxTryTimes", required = false, defaultValue = "0") int maxTryTimes,
                                              @RequestParam(value = "failurePolicy", required = false, defaultValue = "END") FailurePolicyType failurePolicy,
                                              @RequestParam(value = "depWorkflows", required = false) String depWorkflows,
                                              @RequestParam(value = "depPolicy", required = false, defaultValue = "NO_DEP_PRE") DepPolicyType depPolicyType,
@@ -133,6 +138,11 @@ public class ScheduleController {
       throw new BadRequestException(String
           .format("Argument is not valid, timeout must be between (0, %d]",
               Constants.TASK_MAX_TIMEOUT));
+    }
+
+    // maxTryTimes 的限制
+    if(maxTryTimes < 0 || maxTryTimes > 2) {
+      throw new BadRequestException("Argument is not valid, max try times must be between [0, 2]");
     }
 
     return new ScheduleDto(scheduleService.putSchedule(operator, projectName, workflowName, schedule, notifyType, notifyMails, maxTryTimes, failurePolicy, depWorkflows, depPolicyType, timeout));
@@ -160,7 +170,7 @@ public class ScheduleController {
                                    @RequestParam(value = "schedule") String schedule,
                                    @RequestParam(value = "notifyType", required = false, defaultValue = "None") NotifyType notifyType,
                                    @RequestParam(value = "notifyMails", required = false) String notifyMails,
-                                   @RequestParam(value = "maxTryTimes", required = false, defaultValue = "1") int maxTryTimes,
+                                   @RequestParam(value = "maxTryTimes", required = false, defaultValue = "0") int maxTryTimes,
                                    @RequestParam(value = "failurePolicy", required = false, defaultValue = "END") FailurePolicyType failurePolicy,
                                    @RequestParam(value = "depWorkflows", required = false) String depWorkflows,
                                    @RequestParam(value = "depPolicy", required = false, defaultValue = "NO_DEP_PRE") DepPolicyType depPolicyType,
@@ -180,6 +190,11 @@ public class ScheduleController {
               Constants.TASK_MAX_TIMEOUT));
     }
 
+    // maxTryTimes 的限制
+    if(maxTryTimes < 0 || maxTryTimes > 2) {
+      throw new BadRequestException("Argument is not valid, max try times must be between [0, 2]");
+    }
+
     return new ScheduleDto(scheduleService.patchSchedule(operator, projectName, workflowName, schedule, notifyType, notifyMails, maxTryTimes, failurePolicy, depWorkflows, depPolicyType, timeout, null));
   }
 
@@ -192,8 +207,8 @@ public class ScheduleController {
    */
   @PostMapping("/{workflowName}/schedules/online")
   public void scheduleOnline(@RequestAttribute(value = "session.user") User operator,
-                             @PathVariable String projectName,
-                             @PathVariable String workflowName) {
+                             @PathVariable("projectName") String projectName,
+                             @PathVariable("workflowName") String workflowName) {
     logger.info("Operator user {}, schedule online, project name: {}, workflow name: {}",
             operator.getName(), projectName, workflowName);
 
@@ -213,8 +228,8 @@ public class ScheduleController {
    */
   @PostMapping("/{workflowName}/schedules/offline")
   public void scheduleOffline(@RequestAttribute(value = "session.user") User operator,
-                              @PathVariable String projectName,
-                              @PathVariable String workflowName) {
+                              @PathVariable("projectName") String projectName,
+                              @PathVariable("workflowName") String workflowName) {
     logger.info("Operator user {}, schedule offline, project name: {}, workflow name: {}",
             operator.getName(), projectName, workflowName);
 

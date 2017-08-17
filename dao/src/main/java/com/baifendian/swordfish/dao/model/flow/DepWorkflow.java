@@ -17,23 +17,23 @@ package com.baifendian.swordfish.dao.model.flow;
 
 public class DepWorkflow {
 
-  private int projectId;
+  private String projectName;
 
-  private int workflowId;
+  private String workflowName;
 
-  public int getProjectId() {
-    return projectId;
+  public String getProjectName() {
+    return projectName;
   }
 
-  public void setProjectId(int projectId) {
-    this.projectId = projectId;
+  public void setProjectName(String projectName) {
+    this.projectName = projectName;
   }
 
-  public int getWorkflowId() {
-    return workflowId;
+  public String getWorkflowName() {
+    return workflowName;
   }
 
-  public void setWorkflowId(int workflowId) {
-    this.workflowId = workflowId;
+  public void setWorkflowName(String workflowName) {
+    this.workflowName = workflowName;
   }
 }

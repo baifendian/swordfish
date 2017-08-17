@@ -264,8 +264,8 @@ public class HiveSqlExec {
           // 关闭
           hiveConnection.close();
 
-          // 返回连接
-          hiveService2Client.returnClient(hiveService2ConnectionInfo, hiveConnection);
+          // 返回连接, 这里不再返回
+          // hiveService2Client.returnClient(hiveService2ConnectionInfo, hiveConnection);
         }
       } catch (Exception e) {
         logger.error("Catch an exception", e);

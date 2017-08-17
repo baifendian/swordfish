@@ -15,6 +15,8 @@
  */
 package com.baifendian.swordfish.execserver;
 
+import static com.baifendian.swordfish.common.utils.ThriftUtil.getTThreadPoolServer;
+
 import com.baifendian.swordfish.common.hadoop.ConfigurationUtil;
 import com.baifendian.swordfish.common.hadoop.HdfsClient;
 import com.baifendian.swordfish.dao.DaoFactory;
@@ -26,6 +28,13 @@ import com.baifendian.swordfish.execserver.utils.OsUtil;
 import com.baifendian.swordfish.rpc.HeartBeatData;
 import com.baifendian.swordfish.rpc.WorkerService;
 import com.baifendian.swordfish.rpc.client.MasterClient;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.net.UnknownHostException;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
@@ -38,20 +47,11 @@ import org.apache.thrift.transport.TTransportFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
-import java.net.UnknownHostException;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
-
-import static com.baifendian.swordfish.common.utils.ThriftUtil.getTThreadPoolServer;
-
 /**
  * exec thrift server service
  */
 public class ExecThriftServer {
+
   private static Logger logger = LoggerFactory.getLogger(ExecThriftServer.class);
 
   private TServer server;
@@ -123,7 +123,8 @@ public class ExecThriftServer {
       throw new RuntimeException("can't found master server");
     }
 
-    masterClient = new MasterClient(masterServer.getHost(), masterServer.getPort(), Constants.defaultThriftRpcRetrites);
+    masterClient = new MasterClient(masterServer.getHost(), masterServer.getPort(),
+        Constants.defaultThriftRpcRetrites);
 
     // executor 的地址, 端口信息
     host = InetAddress.getLocalHost().getHostAddress();
@@ -148,21 +149,24 @@ public class ExecThriftServer {
       ret = masterClient.registerExecutor(host, port, System.currentTimeMillis());
 
       if (!ret) {
-        logger.error("register to master {}:{} failed", masterServer.getHost(), masterServer.getPort());
+        logger.error("register to master {}:{} failed", masterServer.getHost(),
+            masterServer.getPort());
         throw new RuntimeException("register executor error");
       }
     }
 
-    heartBeatInterval = conf.getInt(Constants.EXECUTOR_HEARTBEAT_INTERVAL, Constants.defaultExecutorHeartbeatInterval);
+    // 心跳
+    heartBeatInterval = conf
+        .getInt(Constants.EXECUTOR_HEARTBEAT_INTERVAL, Constants.defaultExecutorHeartbeatInterval);
 
-    // 执行启动
-    heartbeatExecutorService = Executors.newScheduledThreadPool(Constants.defaultExecutorHeartbeatThreadNum);
+    heartbeatExecutorService = Executors
+        .newScheduledThreadPool(Constants.defaultExecutorHeartbeatThreadNum);
 
-    // 心跳任务启动
     Runnable heartBeatThread = getHeartBeatThread();
-    heartbeatExecutorService.scheduleAtFixedRate(heartBeatThread, 10, heartBeatInterval, TimeUnit.SECONDS);
+    heartbeatExecutorService
+        .scheduleAtFixedRate(heartBeatThread, 10, heartBeatInterval, TimeUnit.SECONDS);
 
-    // 启动实际的 worker service
+    // 启动 worker service
     TProtocolFactory protocolFactory = new TBinaryProtocol.Factory();
     TTransportFactory tTransportFactory = new TTransportFactory();
 
@@ -170,7 +174,8 @@ public class ExecThriftServer {
 
     TProcessor tProcessor = new WorkerService.Processor(workerService);
     inetSocketAddress = new InetSocketAddress(host, port);
-    server = getTThreadPoolServer(protocolFactory, tProcessor, tTransportFactory, inetSocketAddress, Constants.defaultServerMinNum, Constants.defaultServerMaxNum);
+    server = getTThreadPoolServer(protocolFactory, tProcessor, tTransportFactory, inetSocketAddress,
+        Constants.defaultServerMinNum, Constants.defaultServerMaxNum);
 
     logger.info("start thrift server on port:{}", port);
 
@@ -179,19 +184,11 @@ public class ExecThriftServer {
     serverThread.setDaemon(true);
     serverThread.start();
 
-    // 注册钩子
+    // 注册钩子, 销毁一些信息
     Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-      if (heartbeatExecutorService != null) {
-        heartbeatExecutorService.shutdownNow();
-      }
+      postProcess();
 
-      if (workerService != null) {
-        workerService.destory();
-      }
-
-      if (server != null) {
-        server.stop();
-      }
+      logger.info("exec server stop");
     }));
 
     synchronized (this) {
@@ -205,18 +202,36 @@ public class ExecThriftServer {
         }
       }
 
-      heartbeatExecutorService.shutdownNow();
-      workerService.destory();
-      server.stop();
+      postProcess();
 
       logger.info("exec server stop");
     }
   }
 
+  private void postProcess() {
+    if (heartbeatExecutorService != null) {
+      heartbeatExecutorService.shutdownNow();
+      heartbeatExecutorService = null;
+    }
+
+    if (workerService != null) {
+      workerService.destory();
+      workerService = null;
+    }
+
+    if (server != null) {
+      server.stop();
+      server = null;
+    }
+
+    // 告知 master 已经关闭
+    if (masterClient != null) {
+      masterClient.downExecutor(host, port);
+    }
+  }
+
   /**
    * 得到发送心跳的线程
-   *
-   * @return
    */
   public Runnable getHeartBeatThread() {
     Runnable heartBeatThread = () -> {
@@ -246,6 +261,7 @@ public class ExecThriftServer {
   }
 
   public class TServerThread extends Thread {
+
     private TServer server;
 
     public TServerThread(TServer server) {
@@ -258,7 +274,8 @@ public class ExecThriftServer {
     }
   }
 
-  public static void main(String[] args) throws TTransportException, UnknownHostException, InterruptedException {
+  public static void main(String[] args)
+      throws TTransportException, UnknownHostException, InterruptedException {
     ExecThriftServer execThriftServer = new ExecThriftServer();
     execThriftServer.run();
   }

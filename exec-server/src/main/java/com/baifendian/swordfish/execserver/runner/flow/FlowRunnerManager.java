@@ -17,7 +17,6 @@ package com.baifendian.swordfish.execserver.runner.flow;
 
 import com.baifendian.swordfish.dao.DaoFactory;
 import com.baifendian.swordfish.dao.FlowDao;
-import com.baifendian.swordfish.dao.enums.FailurePolicyType;
 import com.baifendian.swordfish.dao.model.ExecutionFlow;
 import com.baifendian.swordfish.execserver.utils.Constants;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
@@ -166,11 +165,13 @@ public class FlowRunnerManager {
     shutdownExecutorService(nodeExecutorService, false);
 
     for (FlowRunner flowRunner : runningFlows.values()) {
+      flowRunner.shutdown();
+
       // 更新状态
-      flowRunner.clean();
+      flowRunner.clean(false);
 
       // 更新为 kill 状态
-      flowRunner.updateExecutionFlowToKillStatus();
+      flowRunner.updateExecutionFlowToKillStatus(false);
     }
 
     // 关闭 flow executor 线程池, 强险停止
@@ -218,7 +219,7 @@ public class FlowRunnerManager {
       return;
     }
 
-    flowRunner.clean();
+    flowRunner.clean(true);
     runningFlows.remove(execId);
   }
 }

@@ -22,7 +22,6 @@ import com.baifendian.swordfish.dao.MasterDao;
 import com.baifendian.swordfish.dao.model.MasterServer;
 import com.baifendian.swordfish.masterserver.config.MasterConfig;
 import com.baifendian.swordfish.masterserver.exception.MasterException;
-import com.baifendian.swordfish.masterserver.master.JobExecManager;
 import com.baifendian.swordfish.masterserver.master.MasterServiceImpl;
 import com.baifendian.swordfish.masterserver.quartz.QuartzManager;
 import com.baifendian.swordfish.rpc.MasterService;
@@ -35,8 +34,6 @@ import org.apache.thrift.transport.TTransportFactory;
 import org.quartz.SchedulerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 
@@ -58,9 +55,6 @@ public class MasterThriftServer {
 
   // master 的接口实现
   private MasterServiceImpl masterService;
-
-  // 任务执行管理器
-  private JobExecManager jobExecManager;
 
   public MasterThriftServer() throws UnknownHostException {
     host = HttpUtil.getHostAddress();
@@ -90,8 +84,8 @@ public class MasterThriftServer {
         // 关闭 server
         server.stop();
 
-        if (jobExecManager != null) {
-          jobExecManager.stop();
+        if (masterService != null) {
+          masterService.stop();
         }
 
         // 关闭调度
@@ -102,7 +96,7 @@ public class MasterThriftServer {
         }
       }));
 
-      jobExecManager.run();
+      masterService.run();
 
       // 启动调度
       QuartzManager.start();
@@ -121,8 +115,7 @@ public class MasterThriftServer {
    * @throws TTransportException
    */
   private void init() throws MasterException, TTransportException {
-    jobExecManager = new JobExecManager();
-    masterService = new MasterServiceImpl(jobExecManager);
+    masterService = new MasterServiceImpl();
 
     TProtocolFactory protocolFactory = new TBinaryProtocol.Factory();
     TTransportFactory tTransportFactory = new TTransportFactory();
