@@ -1,8 +1,5 @@
 #!/usr/bin/env bash
 
-# version
-version="1.0-SNAPSHOT"
-
 # host address
 hostname="172.24.8.98"
 
@@ -48,11 +45,11 @@ stormRestAddr="bgs-8p95-zhanglifeng.bfdabc.com:8744"
 # develop mode
 developMode=true
 
-# home of swordfish
-SWORDFISH_HOME="/opt/udp/swordfish-all-${version}/"
-
 # prohibit user list
 prohibitUserList=admin,ambari-qa,hbase,hcat,hdfs,hive,root,spark,a207,udp
+
+# load swordfish home
+sh $envFile
 
 # 使用示例
 function usage() {
