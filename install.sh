@@ -48,8 +48,10 @@ developMode=true
 # prohibit user list
 prohibitUserList=admin,ambari-qa,hbase,hcat,hdfs,hive,root,spark,a207,udp
 
-# load swordfish home
-sh $envFile
+# get current path
+SCRIPT_DIR=`dirname $0`
+CUR_DIR=`cd "$CUR_DIR"; pwd`
+SWORDFISH_HOME=$CUR_DIR/..
 
 # 使用示例
 function usage() {
