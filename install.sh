@@ -50,7 +50,7 @@ prohibitUserList=admin,ambari-qa,hbase,hcat,hdfs,hive,root,spark,a207,udp
 
 # get current path
 SCRIPT_DIR=`dirname $0`
-CUR_DIR=`cd "$CUR_DIR"; pwd`
+CUR_DIR=`cd "$SCRIPT_DIR"; pwd`
 SWORDFISH_HOME=$CUR_DIR/..
 
 # 使用示例
@@ -141,9 +141,6 @@ function process_check()
         echo "[pid $pid start success, service is '$1']"
     fi
 }
-
-# get script path
-CUR_DIR=`dirname $0`
 
 if [ "$r" = "true" ]; then
     echo "exec file replace"
