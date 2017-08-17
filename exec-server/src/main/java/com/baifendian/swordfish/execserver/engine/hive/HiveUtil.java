@@ -117,11 +117,11 @@ public class HiveUtil extends BaseDao {
       fieldList.add(MessageFormat.format("{0} {1}", hqlColumn.getName(), hqlColumn.getType()));
     }
 
-    String sql = "CREATE TEMPORARY EXTERNAL TABLE {0}.{1}({2}) ROW FORMAT SERDE \"org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe\" WITH SERDEPROPERTIES(\"field.delim\"=\"{3}\",\"serialization.encoding\"=\"{4}\") STORED AS {5} LOCATION \"{6}\"";
+    String sql = "CREATE TEMPORARY EXTERNAL TABLE {0}.{1}({2}) ROW FORMAT SERDE \"org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe\" WITH SERDEPROPERTIES(\"field.delim\"=\"{3}\",\"serialization.encoding\"=\"{4}\") STORED AS textfile LOCATION \"{5}\"";
 
     sql = MessageFormat
         .format(sql, dbName, tableName, String.join(",", fieldList), fieldDelimiter, fileCode,
-            DEFAULT_FILE_TYPE.getType(), localtion);
+            , localtion);
 
     return sql;
   }
