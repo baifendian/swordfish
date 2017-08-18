@@ -411,6 +411,13 @@ public class FlowDao extends BaseDao {
     return executionFlowMapper.selectPreDate(flowId, date);
   }
 
+  /**
+   * 获取参照时间的前一个调度结果
+   */
+  public ExecutionFlow executionFlowPreDate2(int flowId, Date date) {
+    return executionFlowMapper.selectPreDate2(flowId, date);
+  }
+
   public ExecutionFlow executionFlowByStartTimeAndScheduleTime(int flowId, Date startTIme,
       Date scheduleTime) {
     return executionFlowMapper.selectByStartTimeAndScheduleTime(flowId, startTIme, scheduleTime);

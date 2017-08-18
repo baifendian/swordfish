@@ -496,6 +496,25 @@ public class ExecutionFlowMapperProvider {
    * @param parameter
    * @return
    */
+  public String selectPreDate2(Map<String, Object> parameter) {
+    return new SQL() {
+      {
+        SELECT("*");
+
+        FROM(TABLE_NAME);
+
+        WHERE("schedule_time < #{date}");
+        WHERE("flow_id = #{flowId}");
+
+        ORDER_BY("schedule_time DESC");
+      }
+    }.toString() + " limit 1";
+  }
+
+  /**
+   * @param parameter
+   * @return
+   */
   public String selectPreStartDate(Map<String, Object> parameter) {
     return new SQL() {
       {
