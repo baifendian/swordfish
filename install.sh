@@ -46,7 +46,7 @@ stormRestAddr="bgs-8p95-zhanglifeng.bfdabc.com:8744"
 developMode=true
 
 # prohibit user list
-prohibitUserList=admin,ambari-qa,hbase,hcat,hdfs,hive,root,spark,a207,udp
+prohibitUserList=admin,ambari-qa,hbase,hcat,hdfs,hive,root,spark,udp
 
 # get current path
 SCRIPT_DIR=`dirname $0`
