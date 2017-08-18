@@ -1,8 +1,5 @@
 #!/usr/bin/env bash
 
-# version
-version="1.0-SNAPSHOT"
-
 # host address
 hostname="172.24.8.98"
 
@@ -48,8 +45,13 @@ stormRestAddr="bgs-8p95-zhanglifeng.bfdabc.com:8744"
 # develop mode
 developMode=true
 
-# home of swordfish
-SWORDFISH_HOME="/opt/udp/swordfish-all-${version}/"
+# prohibit user list
+prohibitUserList=admin,ambari-qa,hbase,hcat,hdfs,hive,root,spark,udp
+
+# get current path
+SCRIPT_DIR=`dirname $0`
+CUR_DIR=`cd "$SCRIPT_DIR"; pwd`
+SWORDFISH_HOME=$CUR_DIR/..
 
 # 使用示例
 function usage() {
@@ -99,6 +101,7 @@ function file_replace()
 
     sed -i "s#sf.env.file.*#sf.env.file = ${envFile}#g" conf/common/base_config.properties
     sed -i "s#develop.mode.*#develop.mode = ${developMode}#g" conf/common/base_config.properties
+    sed -i "s#prohibit.user.list.*#prohibit.user.list = ${prohibitUserList}#g" conf/common/base_config.properties
 
     sed -i "s#fs.defaultFS.*#fs.defaultFS = hdfs://${hadoopNamenodeAddress}:8020#g" conf/common/hadoop/hadoop.properties
     sed -i "s#yarn.resourcemanager.address.*#yarn.resourcemanager.address = ${hadoopYarnAddress}:8032#g" conf/common/hadoop/hadoop.properties
@@ -138,9 +141,6 @@ function process_check()
         echo "[pid $pid start success, service is '$1']"
     fi
 }
-
-# get script path
-CUR_DIR=`dirname $0`
 
 if [ "$r" = "true" ]; then
     echo "exec file replace"

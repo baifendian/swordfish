@@ -93,9 +93,9 @@ public class FlowScheduleJob implements Job {
   private static FlowDao flowDao;
 
   /**
-   * 检测依赖的等待时间，默认 30 s
+   * 检测依赖的等待时间
    */
-  private static long checkInterval = 30 * 1000;
+  private static long checkInterval = 15 * 1000;
 
   /**
    * 初始化 Job （使用该调度 Job 前，必须先调用该函数初始化） <p>
@@ -121,6 +121,8 @@ public class FlowScheduleJob implements Job {
 
     // 任务实际的触发时间
     Date fireTime = context.getFireTime();
+
+    Date preFireTime = context.getPreviousFireTime();
 
     logger.info("schedule trigger at:{}, trigger at:{}, flow id:{}", scheduledFireTime, fireTime,
         flowId);
@@ -174,7 +176,7 @@ public class FlowScheduleJob implements Job {
     }
 
     // 先检测自依赖
-    if (schedule.getDepPolicy() == DepPolicyType.DEP_PRE) {
+    if (preFireTime != null && schedule.getDepPolicy() == DepPolicyType.DEP_PRE) {
       logger.info("job: {} start check self dep ...", flowId);
       if (!checkSelfDep(flowId, schedule, fireTime, scheduledFireTime)) {
         logger.warn("job: {} check self dep  no pass!", flowId);
@@ -370,7 +372,7 @@ public class FlowScheduleJob implements Job {
    */
   private ExecutionFlow getLastSelfExecFlow(int flowId, CronExpression cronExpression,
       Date scheduleFireTime) {
-    ExecutionFlow scheduleFlow = flowDao.executionFlowPreDate(flowId, scheduleFireTime);
+    ExecutionFlow scheduleFlow = flowDao.executionFlowPreDate2(flowId, scheduleFireTime);
 
     if (scheduleFlow != null) {
       Date nextDate = cronExpression.getTimeAfter(scheduleFlow.getScheduleTime());

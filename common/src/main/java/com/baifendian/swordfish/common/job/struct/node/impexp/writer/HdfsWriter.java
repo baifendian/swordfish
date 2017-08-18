@@ -31,7 +31,7 @@ public class HdfsWriter implements Writer {
   private String fileName;
   private WriteMode writeMode;
   private WriteHdfsType fileType;
-  private String fieldDelimiter;
+  private String fieldDelimiter = "\t";
   private List<HiveColumn> column;
 
   public String getPath() {
