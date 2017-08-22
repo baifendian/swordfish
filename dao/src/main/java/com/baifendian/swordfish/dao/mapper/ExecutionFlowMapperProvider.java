@@ -417,7 +417,7 @@ public class ExecutionFlowMapperProvider {
   public String selectDurationsByProject(Map<String, Object> parameter) {
     String sql1 = new SQL() {
       {
-        SELECT("timestampdiff(SECOND,start_time,end_time) as duration");
+        SELECT("timestampdiff(SECOND,start_time,if(end_time is null,now(),end_time)) as duration");
         SELECT("p_f.name as flow_name");
         SELECT("u.name as owner_name");
         SELECT("e_f.*");
