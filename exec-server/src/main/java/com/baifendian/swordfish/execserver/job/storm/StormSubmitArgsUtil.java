@@ -38,11 +38,11 @@ public class StormSubmitArgsUtil {
       case JAR:
         return jarArgs((StormJarParam) stormParam.getStormParam());
       case SQL:
-        return sqlArgs((StormSqlParam) stormParam.getStormParam());
+        return sqlArgs(stormParam);
       case SHELL:
         return shellArgs((StormShellParam) stormParam.getStormParam());
       default:
-        throw  new IllegalArgumentException("storm type unsupport");
+        throw new IllegalArgumentException("storm type unsupport");
     }
   }
 
@@ -58,21 +58,21 @@ public class StormSubmitArgsUtil {
 
     //add Jars
     List<ResourceInfo> jars = stormJarParam.getJars();
-    if (CollectionUtils.isNotEmpty(jars)){
+    if (CollectionUtils.isNotEmpty(jars)) {
       args.add(JARS);
       args.add(StringUtils.join(jars.stream().map(p -> p.getRes()).toArray(), ","));
     }
 
-    if (StringUtils.isNotEmpty(stormJarParam.getArgs())){
+    if (StringUtils.isNotEmpty(stormJarParam.getArgs())) {
       args.add(stormJarParam.getArgs());
     }
 
-    if (StringUtils.isNotEmpty(stormJarParam.getArtifacts())){
+    if (StringUtils.isNotEmpty(stormJarParam.getArtifacts())) {
       args.add(ARTIFACTS);
       args.add(stormJarParam.getArtifacts());
     }
 
-    if (StringUtils.isNotEmpty(stormJarParam.getArtifactRepositories())){
+    if (StringUtils.isNotEmpty(stormJarParam.getArtifactRepositories())) {
       args.add(ARTIFACTREPOSITORIES);
       args.add(stormJarParam.getArtifactRepositories());
     }
@@ -81,25 +81,27 @@ public class StormSubmitArgsUtil {
 
   }
 
-  private static List<String> sqlArgs(StormSqlParam stormSqlParam) {
+  private static List<String> sqlArgs(StormParam stormParam) {
+    StormSqlParam stormSqlParam = (StormSqlParam) stormParam.getStormParam();
     List<String> args = new ArrayList<>();
     args.add(SQL);
 
     args.add(stormSqlParam.getSqlFile().getRes());
 
+    args.add(stormParam.getTopologyName());
     //add Jars
     List<ResourceInfo> jars = stormSqlParam.getJars();
-    if (CollectionUtils.isNotEmpty(jars)){
+    if (CollectionUtils.isNotEmpty(jars)) {
       args.add(JARS);
       args.add(StringUtils.join(jars.stream().map(p -> p.getRes()).toArray(), ","));
     }
 
-    if (StringUtils.isNotEmpty(stormSqlParam.getArtifacts())){
+    if (StringUtils.isNotEmpty(stormSqlParam.getArtifacts())) {
       args.add(ARTIFACTS);
       args.add(stormSqlParam.getArtifacts());
     }
 
-    if (StringUtils.isNotEmpty(stormSqlParam.getArtifactRepositories())){
+    if (StringUtils.isNotEmpty(stormSqlParam.getArtifactRepositories())) {
       args.add(ARTIFACTREPOSITORIES);
       args.add(stormSqlParam.getArtifactRepositories());
     }

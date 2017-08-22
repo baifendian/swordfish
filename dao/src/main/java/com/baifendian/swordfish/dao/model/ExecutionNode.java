@@ -204,7 +204,7 @@ public class ExecutionNode {
     }
 
     if (CollectionUtils.isEmpty(this.jobLinkList)) {
-      setAppLinkList(jobLinkList);
+      setJobLinkList(jobLinkList);
       return;
     }
 
