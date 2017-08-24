@@ -3,6 +3,7 @@ package com.baifendian.swordfish.common.job.struct.datasource;
 import org.junit.Test;
 
 public class PostgreDatasourceTest {
+
   @Test
   public void testIsConnectable() throws Exception {
     PostgreDatasource postgreDatasource = new PostgreDatasource();

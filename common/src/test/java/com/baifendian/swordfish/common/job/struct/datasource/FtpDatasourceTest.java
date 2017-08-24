@@ -18,6 +18,7 @@ package com.baifendian.swordfish.common.job.struct.datasource;
 import org.junit.Test;
 
 public class FtpDatasourceTest {
+
   @Test
   public void testIsConnectable() throws Exception {
 //    FtpDatasource ftpDatasource = new FtpDatasource();
