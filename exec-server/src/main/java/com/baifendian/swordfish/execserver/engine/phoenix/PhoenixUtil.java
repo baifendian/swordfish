@@ -36,15 +36,16 @@ public class PhoenixUtil {
   static {
     try {
       Class.forName("org.apache.phoenix.queryserver.client.Driver");
+      //Class.forName("org.apache.phoenix.jdbc.PhoenixDriver");
     } catch (ClassNotFoundException e) {
       logger.error(e.getMessage(), e);
       throw new RuntimeException(e);
     }
 
     phoenixPro.put("phoenix.trace.frequency", "always");
-    phoenixPro.put("phoenix.functions.allowUserDefinedFunctions", "true");
-    phoenixPro.put("phoenix.annotation.myannotation", "abc");
-    phoenixPro.put("user", "shuanghu");
+//    phoenixPro.put("phoenix.functions.allowUserDefinedFunctions", "true");
+//    phoenixPro.put("phoenix.annotation.myannotation", "abc");
+//    phoenixPro.put("user", "shuanghu");
 
     try {
       Properties properties = new Properties();
@@ -62,7 +63,7 @@ public class PhoenixUtil {
 
   public static Connection getPhoenixConnection(){
     try {
-      return DriverManager.getConnection(ThinClientUtil.getConnectionUrl(phoenixHost, port), phoenixPro);
+      return DriverManager.getConnection(ThinClientUtil.getConnectionUrl(phoenixHost, port));
     } catch (RuntimeException e){
       if (e.getCause().getClass().getName().equals("java.net.ConnectException")){
         throw new RuntimeException("Failed to connect phoenix");

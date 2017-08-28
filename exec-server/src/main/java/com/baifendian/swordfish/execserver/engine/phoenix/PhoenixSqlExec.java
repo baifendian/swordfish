@@ -60,8 +60,7 @@ public class PhoenixSqlExec {
    * @param remainTime 剩余运行时间, 暂没实现
    */
   public boolean execute(List<String> createFuncs, List<String> sqls, boolean isContinue,
-      ResultCallback resultCallback, Integer queryLimit, int remainTime)
-      throws SQLException {
+      ResultCallback resultCallback, Integer queryLimit, int remainTime) throws SQLException {
     // 没有剩余运行的时间
     if (remainTime <= 0) {
       return false;
@@ -70,15 +69,13 @@ public class PhoenixSqlExec {
     // 查询结果限制
     queryLimit = (queryLimit != null) ? queryLimit : defaultQueryLimit;
 
-    Statement sta = null;
-
     Connection con = PhoenixUtil.getPhoenixConnection();
     if (con == null) {
       logger.error("Failed to get phoenix connect");
       return false;
     }
 
-    sta = con.createStatement();
+    Statement sta = con.createStatement();
 
     if (CollectionUtils.isNotEmpty(createFuncs)){
       try {

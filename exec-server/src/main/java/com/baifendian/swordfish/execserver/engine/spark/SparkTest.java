@@ -17,6 +17,8 @@ public class SparkTest {
 
   public static void main(String[] args) {
 
+    String sql = args[0];
+
     SparkConf sparkConf = new SparkConf().setAppName("JavaSparkSQL")
         .setMaster("local")
         .set("hadoop.home.dir", "/tmp/spark/")
@@ -24,7 +26,7 @@ public class SparkTest {
     JavaSparkContext ctx = new JavaSparkContext(sparkConf);
     HiveContext sqlContext = new HiveContext(ctx);
 
-    DataFrame teenagers = sqlContext.sql("show databases;");
+    DataFrame teenagers = sqlContext.sql(sql);
 
     List<String> teenagerNames = teenagers.toJavaRDD().map(
         (Function<Row, String>) row -> "Name: " + row.getString(0)).collect();
