@@ -59,9 +59,10 @@
             <version>${spark.version}</version>
             <scope>provided</scope>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/org.apache.phoenix/phoenix-queryserver-client -->
         <dependency>
             <groupId>org.apache.phoenix</groupId>
-            <artifactId>phoenix-server-client</artifactId>
+            <artifactId>phoenix-queryserver-client</artifactId>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>

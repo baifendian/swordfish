@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.ConnectException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -20,6 +19,7 @@ import org.springframework.util.ResourceUtils;
  * @author : shuanghu
  */
 public class PhoenixUtil {
+
   private static final Logger logger = LoggerFactory.getLogger(PhoenixUtil.class);
 
   /**
@@ -36,16 +36,16 @@ public class PhoenixUtil {
   static {
     try {
       Class.forName("org.apache.phoenix.queryserver.client.Driver");
-      //Class.forName("org.apache.phoenix.jdbc.PhoenixDriver");
+      //Class.forName("org.apache.phoenix.queryserver.client");
     } catch (ClassNotFoundException e) {
       logger.error(e.getMessage(), e);
       throw new RuntimeException(e);
     }
 
     phoenixPro.put("phoenix.trace.frequency", "always");
-//    phoenixPro.put("phoenix.functions.allowUserDefinedFunctions", "true");
-//    phoenixPro.put("phoenix.annotation.myannotation", "abc");
-//    phoenixPro.put("user", "shuanghu");
+    phoenixPro.put("phoenix.functions.allowUserDefinedFunctions", "true");
+    phoenixPro.put("phoenix.annotation.myannotation", "abc");
+    phoenixPro.put("user", "shuanghu");
 
     try {
       Properties properties = new Properties();
@@ -61,15 +61,16 @@ public class PhoenixUtil {
     }
   }
 
-  public static Connection getPhoenixConnection(){
+  public static Connection getPhoenixConnection() {
     try {
-      return DriverManager.getConnection(ThinClientUtil.getConnectionUrl(phoenixHost, port));
-    } catch (RuntimeException e){
-      if (e.getCause().getClass().getName().equals("java.net.ConnectException")){
+      return DriverManager
+          .getConnection(ThinClientUtil.getConnectionUrl( phoenixHost, port), phoenixPro);
+    } catch (RuntimeException e) {
+      if (e.getCause().getClass().getName().equals("java.net.ConnectException")) {
         throw new RuntimeException("Failed to connect phoenix");
       }
-      logger.error("url:"+ThinClientUtil.getConnectionUrl(phoenixHost, port), e);
-    }   catch (SQLException e) {
+      logger.error("url:" + ThinClientUtil.getConnectionUrl(phoenixHost, port), e);
+    } catch (SQLException e) {
       logger.error(e.getMessage(), e);
     }
 
