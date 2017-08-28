@@ -30,6 +30,8 @@
         <hive.version>1.2.1</hive.version>
         <spark.version>2.1.0</spark.version>
         <es.version>5.2.2</es.version>
+
+        <phoenix.version>4.7.0-HBase-1.1</phoenix.version>
     </properties>
 
     <modules>
@@ -56,6 +58,13 @@
                 <version>${java.version}</version>
                 <scope>system</scope>
                 <systemPath>${java.home}/../lib/tools.jar</systemPath>
+            </dependency>
+
+            <!-- https://mvnrepository.com/artifact/org.apache.phoenix/phoenix-server-client -->
+            <dependency>
+                <groupId>org.apache.phoenix</groupId>
+                <artifactId>phoenix-server-client</artifactId>
+                <version>${phoenix.version}</version>
             </dependency>
 
             <dependency>

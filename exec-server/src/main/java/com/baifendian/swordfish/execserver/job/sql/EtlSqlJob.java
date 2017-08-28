@@ -49,7 +49,7 @@ public class EtlSqlJob extends AbstractYarnJob {
       sqls = ParamHelper.resolvePlaceholders(sqls, props.getDefinedParams());
       List<String> funcs = FunctionUtil
           .createFuncs(param.getUdfs(), props.getExecId(), props.getNodeName(), logger,
-              props.getWorkDir(), false);
+              props.getWorkDir(), false, param.getType());
 
       logger.info("\nhql:\n{}\nfuncs:\n{}", sqls, funcs);
 

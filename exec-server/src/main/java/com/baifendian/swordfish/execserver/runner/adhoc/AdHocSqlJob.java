@@ -30,6 +30,7 @@ import com.baifendian.swordfish.execserver.common.FunctionUtil;
 import com.baifendian.swordfish.execserver.common.ResultCallback;
 import com.baifendian.swordfish.execserver.engine.hive.HiveSqlExec;
 import com.baifendian.swordfish.execserver.engine.hive.HiveUtil;
+import com.baifendian.swordfish.execserver.engine.phoenix.PhoenixSqlExec;
 import com.baifendian.swordfish.execserver.job.JobProps;
 import com.baifendian.swordfish.execserver.parameter.ParamHelper;
 import com.baifendian.swordfish.execserver.parameter.SystemParamManager;
@@ -97,7 +98,7 @@ public class AdHocSqlJob {
 
     // 创建自定义函数
     List<String> funcs = FunctionUtil.createFuncs(param.getUdfs(), props.getExecId(), null, logger,
-        BaseConfig.getHdfsResourcesDir(props.getProjectId()), true);
+        BaseConfig.getHdfsResourcesDir(props.getProjectId()), true, type);
 
     // 切分 sql
     List<String> execSqls = CommonUtil.sqlSplit(sqls);
@@ -143,8 +144,10 @@ public class AdHocSqlJob {
 
       }
       case PHOENIX: {
-        // TODO:: Support Spark SQL Engine
+        PhoenixSqlExec phoenixSqlExec = new PhoenixSqlExec(this::logProcess, props.getProxyUser(), logger);
 
+        return phoenixSqlExec.execute(funcs, execSqls, true, resultCallback, param.getLimit(), Constants.ADHOC_TIMEOUT)
+            ? FlowStatus.SUCCESS : FlowStatus.FAILED;
       }
       case HIVE:
       default: {

@@ -27,6 +27,10 @@ public class UdfsInfo {
 
   private List<ResourceInfo> libJars = new ArrayList<>();
 
+  private String returnType;
+
+  private List<String> argTypes;
+
   public String getFunc() {
     return func;
   }
@@ -49,5 +53,21 @@ public class UdfsInfo {
 
   public void setLibJars(List<ResourceInfo> libJars) {
     this.libJars = libJars;
+  }
+
+  public String getReturnType() {
+    return returnType;
+  }
+
+  public void setReturnType(String returnType) {
+    this.returnType = returnType;
+  }
+
+  public List<String> getArgTypes() {
+    return argTypes;
+  }
+
+  public void setArgTypes(List<String> argTypes) {
+    this.argTypes = argTypes;
   }
 }
