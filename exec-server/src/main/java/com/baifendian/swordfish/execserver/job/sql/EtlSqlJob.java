@@ -18,12 +18,15 @@ package com.baifendian.swordfish.execserver.job.sql;
 import com.baifendian.swordfish.common.job.struct.node.BaseParam;
 import com.baifendian.swordfish.common.job.struct.node.hql.HqlParam;
 import com.baifendian.swordfish.common.utils.CommonUtil;
+import com.baifendian.swordfish.dao.enums.FlowStatus;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
 import com.baifendian.swordfish.execserver.common.FunctionUtil;
 import com.baifendian.swordfish.execserver.engine.hive.HiveSqlExec;
+import com.baifendian.swordfish.execserver.engine.phoenix.PhoenixSqlExec;
 import com.baifendian.swordfish.execserver.job.AbstractYarnJob;
 import com.baifendian.swordfish.execserver.job.JobProps;
 import com.baifendian.swordfish.execserver.parameter.ParamHelper;
+import com.baifendian.swordfish.execserver.utils.Constants;
 import java.util.List;
 import org.slf4j.Logger;
 
@@ -61,14 +64,18 @@ public class EtlSqlJob extends AbstractYarnJob {
 
         }
         case PHOENIX: {
-          // TODO:: Support Spark SQL Engine
+          PhoenixSqlExec phoenixSqlExec = new PhoenixSqlExec(this::logProcess, props.getProxyUser(),
+              logger);
 
+          exitCode =
+              phoenixSqlExec.execute(funcs, execSqls, false, null, null, getRemainTime()) ? 0 : -1;
         }
         case HIVE:
         default: {
           HiveSqlExec hiveSqlExec = new HiveSqlExec(this::logProcess, props.getProxyUser(), logger);
 
-          exitCode = (hiveSqlExec.execute(funcs, execSqls, false, null, null, getRemainTime())) ? 0 : -1;
+          exitCode =
+              (hiveSqlExec.execute(funcs, execSqls, false, null, null, getRemainTime())) ? 0 : -1;
         }
       }
     } catch (Exception e) {
