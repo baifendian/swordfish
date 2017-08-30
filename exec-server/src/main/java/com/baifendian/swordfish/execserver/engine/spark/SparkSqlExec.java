@@ -10,10 +10,12 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.function.Consumer;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
@@ -68,43 +70,56 @@ public class SparkSqlExec {
       return false;
     }
 
-    SparkSession sparkSession = SparkSqlUtil.getHiveContext();
+    try(SparkSession sparkSession = SparkSqlUtil.getHiveContext()) {
 
-    if (CollectionUtils.isNotEmpty(createFuncs)) {
-      try {
-        for (String sql : createFuncs) {
-          logger.info("hive create function sql: {}", sql);
-          sparkSession.sql(sql);
+      if (CollectionUtils.isNotEmpty(createFuncs)) {
+        try {
+          for (String sql : createFuncs) {
+            logger.info("spark hive create function sql: {}", sql);
+            sparkSession.sql(sql);
+          }
+        } catch (Exception e) {
+          logger.error("spark execute query exception", e);
+
+          // 这里就失败了, 会记录下错误记录, 然后返回
+          SqlUtil.handlerResults(0, sqls, FlowStatus.FAILED, resultCallback);
+
+          return false;
         }
-      } catch (Exception e) {
-        logger.error("execute query exception", e);
-
-        // 这里就失败了, 会记录下错误记录, 然后返回
-        SqlUtil.handlerResults(0, sqls, FlowStatus.FAILED, resultCallback);
-
-        return false;
       }
-    }
 
-    //HiveContext hiveContext = SparkSqlUtil.getHiveContext();
+      //HiveContext hiveContext = SparkSqlUtil.getHiveContext();
 
-    // 查询结果限制
-    queryLimit = (queryLimit != null) ? queryLimit : defaultQueryLimit;
+      // 查询结果限制
+      queryLimit = (queryLimit != null) ? queryLimit : defaultQueryLimit;
 
-    // 日志线程
-    // 执行 sql 语句
-    for (int index = 0; index < sqls.size(); ++index) {
-      String sql = sqls.get(index);
-      Date startTime = new Date();
-      logger.info("hive execute sql: {}", sql);
-      ExecResult execResult = new ExecResult();
-      execResult.setIndex(index);
-      execResult.setStm(sql);
-      execSql(sql, sparkSession, queryLimit, execResult);
-      // 执行结果回调处理
-      if (resultCallback != null) {
-        Date endTime = new Date();
-        resultCallback.handleResult(execResult, startTime, endTime);
+      // 日志线程
+      // 执行 sql 语句
+      for (int index = 0; index < sqls.size(); ++index) {
+        String sql = sqls.get(index);
+        Date startTime = new Date();
+        logger.info("spark hive execute sql: {}", sql);
+        ExecResult execResult = new ExecResult();
+        execResult.setIndex(index);
+        execResult.setStm(sql);
+        try {
+          execSql(sql, sparkSession, queryLimit, execResult);
+          // 执行结果回调处理
+          if (resultCallback != null) {
+            Date endTime = new Date();
+            resultCallback.handleResult(execResult, startTime, endTime);
+          }
+        }catch (Exception e){
+          // 语义异常
+          logger.error("spark executeQuery exception", e);
+
+          if (isContinue) {
+            SqlUtil.handlerResult(index, sql, FlowStatus.FAILED, resultCallback);
+          } else {
+            SqlUtil.handlerResults(index, sqls, FlowStatus.FAILED, resultCallback);
+            return false;
+          }
+        }
       }
     }
 
@@ -113,30 +128,26 @@ public class SparkSqlExec {
 
   static void execSql(String sql, SparkSession sparkSession, int queryLimit, ExecResult execResult)
       throws SQLException {
-// 只对 query 和 show 语句显示结果
+
+    // 只对 query 和 show 语句显示结果
     if (HiveUtil.isTokQuery(sql) || HiveUtil.isLikeShowStm(sql)) {
       Dataset<Row> sqlDF = sparkSession.sql(sql).limit(queryLimit);
 
-      List<List<String>> datas = new ArrayList<>();
-      for (Row row: sqlDF.collectAsList()){
-        List<String> values = new ArrayList<>();
-        for (int i = 1; i <= row.length(); ++i) {
-          values.add(row.getString(i));
+      String[] colums = sqlDF.columns();
+      if (colums != null && colums.length > 0) {
+
+        execResult.setTitles(Arrays.asList(colums));
+        List<List<String>> datas = new ArrayList<>();
+        for (Row row : sqlDF.collectAsList()) {
+          List<String> values = new ArrayList<>();
+          for (int i = 0; i < row.length(); ++i) {
+            values.add(row.getString(i));
+          }
+
+          datas.add(values);
         }
-
-        datas.add(values);
+        execResult.setValues(datas);
       }
-
-      //ResultSetMetaData resultSetMetaData = res.getMetaData();
-//      int count = resultSetMetaData.getColumnCount();
-//
-//      List<String> colums = new ArrayList<>();
-//      for (int i = 1; i <= count; i++) {
-//        colums.add(resultSetMetaData.getColumnLabel(i));
-//      }
-//
-//      execResult.setTitles(colums);
-      execResult.setValues(datas);
     } else {
       sparkSession.sql(sql);
     }

@@ -66,7 +66,7 @@ case $startStop in
 
     echo starting $command, logging to $log
 
-    exec_command="$LOG_FILE $SWORDFISH_OPTS -classpath $SWORDFISH_CONF_DIR:$SWORDFISH_LIB_JARS $CLASS"
+    exec_command="$LOG_FILE $SWORDFISH_OPTS -classpath $SWORDFISH_CONF_DIR:$SWORDFISH_LIB_JARS:${SPARK_HOME}/conf/ $CLASS"
 
     echo "nohup $JAVA_HOME/bin/java $exec_command > $log 2>&1 < /dev/null &"
     nohup $JAVA_HOME/bin/java $exec_command > $log 2>&1 < /dev/null &

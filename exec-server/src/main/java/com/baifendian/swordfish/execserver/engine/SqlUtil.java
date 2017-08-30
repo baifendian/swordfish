@@ -33,7 +33,7 @@ public class SqlUtil {
   /**
    * 处理单条记录
    */
-  static private void handlerResult(int index, String sql, FlowStatus status,
+  static public void handlerResult(int index, String sql, FlowStatus status,
       ResultCallback resultCallback) {
     Date now = new Date();
 
