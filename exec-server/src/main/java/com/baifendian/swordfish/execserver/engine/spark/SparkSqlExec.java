@@ -15,12 +15,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.function.Consumer;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang3.ArrayUtils;
-import org.apache.spark.SparkConf;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
-import org.apache.spark.sql.hive.HiveContext;
 import org.slf4j.Logger;
 
 /**
