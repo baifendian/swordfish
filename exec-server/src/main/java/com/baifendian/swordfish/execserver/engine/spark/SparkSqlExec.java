@@ -4,6 +4,8 @@ import com.baifendian.swordfish.execserver.common.ResultCallback;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.function.Consumer;
+import org.apache.spark.SparkConf;
+import org.apache.spark.sql.hive.HiveContext;
 import org.slf4j.Logger;
 
 /**
@@ -52,6 +54,8 @@ public class SparkSqlExec {
     if (remainTime <= 0) {
       return false;
     }
+
+    //HiveContext hiveContext = SparkSqlUtil.getHiveContext();
 
     // 查询结果限制
     queryLimit = (queryLimit != null) ? queryLimit : defaultQueryLimit;

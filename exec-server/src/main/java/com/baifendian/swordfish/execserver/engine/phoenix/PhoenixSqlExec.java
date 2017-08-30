@@ -69,53 +69,54 @@ public class PhoenixSqlExec {
     // 查询结果限制
     queryLimit = (queryLimit != null) ? queryLimit : defaultQueryLimit;
 
-    Connection con = PhoenixUtil.getPhoenixConnection();
-    if (con == null) {
-      logger.error("Failed to get phoenix connect");
-      return false;
-    }
-
-    Statement sta = con.createStatement();
-
-    if (CollectionUtils.isNotEmpty(createFuncs)){
-      try {
-        for (String sql : createFuncs) {
-          logger.info("hive create function sql: {}", sql);
-          sta.execute(sql);
-        }
-      }catch (SQLException e){
-        logger.error("execute query exception", e);
-
-        // 这里就失败了, 会记录下错误记录, 然后返回
-        handlerResults(0, sqls, FlowStatus.FAILED, resultCallback);
-
+    try(Connection con = PhoenixUtil.getPhoenixConnection()) {
+      if (con == null) {
+        logger.error("Failed to get phoenix connect");
         return false;
       }
-    }
 
-    // 日志线程
-    // 执行 sql 语句
-    for (int index = 0; index < sqls.size(); ++index) {
-      String sql = sqls.get(index);
-      Date startTime = new Date();
+      Statement sta = con.createStatement();
 
-      logger.info("hive execute sql: {}", sql);
-      ExecResult execResult = new ExecResult();
-      execResult.setIndex(index);
-      execResult.setStm(sql);
-      try{
-        SqlUtil.execSql(sql, sta, queryLimit, execResult);
-        // 执行结果回调处理
-        if (resultCallback != null) {
-          Date endTime = new Date();
-          resultCallback.handleResult(execResult, startTime, endTime);
-        }
-      }catch (SQLException e) {
-        if (isContinue) {
-          handlerResult(index, sql, FlowStatus.FAILED, resultCallback);
-        } else {
-          handlerResults(index, sqls, FlowStatus.FAILED, resultCallback);
+      if (CollectionUtils.isNotEmpty(createFuncs)) {
+        try {
+          for (String sql : createFuncs) {
+            logger.info("hive create function sql: {}", sql);
+            sta.execute(sql);
+          }
+        } catch (SQLException e) {
+          logger.error("execute query exception", e);
+
+          // 这里就失败了, 会记录下错误记录, 然后返回
+          handlerResults(0, sqls, FlowStatus.FAILED, resultCallback);
+
           return false;
+        }
+      }
+
+      // 日志线程
+      // 执行 sql 语句
+      for (int index = 0; index < sqls.size(); ++index) {
+        String sql = sqls.get(index);
+        Date startTime = new Date();
+
+        logger.info("hive execute sql: {}", sql);
+        ExecResult execResult = new ExecResult();
+        execResult.setIndex(index);
+        execResult.setStm(sql);
+        try {
+          SqlUtil.execSql(sql, sta, queryLimit, execResult);
+          // 执行结果回调处理
+          if (resultCallback != null) {
+            Date endTime = new Date();
+            resultCallback.handleResult(execResult, startTime, endTime);
+          }
+        } catch (SQLException e) {
+          if (isContinue) {
+            handlerResult(index, sql, FlowStatus.FAILED, resultCallback);
+          } else {
+            handlerResults(index, sqls, FlowStatus.FAILED, resultCallback);
+            return false;
+          }
         }
       }
     }
