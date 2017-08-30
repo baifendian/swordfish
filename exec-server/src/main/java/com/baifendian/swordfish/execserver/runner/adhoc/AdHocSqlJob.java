@@ -31,6 +31,7 @@ import com.baifendian.swordfish.execserver.common.ResultCallback;
 import com.baifendian.swordfish.execserver.engine.hive.HiveSqlExec;
 import com.baifendian.swordfish.execserver.engine.hive.HiveUtil;
 import com.baifendian.swordfish.execserver.engine.phoenix.PhoenixSqlExec;
+import com.baifendian.swordfish.execserver.engine.spark.SparkSqlExec;
 import com.baifendian.swordfish.execserver.job.JobProps;
 import com.baifendian.swordfish.execserver.parameter.ParamHelper;
 import com.baifendian.swordfish.execserver.parameter.SystemParamManager;
@@ -140,8 +141,9 @@ public class AdHocSqlJob {
 
     switch (type) {
       case SPARK: {
-        // TODO:: Support Spark SQL Engine
-
+        SparkSqlExec sparkSqlExec = new SparkSqlExec(this::logProcess, props.getProxyUser(), logger);
+        return sparkSqlExec.execute(funcs, execSqls, true, resultCallback, param.getLimit(), Constants.ADHOC_TIMEOUT)
+            ? FlowStatus.SUCCESS : FlowStatus.FAILED;
       }
       case PHOENIX: {
         PhoenixSqlExec phoenixSqlExec = new PhoenixSqlExec(this::logProcess, props.getProxyUser(), logger);

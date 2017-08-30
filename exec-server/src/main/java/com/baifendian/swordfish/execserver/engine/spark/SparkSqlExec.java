@@ -1,10 +1,23 @@
 package com.baifendian.swordfish.execserver.engine.spark;
 
+import com.baifendian.swordfish.dao.enums.FlowStatus;
+import com.baifendian.swordfish.execserver.common.ExecResult;
 import com.baifendian.swordfish.execserver.common.ResultCallback;
+import com.baifendian.swordfish.execserver.engine.SqlUtil;
+import com.baifendian.swordfish.execserver.engine.hive.HiveUtil;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.function.Consumer;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.spark.SparkConf;
+import org.apache.spark.sql.Dataset;
+import org.apache.spark.sql.Row;
+import org.apache.spark.sql.SparkSession;
 import org.apache.spark.sql.hive.HiveContext;
 import org.slf4j.Logger;
 
@@ -55,11 +68,80 @@ public class SparkSqlExec {
       return false;
     }
 
+    SparkSession sparkSession = SparkSqlUtil.getHiveContext();
+
+    if (CollectionUtils.isNotEmpty(createFuncs)) {
+      try {
+        for (String sql : createFuncs) {
+          logger.info("hive create function sql: {}", sql);
+          sparkSession.sql(sql);
+        }
+      } catch (Exception e) {
+        logger.error("execute query exception", e);
+
+        // 这里就失败了, 会记录下错误记录, 然后返回
+        SqlUtil.handlerResults(0, sqls, FlowStatus.FAILED, resultCallback);
+
+        return false;
+      }
+    }
+
     //HiveContext hiveContext = SparkSqlUtil.getHiveContext();
 
     // 查询结果限制
     queryLimit = (queryLimit != null) ? queryLimit : defaultQueryLimit;
 
+    // 日志线程
+    // 执行 sql 语句
+    for (int index = 0; index < sqls.size(); ++index) {
+      String sql = sqls.get(index);
+      Date startTime = new Date();
+      logger.info("hive execute sql: {}", sql);
+      ExecResult execResult = new ExecResult();
+      execResult.setIndex(index);
+      execResult.setStm(sql);
+      execSql(sql, sparkSession, queryLimit, execResult);
+      // 执行结果回调处理
+      if (resultCallback != null) {
+        Date endTime = new Date();
+        resultCallback.handleResult(execResult, startTime, endTime);
+      }
+    }
+
     return true;
+  }
+
+  static void execSql(String sql, SparkSession sparkSession, int queryLimit, ExecResult execResult)
+      throws SQLException {
+// 只对 query 和 show 语句显示结果
+    if (HiveUtil.isTokQuery(sql) || HiveUtil.isLikeShowStm(sql)) {
+      Dataset<Row> sqlDF = sparkSession.sql(sql).limit(queryLimit);
+
+      List<List<String>> datas = new ArrayList<>();
+      for (Row row: sqlDF.collectAsList()){
+        List<String> values = new ArrayList<>();
+        for (int i = 1; i <= row.length(); ++i) {
+          values.add(row.getString(i));
+        }
+
+        datas.add(values);
+      }
+
+      //ResultSetMetaData resultSetMetaData = res.getMetaData();
+//      int count = resultSetMetaData.getColumnCount();
+//
+//      List<String> colums = new ArrayList<>();
+//      for (int i = 1; i <= count; i++) {
+//        colums.add(resultSetMetaData.getColumnLabel(i));
+//      }
+//
+//      execResult.setTitles(colums);
+      execResult.setValues(datas);
+    } else {
+      sparkSession.sql(sql);
+    }
+
+    // 执行到这里，说明已经执行成功了
+    execResult.setStatus(FlowStatus.SUCCESS);
   }
 }

@@ -2,6 +2,7 @@ package com.baifendian.swordfish.execserver.engine;
 
 import com.baifendian.swordfish.dao.enums.FlowStatus;
 import com.baifendian.swordfish.execserver.common.ExecResult;
+import com.baifendian.swordfish.execserver.common.ResultCallback;
 import com.baifendian.swordfish.execserver.engine.hive.HiveUtil;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -17,6 +18,37 @@ import java.util.List;
  * @author : shuanghu
  */
 public class SqlUtil {
+  /**
+   * 处理结果, 从 fromIndex 开始
+   */
+  static public void handlerResults(int fromIndex, List<String> sqls, FlowStatus status,
+      ResultCallback resultCallback) {
+    for (int i = fromIndex; i < sqls.size(); ++i) {
+      String sql = sqls.get(i);
+
+      handlerResult(i, sql, status, resultCallback);
+    }
+  }
+
+  /**
+   * 处理单条记录
+   */
+  static private void handlerResult(int index, String sql, FlowStatus status,
+      ResultCallback resultCallback) {
+    Date now = new Date();
+
+    ExecResult execResult = new ExecResult();
+
+    execResult.setIndex(index);
+    execResult.setStm(sql);
+    execResult.setStatus(status);
+
+    if (resultCallback != null) {
+      // 执行结果回调处理
+      resultCallback.handleResult(execResult, now, now);
+    }
+  }
+
   public static void execSql(String sql, Statement statement, int queryLimit, ExecResult execResult)
       throws SQLException {
     // 只对 query 和 show 语句显示结果
