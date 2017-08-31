@@ -163,6 +163,15 @@ public class FlowDao extends BaseDao {
   }
 
   /**
+   * 更新 flow 执行详情 <p>
+   *
+   * @return 是否成功
+   */
+  public boolean updateExecutionFlowDataSub(ExecutionFlow executionFlow) {
+    return executionFlowMapper.updateFlowDataSub(executionFlow) > 0;
+  }
+
+  /**
    * 调度 workflow 时，插入执行信息（调度或者补数据） <p>
    *
    * @param scheduleTime : 这个时间在不同的场景, 有不同的解释, 直接运行指接受到的时间, 调度和补数据 则是 fire time(定时器给的时间)

@@ -22,19 +22,23 @@ import com.baifendian.swordfish.dao.enums.NotifyType;
 import com.baifendian.swordfish.dao.model.ExecutionFlow;
 import com.baifendian.swordfish.dao.model.ExecutionFlowError;
 import com.baifendian.swordfish.dao.model.ExecutionState;
-import org.apache.ibatis.annotations.*;
-import org.apache.ibatis.type.EnumOrdinalTypeHandler;
-import org.apache.ibatis.type.JdbcType;
-
 import java.util.Date;
 import java.util.List;
+import org.apache.ibatis.annotations.InsertProvider;
+import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Result;
+import org.apache.ibatis.annotations.Results;
+import org.apache.ibatis.annotations.SelectKey;
+import org.apache.ibatis.annotations.SelectProvider;
+import org.apache.ibatis.annotations.UpdateProvider;
+import org.apache.ibatis.type.EnumOrdinalTypeHandler;
+import org.apache.ibatis.type.JdbcType;
 
 public interface ExecutionFlowMapper {
 
   /**
    * 插入记录并获取记录 id <p>
    *
-   * @param executionFlow
    * @return 修改记录数
    */
   @InsertProvider(type = ExecutionFlowMapperProvider.class, method = "insert")
@@ -44,19 +48,22 @@ public interface ExecutionFlowMapper {
   /**
    * workflow 执行的信息更新 <p>
    *
-   * @param executionFlow
    * @return 更新记录数
    */
   @UpdateProvider(type = ExecutionFlowMapperProvider.class, method = "update")
   int update(@Param("executionFlow") ExecutionFlow executionFlow);
 
   /**
-   * 根据执行 id 进行查询
-   *
-   * @param execId
-   * @return
+   * 更新数据
    */
-  @Results(value = {@Result(property = "id", column = "id", id = true, javaType = int.class, jdbcType = JdbcType.INTEGER),
+  @UpdateProvider(type = ExecutionFlowMapperProvider.class, method = "updateFlowDataSub")
+  int updateFlowDataSub(@Param("executionFlow") ExecutionFlow executionFlow);
+
+  /**
+   * 根据执行 id 进行查询
+   */
+  @Results(value = {
+      @Result(property = "id", column = "id", id = true, javaType = int.class, jdbcType = JdbcType.INTEGER),
       @Result(property = "flowId", column = "flow_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
       @Result(property = "worker", column = "worker", javaType = String.class, jdbcType = JdbcType.VARCHAR),
       @Result(property = "projectId", column = "project_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
@@ -71,6 +78,7 @@ public interface ExecutionFlowMapper {
       @Result(property = "scheduleTime", column = "schedule_time", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP),
       @Result(property = "endTime", column = "end_time", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP),
       @Result(property = "workflowData", column = "workflow_data", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+      @Result(property = "workflowDataSub", column = "workflow_data_sub", javaType = String.class, jdbcType = JdbcType.VARCHAR),
       @Result(property = "type", column = "type", typeHandler = EnumOrdinalTypeHandler.class, javaType = ExecType.class, jdbcType = JdbcType.TINYINT),
       @Result(property = "failurePolicy", column = "failure_policy", typeHandler = EnumOrdinalTypeHandler.class, javaType = FailurePolicyType.class, jdbcType = JdbcType.TINYINT),
       @Result(property = "workflowName", column = "flow_name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
@@ -87,10 +95,9 @@ public interface ExecutionFlowMapper {
 
   /**
    * 获取所有未完成的工作流
-   *
-   * @return
    */
-  @Results(value = {@Result(property = "id", column = "id", id = true, javaType = int.class, jdbcType = JdbcType.INTEGER),
+  @Results(value = {
+      @Result(property = "id", column = "id", id = true, javaType = int.class, jdbcType = JdbcType.INTEGER),
       @Result(property = "flowId", column = "flow_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
       @Result(property = "worker", column = "worker", javaType = String.class, jdbcType = JdbcType.VARCHAR),
       @Result(property = "status", column = "status", typeHandler = EnumOrdinalTypeHandler.class, javaType = FlowStatus.class, jdbcType = JdbcType.TINYINT)
@@ -100,11 +107,9 @@ public interface ExecutionFlowMapper {
 
   /**
    * 获取指定worker未完成的工作流列表
-   *
-   * @param worker
-   * @return
    */
-  @Results(value = {@Result(property = "id", column = "id", id = true, javaType = int.class, jdbcType = JdbcType.INTEGER),
+  @Results(value = {
+      @Result(property = "id", column = "id", id = true, javaType = int.class, jdbcType = JdbcType.INTEGER),
       @Result(property = "flowId", column = "flow_id", javaType = int.class, jdbcType = JdbcType.INTEGER)
   })
   @SelectProvider(type = ExecutionFlowMapperProvider.class, method = "selectNoFinishFlow")
@@ -112,11 +117,6 @@ public interface ExecutionFlowMapper {
 
   /**
    * 按照时间查询工作流的最新状态
-   *
-   * @param flowId
-   * @param startDate
-   * @param endDate
-   * @return
    */
   @Results(value = {
       @Result(property = "id", column = "id", id = true, javaType = int.class, jdbcType = JdbcType.INTEGER),
@@ -127,19 +127,11 @@ public interface ExecutionFlowMapper {
       @Result(property = "type", column = "type", typeHandler = EnumOrdinalTypeHandler.class, jdbcType = JdbcType.TINYINT)
   })
   @SelectProvider(type = ExecutionFlowMapperProvider.class, method = "selectByFlowIdAndTimes")
-  List<ExecutionFlow> selectByFlowIdAndTimes(@Param("flowId") Integer flowId, @Param("startDate") Date startDate, @Param("endDate") Date endDate);
+  List<ExecutionFlow> selectByFlowIdAndTimes(@Param("flowId") Integer flowId,
+      @Param("startDate") Date startDate, @Param("endDate") Date endDate);
 
   /**
    * 查询指定工作流的运行
-   *
-   * @param projectName
-   * @param workflowList
-   * @param startDate
-   * @param endDate
-   * @param start
-   * @param limit
-   * @param statuses
-   * @return
    */
   @Results(value = {
       @Result(property = "id", column = "id", id = true, javaType = int.class, jdbcType = JdbcType.INTEGER),
@@ -159,27 +151,21 @@ public interface ExecutionFlowMapper {
       @Result(property = "type", column = "type", typeHandler = EnumOrdinalTypeHandler.class, jdbcType = JdbcType.TINYINT)
   })
   @SelectProvider(type = ExecutionFlowMapperProvider.class, method = "selectByFlowIdAndTimesAndStatusLimit")
-  List<ExecutionFlow> selectByFlowIdAndTimesAndStatusLimit(@Param("projectName") String projectName, @Param("workflowList") List<String> workflowList, @Param("startDate") Date startDate, @Param("endDate") Date endDate, @Param("start") int start, @Param("limit") int limit, @Param("status") List<FlowStatus> statuses);
+  List<ExecutionFlow> selectByFlowIdAndTimesAndStatusLimit(@Param("projectName") String projectName,
+      @Param("workflowList") List<String> workflowList, @Param("startDate") Date startDate,
+      @Param("endDate") Date endDate, @Param("start") int start, @Param("limit") int limit,
+      @Param("status") List<FlowStatus> statuses);
 
   /**
    * 根据工作流ID时间和状态查询工作流执行情况
-   *
-   * @param projectName
-   * @param workflowList
-   * @param startDate
-   * @param endDate
-   * @param statuses
-   * @return
    */
   @SelectProvider(type = ExecutionFlowMapperProvider.class, method = "sumByFlowIdAndTimesAndStatus")
-  int sumByFlowIdAndTimesAndStatus(@Param("projectName") String projectName, @Param("workflowList") List<String> workflowList, @Param("startDate") Date startDate, @Param("endDate") Date endDate, @Param("status") List<FlowStatus> statuses);
+  int sumByFlowIdAndTimesAndStatus(@Param("projectName") String projectName,
+      @Param("workflowList") List<String> workflowList, @Param("startDate") Date startDate,
+      @Param("endDate") Date endDate, @Param("status") List<FlowStatus> statuses);
 
   /**
    * 根据 flow id 以及调度时间查询
-   *
-   * @param flowId
-   * @param scheduleTime
-   * @return
    */
   @Results(value = {
       @Result(property = "id", column = "id", id = true, javaType = int.class, jdbcType = JdbcType.INTEGER),
@@ -190,15 +176,11 @@ public interface ExecutionFlowMapper {
       @Result(property = "type", column = "type", typeHandler = EnumOrdinalTypeHandler.class, jdbcType = JdbcType.TINYINT)
   })
   @SelectProvider(type = ExecutionFlowMapperProvider.class, method = "selectByFlowIdAndTime")
-  List<ExecutionFlow> selectByFlowIdAndTime(@Param("flowId") Integer flowId, @Param("scheduleTime") Date scheduleTime);
+  List<ExecutionFlow> selectByFlowIdAndTime(@Param("flowId") Integer flowId,
+      @Param("scheduleTime") Date scheduleTime);
 
   /**
    * 统计出一段时间内，某个项目下各种状态下的任务数（天为单位）
-   *
-   * @param projectId
-   * @param startDate
-   * @param endDate
-   * @return
    */
   @Results(value = {
       @Result(property = "day", column = "day", id = true, javaType = Date.class, jdbcType = JdbcType.DATE),
@@ -213,14 +195,11 @@ public interface ExecutionFlowMapper {
       @Result(property = "inActive", column = "INACTIVE", javaType = int.class, jdbcType = JdbcType.INTEGER)
   })
   @SelectProvider(type = ExecutionFlowMapperProvider.class, method = "selectStateByProject")
-  List<ExecutionState> selectStateByProject(@Param("projectId") int projectId, @Param("startDate") Date startDate, @Param("endDate") Date endDate);
+  List<ExecutionState> selectStateByProject(@Param("projectId") int projectId,
+      @Param("startDate") Date startDate, @Param("endDate") Date endDate);
 
   /**
    * 根据状态和项目查询
-   *
-   * @param projectId
-   * @param day
-   * @return
    */
   @Results(value = {
       @Result(property = "hour", column = "hour", id = true, javaType = int.class, jdbcType = JdbcType.INTEGER),
@@ -235,17 +214,14 @@ public interface ExecutionFlowMapper {
       @Result(property = "inActive", column = "INACTIVE", javaType = int.class, jdbcType = JdbcType.INTEGER)
   })
   @SelectProvider(type = ExecutionFlowMapperProvider.class, method = "selectStateHourByProject")
-  List<ExecutionState> selectStateHourByProject(@Param("projectId") int projectId, @Param("day") Date day);
+  List<ExecutionState> selectStateHourByProject(@Param("projectId") int projectId,
+      @Param("day") Date day);
 
   /**
    * 统计某天的工作流耗时TOP
-   *
-   * @param projectId
-   * @param top
-   * @param date
-   * @return
    */
-  @Results(value = {@Result(property = "id", column = "id", id = true, javaType = int.class, jdbcType = JdbcType.INTEGER),
+  @Results(value = {
+      @Result(property = "id", column = "id", id = true, javaType = int.class, jdbcType = JdbcType.INTEGER),
       @Result(property = "flowId", column = "flow_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
       @Result(property = "workflowName", column = "flow_name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
       @Result(property = "projectName", column = "project_name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
@@ -263,15 +239,11 @@ public interface ExecutionFlowMapper {
 //      @Result(property = "duration", column = "duration", javaType = int.class, jdbcType = JdbcType.INTEGER)
   })
   @SelectProvider(type = ExecutionFlowMapperProvider.class, method = "selectDurationsByProject")
-  List<ExecutionFlow> selectDurationsByProject(@Param("projectId") int projectId, @Param("top") int top, @Param("date") Date date);
+  List<ExecutionFlow> selectDurationsByProject(@Param("projectId") int projectId,
+      @Param("top") int top, @Param("date") Date date);
 
   /**
    * 统计某天的工作流异常数TOP
-   *
-   * @param projectId
-   * @param top
-   * @param date
-   * @return
    */
   @Results(value = {
       @Result(property = "workflowName", column = "flow_name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
@@ -281,16 +253,14 @@ public interface ExecutionFlowMapper {
       @Result(property = "times", column = "times", javaType = int.class, jdbcType = JdbcType.INTEGER)
   })
   @SelectProvider(type = ExecutionFlowMapperProvider.class, method = "selectErrorsByProject")
-  List<ExecutionFlowError> selectErrorsByProject(@Param("projectId") int projectId, @Param("top") int top, @Param("date") Date date);
+  List<ExecutionFlowError> selectErrorsByProject(@Param("projectId") int projectId,
+      @Param("top") int top, @Param("date") Date date);
 
   /**
    * 获取参照时间最近的前一次调度结果
-   *
-   * @param flowId
-   * @param date
-   * @return
    */
-  @Results(value = {@Result(property = "id", column = "id", id = true, javaType = int.class, jdbcType = JdbcType.INTEGER),
+  @Results(value = {
+      @Result(property = "id", column = "id", id = true, javaType = int.class, jdbcType = JdbcType.INTEGER),
       @Result(property = "flowId", column = "flow_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
       @Result(property = "status", column = "status", typeHandler = EnumOrdinalTypeHandler.class, jdbcType = JdbcType.TINYINT),
       @Result(property = "worker", column = "worker", javaType = String.class, jdbcType = JdbcType.VARCHAR),
@@ -308,12 +278,9 @@ public interface ExecutionFlowMapper {
 
   /**
    * 获取参照时间最近的前一次调度结果
-   *
-   * @param flowId
-   * @param date
-   * @return
    */
-  @Results(value = {@Result(property = "id", column = "id", id = true, javaType = int.class, jdbcType = JdbcType.INTEGER),
+  @Results(value = {
+      @Result(property = "id", column = "id", id = true, javaType = int.class, jdbcType = JdbcType.INTEGER),
       @Result(property = "flowId", column = "flow_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
       @Result(property = "status", column = "status", typeHandler = EnumOrdinalTypeHandler.class, jdbcType = JdbcType.TINYINT),
       @Result(property = "worker", column = "worker", javaType = String.class, jdbcType = JdbcType.VARCHAR),
@@ -331,12 +298,9 @@ public interface ExecutionFlowMapper {
 
   /**
    * 获取参照时间最近的前一次调度结果
-   *
-   * @param flowId
-   * @param date
-   * @return
    */
-  @Results(value = {@Result(property = "id", column = "id", id = true, javaType = int.class, jdbcType = JdbcType.INTEGER),
+  @Results(value = {
+      @Result(property = "id", column = "id", id = true, javaType = int.class, jdbcType = JdbcType.INTEGER),
       @Result(property = "flowId", column = "flow_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
       @Result(property = "status", column = "status", typeHandler = EnumOrdinalTypeHandler.class, jdbcType = JdbcType.TINYINT),
       @Result(property = "worker", column = "worker", javaType = String.class, jdbcType = JdbcType.VARCHAR),
@@ -352,7 +316,8 @@ public interface ExecutionFlowMapper {
   @SelectProvider(type = ExecutionFlowMapperProvider.class, method = "selectPreStartDate")
   ExecutionFlow selectPreStartDate(@Param("flowId") int flowId, @Param("date") Date date);
 
-  @Results(value = {@Result(property = "id", column = "id", id = true, javaType = int.class, jdbcType = JdbcType.INTEGER),
+  @Results(value = {
+      @Result(property = "id", column = "id", id = true, javaType = int.class, jdbcType = JdbcType.INTEGER),
       @Result(property = "flowId", column = "flow_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
       @Result(property = "status", column = "status", typeHandler = EnumOrdinalTypeHandler.class, jdbcType = JdbcType.TINYINT),
       @Result(property = "worker", column = "worker", javaType = String.class, jdbcType = JdbcType.VARCHAR),
@@ -366,14 +331,11 @@ public interface ExecutionFlowMapper {
       @Result(property = "proxyUser", column = "proxy_user", javaType = String.class, jdbcType = JdbcType.VARCHAR)
   })
   @SelectProvider(type = ExecutionFlowMapperProvider.class, method = "selectByStartTimeAndScheduleTime")
-  ExecutionFlow selectByStartTimeAndScheduleTime(@Param("flowId") int flowId, @Param("startTime") Date startTime, @Param("scheduleTime") Date scheduleTime);
+  ExecutionFlow selectByStartTimeAndScheduleTime(@Param("flowId") int flowId,
+      @Param("startTime") Date startTime, @Param("scheduleTime") Date scheduleTime);
 
   /**
    * 根据scheduleTime 和 flowId 查询一个ExecutionFlow信息
-   *
-   * @param flowId
-   * @param scheduleTime
-   * @return
    */
   @Results(value = {
       @Result(property = "id", column = "id", id = true, javaType = int.class, jdbcType = JdbcType.INTEGER),
@@ -393,5 +355,6 @@ public interface ExecutionFlowMapper {
       @Result(property = "type", column = "type", typeHandler = EnumOrdinalTypeHandler.class, jdbcType = JdbcType.TINYINT)
   })
   @SelectProvider(type = ExecutionFlowMapperProvider.class, method = "selectExecutionFlowByScheduleTime")
-  ExecutionFlow selectExecutionFlowByScheduleTime(@Param("flowId") int flowId, @Param("scheduleTime") Date scheduleTime);
+  ExecutionFlow selectExecutionFlowByScheduleTime(@Param("flowId") int flowId,
+      @Param("scheduleTime") Date scheduleTime);
 }
