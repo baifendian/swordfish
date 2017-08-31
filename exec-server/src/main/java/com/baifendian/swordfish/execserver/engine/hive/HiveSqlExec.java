@@ -22,6 +22,7 @@ import com.baifendian.swordfish.dao.enums.FlowStatus;
 import com.baifendian.swordfish.dao.exception.DaoSemanticException;
 import com.baifendian.swordfish.execserver.common.ExecResult;
 import com.baifendian.swordfish.execserver.common.ResultCallback;
+import com.baifendian.swordfish.execserver.engine.SqlUtil;
 import com.baifendian.swordfish.execserver.utils.Constants;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -132,7 +133,7 @@ public class HiveSqlExec {
         logger.error("execute query exception", e);
 
         // 这里就失败了, 会记录下错误记录, 然后返回
-        handlerResults(0, sqls, FlowStatus.FAILED, resultCallback);
+        SqlUtil.handlerResults(0, sqls, FlowStatus.FAILED, resultCallback);
 
         return false;
       }
@@ -208,16 +209,16 @@ public class HiveSqlExec {
           // sql 超时异常
           logger.error("executeQuery timeout exception", e);
 
-          handlerResults(index, sqls, FlowStatus.FAILED, resultCallback);
+          SqlUtil.handlerResults(index, sqls, FlowStatus.FAILED, resultCallback);
           return false;
         } catch (DaoSemanticException | HiveSQLException e) {
           // 语义异常
           logger.error("executeQuery exception", e);
 
           if (isContinue) {
-            handlerResult(index, sql, FlowStatus.FAILED, resultCallback);
+            SqlUtil.handlerResult(index, sql, FlowStatus.FAILED, resultCallback);
           } else {
-            handlerResults(index, sqls, FlowStatus.FAILED, resultCallback);
+            SqlUtil.handlerResults(index, sqls, FlowStatus.FAILED, resultCallback);
             return false;
           }
         } catch (Exception e) {
@@ -226,7 +227,7 @@ public class HiveSqlExec {
             logger.error("Get TTransportException return a client", e);
             // 这个不需要处理
 //            hiveService2Client.invalidateObject(hiveService2ConnectionInfo, hiveConnection);
-            handlerResults(index, sqls, FlowStatus.FAILED, resultCallback);
+            SqlUtil.handlerResults(index, sqls, FlowStatus.FAILED, resultCallback);
             return false;
           }
 
@@ -234,16 +235,16 @@ public class HiveSqlExec {
           if (e.toString().contains("SocketException")) {
             logger.error("SocketException clear pool", e);
             hiveService2Client.clear();
-            handlerResults(index, sqls, FlowStatus.FAILED, resultCallback);
+            SqlUtil.handlerResults(index, sqls, FlowStatus.FAILED, resultCallback);
             return false;
           }
 
           logger.error("executeQuery exception", e);
 
           if (isContinue) {
-            handlerResult(index, sql, FlowStatus.FAILED, resultCallback);
+            SqlUtil.handlerResult(index, sql, FlowStatus.FAILED, resultCallback);
           } else {
-            handlerResults(index, sqls, FlowStatus.FAILED, resultCallback);
+            SqlUtil.handlerResults(index, sqls, FlowStatus.FAILED, resultCallback);
             return false;
           }
         }
@@ -283,37 +284,6 @@ public class HiveSqlExec {
     }
 
     return true;
-  }
-
-  /**
-   * 处理结果, 从 fromIndex 开始
-   */
-  private void handlerResults(int fromIndex, List<String> sqls, FlowStatus status,
-      ResultCallback resultCallback) {
-    for (int i = fromIndex; i < sqls.size(); ++i) {
-      String sql = sqls.get(i);
-
-      handlerResult(i, sql, status, resultCallback);
-    }
-  }
-
-  /**
-   * 处理单条记录
-   */
-  private void handlerResult(int index, String sql, FlowStatus status,
-      ResultCallback resultCallback) {
-    Date now = new Date();
-
-    ExecResult execResult = new ExecResult();
-
-    execResult.setIndex(index);
-    execResult.setStm(sql);
-    execResult.setStatus(status);
-
-    if (resultCallback != null) {
-      // 执行结果回调处理
-      resultCallback.handleResult(execResult, now, now);
-    }
   }
 
   /**

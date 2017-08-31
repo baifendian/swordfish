@@ -87,7 +87,7 @@ public class PhoenixSqlExec {
           logger.error("execute query exception", e);
 
           // 这里就失败了, 会记录下错误记录, 然后返回
-          handlerResults(0, sqls, FlowStatus.FAILED, resultCallback);
+          SqlUtil.handlerResults(0, sqls, FlowStatus.FAILED, resultCallback);
 
           return false;
         }
@@ -112,9 +112,9 @@ public class PhoenixSqlExec {
           }
         } catch (SQLException e) {
           if (isContinue) {
-            handlerResult(index, sql, FlowStatus.FAILED, resultCallback);
+            SqlUtil.handlerResult(index, sql, FlowStatus.FAILED, resultCallback);
           } else {
-            handlerResults(index, sqls, FlowStatus.FAILED, resultCallback);
+            SqlUtil.handlerResults(index, sqls, FlowStatus.FAILED, resultCallback);
             return false;
           }
         }
@@ -122,37 +122,6 @@ public class PhoenixSqlExec {
     }
 
     return true;
-  }
-
-  /**
-   * 处理结果, 从 fromIndex 开始
-   */
-  private void handlerResults(int fromIndex, List<String> sqls, FlowStatus status,
-      ResultCallback resultCallback) {
-    for (int i = fromIndex; i < sqls.size(); ++i) {
-      String sql = sqls.get(i);
-
-      handlerResult(i, sql, status, resultCallback);
-    }
-  }
-
-  /**
-   * 处理单条记录
-   */
-  private void handlerResult(int index, String sql, FlowStatus status,
-      ResultCallback resultCallback) {
-    Date now = new Date();
-
-    ExecResult execResult = new ExecResult();
-
-    execResult.setIndex(index);
-    execResult.setStm(sql);
-    execResult.setStatus(status);
-
-    if (resultCallback != null) {
-      // 执行结果回调处理
-      resultCallback.handleResult(execResult, now, now);
-    }
   }
 
   public static void main(String[] args) throws SQLException, ClassNotFoundException {
