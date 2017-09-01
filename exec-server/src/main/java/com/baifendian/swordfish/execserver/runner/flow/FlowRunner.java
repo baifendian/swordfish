@@ -35,6 +35,8 @@ import com.baifendian.swordfish.dao.model.flow.FlowDag;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
 import com.baifendian.swordfish.execserver.exception.ExecTimeoutException;
 import com.baifendian.swordfish.execserver.job.JobContext;
+import com.baifendian.swordfish.execserver.parameter.ParamHelper;
+import com.baifendian.swordfish.execserver.parameter.SystemParamManager;
 import com.baifendian.swordfish.execserver.runner.node.NodeRunner;
 import com.baifendian.swordfish.execserver.utils.EnvHelper;
 import com.baifendian.swordfish.execserver.utils.LoggerUtil;
@@ -45,6 +47,7 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -59,6 +62,7 @@ import java.util.concurrent.TimeUnit;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -168,6 +172,31 @@ public class FlowRunner implements Runnable {
         "exec id:{}, current execution dir:{}, max try times:{}, timeout:{}, failure policy type:{}",
         executionFlow.getId(), execLocalPath, maxTryTimes, timeout, failurePolicyType);
 
+    // 做变量替换, 并且更新
+    if (StringUtils.isEmpty(executionFlow.getWorkflowDataSub())) {
+      Map<String, String> systemParamMap = SystemParamManager
+          .buildSystemParam(executionFlow.getType(), executionFlow.getScheduleTime());
+
+      // 构建自定义参数, 比如定义了 ${abc} = ${sf.system.bizdate}, $[yyyyMMdd] 等情况
+      Map<String, String> customParamMap = executionFlow.getUserDefinedParamMap();
+
+      Map<String, String> allParamMap = new HashMap<>();
+
+      if (systemParamMap != null) {
+        allParamMap.putAll(systemParamMap);
+      }
+
+      if (customParamMap != null) {
+        allParamMap.putAll(customParamMap);
+      }
+
+      executionFlow.setWorkflowDataSub(ParamHelper
+          .resolvePlaceholders(executionFlow.getWorkflowData(), allParamMap));
+
+      flowDao.updateExecutionFlowDataSub(executionFlow);
+    }
+
+    // 调度执行
     try {
       // 创建工作目录和用户
       EnvHelper.workDirAndUserCreate(execLocalPath, executionFlow.getProxyUser(), logger);

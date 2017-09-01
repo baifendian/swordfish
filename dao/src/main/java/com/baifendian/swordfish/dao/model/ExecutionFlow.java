@@ -85,6 +85,11 @@ public class ExecutionFlow {
   private String workflowData;
 
   /**
+   * workflow 替换变量后的数据
+   **/
+  private String workflowDataSub;
+
+  /**
    * workflow 等运行的类型
    **/
   private ExecType type;
@@ -254,6 +259,14 @@ public class ExecutionFlow {
 
   public void setWorkflowData(String workflowData) {
     this.workflowData = workflowData;
+  }
+
+  public String getWorkflowDataSub() {
+    return workflowDataSub;
+  }
+
+  public void setWorkflowDataSub(String workflowDataSub) {
+    this.workflowDataSub = workflowDataSub;
   }
 
   public ExecType getType() {

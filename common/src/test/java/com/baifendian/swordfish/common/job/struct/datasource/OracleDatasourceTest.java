@@ -18,6 +18,7 @@ package com.baifendian.swordfish.common.job.struct.datasource;
 import org.junit.Test;
 
 public class OracleDatasourceTest {
+
   @Test
   public void testIsConnectable() throws Exception {
     OracleDatasource oracleDatasource = new OracleDatasource();

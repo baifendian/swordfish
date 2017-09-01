@@ -170,6 +170,7 @@ CREATE TABLE `execution_flows` (
   `start_time` datetime NOT NULL COMMENT 'real start time of this exec',
   `end_time` datetime DEFAULT NULL COMMENT 'end time of this exec',
   `workflow_data` LONGTEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT 'short desc of the workflow, contain keys: edges, nodes, extras; [{edges: [{"startNode": "xxx", "endNode": "xxx"}, ...], nodes: [{"name": "shelljob1", "desc":"shell", "type":"VIRTUAL", "param": {"script": "echo shelljob1"}, dep: [], "extras": {...}}, ...]',
+  `workflow_data_sub` LONGTEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT 'substitute of workflow_data field',
   `user_defined_params` LONGTEXT DEFAULT NULL COMMENT 'user defined parameter of the flows.',
   `type` tinyint(4) NOT NULL COMMENT 'exec ways, schedule, add data or run ad-hoc.',
   `failure_policy` tinyint(4) NOT NULL COMMENT 'failure policy',

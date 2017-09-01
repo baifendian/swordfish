@@ -21,15 +21,14 @@ import com.baifendian.swordfish.dao.enums.FlowStatus;
 import com.baifendian.swordfish.dao.enums.NotifyType;
 import com.baifendian.swordfish.dao.mapper.utils.EnumFieldUtil;
 import com.baifendian.swordfish.dao.model.ExecutionFlow;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.ibatis.jdbc.SQL;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.ibatis.jdbc.SQL;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ExecutionFlowMapperProvider {
 
@@ -61,9 +60,11 @@ public class ExecutionFlowMapperProvider {
         VALUES("workflow_data", "#{executionFlow.workflowData}");
         VALUES("user_defined_params", "#{executionFlow.userDefinedParams}");
         VALUES("type", EnumFieldUtil.genFieldStr("executionFlow.type", ExecType.class));
-        VALUES("failure_policy", EnumFieldUtil.genFieldStr("executionFlow.failurePolicy", FailurePolicyType.class));
+        VALUES("failure_policy",
+            EnumFieldUtil.genFieldStr("executionFlow.failurePolicy", FailurePolicyType.class));
         VALUES("max_try_times", "#{executionFlow.maxTryTimes}");
-        VALUES("notify_type", EnumFieldUtil.genFieldStr("executionFlow.notifyType", NotifyType.class));
+        VALUES("notify_type",
+            EnumFieldUtil.genFieldStr("executionFlow.notifyType", NotifyType.class));
         VALUES("notify_mails", "#{executionFlow.notifyMails}");
         VALUES("timeout", "#{executionFlow.timeout}");
         VALUES("queue", "#{executionFlow.queue}");
@@ -112,9 +113,20 @@ public class ExecutionFlowMapperProvider {
   }
 
   /**
+   * 更新 workflow data
+   */
+  public String updateFlowDataSub(Map<String, Object> parameter) {
+    return new SQL() {{
+      UPDATE(TABLE_NAME);
+
+      SET("`workflow_data_sub` = #{executionFlow.workflowDataSub}");
+
+      WHERE("id = #{executionFlow.id}");
+    }}.toString();
+  }
+
+  /**
    * 查询所有没有完成的任务
-   *
-   * @return
    */
   public String selectAllNoFinishFlow() {
     return new SQL() {
@@ -130,9 +142,6 @@ public class ExecutionFlowMapperProvider {
 
   /**
    * 查询某台 executor server 上没有完成的任务
-   *
-   * @param paramter
-   * @return
    */
   public String selectNoFinishFlow(Map<String, Object> paramter) {
     return new SQL() {
@@ -149,9 +158,6 @@ public class ExecutionFlowMapperProvider {
 
   /**
    * 根据执行 id 查询执行的工作流信息
-   *
-   * @param parameter
-   * @return
    */
   public String selectByExecId(Map<String, Object> parameter) {
     String sql = new SQL() {
@@ -189,16 +195,18 @@ public class ExecutionFlowMapperProvider {
 
   /**
    * 查询一定时间范围的工作流信息
-   *
-   * @param parameter
-   * @return
    */
   public String selectByFlowIdAndTimes(Map<String, Object> parameter) {
     StringBuilder sb = new StringBuilder();
-    String inExpr = "(" + ExecType.DIRECT.ordinal() + "," + ExecType.COMPLEMENT_DATA.ordinal() + ")";
+    String inExpr =
+        "(" + ExecType.DIRECT.ordinal() + "," + ExecType.COMPLEMENT_DATA.ordinal() + ")";
 
-    sb.append("SELECT id, flow_id, worker, type, status, schedule_time FROM execution_flows WHERE flow_id = #{flowId} AND type IN " + inExpr + " AND ");
-    sb.append("schedule_time = (SELECT MIN(schedule_time) FROM execution_flows WHERE flow_id = #{flowId} AND type IN" + inExpr
+    sb.append(
+        "SELECT id, flow_id, worker, type, status, schedule_time FROM execution_flows WHERE flow_id = #{flowId} AND type IN "
+            + inExpr + " AND ");
+    sb.append(
+        "schedule_time = (SELECT MIN(schedule_time) FROM execution_flows WHERE flow_id = #{flowId} AND type IN"
+            + inExpr
             + " AND start_time >= #{startDate} AND start_time < #{endDate})");
 
     return sb.toString();
@@ -206,9 +214,6 @@ public class ExecutionFlowMapperProvider {
 
   /**
    * 查询一定时间范围内, 特定状态的工作流信息
-   *
-   * @param parameter
-   * @return
    */
   public String selectByFlowIdAndTimesAndStatusLimit(Map<String, Object> parameter) {
 
@@ -282,9 +287,6 @@ public class ExecutionFlowMapperProvider {
 
   /**
    * 根据时间和状态进行汇总查询
-   *
-   * @param parameter
-   * @return
    */
   public String sumByFlowIdAndTimesAndStatus(Map<String, Object> parameter) {
     List<FlowStatus> flowStatuses = (List<FlowStatus>) parameter.get("status");
@@ -342,9 +344,12 @@ public class ExecutionFlowMapperProvider {
    */
   public String selectByFlowIdAndTime(Map<String, Object> parameter) {
     StringBuilder sb = new StringBuilder();
-    String inExpr = "(" + ExecType.DIRECT.ordinal() + "," + ExecType.COMPLEMENT_DATA.ordinal() + ")";
+    String inExpr =
+        "(" + ExecType.DIRECT.ordinal() + "," + ExecType.COMPLEMENT_DATA.ordinal() + ")";
 
-    sb.append("SELECT id, flow_id, worker, type, status, schedule_time FROM execution_flows WHERE flow_id = #{flowId} AND type IN " + inExpr + " AND ");
+    sb.append(
+        "SELECT id, flow_id, worker, type, status, schedule_time FROM execution_flows WHERE flow_id = #{flowId} AND type IN "
+            + inExpr + " AND ");
     sb.append("schedule_time = #{scheduleTime}");
 
     return sb.toString();
@@ -358,15 +363,15 @@ public class ExecutionFlowMapperProvider {
     String sql = new SQL() {
       {
         SELECT("str_to_date(DATE_FORMAT(e_f.start_time,'%Y%m%d'),'%Y%m%d') as day,\n" +
-                "SUM(case e_f.status when 0 then 1 else 0 end) as INIT,\n" +
-                "SUM(case e_f.status when 1 then 1 else 0 end) as WAITING_DEP,\n" +
-                "SUM(case e_f.status when 2 then 1 else 0 end) as WAITING_RES,\n" +
-                "SUM(case e_f.status when 3 then 1 else 0 end) as RUNNING,\n" +
-                "SUM(case e_f.status when 4 then 1 else 0 end) as SUCCESS,\n" +
-                "SUM(case e_f.status when 5 then 1 else 0 end) as `KILL`,\n" +
-                "SUM(case e_f.status when 6 then 1 else 0 end) as `FAILED`,\n" +
-                "SUM(case e_f.status when 7 then 1 else 0 end) as `DEP_FAILED`,\n"+
-                "SUM(case e_f.status when 8 then 1 else 0 end) as `INACTIVE`");
+            "SUM(case e_f.status when 0 then 1 else 0 end) as INIT,\n" +
+            "SUM(case e_f.status when 1 then 1 else 0 end) as WAITING_DEP,\n" +
+            "SUM(case e_f.status when 2 then 1 else 0 end) as WAITING_RES,\n" +
+            "SUM(case e_f.status when 3 then 1 else 0 end) as RUNNING,\n" +
+            "SUM(case e_f.status when 4 then 1 else 0 end) as SUCCESS,\n" +
+            "SUM(case e_f.status when 5 then 1 else 0 end) as `KILL`,\n" +
+            "SUM(case e_f.status when 6 then 1 else 0 end) as `FAILED`,\n" +
+            "SUM(case e_f.status when 7 then 1 else 0 end) as `DEP_FAILED`,\n" +
+            "SUM(case e_f.status when 8 then 1 else 0 end) as `INACTIVE`");
 
         FROM(TABLE_NAME + " e_f");
 
@@ -388,15 +393,15 @@ public class ExecutionFlowMapperProvider {
     return new SQL() {
       {
         SELECT("CONVERT(DATE_FORMAT(e_f.start_time,'%H'),SIGNED) as hour,\n" +
-                "SUM(case e_f.status when 0 then 1 else 0 end) as INIT,\n" +
-                "SUM(case e_f.status when 1 then 1 else 0 end) as WAITING_DEP,\n" +
-                "SUM(case e_f.status when 2 then 1 else 0 end) as WAITING_RES,\n" +
-                "SUM(case e_f.status when 3 then 1 else 0 end) as RUNNING,\n" +
-                "SUM(case e_f.status when 4 then 1 else 0 end) as SUCCESS,\n" +
-                "SUM(case e_f.status when 5 then 1 else 0 end) as `KILL`,\n" +
-                "SUM(case e_f.status when 6 then 1 else 0 end) as `FAILED`,\n" +
-                "SUM(case e_f.status when 7 then 1 else 0 end) as `DEP_FAILED`,\n"+
-                "SUM(case e_f.status when 8 then 1 else 0 end) as `INACTIVE`");
+            "SUM(case e_f.status when 0 then 1 else 0 end) as INIT,\n" +
+            "SUM(case e_f.status when 1 then 1 else 0 end) as WAITING_DEP,\n" +
+            "SUM(case e_f.status when 2 then 1 else 0 end) as WAITING_RES,\n" +
+            "SUM(case e_f.status when 3 then 1 else 0 end) as RUNNING,\n" +
+            "SUM(case e_f.status when 4 then 1 else 0 end) as SUCCESS,\n" +
+            "SUM(case e_f.status when 5 then 1 else 0 end) as `KILL`,\n" +
+            "SUM(case e_f.status when 6 then 1 else 0 end) as `FAILED`,\n" +
+            "SUM(case e_f.status when 7 then 1 else 0 end) as `DEP_FAILED`,\n" +
+            "SUM(case e_f.status when 8 then 1 else 0 end) as `INACTIVE`");
 
         FROM(TABLE_NAME + " e_f");
 
@@ -417,7 +422,7 @@ public class ExecutionFlowMapperProvider {
   public String selectDurationsByProject(Map<String, Object> parameter) {
     String sql1 = new SQL() {
       {
-        SELECT("timestampdiff(SECOND,start_time,end_time) as duration");
+        SELECT("timestampdiff(SECOND,start_time,if(end_time is null,now(),end_time)) as duration");
         SELECT("p_f.name as flow_name");
         SELECT("u.name as owner_name");
         SELECT("e_f.*");
@@ -464,7 +469,9 @@ public class ExecutionFlowMapperProvider {
         JOIN("project p on p_f.project_id = p.id");
 
         WHERE("str_to_date(DATE_FORMAT(e_f.start_time,'%Y%m%d'),'%Y%m%d') = #{date}");
-        WHERE("e_f.status in (" + FlowStatus.FAILED.ordinal() + "," + FlowStatus.DEP_FAILED.ordinal() + ")");
+        WHERE(
+            "e_f.status in (" + FlowStatus.FAILED.ordinal() + "," + FlowStatus.DEP_FAILED.ordinal()
+                + ")");
         WHERE("p.id = #{projectId}");
 
         GROUP_BY("e_f.flow_id");
@@ -548,9 +555,6 @@ public class ExecutionFlowMapperProvider {
 
   /**
    * 根据flowId和ScheduleTime查询一个ExecutionFlow
-   *
-   * @param parameter
-   * @return
    */
   public String selectExecutionFlowByScheduleTime(Map<String, Object> parameter) {
     return new SQL() {{
@@ -559,6 +563,6 @@ public class ExecutionFlowMapperProvider {
       WHERE("flow_id = #{flowId}");
       WHERE("schedule_time = #{scheduleTime}");
       ORDER_BY("id desc");
-    }}.toString()+" limit 0,1";
+    }}.toString() + " limit 0,1";
   }
 }

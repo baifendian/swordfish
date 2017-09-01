@@ -26,6 +26,7 @@ import java.util.List;
  * Mongo writer
  */
 public class MongoWriter implements Writer {
+
   private String datasource;
   private String table;
   private MongoWriteMode writeMode;
@@ -75,8 +76,9 @@ public class MongoWriter implements Writer {
   @Override
   public boolean checkValid() {
     return StringUtils.isNotEmpty(datasource) &&
-            StringUtils.isNotEmpty(table) &&
-            CollectionUtils.isNotEmpty(column) &&
-            !(writeMode.hasUpsetKey() && StringUtils.isEmpty(upsetKey));
+        StringUtils.isNotEmpty(table) &&
+        writeMode != null &&
+        CollectionUtils.isNotEmpty(column) &&
+        !(writeMode.hasUpsetKey() && StringUtils.isEmpty(upsetKey));
   }
 }
