@@ -11,13 +11,15 @@ import org.apache.spark.sql.hive.HiveContext;
  */
 public class SparkSqlUtil {
 
-  static HiveContext getHiveContext(){
+  static JavaSparkContext ctx;
+  static {
     SparkConf sparkConf = new SparkConf().setAppName("JavaSparkSQL")
         .setMaster("local[*]")
         .set("spark.sql.warehouse.dir", "/opt/udp/tmp/sql");
-    JavaSparkContext ctx = new JavaSparkContext(sparkConf);
-    HiveContext sqlContext = new HiveContext(ctx);
+    ctx = new JavaSparkContext(sparkConf);
+  }
 
-    return sqlContext;
+  static HiveContext getHiveContext(){
+    return new HiveContext(ctx);
   }
 }

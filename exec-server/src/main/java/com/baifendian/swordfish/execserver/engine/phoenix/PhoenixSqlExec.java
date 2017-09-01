@@ -22,7 +22,6 @@ import org.slf4j.LoggerFactory;
  * @author : shuanghu
  */
 public class PhoenixSqlExec {
-  private static final Logger LOGGER = LoggerFactory.getLogger(PhoenixUtil.class);
 
   /**
    * 查询限制，默认为 1000
@@ -80,11 +79,11 @@ public class PhoenixSqlExec {
       if (CollectionUtils.isNotEmpty(createFuncs)) {
         try {
           for (String sql : createFuncs) {
-            logger.info("hive create function sql: {}", sql);
+            logger.info("Phoenix create function sql: {}", sql);
             sta.execute(sql);
           }
         } catch (SQLException e) {
-          logger.error("execute query exception", e);
+          logger.error("Phoenix execute query exception", e);
 
           // 这里就失败了, 会记录下错误记录, 然后返回
           SqlUtil.handlerResults(0, sqls, FlowStatus.FAILED, resultCallback);
@@ -99,7 +98,7 @@ public class PhoenixSqlExec {
         String sql = sqls.get(index);
         Date startTime = new Date();
 
-        logger.info("hive execute sql: {}", sql);
+        logger.info("Phoenix execute sql: {}", sql);
         ExecResult execResult = new ExecResult();
         execResult.setIndex(index);
         execResult.setStm(sql);
@@ -111,6 +110,8 @@ public class PhoenixSqlExec {
             resultCallback.handleResult(execResult, startTime, endTime);
           }
         } catch (SQLException e) {
+          // 语义异常
+          logger.error("Phoenix execute query exception", e);
           if (isContinue) {
             SqlUtil.handlerResult(index, sql, FlowStatus.FAILED, resultCallback);
           } else {
@@ -124,19 +125,5 @@ public class PhoenixSqlExec {
     return true;
   }
 
-  public static void main(String[] args) throws SQLException, ClassNotFoundException {
-    List<String> sqls = new ArrayList<>();
-    sqls.add("upsert into test1 values (1,'Hello1')");
-    sqls.add("upsert into test values (2,'22222222222')");
-    sqls.add("select * from test");
 
-    PhoenixSqlExec phoenixSqlExec = new PhoenixSqlExec(PhoenixSqlExec::logProcess, "", LOGGER);
-    phoenixSqlExec.execute(null, sqls, true, (execResult, startTime, endTime) -> {
-      System.out.println("*****");
-    }, 100, 100);
-  }
-
-  static public void logProcess(List<String> logs) {
-    LOGGER.info("(stdout, stderr) -> \n{}", String.join("\n", logs));
-  }
 }

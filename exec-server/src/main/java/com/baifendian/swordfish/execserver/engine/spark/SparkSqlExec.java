@@ -137,7 +137,12 @@ public class SparkSqlExec {
         for (Row row : sqlDF.collectAsList()) {
           List<String> values = new ArrayList<>();
           for (int i = 0; i < row.length(); ++i) {
-            values.add(row.getString(i));
+            Object obj = row.get(i);
+            if (obj == null){
+              values.add("null");
+            }else {
+              values.add(obj.toString());
+            }
           }
 
           datas.add(values);
