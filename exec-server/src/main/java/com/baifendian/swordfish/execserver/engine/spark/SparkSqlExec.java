@@ -15,9 +15,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.function.Consumer;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.spark.sql.Dataset;
+import org.apache.spark.sql.DataFrame;
 import org.apache.spark.sql.Row;
-import org.apache.spark.sql.SparkSession;
+import org.apache.spark.sql.hive.HiveContext;
 import org.slf4j.Logger;
 
 /**
@@ -67,7 +67,7 @@ public class SparkSqlExec {
       return false;
     }
 
-    try(SparkSession sparkSession = SparkSqlUtil.getHiveContext()) {
+    HiveContext sparkSession = SparkSqlUtil.getHiveContext();
 
       if (CollectionUtils.isNotEmpty(createFuncs)) {
         try {
@@ -118,17 +118,16 @@ public class SparkSqlExec {
           }
         }
       }
-    }
 
     return true;
   }
 
-  static void execSql(String sql, SparkSession sparkSession, int queryLimit, ExecResult execResult)
+  static void execSql(String sql, HiveContext sparkSession, int queryLimit, ExecResult execResult)
       throws SQLException {
 
     // 只对 query 和 show 语句显示结果
     if (HiveUtil.isTokQuery(sql) || HiveUtil.isLikeShowStm(sql)) {
-      Dataset<Row> sqlDF = sparkSession.sql(sql).limit(queryLimit);
+      DataFrame sqlDF = sparkSession.sql(sql).limit(queryLimit);
 
       String[] colums = sqlDF.columns();
       if (colums != null && colums.length > 0) {

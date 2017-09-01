@@ -1,6 +1,8 @@
 package com.baifendian.swordfish.execserver.engine.spark;
 
-import org.apache.spark.sql.SparkSession;
+import org.apache.spark.SparkConf;
+import org.apache.spark.api.java.JavaSparkContext;
+import org.apache.spark.sql.hive.HiveContext;
 
 /**
  * <p>
@@ -9,15 +11,13 @@ import org.apache.spark.sql.SparkSession;
  */
 public class SparkSqlUtil {
 
-  static SparkSession getHiveContext(){
-    SparkSession spark = SparkSession
-        .builder()
-        .appName("Java Spark Hive Example")
-        .master("local")
-        //.config("spark.sql.warehouse.dir", warehouseLocation)
-        .enableHiveSupport()
-        .getOrCreate();
+  static HiveContext getHiveContext(){
+    SparkConf sparkConf = new SparkConf().setAppName("JavaSparkSQL")
+        .setMaster("local[*]")
+        .set("spark.sql.warehouse.dir", "/opt/udp/tmp/sql");
+    JavaSparkContext ctx = new JavaSparkContext(sparkConf);
+    HiveContext sqlContext = new HiveContext(ctx);
 
-    return spark;
+    return sqlContext;
   }
 }
