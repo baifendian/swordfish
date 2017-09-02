@@ -182,15 +182,15 @@ public class ProjectService {
       throw new PreFailedException("Project's streaming is not empty");
     }
 
-    count = resourceMapper.countProjectRes(project.getId());
-    if (count > 0) {
-      throw new PreFailedException("Project's resource is not empty");
-    }
-
-    count = dataSourceMapper.countProjectDatasource(project.getId());
-    if (count > 0) {
-      throw new PreFailedException("Project's data source is not empty");
-    }
+//    count = resourceMapper.countProjectRes(project.getId());
+//    if (count > 0) {
+//      throw new PreFailedException("Project's resource is not empty");
+//    }
+//
+//    count = dataSourceMapper.countProjectDatasource(project.getId());
+//    if (count > 0) {
+//      throw new PreFailedException("Project's data source is not empty");
+//    }
 
     count = projectMapper.deleteById(project.getId());
 
