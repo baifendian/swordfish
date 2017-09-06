@@ -112,6 +112,50 @@ struct HeartBeatData {
 }
 
 /**
+ * UDF函数信息
+ */
+struct UdfInfo {
+  /**
+   * 函数名称
+   */
+  1: string func,
+  /**
+   * 函数名称
+   */
+  2: string className,
+  /**
+   * jar路径列表
+   */
+  3: list<string> libJars
+}
+
+/**
+ * 即席查询结果
+ */
+struct AdhocResultInfo {
+  /**
+   * 执行语句的索引，从0开始
+   */
+  1: i32 index,
+  /**
+   * 执行的语句
+   */
+  2: string stm,
+    /**
+   * 语句执行状态
+   */
+  3: i32 status,
+  /**
+   * 返回的表头
+   */
+  4: list<string> titles,
+  /**
+   * 返回的数据
+   */
+  5: list<list<string>> values
+}
+
+/**
  * Master 服务接口, 供 web-server 调用使用
  */
 service MasterService {
@@ -278,4 +322,34 @@ service WorkerService {
    * adHocId : adHoc id
    */
   RetInfo execAdHoc(1:i32 adHocId)
+}
+
+/**
+ * spark sql server接口
+ */
+service SparkSqlService {
+  /**
+   * 执行某个 spark sql 节点
+   *
+   */
+  RetInfo execEtl(1:string jobId, 2:list<UdfInfo> udfs, 3:i32 remainTime),
+  /**
+   * 执行某个 adhoc
+   *
+   */
+  RetInfo execAdhoc(1:string jobId, 2:list<UdfInfo> udfs, 3:i32 queryLimit, 4:i32 remainTime),
+
+  /**
+   * 取消在执行的spark sql
+   *
+   * jobId : job id
+   */
+  RetInfo cancelExecFlow(1:string jobId),
+
+  /**
+   * 获取adhoc的结果
+   *
+   * execId : 执行 id
+   */
+  AdhocResultInfo getAdhocResult(1:string jobId)
 }
