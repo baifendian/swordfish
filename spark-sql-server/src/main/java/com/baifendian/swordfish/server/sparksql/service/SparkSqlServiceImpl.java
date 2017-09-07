@@ -18,6 +18,7 @@ public class SparkSqlServiceImpl implements Iface {
   @Override
   public RetInfo execEtl(String jobId, List<UdfInfo> udfs, List<String> sql, int remainTime)
       throws TException {
+    logger.info("begin ");
     RetInfo retInfo = new RetInfo();
     long endTime = System.currentTimeMillis() + remainTime * 1000L;
     runnerManager.executeEtlSql(jobId, udfs, sql, endTime);

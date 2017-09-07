@@ -31,7 +31,7 @@ public class SparkSqlExec implements Runnable {
    */
   private boolean isStop = false;
 
-  private List<AdhocResultInfo> adhocResultInfoList = null;
+  AdhocResultData adhocResultData = null;
 
   public SparkSqlExec(String jobId, List<String> createFuncs, List<String> sqls, Integer queryLimit,
       long stopTime) {
@@ -40,7 +40,7 @@ public class SparkSqlExec implements Runnable {
     this.sqls = sqls;
     if (queryLimit != null){
       // adhoc query
-      adhocResultInfoList = new ArrayList<>();
+      adhocResultData = new AdhocResultData(sqls.size());
     }
     // 查询结果限制
     this.queryLimit = queryLimit==null? 1000:queryLimit;
@@ -130,42 +130,36 @@ public class SparkSqlExec implements Runnable {
   }
 
   synchronized  private void handlerResults(int fromIndex, FlowStatus status){
-    if (adhocResultInfoList != null){
       for (int i=fromIndex; i<sqls.size(); ++i){
         handlerResult(i, sqls.get(i), status);
       }
-    }
   }
 
   synchronized private void handlerResult(int fromIndex, String sql, FlowStatus status){
-    if (adhocResultInfoList == null){
+    if (adhocResultData == null){
       return;
     }
 
-    AdhocResultInfo adhocResultInfo = new AdhocResultInfo();
-    adhocResultInfo.setIndex(fromIndex);
-    adhocResultInfo.setStatus(status.ordinal());
-    adhocResultInfo.setStm(sql);
-
-    adhocResultInfoList.add(adhocResultInfo);
+    adhocResultData.handlerResult(fromIndex, sql, status);
   }
 
   synchronized private void  addResult(AdhocResultInfo adhocResultInfo){
-    if (adhocResultInfoList == null){
+    if (adhocResultData == null){
       return;
     }
-    adhocResultInfoList.add(adhocResultInfo);
+    adhocResultData.addResult(adhocResultInfo);
   }
 
   synchronized public AdhocResultInfo getAdHocResult(){
-    if (adhocResultInfoList == null || adhocResultInfoList.isEmpty()){
-      return null;
+    logger.info("Begin get adhoc result");
+    if (adhocResultData == null){
+      logger.info("Job is not adhoc result");
+      AdhocResultInfo adhocResultInfo = new AdhocResultInfo();
+      adhocResultInfo.setStatus(0);
+      return adhocResultInfo;
     }
 
-    AdhocResultInfo adhocResultInfo = adhocResultInfoList.get(0);
-    adhocResultInfoList.remove(0);
-
-    return adhocResultInfo;
+    return adhocResultData.getAdHocResult();
   }
 
   @Override
@@ -181,6 +175,7 @@ public class SparkSqlExec implements Runnable {
 
     HiveContext sparkSession = SparkContextUtil.createHiveContext(jobId);
     execute(sparkSession);
+    logger.info("End exec sql.");
     SparkContextUtil.back(jobId, !createFuncs.isEmpty());
   }
 

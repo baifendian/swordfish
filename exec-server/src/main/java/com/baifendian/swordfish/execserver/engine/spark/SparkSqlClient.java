@@ -7,11 +7,13 @@ import com.baifendian.swordfish.rpc.AdhocResultInfo;
 import com.baifendian.swordfish.rpc.RetInfo;
 import com.baifendian.swordfish.rpc.SparkSqlService.Client;
 import com.baifendian.swordfish.rpc.UdfInfo;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.TimeUnit;
 import org.apache.thrift.TException;
 import org.apache.thrift.protocol.TBinaryProtocol;
@@ -25,7 +27,7 @@ import org.slf4j.LoggerFactory;
 public class SparkSqlClient {
   private static Logger LOGGER = LoggerFactory.getLogger(SparkSqlClient.class.getName());
 
-  private SynchronousQueue<Client> clientQueue = new SynchronousQueue<>();
+  private BlockingQueue<Client> clientQueue ;
 
   private Map<String, Client> jobInfo = new ConcurrentHashMap<>();
 
@@ -40,9 +42,10 @@ public class SparkSqlClient {
 
   public SparkSqlClient(String hosts, int port){
     String[] hostArray = hosts.split(",");
+    clientQueue = new ArrayBlockingQueue<>(hostArray.length);
 
     for (String host: hostArray){
-      TTransport tTransport = new TSocket(host, port, 4000);
+      TTransport tTransport = new TSocket(host, port, 4000*1000);
 
       try {
         TProtocol protocol = new TBinaryProtocol(tTransport);
@@ -87,6 +90,7 @@ public class SparkSqlClient {
 
   public boolean executeAdhoc(String jobId, List<UdfInfo> udfs, List<String> sql,
       ResultCallback resultCallback, int queryLimit, int remainTime, Logger logger) {
+    logger.info("Begin run sql");
     Client client;
     try {
       client = clientQueue.poll(remainTime, TimeUnit.SECONDS);
@@ -148,5 +152,14 @@ public class SparkSqlClient {
     }
 
     return true;
+  }
+
+  public static void main(String[] args) {
+    SparkSqlClient.init("172.24.8.98", 20017);
+    List<String> sqls = new ArrayList<>();
+    sqls.add("select count(1) from ods.tbs_ods_twfb");
+    SparkSqlClient.getInstance()
+        .executeAdhoc("test", new ArrayList<>(), sqls, (execResult, startTime, endTime) -> LOGGER.error(execResult.getStm())
+            , 1000, 100000, LOGGER);
   }
 }
