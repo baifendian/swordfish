@@ -24,6 +24,14 @@ public enum FlowStatus {
    **/
   INIT, WAITING_DEP, WAITING_RES, RUNNING, SUCCESS, KILL, FAILED, DEP_FAILED, INACTIVE;
 
+  static public FlowStatus valueOfType(int type){
+    try {
+      return FlowStatus.values()[type];
+    } catch (Exception ex) {
+      throw new IllegalArgumentException(
+          "Cannot convert " + type + " to " + FlowStatus.class.getSimpleName() + " .", ex);
+    }
+  }
   /**
    * 判断是否成功状态 <p>
    *

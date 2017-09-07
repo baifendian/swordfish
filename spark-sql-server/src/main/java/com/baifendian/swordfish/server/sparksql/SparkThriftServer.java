@@ -22,8 +22,6 @@ public class SparkThriftServer {
 
   private TServer server;
 
-  private SparkSqlServiceImpl sparkSqlService;
-
   /**
    * 当前 exec 的 host 信息
    */
@@ -70,13 +68,18 @@ public class SparkThriftServer {
     TThreadPoolServer.Args serverArgs = new TThreadPoolServer.Args(serverTransport);
     serverArgs.minWorkerThreads(50);
     serverArgs.maxWorkerThreads(200);
-    serverArgs.processor(new SparkSqlService.Processor(sparkSqlService));
+    serverArgs.processor(new SparkSqlService.Processor(new SparkSqlServiceImpl()));
     serverArgs.transportFactory( new TTransportFactory());
     serverArgs.protocolFactory(protocolFactory);
     return new TThreadPoolServer(serverArgs);
   }
 
-  public static void main(String[] args) {
+  public static void main(String[] args)
+      throws UnknownHostException, TTransportException, InterruptedException {
+    new SparkThriftServer();
 
+    while (true){
+      Thread.sleep(10000);
+    }
   }
 }

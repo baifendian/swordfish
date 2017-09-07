@@ -22,6 +22,7 @@ import com.baifendian.swordfish.common.hadoop.HdfsClient;
 import com.baifendian.swordfish.dao.DaoFactory;
 import com.baifendian.swordfish.dao.MasterDao;
 import com.baifendian.swordfish.dao.model.MasterServer;
+import com.baifendian.swordfish.execserver.engine.spark.SparkSqlClient;
 import com.baifendian.swordfish.execserver.service.ExecServiceImpl;
 import com.baifendian.swordfish.execserver.utils.Constants;
 import com.baifendian.swordfish.execserver.utils.OsUtil;
@@ -108,6 +109,8 @@ public class ExecThriftServer {
   static {
     try {
       conf = new PropertiesConfiguration("worker.properties");
+
+      SparkSqlClient.init(conf.getString("executor.server.hosts"), conf.getInt("executor.server.port", 20017));
     } catch (ConfigurationException e) {
       logger.error("Load configuration exception", e);
       System.exit(1);

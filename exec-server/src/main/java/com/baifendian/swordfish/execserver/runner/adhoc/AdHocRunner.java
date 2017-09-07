@@ -40,10 +40,13 @@ public class AdHocRunner implements Runnable {
    */
   private Logger logger;
 
-  public AdHocRunner(AdHoc adHoc, AdHocDao adHocDao, Logger logger) {
+  private String jobId;
+
+  public AdHocRunner(String jobId, AdHoc adHoc, AdHocDao adHocDao, Logger logger) {
     this.adHocDao = adHocDao;
     this.adHoc = adHoc;
     this.logger = logger;
+    this.jobId = jobId;
   }
 
   @Override
@@ -56,6 +59,7 @@ public class AdHocRunner implements Runnable {
     props.setProjectId(adHoc.getProjectId());
     props.setExecJobId(adHoc.getId());
     props.setCycTime(adHoc.getCreateTime());
+    props.setJobId(jobId);
 
     FlowStatus status;
 

@@ -90,6 +90,11 @@ public class JobProps {
    */
   private int execJobTimeout;
 
+  /**
+   * job id
+   */
+  private String jobId;
+
   public int getProjectId() {
     return projectId;
   }
@@ -200,5 +205,13 @@ public class JobProps {
 
   public void setExecJobTimeout(int execJobTimeout) {
     this.execJobTimeout = execJobTimeout;
+  }
+
+  public String getJobId() {
+    return jobId;
+  }
+
+  public void setJobId(String jobId) {
+    this.jobId = jobId;
   }
 }

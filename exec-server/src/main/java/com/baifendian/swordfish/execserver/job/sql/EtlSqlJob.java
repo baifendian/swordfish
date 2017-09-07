@@ -59,8 +59,8 @@ public class EtlSqlJob extends AbstractYarnJob {
 
       switch (param.getType()) {
         case SPARK: {
-          SparkSqlExec sparkSqlExec = new SparkSqlExec(this::logProcess, props.getProxyUser(), logger);
-          exitCode = sparkSqlExec.execute(funcs, execSqls, true, null, null, getRemainTime()) ? 0 : -1;
+          SparkSqlExec sparkSqlExec = new SparkSqlExec(logger);
+          exitCode = sparkSqlExec.execute(props.getJobId(), param.getUdfs(), execSqls, true, null, null, getRemainTime()) ? 0 : -1;
         }
         case PHOENIX: {
           PhoenixSqlExec phoenixSqlExec = new PhoenixSqlExec(this::logProcess, props.getProxyUser(),

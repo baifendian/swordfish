@@ -69,6 +69,7 @@ public class AdHocSqlJob {
    */
   private Logger logger;
 
+
   public AdHocSqlJob(JobProps props, SqlEngineType type, Logger logger) {
     this.props = props;
     this.adHocDao = DaoFactory.getDaoInstance(AdHocDao.class);
@@ -141,8 +142,8 @@ public class AdHocSqlJob {
 
     switch (type) {
       case SPARK: {
-        SparkSqlExec sparkSqlExec = new SparkSqlExec(this::logProcess, props.getProxyUser(), logger);
-        return sparkSqlExec.execute(funcs, execSqls, true, resultCallback, param.getLimit(), Constants.ADHOC_TIMEOUT)
+        SparkSqlExec sparkSqlExec = new SparkSqlExec(logger);
+        return sparkSqlExec.execute(props.getJobId(), param.getUdfs(), execSqls, true, resultCallback, param.getLimit(), Constants.ADHOC_TIMEOUT)
             ? FlowStatus.SUCCESS : FlowStatus.FAILED;
       }
       case PHOENIX: {

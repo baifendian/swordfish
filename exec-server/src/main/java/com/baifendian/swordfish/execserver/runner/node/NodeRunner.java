@@ -138,6 +138,7 @@ public class NodeRunner implements Callable<Boolean> {
       props.setQueue(executionFlow.getQueue());
       props.setExecJobStartTime(executionFlow.getStartTime()); // 设置为起始运行的时间
       props.setExecJobTimeout(executionFlow.getTimeout());
+      props.setJobId(executionNode.getJobId());
 
       props.setJobAppId(String.format("%s_%s", executionNode.getJobId(),
           HttpUtil.getMd5(executionNode.getName()).substring(0, 8)));

@@ -42,16 +42,14 @@ public class RunnerManager {
     return udfCmds;
   }
 
-  public boolean executeEtlSql(String jobId, List<UdfInfo> udfs, List<String> sqls, long stopTime)
-      throws SQLException {
+  public boolean executeEtlSql(String jobId, List<UdfInfo> udfs, List<String> sqls, long stopTime) {
     SparkSqlExec sparkSqlExec = new SparkSqlExec(jobId, createUdf(udfs), sqls, null, stopTime);
     Future future = sqlExecutorService.submit(sparkSqlExec);
     jobInfo.put(jobId, new SimpleEntry<>(sparkSqlExec, future));
     return true;
   }
 
-  public boolean executeAdhocSql(String jobId, List<UdfInfo> udfs, List<String> sqls, long stopTime, int queryLimit)
-      throws SQLException {
+  public boolean executeAdhocSql(String jobId, List<UdfInfo> udfs, List<String> sqls, long stopTime, int queryLimit) {
     SparkSqlExec sparkSqlExec = new SparkSqlExec(jobId, createUdf(udfs), sqls, queryLimit, stopTime);
     Future future = sqlExecutorService.submit(sparkSqlExec);
     jobInfo.put(jobId, new SimpleEntry<>(sparkSqlExec, future));

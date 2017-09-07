@@ -45,9 +45,10 @@ public class SparkSqlService {
      * 
      * @param jobId
      * @param udfs
+     * @param sql
      * @param remainTime
      */
-    public RetInfo execEtl(String jobId, List<UdfInfo> udfs, int remainTime) throws org.apache.thrift.TException;
+    public RetInfo execEtl(String jobId, List<UdfInfo> udfs, List<String> sql, int remainTime) throws org.apache.thrift.TException;
 
     /**
      * 执行某个 adhoc
@@ -55,10 +56,11 @@ public class SparkSqlService {
      * 
      * @param jobId
      * @param udfs
+     * @param sql
      * @param queryLimit
      * @param remainTime
      */
-    public RetInfo execAdhoc(String jobId, List<UdfInfo> udfs, int queryLimit, int remainTime) throws org.apache.thrift.TException;
+    public RetInfo execAdhoc(String jobId, List<UdfInfo> udfs, List<String> sql, int queryLimit, int remainTime) throws org.apache.thrift.TException;
 
     /**
      * 取消在执行的spark sql
@@ -82,9 +84,9 @@ public class SparkSqlService {
 
   public interface AsyncIface {
 
-    public void execEtl(String jobId, List<UdfInfo> udfs, int remainTime, org.apache.thrift.async.AsyncMethodCallback resultHandler) throws org.apache.thrift.TException;
+    public void execEtl(String jobId, List<UdfInfo> udfs, List<String> sql, int remainTime, org.apache.thrift.async.AsyncMethodCallback resultHandler) throws org.apache.thrift.TException;
 
-    public void execAdhoc(String jobId, List<UdfInfo> udfs, int queryLimit, int remainTime, org.apache.thrift.async.AsyncMethodCallback resultHandler) throws org.apache.thrift.TException;
+    public void execAdhoc(String jobId, List<UdfInfo> udfs, List<String> sql, int queryLimit, int remainTime, org.apache.thrift.async.AsyncMethodCallback resultHandler) throws org.apache.thrift.TException;
 
     public void cancelExecFlow(String jobId, org.apache.thrift.async.AsyncMethodCallback resultHandler) throws org.apache.thrift.TException;
 
@@ -112,17 +114,18 @@ public class SparkSqlService {
       super(iprot, oprot);
     }
 
-    public RetInfo execEtl(String jobId, List<UdfInfo> udfs, int remainTime) throws org.apache.thrift.TException
+    public RetInfo execEtl(String jobId, List<UdfInfo> udfs, List<String> sql, int remainTime) throws org.apache.thrift.TException
     {
-      send_execEtl(jobId, udfs, remainTime);
+      send_execEtl(jobId, udfs, sql, remainTime);
       return recv_execEtl();
     }
 
-    public void send_execEtl(String jobId, List<UdfInfo> udfs, int remainTime) throws org.apache.thrift.TException
+    public void send_execEtl(String jobId, List<UdfInfo> udfs, List<String> sql, int remainTime) throws org.apache.thrift.TException
     {
       execEtl_args args = new execEtl_args();
       args.setJobId(jobId);
       args.setUdfs(udfs);
+      args.setSql(sql);
       args.setRemainTime(remainTime);
       sendBase("execEtl", args);
     }
@@ -137,17 +140,18 @@ public class SparkSqlService {
       throw new org.apache.thrift.TApplicationException(org.apache.thrift.TApplicationException.MISSING_RESULT, "execEtl failed: unknown result");
     }
 
-    public RetInfo execAdhoc(String jobId, List<UdfInfo> udfs, int queryLimit, int remainTime) throws org.apache.thrift.TException
+    public RetInfo execAdhoc(String jobId, List<UdfInfo> udfs, List<String> sql, int queryLimit, int remainTime) throws org.apache.thrift.TException
     {
-      send_execAdhoc(jobId, udfs, queryLimit, remainTime);
+      send_execAdhoc(jobId, udfs, sql, queryLimit, remainTime);
       return recv_execAdhoc();
     }
 
-    public void send_execAdhoc(String jobId, List<UdfInfo> udfs, int queryLimit, int remainTime) throws org.apache.thrift.TException
+    public void send_execAdhoc(String jobId, List<UdfInfo> udfs, List<String> sql, int queryLimit, int remainTime) throws org.apache.thrift.TException
     {
       execAdhoc_args args = new execAdhoc_args();
       args.setJobId(jobId);
       args.setUdfs(udfs);
+      args.setSql(sql);
       args.setQueryLimit(queryLimit);
       args.setRemainTime(remainTime);
       sendBase("execAdhoc", args);
@@ -227,9 +231,9 @@ public class SparkSqlService {
       super(protocolFactory, clientManager, transport);
     }
 
-    public void execEtl(String jobId, List<UdfInfo> udfs, int remainTime, org.apache.thrift.async.AsyncMethodCallback resultHandler) throws org.apache.thrift.TException {
+    public void execEtl(String jobId, List<UdfInfo> udfs, List<String> sql, int remainTime, org.apache.thrift.async.AsyncMethodCallback resultHandler) throws org.apache.thrift.TException {
       checkReady();
-      execEtl_call method_call = new execEtl_call(jobId, udfs, remainTime, resultHandler, this, ___protocolFactory, ___transport);
+      execEtl_call method_call = new execEtl_call(jobId, udfs, sql, remainTime, resultHandler, this, ___protocolFactory, ___transport);
       this.___currentMethod = method_call;
       ___manager.call(method_call);
     }
@@ -237,11 +241,13 @@ public class SparkSqlService {
     public static class execEtl_call extends org.apache.thrift.async.TAsyncMethodCall {
       private String jobId;
       private List<UdfInfo> udfs;
+      private List<String> sql;
       private int remainTime;
-      public execEtl_call(String jobId, List<UdfInfo> udfs, int remainTime, org.apache.thrift.async.AsyncMethodCallback resultHandler, org.apache.thrift.async.TAsyncClient client, org.apache.thrift.protocol.TProtocolFactory protocolFactory, org.apache.thrift.transport.TNonblockingTransport transport) throws org.apache.thrift.TException {
+      public execEtl_call(String jobId, List<UdfInfo> udfs, List<String> sql, int remainTime, org.apache.thrift.async.AsyncMethodCallback resultHandler, org.apache.thrift.async.TAsyncClient client, org.apache.thrift.protocol.TProtocolFactory protocolFactory, org.apache.thrift.transport.TNonblockingTransport transport) throws org.apache.thrift.TException {
         super(client, protocolFactory, transport, resultHandler, false);
         this.jobId = jobId;
         this.udfs = udfs;
+        this.sql = sql;
         this.remainTime = remainTime;
       }
 
@@ -250,6 +256,7 @@ public class SparkSqlService {
         execEtl_args args = new execEtl_args();
         args.setJobId(jobId);
         args.setUdfs(udfs);
+        args.setSql(sql);
         args.setRemainTime(remainTime);
         args.write(prot);
         prot.writeMessageEnd();
@@ -265,9 +272,9 @@ public class SparkSqlService {
       }
     }
 
-    public void execAdhoc(String jobId, List<UdfInfo> udfs, int queryLimit, int remainTime, org.apache.thrift.async.AsyncMethodCallback resultHandler) throws org.apache.thrift.TException {
+    public void execAdhoc(String jobId, List<UdfInfo> udfs, List<String> sql, int queryLimit, int remainTime, org.apache.thrift.async.AsyncMethodCallback resultHandler) throws org.apache.thrift.TException {
       checkReady();
-      execAdhoc_call method_call = new execAdhoc_call(jobId, udfs, queryLimit, remainTime, resultHandler, this, ___protocolFactory, ___transport);
+      execAdhoc_call method_call = new execAdhoc_call(jobId, udfs, sql, queryLimit, remainTime, resultHandler, this, ___protocolFactory, ___transport);
       this.___currentMethod = method_call;
       ___manager.call(method_call);
     }
@@ -275,12 +282,14 @@ public class SparkSqlService {
     public static class execAdhoc_call extends org.apache.thrift.async.TAsyncMethodCall {
       private String jobId;
       private List<UdfInfo> udfs;
+      private List<String> sql;
       private int queryLimit;
       private int remainTime;
-      public execAdhoc_call(String jobId, List<UdfInfo> udfs, int queryLimit, int remainTime, org.apache.thrift.async.AsyncMethodCallback resultHandler, org.apache.thrift.async.TAsyncClient client, org.apache.thrift.protocol.TProtocolFactory protocolFactory, org.apache.thrift.transport.TNonblockingTransport transport) throws org.apache.thrift.TException {
+      public execAdhoc_call(String jobId, List<UdfInfo> udfs, List<String> sql, int queryLimit, int remainTime, org.apache.thrift.async.AsyncMethodCallback resultHandler, org.apache.thrift.async.TAsyncClient client, org.apache.thrift.protocol.TProtocolFactory protocolFactory, org.apache.thrift.transport.TNonblockingTransport transport) throws org.apache.thrift.TException {
         super(client, protocolFactory, transport, resultHandler, false);
         this.jobId = jobId;
         this.udfs = udfs;
+        this.sql = sql;
         this.queryLimit = queryLimit;
         this.remainTime = remainTime;
       }
@@ -290,6 +299,7 @@ public class SparkSqlService {
         execAdhoc_args args = new execAdhoc_args();
         args.setJobId(jobId);
         args.setUdfs(udfs);
+        args.setSql(sql);
         args.setQueryLimit(queryLimit);
         args.setRemainTime(remainTime);
         args.write(prot);
@@ -405,7 +415,7 @@ public class SparkSqlService {
 
       public execEtl_result getResult(I iface, execEtl_args args) throws org.apache.thrift.TException {
         execEtl_result result = new execEtl_result();
-        result.success = iface.execEtl(args.jobId, args.udfs, args.remainTime);
+        result.success = iface.execEtl(args.jobId, args.udfs, args.sql, args.remainTime);
         return result;
       }
     }
@@ -425,7 +435,7 @@ public class SparkSqlService {
 
       public execAdhoc_result getResult(I iface, execAdhoc_args args) throws org.apache.thrift.TException {
         execAdhoc_result result = new execAdhoc_result();
-        result.success = iface.execAdhoc(args.jobId, args.udfs, args.queryLimit, args.remainTime);
+        result.success = iface.execAdhoc(args.jobId, args.udfs, args.sql, args.queryLimit, args.remainTime);
         return result;
       }
     }
@@ -537,7 +547,7 @@ public class SparkSqlService {
       }
 
       public void start(I iface, execEtl_args args, org.apache.thrift.async.AsyncMethodCallback<RetInfo> resultHandler) throws TException {
-        iface.execEtl(args.jobId, args.udfs, args.remainTime,resultHandler);
+        iface.execEtl(args.jobId, args.udfs, args.sql, args.remainTime,resultHandler);
       }
     }
 
@@ -588,7 +598,7 @@ public class SparkSqlService {
       }
 
       public void start(I iface, execAdhoc_args args, org.apache.thrift.async.AsyncMethodCallback<RetInfo> resultHandler) throws TException {
-        iface.execAdhoc(args.jobId, args.udfs, args.queryLimit, args.remainTime,resultHandler);
+        iface.execAdhoc(args.jobId, args.udfs, args.sql, args.queryLimit, args.remainTime,resultHandler);
       }
     }
 
@@ -701,7 +711,8 @@ public class SparkSqlService {
 
     private static final org.apache.thrift.protocol.TField JOB_ID_FIELD_DESC = new org.apache.thrift.protocol.TField("jobId", org.apache.thrift.protocol.TType.STRING, (short)1);
     private static final org.apache.thrift.protocol.TField UDFS_FIELD_DESC = new org.apache.thrift.protocol.TField("udfs", org.apache.thrift.protocol.TType.LIST, (short)2);
-    private static final org.apache.thrift.protocol.TField REMAIN_TIME_FIELD_DESC = new org.apache.thrift.protocol.TField("remainTime", org.apache.thrift.protocol.TType.I32, (short)3);
+    private static final org.apache.thrift.protocol.TField SQL_FIELD_DESC = new org.apache.thrift.protocol.TField("sql", org.apache.thrift.protocol.TType.LIST, (short)3);
+    private static final org.apache.thrift.protocol.TField REMAIN_TIME_FIELD_DESC = new org.apache.thrift.protocol.TField("remainTime", org.apache.thrift.protocol.TType.I32, (short)4);
 
     private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
     static {
@@ -711,13 +722,15 @@ public class SparkSqlService {
 
     public String jobId; // required
     public List<UdfInfo> udfs; // required
+    public List<String> sql; // required
     public int remainTime; // required
 
     /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
     public enum _Fields implements org.apache.thrift.TFieldIdEnum {
       JOB_ID((short)1, "jobId"),
       UDFS((short)2, "udfs"),
-      REMAIN_TIME((short)3, "remainTime");
+      SQL((short)3, "sql"),
+      REMAIN_TIME((short)4, "remainTime");
 
       private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
@@ -736,7 +749,9 @@ public class SparkSqlService {
             return JOB_ID;
           case 2: // UDFS
             return UDFS;
-          case 3: // REMAIN_TIME
+          case 3: // SQL
+            return SQL;
+          case 4: // REMAIN_TIME
             return REMAIN_TIME;
           default:
             return null;
@@ -788,6 +803,9 @@ public class SparkSqlService {
       tmpMap.put(_Fields.UDFS, new org.apache.thrift.meta_data.FieldMetaData("udfs", org.apache.thrift.TFieldRequirementType.DEFAULT, 
           new org.apache.thrift.meta_data.ListMetaData(org.apache.thrift.protocol.TType.LIST, 
               new org.apache.thrift.meta_data.StructMetaData(org.apache.thrift.protocol.TType.STRUCT, UdfInfo.class))));
+      tmpMap.put(_Fields.SQL, new org.apache.thrift.meta_data.FieldMetaData("sql", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+          new org.apache.thrift.meta_data.ListMetaData(org.apache.thrift.protocol.TType.LIST, 
+              new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING))));
       tmpMap.put(_Fields.REMAIN_TIME, new org.apache.thrift.meta_data.FieldMetaData("remainTime", org.apache.thrift.TFieldRequirementType.DEFAULT, 
           new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.I32)));
       metaDataMap = Collections.unmodifiableMap(tmpMap);
@@ -800,11 +818,13 @@ public class SparkSqlService {
     public execEtl_args(
       String jobId,
       List<UdfInfo> udfs,
+      List<String> sql,
       int remainTime)
     {
       this();
       this.jobId = jobId;
       this.udfs = udfs;
+      this.sql = sql;
       this.remainTime = remainTime;
       setRemainTimeIsSet(true);
     }
@@ -824,6 +844,10 @@ public class SparkSqlService {
         }
         this.udfs = __this__udfs;
       }
+      if (other.isSetSql()) {
+        List<String> __this__sql = new ArrayList<String>(other.sql);
+        this.sql = __this__sql;
+      }
       this.remainTime = other.remainTime;
     }
 
@@ -835,6 +859,7 @@ public class SparkSqlService {
     public void clear() {
       this.jobId = null;
       this.udfs = null;
+      this.sql = null;
       setRemainTimeIsSet(false);
       this.remainTime = 0;
     }
@@ -902,6 +927,45 @@ public class SparkSqlService {
       }
     }
 
+    public int getSqlSize() {
+      return (this.sql == null) ? 0 : this.sql.size();
+    }
+
+    public java.util.Iterator<String> getSqlIterator() {
+      return (this.sql == null) ? null : this.sql.iterator();
+    }
+
+    public void addToSql(String elem) {
+      if (this.sql == null) {
+        this.sql = new ArrayList<String>();
+      }
+      this.sql.add(elem);
+    }
+
+    public List<String> getSql() {
+      return this.sql;
+    }
+
+    public execEtl_args setSql(List<String> sql) {
+      this.sql = sql;
+      return this;
+    }
+
+    public void unsetSql() {
+      this.sql = null;
+    }
+
+    /** Returns true if field sql is set (has been assigned a value) and false otherwise */
+    public boolean isSetSql() {
+      return this.sql != null;
+    }
+
+    public void setSqlIsSet(boolean value) {
+      if (!value) {
+        this.sql = null;
+      }
+    }
+
     public int getRemainTime() {
       return this.remainTime;
     }
@@ -943,6 +1007,14 @@ public class SparkSqlService {
         }
         break;
 
+      case SQL:
+        if (value == null) {
+          unsetSql();
+        } else {
+          setSql((List<String>)value);
+        }
+        break;
+
       case REMAIN_TIME:
         if (value == null) {
           unsetRemainTime();
@@ -962,6 +1034,9 @@ public class SparkSqlService {
       case UDFS:
         return getUdfs();
 
+      case SQL:
+        return getSql();
+
       case REMAIN_TIME:
         return Integer.valueOf(getRemainTime());
 
@@ -980,6 +1055,8 @@ public class SparkSqlService {
         return isSetJobId();
       case UDFS:
         return isSetUdfs();
+      case SQL:
+        return isSetSql();
       case REMAIN_TIME:
         return isSetRemainTime();
       }
@@ -1014,6 +1091,15 @@ public class SparkSqlService {
         if (!(this_present_udfs && that_present_udfs))
           return false;
         if (!this.udfs.equals(that.udfs))
+          return false;
+      }
+
+      boolean this_present_sql = true && this.isSetSql();
+      boolean that_present_sql = true && that.isSetSql();
+      if (this_present_sql || that_present_sql) {
+        if (!(this_present_sql && that_present_sql))
+          return false;
+        if (!this.sql.equals(that.sql))
           return false;
       }
 
@@ -1062,6 +1148,16 @@ public class SparkSqlService {
           return lastComparison;
         }
       }
+      lastComparison = Boolean.valueOf(isSetSql()).compareTo(other.isSetSql());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetSql()) {
+        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.sql, other.sql);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
       lastComparison = Boolean.valueOf(isSetRemainTime()).compareTo(other.isSetRemainTime());
       if (lastComparison != 0) {
         return lastComparison;
@@ -1105,6 +1201,14 @@ public class SparkSqlService {
         sb.append("null");
       } else {
         sb.append(this.udfs);
+      }
+      first = false;
+      if (!first) sb.append(", ");
+      sb.append("sql:");
+      if (this.sql == null) {
+        sb.append("null");
+      } else {
+        sb.append(this.sql);
       }
       first = false;
       if (!first) sb.append(", ");
@@ -1183,7 +1287,25 @@ public class SparkSqlService {
                 org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
               }
               break;
-            case 3: // REMAIN_TIME
+            case 3: // SQL
+              if (schemeField.type == org.apache.thrift.protocol.TType.LIST) {
+                {
+                  org.apache.thrift.protocol.TList _list59 = iprot.readListBegin();
+                  struct.sql = new ArrayList<String>(_list59.size);
+                  for (int _i60 = 0; _i60 < _list59.size; ++_i60)
+                  {
+                    String _elem61;
+                    _elem61 = iprot.readString();
+                    struct.sql.add(_elem61);
+                  }
+                  iprot.readListEnd();
+                }
+                struct.setSqlIsSet(true);
+              } else { 
+                org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+              }
+              break;
+            case 4: // REMAIN_TIME
               if (schemeField.type == org.apache.thrift.protocol.TType.I32) {
                 struct.remainTime = iprot.readI32();
                 struct.setRemainTimeIsSet(true);
@@ -1215,9 +1337,21 @@ public class SparkSqlService {
           oprot.writeFieldBegin(UDFS_FIELD_DESC);
           {
             oprot.writeListBegin(new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRUCT, struct.udfs.size()));
-            for (UdfInfo _iter59 : struct.udfs)
+            for (UdfInfo _iter62 : struct.udfs)
             {
-              _iter59.write(oprot);
+              _iter62.write(oprot);
+            }
+            oprot.writeListEnd();
+          }
+          oprot.writeFieldEnd();
+        }
+        if (struct.sql != null) {
+          oprot.writeFieldBegin(SQL_FIELD_DESC);
+          {
+            oprot.writeListBegin(new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRING, struct.sql.size()));
+            for (String _iter63 : struct.sql)
+            {
+              oprot.writeString(_iter63);
             }
             oprot.writeListEnd();
           }
@@ -1250,19 +1384,31 @@ public class SparkSqlService {
         if (struct.isSetUdfs()) {
           optionals.set(1);
         }
-        if (struct.isSetRemainTime()) {
+        if (struct.isSetSql()) {
           optionals.set(2);
         }
-        oprot.writeBitSet(optionals, 3);
+        if (struct.isSetRemainTime()) {
+          optionals.set(3);
+        }
+        oprot.writeBitSet(optionals, 4);
         if (struct.isSetJobId()) {
           oprot.writeString(struct.jobId);
         }
         if (struct.isSetUdfs()) {
           {
             oprot.writeI32(struct.udfs.size());
-            for (UdfInfo _iter60 : struct.udfs)
+            for (UdfInfo _iter64 : struct.udfs)
             {
-              _iter60.write(oprot);
+              _iter64.write(oprot);
+            }
+          }
+        }
+        if (struct.isSetSql()) {
+          {
+            oprot.writeI32(struct.sql.size());
+            for (String _iter65 : struct.sql)
+            {
+              oprot.writeString(_iter65);
             }
           }
         }
@@ -1274,26 +1420,39 @@ public class SparkSqlService {
       @Override
       public void read(org.apache.thrift.protocol.TProtocol prot, execEtl_args struct) throws org.apache.thrift.TException {
         TTupleProtocol iprot = (TTupleProtocol) prot;
-        BitSet incoming = iprot.readBitSet(3);
+        BitSet incoming = iprot.readBitSet(4);
         if (incoming.get(0)) {
           struct.jobId = iprot.readString();
           struct.setJobIdIsSet(true);
         }
         if (incoming.get(1)) {
           {
-            org.apache.thrift.protocol.TList _list61 = new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRUCT, iprot.readI32());
-            struct.udfs = new ArrayList<UdfInfo>(_list61.size);
-            for (int _i62 = 0; _i62 < _list61.size; ++_i62)
+            org.apache.thrift.protocol.TList _list66 = new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRUCT, iprot.readI32());
+            struct.udfs = new ArrayList<UdfInfo>(_list66.size);
+            for (int _i67 = 0; _i67 < _list66.size; ++_i67)
             {
-              UdfInfo _elem63;
-              _elem63 = new UdfInfo();
-              _elem63.read(iprot);
-              struct.udfs.add(_elem63);
+              UdfInfo _elem68;
+              _elem68 = new UdfInfo();
+              _elem68.read(iprot);
+              struct.udfs.add(_elem68);
             }
           }
           struct.setUdfsIsSet(true);
         }
         if (incoming.get(2)) {
+          {
+            org.apache.thrift.protocol.TList _list69 = new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRING, iprot.readI32());
+            struct.sql = new ArrayList<String>(_list69.size);
+            for (int _i70 = 0; _i70 < _list69.size; ++_i70)
+            {
+              String _elem71;
+              _elem71 = iprot.readString();
+              struct.sql.add(_elem71);
+            }
+          }
+          struct.setSqlIsSet(true);
+        }
+        if (incoming.get(3)) {
           struct.remainTime = iprot.readI32();
           struct.setRemainTimeIsSet(true);
         }
@@ -1666,8 +1825,9 @@ public class SparkSqlService {
 
     private static final org.apache.thrift.protocol.TField JOB_ID_FIELD_DESC = new org.apache.thrift.protocol.TField("jobId", org.apache.thrift.protocol.TType.STRING, (short)1);
     private static final org.apache.thrift.protocol.TField UDFS_FIELD_DESC = new org.apache.thrift.protocol.TField("udfs", org.apache.thrift.protocol.TType.LIST, (short)2);
-    private static final org.apache.thrift.protocol.TField QUERY_LIMIT_FIELD_DESC = new org.apache.thrift.protocol.TField("queryLimit", org.apache.thrift.protocol.TType.I32, (short)3);
-    private static final org.apache.thrift.protocol.TField REMAIN_TIME_FIELD_DESC = new org.apache.thrift.protocol.TField("remainTime", org.apache.thrift.protocol.TType.I32, (short)4);
+    private static final org.apache.thrift.protocol.TField SQL_FIELD_DESC = new org.apache.thrift.protocol.TField("sql", org.apache.thrift.protocol.TType.LIST, (short)3);
+    private static final org.apache.thrift.protocol.TField QUERY_LIMIT_FIELD_DESC = new org.apache.thrift.protocol.TField("queryLimit", org.apache.thrift.protocol.TType.I32, (short)4);
+    private static final org.apache.thrift.protocol.TField REMAIN_TIME_FIELD_DESC = new org.apache.thrift.protocol.TField("remainTime", org.apache.thrift.protocol.TType.I32, (short)5);
 
     private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
     static {
@@ -1677,6 +1837,7 @@ public class SparkSqlService {
 
     public String jobId; // required
     public List<UdfInfo> udfs; // required
+    public List<String> sql; // required
     public int queryLimit; // required
     public int remainTime; // required
 
@@ -1684,8 +1845,9 @@ public class SparkSqlService {
     public enum _Fields implements org.apache.thrift.TFieldIdEnum {
       JOB_ID((short)1, "jobId"),
       UDFS((short)2, "udfs"),
-      QUERY_LIMIT((short)3, "queryLimit"),
-      REMAIN_TIME((short)4, "remainTime");
+      SQL((short)3, "sql"),
+      QUERY_LIMIT((short)4, "queryLimit"),
+      REMAIN_TIME((short)5, "remainTime");
 
       private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
@@ -1704,9 +1866,11 @@ public class SparkSqlService {
             return JOB_ID;
           case 2: // UDFS
             return UDFS;
-          case 3: // QUERY_LIMIT
+          case 3: // SQL
+            return SQL;
+          case 4: // QUERY_LIMIT
             return QUERY_LIMIT;
-          case 4: // REMAIN_TIME
+          case 5: // REMAIN_TIME
             return REMAIN_TIME;
           default:
             return null;
@@ -1759,6 +1923,9 @@ public class SparkSqlService {
       tmpMap.put(_Fields.UDFS, new org.apache.thrift.meta_data.FieldMetaData("udfs", org.apache.thrift.TFieldRequirementType.DEFAULT, 
           new org.apache.thrift.meta_data.ListMetaData(org.apache.thrift.protocol.TType.LIST, 
               new org.apache.thrift.meta_data.StructMetaData(org.apache.thrift.protocol.TType.STRUCT, UdfInfo.class))));
+      tmpMap.put(_Fields.SQL, new org.apache.thrift.meta_data.FieldMetaData("sql", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+          new org.apache.thrift.meta_data.ListMetaData(org.apache.thrift.protocol.TType.LIST, 
+              new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING))));
       tmpMap.put(_Fields.QUERY_LIMIT, new org.apache.thrift.meta_data.FieldMetaData("queryLimit", org.apache.thrift.TFieldRequirementType.DEFAULT, 
           new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.I32)));
       tmpMap.put(_Fields.REMAIN_TIME, new org.apache.thrift.meta_data.FieldMetaData("remainTime", org.apache.thrift.TFieldRequirementType.DEFAULT, 
@@ -1773,12 +1940,14 @@ public class SparkSqlService {
     public execAdhoc_args(
       String jobId,
       List<UdfInfo> udfs,
+      List<String> sql,
       int queryLimit,
       int remainTime)
     {
       this();
       this.jobId = jobId;
       this.udfs = udfs;
+      this.sql = sql;
       this.queryLimit = queryLimit;
       setQueryLimitIsSet(true);
       this.remainTime = remainTime;
@@ -1800,6 +1969,10 @@ public class SparkSqlService {
         }
         this.udfs = __this__udfs;
       }
+      if (other.isSetSql()) {
+        List<String> __this__sql = new ArrayList<String>(other.sql);
+        this.sql = __this__sql;
+      }
       this.queryLimit = other.queryLimit;
       this.remainTime = other.remainTime;
     }
@@ -1812,6 +1985,7 @@ public class SparkSqlService {
     public void clear() {
       this.jobId = null;
       this.udfs = null;
+      this.sql = null;
       setQueryLimitIsSet(false);
       this.queryLimit = 0;
       setRemainTimeIsSet(false);
@@ -1881,6 +2055,45 @@ public class SparkSqlService {
       }
     }
 
+    public int getSqlSize() {
+      return (this.sql == null) ? 0 : this.sql.size();
+    }
+
+    public java.util.Iterator<String> getSqlIterator() {
+      return (this.sql == null) ? null : this.sql.iterator();
+    }
+
+    public void addToSql(String elem) {
+      if (this.sql == null) {
+        this.sql = new ArrayList<String>();
+      }
+      this.sql.add(elem);
+    }
+
+    public List<String> getSql() {
+      return this.sql;
+    }
+
+    public execAdhoc_args setSql(List<String> sql) {
+      this.sql = sql;
+      return this;
+    }
+
+    public void unsetSql() {
+      this.sql = null;
+    }
+
+    /** Returns true if field sql is set (has been assigned a value) and false otherwise */
+    public boolean isSetSql() {
+      return this.sql != null;
+    }
+
+    public void setSqlIsSet(boolean value) {
+      if (!value) {
+        this.sql = null;
+      }
+    }
+
     public int getQueryLimit() {
       return this.queryLimit;
     }
@@ -1945,6 +2158,14 @@ public class SparkSqlService {
         }
         break;
 
+      case SQL:
+        if (value == null) {
+          unsetSql();
+        } else {
+          setSql((List<String>)value);
+        }
+        break;
+
       case QUERY_LIMIT:
         if (value == null) {
           unsetQueryLimit();
@@ -1972,6 +2193,9 @@ public class SparkSqlService {
       case UDFS:
         return getUdfs();
 
+      case SQL:
+        return getSql();
+
       case QUERY_LIMIT:
         return Integer.valueOf(getQueryLimit());
 
@@ -1993,6 +2217,8 @@ public class SparkSqlService {
         return isSetJobId();
       case UDFS:
         return isSetUdfs();
+      case SQL:
+        return isSetSql();
       case QUERY_LIMIT:
         return isSetQueryLimit();
       case REMAIN_TIME:
@@ -2029,6 +2255,15 @@ public class SparkSqlService {
         if (!(this_present_udfs && that_present_udfs))
           return false;
         if (!this.udfs.equals(that.udfs))
+          return false;
+      }
+
+      boolean this_present_sql = true && this.isSetSql();
+      boolean that_present_sql = true && that.isSetSql();
+      if (this_present_sql || that_present_sql) {
+        if (!(this_present_sql && that_present_sql))
+          return false;
+        if (!this.sql.equals(that.sql))
           return false;
       }
 
@@ -2086,6 +2321,16 @@ public class SparkSqlService {
           return lastComparison;
         }
       }
+      lastComparison = Boolean.valueOf(isSetSql()).compareTo(other.isSetSql());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetSql()) {
+        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.sql, other.sql);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
       lastComparison = Boolean.valueOf(isSetQueryLimit()).compareTo(other.isSetQueryLimit());
       if (lastComparison != 0) {
         return lastComparison;
@@ -2139,6 +2384,14 @@ public class SparkSqlService {
         sb.append("null");
       } else {
         sb.append(this.udfs);
+      }
+      first = false;
+      if (!first) sb.append(", ");
+      sb.append("sql:");
+      if (this.sql == null) {
+        sb.append("null");
+      } else {
+        sb.append(this.sql);
       }
       first = false;
       if (!first) sb.append(", ");
@@ -2205,14 +2458,14 @@ public class SparkSqlService {
             case 2: // UDFS
               if (schemeField.type == org.apache.thrift.protocol.TType.LIST) {
                 {
-                  org.apache.thrift.protocol.TList _list64 = iprot.readListBegin();
-                  struct.udfs = new ArrayList<UdfInfo>(_list64.size);
-                  for (int _i65 = 0; _i65 < _list64.size; ++_i65)
+                  org.apache.thrift.protocol.TList _list72 = iprot.readListBegin();
+                  struct.udfs = new ArrayList<UdfInfo>(_list72.size);
+                  for (int _i73 = 0; _i73 < _list72.size; ++_i73)
                   {
-                    UdfInfo _elem66;
-                    _elem66 = new UdfInfo();
-                    _elem66.read(iprot);
-                    struct.udfs.add(_elem66);
+                    UdfInfo _elem74;
+                    _elem74 = new UdfInfo();
+                    _elem74.read(iprot);
+                    struct.udfs.add(_elem74);
                   }
                   iprot.readListEnd();
                 }
@@ -2221,7 +2474,25 @@ public class SparkSqlService {
                 org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
               }
               break;
-            case 3: // QUERY_LIMIT
+            case 3: // SQL
+              if (schemeField.type == org.apache.thrift.protocol.TType.LIST) {
+                {
+                  org.apache.thrift.protocol.TList _list75 = iprot.readListBegin();
+                  struct.sql = new ArrayList<String>(_list75.size);
+                  for (int _i76 = 0; _i76 < _list75.size; ++_i76)
+                  {
+                    String _elem77;
+                    _elem77 = iprot.readString();
+                    struct.sql.add(_elem77);
+                  }
+                  iprot.readListEnd();
+                }
+                struct.setSqlIsSet(true);
+              } else { 
+                org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+              }
+              break;
+            case 4: // QUERY_LIMIT
               if (schemeField.type == org.apache.thrift.protocol.TType.I32) {
                 struct.queryLimit = iprot.readI32();
                 struct.setQueryLimitIsSet(true);
@@ -2229,7 +2500,7 @@ public class SparkSqlService {
                 org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
               }
               break;
-            case 4: // REMAIN_TIME
+            case 5: // REMAIN_TIME
               if (schemeField.type == org.apache.thrift.protocol.TType.I32) {
                 struct.remainTime = iprot.readI32();
                 struct.setRemainTimeIsSet(true);
@@ -2261,9 +2532,21 @@ public class SparkSqlService {
           oprot.writeFieldBegin(UDFS_FIELD_DESC);
           {
             oprot.writeListBegin(new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRUCT, struct.udfs.size()));
-            for (UdfInfo _iter67 : struct.udfs)
+            for (UdfInfo _iter78 : struct.udfs)
             {
-              _iter67.write(oprot);
+              _iter78.write(oprot);
+            }
+            oprot.writeListEnd();
+          }
+          oprot.writeFieldEnd();
+        }
+        if (struct.sql != null) {
+          oprot.writeFieldBegin(SQL_FIELD_DESC);
+          {
+            oprot.writeListBegin(new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRING, struct.sql.size()));
+            for (String _iter79 : struct.sql)
+            {
+              oprot.writeString(_iter79);
             }
             oprot.writeListEnd();
           }
@@ -2299,22 +2582,34 @@ public class SparkSqlService {
         if (struct.isSetUdfs()) {
           optionals.set(1);
         }
-        if (struct.isSetQueryLimit()) {
+        if (struct.isSetSql()) {
           optionals.set(2);
         }
-        if (struct.isSetRemainTime()) {
+        if (struct.isSetQueryLimit()) {
           optionals.set(3);
         }
-        oprot.writeBitSet(optionals, 4);
+        if (struct.isSetRemainTime()) {
+          optionals.set(4);
+        }
+        oprot.writeBitSet(optionals, 5);
         if (struct.isSetJobId()) {
           oprot.writeString(struct.jobId);
         }
         if (struct.isSetUdfs()) {
           {
             oprot.writeI32(struct.udfs.size());
-            for (UdfInfo _iter68 : struct.udfs)
+            for (UdfInfo _iter80 : struct.udfs)
             {
-              _iter68.write(oprot);
+              _iter80.write(oprot);
+            }
+          }
+        }
+        if (struct.isSetSql()) {
+          {
+            oprot.writeI32(struct.sql.size());
+            for (String _iter81 : struct.sql)
+            {
+              oprot.writeString(_iter81);
             }
           }
         }
@@ -2329,30 +2624,43 @@ public class SparkSqlService {
       @Override
       public void read(org.apache.thrift.protocol.TProtocol prot, execAdhoc_args struct) throws org.apache.thrift.TException {
         TTupleProtocol iprot = (TTupleProtocol) prot;
-        BitSet incoming = iprot.readBitSet(4);
+        BitSet incoming = iprot.readBitSet(5);
         if (incoming.get(0)) {
           struct.jobId = iprot.readString();
           struct.setJobIdIsSet(true);
         }
         if (incoming.get(1)) {
           {
-            org.apache.thrift.protocol.TList _list69 = new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRUCT, iprot.readI32());
-            struct.udfs = new ArrayList<UdfInfo>(_list69.size);
-            for (int _i70 = 0; _i70 < _list69.size; ++_i70)
+            org.apache.thrift.protocol.TList _list82 = new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRUCT, iprot.readI32());
+            struct.udfs = new ArrayList<UdfInfo>(_list82.size);
+            for (int _i83 = 0; _i83 < _list82.size; ++_i83)
             {
-              UdfInfo _elem71;
-              _elem71 = new UdfInfo();
-              _elem71.read(iprot);
-              struct.udfs.add(_elem71);
+              UdfInfo _elem84;
+              _elem84 = new UdfInfo();
+              _elem84.read(iprot);
+              struct.udfs.add(_elem84);
             }
           }
           struct.setUdfsIsSet(true);
         }
         if (incoming.get(2)) {
+          {
+            org.apache.thrift.protocol.TList _list85 = new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRING, iprot.readI32());
+            struct.sql = new ArrayList<String>(_list85.size);
+            for (int _i86 = 0; _i86 < _list85.size; ++_i86)
+            {
+              String _elem87;
+              _elem87 = iprot.readString();
+              struct.sql.add(_elem87);
+            }
+          }
+          struct.setSqlIsSet(true);
+        }
+        if (incoming.get(3)) {
           struct.queryLimit = iprot.readI32();
           struct.setQueryLimitIsSet(true);
         }
-        if (incoming.get(3)) {
+        if (incoming.get(4)) {
           struct.remainTime = iprot.readI32();
           struct.setRemainTimeIsSet(true);
         }
