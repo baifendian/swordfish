@@ -332,12 +332,12 @@ service SparkSqlService {
    * 执行某个 spark sql 节点
    *
    */
-  RetInfo execEtl(1:string jobId, 2:list<UdfInfo> udfs, 3:i32 remainTime),
+  RetInfo execEtl(1:string jobId, 2:list<UdfInfo> udfs, 3:list<string> sql, 4:i32 remainTime),
   /**
    * 执行某个 adhoc
    *
    */
-  RetInfo execAdhoc(1:string jobId, 2:list<UdfInfo> udfs, 3:i32 queryLimit, 4:i32 remainTime),
+  RetInfo execAdhoc(1:string jobId, 2:list<UdfInfo> udfs, 3:list<string> sql, 4:i32 queryLimit, 5:i32 remainTime),
 
   /**
    * 取消在执行的spark sql
