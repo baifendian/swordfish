@@ -91,22 +91,42 @@ public class SparkSqlClient {
     return retInfo.getStatus() == 0;
   }
 
-  boolean executeAdhoc(String jobId, List<UdfInfo> udfs, List<String> sql,
-      ResultCallback resultCallback, int queryLimit, int remainTime, Logger logger) {
-    logger.info("Begin run sql");
+  private Client getClient(int remainTime, Logger logger){
     Client client;
     try {
       client = clientQueue.poll(remainTime, TimeUnit.SECONDS);
     } catch (InterruptedException e) {
       logger.info("queue interrupted", e);
-      return false;
+      return null;
     }
+
+    return client;
+  }
+
+  boolean executeAdhoc(String jobId, List<UdfInfo> udfs, List<String> sql,
+      ResultCallback resultCallback, int queryLimit, int remainTime, Logger logger) {
+    logger.info("Begin run sql");
+    Client client = getClient(remainTime, logger);
 
     if (client == null) {
       logger.info("job time out");
       return false;
     }
 
+    boolean ret = false;
+    try {
+      ret = exec(client, jobId, udfs, sql, resultCallback, queryLimit, remainTime, logger);
+    }catch (Throwable e){
+      logger.error("Spark sql exec error.", e);
+    }
+
+    clientQueue.add(client);
+
+    return ret;
+  }
+
+  private boolean exec(Client client, String jobId, List<UdfInfo> udfs, List<String> sql,
+      ResultCallback resultCallback, int queryLimit, int remainTime, Logger logger){
     Date startTime = new Date();
     RetInfo retInfo;
     try {

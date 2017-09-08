@@ -176,7 +176,7 @@ public class SparkSqlExec implements Runnable {
 
     HiveContext sparkSession = SparkContextUtil.createHiveContext(jobId);
     execute(sparkSession);
-    logger.info("End exec sql.");
+    logger.info("End exec sql. jobId:{}", jobId);
     SparkContextUtil.back(jobId, !createFuncs.isEmpty());
   }
 

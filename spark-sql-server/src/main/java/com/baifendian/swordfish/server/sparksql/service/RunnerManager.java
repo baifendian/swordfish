@@ -40,6 +40,7 @@ public class RunnerManager {
   }
 
   public boolean executeEtlSql(String jobId, List<UdfInfo> udfs, List<String> sqls, long stopTime) {
+    logger.info("Begin running spark sql, jobid:{}", jobId);
     SparkSqlExec sparkSqlExec = new SparkSqlExec(jobId, createUdf(udfs), sqls, null, stopTime);
     Future future = sqlExecutorService.submit(sparkSqlExec);
     jobInfo.put(jobId, new SimpleEntry<>(sparkSqlExec, future));
@@ -47,6 +48,7 @@ public class RunnerManager {
   }
 
   public boolean executeAdhocSql(String jobId, List<UdfInfo> udfs, List<String> sqls, long stopTime, int queryLimit) {
+    logger.info("Begin running adHoc spark sql, jobid:{}", jobId);
     SparkSqlExec sparkSqlExec = new SparkSqlExec(jobId, createUdf(udfs), sqls, queryLimit, stopTime);
     Future future = sqlExecutorService.submit(sparkSqlExec);
     jobInfo.put(jobId, new SimpleEntry<>(sparkSqlExec, future));
@@ -55,6 +57,7 @@ public class RunnerManager {
   }
 
   public AdhocResultRet getAdHocResult(String jobId, int index) {
+    logger.info("Begin get adHoc spark sql result, jobid:{}", jobId);
     AdhocResultRet adhocResultRet = new AdhocResultRet();
 
     Map.Entry<SparkSqlExec, Future> entry = jobInfo.get(jobId);
@@ -85,6 +88,7 @@ public class RunnerManager {
   }
 
   public boolean cancelExecFlow(String jobId) {
+    logger.info("Begin cancel spark sql result, jobid:{}", jobId);
     Map.Entry<SparkSqlExec, Future> entry = jobInfo.get(jobId);
     if (entry == null || entry.getValue().isDone()) {
       logger.info("job id:{} is end.", jobId);
