@@ -1,6 +1,7 @@
 package com.baifendian.swordfish.server.sparksql.service;
 
 import com.baifendian.swordfish.rpc.AdhocResultInfo;
+import com.baifendian.swordfish.rpc.AdhocResultRet;
 import com.baifendian.swordfish.rpc.RetInfo;
 import com.baifendian.swordfish.rpc.SparkSqlService.Iface;
 import com.baifendian.swordfish.rpc.UdfInfo;
@@ -46,7 +47,7 @@ public class SparkSqlServiceImpl implements Iface {
   }
 
   @Override
-  public AdhocResultInfo getAdhocResult(String jobId) throws TException {
-    return runnerManager.getAdHocResult(jobId);
+  public AdhocResultRet getAdhocResult(String jobId, int index) throws TException {
+    return runnerManager.getAdHocResult(jobId, index);
   }
 }

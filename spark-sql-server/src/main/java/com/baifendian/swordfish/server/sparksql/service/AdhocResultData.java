@@ -2,24 +2,31 @@ package com.baifendian.swordfish.server.sparksql.service;
 
 import com.baifendian.swordfish.rpc.AdhocResultInfo;
 import com.baifendian.swordfish.server.sparksql.common.FlowStatus;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.BlockingQueue;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class AdhocResultData {
+
   /**
    * 记录日志的实例
    */
   private static Logger logger = LoggerFactory.getLogger(AdhocResultData.class);
 
-  private BlockingQueue<AdhocResultInfo> adhocResultInfoList;
-  private int curIndex = 0;
-  private int totalLen = 0;
+  private List<AdhocResultInfo> adhocResultInfoList;
+  private Lock lock = new ReentrantLock();
+
+  private Condition resultCondition = lock.newCondition();
+  private final int totalLen;
+  private boolean isKill = false;
 
   public AdhocResultData(int totalLen) {
     this.totalLen = totalLen;
-    adhocResultInfoList = new ArrayBlockingQueue<>(totalLen);
+    adhocResultInfoList = new ArrayList<>(totalLen);
   }
 
   synchronized void handlerResult(int fromIndex, String sql, FlowStatus status) {
@@ -41,16 +48,48 @@ public class AdhocResultData {
       return;
     }
     adhocResultInfoList.add(adhocResultInfo);
+
+    lock.lock();
+    resultCondition.signal();
+    lock.unlock();
   }
 
-  synchronized AdhocResultInfo getAdHocResult() {
-    if (curIndex++ >= totalLen) {
-      AdhocResultInfo adhocResultInfo = new AdhocResultInfo();
-      adhocResultInfo.setIndex(curIndex);
-      adhocResultInfo.setStatus(1);
-      return adhocResultInfo;
+  void cancel() {
+    isKill = true;
+
+    lock.lock();
+    resultCondition.signal();
+    lock.unlock();
+  }
+
+  AdhocResultInfo getAdHocResult(int index) {
+    if (index >= totalLen) {
+      throw new RuntimeException("index is too big.");
     }
 
-    return adhocResultInfoList.poll();
+    while (index >= adhocResultInfoList.size()) {
+
+      if (isKill) {
+        return createKillResult();
+      }
+
+      lock.lock();
+      try {
+        resultCondition.await();
+      } catch (InterruptedException e) {
+        logger.error("Result error.", e);
+      } finally {
+        lock.unlock();
+      }
+    }
+
+    return adhocResultInfoList.get(index);
+  }
+
+
+  AdhocResultInfo createKillResult() {
+    AdhocResultInfo adhocResultInfo = new AdhocResultInfo();
+    adhocResultInfo.setStatus(FlowStatus.KILL.ordinal());
+    return adhocResultInfo;
   }
 }

@@ -4,6 +4,7 @@ import com.baifendian.swordfish.dao.enums.FlowStatus;
 import com.baifendian.swordfish.execserver.common.ExecResult;
 import com.baifendian.swordfish.execserver.common.ResultCallback;
 import com.baifendian.swordfish.rpc.AdhocResultInfo;
+import com.baifendian.swordfish.rpc.AdhocResultRet;
 import com.baifendian.swordfish.rpc.RetInfo;
 import com.baifendian.swordfish.rpc.SparkSqlService.Client;
 import com.baifendian.swordfish.rpc.UdfInfo;
@@ -25,27 +26,29 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class SparkSqlClient {
+
   private static Logger LOGGER = LoggerFactory.getLogger(SparkSqlClient.class.getName());
 
-  private BlockingQueue<Client> clientQueue ;
+  private BlockingQueue<Client> clientQueue;
 
   private Map<String, Client> jobInfo = new ConcurrentHashMap<>();
 
   static public void init(String hosts, int port) {
     instance = new SparkSqlClient(hosts, port);
   }
-  static public SparkSqlClient getInstance(){
+
+  static public SparkSqlClient getInstance() {
     return instance;
   }
 
   static private SparkSqlClient instance;
 
-  public SparkSqlClient(String hosts, int port){
+  public SparkSqlClient(String hosts, int port) {
     String[] hostArray = hosts.split(",");
     clientQueue = new ArrayBlockingQueue<>(hostArray.length);
 
-    for (String host: hostArray){
-      TTransport tTransport = new TSocket(host, port, 4000*1000);
+    for (String host : hostArray) {
+      TTransport tTransport = new TSocket(host, port, 4000 * 1000);
 
       try {
         TProtocol protocol = new TBinaryProtocol(tTransport);
@@ -88,7 +91,7 @@ public class SparkSqlClient {
     return retInfo.getStatus() == 0;
   }
 
-  public boolean executeAdhoc(String jobId, List<UdfInfo> udfs, List<String> sql,
+  boolean executeAdhoc(String jobId, List<UdfInfo> udfs, List<String> sql,
       ResultCallback resultCallback, int queryLimit, int remainTime, Logger logger) {
     logger.info("Begin run sql");
     Client client;
@@ -113,13 +116,23 @@ public class SparkSqlClient {
       return false;
     }
     jobInfo.put(jobId, client);
-    for (int i=0;i<sql.size(); ++i){
+    for (int i = 0; i < sql.size(); ++i) {
       ExecResult execResult = new ExecResult();
       execResult.setIndex(i);
       execResult.setStm(sql.get(i));
       AdhocResultInfo adhocResultInfo;
       try {
-        adhocResultInfo = client.getAdhocResult(jobId);
+        AdhocResultRet adhocResultRet = client.getAdhocResult(jobId, i);
+        if (adhocResultRet.retInfo.getStatus() == 0) {
+          adhocResultInfo = adhocResultRet.getResultData();
+        } else {
+          logger.info("Get result error. {}", adhocResultRet.getRetInfo().getMsg());
+
+          execResult.setStatus(FlowStatus.FAILED);
+          resultCallback.handleResult(execResult, startTime, new Date());
+
+          continue;
+        }
       } catch (TException e) {
         logger.info("TException", e);
         execResult.setStatus(FlowStatus.FAILED);
@@ -138,9 +151,9 @@ public class SparkSqlClient {
     return retInfo.getStatus() == 0;
   }
 
-  public boolean cancel(String jobId, Logger logger){
+  public boolean cancel(String jobId, Logger logger) {
     Client client = jobInfo.get(jobId);
-    if (client == null){
+    if (client == null) {
       return false;
     }
 
@@ -154,12 +167,13 @@ public class SparkSqlClient {
     return true;
   }
 
-  public static void main(String[] args) {
+  public static void main(String[] args) throws InterruptedException {
     SparkSqlClient.init("172.24.8.98", 20017);
     List<String> sqls = new ArrayList<>();
     sqls.add("select count(1) from ods.tbs_ods_twfb");
     SparkSqlClient.getInstance()
-        .executeAdhoc("test", new ArrayList<>(), sqls, (execResult, startTime, endTime) -> LOGGER.error(execResult.getStm())
+        .executeAdhoc("test", new ArrayList<>(), sqls,
+            (execResult, startTime, endTime) -> LOGGER.error(execResult.getStm())
             , 1000, 100000, LOGGER);
   }
 }

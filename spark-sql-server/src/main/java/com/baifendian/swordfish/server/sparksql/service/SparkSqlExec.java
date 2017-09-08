@@ -48,14 +48,17 @@ public class SparkSqlExec implements Runnable {
     this.stopTime = stopTime;
   }
 
-  public boolean cancel() {
+  boolean cancel() {
     logInfo("kill spark job.");
     SparkContextUtil.close(jobId);
     isStop = true;
+    if (adhocResultData != null){
+      adhocResultData.cancel();
+    }
     return true;
   }
 
-  public boolean execute(HiveContext sparkSession) {
+  private boolean execute(HiveContext sparkSession) {
     if (!createFuncs.isEmpty()) {
       try {
         for (String sql : createFuncs) {
@@ -94,7 +97,8 @@ public class SparkSqlExec implements Runnable {
     return true;
   }
 
-  static void execSql(String sql, HiveContext sparkSession, int queryLimit, AdhocResultInfo execResult)
+  private void execSql(String sql, HiveContext sparkSession, int queryLimit,
+      AdhocResultInfo execResult)
       throws SQLException {
 
     // 只对 query 和 show 语句显示结果
@@ -129,13 +133,13 @@ public class SparkSqlExec implements Runnable {
     execResult.setStatus(FlowStatus.SUCCESS.ordinal());
   }
 
-  synchronized  private void handlerResults(int fromIndex, FlowStatus status){
+  private void handlerResults(int fromIndex, FlowStatus status){
       for (int i=fromIndex; i<sqls.size(); ++i){
         handlerResult(i, sqls.get(i), status);
       }
   }
 
-  synchronized private void handlerResult(int fromIndex, String sql, FlowStatus status){
+  private void handlerResult(int fromIndex, String sql, FlowStatus status){
     if (adhocResultData == null){
       return;
     }
@@ -143,23 +147,20 @@ public class SparkSqlExec implements Runnable {
     adhocResultData.handlerResult(fromIndex, sql, status);
   }
 
-  synchronized private void  addResult(AdhocResultInfo adhocResultInfo){
+  private void  addResult(AdhocResultInfo adhocResultInfo){
     if (adhocResultData == null){
       return;
     }
     adhocResultData.addResult(adhocResultInfo);
   }
 
-  synchronized public AdhocResultInfo getAdHocResult(){
+  public AdhocResultInfo getAdHocResult(int index){
     logger.info("Begin get adhoc result");
     if (adhocResultData == null){
-      logger.info("Job is not adhoc result");
-      AdhocResultInfo adhocResultInfo = new AdhocResultInfo();
-      adhocResultInfo.setStatus(0);
-      return adhocResultInfo;
+      throw new RuntimeException("Job is not adhoc result");
     }
 
-    return adhocResultData.getAdHocResult();
+    return adhocResultData.getAdHocResult(index);
   }
 
   @Override

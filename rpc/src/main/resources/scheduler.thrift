@@ -156,6 +156,20 @@ struct AdhocResultInfo {
 }
 
 /**
+ * 即席查询结果返回值
+ */
+struct AdhocResultRet {
+  /**
+   * 返回状态
+   */
+  1: RetInfo retInfo,
+  /**
+   * 即席查询结果
+   */
+  2: AdhocResultInfo resultData
+}
+
+/**
  * Master 服务接口, 供 web-server 调用使用
  */
 service MasterService {
@@ -348,8 +362,6 @@ service SparkSqlService {
 
   /**
    * 获取adhoc的结果
-   *
-   * execId : 执行 id
    */
-  AdhocResultInfo getAdhocResult(1:string jobId)
+  AdhocResultRet getAdhocResult(1:string jobId, 2:i32 index)
 }

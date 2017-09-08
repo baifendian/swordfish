@@ -1,6 +1,7 @@
 package com.baifendian.swordfish.server.sparksql.service;
 
-import com.baifendian.swordfish.rpc.AdhocResultInfo;
+import com.baifendian.swordfish.rpc.AdhocResultRet;
+import com.baifendian.swordfish.rpc.RetInfo;
 import com.baifendian.swordfish.rpc.UdfInfo;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
@@ -53,14 +54,34 @@ public class RunnerManager {
     return true;
   }
 
-  public AdhocResultInfo getAdHocResult(String jobId) {
+  public AdhocResultRet getAdHocResult(String jobId, int index) {
+    AdhocResultRet adhocResultRet = new AdhocResultRet();
+
     Map.Entry<SparkSqlExec, Future> entry = jobInfo.get(jobId);
     if (entry == null) {
       logger.info("job id:{} is end.", jobId);
-      return null;
+      RetInfo retInfo = new RetInfo();
+      retInfo.setStatus(1);
+      retInfo.setMsg("job id is end");
+      adhocResultRet.setRetInfo(retInfo);
+      return adhocResultRet;
     }
+    try {
+      RetInfo retInfo = new RetInfo();
+      retInfo.setStatus(0);
+      adhocResultRet.setRetInfo(retInfo);
+      adhocResultRet.setResultData(entry.getKey().getAdHocResult(index));
 
-    return entry.getKey().getAdHocResult();
+      return adhocResultRet;
+    } catch (Throwable e){
+      logger.info("Get result failed.", e);
+      RetInfo retInfo = new RetInfo();
+      retInfo.setStatus(1);
+      retInfo.setMsg(e.getMessage());
+      adhocResultRet.setRetInfo(retInfo);
+
+      return adhocResultRet;
+    }
   }
 
   public boolean cancelExecFlow(String jobId) {

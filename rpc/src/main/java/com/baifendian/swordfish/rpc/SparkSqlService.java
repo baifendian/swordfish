@@ -74,11 +74,10 @@ public class SparkSqlService {
     /**
      * 获取adhoc的结果
      * 
-     * execId : 执行 id
-     * 
      * @param jobId
+     * @param index
      */
-    public AdhocResultInfo getAdhocResult(String jobId) throws org.apache.thrift.TException;
+    public AdhocResultRet getAdhocResult(String jobId, int index) throws org.apache.thrift.TException;
 
   }
 
@@ -90,7 +89,7 @@ public class SparkSqlService {
 
     public void cancelExecFlow(String jobId, org.apache.thrift.async.AsyncMethodCallback resultHandler) throws org.apache.thrift.TException;
 
-    public void getAdhocResult(String jobId, org.apache.thrift.async.AsyncMethodCallback resultHandler) throws org.apache.thrift.TException;
+    public void getAdhocResult(String jobId, int index, org.apache.thrift.async.AsyncMethodCallback resultHandler) throws org.apache.thrift.TException;
 
   }
 
@@ -190,20 +189,21 @@ public class SparkSqlService {
       throw new org.apache.thrift.TApplicationException(org.apache.thrift.TApplicationException.MISSING_RESULT, "cancelExecFlow failed: unknown result");
     }
 
-    public AdhocResultInfo getAdhocResult(String jobId) throws org.apache.thrift.TException
+    public AdhocResultRet getAdhocResult(String jobId, int index) throws org.apache.thrift.TException
     {
-      send_getAdhocResult(jobId);
+      send_getAdhocResult(jobId, index);
       return recv_getAdhocResult();
     }
 
-    public void send_getAdhocResult(String jobId) throws org.apache.thrift.TException
+    public void send_getAdhocResult(String jobId, int index) throws org.apache.thrift.TException
     {
       getAdhocResult_args args = new getAdhocResult_args();
       args.setJobId(jobId);
+      args.setIndex(index);
       sendBase("getAdhocResult", args);
     }
 
-    public AdhocResultInfo recv_getAdhocResult() throws org.apache.thrift.TException
+    public AdhocResultRet recv_getAdhocResult() throws org.apache.thrift.TException
     {
       getAdhocResult_result result = new getAdhocResult_result();
       receiveBase(result, "getAdhocResult");
@@ -348,29 +348,32 @@ public class SparkSqlService {
       }
     }
 
-    public void getAdhocResult(String jobId, org.apache.thrift.async.AsyncMethodCallback resultHandler) throws org.apache.thrift.TException {
+    public void getAdhocResult(String jobId, int index, org.apache.thrift.async.AsyncMethodCallback resultHandler) throws org.apache.thrift.TException {
       checkReady();
-      getAdhocResult_call method_call = new getAdhocResult_call(jobId, resultHandler, this, ___protocolFactory, ___transport);
+      getAdhocResult_call method_call = new getAdhocResult_call(jobId, index, resultHandler, this, ___protocolFactory, ___transport);
       this.___currentMethod = method_call;
       ___manager.call(method_call);
     }
 
     public static class getAdhocResult_call extends org.apache.thrift.async.TAsyncMethodCall {
       private String jobId;
-      public getAdhocResult_call(String jobId, org.apache.thrift.async.AsyncMethodCallback resultHandler, org.apache.thrift.async.TAsyncClient client, org.apache.thrift.protocol.TProtocolFactory protocolFactory, org.apache.thrift.transport.TNonblockingTransport transport) throws org.apache.thrift.TException {
+      private int index;
+      public getAdhocResult_call(String jobId, int index, org.apache.thrift.async.AsyncMethodCallback resultHandler, org.apache.thrift.async.TAsyncClient client, org.apache.thrift.protocol.TProtocolFactory protocolFactory, org.apache.thrift.transport.TNonblockingTransport transport) throws org.apache.thrift.TException {
         super(client, protocolFactory, transport, resultHandler, false);
         this.jobId = jobId;
+        this.index = index;
       }
 
       public void write_args(org.apache.thrift.protocol.TProtocol prot) throws org.apache.thrift.TException {
         prot.writeMessageBegin(new org.apache.thrift.protocol.TMessage("getAdhocResult", org.apache.thrift.protocol.TMessageType.CALL, 0));
         getAdhocResult_args args = new getAdhocResult_args();
         args.setJobId(jobId);
+        args.setIndex(index);
         args.write(prot);
         prot.writeMessageEnd();
       }
 
-      public AdhocResultInfo getResult() throws org.apache.thrift.TException {
+      public AdhocResultRet getResult() throws org.apache.thrift.TException {
         if (getState() != org.apache.thrift.async.TAsyncMethodCall.State.RESPONSE_READ) {
           throw new IllegalStateException("Method call not finished!");
         }
@@ -475,7 +478,7 @@ public class SparkSqlService {
 
       public getAdhocResult_result getResult(I iface, getAdhocResult_args args) throws org.apache.thrift.TException {
         getAdhocResult_result result = new getAdhocResult_result();
-        result.success = iface.getAdhocResult(args.jobId);
+        result.success = iface.getAdhocResult(args.jobId, args.index);
         return result;
       }
     }
@@ -653,7 +656,7 @@ public class SparkSqlService {
       }
     }
 
-    public static class getAdhocResult<I extends AsyncIface> extends org.apache.thrift.AsyncProcessFunction<I, getAdhocResult_args, AdhocResultInfo> {
+    public static class getAdhocResult<I extends AsyncIface> extends org.apache.thrift.AsyncProcessFunction<I, getAdhocResult_args, AdhocResultRet> {
       public getAdhocResult() {
         super("getAdhocResult");
       }
@@ -662,10 +665,10 @@ public class SparkSqlService {
         return new getAdhocResult_args();
       }
 
-      public AsyncMethodCallback<AdhocResultInfo> getResultHandler(final AsyncFrameBuffer fb, final int seqid) {
+      public AsyncMethodCallback<AdhocResultRet> getResultHandler(final AsyncFrameBuffer fb, final int seqid) {
         final org.apache.thrift.AsyncProcessFunction fcall = this;
-        return new AsyncMethodCallback<AdhocResultInfo>() { 
-          public void onComplete(AdhocResultInfo o) {
+        return new AsyncMethodCallback<AdhocResultRet>() { 
+          public void onComplete(AdhocResultRet o) {
             getAdhocResult_result result = new getAdhocResult_result();
             result.success = o;
             try {
@@ -699,8 +702,8 @@ public class SparkSqlService {
         return false;
       }
 
-      public void start(I iface, getAdhocResult_args args, org.apache.thrift.async.AsyncMethodCallback<AdhocResultInfo> resultHandler) throws TException {
-        iface.getAdhocResult(args.jobId,resultHandler);
+      public void start(I iface, getAdhocResult_args args, org.apache.thrift.async.AsyncMethodCallback<AdhocResultRet> resultHandler) throws TException {
+        iface.getAdhocResult(args.jobId, args.index,resultHandler);
       }
     }
 
@@ -3745,6 +3748,7 @@ public class SparkSqlService {
     private static final org.apache.thrift.protocol.TStruct STRUCT_DESC = new org.apache.thrift.protocol.TStruct("getAdhocResult_args");
 
     private static final org.apache.thrift.protocol.TField JOB_ID_FIELD_DESC = new org.apache.thrift.protocol.TField("jobId", org.apache.thrift.protocol.TType.STRING, (short)1);
+    private static final org.apache.thrift.protocol.TField INDEX_FIELD_DESC = new org.apache.thrift.protocol.TField("index", org.apache.thrift.protocol.TType.I32, (short)2);
 
     private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
     static {
@@ -3753,10 +3757,12 @@ public class SparkSqlService {
     }
 
     public String jobId; // required
+    public int index; // required
 
     /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
     public enum _Fields implements org.apache.thrift.TFieldIdEnum {
-      JOB_ID((short)1, "jobId");
+      JOB_ID((short)1, "jobId"),
+      INDEX((short)2, "index");
 
       private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
@@ -3773,6 +3779,8 @@ public class SparkSqlService {
         switch(fieldId) {
           case 1: // JOB_ID
             return JOB_ID;
+          case 2: // INDEX
+            return INDEX;
           default:
             return null;
         }
@@ -3813,11 +3821,15 @@ public class SparkSqlService {
     }
 
     // isset id assignments
+    private static final int __INDEX_ISSET_ID = 0;
+    private byte __isset_bitfield = 0;
     public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
     static {
       Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
       tmpMap.put(_Fields.JOB_ID, new org.apache.thrift.meta_data.FieldMetaData("jobId", org.apache.thrift.TFieldRequirementType.DEFAULT, 
           new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING)));
+      tmpMap.put(_Fields.INDEX, new org.apache.thrift.meta_data.FieldMetaData("index", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.I32)));
       metaDataMap = Collections.unmodifiableMap(tmpMap);
       org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(getAdhocResult_args.class, metaDataMap);
     }
@@ -3826,19 +3838,24 @@ public class SparkSqlService {
     }
 
     public getAdhocResult_args(
-      String jobId)
+      String jobId,
+      int index)
     {
       this();
       this.jobId = jobId;
+      this.index = index;
+      setIndexIsSet(true);
     }
 
     /**
      * Performs a deep copy on <i>other</i>.
      */
     public getAdhocResult_args(getAdhocResult_args other) {
+      __isset_bitfield = other.__isset_bitfield;
       if (other.isSetJobId()) {
         this.jobId = other.jobId;
       }
+      this.index = other.index;
     }
 
     public getAdhocResult_args deepCopy() {
@@ -3848,6 +3865,8 @@ public class SparkSqlService {
     @Override
     public void clear() {
       this.jobId = null;
+      setIndexIsSet(false);
+      this.index = 0;
     }
 
     public String getJobId() {
@@ -3874,6 +3893,29 @@ public class SparkSqlService {
       }
     }
 
+    public int getIndex() {
+      return this.index;
+    }
+
+    public getAdhocResult_args setIndex(int index) {
+      this.index = index;
+      setIndexIsSet(true);
+      return this;
+    }
+
+    public void unsetIndex() {
+      __isset_bitfield = EncodingUtils.clearBit(__isset_bitfield, __INDEX_ISSET_ID);
+    }
+
+    /** Returns true if field index is set (has been assigned a value) and false otherwise */
+    public boolean isSetIndex() {
+      return EncodingUtils.testBit(__isset_bitfield, __INDEX_ISSET_ID);
+    }
+
+    public void setIndexIsSet(boolean value) {
+      __isset_bitfield = EncodingUtils.setBit(__isset_bitfield, __INDEX_ISSET_ID, value);
+    }
+
     public void setFieldValue(_Fields field, Object value) {
       switch (field) {
       case JOB_ID:
@@ -3884,6 +3926,14 @@ public class SparkSqlService {
         }
         break;
 
+      case INDEX:
+        if (value == null) {
+          unsetIndex();
+        } else {
+          setIndex((Integer)value);
+        }
+        break;
+
       }
     }
 
@@ -3891,6 +3941,9 @@ public class SparkSqlService {
       switch (field) {
       case JOB_ID:
         return getJobId();
+
+      case INDEX:
+        return Integer.valueOf(getIndex());
 
       }
       throw new IllegalStateException();
@@ -3905,6 +3958,8 @@ public class SparkSqlService {
       switch (field) {
       case JOB_ID:
         return isSetJobId();
+      case INDEX:
+        return isSetIndex();
       }
       throw new IllegalStateException();
     }
@@ -3931,6 +3986,15 @@ public class SparkSqlService {
           return false;
       }
 
+      boolean this_present_index = true;
+      boolean that_present_index = true;
+      if (this_present_index || that_present_index) {
+        if (!(this_present_index && that_present_index))
+          return false;
+        if (this.index != that.index)
+          return false;
+      }
+
       return true;
     }
 
@@ -3953,6 +4017,16 @@ public class SparkSqlService {
       }
       if (isSetJobId()) {
         lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.jobId, other.jobId);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetIndex()).compareTo(other.isSetIndex());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetIndex()) {
+        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.index, other.index);
         if (lastComparison != 0) {
           return lastComparison;
         }
@@ -3984,6 +4058,10 @@ public class SparkSqlService {
         sb.append(this.jobId);
       }
       first = false;
+      if (!first) sb.append(", ");
+      sb.append("index:");
+      sb.append(this.index);
+      first = false;
       sb.append(")");
       return sb.toString();
     }
@@ -4003,6 +4081,8 @@ public class SparkSqlService {
 
     private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
       try {
+        // it doesn't seem like you should have to do this, but java serialization is wacky, and doesn't call the default constructor.
+        __isset_bitfield = 0;
         read(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(in)));
       } catch (org.apache.thrift.TException te) {
         throw new java.io.IOException(te);
@@ -4035,6 +4115,14 @@ public class SparkSqlService {
                 org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
               }
               break;
+            case 2: // INDEX
+              if (schemeField.type == org.apache.thrift.protocol.TType.I32) {
+                struct.index = iprot.readI32();
+                struct.setIndexIsSet(true);
+              } else { 
+                org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+              }
+              break;
             default:
               org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
           }
@@ -4055,6 +4143,9 @@ public class SparkSqlService {
           oprot.writeString(struct.jobId);
           oprot.writeFieldEnd();
         }
+        oprot.writeFieldBegin(INDEX_FIELD_DESC);
+        oprot.writeI32(struct.index);
+        oprot.writeFieldEnd();
         oprot.writeFieldStop();
         oprot.writeStructEnd();
       }
@@ -4076,19 +4167,29 @@ public class SparkSqlService {
         if (struct.isSetJobId()) {
           optionals.set(0);
         }
-        oprot.writeBitSet(optionals, 1);
+        if (struct.isSetIndex()) {
+          optionals.set(1);
+        }
+        oprot.writeBitSet(optionals, 2);
         if (struct.isSetJobId()) {
           oprot.writeString(struct.jobId);
+        }
+        if (struct.isSetIndex()) {
+          oprot.writeI32(struct.index);
         }
       }
 
       @Override
       public void read(org.apache.thrift.protocol.TProtocol prot, getAdhocResult_args struct) throws org.apache.thrift.TException {
         TTupleProtocol iprot = (TTupleProtocol) prot;
-        BitSet incoming = iprot.readBitSet(1);
+        BitSet incoming = iprot.readBitSet(2);
         if (incoming.get(0)) {
           struct.jobId = iprot.readString();
           struct.setJobIdIsSet(true);
+        }
+        if (incoming.get(1)) {
+          struct.index = iprot.readI32();
+          struct.setIndexIsSet(true);
         }
       }
     }
@@ -4106,7 +4207,7 @@ public class SparkSqlService {
       schemes.put(TupleScheme.class, new getAdhocResult_resultTupleSchemeFactory());
     }
 
-    public AdhocResultInfo success; // required
+    public AdhocResultRet success; // required
 
     /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
     public enum _Fields implements org.apache.thrift.TFieldIdEnum {
@@ -4171,7 +4272,7 @@ public class SparkSqlService {
     static {
       Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
       tmpMap.put(_Fields.SUCCESS, new org.apache.thrift.meta_data.FieldMetaData("success", org.apache.thrift.TFieldRequirementType.DEFAULT, 
-          new org.apache.thrift.meta_data.StructMetaData(org.apache.thrift.protocol.TType.STRUCT, AdhocResultInfo.class)));
+          new org.apache.thrift.meta_data.StructMetaData(org.apache.thrift.protocol.TType.STRUCT, AdhocResultRet.class)));
       metaDataMap = Collections.unmodifiableMap(tmpMap);
       org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(getAdhocResult_result.class, metaDataMap);
     }
@@ -4180,7 +4281,7 @@ public class SparkSqlService {
     }
 
     public getAdhocResult_result(
-      AdhocResultInfo success)
+      AdhocResultRet success)
     {
       this();
       this.success = success;
@@ -4191,7 +4292,7 @@ public class SparkSqlService {
      */
     public getAdhocResult_result(getAdhocResult_result other) {
       if (other.isSetSuccess()) {
-        this.success = new AdhocResultInfo(other.success);
+        this.success = new AdhocResultRet(other.success);
       }
     }
 
@@ -4204,11 +4305,11 @@ public class SparkSqlService {
       this.success = null;
     }
 
-    public AdhocResultInfo getSuccess() {
+    public AdhocResultRet getSuccess() {
       return this.success;
     }
 
-    public getAdhocResult_result setSuccess(AdhocResultInfo success) {
+    public getAdhocResult_result setSuccess(AdhocResultRet success) {
       this.success = success;
       return this;
     }
@@ -4234,7 +4335,7 @@ public class SparkSqlService {
         if (value == null) {
           unsetSuccess();
         } else {
-          setSuccess((AdhocResultInfo)value);
+          setSuccess((AdhocResultRet)value);
         }
         break;
 
@@ -4386,7 +4487,7 @@ public class SparkSqlService {
           switch (schemeField.id) {
             case 0: // SUCCESS
               if (schemeField.type == org.apache.thrift.protocol.TType.STRUCT) {
-                struct.success = new AdhocResultInfo();
+                struct.success = new AdhocResultRet();
                 struct.success.read(iprot);
                 struct.setSuccessIsSet(true);
               } else { 
@@ -4445,7 +4546,7 @@ public class SparkSqlService {
         TTupleProtocol iprot = (TTupleProtocol) prot;
         BitSet incoming = iprot.readBitSet(1);
         if (incoming.get(0)) {
-          struct.success = new AdhocResultInfo();
+          struct.success = new AdhocResultRet();
           struct.success.read(iprot);
           struct.setSuccessIsSet(true);
         }
