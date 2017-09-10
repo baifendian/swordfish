@@ -173,7 +173,7 @@ public class SparkSqlClient {
   public static void main(String[] args) throws InterruptedException {
     SparkSqlClient.init("172.24.8.98", 20017);
     List<String> sqls = new ArrayList<>();
-    sqls.add("select count(1) from ods.tbs_ods_twfb");
+    sqls.add("select count(1) from ods.tbs_ods_twfb1");
     SparkSqlClient.getInstance()
         .executeAdhoc("test", new ArrayList<>(), sqls,
             (execResult, startTime, endTime) -> LOGGER.error(execResult.getStm())

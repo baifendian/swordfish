@@ -30,21 +30,17 @@ public class AdhocResultData {
   }
 
   synchronized void handlerResult(int fromIndex, String sql, FlowStatus status) {
-    if (adhocResultInfoList == null) {
-      logger.error("*************\nAdhoc result list is null.");
-      return;
-    }
-
     AdhocResultInfo adhocResultInfo = new AdhocResultInfo();
     adhocResultInfo.setIndex(fromIndex);
     adhocResultInfo.setStatus(status.ordinal());
     adhocResultInfo.setStm(sql);
 
-    adhocResultInfoList.add(adhocResultInfo);
+    addResult(adhocResultInfo);
   }
 
   synchronized void addResult(AdhocResultInfo adhocResultInfo) {
     if (adhocResultInfoList == null) {
+      logger.error("*************\nAdhoc result list is null.");
       return;
     }
     adhocResultInfoList.add(adhocResultInfo);

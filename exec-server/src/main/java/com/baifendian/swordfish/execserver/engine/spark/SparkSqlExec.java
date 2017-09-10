@@ -1,5 +1,6 @@
 package com.baifendian.swordfish.execserver.engine.spark;
 
+import com.baifendian.swordfish.common.config.BaseConfig;
 import com.baifendian.swordfish.common.job.struct.node.common.UdfsInfo;
 import com.baifendian.swordfish.common.job.struct.resource.ResourceInfo;
 import com.baifendian.swordfish.execserver.common.ResultCallback;
@@ -33,7 +34,7 @@ public class SparkSqlExec {
    * @param queryLimit 结果限制
    * @param remainTime 剩余运行时间, 暂没实现
    */
-  public boolean execute(String jobId, List<UdfsInfo> createFuncs, List<String> sqls, boolean isContinue,
+  public boolean execute(String jobId, int execId,List<UdfsInfo> createFuncs, List<String> sqls, boolean isContinue,
       ResultCallback resultCallback, Integer queryLimit, int remainTime) throws SQLException {
     // 没有剩余运行的时间
     if (remainTime <= 0) {
@@ -49,7 +50,7 @@ public class SparkSqlExec {
         udfInfo.setFunc(udf.getFunc());
         List<String> paths = new ArrayList<>();
         for (ResourceInfo resourceInfo: udf.getLibJars()){
-          paths.add(resourceInfo.getRes());
+          paths.add(BaseConfig.getJobHiveUdfJarPath(execId, resourceInfo.getRes()));
         }
         udfInfo.setLibJars(paths);
         rpcUdfList.add(udfInfo);

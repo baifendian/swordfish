@@ -143,7 +143,7 @@ public class AdHocSqlJob {
     switch (type) {
       case SPARK: {
         SparkSqlExec sparkSqlExec = new SparkSqlExec(logger);
-        return sparkSqlExec.execute(props.getJobId(), param.getUdfs(), execSqls, true, resultCallback, param.getLimit(), Constants.ADHOC_TIMEOUT)
+        return sparkSqlExec.execute(props.getJobId(), props.getExecId(), param.getUdfs(), execSqls, true, resultCallback, param.getLimit(), Constants.ADHOC_TIMEOUT)
             ? FlowStatus.SUCCESS : FlowStatus.FAILED;
       }
       case PHOENIX: {

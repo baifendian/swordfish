@@ -128,7 +128,7 @@ function file_replace()
 
 function process_check()
 {
-    sleep 3s
+    sleep 20s
 
     pid=`cat /tmp/*$1.pid`
     ps -fe|grep ${pid}|grep -v grep
