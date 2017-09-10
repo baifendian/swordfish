@@ -54,8 +54,7 @@ elif [ "$command" = "spark-sql-server" ]; then
    which spark-sql  || { echo "Command spark-sql is not found."; exit 1 }
    HIVE_JSON_LIB=`find / -name "hive-hcatalog-core.jar" ! -path "/tmp/*" 2>/dev/null|head -n 1`
    SPARK_LIBS=${HIVE_JSON_LIB},${SWORDFISH_LIB_PATH}/swordfish-spark-sql-server-*.jar,${SWORDFISH_LIB_PATH}/swordfish-rpc*.jar,/usr/hdp/2.6.1.0-129/hive2/lib/hive-hcatalog-core.jar
-   nohup spark-sql  --class com.baifendian.swordfish.server.sparksql.SparkThriftServer \
-    --master yarn-client --jars "${SPARK_LIBS}" > ${log} 2>&1 < /dev/null &
+   nohup spark-sql  --class com.baifendian.swordfish.server.sparksql.SparkThriftServer --master yarn-client --jars "${SPARK_LIBS}" > ${log} 2>&1 < /dev/null &
    echo $! > ${pid}
  fi
 else
