@@ -155,6 +155,13 @@ fi
 # start all service
 cd $SWORDFISH_HOME
 
+if [ "$m" = "all" ] || [ "$m" = "spark-sql-server" ]; then
+  sh bin/swordfish-daemon.sh stop spark-sql-server
+  sh bin/swordfish-daemon.sh start spark-sql-server
+
+  process_check spark-sql-server
+fi
+
 if [ "$m" = "all" ] || [ "$m" = "web-server" ]; then
   sh bin/swordfish-daemon.sh stop web-server
   sh bin/swordfish-daemon.sh start web-server
@@ -174,13 +181,6 @@ if [ "$m" = "all" ] || [ "$m" = "exec-server" ]; then
   sh bin/swordfish-daemon.sh start exec-server
 
   process_check exec-server
-fi
-
-if [ "$m" = "all" ] || [ "$m" = "spark-sql-server" ]; then
-  sh bin/swordfish-daemon.sh stop spark-sql-server
-  sh bin/swordfish-daemon.sh start spark-sql-server
-
-  process_check spark-sql-server
 fi
 
 # 查看进程是否存在
