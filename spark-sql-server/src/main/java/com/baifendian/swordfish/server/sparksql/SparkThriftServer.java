@@ -5,6 +5,7 @@ import com.baifendian.swordfish.server.sparksql.service.SparkSqlServiceImpl;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
+import org.apache.log4j.PropertyConfigurator;
 import org.apache.thrift.protocol.TBinaryProtocol;
 import org.apache.thrift.protocol.TProtocolFactory;
 import org.apache.thrift.server.TServer;
@@ -77,8 +78,13 @@ public class SparkThriftServer {
   public static void main(String[] args)
       throws UnknownHostException, TTransportException, InterruptedException {
     int port = 20017;
-    if (args.length == 1){
+    if (args.length >= 2){
       port = Integer.parseInt(args[0]);
+
+      PropertyConfigurator.configure(args[1]);
+
+      System.out.println("port:"+port);
+      System.out.println("Log conf:"+args[1]);
     }
     new SparkThriftServer(port);
 

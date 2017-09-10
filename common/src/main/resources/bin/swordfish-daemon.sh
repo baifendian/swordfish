@@ -56,7 +56,7 @@ elif [ "$command" = "spark-sql-server" ]; then
    HIVE_JSON_LIB=`find / -name "hive-hcatalog-core.jar" ! -path "/tmp/*" 2>/dev/null|head -n 1`
    SWF_RPC_LIB=`ls ${SWORDFISH_LIB_PATH}/swordfish-rpc*.jar|head -n 1`
    SPARK_LIBS=${HIVE_JSON_LIB},${SPARK_SERVER_LIB},${SWF_RPC_LIB}
-   execCmd=" --class com.baifendian.swordfish.server.sparksql.SparkThriftServer --master yarn-client --jars ${SPARK_LIBS} 20017"
+   execCmd=" --class com.baifendian.swordfish.server.sparksql.SparkThriftServer --master yarn-client --jars ${SPARK_LIBS} 20017 ${SWORDFISH_CONF_DIR}/spark-sql-log4j.properties"
    echo ${execCmd}
    nohup spark-sql ${execCmd} > ${log} 2>&1 < /dev/null &
    echo $! > ${pid}
