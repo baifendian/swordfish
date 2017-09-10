@@ -24,11 +24,6 @@ public class RunnerManager {
   private final ExecutorService sqlExecutorService;
   private Map<String, Map.Entry<SparkSqlExec, Future>> jobInfo = new ConcurrentHashMap<>();
 
-  /**
-   * 查询限制，默认为 1000
-   */
-  private static int defaultQueryLimit = 1000;
-
   public RunnerManager() {
     this.sqlExecutorService = Executors.newSingleThreadExecutor();
   }

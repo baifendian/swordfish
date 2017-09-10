@@ -1,6 +1,5 @@
 package com.baifendian.swordfish.server.sparksql.service;
 
-import com.baifendian.swordfish.rpc.AdhocResultInfo;
 import com.baifendian.swordfish.rpc.AdhocResultRet;
 import com.baifendian.swordfish.rpc.RetInfo;
 import com.baifendian.swordfish.rpc.SparkSqlService.Iface;
