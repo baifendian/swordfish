@@ -31,6 +31,13 @@
             <outputDirectory>.</outputDirectory>
         </fileSet>
         <fileSet>
+            <directory>spark-sql-server/target/swordfish-spark-sql-server-${project.version}</directory>
+            <includes>
+                <include>**/*.*</include>
+            </includes>
+            <outputDirectory>.</outputDirectory>
+        </fileSet>
+        <fileSet>
             <directory>sql</directory>
             <includes>
                 <include>**/*.*</include>

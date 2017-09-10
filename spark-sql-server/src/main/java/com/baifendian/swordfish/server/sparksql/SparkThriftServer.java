@@ -46,8 +46,8 @@ public class SparkThriftServer {
     }
   }
 
-  SparkThriftServer() throws TTransportException, UnknownHostException {
-    port = 20017;
+  SparkThriftServer(int port) throws TTransportException, UnknownHostException {
+    this.port = port;
     // executor 的地址, 端口信息
     host = InetAddress.getLocalHost().getHostAddress();
 
@@ -61,7 +61,7 @@ public class SparkThriftServer {
     logger.info("start thrift server on port:{}", port);
   }
 
-  public TServer getTThreadPoolServer(  ) throws TTransportException {
+  public TServer getTThreadPoolServer() throws TTransportException {
     TProtocolFactory protocolFactory = new TBinaryProtocol.Factory();
 
     TServerTransport serverTransport = new TServerSocket(new InetSocketAddress(host, port));
@@ -76,7 +76,11 @@ public class SparkThriftServer {
 
   public static void main(String[] args)
       throws UnknownHostException, TTransportException, InterruptedException {
-    new SparkThriftServer();
+    int port = 20017;
+    if (args.length == 1){
+      port = Integer.parseInt(args[0]);
+    }
+    new SparkThriftServer(port);
 
     while (true){
       Thread.sleep(10000);
