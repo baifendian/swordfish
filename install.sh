@@ -55,7 +55,7 @@ SWORDFISH_HOME=$CUR_DIR/..
 
 # 使用示例
 function usage() {
-    echo "Usage: $0 -r <true|false> [-m <all|web-server|master-server|exec-server>" 1>&2;
+    echo "Usage: $0 -r <true|false> [-m <all|web-server|master-server|exec-server|spark-sql-server>" 1>&2;
     exit 1;
 }
 
@@ -67,7 +67,7 @@ while getopts ":r:m:" o; do
             ;;
         m)
             m=${OPTARG}
-            [[ "$m" = "all" || "$m" = "web-server" || "$m" = "master-server" || "$m" = "exec-server" ]] || usage
+            [[ "$m" = "all" || "$m" = "web-server" || "$m" = "master-server" || "$m" = "exec-server" || "${m}" = "spark-sql-server" ]] || usage
             ;;
         *)
             usage
@@ -174,6 +174,13 @@ if [ "$m" = "all" ] || [ "$m" = "exec-server" ]; then
   sh bin/swordfish-daemon.sh start exec-server
 
   process_check exec-server
+fi
+
+if [ "$m" = "all" ] || [ "$m" = "spark-sql-server" ]; then
+  sh bin/swordfish-daemon.sh stop spark-sql-server
+  sh bin/swordfish-daemon.sh start spark-sql-server
+
+  process_check spark-sql-server
 fi
 
 # 查看进程是否存在

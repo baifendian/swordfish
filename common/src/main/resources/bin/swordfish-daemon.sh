@@ -26,6 +26,7 @@ export SWORDFISH_PID_DIR=/tmp/
 export SWORDFISH_LOG_DIR=$SWORDFISH_HOME/logs
 export SWORDFISH_CONF_DIR=$SWORDFISH_HOME/conf
 export SWORDFISH_LIB_JARS=$SWORDFISH_HOME/lib/*
+SWORDFISH_LIB_PATH=$SWORDFISH_HOME/lib/
 
 export SWORDFISH_OPTS="-server -Xmx4g -Xms4g -Xss256k -XX:+DisableExplicitGC -XX:+UseConcMarkSweepGC -XX:+CMSParallelRemarkEnabled -XX:LargePageSizeInBytes=128m -XX:+UseFastAccessorMethods -XX:+UseCMSInitiatingOccupancyOnly -XX:CMSInitiatingOccupancyFraction=70"
 export STOP_TIMEOUT=5
@@ -48,6 +49,15 @@ elif [ "$command" = "master-server" ]; then
 elif [ "$command" = "exec-server" ]; then
   LOG_FILE="-Dlogback.configurationFile=conf/execserver_logback.xml"
   CLASS=com.baifendian.swordfish.execserver.ExecThriftServer
+elif [ "$command" = "spark-sql-server" ]; then
+ if [ "$startStop" = "start" ]; then
+   which spark-sql  || { echo "Command spark-sql is not found."; exit 1 }
+   HIVE_JSON_LIB=`find / -name "hive-hcatalog-core.jar" ! -path "/tmp/*" 2>/dev/null|head -n 1`
+   SPARK_LIBS=${HIVE_JSON_LIB},${SWORDFISH_LIB_PATH}/swordfish-spark-sql-server-*.jar,${SWORDFISH_LIB_PATH}/swordfish-rpc*.jar,/usr/hdp/2.6.1.0-129/hive2/lib/hive-hcatalog-core.jar
+   nohup spark-sql  --class com.baifendian.swordfish.server.sparksql.SparkThriftServer \
+    --master yarn-client --jars "${SPARK_LIBS}" > ${log} 2>&1 < /dev/null &
+   echo $! > ${pid}
+ fi
 else
   echo "Error: No command named \`$command' was found."
   exit 1

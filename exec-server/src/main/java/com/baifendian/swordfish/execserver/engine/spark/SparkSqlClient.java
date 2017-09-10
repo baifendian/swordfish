@@ -6,7 +6,8 @@ import com.baifendian.swordfish.execserver.common.ResultCallback;
 import com.baifendian.swordfish.rpc.AdhocResultInfo;
 import com.baifendian.swordfish.rpc.AdhocResultRet;
 import com.baifendian.swordfish.rpc.RetInfo;
-import com.baifendian.swordfish.rpc.SparkSqlService.Client;
+import com.baifendian.swordfish.rpc.SparkSqlService;
+import com.baifendian.swordfish.rpc.SparkSqlService.Iface;
 import com.baifendian.swordfish.rpc.UdfInfo;
 import java.util.ArrayList;
 import java.util.Date;
@@ -16,12 +17,8 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 import org.apache.thrift.TException;
-import org.apache.thrift.protocol.TBinaryProtocol;
-import org.apache.thrift.protocol.TProtocol;
-import org.apache.thrift.transport.TSocket;
-import org.apache.thrift.transport.TTransport;
-import org.apache.thrift.transport.TTransportException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,9 +26,9 @@ public class SparkSqlClient {
 
   private static Logger LOGGER = LoggerFactory.getLogger(SparkSqlClient.class.getName());
 
-  private BlockingQueue<Client> clientQueue;
+  private BlockingQueue<SparkSqlService.Iface> clientQueue;
 
-  private Map<String, Client> jobInfo = new ConcurrentHashMap<>();
+  private Map<String, SparkSqlService.Iface> jobInfo = new ConcurrentHashMap<>();
 
   static public void init(String hosts, int port) {
     instance = new SparkSqlClient(hosts, port);
@@ -48,51 +45,26 @@ public class SparkSqlClient {
     clientQueue = new ArrayBlockingQueue<>(hostArray.length);
 
     for (String host : hostArray) {
-      TTransport tTransport = new TSocket(host, port, 4000 * 1000);
-
-      try {
-        TProtocol protocol = new TBinaryProtocol(tTransport);
-
-        Client client = new Client(protocol);
-        tTransport.open();
-        clientQueue.offer(client);
-      } catch (TTransportException e) {
-        LOGGER.error("Connection server exception", e);
-      }
+      clientQueue.add(new SparkSqlClientDecorator(host, port));
     }
   }
 
-  public boolean execute(String jobId, List<UdfInfo> udfs, List<String> sql, int remainTime,
+  public boolean execEtl(String jobId, List<UdfInfo> udfs, List<String> sql, int remainTime,
       Logger logger) {
-    Client client;
-    try {
-      client = clientQueue.poll(remainTime, TimeUnit.SECONDS);
-    } catch (InterruptedException e) {
-      logger.info("queue interrupted", e);
-      return false;
-    }
 
-    if (client == null) {
-      logger.info("job time out");
-      return false;
-    }
-
-    RetInfo retInfo;
-    try {
-      jobInfo.put(jobId, client);
-      retInfo = client.execEtl(jobId, udfs, sql, remainTime);
-    } catch (TException e) {
-      logger.info("TException", e);
-      return false;
-    }
-
-    jobInfo.remove(jobId);
-
-    return retInfo.getStatus() == 0;
+    return execute(jobId, remainTime, logger,
+        (client) -> {
+          logger.info("Begin run sql");
+          try {
+            return client.execEtl(jobId, udfs, sql, remainTime).getStatus() == 0;
+          } catch (TException e) {
+            throw new RuntimeException(e);
+          }
+        });
   }
 
-  private Client getClient(int remainTime, Logger logger){
-    Client client;
+  private SparkSqlService.Iface getClient(int remainTime, Logger logger) {
+    SparkSqlService.Iface client;
     try {
       client = clientQueue.poll(remainTime, TimeUnit.SECONDS);
     } catch (InterruptedException e) {
@@ -105,28 +77,17 @@ public class SparkSqlClient {
 
   boolean executeAdhoc(String jobId, List<UdfInfo> udfs, List<String> sql,
       ResultCallback resultCallback, int queryLimit, int remainTime, Logger logger) {
-    logger.info("Begin run sql");
-    Client client = getClient(remainTime, logger);
-
-    if (client == null) {
-      logger.info("job time out");
-      return false;
-    }
-
-    boolean ret = false;
-    try {
-      ret = exec(client, jobId, udfs, sql, resultCallback, queryLimit, remainTime, logger);
-    }catch (Throwable e){
-      logger.error("Spark sql exec error.", e);
-    }
-
-    clientQueue.add(client);
-
-    return ret;
+    return execute(jobId, remainTime, logger,
+        (client) -> {
+          logger.info("Begin run sql");
+          return execAdhocSql(client, jobId, udfs, sql, resultCallback, queryLimit, remainTime,
+              logger);
+        });
   }
 
-  private boolean exec(Client client, String jobId, List<UdfInfo> udfs, List<String> sql,
-      ResultCallback resultCallback, int queryLimit, int remainTime, Logger logger){
+  private boolean execAdhocSql(SparkSqlService.Iface client, String jobId, List<UdfInfo> udfs,
+      List<String> sql,
+      ResultCallback resultCallback, int queryLimit, int remainTime, Logger logger) {
     Date startTime = new Date();
     RetInfo retInfo;
     try {
@@ -153,7 +114,7 @@ public class SparkSqlClient {
 
           continue;
         }
-      } catch (TException e) {
+      } catch (Throwable e) {
         logger.info("TException", e);
         execResult.setStatus(FlowStatus.FAILED);
         resultCallback.handleResult(execResult, startTime, new Date());
@@ -172,8 +133,9 @@ public class SparkSqlClient {
   }
 
   public boolean cancel(String jobId, Logger logger) {
-    Client client = jobInfo.get(jobId);
+    SparkSqlService.Iface client = jobInfo.get(jobId);
     if (client == null) {
+      logger.info("Job:{} is end.", jobId);
       return false;
     }
 
@@ -185,6 +147,27 @@ public class SparkSqlClient {
     }
 
     return true;
+  }
+
+  private boolean execute(String jobId, int remainTime, Logger logger,
+      Function<Iface, Boolean> function) {
+    SparkSqlService.Iface client = getClient(remainTime, logger);
+    if (client == null) {
+      return false;
+    }
+
+    jobInfo.put(jobId, client);
+
+    try {
+      return function.apply(client);
+    } catch (Throwable e) {
+      logger.info("Sql exec error.", e);
+    } finally {
+      clientQueue.add(client);
+      jobInfo.remove(jobId);
+    }
+
+    return false;
   }
 
   public static void main(String[] args) throws InterruptedException {

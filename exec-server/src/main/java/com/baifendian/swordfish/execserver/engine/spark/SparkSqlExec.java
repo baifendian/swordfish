@@ -7,7 +7,6 @@ import com.baifendian.swordfish.rpc.UdfInfo;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Consumer;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 
@@ -57,7 +56,7 @@ public class SparkSqlExec {
       }
     }
     if (resultCallback == null) {
-      SparkSqlClient.getInstance().execute(jobId, rpcUdfList, sqls, remainTime, logger);
+      SparkSqlClient.getInstance().execEtl(jobId, rpcUdfList, sqls, remainTime, logger);
     }else {
       SparkSqlClient.getInstance()
           .executeAdhoc(jobId, rpcUdfList, sqls, resultCallback, queryLimit, remainTime, logger);
