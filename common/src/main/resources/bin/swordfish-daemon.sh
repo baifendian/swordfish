@@ -52,8 +52,10 @@ elif [ "$command" = "exec-server" ]; then
 elif [ "$command" = "spark-sql-server" ]; then
  if [ "$startStop" = "start" ]; then
    which spark-sql  || { echo "Command spark-sql is not found."; exit 1; }
+   SPARK_SERVER_LIB=`ls ${SWORDFISH_LIB_PATH}/swordfish-spark-sql-server-*.jar|head -n 1`
    HIVE_JSON_LIB=`find / -name "hive-hcatalog-core.jar" ! -path "/tmp/*" 2>/dev/null|head -n 1`
-   SPARK_LIBS=${HIVE_JSON_LIB},${SWORDFISH_LIB_PATH}/swordfish-spark-sql-server-*.jar,${SWORDFISH_LIB_PATH}/swordfish-rpc*.jar,/usr/hdp/2.6.1.0-129/hive2/lib/hive-hcatalog-core.jar
+   SWF_RPC_LIB=`ls ${SWORDFISH_LIB_PATH}/swordfish-rpc*.jar|head -n 1`
+   SPARK_LIBS=${HIVE_JSON_LIB},${SWORDFISH_LIB_PATH}/${SPARK_SERVER_LIB},${SWORDFISH_LIB_PATH}/${SWF_RPC_LIB}
    execCmd=" --class com.baifendian.swordfish.server.sparksql.SparkThriftServer --master yarn-client --jars ${SPARK_LIBS}"
    echo ${execCmd}
    nohup spark-sql ${execCmd} > ${log} 2>&1 < /dev/null &

@@ -31,6 +31,8 @@ public class SparkSqlExec implements Runnable {
    */
   private boolean isStop = false;
 
+  private boolean adHocEnd = false;
+
   AdhocResultData adhocResultData = null;
 
   public SparkSqlExec(String jobId, List<String> createFuncs, List<String> sqls, Integer queryLimit,
@@ -56,6 +58,13 @@ public class SparkSqlExec implements Runnable {
       adhocResultData.cancel();
     }
     return true;
+  }
+
+  boolean isAdHoc(){
+    return adhocResultData != null;
+  }
+  boolean isAdHocEnd(){
+    return adHocEnd;
   }
 
   private boolean execute(HiveContext sparkSession) {
@@ -159,6 +168,8 @@ public class SparkSqlExec implements Runnable {
     if (adhocResultData == null){
       throw new RuntimeException("Job is not adhoc result");
     }
+
+    adHocEnd = index == (sqls.size() - 1);
 
     return adhocResultData.getAdHocResult(index);
   }

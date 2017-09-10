@@ -21,7 +21,14 @@ public class SparkSqlServiceImpl implements Iface {
     logger.info("begin ");
     RetInfo retInfo = new RetInfo();
     long endTime = System.currentTimeMillis() + remainTime * 1000L;
-    runnerManager.executeEtlSql(jobId, udfs, sql, endTime);
+    try {
+      runnerManager.executeEtlSql(jobId, udfs, sql, endTime);
+    } catch (Throwable e) {
+      logger.error("exec error.", e);
+      retInfo.setStatus(1);
+      retInfo.setMsg(e.getMessage());
+      return retInfo;
+    }
     retInfo.setStatus(0);
     return retInfo;
   }
@@ -31,7 +38,14 @@ public class SparkSqlServiceImpl implements Iface {
       int remainTime) throws TException {
     RetInfo retInfo = new RetInfo();
     long endTime = System.currentTimeMillis() + remainTime * 1000L;
-    runnerManager.executeAdhocSql(jobId, udfs, sql, endTime, queryLimit);
+    try {
+      runnerManager.executeAdhocSql(jobId, udfs, sql, endTime, queryLimit);
+    } catch (Throwable e) {
+      logger.error("exec error.", e);
+      retInfo.setStatus(1);
+      retInfo.setMsg(e.getMessage());
+      return retInfo;
+    }
     retInfo.setStatus(0);
     return retInfo;
   }
