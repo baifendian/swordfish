@@ -50,8 +50,9 @@ public class RunnerManager {
     for (UdfInfo udfInfo : udfs) {
       for (String path : udfInfo.getLibJars()) {
         long curTime = System.currentTimeMillis();
+        String jarLocalFile = tmpPath + jobId + "/" + curTime;
         String hadoopStr = MessageFormat
-            .format(HADOOP_GET_FORMAT, path, tmpPath + jobId + "/" + curTime);
+            .format(HADOOP_GET_FORMAT, path, jarLocalFile);
         logger.info("hadoop string:{}", hadoopStr);
         try {
           runtime.exec(hadoopStr);
@@ -59,6 +60,8 @@ public class RunnerManager {
           logger.info("Exec script error. cmd:{}", hadoopStr);
           throw new RuntimeException(e);
         }
+
+        result.add("add jar "+jarLocalFile);
       }
       String funcStr = MessageFormat
           .format(CREATE_FUNCTION_FORMAT, udfInfo.getFunc(), udfInfo.getClassName());
