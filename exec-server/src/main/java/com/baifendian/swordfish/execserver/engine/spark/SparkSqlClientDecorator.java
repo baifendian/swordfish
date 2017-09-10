@@ -97,5 +97,5 @@ public class SparkSqlClientDecorator implements SparkSqlService.Iface{
   /**
    * 超时时间, 客户端连接到 master 的超时时间
    */
-  private static final int CONNECTION_TIMEOUT = 4000;
+  private static final int CONNECTION_TIMEOUT = 1000*60*60*10;
 }
