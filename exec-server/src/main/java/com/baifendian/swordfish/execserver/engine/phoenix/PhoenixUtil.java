@@ -64,7 +64,7 @@ public class PhoenixUtil {
   public static Connection getPhoenixConnection() {
     try {
       return DriverManager
-          .getConnection(ThinClientUtil.getConnectionUrl( phoenixHost, port), phoenixPro);
+          .getConnection(ThinClientUtil.getConnectionUrl( phoenixHost, port), "u_bloxy", "");
     } catch (RuntimeException e) {
       if (e.getCause().getClass().getName().equals("java.net.ConnectException")) {
         throw new RuntimeException("Failed to connect phoenix");

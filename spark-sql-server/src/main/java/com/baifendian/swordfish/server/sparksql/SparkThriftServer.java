@@ -5,6 +5,8 @@ import com.baifendian.swordfish.server.sparksql.service.SparkSqlServiceImpl;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
+import org.apache.log4j.BasicConfigurator;
+import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import org.apache.thrift.protocol.TBinaryProtocol;
 import org.apache.thrift.protocol.TProtocolFactory;
@@ -14,12 +16,9 @@ import org.apache.thrift.transport.TServerSocket;
 import org.apache.thrift.transport.TServerTransport;
 import org.apache.thrift.transport.TTransportException;
 import org.apache.thrift.transport.TTransportFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class SparkThriftServer {
-
-  private static Logger logger = LoggerFactory.getLogger(SparkThriftServer.class);
+  private Logger logger = Logger.getLogger(SparkThriftServer.class);
 
   private TServer server;
 
@@ -59,7 +58,8 @@ public class SparkThriftServer {
     serverThread.setDaemon(true);
     serverThread.start();
 
-    logger.info("start thrift server on port:{}", port);
+
+    logger.info("start thrift server on port:"+port);
   }
 
   public TServer getTThreadPoolServer() throws TTransportException {
@@ -78,14 +78,15 @@ public class SparkThriftServer {
   public static void main(String[] args)
       throws UnknownHostException, TTransportException, InterruptedException {
     int port = 20017;
-    if (args.length >= 2){
-      port = Integer.parseInt(args[0]);
-
-      PropertyConfigurator.configure(args[1]);
-
-      System.out.println("port:"+port);
-      System.out.println("Log conf:"+args[1]);
-    }
+//    if (args.length >= 2){
+//      port = Integer.parseInt(args[0]);
+//
+//      BasicConfigurator.configure();
+//      PropertyConfigurator.configure(args[1]);
+//
+//      System.out.println("port:"+port);
+//      System.out.println("Log conf:"+args[1]);
+//    }
     new SparkThriftServer(port);
 
     while (true){

@@ -74,7 +74,6 @@ public class SqlUtil {
           List<String> values = new ArrayList<>();
           for (int i = 1; i <= count; ++i) {
             values.add(res.getString(i));
-            System.out.println(res.getString(i));
           }
 
           datas.add(values);
@@ -89,7 +88,6 @@ public class SqlUtil {
 
         List<String> values = new ArrayList<>();
         values.add(buffer.toString().trim());
-        System.out.println(buffer.toString());
 
         datas.add(values);
       }
