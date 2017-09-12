@@ -31,6 +31,7 @@
         <spark.version>2.1.0</spark.version>
         <es.version>5.2.2</es.version>
         <phoenix.version>4.8.0-HBase-1.1</phoenix.version>
+        <jackson.version>2.8.6</jackson.version>
     </properties>
 
     <modules>
@@ -63,6 +64,17 @@
                 <groupId>org.apache.phoenix</groupId>
                 <artifactId>phoenix-queryserver-client</artifactId>
                 <version>${phoenix.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-databind</artifactId>
+                <version>${jackson.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-annotations</artifactId>
+                <version>${jackson.version}</version>
             </dependency>
 
             <dependency>
@@ -114,16 +126,6 @@
                 <groupId>commons-httpclient</groupId>
                 <artifactId>commons-httpclient</artifactId>
                 <version>3.1</version>
-            </dependency>
-            <dependency>
-                <groupId>com.fasterxml.jackson.core</groupId>
-                <artifactId>jackson-databind</artifactId>
-                <version>2.8.5</version>
-            </dependency>
-            <dependency>
-                <groupId>com.fasterxml.jackson.core</groupId>
-                <artifactId>jackson-annotations</artifactId>
-                <version>2.8.5</version>
             </dependency>
 
             <dependency>
