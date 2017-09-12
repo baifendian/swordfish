@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -38,7 +39,7 @@ public class FunctionUtil {
 
   private static final String CREATE_FUNCTION_FORMAT = "create temporary function {0} as ''{1}''";
   private static final String CREATE_PHOENIX_FUNCTION_FORMAT =
-      "create temporary function {0} ({1}) RETURNS ({2}) as '{3}' USING JAR 'hdfs://{4}'";
+      "create temporary function {0} ({1}) RETURNS ({2}) as ''{3}'' USING JAR ''hdfs://{4}''";
   private static Joiner joiner = Joiner.on(",");
 
   /**
@@ -202,5 +203,23 @@ public class FunctionUtil {
                 udfsInfo.getReturnType(), udfsInfo.getClassName(), hdfsFile));
       }
     }
+  }
+
+  public static void main(String[] args) {
+    List<String> sqls = new ArrayList<>();
+    List<UdfsInfo> udfsInfos = new ArrayList<>();
+    UdfsInfo udfsInfo = new UdfsInfo();
+    udfsInfo.setFunc("func");
+    udfsInfo.setClassName("test");
+    udfsInfo.setReturnType("string");
+    udfsInfo.setArgTypes(Arrays.asList("string"));
+    ResourceInfo resourceInfo = new ResourceInfo();
+    resourceInfo.setRes("test.jar");
+    udfsInfo.setLibJars(Arrays.asList(resourceInfo));
+    udfsInfos.add(udfsInfo);
+
+    String hdfsPath = "/test/";
+
+    addPhoenixTempFuncSql(sqls, udfsInfos, hdfsPath);
   }
 }
