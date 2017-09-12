@@ -39,7 +39,7 @@ public class FunctionUtil {
 
   private static final String CREATE_FUNCTION_FORMAT = "create temporary function {0} as ''{1}''";
   private static final String CREATE_PHOENIX_FUNCTION_FORMAT =
-      "create temporary function {0} ({1}) RETURNS ({2}) as ''{3}'' USING JAR ''hdfs://{4}''";
+      "create temporary function {0} ({1}) RETURNS {2} as ''{3}'' USING JAR ''hdfs://{4}''";
   private static Joiner joiner = Joiner.on(",");
 
   /**
