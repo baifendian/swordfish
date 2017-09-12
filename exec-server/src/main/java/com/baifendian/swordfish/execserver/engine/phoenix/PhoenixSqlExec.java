@@ -66,62 +66,64 @@ public class PhoenixSqlExec {
     // 查询结果限制
     queryLimit = (queryLimit != null) ? queryLimit : defaultQueryLimit;
 
-    try(Connection con = PhoenixUtil.getPhoenixConnection()) {
+    try(Connection con = PhoenixUtil.getPhoenixConnection(userName, remainTime)) {
       if (con == null) {
         logger.error("Failed to get phoenix connect");
         return false;
       }
 
-      Statement sta = con.createStatement();
+      try(Statement sta = con.createStatement()) {
 
-      if (CollectionUtils.isNotEmpty(createFuncs)) {
-        try {
-          for (String sql : createFuncs) {
-            logger.info("Phoenix create function sql: {}", sql);
-            sta.execute(sql);
-          }
-        } catch (SQLException e) {
-          logger.error("Phoenix execute query exception", e);
+        if (CollectionUtils.isNotEmpty(createFuncs)) {
+          try {
+            for (String sql : createFuncs) {
+              logger.info("Phoenix create function sql: {}", sql);
+              sta.execute(sql);
+            }
+          } catch (SQLException e) {
+            logger.error("Phoenix execute query exception", e);
 
-          // 这里就失败了, 会记录下错误记录, 然后返回
-          SqlUtil.handlerResults(0, sqls, FlowStatus.FAILED, resultCallback);
+            // 这里就失败了, 会记录下错误记录, 然后返回
+            SqlUtil.handlerResults(0, sqls, FlowStatus.FAILED, resultCallback);
 
-          return false;
-        }
-      }
-
-      // 日志线程
-      // 执行 sql 语句
-      for (int index = 0; index < sqls.size(); ++index) {
-        String sql = sqls.get(index);
-        Date startTime = new Date();
-
-        logger.info("Phoenix execute sql: {}", sql);
-        ExecResult execResult = new ExecResult();
-        execResult.setIndex(index);
-        execResult.setStm(sql);
-        try {
-          SqlUtil.execSql(sql, sta, queryLimit, execResult);
-          // 执行结果回调处理
-          if (resultCallback != null) {
-            Date endTime = new Date();
-            resultCallback.handleResult(execResult, startTime, endTime);
-          }
-        } catch (SQLException e) {
-          // 语义异常
-          logger.error("Phoenix execute query exception", e);
-          if (isContinue) {
-            SqlUtil.handlerResult(index, sql, FlowStatus.FAILED, resultCallback);
-          } else {
-            SqlUtil.handlerResults(index, sqls, FlowStatus.FAILED, resultCallback);
             return false;
           }
         }
+
+        // 日志线程
+        // 执行 sql 语句
+        for (int index = 0; index < sqls.size(); ++index) {
+          String sql = sqls.get(index);
+          Date startTime = new Date();
+
+          logger.info("Phoenix execute sql: {}", sql);
+          ExecResult execResult = new ExecResult();
+          execResult.setIndex(index);
+          execResult.setStm(sql);
+          try {
+            SqlUtil.execSql(sql, sta, queryLimit, execResult);
+            con.commit();
+            // 执行结果回调处理
+            if (resultCallback != null) {
+              Date endTime = new Date();
+              resultCallback.handleResult(execResult, startTime, endTime);
+            }
+          } catch (SQLException e) {
+            // 语义异常
+            logger.error("Phoenix execute query exception", e);
+            if (isContinue) {
+              SqlUtil.handlerResult(index, sql, FlowStatus.FAILED, resultCallback);
+            } else {
+              SqlUtil.handlerResults(index, sqls, FlowStatus.FAILED, resultCallback);
+              return false;
+            }
+          }
+        }
       }
+
+      con.commit();
     }
 
     return true;
   }
-
-
 }

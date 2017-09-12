@@ -49,45 +49,46 @@ public class SqlUtil {
     // 只对 query 和 show 语句显示结果
     if (HiveUtil.isTokQuery(sql) || HiveUtil.isLikeShowStm(sql)) {
       statement.setMaxRows(queryLimit);
-      ResultSet res = statement.executeQuery(sql);
+      try(ResultSet res = statement.executeQuery(sql)) {
 
-      ResultSetMetaData resultSetMetaData = res.getMetaData();
-      int count = resultSetMetaData.getColumnCount();
+        ResultSetMetaData resultSetMetaData = res.getMetaData();
+        int count = resultSetMetaData.getColumnCount();
 
-      List<String> colums = new ArrayList<>();
-      for (int i = 1; i <= count; i++) {
-        colums.add(resultSetMetaData.getColumnLabel(i));
-      }
+        List<String> colums = new ArrayList<>();
+        for (int i = 1; i <= count; i++) {
+          colums.add(resultSetMetaData.getColumnLabel(i));
+        }
 
-      execResult.setTitles(colums);
+        execResult.setTitles(colums);
 
-      List<List<String>> datas = new ArrayList<>();
+        List<List<String>> datas = new ArrayList<>();
 
-      // 如果字段数大于 1, 或是 query 语句
-      if (count > 1 || HiveUtil.isTokQuery(sql)) {
-        while (res.next()) {
-          List<String> values = new ArrayList<>();
-          for (int i = 1; i <= count; ++i) {
-            values.add(res.getString(i));
+        // 如果字段数大于 1, 或是 query 语句
+        if (count > 1 || HiveUtil.isTokQuery(sql)) {
+          while (res.next()) {
+            List<String> values = new ArrayList<>();
+            for (int i = 1; i <= count; ++i) {
+              values.add(res.getString(i));
+            }
+
+            datas.add(values);
           }
+        } else {
+          StringBuffer buffer = new StringBuffer();
+
+          while (res.next()) {
+            buffer.append(res.getString(1));
+            buffer.append("\n");
+          }
+
+          List<String> values = new ArrayList<>();
+          values.add(buffer.toString().trim());
 
           datas.add(values);
         }
-      } else {
-        StringBuffer buffer = new StringBuffer();
 
-        while (res.next()) {
-          buffer.append(res.getString(1));
-          buffer.append("\n");
-        }
-
-        List<String> values = new ArrayList<>();
-        values.add(buffer.toString().trim());
-
-        datas.add(values);
+        execResult.setValues(datas);
       }
-
-      execResult.setValues(datas);
     } else {
       statement.execute(sql);
     }

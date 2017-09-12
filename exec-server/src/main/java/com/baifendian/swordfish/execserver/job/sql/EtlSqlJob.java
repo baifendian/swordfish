@@ -21,6 +21,7 @@ import com.baifendian.swordfish.common.utils.CommonUtil;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
 import com.baifendian.swordfish.execserver.common.FunctionUtil;
 import com.baifendian.swordfish.execserver.engine.hive.HiveSqlExec;
+import com.baifendian.swordfish.execserver.engine.phoenix.PhoenixSqlExec;
 import com.baifendian.swordfish.execserver.job.AbstractYarnJob;
 import com.baifendian.swordfish.execserver.job.JobProps;
 import com.baifendian.swordfish.execserver.parameter.ParamHelper;
@@ -49,22 +50,21 @@ public class EtlSqlJob extends AbstractYarnJob {
       sqls = ParamHelper.resolvePlaceholders(sqls, props.getDefinedParams());
       List<String> funcs = FunctionUtil
           .createFuncs(param.getUdfs(), props.getExecId(), props.getNodeName(), logger,
-              props.getWorkDir(), false);
+              props.getWorkDir(), false, param.getType());
 
       logger.info("\nhql:\n{}\nfuncs:\n{}", sqls, funcs);
 
       List<String> execSqls = CommonUtil.sqlSplit(sqls);
 
       switch (param.getType()) {
-        case SPARK: {
-          // TODO:: Support Spark SQL Engine
-
-        }
         case PHOENIX: {
-          // TODO:: Support Spark SQL Engine
-
+          PhoenixSqlExec phoenixSqlExec = new PhoenixSqlExec(this::logProcess, props.getProxyUser(),
+              logger);
+          exitCode = (phoenixSqlExec.execute(funcs, execSqls, false, null, null, getRemainTime())) ? 0 : -1;
         }
+
         case HIVE:
+        case SPARK:
         default: {
           HiveSqlExec hiveSqlExec = new HiveSqlExec(this::logProcess, props.getProxyUser(), logger);
 

@@ -45,7 +45,9 @@ public class PhoenixUtil {
     phoenixPro.put("phoenix.trace.frequency", "always");
     phoenixPro.put("phoenix.functions.allowUserDefinedFunctions", "true");
     phoenixPro.put("phoenix.annotation.myannotation", "abc");
-    phoenixPro.put("user", "shuanghu");
+    phoenixPro.put("user", "udp");
+    phoenixPro.put("phoenix.query.timeoutMs", "100000");
+
 
     try {
       Properties properties = new Properties();
@@ -61,10 +63,18 @@ public class PhoenixUtil {
     }
   }
 
-  public static Connection getPhoenixConnection(String userName) {
+  public static Connection getPhoenixConnection(String userName, long timeout) {
+    Properties phoenixConfPro = new Properties();
+    phoenixConfPro.put("phoenix.functions.allowUserDefinedFunctions", "true");
+    phoenixConfPro.put("phoenix.query.timeoutMs", timeout*1000L);
+    phoenixConfPro.put("user", userName);
+
     try {
-      return DriverManager
-          .getConnection(ThinClientUtil.getConnectionUrl( phoenixHost, port), userName, "");
+      Connection connection = DriverManager
+          .getConnection(ThinClientUtil.getConnectionUrl( phoenixHost, port), phoenixConfPro);
+
+      //connection.setAutoCommit(true);
+      return connection;
     } catch (RuntimeException e) {
       if (e.getCause().getClass().getName().equals("java.net.ConnectException")) {
         throw new RuntimeException("Failed to connect phoenix");

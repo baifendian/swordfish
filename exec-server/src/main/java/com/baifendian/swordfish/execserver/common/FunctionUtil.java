@@ -19,7 +19,9 @@ import com.baifendian.swordfish.common.config.BaseConfig;
 import com.baifendian.swordfish.common.hadoop.HdfsClient;
 import com.baifendian.swordfish.common.job.struct.node.common.UdfsInfo;
 import com.baifendian.swordfish.common.job.struct.resource.ResourceInfo;
+import com.baifendian.swordfish.dao.enums.SqlEngineType;
 import com.baifendian.swordfish.execserver.exception.ExecException;
+import com.google.common.base.Joiner;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.text.MessageFormat;
@@ -35,6 +37,9 @@ import org.slf4j.Logger;
 public class FunctionUtil {
 
   private static final String CREATE_FUNCTION_FORMAT = "create temporary function {0} as ''{1}''";
+  private static final String CREATE_PHOENIX_FUNCTION_FORMAT =
+      "create temporary function {0} ({1}) RETURNS ({2}) as '{3}' USING JAR 'hdfs://{4}'";
+  private static Joiner joiner = Joiner.on(",");
 
   /**
    * 创建自定义函数, 即 udf
@@ -43,7 +48,7 @@ public class FunctionUtil {
    * @param isHdfsFile 源是否是 hdfs 文件系统
    */
   public static List<String> createFuncs(List<UdfsInfo> udfsInfos, int execId, String nodeName, Logger logger,
-      String srcDir, boolean isHdfsFile) throws IOException, InterruptedException {
+      String srcDir, boolean isHdfsFile, SqlEngineType type) throws IOException, InterruptedException {
     // 得到 hive udf jar 包路径
     String hiveUdfJarPath = BaseConfig.getJobHiveUdfJarPath(execId, nodeName);
 
@@ -66,11 +71,19 @@ public class FunctionUtil {
           uploadUdfJars(resources, hiveUdfJarPath, srcDir, logger);
         }
 
-        addJarSql(funcList, resources, hiveUdfJarPath);
+        if (!SqlEngineType.PHOENIX.equals(type)) {
+          // Phoenix sql can not add jar
+          addJarSql(funcList, resources, hiveUdfJarPath);
+        }
       }
     }
 
-    addTempFuncSql(funcList, udfsInfos);
+    if (SqlEngineType.PHOENIX.equals(type)) {
+      addPhoenixTempFuncSql(funcList, udfsInfos, hiveUdfJarPath);
+    } else {
+      addTempFuncSql(funcList, udfsInfos);
+    }
+
     return funcList;
   }
 
@@ -167,6 +180,26 @@ public class FunctionUtil {
       for (UdfsInfo udfsInfo : udfsInfos) {
         sqls.add(MessageFormat
                 .format(CREATE_FUNCTION_FORMAT, udfsInfo.getFunc(), udfsInfo.getClassName()));
+      }
+    }
+  }
+
+  /**
+   * PHOENIX临时函数
+   */
+  private static void addPhoenixTempFuncSql(List<String> sqls, List<UdfsInfo> udfsInfos,
+      String hdfsPath) {
+    if (CollectionUtils.isNotEmpty(udfsInfos)) {
+      for (UdfsInfo udfsInfo : udfsInfos) {
+        String argTypes = "";
+        if (CollectionUtils.isNotEmpty(udfsInfo.getArgTypes())) {
+          argTypes = joiner.join(udfsInfo.getArgTypes());
+        }
+        String hdfsFile = hdfsPath + "/"+udfsInfo.getLibJars().get(0).getRes();
+
+        sqls.add(MessageFormat
+            .format(CREATE_PHOENIX_FUNCTION_FORMAT, udfsInfo.getFunc(), argTypes,
+                udfsInfo.getReturnType(), udfsInfo.getClassName(), hdfsFile));
       }
     }
   }

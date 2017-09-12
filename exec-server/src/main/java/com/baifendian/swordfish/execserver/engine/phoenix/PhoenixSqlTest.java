@@ -17,12 +17,8 @@ public class PhoenixSqlTest {
   public static void main(String[] args) throws SQLException, ClassNotFoundException {
     Boolean.FALSE.toString();
     List<String> sqls = new ArrayList<>();
-    sqls.add("select count(1) from GLOBAL_LAND_TEMPERATURES_BY_CITY");
-    sqls.add("select * from (SELECT \"dt\",count(1) num FROM GLOBAL_LAND_TEMPERATURES_BY_CITY group by \"dt\") as t where num > 1");
-    //sqls.add("show tables;");
-    //sqls.add("upsert into test1 values (1,'Hello1')");
-    sqls.add("upsert into test values (2,'22222222222')");
-    sqls.add("select * from test");
+    sqls.add("upsert into MY_BLOXY.COUNT_RESULT(\"id\", \"num\") select 1,count(1) from MY_BLOXY.TEMP_TEST");
+    sqls.add("select * from MY_BLOXY.COUNT_RESULT");
 
     PhoenixSqlExec phoenixSqlExec = new PhoenixSqlExec(PhoenixSqlTest::logProcess, "", LOGGER);
     phoenixSqlExec.execute(null, sqls, true, (execResult, startTime, endTime) -> {
