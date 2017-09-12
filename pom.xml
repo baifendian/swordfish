@@ -64,6 +64,12 @@
                 <groupId>org.apache.phoenix</groupId>
                 <artifactId>phoenix-queryserver-client</artifactId>
                 <version>${phoenix.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>com.fasterxml.jackson.core</groupId>
+                        <artifactId>jackson-core</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
 
             <dependency>
