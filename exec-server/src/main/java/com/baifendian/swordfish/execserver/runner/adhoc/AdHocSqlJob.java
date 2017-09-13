@@ -16,6 +16,7 @@
 package com.baifendian.swordfish.execserver.runner.adhoc;
 
 import com.baifendian.swordfish.common.config.BaseConfig;
+import com.baifendian.swordfish.common.enums.ExternalJobType;
 import com.baifendian.swordfish.common.job.struct.node.adhoc.AdHocParam;
 import com.baifendian.swordfish.common.utils.CommonUtil;
 import com.baifendian.swordfish.dao.AdHocDao;
@@ -30,6 +31,7 @@ import com.baifendian.swordfish.execserver.common.FunctionUtil;
 import com.baifendian.swordfish.execserver.common.ResultCallback;
 import com.baifendian.swordfish.execserver.engine.hive.HiveSqlExec;
 import com.baifendian.swordfish.execserver.engine.hive.HiveUtil;
+import com.baifendian.swordfish.execserver.engine.phoenix.PhoenixSqlExec;
 import com.baifendian.swordfish.execserver.job.JobProps;
 import com.baifendian.swordfish.execserver.parameter.ParamHelper;
 import com.baifendian.swordfish.execserver.parameter.SystemParamManager;
@@ -96,15 +98,18 @@ public class AdHocSqlJob {
         SystemParamManager.buildSystemParam(ExecType.DIRECT, props.getCycTime()));
 
     // 创建自定义函数
-    List<String> funcs = FunctionUtil.createFuncs(param.getUdfs(), props.getExecId(), null, logger,
-        BaseConfig.getHdfsResourcesDir(props.getProjectId()), true);
+    List<String> funcs = FunctionUtil
+        .createFuncs(param.getUdfs(), props.getExecJobId(), null, logger,
+            BaseConfig.getHdfsResourcesDir(props.getProjectId()), true, type,
+            ExternalJobType.ADHOC);
 
     // 切分 sql
     List<String> execSqls = CommonUtil.sqlSplit(sqls);
 
     for (String sql : execSqls) {
       if (HiveUtil.isTokDDL(sql)) {
-        logger.error("exec sqls has ddl or invalid clause, can't execution, clause is: \"{}\"", sql);
+        logger
+            .error("exec sqls has ddl or invalid clause, can't execution, clause is: \"{}\"", sql);
         return FlowStatus.FAILED;
       }
     }
@@ -138,19 +143,21 @@ public class AdHocSqlJob {
     };
 
     switch (type) {
-      case SPARK: {
-        // TODO:: Support Spark SQL Engine
-
-      }
       case PHOENIX: {
-        // TODO:: Support Spark SQL Engine
+        PhoenixSqlExec phoenixSqlExec = new PhoenixSqlExec(this::logProcess, props.getProxyUser(),
+            logger);
 
+        return phoenixSqlExec.execute(funcs, execSqls, true, resultCallback, param.getLimit(),
+            Constants.ADHOC_TIMEOUT)
+            ? FlowStatus.SUCCESS : FlowStatus.FAILED;
       }
       case HIVE:
+      case SPARK:
       default: {
         HiveSqlExec hiveSqlExec = new HiveSqlExec(this::logProcess, props.getProxyUser(), logger);
 
-        return hiveSqlExec.execute(funcs, execSqls, true, resultCallback, param.getLimit(), Constants.ADHOC_TIMEOUT)
+        return hiveSqlExec.execute(funcs, execSqls, true, resultCallback, param.getLimit(),
+            Constants.ADHOC_TIMEOUT)
             ? FlowStatus.SUCCESS : FlowStatus.FAILED;
       }
     }
