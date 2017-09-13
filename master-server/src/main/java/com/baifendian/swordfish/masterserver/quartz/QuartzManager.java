@@ -96,9 +96,6 @@ public class QuartzManager {
 
   /**
    * 添加对象到上下文中（若已存在相同 key，则覆盖）
-   *
-   * @param key
-   * @param object
    */
   public static void putObjectToContext(String key, Object object) {
     if (scheduler == null) {
@@ -116,29 +113,29 @@ public class QuartzManager {
   /**
    * 添加一个任务和触发器（若已经存在，则直接返回任务，并更新任务的触发器） <p>
    *
-   * @param jobName        任务名
-   * @param jobGroupName   任务组名
-   * @param jobClass       任务类
-   * @param startDate      开始日期
-   * @param endDate        结束日期
+   * @param jobName 任务名
+   * @param jobGroupName 任务组名
+   * @param jobClass 任务类
+   * @param startDate 开始日期
+   * @param endDate 结束日期
    * @param cronExpression "cron 表达式"
-   * @param dataMap        传递的数据
-   * @return
+   * @param dataMap 传递的数据
    * @see JobDetail
    */
   public static JobDetail addJobAndTrigger(String jobName,
-                                           String jobGroupName,
-                                           Class<? extends Job> jobClass,
-                                           Date startDate, Date endDate,
-                                           String cronExpression,
-                                           Map<String, Object> dataMap) {
+      String jobGroupName,
+      Class<? extends Job> jobClass,
+      Date startDate, Date endDate,
+      String cronExpression,
+      Map<String, Object> dataMap) {
     checkStatus();
 
     try {
       JobDetail jobDetail = addJob(jobName, jobGroupName, jobClass, dataMap);
 
       // 这里触发器名和任务名一致，保证唯一性
-      addCronTrigger(jobDetail, DEFAULT_TRIGGER_GROUP_NAME, jobName, startDate, endDate, cronExpression, true);
+      addCronTrigger(jobDetail, DEFAULT_TRIGGER_GROUP_NAME, jobName, startDate, endDate,
+          cronExpression, true);
 
       return jobDetail;
     } catch (Exception e) {
@@ -150,14 +147,14 @@ public class QuartzManager {
   /**
    * 添加一个任务（若已经存在，则直接返回） <p>
    *
-   * @param jobName      任务名
+   * @param jobName 任务名
    * @param jobGroupName 任务组名
-   * @param jobClass     任务类
-   * @param dataMap      传递的数据
-   * @return
+   * @param jobClass 任务类
+   * @param dataMap 传递的数据
    * @see JobDetail
    */
-  private static JobDetail addJob(String jobName, String jobGroupName, Class<? extends Job> jobClass, Map<String, Object> dataMap) {
+  private static JobDetail addJob(String jobName, String jobGroupName,
+      Class<? extends Job> jobClass, Map<String, Object> dataMap) {
     checkStatus();
 
     try {
@@ -176,6 +173,8 @@ public class QuartzManager {
             jobDetail.getJobDataMap().putAll(dataMap);
           }
           scheduler.addJob(jobDetail, false, true);
+          logger.info("Add job, job name: {}, group name: {}",
+              jobName, jobGroupName);
         }
       }
 
@@ -189,42 +188,47 @@ public class QuartzManager {
   /**
    * 给指定 Job 添加一个 "cron 表达式" 的 触发器 <p>
    *
-   * @param jobDetail      {@link JobDetail}
-   * @param triggerName    触发器名
-   * @param startDate      开始日期
-   * @param endDate        结束日期
+   * @param jobDetail {@link JobDetail}
+   * @param triggerName 触发器名
+   * @param startDate 开始日期
+   * @param endDate 结束日期
    * @param cronExpression "cron 表达式"
-   * @param replace        如果已经存在，则是否替换
+   * @param replace 如果已经存在，则是否替换
    */
-  public static void addCronTrigger(JobDetail jobDetail, String triggerName, Date startDate, Date endDate, String cronExpression, boolean replace) {
+  public static void addCronTrigger(JobDetail jobDetail, String triggerName, Date startDate,
+      Date endDate, String cronExpression, boolean replace) {
     checkStatus();
 
-    addCronTrigger(jobDetail, DEFAULT_TRIGGER_GROUP_NAME, triggerName, startDate, endDate, cronExpression, replace);
+    addCronTrigger(jobDetail, DEFAULT_TRIGGER_GROUP_NAME, triggerName, startDate, endDate,
+        cronExpression, replace);
   }
 
   /**
    * 给指定 Job 添加一个 "cron 表达式" 的 触发器 <p>
    *
-   * @param jobDetail        {@link JobDetail}
-   * @param triggerName      触发器名
+   * @param jobDetail {@link JobDetail}
+   * @param triggerName 触发器名
    * @param triggerGroupName 触发器组名
-   * @param startDate        开始日期
-   * @param endDate          结束日期
-   * @param cronExpression   "cron 表达式"
-   * @param replace          如果已经存在，则是否替换
+   * @param startDate 开始日期
+   * @param endDate 结束日期
+   * @param cronExpression "cron 表达式"
+   * @param replace 如果已经存在，则是否替换
    */
   private static void addCronTrigger(JobDetail jobDetail,
-                                     String triggerName,
-                                     String triggerGroupName,
-                                     Date startDate,
-                                     Date endDate,
-                                     String cronExpression,
-                                     boolean replace) {
+      String triggerName,
+      String triggerGroupName,
+      Date startDate,
+      Date endDate,
+      String cronExpression,
+      boolean replace) {
     TriggerKey triggerKey = new TriggerKey(triggerName, triggerGroupName);
 
     try {
       synchronized (SYN_OBJ) {
-        CronTrigger trigger = newTrigger().withIdentity(triggerKey).startAt(startDate).endAt(endDate).withSchedule(cronSchedule(cronExpression).withMisfireHandlingInstructionDoNothing()).forJob(jobDetail).build();
+        CronTrigger trigger = newTrigger().withIdentity(triggerKey).startAt(startDate)
+            .endAt(endDate)
+            .withSchedule(cronSchedule(cronExpression).withMisfireHandlingInstructionDoNothing())
+            .forJob(jobDetail).build();
         if (scheduler.checkExists(triggerKey)) {
           if (replace) { // 允许替换的情况
             // 仅在调度周期发生改变时，才更新调度
@@ -234,10 +238,12 @@ public class QuartzManager {
             if (!oldCronExpression.equalsIgnoreCase(cronExpression)) {
               // 重启触发器
               scheduler.rescheduleJob(triggerKey, trigger);
-              logger.info("restart trigger");
+              logger.info("RescheduleJob trigger, trigger name: {}, group name: {}, crontab: {}",
+                  triggerName, triggerGroupName, cronExpression);
             }
           } else {
-            throw new QuartzException("Add schedule CronTrigger failed: exist the same CronTrigger");
+            throw new QuartzException(
+                "Add schedule CronTrigger failed: exist the same CronTrigger");
           }
         } else {
           // 触发器
@@ -252,8 +258,6 @@ public class QuartzManager {
 
   /**
    * 删除一个 Job(使用默认的任务组名)
-   *
-   * @param jobName
    */
   public static void deleteJob(String jobName) {
     try {
@@ -266,14 +270,11 @@ public class QuartzManager {
 
   /**
    * 删除一个 Job
-   *
-   * @param jobName
-   * @param jobGroupName
    */
   public static void deleteJob(String jobName, String jobGroupName) {
     try {
       scheduler.deleteJob(new JobKey(jobName, jobGroupName));// 删除任务
-      logger.info("delete trigger,job group: {}", jobGroupName);
+      logger.info("delete job, job group: {}, job name: {}", jobGroupName, jobName);
     } catch (SchedulerException e) {
       logger.error(e.getMessage(), e);
       throw new QuartzException("Delete Job failed", e);
@@ -282,14 +283,13 @@ public class QuartzManager {
 
   /**
    * 删除一个 Job Group 的所有任务
-   *
-   * @param jobGroupName
    */
   public static void deleteJobs(String jobGroupName) {
     try {
       List<JobKey> jobKeys = new ArrayList<>();
       jobKeys.addAll(scheduler.getJobKeys(GroupMatcher.groupEndsWith(jobGroupName)));
       scheduler.deleteJobs(jobKeys);
+      logger.info("delete group job, job group: {}", jobGroupName);
     } catch (SchedulerException e) {
       logger.error(e.getMessage(), e);
       throw new QuartzException("Delete Job failed", e);
@@ -298,8 +298,6 @@ public class QuartzManager {
 
   /**
    * 暂停一个 Trigger (使用默认的触发器组名) <p>
-   *
-   * @param triggerName
    */
   public static void pauseTrigger(String triggerName) {
     TriggerKey triggerKey = new TriggerKey(triggerName, DEFAULT_TRIGGER_GROUP_NAME);
@@ -315,8 +313,6 @@ public class QuartzManager {
 
   /**
    * 重置一个 Trigger (使用默认的触发器组名) <p>
-   *
-   * @param triggerName
    */
   public static void resumeTrigger(String triggerName) {
     TriggerKey triggerKey = new TriggerKey(triggerName, DEFAULT_TRIGGER_GROUP_NAME);
@@ -332,8 +328,6 @@ public class QuartzManager {
 
   /**
    * 删除一个 Trigger (使用默认的触发器组名) <p>
-   *
-   * @param triggerName
    */
   public static void deleteTrigger(String triggerName) {
     TriggerKey triggerKey = new TriggerKey(triggerName, DEFAULT_TRIGGER_GROUP_NAME);
