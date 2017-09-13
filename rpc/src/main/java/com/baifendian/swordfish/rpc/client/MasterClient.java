@@ -40,7 +40,7 @@ public class MasterClient {
   /**
    * 再次发送心跳间隔
    */
-  private static final int HEARTBEAT_INTERVAL = 2;
+  private static final long HEARTBEAT_INTERVAL = 2000;
 
   /**
    * 超时时间, 客户端连接到 master 的超时时间
