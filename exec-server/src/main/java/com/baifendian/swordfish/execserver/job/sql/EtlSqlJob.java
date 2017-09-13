@@ -60,9 +60,10 @@ public class EtlSqlJob extends AbstractYarnJob {
         case PHOENIX: {
           PhoenixSqlExec phoenixSqlExec = new PhoenixSqlExec(this::logProcess, props.getProxyUser(),
               logger);
+
           exitCode = (phoenixSqlExec.execute(funcs, execSqls, false, null, null, getRemainTime())) ? 0 : -1;
         }
-
+        break;
         case HIVE:
         case SPARK:
         default: {

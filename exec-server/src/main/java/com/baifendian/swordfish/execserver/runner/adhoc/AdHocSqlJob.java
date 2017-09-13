@@ -97,7 +97,7 @@ public class AdHocSqlJob {
         SystemParamManager.buildSystemParam(ExecType.DIRECT, props.getCycTime()));
 
     // 创建自定义函数
-    List<String> funcs = FunctionUtil.createFuncs(param.getUdfs(), props.getExecId(), null, logger,
+    List<String> funcs = FunctionUtil.createFuncs(param.getUdfs(), props.getExecJobId(), null, logger,
         BaseConfig.getHdfsResourcesDir(props.getProjectId()), true, type);
 
     // 切分 sql

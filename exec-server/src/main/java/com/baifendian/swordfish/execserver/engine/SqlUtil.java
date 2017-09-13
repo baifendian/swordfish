@@ -13,10 +13,11 @@ import java.util.Date;
 import java.util.List;
 
 public class SqlUtil {
+
   /**
    * 处理结果, 从 fromIndex 开始
    */
-  static public void handlerResults(int fromIndex, List<String> sqls, FlowStatus status,
+  public static void handlerResults(int fromIndex, List<String> sqls, FlowStatus status,
       ResultCallback resultCallback) {
     for (int i = fromIndex; i < sqls.size(); ++i) {
       String sql = sqls.get(i);
@@ -28,7 +29,7 @@ public class SqlUtil {
   /**
    * 处理单条记录
    */
-  static public void handlerResult(int index, String sql, FlowStatus status,
+  public static void handlerResult(int index, String sql, FlowStatus status,
       ResultCallback resultCallback) {
     Date now = new Date();
 
@@ -49,7 +50,7 @@ public class SqlUtil {
     // 只对 query 和 show 语句显示结果
     if (HiveUtil.isTokQuery(sql) || HiveUtil.isLikeShowStm(sql)) {
       statement.setMaxRows(queryLimit);
-      try(ResultSet res = statement.executeQuery(sql)) {
+      try (ResultSet res = statement.executeQuery(sql)) {
 
         ResultSetMetaData resultSetMetaData = res.getMetaData();
         int count = resultSetMetaData.getColumnCount();

@@ -48,8 +48,10 @@ public class FunctionUtil {
    * @param srcDir 资源目录
    * @param isHdfsFile 源是否是 hdfs 文件系统
    */
-  public static List<String> createFuncs(List<UdfsInfo> udfsInfos, int execId, String nodeName, Logger logger,
-      String srcDir, boolean isHdfsFile, SqlEngineType type) throws IOException, InterruptedException {
+  public static List<String> createFuncs(List<UdfsInfo> udfsInfos, int execId, String nodeName,
+      Logger logger,
+      String srcDir, boolean isHdfsFile, SqlEngineType type)
+      throws IOException, InterruptedException {
     // 得到 hive udf jar 包路径
     String hiveUdfJarPath = BaseConfig.getJobHiveUdfJarPath(execId, nodeName);
 
@@ -72,14 +74,14 @@ public class FunctionUtil {
           uploadUdfJars(resources, hiveUdfJarPath, srcDir, logger);
         }
 
-        if (!SqlEngineType.PHOENIX.equals(type)) {
+        if (SqlEngineType.PHOENIX != type) {
           // Phoenix sql can not add jar
           addJarSql(funcList, resources, hiveUdfJarPath);
         }
       }
     }
 
-    if (SqlEngineType.PHOENIX.equals(type)) {
+    if (SqlEngineType.PHOENIX == type) {
       addPhoenixTempFuncSql(funcList, udfsInfos, hiveUdfJarPath);
     } else {
       addTempFuncSql(funcList, udfsInfos);
@@ -177,10 +179,10 @@ public class FunctionUtil {
    * 添加临时函数
    */
   private static void addTempFuncSql(List<String> sqls, List<UdfsInfo> udfsInfos) {
-    if (CollectionUtils.isNotEmpty(udfsInfos)){
+    if (CollectionUtils.isNotEmpty(udfsInfos)) {
       for (UdfsInfo udfsInfo : udfsInfos) {
         sqls.add(MessageFormat
-                .format(CREATE_FUNCTION_FORMAT, udfsInfo.getFunc(), udfsInfo.getClassName()));
+            .format(CREATE_FUNCTION_FORMAT, udfsInfo.getFunc(), udfsInfo.getClassName()));
       }
     }
   }
@@ -196,7 +198,7 @@ public class FunctionUtil {
         if (CollectionUtils.isNotEmpty(udfsInfo.getArgTypes())) {
           argTypes = joiner.join(udfsInfo.getArgTypes());
         }
-        String hdfsFile = hdfsPath + "/"+udfsInfo.getLibJars().get(0).getRes();
+        String hdfsFile = hdfsPath + "/" + udfsInfo.getLibJars().get(0).getRes();
 
         sqls.add(MessageFormat
             .format(CREATE_PHOENIX_FUNCTION_FORMAT, udfsInfo.getFunc(), argTypes,
