@@ -16,6 +16,7 @@
 package com.baifendian.swordfish.execserver.runner.flow;
 
 import com.baifendian.swordfish.common.config.BaseConfig;
+import com.baifendian.swordfish.common.enums.ExternalJobType;
 import com.baifendian.swordfish.common.hadoop.HdfsClient;
 import com.baifendian.swordfish.common.job.struct.node.BaseParam;
 import com.baifendian.swordfish.common.job.struct.node.BaseParamFactory;
@@ -743,7 +744,7 @@ public class FlowRunner implements Runnable {
       }
 
       // 执行完后, 清理 udf 目录
-      hdfsCleanUp(BaseConfig.getJobHiveUdfJarPath(executionFlow.getId()));
+      hdfsCleanUp(BaseConfig.getJobHiveUdfJarPath(executionFlow.getId(), ExternalJobType.WORKFLOW));
 
       // 执行完后, 清理 import/export 目录
       hdfsCleanUp(BaseConfig.getHdfsImpExpDir(executionFlow.getProjectId(), executionFlow.getId()));

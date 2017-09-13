@@ -16,6 +16,7 @@
 package com.baifendian.swordfish.execserver.runner.adhoc;
 
 import com.baifendian.swordfish.common.config.BaseConfig;
+import com.baifendian.swordfish.common.enums.ExternalJobType;
 import com.baifendian.swordfish.common.job.struct.node.adhoc.AdHocParam;
 import com.baifendian.swordfish.common.utils.CommonUtil;
 import com.baifendian.swordfish.dao.AdHocDao;
@@ -97,15 +98,18 @@ public class AdHocSqlJob {
         SystemParamManager.buildSystemParam(ExecType.DIRECT, props.getCycTime()));
 
     // 创建自定义函数
-    List<String> funcs = FunctionUtil.createFuncs(param.getUdfs(), props.getExecJobId(), null, logger,
-        BaseConfig.getHdfsResourcesDir(props.getProjectId()), true, type);
+    List<String> funcs = FunctionUtil
+        .createFuncs(param.getUdfs(), props.getExecJobId(), null, logger,
+            BaseConfig.getHdfsResourcesDir(props.getProjectId()), true, type,
+            ExternalJobType.ADHOC);
 
     // 切分 sql
     List<String> execSqls = CommonUtil.sqlSplit(sqls);
 
     for (String sql : execSqls) {
       if (HiveUtil.isTokDDL(sql)) {
-        logger.error("exec sqls has ddl or invalid clause, can't execution, clause is: \"{}\"", sql);
+        logger
+            .error("exec sqls has ddl or invalid clause, can't execution, clause is: \"{}\"", sql);
         return FlowStatus.FAILED;
       }
     }
@@ -142,7 +146,9 @@ public class AdHocSqlJob {
       case PHOENIX: {
         PhoenixSqlExec phoenixSqlExec = new PhoenixSqlExec(this::logProcess, props.getProxyUser(),
             logger);
-        return phoenixSqlExec.execute(funcs, execSqls, true, resultCallback, param.getLimit(), Constants.ADHOC_TIMEOUT)
+
+        return phoenixSqlExec.execute(funcs, execSqls, true, resultCallback, param.getLimit(),
+            Constants.ADHOC_TIMEOUT)
             ? FlowStatus.SUCCESS : FlowStatus.FAILED;
       }
       case HIVE:
@@ -150,7 +156,8 @@ public class AdHocSqlJob {
       default: {
         HiveSqlExec hiveSqlExec = new HiveSqlExec(this::logProcess, props.getProxyUser(), logger);
 
-        return hiveSqlExec.execute(funcs, execSqls, true, resultCallback, param.getLimit(), Constants.ADHOC_TIMEOUT)
+        return hiveSqlExec.execute(funcs, execSqls, true, resultCallback, param.getLimit(),
+            Constants.ADHOC_TIMEOUT)
             ? FlowStatus.SUCCESS : FlowStatus.FAILED;
       }
     }

@@ -16,6 +16,7 @@
 package com.baifendian.swordfish.execserver.common;
 
 import com.baifendian.swordfish.common.config.BaseConfig;
+import com.baifendian.swordfish.common.enums.ExternalJobType;
 import com.baifendian.swordfish.common.hadoop.HdfsClient;
 import com.baifendian.swordfish.common.job.struct.node.common.UdfsInfo;
 import com.baifendian.swordfish.common.job.struct.resource.ResourceInfo;
@@ -50,10 +51,11 @@ public class FunctionUtil {
    */
   public static List<String> createFuncs(List<UdfsInfo> udfsInfos, int execId, String nodeName,
       Logger logger,
-      String srcDir, boolean isHdfsFile, SqlEngineType type)
+      String srcDir, boolean isHdfsFile,
+      SqlEngineType type, ExternalJobType externalJobType)
       throws IOException, InterruptedException {
     // 得到 hive udf jar 包路径
-    String hiveUdfJarPath = BaseConfig.getJobHiveUdfJarPath(execId, nodeName);
+    String hiveUdfJarPath = BaseConfig.getJobHiveUdfJarPath(execId, externalJobType, nodeName);
 
     // 是否定义了 udf 的基本目录
     if (StringUtils.isEmpty(hiveUdfJarPath)) {
