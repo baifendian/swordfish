@@ -234,6 +234,7 @@ public class QuartzManager {
             if (!oldCronExpression.equalsIgnoreCase(cronExpression)) {
               // 重启触发器
               scheduler.rescheduleJob(triggerKey, trigger);
+              logger.info("restart trigger");
             }
           } else {
             throw new QuartzException("Add schedule CronTrigger failed: exist the same CronTrigger");
@@ -272,6 +273,7 @@ public class QuartzManager {
   public static void deleteJob(String jobName, String jobGroupName) {
     try {
       scheduler.deleteJob(new JobKey(jobName, jobGroupName));// 删除任务
+      logger.info("delete trigger,job group: {}", jobGroupName);
     } catch (SchedulerException e) {
       logger.error(e.getMessage(), e);
       throw new QuartzException("Delete Job failed", e);
