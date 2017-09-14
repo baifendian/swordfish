@@ -87,6 +87,9 @@ public class QuartzManager {
     if (scheduler == null) {
       throw new QuartzException("Scheduler init failed, please init again!");
     }
+
+    logger.info("start scheduler");
+
     scheduler.start();
   }
 
@@ -95,26 +98,28 @@ public class QuartzManager {
    */
   public static void shutdown() throws SchedulerException {
     if (scheduler != null && !scheduler.isShutdown()) {
+      logger.info("shutdown scheduler");
+
       // 不等待任务执行完成
       scheduler.shutdown();
     }
   }
-
-  /**
-   * 添加对象到上下文中（若已存在相同 key，则覆盖）
-   */
-  public static void putObjectToContext(String key, Object object) {
-    if (scheduler == null) {
-      throw new QuartzException("Scheduler init failed, please init again!");
-    }
-
-    try {
-      scheduler.getContext().put(key, object);
-    } catch (SchedulerException e) {
-      logger.error(e.getMessage(), e);
-      throw new QuartzException("Add object to context failed", e);
-    }
-  }
+//
+//  /**
+//   * 添加对象到上下文中（若已存在相同 key，则覆盖）
+//   */
+//  public static void putObjectToContext(String key, Object object) {
+//    if (scheduler == null) {
+//      throw new QuartzException("Scheduler init failed, please init again!");
+//    }
+//
+//    try {
+//      scheduler.getContext().put(key, object);
+//    } catch (SchedulerException e) {
+//      logger.error(e.getMessage(), e);
+//      throw new QuartzException("Add object to context failed", e);
+//    }
+//  }
 
   /**
    * 添加一个任务和触发器（若已经存在，则直接返回任务，并更新任务的触发器） <p>
@@ -175,10 +180,13 @@ public class QuartzManager {
           }
         } else {
           jobDetail = newJob(jobClass).withIdentity(jobKey).build();
+
           if (dataMap != null) {
             jobDetail.getJobDataMap().putAll(dataMap);
           }
+
           scheduler.addJob(jobDetail, false, true);
+
           logger.info("Add job, job name: {}, group name: {}",
               jobName, jobGroupName);
         }
@@ -190,24 +198,24 @@ public class QuartzManager {
       throw new QuartzException("Add schedule Job failed", e);
     }
   }
-
-  /**
-   * 给指定 Job 添加一个 "cron 表达式" 的 触发器 <p>
-   *
-   * @param jobDetail {@link JobDetail}
-   * @param triggerName 触发器名
-   * @param startDate 开始日期
-   * @param endDate 结束日期
-   * @param cronExpression "cron 表达式"
-   * @param replace 如果已经存在，则是否替换
-   */
-  public static void addCronTrigger(JobDetail jobDetail, String triggerName, Date startDate,
-      Date endDate, String cronExpression, boolean replace) {
-    checkStatus();
-
-    addCronTrigger(jobDetail, DEFAULT_TRIGGER_GROUP_NAME, triggerName, startDate, endDate,
-        cronExpression, replace);
-  }
+//
+//  /**
+//   * 给指定 Job 添加一个 "cron 表达式" 的 触发器 <p>
+//   *
+//   * @param jobDetail {@link JobDetail}
+//   * @param triggerName 触发器名
+//   * @param startDate 开始日期
+//   * @param endDate 结束日期
+//   * @param cronExpression "cron 表达式"
+//   * @param replace 如果已经存在，则是否替换
+//   */
+//  public static void addCronTrigger(JobDetail jobDetail, String triggerName, Date startDate,
+//      Date endDate, String cronExpression, boolean replace) {
+//    checkStatus();
+//
+//    addCronTrigger(jobDetail, DEFAULT_TRIGGER_GROUP_NAME, triggerName, startDate, endDate,
+//        cronExpression, replace);
+//  }
 
   /**
    * 给指定 Job 添加一个 "cron 表达式" 的 触发器 <p>
@@ -261,25 +269,26 @@ public class QuartzManager {
       throw new QuartzException("Add schedule CronTrigger failed", e);
     }
   }
-
-  /**
-   * 删除一个 Job(使用默认的任务组名)
-   */
-  public static void deleteJob(String jobName) {
-    try {
-      scheduler.deleteJob(new JobKey(jobName, DEFAULT_JOB_GROUP_NAME));// 删除任务
-    } catch (SchedulerException e) {
-      logger.error(e.getMessage(), e);
-      throw new QuartzException("Delete Job failed", e);
-    }
-  }
+//
+//  /**
+//   * 删除一个 Job(使用默认的任务组名)
+//   */
+//  public static void deleteJob(String jobName) {
+//    try {
+//      scheduler.deleteJob(new JobKey(jobName, DEFAULT_JOB_GROUP_NAME));// 删除任务
+//    } catch (SchedulerException e) {
+//      logger.error(e.getMessage(), e);
+//      throw new QuartzException("Delete Job failed", e);
+//    }
+//  }
 
   /**
    * 删除一个 Job
    */
   public static void deleteJob(String jobName, String jobGroupName) {
     try {
-      scheduler.deleteJob(new JobKey(jobName, jobGroupName));// 删除任务
+      // 删除任务
+      scheduler.deleteJob(new JobKey(jobName, jobGroupName));
       logger.info("delete job, job group: {}, job name: {}", jobGroupName, jobName);
     } catch (SchedulerException e) {
       logger.error(e.getMessage(), e);
@@ -301,53 +310,53 @@ public class QuartzManager {
       throw new QuartzException("Delete Job failed", e);
     }
   }
-
-  /**
-   * 暂停一个 Trigger (使用默认的触发器组名) <p>
-   */
-  public static void pauseTrigger(String triggerName) {
-    TriggerKey triggerKey = new TriggerKey(triggerName, DEFAULT_TRIGGER_GROUP_NAME);
-
-    try {
-      // 终止 trigger
-      scheduler.pauseTrigger(triggerKey);
-    } catch (SchedulerException e) {
-      logger.error(e.getMessage(), e);
-      throw new QuartzException("Delete Job failed", e);
-    }
-  }
-
-  /**
-   * 重置一个 Trigger (使用默认的触发器组名) <p>
-   */
-  public static void resumeTrigger(String triggerName) {
-    TriggerKey triggerKey = new TriggerKey(triggerName, DEFAULT_TRIGGER_GROUP_NAME);
-
-    try {
-      // 终止 trigger
-      scheduler.resumeTrigger(triggerKey);
-    } catch (SchedulerException e) {
-      logger.error(e.getMessage(), e);
-      throw new QuartzException("Delete Job failed", e);
-    }
-  }
-
-  /**
-   * 删除一个 Trigger (使用默认的触发器组名) <p>
-   */
-  public static void deleteTrigger(String triggerName) {
-    TriggerKey triggerKey = new TriggerKey(triggerName, DEFAULT_TRIGGER_GROUP_NAME);
-
-    try {
-      // 终止 trigger
-      scheduler.pauseTrigger(triggerKey);
-      // 移除 trigger
-      scheduler.unscheduleJob(triggerKey);
-    } catch (SchedulerException e) {
-      logger.error(e.getMessage(), e);
-      throw new QuartzException("Delete Job failed", e);
-    }
-  }
+//
+//  /**
+//   * 暂停一个 Trigger (使用默认的触发器组名) <p>
+//   */
+//  public static void pauseTrigger(String triggerName) {
+//    TriggerKey triggerKey = new TriggerKey(triggerName, DEFAULT_TRIGGER_GROUP_NAME);
+//
+//    try {
+//      // 终止 trigger
+//      scheduler.pauseTrigger(triggerKey);
+//    } catch (SchedulerException e) {
+//      logger.error(e.getMessage(), e);
+//      throw new QuartzException("Delete Job failed", e);
+//    }
+//  }
+//
+//  /**
+//   * 重置一个 Trigger (使用默认的触发器组名) <p>
+//   */
+//  public static void resumeTrigger(String triggerName) {
+//    TriggerKey triggerKey = new TriggerKey(triggerName, DEFAULT_TRIGGER_GROUP_NAME);
+//
+//    try {
+//      // 终止 trigger
+//      scheduler.resumeTrigger(triggerKey);
+//    } catch (SchedulerException e) {
+//      logger.error(e.getMessage(), e);
+//      throw new QuartzException("Delete Job failed", e);
+//    }
+//  }
+//
+//  /**
+//   * 删除一个 Trigger (使用默认的触发器组名) <p>
+//   */
+//  public static void deleteTrigger(String triggerName) {
+//    TriggerKey triggerKey = new TriggerKey(triggerName, DEFAULT_TRIGGER_GROUP_NAME);
+//
+//    try {
+//      // 终止 trigger
+//      scheduler.pauseTrigger(triggerKey);
+//      // 移除 trigger
+//      scheduler.unscheduleJob(triggerKey);
+//    } catch (SchedulerException e) {
+//      logger.error(e.getMessage(), e);
+//      throw new QuartzException("Delete Job failed", e);
+//    }
+//  }
 
   /**
    * 判断当前调度器的状态 <p>
