@@ -20,7 +20,6 @@ import com.baifendian.swordfish.dao.model.DataSource;
 import com.baifendian.swordfish.dao.utils.json.JsonObjectDeserializer;
 import com.fasterxml.jackson.annotation.JsonRawValue;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-
 import java.util.Date;
 
 /**

@@ -19,11 +19,9 @@ import com.baifendian.swordfish.dao.mapper.utils.EqualUtils;
 import com.baifendian.swordfish.dao.utils.json.JsonObjectDeserializer;
 import com.baifendian.swordfish.dao.utils.json.JsonObjectSerializer;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-
 import java.io.IOException;
 import java.util.List;
 import java.util.Objects;

@@ -16,10 +16,9 @@
 package com.baifendian.swordfish.common.job.struct.node;
 
 import com.baifendian.swordfish.common.job.struct.resource.ResourceInfo;
-import org.apache.commons.collections.CollectionUtils;
-
 import java.util.List;
 import java.util.stream.Collectors;
+import org.apache.commons.collections.CollectionUtils;
 
 /**
  * 参数基类(需要校验参数和获取资源的子类需要 @Override 对应的方法)

@@ -15,14 +15,13 @@
  */
 package com.baifendian.swordfish.dao.mapper;
 
-import com.baifendian.swordfish.dao.enums.SqlEngineType;
 import com.baifendian.swordfish.dao.enums.FlowStatus;
+import com.baifendian.swordfish.dao.enums.SqlEngineType;
 import com.baifendian.swordfish.dao.mapper.utils.EnumFieldUtil;
+import java.util.Map;
 import org.apache.ibatis.jdbc.SQL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.Map;
 
 public class AdHocMapperProvider {
 

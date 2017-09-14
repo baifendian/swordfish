@@ -16,7 +16,6 @@
 package com.baifendian.swordfish.common.job.struct.node.common;
 
 import com.baifendian.swordfish.common.job.struct.resource.ResourceInfo;
-
 import java.util.ArrayList;
 import java.util.List;
 

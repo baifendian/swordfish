@@ -17,7 +17,6 @@ package com.baifendian.swordfish.common.job.struct.node.shell;
 
 import com.baifendian.swordfish.common.job.struct.node.BaseParam;
 import com.baifendian.swordfish.common.job.struct.resource.ResourceInfo;
-
 import java.util.List;
 import java.util.stream.Collectors;
 

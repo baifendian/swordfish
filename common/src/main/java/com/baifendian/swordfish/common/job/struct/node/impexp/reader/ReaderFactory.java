@@ -18,7 +18,6 @@ package com.baifendian.swordfish.common.job.struct.node.impexp.reader;
 import com.baifendian.swordfish.common.enums.ImpExpType;
 import com.baifendian.swordfish.common.enums.ReaderType;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
-import org.apache.avro.data.Json;
 
 /**
  * 读配置工厂

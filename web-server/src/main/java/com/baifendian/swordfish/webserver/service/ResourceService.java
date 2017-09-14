@@ -15,6 +15,9 @@
  */
 package com.baifendian.swordfish.webserver.service;
 
+import static com.baifendian.swordfish.webserver.utils.ParamVerify.verifyDesc;
+import static com.baifendian.swordfish.webserver.utils.ParamVerify.verifyResName;
+
 import com.baifendian.swordfish.common.config.BaseConfig;
 import com.baifendian.swordfish.common.hadoop.HdfsClient;
 import com.baifendian.swordfish.common.utils.CommonUtil;
@@ -23,8 +26,14 @@ import com.baifendian.swordfish.dao.mapper.ResourceMapper;
 import com.baifendian.swordfish.dao.model.Project;
 import com.baifendian.swordfish.dao.model.Resource;
 import com.baifendian.swordfish.dao.model.User;
-import com.baifendian.swordfish.webserver.exception.*;
+import com.baifendian.swordfish.webserver.exception.NotFoundException;
+import com.baifendian.swordfish.webserver.exception.ParameterException;
+import com.baifendian.swordfish.webserver.exception.PermissionException;
+import com.baifendian.swordfish.webserver.exception.ServerErrorException;
 import com.baifendian.swordfish.webserver.service.storage.FileSystemStorageService;
+import java.util.Date;
+import java.util.List;
+import java.util.UUID;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,13 +42,6 @@ import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
-
-import static com.baifendian.swordfish.webserver.utils.ParamVerify.verifyDesc;
-import static com.baifendian.swordfish.webserver.utils.ParamVerify.verifyResName;
 
 @Service
 public class ResourceService {

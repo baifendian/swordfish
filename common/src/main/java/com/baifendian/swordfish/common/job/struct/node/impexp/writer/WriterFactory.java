@@ -18,7 +18,6 @@ package com.baifendian.swordfish.common.job.struct.node.impexp.writer;
 import com.baifendian.swordfish.common.enums.ImpExpType;
 import com.baifendian.swordfish.common.enums.WriterType;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
-import org.apache.avro.data.Json;
 
 /**
  * 写配置工厂

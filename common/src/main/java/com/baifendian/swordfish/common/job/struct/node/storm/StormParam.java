@@ -18,9 +18,8 @@ package com.baifendian.swordfish.common.job.struct.node.storm;
 import com.baifendian.swordfish.common.enums.StormType;
 import com.baifendian.swordfish.common.job.struct.node.BaseParam;
 import com.baifendian.swordfish.common.job.struct.node.storm.param.IStormParam;
-import org.apache.commons.lang.StringUtils;
-
 import java.util.List;
+import org.apache.commons.lang.StringUtils;
 
 /**
  * storm 任务参数

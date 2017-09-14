@@ -1,10 +1,9 @@
 package com.baifendian.swordfish.common.job.struct.node.impexp.writer;
 
 import com.baifendian.swordfish.common.enums.MysqlWriteMode;
+import java.util.List;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
-
-import java.util.List;
 
 /**
  * 写入mysql

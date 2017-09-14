@@ -15,19 +15,18 @@
  */
 package com.baifendian.swordfish.masterserver.utils.crontab;
 
+import static com.baifendian.swordfish.masterserver.utils.crontab.CrontabUtil.getCycle;
+import static com.baifendian.swordfish.masterserver.utils.crontab.CrontabUtil.parseCron;
+import static junit.framework.TestCase.assertEquals;
+
 import com.baifendian.swordfish.dao.enums.ScheduleType;
 import com.cronutils.model.Cron;
-import org.junit.Test;
-import org.quartz.CronExpression;
-
 import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-
-import static com.baifendian.swordfish.masterserver.utils.crontab.CrontabUtil.getCycle;
-import static com.baifendian.swordfish.masterserver.utils.crontab.CrontabUtil.parseCron;
-import static junit.framework.TestCase.assertEquals;
+import org.junit.Test;
+import org.quartz.CronExpression;
 
 /**
  * 调度工具类单元测试

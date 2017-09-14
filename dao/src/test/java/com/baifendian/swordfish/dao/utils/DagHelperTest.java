@@ -15,17 +15,16 @@
  */
 package com.baifendian.swordfish.dao.utils;
 
+import static org.junit.Assert.assertEquals;
+
 import com.baifendian.swordfish.dao.model.FlowNode;
 import com.baifendian.swordfish.dao.model.FlowNodeRelation;
 import com.baifendian.swordfish.dao.model.flow.FlowDag;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
-import org.junit.Test;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-
-import static org.junit.Assert.assertEquals;
+import org.junit.Test;
 
 public class DagHelperTest {
 

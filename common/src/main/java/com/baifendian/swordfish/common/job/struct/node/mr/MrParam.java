@@ -18,13 +18,12 @@ package com.baifendian.swordfish.common.job.struct.node.mr;
 import com.baifendian.swordfish.common.job.struct.node.BaseParam;
 import com.baifendian.swordfish.common.job.struct.resource.ResourceInfo;
 import com.baifendian.swordfish.dao.model.flow.Property;
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections.ListUtils;
-import org.apache.commons.lang3.StringUtils;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.ListUtils;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * MR 节点的参数 <p>

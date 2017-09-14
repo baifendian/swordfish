@@ -16,7 +16,6 @@
 package com.baifendian.swordfish.execserver.utils;
 
 import com.baifendian.swordfish.common.utils.StructuredArguments;
-import com.baifendian.swordfish.execserver.runner.adhoc.AdHocRunnerManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Marker;

@@ -17,12 +17,11 @@ package com.baifendian.swordfish.webserver.dto;
 
 import com.baifendian.swordfish.common.job.struct.node.adhoc.AdHocParam;
 import com.baifendian.swordfish.common.json.JsonOrdinalSerializer;
-import com.baifendian.swordfish.dao.enums.SqlEngineType;
 import com.baifendian.swordfish.dao.enums.FlowStatus;
+import com.baifendian.swordfish.dao.enums.SqlEngineType;
 import com.baifendian.swordfish.dao.model.AdHoc;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-
 import java.util.Date;
 
 /**

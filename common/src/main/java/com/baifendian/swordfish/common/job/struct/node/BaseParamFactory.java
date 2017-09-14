@@ -15,6 +15,15 @@
  */
 package com.baifendian.swordfish.common.job.struct.node;
 
+import static com.baifendian.swordfish.common.job.struct.node.JobType.HQL;
+import static com.baifendian.swordfish.common.job.struct.node.JobType.IMPEXP;
+import static com.baifendian.swordfish.common.job.struct.node.JobType.MR;
+import static com.baifendian.swordfish.common.job.struct.node.JobType.SHELL;
+import static com.baifendian.swordfish.common.job.struct.node.JobType.SPARK;
+import static com.baifendian.swordfish.common.job.struct.node.JobType.SPARK_STREAMING;
+import static com.baifendian.swordfish.common.job.struct.node.JobType.STORM;
+import static com.baifendian.swordfish.common.job.struct.node.JobType.VIRTUAL;
+
 import com.baifendian.swordfish.common.job.struct.datasource.DatasourceFactory;
 import com.baifendian.swordfish.common.job.struct.node.hql.HqlParam;
 import com.baifendian.swordfish.common.job.struct.node.impexp.ImpExpBuilder;
@@ -24,11 +33,8 @@ import com.baifendian.swordfish.common.job.struct.node.spark.SparkParam;
 import com.baifendian.swordfish.common.job.struct.node.storm.StormBuilder;
 import com.baifendian.swordfish.common.job.struct.node.virtual.VirtualParam;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
-import org.apache.avro.data.Json;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import static com.baifendian.swordfish.common.job.struct.node.JobType.*;
 
 /**
  * 节点参数工厂

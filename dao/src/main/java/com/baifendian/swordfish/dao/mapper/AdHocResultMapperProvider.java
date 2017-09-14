@@ -17,9 +17,8 @@ package com.baifendian.swordfish.dao.mapper;
 
 import com.baifendian.swordfish.dao.enums.FlowStatus;
 import com.baifendian.swordfish.dao.mapper.utils.EnumFieldUtil;
-import org.apache.ibatis.jdbc.SQL;
-
 import java.util.Map;
+import org.apache.ibatis.jdbc.SQL;
 
 /**
  * 即席查询结果 sql 生成器 <p>

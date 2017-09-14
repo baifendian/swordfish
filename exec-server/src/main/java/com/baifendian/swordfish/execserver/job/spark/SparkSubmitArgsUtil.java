@@ -18,10 +18,9 @@ package com.baifendian.swordfish.execserver.job.spark;
 import com.baifendian.swordfish.common.job.struct.node.spark.SparkParam;
 import com.baifendian.swordfish.common.job.struct.resource.ResourceInfo;
 import com.baifendian.swordfish.dao.model.flow.Property;
-import org.apache.commons.lang.StringUtils;
-
 import java.util.ArrayList;
 import java.util.List;
+import org.apache.commons.lang.StringUtils;
 
 /**
  * Spark 提交参数构建器 <p>

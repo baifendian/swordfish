@@ -15,6 +15,13 @@
  */
 package com.baifendian.swordfish.webserver.utils;
 
+import static com.baifendian.swordfish.common.utils.VerifyUtil.matchEmail;
+import static com.baifendian.swordfish.common.utils.VerifyUtil.matchWorkflowName;
+import static com.baifendian.swordfish.common.utils.VerifyUtil.matcheDatasourceName;
+import static com.baifendian.swordfish.common.utils.VerifyUtil.matcheProjectName;
+import static com.baifendian.swordfish.common.utils.VerifyUtil.matcheResName;
+import static com.baifendian.swordfish.common.utils.VerifyUtil.matcheUserName;
+
 import com.baifendian.swordfish.common.config.BaseConfig;
 import com.baifendian.swordfish.common.job.struct.node.BaseParam;
 import com.baifendian.swordfish.common.job.struct.node.BaseParamFactory;
@@ -23,12 +30,9 @@ import com.baifendian.swordfish.webserver.exception.BadRequestException;
 import com.baifendian.swordfish.webserver.exception.NotFoundException;
 import com.baifendian.swordfish.webserver.exception.ParameterException;
 import com.baifendian.swordfish.webserver.exception.ServerErrorException;
+import java.util.List;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
-
-import java.util.List;
-
-import static com.baifendian.swordfish.common.utils.VerifyUtil.*;
 
 /**
  * server校验工具

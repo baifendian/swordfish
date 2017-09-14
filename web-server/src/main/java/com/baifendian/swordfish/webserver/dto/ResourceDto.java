@@ -17,7 +17,6 @@ package com.baifendian.swordfish.webserver.dto;
 
 import com.baifendian.swordfish.common.utils.CommonUtil;
 import com.baifendian.swordfish.dao.model.Resource;
-
 import java.util.Date;
 
 /**

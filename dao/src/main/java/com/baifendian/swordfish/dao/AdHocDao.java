@@ -21,12 +21,11 @@ import com.baifendian.swordfish.dao.mapper.AdHocMapper;
 import com.baifendian.swordfish.dao.mapper.AdHocResultMapper;
 import com.baifendian.swordfish.dao.model.AdHoc;
 import com.baifendian.swordfish.dao.model.AdHocResult;
+import java.util.Date;
+import java.util.List;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Date;
-import java.util.List;
 
 public class AdHocDao extends BaseDao {
   @Autowired

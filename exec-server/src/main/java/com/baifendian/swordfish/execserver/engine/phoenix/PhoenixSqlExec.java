@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2017 Baifendian Corporation
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *          http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.baifendian.swordfish.execserver.engine.phoenix;
 
 import com.baifendian.swordfish.dao.enums.FlowStatus;
@@ -15,9 +31,6 @@ import org.slf4j.Logger;
 
 /**
  * 官方推荐，不使用连接池。详情请参见： https://phoenix.apache.org/faq.html#Should_I_pool_Phoenix_JDBC_Connections
- * <p>
- *
- * @author : shuanghu
  */
 public class PhoenixSqlExec {
 
@@ -50,7 +63,8 @@ public class PhoenixSqlExec {
 
   /**
    * 执行多个 sql 语句 并返回查询的语句, 注意, 多次调用 execute, 上下文是不相关的
-   *  @param createFuncs 创建自定义函数语句
+   *
+   * @param createFuncs 创建自定义函数语句
    * @param sqls 执行的 sql
    * @param resultCallback 回调, 执行的结果处理
    * @param queryLimit 结果限制
@@ -66,13 +80,13 @@ public class PhoenixSqlExec {
     // 查询结果限制
     queryLimit = (queryLimit != null) ? queryLimit : defaultQueryLimit;
 
-    try(Connection con = PhoenixUtil.getPhoenixConnection(userName, remainTime)) {
+    try (Connection con = PhoenixUtil.getPhoenixConnection(userName, remainTime)) {
       if (con == null) {
         logger.error("Failed to get phoenix connect");
         return false;
       }
 
-      try(Statement sta = con.createStatement()) {
+      try (Statement sta = con.createStatement()) {
 
         if (CollectionUtils.isNotEmpty(createFuncs)) {
           try {

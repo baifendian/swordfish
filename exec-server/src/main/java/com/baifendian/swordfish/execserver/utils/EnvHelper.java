@@ -17,14 +17,12 @@ package com.baifendian.swordfish.execserver.utils;
 
 import com.baifendian.swordfish.common.config.BaseConfig;
 import com.baifendian.swordfish.common.hadoop.HdfsClient;
-import com.baifendian.swordfish.execserver.utils.OsUtil;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
 
 public class EnvHelper {
 

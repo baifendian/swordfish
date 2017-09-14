@@ -16,7 +16,6 @@
 package com.baifendian.swordfish.common.job.struct.node.common;
 
 import com.baifendian.swordfish.common.job.struct.node.BaseParam;
-
 import java.util.List;
 import java.util.Map;
 

@@ -17,7 +17,6 @@ package com.baifendian.swordfish.dao.model.flow;
 
 import com.baifendian.swordfish.dao.model.FlowNode;
 import com.baifendian.swordfish.dao.model.FlowNodeRelation;
-
 import java.util.List;
 
 public class FlowDag {

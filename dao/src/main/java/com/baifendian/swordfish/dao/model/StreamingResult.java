@@ -23,12 +23,11 @@ import com.baifendian.swordfish.dao.utils.json.JsonObjectSerializer;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import org.apache.commons.lang.StringUtils;
-
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import org.apache.commons.lang.StringUtils;
 
 /**
  * 描述一个流任务的结果

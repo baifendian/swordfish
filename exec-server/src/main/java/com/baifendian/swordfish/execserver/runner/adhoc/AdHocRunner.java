@@ -19,9 +19,8 @@ import com.baifendian.swordfish.dao.AdHocDao;
 import com.baifendian.swordfish.dao.enums.FlowStatus;
 import com.baifendian.swordfish.dao.model.AdHoc;
 import com.baifendian.swordfish.execserver.job.JobProps;
-import org.slf4j.Logger;
-
 import java.util.Date;
+import org.slf4j.Logger;
 
 public class AdHocRunner implements Runnable {
 

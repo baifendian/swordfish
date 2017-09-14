@@ -15,8 +15,6 @@
  */
 package com.baifendian.swordfish.dao.enums;
 
-import com.fasterxml.jackson.annotation.JsonValue;
-
 /**
  * 调度状态 <p>
  */

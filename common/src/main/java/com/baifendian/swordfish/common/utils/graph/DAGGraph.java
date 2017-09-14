@@ -15,11 +15,10 @@
  */
 package com.baifendian.swordfish.common.utils.graph;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.LinkedList;
 import java.util.Queue;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * 有向无环图, 增加边需要判断是否符合无环的约束, 否则增加失败

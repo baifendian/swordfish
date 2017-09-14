@@ -15,9 +15,8 @@
  */
 package com.baifendian.swordfish.dao.model;
 
-import com.baifendian.swordfish.dao.enums.SqlEngineType;
 import com.baifendian.swordfish.dao.enums.FlowStatus;
-
+import com.baifendian.swordfish.dao.enums.SqlEngineType;
 import java.util.Date;
 
 public class AdHoc {

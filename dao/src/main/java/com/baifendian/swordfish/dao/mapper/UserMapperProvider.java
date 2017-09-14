@@ -17,11 +17,8 @@ package com.baifendian.swordfish.dao.mapper;
 
 import com.baifendian.swordfish.dao.enums.UserRoleType;
 import com.baifendian.swordfish.dao.mapper.utils.EnumFieldUtil;
-import com.baifendian.swordfish.dao.model.User;
-import org.apache.commons.lang.StringUtils;
-import org.apache.ibatis.jdbc.SQL;
-
 import java.util.Map;
+import org.apache.ibatis.jdbc.SQL;
 
 public class UserMapperProvider {
 

@@ -15,14 +15,13 @@
  */
 package com.baifendian.swordfish.common.hive.service2;
 
+import java.sql.SQLException;
+import java.util.Properties;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.pool.BaseKeyedPoolableObjectFactory;
 import org.apache.hive.jdbc.HiveConnection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.sql.SQLException;
-import java.util.Properties;
 
 public class HiveService2PoolFactory extends BaseKeyedPoolableObjectFactory {
 

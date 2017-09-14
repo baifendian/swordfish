@@ -15,18 +15,22 @@
  */
 package com.baifendian.swordfish.execserver.job.storm;
 
+import static com.baifendian.swordfish.execserver.job.storm.StormSubmitArgsConst.ARTIFACTREPOSITORIES;
+import static com.baifendian.swordfish.execserver.job.storm.StormSubmitArgsConst.ARTIFACTS;
+import static com.baifendian.swordfish.execserver.job.storm.StormSubmitArgsConst.JAR;
+import static com.baifendian.swordfish.execserver.job.storm.StormSubmitArgsConst.JARS;
+import static com.baifendian.swordfish.execserver.job.storm.StormSubmitArgsConst.SHELL;
+import static com.baifendian.swordfish.execserver.job.storm.StormSubmitArgsConst.SQL;
+
 import com.baifendian.swordfish.common.job.struct.node.storm.StormParam;
 import com.baifendian.swordfish.common.job.struct.node.storm.param.StormJarParam;
 import com.baifendian.swordfish.common.job.struct.node.storm.param.StormShellParam;
 import com.baifendian.swordfish.common.job.struct.node.storm.param.StormSqlParam;
 import com.baifendian.swordfish.common.job.struct.resource.ResourceInfo;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
-
 import java.util.ArrayList;
 import java.util.List;
-
-import static com.baifendian.swordfish.execserver.job.storm.StormSubmitArgsConst.*;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 
 /**
  * storm命令参数拼接

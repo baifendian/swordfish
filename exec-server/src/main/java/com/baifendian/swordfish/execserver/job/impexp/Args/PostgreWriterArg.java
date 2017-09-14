@@ -16,7 +16,6 @@
 package com.baifendian.swordfish.execserver.job.impexp.Args;
 
 import com.baifendian.swordfish.common.enums.MysqlWriteMode;
-import com.baifendian.swordfish.common.job.struct.node.impexp.writer.MysqlWriter;
 import com.baifendian.swordfish.common.job.struct.node.impexp.writer.PostgreWriter;
 import com.baifendian.swordfish.common.utils.CommonUtil;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;

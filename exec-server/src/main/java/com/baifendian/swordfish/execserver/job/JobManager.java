@@ -24,11 +24,11 @@ import static com.baifendian.swordfish.common.job.struct.node.JobType.SPARK_STRE
 import static com.baifendian.swordfish.common.job.struct.node.JobType.STORM;
 import static com.baifendian.swordfish.common.job.struct.node.JobType.VIRTUAL;
 
-import com.baifendian.swordfish.execserver.job.sql.EtlSqlJob;
 import com.baifendian.swordfish.execserver.job.impexp.ImpExpJobManager;
 import com.baifendian.swordfish.execserver.job.mr.MrJob;
 import com.baifendian.swordfish.execserver.job.shell.ShellJob;
 import com.baifendian.swordfish.execserver.job.spark.SparkJob;
+import com.baifendian.swordfish.execserver.job.sql.EtlSqlJob;
 import com.baifendian.swordfish.execserver.job.storm.StormJob;
 import com.baifendian.swordfish.execserver.job.virtual.VirtualJob;
 import org.slf4j.Logger;

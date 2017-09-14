@@ -16,7 +16,6 @@
 package com.baifendian.swordfish.webserver.dto;
 
 import com.baifendian.swordfish.dao.model.ProjectUser;
-
 import java.util.Date;
 
 /**

@@ -15,14 +15,13 @@
  */
 package com.baifendian.swordfish.dao.model;
 
-import com.baifendian.swordfish.dao.utils.json.JsonUtil;
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
 
+import com.baifendian.swordfish.dao.utils.json.JsonUtil;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
-import static org.junit.Assert.assertEquals;
+import org.junit.Test;
 
 public class FlowNodeTest {
   @Test

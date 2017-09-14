@@ -15,6 +15,8 @@
  */
 package com.baifendian.swordfish.webserver.service;
 
+import static com.baifendian.swordfish.dao.enums.ScheduleStatus.OFFLINE;
+
 import com.baifendian.swordfish.dao.FlowDao;
 import com.baifendian.swordfish.dao.enums.DepPolicyType;
 import com.baifendian.swordfish.dao.enums.FailurePolicyType;
@@ -23,11 +25,22 @@ import com.baifendian.swordfish.dao.enums.ScheduleStatus;
 import com.baifendian.swordfish.dao.mapper.MasterServerMapper;
 import com.baifendian.swordfish.dao.mapper.ProjectMapper;
 import com.baifendian.swordfish.dao.mapper.ScheduleMapper;
-import com.baifendian.swordfish.dao.model.*;
+import com.baifendian.swordfish.dao.model.MasterServer;
+import com.baifendian.swordfish.dao.model.Project;
+import com.baifendian.swordfish.dao.model.ProjectFlow;
+import com.baifendian.swordfish.dao.model.Schedule;
+import com.baifendian.swordfish.dao.model.User;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
 import com.baifendian.swordfish.rpc.client.MasterClient;
 import com.baifendian.swordfish.webserver.dto.ScheduleParam;
-import com.baifendian.swordfish.webserver.exception.*;
+import com.baifendian.swordfish.webserver.exception.BadRequestException;
+import com.baifendian.swordfish.webserver.exception.NotFoundException;
+import com.baifendian.swordfish.webserver.exception.ParameterException;
+import com.baifendian.swordfish.webserver.exception.PermissionException;
+import com.baifendian.swordfish.webserver.exception.PreFailedException;
+import com.baifendian.swordfish.webserver.exception.ServerErrorException;
+import java.util.Date;
+import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,11 +48,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Date;
-import java.util.List;
-
-import static com.baifendian.swordfish.dao.enums.ScheduleStatus.OFFLINE;
 
 @Service
 public class ScheduleService {
@@ -330,7 +338,7 @@ public class ScheduleService {
     try {
       switch (scheduleStatus) {
         case ONLINE: {
-          logger.info("Call master client set schedule online , project id: {}, flow id: {},host: {}, port: {}", project.getId(), projectFlow.getId(), masterServer.getHost(), masterServer.getPort());
+          logger.info("Call master client set schedule online, project id: {}, flow id: {},host: {}, port: {}", project.getId(), projectFlow.getId(), masterServer.getHost(), masterServer.getPort());
 
           if (!masterClient.setSchedule(project.getId(), projectFlow.getId())) {
             logger.error("Call master client set schedule online false , project id: {}, flow id: {},host: {}, port: {}", project.getId(), projectFlow.getId(), masterServer.getHost(), masterServer.getPort());
@@ -340,7 +348,7 @@ public class ScheduleService {
           break;
         }
         case OFFLINE: {
-          logger.info("Call master client set schedule offline , project id: {}, flow id: {},host: {}, port: {}", project.getId(), projectFlow.getId(), masterServer.getHost(), masterServer.getPort());
+          logger.info("Call master client set schedule offline, project id: {}, flow id: {},host: {}, port: {}", project.getId(), projectFlow.getId(), masterServer.getHost(), masterServer.getPort());
 
           if (!masterClient.deleteSchedule(project.getId(), projectFlow.getId())) {
             logger.error("Call master client set schedule offline false , project id: {}, flow id: {},host: {}, port: {}", project.getId(), projectFlow.getId(), masterServer.getHost(), masterServer.getPort());

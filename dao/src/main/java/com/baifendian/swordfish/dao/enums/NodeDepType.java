@@ -15,8 +15,6 @@
  */
 package com.baifendian.swordfish.dao.enums;
 
-import com.fasterxml.jackson.annotation.JsonValue;
-
 /**
  * 执行任务的节点依赖类型 <p>
  */

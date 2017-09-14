@@ -18,9 +18,8 @@ package com.baifendian.swordfish.common.job.struct.node.impexp.writer;
 import com.baifendian.swordfish.common.enums.WriteMode;
 import com.baifendian.swordfish.common.job.struct.node.impexp.column.HiveColumn;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import org.apache.commons.lang3.StringUtils;
-
 import java.util.List;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * hive 写入对象
