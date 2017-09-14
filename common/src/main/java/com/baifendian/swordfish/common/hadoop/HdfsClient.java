@@ -406,7 +406,7 @@ public class HdfsClient implements Closeable {
         }
       }
 
-      //如果目录不存在就创建
+      // 如果目录不存在就创建
       dstFile.getParentFile().mkdirs();
 
       // hdfs 文件拷贝到本地

@@ -15,6 +15,7 @@
  */
 package com.baifendian.swordfish.common.config;
 
+import com.baifendian.swordfish.common.enums.ExternalJobType;
 import com.baifendian.swordfish.common.utils.http.HttpUtil;
 import java.io.File;
 import java.io.FileInputStream;
@@ -237,17 +238,23 @@ public class BaseConfig {
   /**
    * 返回 hive 的 udf jar 路径, 注意, 这里没有 project 的信息(其实应该用 project id)
    */
-  public static String getJobHiveUdfJarPath(long execId) {
+  public static String getJobHiveUdfJarPath(long execId, ExternalJobType externalJobType) {
     return MessageFormat
-        .format("{0}/{1}", hdfsUdfJarBasePath, Long.toString(execId));
+        .format("{0}/{1}/{2}", hdfsUdfJarBasePath, externalJobType.name(), Long.toString(execId));
   }
 
   /**
    * 得到路径
    */
-  public static String getJobHiveUdfJarPath(long execId, String nodeName) {
+  public static String getJobHiveUdfJarPath(long execId, ExternalJobType externalJobType,
+      String nodeName) {
+    if (StringUtils.isEmpty(nodeName)) {
+      return getJobHiveUdfJarPath(execId, externalJobType);
+    }
+
     return MessageFormat
-        .format("{0}/{1}", getJobHiveUdfJarPath(execId), HttpUtil.getMd5(nodeName).substring(0, 8));
+        .format("{0}/{1}", getJobHiveUdfJarPath(execId, externalJobType),
+            HttpUtil.getMd5(nodeName).substring(0, 8));
   }
 
   /**

@@ -15,6 +15,7 @@
  */
 package com.baifendian.swordfish.execserver.job.sql;
 
+import com.baifendian.swordfish.common.enums.ExternalJobType;
 import com.baifendian.swordfish.common.job.struct.node.BaseParam;
 import com.baifendian.swordfish.common.job.struct.node.hql.HqlParam;
 import com.baifendian.swordfish.common.utils.CommonUtil;
@@ -50,7 +51,7 @@ public class EtlSqlJob extends AbstractYarnJob {
       sqls = ParamHelper.resolvePlaceholders(sqls, props.getDefinedParams());
       List<String> funcs = FunctionUtil
           .createFuncs(param.getUdfs(), props.getExecId(), props.getNodeName(), logger,
-              props.getWorkDir(), false, param.getType());
+              props.getWorkDir(), false, param.getType(), ExternalJobType.WORKFLOW);
 
       logger.info("\nhql:\n{}\nfuncs:\n{}", sqls, funcs);
 
@@ -60,9 +61,10 @@ public class EtlSqlJob extends AbstractYarnJob {
         case PHOENIX: {
           PhoenixSqlExec phoenixSqlExec = new PhoenixSqlExec(this::logProcess, props.getProxyUser(),
               logger);
+
           exitCode = (phoenixSqlExec.execute(funcs, execSqls, false, null, null, getRemainTime())) ? 0 : -1;
         }
-
+        break;
         case HIVE:
         case SPARK:
         default: {
