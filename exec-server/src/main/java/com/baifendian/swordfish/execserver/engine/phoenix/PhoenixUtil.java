@@ -1,3 +1,18 @@
+/*
+ * Copyright (C) 2017 Baifendian Corporation
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *          http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.baifendian.swordfish.execserver.engine.phoenix;
 
 import java.io.File;
@@ -13,6 +28,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.ResourceUtils;
 
+/**
+ * create connect<p>
+ *
+ */
 public class PhoenixUtil {
 
   private static final Logger logger = LoggerFactory.getLogger(PhoenixUtil.class);
@@ -21,28 +40,18 @@ public class PhoenixUtil {
    * phoenix Host
    */
   static private String phoenixHost;
-
   /**
    * phoenix port
    */
   static private int port;
 
-  static private Properties phoenixPro = new Properties();
-
   static {
     try {
       Class.forName("org.apache.phoenix.queryserver.client.Driver");
-      //Class.forName("org.apache.phoenix.queryserver.client");
     } catch (ClassNotFoundException e) {
       logger.error(e.getMessage(), e);
       throw new RuntimeException(e);
     }
-
-    phoenixPro.put("phoenix.trace.frequency", "always");
-    phoenixPro.put("phoenix.functions.allowUserDefinedFunctions", "true");
-    phoenixPro.put("phoenix.annotation.myannotation", "abc");
-    phoenixPro.put("user", "udp");
-    phoenixPro.put("phoenix.query.timeoutMs", "100000");
 
     try {
       Properties properties = new Properties();
@@ -61,14 +70,13 @@ public class PhoenixUtil {
   public static Connection getPhoenixConnection(String userName, long timeout) {
     Properties phoenixConfPro = new Properties();
     phoenixConfPro.put("phoenix.functions.allowUserDefinedFunctions", "true");
-    phoenixConfPro.put("phoenix.query.timeoutMs", timeout * 1000L);
+    phoenixConfPro.put("phoenix.query.timeoutMs", timeout*1000L);
     phoenixConfPro.put("user", userName);
 
     try {
       Connection connection = DriverManager
-          .getConnection(ThinClientUtil.getConnectionUrl(phoenixHost, port), phoenixConfPro);
+          .getConnection(ThinClientUtil.getConnectionUrl( phoenixHost, port), phoenixConfPro);
 
-      //connection.setAutoCommit(true);
       return connection;
     } catch (RuntimeException e) {
       if (e.getCause().getClass().getName().equals("java.net.ConnectException")) {
