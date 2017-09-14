@@ -16,11 +16,9 @@
 package com.baifendian.swordfish.common.job.struct.node.impexp.reader;
 
 import com.baifendian.swordfish.common.job.struct.node.impexp.column.FileColumn;
+import java.util.List;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
-import org.stringtemplate.v4.ST;
-
-import java.util.List;
 
 /**
  * 文件读取

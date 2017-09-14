@@ -16,10 +16,9 @@
 package com.baifendian.swordfish.common.job.struct.node.storm.param;
 
 import com.baifendian.swordfish.common.job.struct.resource.ResourceInfo;
-import org.apache.commons.lang.StringUtils;
-
 import java.util.ArrayList;
 import java.util.List;
+import org.apache.commons.lang.StringUtils;
 
 /**
  * jar 方式提交任务参数

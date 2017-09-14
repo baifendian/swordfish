@@ -7,10 +7,8 @@ import com.baifendian.swordfish.dao.utils.json.JsonUtil;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-
 import java.util.Arrays;
 import java.util.List;
-
 import org.apache.commons.collections4.CollectionUtils;
 
 /**

@@ -17,8 +17,6 @@ package com.baifendian.swordfish.dao.model;
 
 import com.baifendian.swordfish.dao.enums.UserRoleType;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import java.util.Date;
 import java.util.List;
 

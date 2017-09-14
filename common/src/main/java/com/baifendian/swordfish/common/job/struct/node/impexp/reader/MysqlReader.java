@@ -16,10 +16,9 @@
 package com.baifendian.swordfish.common.job.struct.node.impexp.reader;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import java.util.List;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-
-import java.util.List;
 
 /**
  * mysql 读取对象

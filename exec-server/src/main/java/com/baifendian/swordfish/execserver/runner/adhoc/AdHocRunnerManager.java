@@ -26,14 +26,13 @@ import com.baifendian.swordfish.dao.utils.json.JsonUtil;
 import com.baifendian.swordfish.execserver.utils.Constants;
 import com.baifendian.swordfish.execserver.utils.JobLogger;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import org.apache.commons.configuration.Configuration;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.Date;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
+import org.apache.commons.configuration.Configuration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class AdHocRunnerManager {
   private static Logger logger = LoggerFactory.getLogger(AdHocRunnerManager.class.getName());

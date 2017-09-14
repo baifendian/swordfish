@@ -18,7 +18,6 @@ package com.baifendian.swordfish.webserver.dto;
 import com.baifendian.swordfish.dao.mapper.utils.EqualUtils;
 import com.baifendian.swordfish.dao.model.FlowNode;
 import com.baifendian.swordfish.dao.model.flow.Property;
-
 import java.util.ArrayList;
 import java.util.List;
 

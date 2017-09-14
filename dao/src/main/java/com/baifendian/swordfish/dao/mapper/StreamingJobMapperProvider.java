@@ -17,9 +17,8 @@ package com.baifendian.swordfish.dao.mapper;
 
 import com.baifendian.swordfish.dao.enums.NotifyType;
 import com.baifendian.swordfish.dao.mapper.utils.EnumFieldUtil;
-import org.apache.ibatis.jdbc.SQL;
-
 import java.util.Map;
+import org.apache.ibatis.jdbc.SQL;
 
 public class StreamingJobMapperProvider {
 

@@ -15,16 +15,32 @@
  */
 package com.baifendian.swordfish.webserver.service;
 
+import static com.baifendian.swordfish.webserver.utils.ParamVerify.verifyDesc;
+import static com.baifendian.swordfish.webserver.utils.ParamVerify.verifyProjectName;
+
 import com.baifendian.swordfish.common.config.BaseConfig;
 import com.baifendian.swordfish.common.consts.Constants;
 import com.baifendian.swordfish.common.hadoop.HdfsClient;
 import com.baifendian.swordfish.common.utils.PermUtil;
 import com.baifendian.swordfish.dao.enums.UserRoleType;
-import com.baifendian.swordfish.dao.mapper.*;
+import com.baifendian.swordfish.dao.mapper.DataSourceMapper;
+import com.baifendian.swordfish.dao.mapper.ProjectFlowMapper;
+import com.baifendian.swordfish.dao.mapper.ProjectMapper;
+import com.baifendian.swordfish.dao.mapper.ProjectUserMapper;
+import com.baifendian.swordfish.dao.mapper.ResourceMapper;
+import com.baifendian.swordfish.dao.mapper.StreamingJobMapper;
+import com.baifendian.swordfish.dao.mapper.UserMapper;
 import com.baifendian.swordfish.dao.model.Project;
 import com.baifendian.swordfish.dao.model.ProjectUser;
 import com.baifendian.swordfish.dao.model.User;
-import com.baifendian.swordfish.webserver.exception.*;
+import com.baifendian.swordfish.webserver.exception.BadRequestException;
+import com.baifendian.swordfish.webserver.exception.NotFoundException;
+import com.baifendian.swordfish.webserver.exception.PermissionException;
+import com.baifendian.swordfish.webserver.exception.PreFailedException;
+import com.baifendian.swordfish.webserver.exception.ServerErrorException;
+import java.io.File;
+import java.util.Date;
+import java.util.List;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,13 +48,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.io.File;
-import java.util.Date;
-import java.util.List;
-
-import static com.baifendian.swordfish.webserver.utils.ParamVerify.verifyDesc;
-import static com.baifendian.swordfish.webserver.utils.ParamVerify.verifyProjectName;
 
 @Service
 public class ProjectService {

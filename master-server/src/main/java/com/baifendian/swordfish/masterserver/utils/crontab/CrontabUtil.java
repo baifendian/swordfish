@@ -15,19 +15,27 @@
  */
 package com.baifendian.swordfish.masterserver.utils.crontab;
 
+import static com.baifendian.swordfish.masterserver.utils.crontab.CycleHelperFactory.day;
+import static com.baifendian.swordfish.masterserver.utils.crontab.CycleHelperFactory.hour;
+import static com.baifendian.swordfish.masterserver.utils.crontab.CycleHelperFactory.min;
+import static com.baifendian.swordfish.masterserver.utils.crontab.CycleHelperFactory.month;
+import static com.baifendian.swordfish.masterserver.utils.crontab.CycleHelperFactory.week;
+import static com.cronutils.model.CronType.QUARTZ;
+
 import com.baifendian.swordfish.dao.enums.ScheduleType;
 import com.cronutils.model.Cron;
 import com.cronutils.model.definition.CronDefinitionBuilder;
 import com.cronutils.parser.CronParser;
-import org.quartz.CronExpression;
-
 import java.text.ParseException;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.*;
-
-import static com.baifendian.swordfish.masterserver.utils.crontab.CycleHelperFactory.*;
-import static com.cronutils.model.CronType.QUARTZ;
+import java.util.AbstractMap;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import org.quartz.CronExpression;
 
 /**
  * crontab 工具类

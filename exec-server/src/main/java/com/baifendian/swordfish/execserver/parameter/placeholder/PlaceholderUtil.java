@@ -15,12 +15,11 @@
  */
 package com.baifendian.swordfish.execserver.parameter.placeholder;
 
+import java.util.HashMap;
+import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.PropertyPlaceholderHelper;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * 占位符工具类, 我们定义了两种变量:

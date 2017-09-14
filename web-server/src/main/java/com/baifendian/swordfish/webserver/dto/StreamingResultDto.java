@@ -15,6 +15,9 @@
  */
 package com.baifendian.swordfish.webserver.dto;
 
+import static com.baifendian.swordfish.common.job.struct.node.JobType.SPARK_STREAMING;
+import static com.baifendian.swordfish.common.job.struct.node.JobType.STORM;
+
 import com.baifendian.swordfish.common.hadoop.ConfigurationUtil;
 import com.baifendian.swordfish.common.json.JsonOrdinalSerializer;
 import com.baifendian.swordfish.dao.enums.FlowStatus;
@@ -24,14 +27,10 @@ import com.baifendian.swordfish.dao.utils.json.JsonObjectDeserializer;
 import com.fasterxml.jackson.annotation.JsonRawValue;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import org.apache.commons.collections.CollectionUtils;
-
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
-import static com.baifendian.swordfish.common.job.struct.node.JobType.SPARK_STREAMING;
-import static com.baifendian.swordfish.common.job.struct.node.JobType.STORM;
+import org.apache.commons.collections.CollectionUtils;
 
 public class StreamingResultDto {
 

@@ -16,7 +16,6 @@
 package com.baifendian.swordfish.dao.model;
 
 import com.baifendian.swordfish.dao.enums.DbType;
-
 import java.util.Date;
 
 public class DataSource {

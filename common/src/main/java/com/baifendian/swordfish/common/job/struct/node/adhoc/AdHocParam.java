@@ -16,7 +16,6 @@
 package com.baifendian.swordfish.common.job.struct.node.adhoc;
 
 import com.baifendian.swordfish.common.job.struct.node.common.UdfsInfo;
-
 import java.util.List;
 
 /**

@@ -1,8 +1,7 @@
 package com.baifendian.swordfish.dao.mapper.utils;
 
-import org.apache.commons.collections4.CollectionUtils;
-
 import java.util.Collection;
+import org.apache.commons.collections4.CollectionUtils;
 
 public class EqualUtils {
 

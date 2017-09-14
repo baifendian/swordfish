@@ -22,7 +22,6 @@ import com.baifendian.swordfish.dao.enums.NotifyType;
 import com.baifendian.swordfish.dao.enums.ScheduleStatus;
 import com.baifendian.swordfish.dao.model.Schedule;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-
 import java.util.Date;
 import java.util.List;
 

@@ -18,7 +18,6 @@ package com.baifendian.swordfish.execserver.job.impexp.Args;
 import com.baifendian.swordfish.common.enums.WriteHdfsType;
 import com.baifendian.swordfish.common.job.struct.node.impexp.column.HiveColumn;
 import com.fasterxml.jackson.annotation.JsonInclude;
-
 import java.util.List;
 
 /**

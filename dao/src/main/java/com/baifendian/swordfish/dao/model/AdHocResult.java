@@ -16,7 +16,6 @@
 package com.baifendian.swordfish.dao.model;
 
 import com.baifendian.swordfish.dao.enums.FlowStatus;
-
 import java.util.Date;
 
 public class AdHocResult {

@@ -17,9 +17,8 @@ package com.baifendian.swordfish.common.utils;
 
 import com.baifendian.swordfish.common.config.BaseConfig;
 import com.baifendian.swordfish.common.consts.Constants;
-import org.apache.commons.lang3.StringUtils;
-
 import java.util.regex.Pattern;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * 校验工具类

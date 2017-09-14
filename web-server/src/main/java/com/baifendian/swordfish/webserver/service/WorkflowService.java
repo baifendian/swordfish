@@ -15,19 +15,16 @@
  */
 package com.baifendian.swordfish.webserver.service;
 
+import static com.baifendian.swordfish.webserver.utils.ParamVerify.flowNodeParamCheck;
+import static com.baifendian.swordfish.webserver.utils.ParamVerify.verifyDesc;
+import static com.baifendian.swordfish.webserver.utils.ParamVerify.verifyExtras;
+import static com.baifendian.swordfish.webserver.utils.ParamVerify.verifyProxyUser;
+import static com.baifendian.swordfish.webserver.utils.ParamVerify.verifyWorkflowName;
+
 import com.baifendian.swordfish.common.config.BaseConfig;
 import com.baifendian.swordfish.common.hadoop.HdfsClient;
-import com.baifendian.swordfish.common.job.struct.node.BaseParam;
-import com.baifendian.swordfish.common.job.struct.node.BaseParamFactory;
-import com.baifendian.swordfish.common.job.struct.node.impexp.ImpExpBuilder;
-import com.baifendian.swordfish.common.job.struct.node.impexp.ImpExpParam;
-import com.baifendian.swordfish.common.job.struct.node.impexp.reader.FileReader;
-import com.baifendian.swordfish.common.job.struct.node.impexp.setting.Setting;
-import com.baifendian.swordfish.common.job.struct.node.impexp.setting.Speed;
-import com.baifendian.swordfish.common.utils.CommonUtil;
 import com.baifendian.swordfish.common.utils.graph.Graph;
 import com.baifendian.swordfish.dao.FlowDao;
-import com.baifendian.swordfish.dao.enums.NotifyType;
 import com.baifendian.swordfish.dao.mapper.ProjectFlowMapper;
 import com.baifendian.swordfish.dao.mapper.ProjectMapper;
 import com.baifendian.swordfish.dao.model.FlowNode;
@@ -35,18 +32,27 @@ import com.baifendian.swordfish.dao.model.Project;
 import com.baifendian.swordfish.dao.model.ProjectFlow;
 import com.baifendian.swordfish.dao.model.User;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
-import com.baifendian.swordfish.webserver.dto.ExecutorIdDto;
 import com.baifendian.swordfish.webserver.dto.WorkflowData;
 import com.baifendian.swordfish.webserver.dto.WorkflowNodeDto;
-import com.baifendian.swordfish.webserver.exception.*;
+import com.baifendian.swordfish.webserver.exception.BadRequestException;
+import com.baifendian.swordfish.webserver.exception.NotFoundException;
+import com.baifendian.swordfish.webserver.exception.ParameterException;
+import com.baifendian.swordfish.webserver.exception.PermissionException;
+import com.baifendian.swordfish.webserver.exception.ServerErrorException;
 import com.baifendian.swordfish.webserver.service.storage.FileSystemStorageService;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+import java.util.UUID;
 import net.lingala.zip4j.core.ZipFile;
 import net.lingala.zip4j.exception.ZipException;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.fs.permission.FsPermission;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,14 +60,6 @@ import org.springframework.core.io.InputStreamResource;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.text.MessageFormat;
-import java.util.*;
-
-import static com.baifendian.swordfish.common.job.struct.node.JobType.IMPEXP;
-import static com.baifendian.swordfish.webserver.utils.ParamVerify.*;
 
 @Service
 public class WorkflowService {

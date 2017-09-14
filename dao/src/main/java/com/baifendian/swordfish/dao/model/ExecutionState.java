@@ -16,7 +16,6 @@
 package com.baifendian.swordfish.dao.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-
 import java.util.Date;
 
 /**

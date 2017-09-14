@@ -15,9 +15,8 @@
  */
 package com.baifendian.swordfish.dao.mapper;
 
-import org.apache.ibatis.jdbc.SQL;
-
 import java.util.Map;
+import org.apache.ibatis.jdbc.SQL;
 
 public class MasterServerMapperProvider {
 

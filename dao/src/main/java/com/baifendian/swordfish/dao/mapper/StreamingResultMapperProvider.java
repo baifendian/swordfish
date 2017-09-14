@@ -17,13 +17,12 @@ package com.baifendian.swordfish.dao.mapper;
 
 import com.baifendian.swordfish.dao.enums.FlowStatus;
 import com.baifendian.swordfish.dao.mapper.utils.EnumFieldUtil;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.ibatis.jdbc.SQL;
-
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
+import org.apache.ibatis.jdbc.SQL;
 
 public class StreamingResultMapperProvider {
 

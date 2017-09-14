@@ -25,6 +25,8 @@ import com.baifendian.swordfish.masterserver.exception.MasterException;
 import com.baifendian.swordfish.masterserver.master.MasterServiceImpl;
 import com.baifendian.swordfish.masterserver.quartz.QuartzManager;
 import com.baifendian.swordfish.rpc.MasterService;
+import java.net.InetSocketAddress;
+import java.net.UnknownHostException;
 import org.apache.thrift.TProcessor;
 import org.apache.thrift.protocol.TBinaryProtocol;
 import org.apache.thrift.protocol.TProtocolFactory;
@@ -34,8 +36,6 @@ import org.apache.thrift.transport.TTransportFactory;
 import org.quartz.SchedulerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import java.net.InetSocketAddress;
-import java.net.UnknownHostException;
 
 public class MasterThriftServer {
 

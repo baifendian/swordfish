@@ -13,11 +13,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.ResourceUtils;
 
-/**
- * <p>
- *
- * @author : shuanghu
- */
 public class PhoenixUtil {
 
   private static final Logger logger = LoggerFactory.getLogger(PhoenixUtil.class);
@@ -26,6 +21,7 @@ public class PhoenixUtil {
    * phoenix Host
    */
   static private String phoenixHost;
+
   /**
    * phoenix port
    */
@@ -48,7 +44,6 @@ public class PhoenixUtil {
     phoenixPro.put("user", "udp");
     phoenixPro.put("phoenix.query.timeoutMs", "100000");
 
-
     try {
       Properties properties = new Properties();
 
@@ -66,12 +61,12 @@ public class PhoenixUtil {
   public static Connection getPhoenixConnection(String userName, long timeout) {
     Properties phoenixConfPro = new Properties();
     phoenixConfPro.put("phoenix.functions.allowUserDefinedFunctions", "true");
-    phoenixConfPro.put("phoenix.query.timeoutMs", timeout*1000L);
+    phoenixConfPro.put("phoenix.query.timeoutMs", timeout * 1000L);
     phoenixConfPro.put("user", userName);
 
     try {
       Connection connection = DriverManager
-          .getConnection(ThinClientUtil.getConnectionUrl( phoenixHost, port), phoenixConfPro);
+          .getConnection(ThinClientUtil.getConnectionUrl(phoenixHost, port), phoenixConfPro);
 
       //connection.setAutoCommit(true);
       return connection;

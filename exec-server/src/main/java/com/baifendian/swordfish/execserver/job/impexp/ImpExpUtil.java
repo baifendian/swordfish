@@ -15,14 +15,7 @@
  */
 package com.baifendian.swordfish.execserver.job.impexp;
 
-import com.baifendian.swordfish.common.job.struct.node.impexp.column.HiveColumn;
-import com.baifendian.swordfish.execserver.job.impexp.Args.HqlColumn;
 import org.apache.commons.lang.StringUtils;
-import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
-
-import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.List;
 
 
 /**

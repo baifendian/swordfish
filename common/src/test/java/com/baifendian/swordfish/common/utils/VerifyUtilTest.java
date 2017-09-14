@@ -15,9 +15,9 @@
  */
 package com.baifendian.swordfish.common.utils;
 
-import org.junit.Test;
-
 import static junit.framework.TestCase.assertTrue;
+
+import org.junit.Test;
 
 public class VerifyUtilTest {
   @Test

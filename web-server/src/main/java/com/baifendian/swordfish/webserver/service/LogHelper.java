@@ -17,6 +17,10 @@ package com.baifendian.swordfish.webserver.service;
 
 import com.baifendian.swordfish.common.search.EsSearch;
 import com.baifendian.swordfish.webserver.dto.LogResult;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.rest.RestStatus;
@@ -25,11 +29,6 @@ import org.elasticsearch.search.SearchHits;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 @Service
 public class LogHelper {

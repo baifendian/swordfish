@@ -16,6 +16,8 @@
 package com.baifendian.swordfish.dao.datasource;
 
 import com.alibaba.druid.pool.DruidDataSource;
+import java.sql.SQLException;
+import java.util.Arrays;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.SqlSessionFactoryBean;
@@ -31,9 +33,6 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
-
-import java.sql.SQLException;
-import java.util.Arrays;
 
 @Configuration
 @PropertySource({"classpath:dao/data_source.properties"})

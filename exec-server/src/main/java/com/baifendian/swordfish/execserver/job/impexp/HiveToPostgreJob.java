@@ -1,17 +1,14 @@
 package com.baifendian.swordfish.execserver.job.impexp;
 
 import com.baifendian.swordfish.common.job.struct.datasource.DatasourceFactory;
-import com.baifendian.swordfish.common.job.struct.datasource.MysqlDatasource;
 import com.baifendian.swordfish.common.job.struct.datasource.PostgreDatasource;
 import com.baifendian.swordfish.common.job.struct.node.impexp.reader.HiveReader;
-import com.baifendian.swordfish.common.job.struct.node.impexp.writer.MysqlWriter;
 import com.baifendian.swordfish.common.job.struct.node.impexp.writer.PostgreWriter;
 import com.baifendian.swordfish.dao.enums.DbType;
 import com.baifendian.swordfish.dao.model.DataSource;
 import com.baifendian.swordfish.execserver.job.JobProps;
 import com.baifendian.swordfish.execserver.job.impexp.Args.HiveReaderArg;
 import com.baifendian.swordfish.execserver.job.impexp.Args.ImpExpProps;
-import com.baifendian.swordfish.execserver.job.impexp.Args.MysqlWriterArg;
 import com.baifendian.swordfish.execserver.job.impexp.Args.PostgreWriterArg;
 import com.baifendian.swordfish.execserver.job.impexp.Args.ReaderArg;
 import com.baifendian.swordfish.execserver.job.impexp.Args.WriterArg;

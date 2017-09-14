@@ -20,9 +20,8 @@ import com.baifendian.swordfish.dao.enums.FailurePolicyType;
 import com.baifendian.swordfish.dao.enums.NotifyType;
 import com.baifendian.swordfish.dao.enums.ScheduleStatus;
 import com.baifendian.swordfish.dao.mapper.utils.EnumFieldUtil;
-import org.apache.ibatis.jdbc.SQL;
-
 import java.util.Map;
+import org.apache.ibatis.jdbc.SQL;
 
 public class ScheduleMapperProvider {
 

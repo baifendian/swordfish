@@ -15,14 +15,12 @@
  */
 package com.baifendian.swordfish.common.job.struct.datasource;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.stringtemplate.v4.ST;
-
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.text.MessageFormat;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Oracle数据源的参数配置

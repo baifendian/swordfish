@@ -15,16 +15,15 @@
  */
 package com.baifendian.swordfish.dao.datasource;
 
+import static org.junit.Assert.assertEquals;
+
 import com.baifendian.swordfish.dao.mapper.SessionMapper;
 import com.baifendian.swordfish.dao.model.Session;
+import java.util.Date;
+import java.util.UUID;
 import org.apache.ibatis.session.SqlSession;
 import org.junit.BeforeClass;
 import org.junit.Test;
-
-import java.util.Date;
-import java.util.UUID;
-
-import static org.junit.Assert.assertEquals;
 
 public class DatabaseConfigurationTest {
   private static SqlSession sqlSession;

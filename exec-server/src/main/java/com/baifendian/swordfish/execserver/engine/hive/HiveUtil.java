@@ -15,8 +15,6 @@
  */
 package com.baifendian.swordfish.execserver.engine.hive;
 
-import static com.baifendian.swordfish.execserver.job.impexp.ImpExpJobConst.DEFAULT_FILE_TYPE;
-
 import com.baifendian.swordfish.common.hive.metastore.HiveMetaPoolClient;
 import com.baifendian.swordfish.common.hive.service2.HiveService2Client;
 import com.baifendian.swordfish.common.hive.service2.HiveService2ConnectionInfo;

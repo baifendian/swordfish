@@ -16,7 +16,6 @@
 package com.baifendian.swordfish.masterserver.utils;
 
 import com.baifendian.swordfish.rpc.RetResultInfo;
-
 import java.util.List;
 
 public class ResultDetailHelper {

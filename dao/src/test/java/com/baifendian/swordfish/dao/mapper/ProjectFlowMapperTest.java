@@ -15,12 +15,12 @@
  */
 package com.baifendian.swordfish.dao.mapper;
 
+import static junit.framework.TestCase.assertTrue;
+
 import com.baifendian.swordfish.dao.datasource.ConnectionFactory;
 import com.baifendian.swordfish.dao.model.ProjectFlow;
 import org.junit.Before;
 import org.junit.Test;
-
-import static junit.framework.TestCase.assertTrue;
 
 public class ProjectFlowMapperTest {
   ProjectFlowMapper projectFlowMapper;

@@ -15,12 +15,11 @@
  */
 package com.baifendian.swordfish.common.job.struct.datasource;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * mysql数据源的配置参数

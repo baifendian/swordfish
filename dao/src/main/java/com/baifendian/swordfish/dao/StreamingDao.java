@@ -19,9 +19,8 @@ import com.baifendian.swordfish.dao.datasource.ConnectionFactory;
 import com.baifendian.swordfish.dao.mapper.StreamingJobMapper;
 import com.baifendian.swordfish.dao.mapper.StreamingResultMapper;
 import com.baifendian.swordfish.dao.model.StreamingResult;
-import org.springframework.beans.factory.annotation.Autowired;
-
 import java.util.List;
+import org.springframework.beans.factory.annotation.Autowired;
 
 public class StreamingDao extends BaseDao {
   @Autowired

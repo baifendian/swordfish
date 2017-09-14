@@ -15,11 +15,10 @@
  */
 package com.baifendian.swordfish.execserver.parameter.placeholder;
 
-import org.apache.commons.lang.StringUtils;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
+import org.apache.commons.lang.StringUtils;
 
 /**
  * 计算表达式工具类 <p>

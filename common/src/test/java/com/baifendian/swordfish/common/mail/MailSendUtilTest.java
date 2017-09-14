@@ -15,9 +15,8 @@
  */
 package com.baifendian.swordfish.common.mail;
 
-import org.junit.Test;
-
 import java.util.Arrays;
+import org.junit.Test;
 
 public class MailSendUtilTest {
   @Test

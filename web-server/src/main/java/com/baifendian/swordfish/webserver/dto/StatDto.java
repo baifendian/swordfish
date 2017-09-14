@@ -17,7 +17,6 @@ package com.baifendian.swordfish.webserver.dto;
 
 import com.baifendian.swordfish.dao.model.ExecutionState;
 import com.fasterxml.jackson.annotation.JsonInclude;
-
 import java.util.Date;
 
 /**

@@ -16,6 +16,7 @@
 package com.baifendian.swordfish.common.hadoop;
 
 import com.baifendian.swordfish.dao.enums.FlowStatus;
+import java.io.IOException;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.http.HttpEntity;
@@ -31,8 +32,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
 
 public class YarnRestClient {
 

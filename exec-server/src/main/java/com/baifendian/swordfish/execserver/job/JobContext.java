@@ -18,8 +18,6 @@ package com.baifendian.swordfish.execserver.job;
 import com.baifendian.swordfish.dao.model.ExecutionFlow;
 import com.baifendian.swordfish.dao.model.ExecutionNode;
 import com.baifendian.swordfish.dao.model.FlowNode;
-
-import java.util.Map;
 import java.util.concurrent.Semaphore;
 
 public class JobContext {

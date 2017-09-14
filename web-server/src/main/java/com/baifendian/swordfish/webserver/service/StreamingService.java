@@ -15,6 +15,11 @@
  */
 package com.baifendian.swordfish.webserver.service;
 
+import static com.baifendian.swordfish.webserver.utils.ParamVerify.flowNodeParamCheck;
+import static com.baifendian.swordfish.webserver.utils.ParamVerify.verifyDesc;
+import static com.baifendian.swordfish.webserver.utils.ParamVerify.verifyEmails;
+import static com.baifendian.swordfish.webserver.utils.ParamVerify.verifyStreamingName;
+
 import com.baifendian.swordfish.common.job.struct.node.JobType;
 import com.baifendian.swordfish.dao.enums.NotifyType;
 import com.baifendian.swordfish.dao.mapper.ProjectMapper;
@@ -27,19 +32,21 @@ import com.baifendian.swordfish.dao.model.User;
 import com.baifendian.swordfish.dao.model.flow.Property;
 import com.baifendian.swordfish.dao.utils.json.JsonUtil;
 import com.baifendian.swordfish.webserver.dto.StreamingJobDto;
-import com.baifendian.swordfish.webserver.exception.*;
+import com.baifendian.swordfish.webserver.exception.BadRequestException;
+import com.baifendian.swordfish.webserver.exception.NotFoundException;
+import com.baifendian.swordfish.webserver.exception.ParameterException;
+import com.baifendian.swordfish.webserver.exception.PermissionException;
+import com.baifendian.swordfish.webserver.exception.PreFailedException;
+import com.baifendian.swordfish.webserver.exception.ServerErrorException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
-import static com.baifendian.swordfish.webserver.utils.ParamVerify.*;
 
 @Service
 public class StreamingService {
