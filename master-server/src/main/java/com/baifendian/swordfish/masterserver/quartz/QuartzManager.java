@@ -65,7 +65,7 @@ public class QuartzManager {
   /**
    * {@link SchedulerFactory}
    */
-  private static SchedulerFactory schedulerFactory = new StdSchedulerFactory();
+  private static SchedulerFactory schedulerFactory;
 
   /**
    * {@link Scheduler}
@@ -74,9 +74,11 @@ public class QuartzManager {
 
   static {
     try {
+      schedulerFactory =  new StdSchedulerFactory(/*"quartz.properties"*/);
       scheduler = schedulerFactory.getScheduler();
     } catch (SchedulerException e) {
       logger.error(e.getMessage(), e);
+      System.exit(1);
     }
   }
 
