@@ -65,7 +65,7 @@ public class QuartzManager {
   /**
    * {@link SchedulerFactory}
    */
-  private static SchedulerFactory schedulerFactory = new StdSchedulerFactory();
+  private static SchedulerFactory schedulerFactory;
 
   /**
    * {@link Scheduler}
@@ -74,9 +74,11 @@ public class QuartzManager {
 
   static {
     try {
+      schedulerFactory = new StdSchedulerFactory(/*"quartz.properties"*/);
       scheduler = schedulerFactory.getScheduler();
     } catch (SchedulerException e) {
       logger.error(e.getMessage(), e);
+      System.exit(1);
     }
   }
 
@@ -252,8 +254,9 @@ public class QuartzManager {
             if (!oldCronExpression.equalsIgnoreCase(cronExpression)) {
               // 重启触发器
               scheduler.rescheduleJob(triggerKey, trigger);
-              logger.info("RescheduleJob trigger, trigger name: {}, group name: {}, crontab: {}",
-                  triggerName, triggerGroupName, cronExpression);
+              logger.info(
+                  "RescheduleJob trigger, trigger name: {}, group name: {}, crontab: {}, startDate: {}, endDate: {}",
+                  triggerName, triggerGroupName, cronExpression, startDate, endDate);
             }
           } else {
             throw new QuartzException(
@@ -261,6 +264,9 @@ public class QuartzManager {
           }
         } else {
           // 触发器
+          logger.info(
+              "Add trigger, trigger name: {}, group name: {}, crontab: {}, startDate: {}, endDate: {}",
+              triggerName, triggerGroupName, cronExpression, startDate, endDate);
           scheduler.scheduleJob(trigger);
         }
       }
