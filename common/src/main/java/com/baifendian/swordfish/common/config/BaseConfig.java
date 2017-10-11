@@ -105,6 +105,10 @@ public class BaseConfig {
     }
   }
 
+  public static Set<String> getProhibitUserSet() {
+    return prohibitUserSet;
+  }
+
   /**
    * 得到下载到本地的文件名称, 能保证区分开来名称
    */
