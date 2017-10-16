@@ -39,15 +39,11 @@ public class ExecutorCheckThread implements Runnable {
   // 心跳超时时间
   private int timeoutInterval;
 
-  // 工作流数据库接口
-  private FlowDao flowDao;
-
   public ExecutorCheckThread(ExecutorServerManager executorServerManager, int timeoutInterval,
       Submit2ExecutorServerThread submit2ExecutorServerThread, FlowDao flowDao) {
     this.executorServerManager = executorServerManager;
     this.submit2ExecutorServerThread = submit2ExecutorServerThread;
     this.timeoutInterval = timeoutInterval;
-    this.flowDao = flowDao;
   }
 
   @Override
