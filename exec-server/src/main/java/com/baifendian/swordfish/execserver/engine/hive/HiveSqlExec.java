@@ -33,6 +33,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.function.Consumer;
+import org.apache.commons.lang.StringUtils;
 import org.apache.hive.jdbc.HiveConnection;
 import org.apache.hive.jdbc.HiveStatement;
 import org.apache.hive.service.cli.HiveSQLException;
@@ -77,8 +78,11 @@ public class HiveSqlExec {
     this.logHandler = logHandler;
     this.userName = userName;
     this.logger = logger;
-    this.queueSQL = "SET mapreduce.job.queuename="+queue+";";
-
+    if (StringUtils.isEmpty(queue)){
+      queueSQL = null;
+    }else {
+      this.queueSQL = "SET mapreduce.job.queuename=" + queue + ";";
+    }
     this.hiveUtil = DaoFactory.getDaoInstance(HiveUtil.class);
   }
 
@@ -127,7 +131,10 @@ public class HiveSqlExec {
         logThread.setDaemon(true);
         logThread.start();
 
-        sta.execute(queueSQL);
+        // set queue
+        if (queueSQL != null) {
+          sta.execute(queueSQL);
+        }
 
         // 创建临时 function
         if (createFuncs != null) {

@@ -68,7 +68,7 @@ public class EtlSqlJob extends AbstractYarnJob {
         case HIVE:
         case SPARK:
         default: {
-          HiveSqlExec hiveSqlExec = new HiveSqlExec(this::logProcess, props.getProxyUser(), logger);
+          HiveSqlExec hiveSqlExec = new HiveSqlExec(this::logProcess, props.getProxyUser(), logger, props.getQueue());
 
           exitCode = (hiveSqlExec.execute(funcs, execSqls, false, null, null, getRemainTime())) ? 0 : -1;
         }
