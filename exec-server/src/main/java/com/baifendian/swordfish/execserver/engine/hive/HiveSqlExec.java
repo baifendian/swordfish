@@ -68,10 +68,16 @@ public class HiveSqlExec {
    */
   private Logger logger;
 
-  public HiveSqlExec(Consumer<List<String>> logHandler, String userName, Logger logger) {
+  /**
+   * queue name
+   */
+  private String queueSQL;
+
+  public HiveSqlExec(Consumer<List<String>> logHandler, String userName, Logger logger, String queue) {
     this.logHandler = logHandler;
     this.userName = userName;
     this.logger = logger;
+    this.queueSQL = "SET mapreduce.job.queuename="+queue+";";
 
     this.hiveUtil = DaoFactory.getDaoInstance(HiveUtil.class);
   }
@@ -120,6 +126,8 @@ public class HiveSqlExec {
         logThread = new Thread(new JdbcLogRunnable(sta));
         logThread.setDaemon(true);
         logThread.start();
+
+        sta.execute(queueSQL);
 
         // 创建临时 function
         if (createFuncs != null) {
