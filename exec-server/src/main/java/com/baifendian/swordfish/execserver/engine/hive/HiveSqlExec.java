@@ -81,7 +81,7 @@ public class HiveSqlExec {
     if (StringUtils.isEmpty(queue)){
       queueSQL = null;
     }else {
-      this.queueSQL = "SET mapreduce.job.queuename=" + queue + ";";
+      this.queueSQL = "SET mapreduce.job.queuename=" + queue ;
     }
     this.hiveUtil = DaoFactory.getDaoInstance(HiveUtil.class);
   }
@@ -133,6 +133,7 @@ public class HiveSqlExec {
 
         // set queue
         if (queueSQL != null) {
+          logger.info("hive queue : {}", queueSQL);
           sta.execute(queueSQL);
         }
 
