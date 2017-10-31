@@ -33,6 +33,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.function.Consumer;
+import org.apache.commons.lang.StringUtils;
 import org.apache.hive.jdbc.HiveConnection;
 import org.apache.hive.jdbc.HiveStatement;
 import org.apache.hive.service.cli.HiveSQLException;
@@ -68,11 +69,20 @@ public class HiveSqlExec {
    */
   private Logger logger;
 
-  public HiveSqlExec(Consumer<List<String>> logHandler, String userName, Logger logger) {
+  /**
+   * queue name
+   */
+  private String queueSQL;
+
+  public HiveSqlExec(Consumer<List<String>> logHandler, String userName, Logger logger, String queue) {
     this.logHandler = logHandler;
     this.userName = userName;
     this.logger = logger;
-
+    if (StringUtils.isEmpty(queue)){
+      queueSQL = null;
+    }else {
+      this.queueSQL = "SET mapreduce.job.queuename=" + queue ;
+    }
     this.hiveUtil = DaoFactory.getDaoInstance(HiveUtil.class);
   }
 
@@ -120,6 +130,12 @@ public class HiveSqlExec {
         logThread = new Thread(new JdbcLogRunnable(sta));
         logThread.setDaemon(true);
         logThread.start();
+
+        // set queue
+        if (queueSQL != null) {
+          logger.info("hive queue : {}", queueSQL);
+          sta.execute(queueSQL);
+        }
 
         // 创建临时 function
         if (createFuncs != null) {

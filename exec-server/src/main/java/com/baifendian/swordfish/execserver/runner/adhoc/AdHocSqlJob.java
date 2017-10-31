@@ -154,7 +154,7 @@ public class AdHocSqlJob {
       case HIVE:
       case SPARK:
       default: {
-        HiveSqlExec hiveSqlExec = new HiveSqlExec(this::logProcess, props.getProxyUser(), logger);
+        HiveSqlExec hiveSqlExec = new HiveSqlExec(this::logProcess, props.getProxyUser(), logger, props.getQueue());
 
         return hiveSqlExec.execute(funcs, execSqls, true, resultCallback, param.getLimit(),
             Constants.ADHOC_TIMEOUT)

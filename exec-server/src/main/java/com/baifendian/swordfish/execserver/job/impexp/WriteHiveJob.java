@@ -147,7 +147,7 @@ public abstract class WriteHiveJob extends DataXJob {
       execSqls = Arrays.asList(ddl, "SET hive.exec.dynamic.partition.mode=nonstrict", insertSql);
 
       // 执行 sql
-      HiveSqlExec hiveSqlExec = new HiveSqlExec(this::logProcess, props.getProxyUser(), logger);
+      HiveSqlExec hiveSqlExec = new HiveSqlExec(this::logProcess, props.getProxyUser(), logger, props.getQueue());
 
       exitCode = (hiveSqlExec.execute(null, execSqls, false, null, null, getRemainTime())) ? 0 : -1;
 
