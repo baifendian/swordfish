@@ -40,7 +40,7 @@ public class ExecutorCheckThread implements Runnable {
   private int timeoutInterval;
 
   public ExecutorCheckThread(ExecutorServerManager executorServerManager, int timeoutInterval,
-      Submit2ExecutorServerThread submit2ExecutorServerThread, FlowDao flowDao) {
+      Submit2ExecutorServerThread submit2ExecutorServerThread) {
     this.executorServerManager = executorServerManager;
     this.submit2ExecutorServerThread = submit2ExecutorServerThread;
     this.timeoutInterval = timeoutInterval;
