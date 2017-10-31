@@ -245,6 +245,7 @@ public class QuartzManager {
             .endAt(endDate)
             .withSchedule(cronSchedule(cronExpression).withMisfireHandlingInstructionDoNothing())
             .forJob(jobDetail).build();
+
         if (scheduler.checkExists(triggerKey)) {
           if (replace) { // 允许替换的情况
             // 仅在调度周期发生改变时，才更新调度

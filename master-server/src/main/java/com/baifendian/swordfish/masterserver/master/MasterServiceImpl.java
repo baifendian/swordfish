@@ -150,7 +150,7 @@ public class MasterServiceImpl implements Iface {
     // 检测 executor 的线程
     executorCheckThread = new ExecutorCheckThread(executorServerManager,
         MasterConfig.heartBeatTimeoutInterval,
-        flowSubmit2ExecutorThread, flowDao);
+        flowSubmit2ExecutorThread);
 
     // 固定执行 executor 的检测
     checkService.scheduleAtFixedRate(executorCheckThread, 10, MasterConfig.heartBeatCheckInterval,
